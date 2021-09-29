@@ -25,7 +25,8 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
 
     private ConcurrentHashMap<String,TournamentHeader> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex = new ConcurrentHashMap<>();
-    private IndexSet lookupKey;
+    private IndexSet lookupTournamentKey;
+    private IndexSet lookupScheduleKey;
     private Configuration configuration;
     private String reloadKey;
     private GameCluster gameCluster;
@@ -99,26 +100,29 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.configuration = serviceContext.configuration(CONFIG);
-        this.lookupKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
-        this.lookupKey.distributionKey(gameCluster.distributionKey());
+        this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
+        this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
+        this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
+        this.lookupScheduleKey.distributionKey(gameCluster.distributionKey());
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
-        this.dataStore.createIfAbsent(this.lookupKey,true);
+        this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
+        this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.logger = serviceContext.logger(DistributedTournamentServiceProvider.class);
-        reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
+        this.reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
     }
     @Override
     public void waitForData(){
         ArrayList<String> removed = new ArrayList();
-        lookupKey.keySet().forEach((k)->{
+        lookupTournamentKey.keySet().forEach((k)->{
             if(!loadTournamentHeader(k)){
                 removed.add(k);
             }
         });
         removed.forEach((r)->{
-            lookupKey.removeKey(r);
+            lookupTournamentKey.removeKey(r);
         });
-        this.dataStore.update(lookupKey);
+        this.dataStore.update(lookupTournamentKey);
     }
     @Override
     public void start() throws Exception {
@@ -138,14 +142,14 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
             TournamentHeader tournament = new TournamentHeader(schedule);
             tournament.dataStore(dataStore);
             dataStore.create(tournament);
-            lookupKey.addKey(tournament.distributionKey());
-            dataStore.update(lookupKey);
+            lookupTournamentKey.addKey(tournament.distributionKey());
+            dataStore.update(lookupTournamentKey);
             tournament.setup(instanceIndex,this);
             tournamentIndex.put(tournament.distributionKey(),tournament);
             this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
         }
         else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-            
+            dataStore.create(schedule);
         }
         else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
 

@@ -82,6 +82,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public Map<String,Object> toMap(){
         properties.put("s0",scheduleId);
         properties.put("s1",schedule);
+        properties.put("s2",status.name());
         properties.put("1",type);
         properties.put("2",name);
         properties.put("3", TimeUtil.toUTCMilliseconds(startTime));
@@ -95,6 +96,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public void fromMap(Map<String,Object> properties){
         this.scheduleId = (String)properties.get("s0");
         this.schedule = (String)properties.get("s1");
+        this.status = Status.valueOf((String)properties.get("s2"));
         this.type = (String)properties.get("1");
         this.name = (String)properties.get("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
