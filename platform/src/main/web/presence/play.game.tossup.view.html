@@ -28,7 +28,7 @@
     tournament.x = 10;
     app.stage.addChild(tournament);
 
-    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:30,fill:'yellow'});
+    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     messageBox.y = 180;
     messageBox.x = 10;
     app.stage.addChild(messageBox);
@@ -57,7 +57,15 @@
 
     let stats = text_button('Kills',()=>{
         ttc.commit_kills((resp)=>{
-            messageBox.text = JSON.stringify(resp);
+            if(resp.successful){
+                let sm =[];
+                resp.stats.forEach(e=>{
+                    sm.push(JSON.stringify(e));
+                });
+                messageBox.text = sm.join('\n');        
+            }else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     stats.x = window.innerWidth-70;;
@@ -66,7 +74,15 @@
 
     let wins = text_button('Wins',()=>{
         ttc.commit_wins((resp)=>{
-            messageBox.text = JSON.stringify(resp);
+            if(resp.successful){
+                let sm =[];
+                resp.stats.forEach(e=>{
+                    sm.push(JSON.stringify(e));
+                });
+                messageBox.text = sm.join('\n');        
+            }else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     wins.x = window.innerWidth-70;;
@@ -84,7 +100,16 @@
 
     let list = text_button('List',()=>{
         ttc.commit_list((resp)=>{
-            messageBox.text = JSON.stringify(resp);
+            if(resp.successful){
+                let bm = [];
+                resp.board.forEach(e => {
+                    bm.push(JSON.stringify(e));
+                });
+                messageBox.text = bm.join('\n');
+            }
+            else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     list.x = window.innerWidth-70;;

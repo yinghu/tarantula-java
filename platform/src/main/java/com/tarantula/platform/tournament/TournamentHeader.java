@@ -45,7 +45,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private DistributedTournamentServiceProvider tournamentServiceProvider;
 
     public TournamentHeader(Schedule schedule){
-        this.scheduleId = schedule.distributionKey();
+        this.scheduleId = schedule.index();
         this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();

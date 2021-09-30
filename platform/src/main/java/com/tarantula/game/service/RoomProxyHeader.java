@@ -71,7 +71,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
             session.write(board.toJson().toString().getBytes());
         }
         else{
-            session.write(JsonUtil.toSimpleResponse(false,"no tournament").getBytes());
+            session.write(JsonUtil.toSimpleResponse(false,"no tournament joined").getBytes());
         }
     }
     public void close(){

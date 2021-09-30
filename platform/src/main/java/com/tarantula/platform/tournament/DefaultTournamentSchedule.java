@@ -73,6 +73,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
         properties.put("end",TimeUtil.toUTCMilliseconds(end));
         properties.put("maxEntries",maxEntries);
         properties.put("duration",duration);
+        properties.put("index",index);//config key
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -84,6 +85,7 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
         this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("end")).longValue());
         this.maxEntries = ((Number)properties.get("maxEntries")).intValue();
         this.duration = ((Number)properties.get("duration")).intValue();
+        this.index = (String) properties.get("index");
     }
     @Override
     public int getFactoryId() {

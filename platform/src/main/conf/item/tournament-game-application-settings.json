@@ -9,12 +9,11 @@
         "configurationTypeId": "T10",
         "configurationName": "On Demand 10",
         "header": {
-          "type":"T10","name": "10 player","schedule": "onDemand"
+          "type":"T10","name": "10 player","schedule": "onDemand","maxEntriesPerInstance": 10
         },
         "application":
         {
           "durationHours": 2,
-          "maxEntriesPerInstance": 10,
           "durationMinutesPerInstance": 10
         },
         "payload": {},
@@ -24,12 +23,11 @@
         "configurationTypeId": "TD100",
         "configurationName": "Daily 100",
         "header": {
-          "type":"TD100","name": "Daily 100 player","schedule": "daily"
+          "type":"TD100","name": "Daily 100 player","schedule": "daily","maxEntriesPerInstance": 100
         },
         "application":
         {
           "startDate": "2021-10-12",
-          "maxEntriesPerInstance": 100,
           "durationMinutesPerInstance": 30
         },
         "payload": {},
@@ -39,12 +37,11 @@
         "configurationTypeId": "TW100",
         "configurationName": "Weekly 100",
         "header": {
-          "type":"TW100","name": "Weekly 100 player","schedule": "weekly"
+          "type":"TW100","name": "Weekly 100 player","schedule": "weekly","maxEntriesPerInstance": 100
         },
         "application":
         {
           "startDate": "2021-10-12",
-          "maxEntriesPerInstance": 100,
           "durationMinutesPerInstance": 30
         },
         "payload": {},
@@ -54,12 +51,11 @@
         "configurationTypeId": "TM100",
         "configurationName": "Monthly 100",
         "header": {
-          "type":"TM100","name": "Monthly 100 player","schedule": "monthly"
+          "type":"TM100","name": "Monthly 100 player","schedule": "monthly","maxEntriesPerInstance": 100
         },
         "application":
         {
           "startDate": "2021-10-12",
-          "maxEntriesPerInstance": 100,
           "durationMinutesPerInstance": 30
         },
         "payload": {},

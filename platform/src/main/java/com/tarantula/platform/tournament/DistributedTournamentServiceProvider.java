@@ -9,6 +9,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -107,7 +108,9 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
-        this.logger = serviceContext.logger(DistributedTournamentServiceProvider.class);
+        this.lookupTournamentKey.dataStore(this.dataStore);
+        this.lookupScheduleKey.dataStore(this.dataStore);
+        this.logger = this.serviceContext.logger(DistributedTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
     }
@@ -122,7 +125,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         removed.forEach((r)->{
             lookupTournamentKey.removeKey(r);
         });
-        this.dataStore.update(lookupTournamentKey);
+        this.lookupTournamentKey.update();
     }
     @Override
     public void start() throws Exception {
@@ -139,26 +142,12 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public boolean schedule(Tournament.Schedule schedule) {
         boolean scheduled = true;
         if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)) {
-            TournamentHeader tournament = new TournamentHeader(schedule);
-            tournament.dataStore(dataStore);
-            dataStore.create(tournament);
-            lookupTournamentKey.addKey(tournament.distributionKey());
-            dataStore.update(lookupTournamentKey);
-            tournament.setup(instanceIndex,this);
-            tournamentIndex.put(tournament.distributionKey(),tournament);
-            this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+            launch(schedule);
         }
-        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-            dataStore.create(schedule);
-        }
-        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-
-        }
-        else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-
-        }
-        else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-
+        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)||schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)||schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
+            this.dataStore.create(schedule);
+            lookupScheduleKey.addKey(schedule.distributionKey());
+            lookupScheduleKey.update();
         }
         else{
             this.logger.warn("Schedule->"+schedule.schedule()+" not supported");
@@ -178,7 +167,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         TournamentInstanceHeader tournament = this.instanceIndex.get(instanceId);
         return tournament;
     }
-    public List<Tournament.History> history(String systemId){
+    public List<Tournament.History> playerHistory(String systemId){
         ArrayList<Tournament.History> list = new ArrayList<>();
         IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
         indexSet.distributionKey(systemId);
@@ -191,6 +180,15 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
             }
         });
         return list;
+    }
+    public Tournament.Instance tournamentHistory(String tournamentId){//schedule node
+        TournamentInstanceHeader tournament = new TournamentInstanceHeader();
+        tournament.distributionKey(tournamentId);
+        if(!this.dataStore.load(tournament)){
+            return null;
+        }
+        tournament.load();
+        return tournament;
     }
     private boolean loadTournamentHeader(String tournamentId){
         TournamentHeader tournamentHeader = new TournamentHeader();
@@ -206,7 +204,16 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex,this);
         return true;
     }
-
+    private void launch(Tournament.Schedule schedule){
+        TournamentHeader tournament = new TournamentHeader(schedule);
+        tournament.dataStore(dataStore);
+        dataStore.create(tournament);
+        lookupTournamentKey.addKey(tournament.distributionKey());
+        lookupTournamentKey.update();
+        this.tournamentIndex.put(tournament.distributionKey(),tournament);
+        this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+        if(this.distributionTournamentService.localManaged(tournament.distributionKey())) tournament.setup(instanceIndex,this);
+    }
     @Override
     public void reload() {
         logger.warn("reloading tournament");
@@ -216,6 +223,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     }
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
+        this.lookupScheduleKey.keySet().forEach(k->{
+            DefaultTournamentSchedule schedule = new DefaultTournamentSchedule();
+            schedule.distributionKey(k);
+            if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear()==LocalDateTime.now().getDayOfYear()) launch(schedule);
+        });
     }
     void onTournamentStart(TournamentHeader tournamentHeader){
         listeners.forEach((k,l)->l.tournamentStarted(tournamentHeader));

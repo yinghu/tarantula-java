@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 
 import java.util.List;
@@ -20,11 +21,17 @@ public class TournamentModule implements Module , Tournament.Listener {
         if(session.action().equals("onList")){
             session.write(toList().toString().getBytes());
         }
-        else if(session.action().equals("onRace")){
-
+        else if(session.action().equals("onPlayerHistory")){
+            session.write(toHistory(this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
         }
-        else if(session.action().equals("onHistory")){
-            session.write(toHistory(this.tournamentServiceProvider.history(session.systemId())).toString().getBytes());
+        else if(session.action().equals("onTournamentHistory")){
+            Tournament.Instance ht = this.tournamentServiceProvider.tournamentHistory(session.name());
+            if(ht!=null){
+                session.write(ht.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"tournament not existed->"+session.name()).getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");

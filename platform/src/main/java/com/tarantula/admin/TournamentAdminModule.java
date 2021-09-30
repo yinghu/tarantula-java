@@ -1,5 +1,6 @@
 package com.tarantula.admin;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -36,7 +37,8 @@ public class TournamentAdminModule implements Module {
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
             boolean loaded = applicationPreSetup.load(context,desc,app);
             if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
-                Tournament.Schedule schedule = app.parse();
+                JsonObject config = JsonUtil.parse(payload);
+                Tournament.Schedule schedule = app.schedule(config.getAsJsonObject("application"));
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
                 GameServiceProvider tsp = this.context.serviceProvider(serviceName);
                 boolean scheduled = tsp.tournamentServiceProvider().register(schedule);

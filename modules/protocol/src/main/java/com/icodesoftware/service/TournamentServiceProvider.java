@@ -19,5 +19,6 @@ public interface TournamentServiceProvider extends ServiceProvider{
 
     Tournament.RaceBoard list(String instanceId);
 
-    List<Tournament.History> history(String systemId);
+    List<Tournament.History> playerHistory(String systemId);
+    Tournament.Instance tournamentHistory(String tournamentId);
 }

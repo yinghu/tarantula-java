@@ -9,7 +9,7 @@
       "configurationTypeId": "A1",
       "configurationName": "Achievement1",
       "header": {
-        "name": "Achievement1"
+        "name": "Achievement1","goal": 30
       },
       "application": {},
       "payload": {},
@@ -19,7 +19,7 @@
       "configurationTypeId": "A1",
       "configurationName": "Achievement2",
       "header": {
-        "name": "Achievement2"
+        "name": "Achievement2","goal": 20
       },
       "application": {},
       "payload": {},
