@@ -142,12 +142,11 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     public boolean schedule(Tournament.Schedule schedule) {
         boolean scheduled = true;
         if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)) {
+            createSchedule(schedule);
             launch(schedule);
         }
         else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)||schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)||schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-            this.dataStore.create(schedule);
-            lookupScheduleKey.addKey(schedule.distributionKey());
-            lookupScheduleKey.update();
+            createSchedule(schedule);
         }
         else{
             this.logger.warn("Schedule->"+schedule.schedule()+" not supported");
@@ -182,8 +181,9 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         return list;
     }
     public Tournament.Instance tournamentHistory(String tournamentId){//schedule node
-        TournamentInstanceHeader tournament = new TournamentInstanceHeader();
+        TournamentHistoryRecord tournament = new TournamentHistoryRecord();
         tournament.distributionKey(tournamentId);
+        tournament.dataStore(dataStore);
         if(!this.dataStore.load(tournament)){
             return null;
         }
@@ -210,9 +210,16 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         dataStore.create(tournament);
         lookupTournamentKey.addKey(tournament.distributionKey());
         lookupTournamentKey.update();
+        lookupScheduleKey.removeKey(schedule.distributionKey());
+        lookupScheduleKey.update();
         this.tournamentIndex.put(tournament.distributionKey(),tournament);
         this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
         if(this.distributionTournamentService.localManaged(tournament.distributionKey())) tournament.setup(instanceIndex,this);
+    }
+    private void createSchedule(Tournament.Schedule schedule){
+        this.dataStore.create(schedule);
+        lookupScheduleKey.addKey(schedule.distributionKey());
+        lookupScheduleKey.update();
     }
     @Override
     public void reload() {

@@ -117,6 +117,11 @@
     document.querySelector('#tx-tournament-history').onclick=()=>{
         TARA_API.onGet(TARA_API.query().serviceTag,'onPlayerHistory',"",(resp)=>{
             console.log(resp);
+            resp.onList.forEach(h=>{
+                TARA_API.onGet(TARA_API.query().serviceTag,'onTournamentHistory',h.tournamentId,(t)=>{
+                    console.log(t);
+                });
+            });
         });
     };
     document.querySelector('#tx-game-service-tournament-close').onclick=()=>{
