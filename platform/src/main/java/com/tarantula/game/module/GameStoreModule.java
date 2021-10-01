@@ -7,7 +7,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ItemApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameStoreModule implements Module,Configurable.Listener<Application>{
@@ -17,7 +20,7 @@ public class GameStoreModule implements Module,Configurable.Listener<Application
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            session.write(toJson().toString().getBytes());
+            session.write(new ItemApplicationContext(true,"shop list",toList()).toJson().toString().getBytes());
         }
         if(session.action().equals("onBuy")){
             Application item = itemList.get(session.name());
@@ -42,15 +45,10 @@ public class GameStoreModule implements Module,Configurable.Listener<Application
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
-    private JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        itemList.forEach((k,v)->{
-            alist.add(v.configurableHeader().toJson());
-        });
-        jsonObject.add("itemList",alist);
-        return jsonObject;
+    private List<Application> toList(){
+        ArrayList<Application> arrayList = new ArrayList<>();
+        itemList.forEach((k,v)->arrayList.add(v));
+        return arrayList;
     }
 
 }

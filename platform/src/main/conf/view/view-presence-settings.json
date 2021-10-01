@@ -14,6 +14,7 @@
     {"type": "play.game.tossup.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.statistics","moduleResourceFile": "presence/live.game.service.statistics.view.html"},
+    {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.achievement.view.html"},
 
     {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.leaderboard.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},

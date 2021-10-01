@@ -57,7 +57,7 @@ public class TournamentModule implements Module , Tournament.Listener {
     }
     public void tournamentClosed(Tournament tournament){
         this.context.log("tournament closed->"+tournament.distributionKey(),OnLog.WARN);
-
+        tournaments.remove(tournament.distributionKey());
     }
     public void tournamentEnded(Tournament tournament){
         this.context.log("tournament ended->"+tournament.distributionKey(),OnLog.WARN);

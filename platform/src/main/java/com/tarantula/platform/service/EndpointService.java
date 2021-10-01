@@ -81,10 +81,10 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         gameServerEventHandler.start();
         rMap.put(gameServerEventHandler.name(),gameServerEventHandler);
 
-        DevelopmentEventHandler developmentEventHandler = new DevelopmentEventHandler();
-        developmentEventHandler.setup(this.tarantulaContext);
-        developmentEventHandler.start();
-        rMap.put(developmentEventHandler.name(),developmentEventHandler);
+        //DevelopmentEventHandler developmentEventHandler = new DevelopmentEventHandler();
+        //developmentEventHandler.setup(this.tarantulaContext);
+        //developmentEventHandler.start();
+        //rMap.put(developmentEventHandler.name(),developmentEventHandler);
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
