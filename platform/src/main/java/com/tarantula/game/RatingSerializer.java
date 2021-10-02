@@ -14,7 +14,6 @@ public class RatingSerializer implements JsonSerializer<Rating> {
         JsonObject jo = new JsonObject();
         jo.addProperty("rank",response.rank);
         jo.addProperty("xp",response.xp);
-        jo.addProperty("elo",response.elo);
         jo.addProperty("successful",true);
         return jo;
     }

@@ -24,7 +24,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
     public int arenaLevel =1; //level of arena
     public double arenaXp =0;  //xp of arena level
 
-    public double elo = 1200; //elo service
     public int csw = 0; //consecutive winnings
 
 
@@ -60,7 +59,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
         this.properties.put("3",arenaLevel);
         this.properties.put("4",arenaXp);
         this.properties.put("5",xp);
-        this.properties.put("6",elo);
         this.properties.put("7",csw);
         return this.properties;
     }
@@ -71,7 +69,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
         this.arenaLevel =((Number)properties.get("3")).intValue();
         this.arenaXp = ((Number)properties.get("4")).doubleValue();
         this.xp = ((Number)properties.get("5")).doubleValue();
-        this.elo = ((Number)properties.get("6")).doubleValue();
         this.csw =((Number)properties.get("7")).intValue();
     }
 

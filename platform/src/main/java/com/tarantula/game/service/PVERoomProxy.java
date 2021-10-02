@@ -52,6 +52,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.tag = application.tag();
         stub.rating = rating;
         stub.statistics = gameServiceProvider.statistics(session.systemId());
+        stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());
         activeRoomIndex.put(room.distributionKey(),room);
         return stub;
     }

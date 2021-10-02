@@ -29,7 +29,6 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int CONFIGURABLE_HEADER_CID = 12;
 
-
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){

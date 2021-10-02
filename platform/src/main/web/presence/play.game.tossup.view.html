@@ -23,13 +23,18 @@
     room.x = 10;
     app.stage.addChild(room);
 
+    let dailyLogin = new PIXI.Text('DailyLogin=>'+JSON.stringify(TARA_API.query().stub.dailyLogin),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
+    dailyLogin.y = 140;
+    dailyLogin.x = 10;
+    app.stage.addChild(dailyLogin);
+
     let tournament = new PIXI.Text('Tournament=>'+JSON.stringify(TARA_API.query().stub.tournament),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
-    tournament.y = 140;
+    tournament.y = 180;
     tournament.x = 10;
     app.stage.addChild(tournament);
 
     let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
-    messageBox.y = 180;
+    messageBox.y = 220;
     messageBox.x = 10;
     app.stage.addChild(messageBox);
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 

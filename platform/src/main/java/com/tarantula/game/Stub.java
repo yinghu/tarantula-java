@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.presence.DailyLoginTrack;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class Stub extends PlayerGameObject {
     public GameZone zone;
     public String tag;
     public Rating rating;
+    public DailyLoginTrack dailyLogin;
     public Statistics statistics;
 
     public Stub(){
@@ -33,6 +35,7 @@ public class Stub extends PlayerGameObject {
         jo.add("arena", room.arena().toJson());
         jo.add("room",room.toJson());
         jo.add("rating",rating.toJson());
+        if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(room.tournamentEnabled()){
             jo.add("tournament",room.tournament().toJson());
         }

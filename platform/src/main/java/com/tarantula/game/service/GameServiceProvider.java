@@ -7,6 +7,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
@@ -133,7 +134,9 @@ public class GameServiceProvider implements ServiceProvider{
     public Statistics statistics(String systemId){
         return playerDataProvider.statistics(systemId,leaderBoardProvider);
     }
-
+    public DailyLoginTrack dailyLogin(String systemId){
+        return playerDataProvider.checkDailyLogin(systemId);
+    }
     public InventoryServiceProvider inventoryServiceProvider(){
         return this.inventoryServiceProvider;
     }

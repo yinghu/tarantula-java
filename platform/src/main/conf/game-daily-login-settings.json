@@ -1,0 +1,5 @@
+{
+  "waitingTimeHours": 5,
+  "maxConsecutiveDays": 7,
+  "maxRewardTiers": 7
+}

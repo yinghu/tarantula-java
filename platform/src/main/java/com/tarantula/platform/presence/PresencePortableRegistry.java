@@ -12,6 +12,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int PRESENCE_CID = 1;
 
+    public static final int DAILY_LOGIN_TRACK_CID = 2;
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -23,8 +24,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
             case PRESENCE_CID:
                 pt = new PresenceIndex();
                 break;
-
-
+            case DAILY_LOGIN_TRACK_CID:
+                pt = new DailyLoginTrack();
+                break;
             case GAME_CLUSTER_CID:
                 pt = new GameCluster();
                 break;
