@@ -7,7 +7,6 @@
 ### 5. Distributing and scaling persistent connections such as TCP socket, web socket, or UDP. 
 ### 6. Providing lightweight mobile friendly integration platform. 
 
-[Platform Architecture/Design Document](doc/gec-summary.pdf)
 
 # System Features
 ### 1. Global Unique Key Cluster Indexing Support 
@@ -23,15 +22,6 @@
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
 ### 12. Hot Runtime Deployment Support 
 
-[Programming Server Module API](doc/gec-module-api.md)
-
-[Programming Client AJAX HTTP API](doc/gec-client-api.md)
-
-[Programming Client WEB SOCKET API](doc/gec-client-websocket.md)
-
-[Programming Client UDP API](doc/gec-client-udp.md)
-
-[Scalling UDP and WEB SOCKET Cluster](doc/gec-front-scaling.md)
 
 ## How To Use
 1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
