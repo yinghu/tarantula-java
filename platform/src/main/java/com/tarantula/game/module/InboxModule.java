@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 
-public class DailyGiveAwayModule implements Module {
+public class InboxModule implements Module {
     private ApplicationContext context;
 
     @Override
@@ -16,7 +16,7 @@ public class DailyGiveAwayModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Daily giveaway module started", OnLog.WARN);
+        this.context.log("Inbox module started", OnLog.WARN);
     }
     @Override
     public void clear(){

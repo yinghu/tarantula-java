@@ -3,7 +3,7 @@ class TossUp{
     constructor(){   
     }
     commit_config(){
-        TARA_API.onGet('tossup/cfg','onList','category/abilities',(resp)=>{
+        TARA_API.onGet('tossup/item','onList','category/abilities',(resp)=>{
             console.log(resp);
         });
     }
@@ -22,7 +22,7 @@ class TossUp{
         });
     }
     commit_kills(callback){
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}],achievement:{goal:'kill_boss',progress:1}}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
             callback(resp);    
         });    
@@ -36,6 +36,12 @@ class TossUp{
     commit_score(callback){
         let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','tournament',payload,(resp)=>{
+            callback(resp);    
+        });    
+    }
+    commit_achievement(callback){
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],achievement:{goal:'kill_boss',progress:1},tournament:{score:100}}; 
+        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','achievement',payload,(resp)=>{
             callback(resp);    
         });    
     }

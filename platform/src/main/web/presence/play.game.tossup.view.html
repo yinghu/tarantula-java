@@ -35,7 +35,7 @@
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
     
-    let exit = text_button('EXIT',()=>{
+    let exit = text_button('EXIT',64,64,()=>{
         ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);
             m3.innerHTML="";
@@ -46,7 +46,7 @@
     exit.y = 6;
     app.stage.addChild(exit);
    
-    let rating = text_button('Rating',()=>{
+    let rating = text_button('Rating',64,64,()=>{
         ttc.commit_rating((resp)=>{
             messageBox.text = JSON.stringify(resp);
         });
@@ -55,7 +55,7 @@
     rating.y = 400;
     app.stage.addChild(rating);
 
-    let stats = text_button('Kills',()=>{
+    let stats = text_button('Kills',64,64,()=>{
         ttc.commit_kills((resp)=>{
             if(resp.successful){
                 let sm =[];
@@ -72,7 +72,7 @@
     stats.y = 480;
     app.stage.addChild(stats);
 
-    let wins = text_button('Wins',()=>{
+    let wins = text_button('Wins',64,64,()=>{
         ttc.commit_wins((resp)=>{
             if(resp.successful){
                 let sm =[];
@@ -89,7 +89,9 @@
     wins.y = 560;
     app.stage.addChild(wins);
 
-    let score = text_button('Score',()=>{
+
+
+    let score = text_button('Score',64,64,()=>{
         ttc.commit_score((resp)=>{
             messageBox.text = JSON.stringify(resp);
         });
@@ -98,7 +100,7 @@
     score.y = 640;
     app.stage.addChild(score);
 
-    let list = text_button('List',()=>{
+    let list = text_button('List',64,64,()=>{
         ttc.commit_list((resp)=>{
             if(resp.successful){
                 let bm = [];
@@ -116,21 +118,29 @@
     list.y = 720;
     app.stage.addChild(list);
 
+    let goal = text_button('Achievement',120,64,()=>{
+        ttc.commit_achievement((resp)=>{
+            messageBox.text = JSON.stringify(resp);
+        });
+    });
+    goal.x = window.innerWidth-128;;
+    goal.y = 800;
+    app.stage.addChild(goal);
 
 
-    function text_button(cap,cmd){
+    function text_button(cap,w,h,cmd){
         let container = new PIXI.Container();
         let rect = new PIXI.Graphics();
         rect.lineStyle(4, 0xFF3300, 1);
         rect.beginFill(0x66CCFF);
-        rect.drawRect(0, 0, 64, 64);
+        rect.drawRect(0, 0, w,h);
         rect.endFill();
         rect.interactive = true;
         rect.buttonMode = true;
         rect.on('pointerdown',cmd);
         let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
-        txt.x = (64-txt.width)/2;
-        txt.y = (64-txt.height)/2;
+        txt.x = (w-txt.width)/2;
+        txt.y = (h-txt.height)/2;
         container.addChild(rect);
         container.addChild(txt);
         return container;

@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.achievement.AchievementServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -24,6 +25,7 @@ public class GameServiceProvider implements ServiceProvider{
     private LeaderBoardProvider leaderBoardProvider;
     private InventoryServiceProvider inventoryServiceProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
+    private AchievementServiceProvider achievementServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
@@ -66,6 +68,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
+        this.achievementServiceProvider = new AchievementServiceProvider(gameCluster);
+        this.achievementServiceProvider.waitForData();
+        this.achievementServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
@@ -142,10 +147,11 @@ public class GameServiceProvider implements ServiceProvider{
     public ItemConfigurationServiceProvider configurationServiceProvider(){
         return this.configurationServiceProvider;
     }
-    //public boolean onRegister(Configurable configurable){
-        //return configurationServiceProvider.onRegister(configurable);
-    //}
 
+    //Achievement service provider
+    public AchievementServiceProvider achievementServiceProvider(){
+        return achievementServiceProvider;
+    }
     //tournament service provider hook calls
     public TournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
