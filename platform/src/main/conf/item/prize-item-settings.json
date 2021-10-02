@@ -1,47 +1,109 @@
 {
-  "type": "commodity",
+  "type": "item",
   "category": "prize",
   "version": "1.0",
   "description": "prize item template list",
   "itemList":
   [
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank1",
         "header": {
-          "name": "Chip Prize"
+          "name": "Prize1","rank": 1
         },
-        "application":
-        {
-          "rank": 1,
-          "prize": 100000
-        },
+        "application":{},
         "payload": {},
         "reference": []
       },
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank2",
         "header": {
-          "name": "Chip Prize"
+          "name": "Prize2","rank": 2
         },
-        "application":
-        {
-          "rank": 2,
-          "prize": 70000
-        },
+        "application":{},
         "payload": {},
         "reference": []
       },
       {
+        "configurationTypeId": "Winner",
         "configurationName": "Rank3",
         "header": {
-          "name": "Chip Prize"
+          "name": "Prize3","rank": 3
         },
-        "application":
-        {
-          "prize": 50000
-        },
+        "application":{},
         "payload": {},
         "reference": []
-      }
+      },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank4",
+      "header": {
+        "name": "Prize4","rank": 4
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank5",
+      "header": {
+        "name": "Prize5","rank": 5
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank6",
+      "header": {
+        "name": "Prize6","rank": 6
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank7",
+      "header": {
+        "name": "Prize7","rank": 7
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank8",
+      "header": {
+        "name": "Prize8","rank": 8
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank9",
+      "header": {
+        "name": "Prize9","rank": 9
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "Winner",
+      "configurationName": "Rank10",
+      "header": {
+        "name": "Prize10","rank": 10
+      },
+      "application":{},
+      "payload": {},
+      "reference": []
+    }
   ]
 }

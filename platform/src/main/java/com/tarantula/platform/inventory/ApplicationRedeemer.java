@@ -1,18 +1,19 @@
 package com.tarantula.platform.inventory;
 
 import com.icodesoftware.Configurable;
-import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
 
 
-public class InventoryRedeemer extends ConfigurableObject {
+public class ApplicationRedeemer extends ConfigurableObject{
 
     protected String systemId;
+    protected InventoryServiceProvider inventoryServiceProvider;
 
-    public InventoryRedeemer(String systemId){
+    public ApplicationRedeemer(String systemId, InventoryServiceProvider inventoryServiceProvider){
         this.systemId = systemId;
+        this.inventoryServiceProvider = inventoryServiceProvider;
     }
-    public InventoryRedeemer(String systemId,InventoryRedeemer inventoryRedeemer){
+    public ApplicationRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
         this.systemId = systemId;
         this.configurationType = inventoryRedeemer.configurationType;
         this.configurationTypeId = inventoryRedeemer.configurationTypeId;
@@ -23,13 +24,15 @@ public class InventoryRedeemer extends ConfigurableObject {
         this.application = inventoryRedeemer.application;
         this.payload = inventoryRedeemer.payload;
         this.reference = inventoryRedeemer.reference;
+        this.inventoryServiceProvider = inventoryRedeemer.inventoryServiceProvider;
         this.distributionKey(inventoryRedeemer.distributionKey());
     }
 
 
     public  void redeem(){
+        if(!this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)) return;
         reference.forEach((ref)->{
-            InventoryRedeemer inventoryRedeemer = new InventoryRedeemer(systemId);
+            ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.inventoryServiceProvider);
             inventoryRedeemer.distributionKey(ref.getAsString());
             if(dataStore.load(inventoryRedeemer)){
                 if(inventoryRedeemer.configurationType().equals(Configurable.ASSET_CONFIG_TYPE)){
@@ -43,10 +46,15 @@ public class InventoryRedeemer extends ConfigurableObject {
                     commodityRedeemer.redeem();
                 }
                 else if(inventoryRedeemer.configurationType().equals(Configurable.ITEM_CONFIG_TYPE)){
-                    inventoryRedeemer.dataStore(dataStore);
-                    inventoryRedeemer.redeem();
+                    ItemRedeemer itemRedeemer = new ItemRedeemer(systemId,inventoryRedeemer);
+                    itemRedeemer.dataStore(dataStore);
+                    itemRedeemer.redeem();
                 }
             }
         });
+    }
+
+    public double amount() {
+        return application.has("amount")?application.get("amount").getAsDouble():0;
     }
 }

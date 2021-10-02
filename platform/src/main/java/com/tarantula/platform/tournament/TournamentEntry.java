@@ -7,9 +7,11 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
@@ -37,6 +39,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public double score(double delta) {
         score = score+delta;
         if(delta>0){
+            timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
             this.update();
         }
         return score;
@@ -44,6 +47,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     @Override
     public int rank(){
         return rank;
+    }
+    void rank(int rank){
+        this.rank = rank;
     }
     public Map<String,Object> toMap(){
         properties.put("1",systemId);

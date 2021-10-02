@@ -1,10 +1,10 @@
 package com.tarantula.platform.presence;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
@@ -66,7 +66,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         //public lobby access by page number
         else if(session.action().equals("onLobbyList")){
-            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             int page = Integer.parseInt(onAccess.property("page").toString());
             LiveGame liveGame = liveGameContext.onIndex(page);
@@ -77,7 +76,20 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
                 session.write(liveGame.toJson().toString().getBytes());
             }else{
-                session.write(toMessage("no lobby data",false).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"no lobby data").getBytes());
+            }
+        }
+        else if(session.action().equals("onLobby")){
+            if(liveGameContext.onIndex(session.name())){
+                LiveGame liveGame = new LiveGame(0,session.name());
+                liveGame.lobbyList = new ArrayList<>();
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
+                session.write(liveGame.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,session.name()+" not available").getBytes());
             }
         }
         else if(session.action().equals("onAddEmail")){
@@ -101,7 +113,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if(session.action().equals("onRequestCode")){
             User u = user(session.systemId());
             if(u.activated()){
-                session.write(toMessage("Email already has validated",false).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"Email already has validated").getBytes());
             }
             else{
                 if(u.emailAddress()!=null&&u.emailAddress.contains("@")){
@@ -113,7 +125,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                     }
                 }
                 else{
-                    session.write(toMessage("No email available",false).toString().getBytes());
+                    session.write(JsonUtil.toSimpleResponse(false,"No email available").getBytes());
                 }
             }
         }
@@ -124,10 +136,10 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 User u = user(session.systemId());
                 u.activated(true);
                 userDs.update(u);
-                session.write(toMessage("validated email",true).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(true,"validated email").getBytes());
             }
             else{
-                session.write(toMessage("wrong validation code",true).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"wrong validation code").getBytes());
             }
         }
         else if(session.action().equals("onCheckRole")){
@@ -140,7 +152,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 session.write(this.builder.create().toJson(pc).getBytes());
             }
             else{
-                session.write(toMessage("invalid role upgrade for ["+role+"] from ["+u.role+"]",false).toString().getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid role upgrade for ["+role+"] from ["+u.role+"]").getBytes());
             }
         }
         else if(session.action().equals("onUpgradeAccountRole")){
@@ -178,12 +190,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes());
         }
-    }
-    private JsonObject toMessage(String msg, boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms;
     }
     private User user(String systemId){
         User user = new User();

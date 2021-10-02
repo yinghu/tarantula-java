@@ -2,10 +2,11 @@
   "type": "application",
   "category": "store",
   "version": "1.0",
-  "description": "robot item template list",
+  "description": "store application template list",
   "itemList":
   [
     {
+      "configurationTypeId": "S10",
       "configurationName": "Bot Pack",
       "header": {
         "Name": "Bot Pack"
@@ -15,6 +16,7 @@
       "reference": []
     },
     {
+      "configurationTypeId": "S20",
       "configurationName": "Gun Pack",
       "header": {
         "Name": "Abilities Pack"

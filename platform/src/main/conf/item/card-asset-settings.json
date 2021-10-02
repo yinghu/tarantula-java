@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "DisplayCard",
         "configurationName": "MagnetAbilityCard",
         "header": {
           "Name": "Magnet",

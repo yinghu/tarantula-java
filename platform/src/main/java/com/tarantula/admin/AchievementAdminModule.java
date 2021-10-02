@@ -5,12 +5,8 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemContext;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -25,17 +21,23 @@ public class AchievementAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("category/"+app.category()));
-            session.write(new ItemContext(true,items.size()>0?"Configure achievement item":"no items configured",items).toJson().toString().getBytes());
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("category/"+app.category()));
+            session.write(new ItemHeaderContext(true,items.size()>0?"Configure achievement item":"no items configured",items).toJson().toString().getBytes());
         }
-        else if (session.action().equals("onSave")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-            GameServiceProvider gameServiceProvider = this.context.serviceProvider(serviceName);
-            ApplicationConfiguration app = new ApplicationConfiguration();
-            app.configurationType(this.context.descriptor().category());
-            gameServiceProvider.configurationServiceProvider().register(app);
-            session.write(JsonUtil.toSimpleResponse(true,serviceName).getBytes());
+        else if (session.action().equals("onRegister")){
+            String[] ks = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
+            ConfigurableObject app = new ConfigurableObject();
+            app.distributionKey(ks[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+                session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
+                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                gameServiceProvider.configurationServiceProvider().register(app.setup());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to register achievement item").getBytes());
+            }
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

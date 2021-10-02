@@ -62,7 +62,7 @@
                 <name>Item</name>
                 <type>application</type>
                 <category>item</category>
-                <tag>game/cfg</tag>
+                <tag>game/item</tag>
                 <module-name>com.tarantula.game.module.GameItemModule</module-name>
             </application>
             <application>

@@ -100,6 +100,7 @@
     });
     document.querySelectorAll('.tx-live-game-inventory-bar').forEach((a)=>{
         a.onclick=()=>{
+            reset_live_game_inventory_list();
             let cat = a.getAttribute('tx-inventory-category');
             TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',cat,(resp)=>{
             editor.set(resp);
@@ -107,7 +108,7 @@
                 resp.itemList.forEach((gi,i)=>{
                     document.querySelector('#tx-live-game-inventory-list-type-'+i).innerHTML = gi.typeId;
                     document.querySelector('#tx-live-game-inventory-list-name-'+i).innerHTML = gi.name;
-                    document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',(resp.name+'#'+gi.inventoryId));
+                    document.querySelector('#tx-live-game-inventory-list-api-'+i).setAttribute('tx-inventory-id',(resp.type+'#'+gi.inventoryId));
                     document.querySelector('#tx-live-game-inventory-list-'+i).style.display = 'block';    
                 });
             });        
@@ -139,5 +140,12 @@
     };
     function reset_live_game_inventory_bar(){
         document.querySelectorAll('.tx-live-game-inventory-bar').forEach((a)=>{a.style.display ='none';});
+    }
+    function reset_live_game_inventory_list(){
+        document.querySelector('#tx-live-game-inventory-list-0').style.display = 'none'; 
+        document.querySelector('#tx-live-game-inventory-list-1').style.display = 'none'; 
+        document.querySelector('#tx-live-game-inventory-list-2').style.display = 'none'; 
+        document.querySelector('#tx-live-game-inventory-list-3').style.display = 'none'; 
+        document.querySelector('#tx-live-game-inventory-list-4').style.display = 'none'; 
     }
 </script>

@@ -38,6 +38,11 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             });
             pc.add("roleList",rlist);
         }
+        if(presenceContext.gameList!=null){
+            JsonArray glist = new JsonArray();
+            presenceContext.gameList.forEach(s->glist.add(s));
+            pc.add("gameList",glist);
+        }
         if(presenceContext.googleClientId!=null){
             pc.addProperty("googleClientId",presenceContext.googleClientId);
         }

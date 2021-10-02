@@ -12,6 +12,9 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -125,6 +128,12 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
         jsonObject.addProperty("close",close.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("end",end.format(DateTimeFormatter.ISO_DATE_TIME));
         return jsonObject;
+    }
+    List<TournamentEntry> end(){
+        ArrayList<TournamentEntry> rankedList = new ArrayList<>();
+        entryIndex.forEach((k,e)->rankedList.add(e));
+        Collections.sort(rankedList,new TournamentEntryComparator());
+        return rankedList;
     }
 
 }

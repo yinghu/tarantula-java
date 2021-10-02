@@ -34,7 +34,6 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
 
     @Override
     public <T extends Configurable> void register(T config) {
-
         distributionItemService.register(name,config.configurationCategory(),config.distributionKey());
     }
 

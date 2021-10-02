@@ -66,6 +66,7 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
         JsonArray plist = new JsonArray();
         onBoard.forEach((v)->{
             plist.add(v.toJson());

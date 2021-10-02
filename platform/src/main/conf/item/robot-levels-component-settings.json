@@ -6,6 +6,7 @@
   "itemList":
   [
       {
+        "configurationTypeId": "RobotLevels",
         "configurationName": "RobotLevels",
         "header": {
         },

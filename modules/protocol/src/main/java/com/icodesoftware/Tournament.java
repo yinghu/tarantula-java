@@ -6,13 +6,18 @@ import java.util.List;
 public interface Tournament extends Configurable {
 
     String ENTRY_LABEL = "TEE";
+    String HISTORY_LABEL = "History";
+
 
     String DAILY_SCHEDULE = "daily";
+    String WEEKLY_SCHEDULE = "weekly";
+    String MONTHLY_SCHEDULE = "monthly";
     String ON_DEMAND_SCHEDULE = "onDemand";
 
     enum Status{
         SCHEDULED,STARTED,CLOSED,ENDED
     }
+    String schedule();
     String type();
     void type(String type);
     String name();
@@ -42,22 +47,24 @@ public interface Tournament extends Configurable {
 
         RaceBoard raceBoard();
     }
+    interface Prize extends Configurable{
+        int rank();
+    }
     interface RaceBoard extends Configurable{
         int size();
         List<Entry> list();
+    }
+    interface History extends Configurable{
+        String tournamentId();
+        int rank();
+        double score();
+        LocalDateTime dateTime();
     }
     interface Listener{
         default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
-
-        default void onStarted(Instance instance){}
-        default void onClosed(Instance instance){}
-        default void onEnded(Instance instance){}
-
-        default void onCreated(Entry entry){}
-        default void onUpdated(Entry entry){}
     }
 
     interface Schedule extends Configurable{

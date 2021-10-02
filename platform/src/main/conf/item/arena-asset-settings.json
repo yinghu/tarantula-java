@@ -6,7 +6,8 @@
   "itemList":
   [
       {
-        "configurationName": "Arena",
+        "configurationTypeId": "Arena",
+        "configurationName": "BumpCity",
         "header": {
           "Name": "BumpCity",
           "Description": "Amber2",

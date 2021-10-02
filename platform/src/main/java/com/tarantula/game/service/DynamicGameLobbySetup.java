@@ -28,7 +28,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         for(int i=1;i<=initialZoneCount;i++){
             int levelMatch = (levelStart-1)+i*levelMatchFactor;
             GameZone zone = createGameZone(dataStore,"zone"+i,configName,levelMatch,arenaLimit,zoneCapacityBase/roomCapacity,roomCapacity,joinsOnStart,duration,levelUpXpBase);
-            gameLobby.keySet.add(zone.distributionKey());
+            gameLobby.addKey(zone.distributionKey());
         }
         gameLobby.levelMatchOffset(levelMatchOffset);
         dataStore.create(gameLobby);
@@ -41,7 +41,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
         gameLobby.dataStore(dataStore);
-        gameLobby.keySet.forEach((k)->{
+        gameLobby.keySet().forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
             gameLobby.addGameZone(zone);
         });
@@ -55,7 +55,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         gameLobby.distributionKey(application.distributionKey());
         dataStore.load(gameLobby);
         gameLobby.dataStore(dataStore);
-        gameLobby.keySet.forEach((k)->{
+        gameLobby.keySet().forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
             gameLobby.addGameZone(zone);
         });

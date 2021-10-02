@@ -150,10 +150,13 @@
     itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
     itemTemplate.configurationName = selectedItem.configurationName;
+    itemTemplate.configurationTypeId = selectedItem.configurationTypeId;
     itemTemplate.application = selectedItem.application;
     itemTemplate.header = selectedItem.header;
     itemTemplate.payload = selectedItem.payload;
     itemTemplate.reference = selectedItem.reference;
+    document.querySelector('#tx-configuration-item-type-id').value = itemTemplate.configurationTypeId;
+    document.querySelector('#tx-configuration-item-name').value = itemTemplate.configurationName;  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-item"),{mode:'tree'},itemTemplate);
     TARA_API.onGet('role/item',"onCategoryForItem",TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);

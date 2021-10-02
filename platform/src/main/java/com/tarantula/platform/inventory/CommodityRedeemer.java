@@ -1,14 +1,14 @@
 package com.tarantula.platform.inventory;
 
 
-public class CommodityRedeemer extends InventoryRedeemer{
+public class CommodityRedeemer extends ApplicationRedeemer {
 
-    public CommodityRedeemer(String systemId,InventoryRedeemer inventoryRedeemer){
+    public CommodityRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
         super(systemId,inventoryRedeemer);
     }
 
     public void redeem() {
-        Inventory inventory = new Inventory(this.configurationCategory);
+        Inventory inventory = this.inventoryServiceProvider.inventory(this.configurationCategory);
         inventory.distributionKey(systemId);
         dataStore.createIfAbsent(inventory,true);
         inventory.dataStore(dataStore);

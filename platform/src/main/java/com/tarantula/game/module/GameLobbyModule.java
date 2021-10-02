@@ -21,7 +21,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private Descriptor application;
     @Override
     public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
-        if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
+        if(application.tournamentEnabled()&&session.tournamentId()!=null&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).getBytes());
             return;
         }
@@ -41,19 +41,6 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         }
         else if(session.action().equals("onList")){
             this.gameLobby.list(session);
-        }
-        else if(session.action().equals("onTest")){
-            if(application.tournamentEnabled()&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
-                session.write(toMessage("no tournament available,please try later",false).getBytes());
-            }
-            else{
-                OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-                Rating rating = this.gameServiceProvider.rating(session.systemId());
-                rating.arenaLevel = onAccess.stub();
-                Stub stub = gameLobby.join(session,rating);
-                session.write(stub.toJson().toString().getBytes());
-                gameLobby.leave(session);
-            }
         }
         else{
             throw new UnsupportedOperationException(session.action());

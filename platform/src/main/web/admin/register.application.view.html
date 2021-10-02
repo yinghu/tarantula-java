@@ -36,11 +36,11 @@
 </div>
 <script>
     let itemTemplate = TARA_API.query().item;
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'code'},itemTemplate);
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'tree'},itemTemplate);
     document.querySelector('#tx-register-item-register').onclick=()=>{
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
-        TARA_API.onGet(TARA_API.query().serviceTag,'onRegister',query,(resp)=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,'onRegister',query,item,(resp)=>{
             editor.set(resp);   
         });
     };

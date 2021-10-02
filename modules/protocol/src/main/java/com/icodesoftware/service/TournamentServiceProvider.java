@@ -2,12 +2,14 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Tournament;
 
+import java.util.List;
+
 public interface TournamentServiceProvider extends ServiceProvider{
 
     String registerTournamentListener(Tournament.Listener listener);
     void unregisterTournamentListener(String registryKey);
 
-    Tournament register(Tournament.Schedule schedule);
+    boolean register(Tournament.Schedule schedule);
 
     boolean available(String tournamentId);
     Tournament.Instance join(String tournamentId,String systemId);
@@ -16,4 +18,7 @@ public interface TournamentServiceProvider extends ServiceProvider{
     void leave(String instanceId,String systemId);
 
     Tournament.RaceBoard list(String instanceId);
+
+    List<Tournament.History> playerHistory(String systemId);
+    Tournament.Instance tournamentHistory(String tournamentId);
 }

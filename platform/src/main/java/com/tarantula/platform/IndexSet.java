@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class IndexSet extends RecoverableObject {
 
-    public Set<String> keySet = new HashSet<>();
+    protected Set<String> keySet = new HashSet<>();
 
     public IndexSet(){
     }
@@ -25,10 +25,10 @@ public class IndexSet extends RecoverableObject {
 
     @Override
     public Map<String,Object> toMap(){
-       keySet.forEach((k)->{
+        keySet.forEach((k)->{
            properties.put(k,"1");
-       });
-       return this.properties;
+        });
+        return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
@@ -45,6 +45,25 @@ public class IndexSet extends RecoverableObject {
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
+    }
+
+    public void addKey(String key){
+        synchronized (keySet){
+            keySet.add(key);
+        }
+    }
+    public void removeKey(String key){
+        synchronized (keySet){
+            keySet.remove(key);
+            properties.remove(key);
+        }
+    }
+    public Set<String> keySet(){
+        HashSet<String> copy = new HashSet();
+        synchronized (keySet){
+            copy.addAll(keySet);
+        }
+        return copy;
     }
 
 }

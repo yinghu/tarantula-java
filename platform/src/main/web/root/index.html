@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="tarantula.css"/>
     <link rel="stylesheet" href="jsoneditor.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+    <script src="https://pixijs.download/v6.1.3/pixi.min.js"></script>
     <script src="resource/tarantula.api.js"></script>
     <script src="resource/tarantula.webgl.js"></script>
     <script src="jsoneditor.min.js"></script>
@@ -20,25 +19,38 @@
 </head>
 <body class='w3-white' onload="_ready()"> 
     <div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-120">
+        <div class="w3-display-container w3-green  tx-content-120">
             <div class="w3-display-topright w3-padding">
                 <span id="tx-menu-open"><i class="fa fa-sign-in" style="font-size:24px"></i></span>
                 <!-- TO DO popup menu 100% width-->            
             </div>
             <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:32px"></i></span>
+                <span><i class="fa fa-cubes" style="font-size:32px;color: white;"></i></span>
                 <span class="tx-margin-left-8 tx-text-32">Game Cluster</span>
             </div>
-            <div class="w3-display-bottomleft w3-padding"><span class='tx-text-24'>Innovative Game Integration Platform</span></div>
             <div class="w3-display-bottomright w3-padding"><span id='tx-sign-up' class='w3-tag w3-green w3-round w3-border w3-border-white tx-text-12 tx-padding-button'>SIGN UP</span></div>
         </div>
-        <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
-        <div class="w3-display-container w3-white tx-content-8"></div> 
-        <div class="w3-row">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-red tx-content-48">
+            <div class="w3-display-bottomleft w3-padding">
+                <span><i class="fa fa-diamond" style="font-size:24px;color: red;"></i></span>
+                <span class='tx-text-24 tx-margin-left-8'>Innovative Game Integration Platform</span>
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>    
+        </div>
+        <div class="w3-panel w3-padding w3-border-bottom w3-border-red">
+            <span id='tx-play-game-message' class="tx-text-16"></span>
+            <div class='w3-bar w3-white'>
+                <span tx-game='tossup' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-play-bar">Play Tossup</span>
+            </div>
+        </div>
+        <div class="w3-display-container w3-white tx-content-16"></div> 
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white">
                     <div class="w3-container">
-                        <span><i class="fa fa-share-alt" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-share-alt" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Distributed Game Room And Match Making</span>
                     </div>
                     <div class="w3-container">
@@ -47,22 +59,23 @@
                 </div>
             </div> 
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
+                <div class="w3-container w3-white">
                     <div class="w3-container">
-                        <span><i class="fa fa-map" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-map" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Seamless Tournament Game Integration</span>
                     </div>
                     <div class="w3-container">
-                        <p class="tx-margin-left-24 tx-text-12">High performance distributed tournament runtime</p>
+                        <p class="tx-margin-left-24 tx-text-12">Support multiple type tournament runtimes</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-cogs" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-cogs" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Dedicated Game Server Integration</span>
                     </div>
                     <div class="w3-container">
@@ -71,9 +84,9 @@
                 </div>
             </div>
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-coffee" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-coffee" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Dynamic Module Extension</span>
                     </div>
                     <div class="w3-container">
@@ -82,22 +95,23 @@
                 </div>
             </div>
         </div>
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-arrow-circle-up" style="font-size:16px"></i></span>
-                        <span class="tx-margin-left-4 tx-text-16">Player XP Leveling And Virtual Currency</span>
+                        <span><i class="fa fa-arrow-circle-up" style="font-size : 24px; color : green"></i></span>
+                        <span class="tx-margin-left-4 tx-text-16">Player XP Leveling And Ranking</span>
                     </div>
                     <div class="w3-container">
-                        <p class="tx-margin-left-24 tx-text-12">Integrated XP level with ELO rating</p>
+                        <p class="tx-margin-left-24 tx-text-12">Integrated XP level and ranking service</p>
                     </div>
                 </div>
             </div>
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-pie-chart" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-pie-chart" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Game Statistics Per Game And Player</span>
                     </div>
                     <div class="w3-container">
@@ -106,11 +120,12 @@
                 </div>
             </div>
         </div>
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
+                <div class="w3-container w3-white  ">
                     <div class="w3-container">
-                        <span><i class="fa fa-trophy" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-trophy" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Leader Board Per Game Category</span>
                     </div>
                     <div class="w3-container">
@@ -119,9 +134,9 @@
                 </div>
             </div> 
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-user-circle-o" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-user-circle-o" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Player And Game Data Management</span>
                     </div>
                     <div class="w3-container">
@@ -130,11 +145,12 @@
                 </div>
             </div>
         </div>  
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
+                <div class="w3-container w3-white  ">
                     <div class="w3-container">
-                        <span><i class="fa fa-lock" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-lock" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">High Security Design</span>
                     </div>
                     <div class="w3-container">
@@ -143,9 +159,9 @@
                 </div>
             </div> 
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-group" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-group" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Friend And Recently Play List</span>
                     </div>
                     <div class="w3-container">
@@ -154,11 +170,12 @@
                 </div>
             </div>
         </div>  
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
+                <div class="w3-container w3-white  ">
                     <div class="w3-container">
-                        <span><i class="fa fa-send" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-send" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Messaging</span>
                     </div>
                     <div class="w3-container">
@@ -167,9 +184,9 @@
                 </div>
             </div> 
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-database" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-database" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">Data Persistence</span>
                     </div>
                     <div class="w3-container">
@@ -178,11 +195,12 @@
                 </div>
             </div>
         </div> 
-        <div class="w3-row">
+        <div class="w3-display-container w3-white tx-content-16"></div>
+        <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
+                <div class="w3-container w3-white  ">
                     <div class="w3-container">
-                        <span><i class="fa fa-building" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-building" style="font-size:24px;color: green;"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">System Architecture</span>
                     </div>
                     <div class="w3-container">
@@ -191,9 +209,9 @@
                 </div>
             </div> 
             <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
+                <div class="w3-container w3-white ">
                     <div class="w3-container">
-                        <span><i class="fa fa-gear" style="font-size:16px"></i></span>
+                        <span><i class="fa fa-gear" style="font-size : 24px; color : green"></i></span>
                         <span class="tx-margin-left-4 tx-text-16">API</span>
                     </div>
                     <div class="w3-container">
@@ -202,32 +220,9 @@
                 </div>
             </div>
         </div> 
-        <div class="w3-row">
-            <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white ">
-                    <div class="w3-container">
-                        <span><i class="fa fa-server" style="font-size:16px"></i></span>
-                        <span class="tx-margin-left-4 tx-text-16">Hosting And Consulting</span>
-                    </div>
-                    <div class="w3-container">
-                        <p class="tx-margin-left-24 tx-text-12">Self-hosting and Multi-homing Consulting</p>
-                    </div>
-                </div>
-            </div> 
-            <div class="w3-half w3-container">
-                <div class="w3-container w3-white w3-border-bottom w3-border-white">
-                    <div class="w3-container">
-                        <span><i class="fa fa-legal" style="font-size:16px"></i></span>
-                        <span class="tx-margin-left-4 tx-text-16">Lisensing</span>
-                    </div>
-                    <div class="w3-container">
-                        <p class="tx-margin-left-24 tx-text-12">Subscription with free self-hosting</p>
-                    </div>
-                </div>
-            </div>
-        </div>               
+        <div class="w3-display-container w3-white tx-content-16"></div>            
     </div>
-    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+    <div class="w3-display-container w3-green  tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
         </div>
@@ -264,6 +259,14 @@
             document.querySelector('#tx-sign-up').onclick = ()=>{    
                 tx_view({viewId:'sign.up',containerId:'#tx-popup'});  
             }
+            document.querySelectorAll('.tx-live-game-play-bar').forEach((a)=>{
+                a.onclick=()=>{
+                    //console.log(a.getAttribute('tx-game'));
+                    TARA_API.query().game = a.getAttribute('tx-game');
+                    tx_guest_play_try();
+                    //tx_view({viewId:'play.game',containerId:'#tx-popup'});
+                }
+            });
         }
         function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
             TARA_API.onView(setup.viewId,function(v){
@@ -332,7 +335,6 @@
             let m3 = document.querySelector('#tx-popup');
             m3.innerHTML="";
             m3.style.display = 'none'; 
-            //document.querySelector("#tx-sign-up").innerHTML="SIGN OUT";
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_on_google_auth(){
@@ -378,12 +380,98 @@
             }); 
         }
         function tx_oauth_sign_out() {
+            if(!window.gapi) return;
             let auth2 = gapi.auth2.getAuthInstance();
             if(auth2.isSignedIn.get() == true){
                 auth2.signOut().then(function () {
                     console.log('Google user signed out.');
                 });
             }
+        }
+        function tx_create_uuid(){
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+        function tx_guest_play_try(){
+            let payload = {login:'',password:''};
+            if(window.localStorage){
+                let _login = localStorage.getItem('guest_try');
+                if(_login){
+                    payload.login = _login;
+                    payload.password = _login;
+                }    
+                else{
+                    payload.login = tx_create_uuid();
+                    payload.password = payload.login;
+                    localStorage.setItem('guest_try',payload.login);    
+                }
+            }
+            else{
+                payload.login = tx_create_uuid();
+                payload.password = payload.login;    
+            }
+            TARA_API.onRegister(payload,function(resp){
+                _tx_guest_login_and_setup(payload);
+            });     
+        }
+        function _tx_guest_login_and_setup(payload){
+            TARA_API.onLogin(payload,function(resp){
+                if(resp.successful){
+                    TARA_API.onGet('presence/lobby','onLobby',TARA_API.query().game,(respLobby)=>{
+                        if(respLobby.successful){
+                            _tx_guest_play(respLobby);
+                        }
+                        else{
+                            document.querySelector("#tx-play-game-message").innerHTML=respLobby.message;        
+                        }
+                    });              
+                }
+                else{
+                    document.querySelector("#tx-play-game-message").innerHTML=resp.message;
+                }
+            });  
+        }
+        function _tx_guest_play(lobby){
+            let tournamentEnabled = false;
+            lobby.lobbyList.forEach((a)=>{
+                if(a.descriptor.typeId == lobby.name+'-lobby' ){
+                    a.applications.forEach((b)=>{
+                        tournamentEnabled = b.tournamentEnabled;
+                    });
+                }
+            });
+            let _mmk = TARA_API.query().game+'/mmk';
+            let _path = TARA_API.query().game;
+            let _gameView = 'play.game.'+TARA_API.query().game;
+            TARA_API.query().gamePlayViewId = _gameView;
+            if(tournamentEnabled){
+                let tournamentView = _gameView+'.tournament';//play.{game}.tournament
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:true,viewId:_gameView}; 
+                TARA_API.query().payload = payload;
+                TARA_API.query().serviceTag = _path+'/tournament';
+                TARA_API.query().popup = '#tx-popup';
+                tx_view({viewId:tournamentView,containerId:'#tx-popup'});       
+            }
+            else{
+                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:false}; 
+                TARA_API.onPlay(payload,(resp)=>{
+                    if(resp.successful){
+                        TARA_API.query().gamePopup = '#tx-popup-game';
+                        TARA_API.query().popup = '#tx-popup-game';//in case goes to invalid page
+                        tx_view({viewId:_gameView,containerId:'#tx-popup-game'});
+                    }
+                    else{//goes to error page
+                        TARA_API.query().popup = '#tx-popup';
+                        TARA_API.query().message = resp.message;
+                        tx_view({viewId:'error',containerId:'#tx-popup'});
+                    }
+                });
+            }         
         }
 
     </script>

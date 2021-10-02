@@ -147,7 +147,7 @@
                 document.querySelector('#tx-game-item-list-description-0').innerHTML = resp.description;
                 document.querySelector('#tx-game-item-list-category-0').innerHTML = resp.category; 
                 resp.itemList.forEach((gi,i)=>{
-                    document.querySelector('#tx-game-item-list-type-'+i).innerHTML = resp.category;
+                    document.querySelector('#tx-game-item-list-type-'+i).innerHTML = gi.configurationTypeId;
                     document.querySelector('#tx-game-item-list-name-'+i).innerHTML = gi.configurationName;
                     document.querySelector('#tx-game-item-list-'+i).style.display = 'block';    
                 });

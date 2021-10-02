@@ -2,33 +2,60 @@
   "type": "application",
   "category": "tournament",
   "version": "1.0",
-  "description": "tournament item template list",
+  "description": "tournament application template list",
   "itemList":
   [
       {
+        "configurationTypeId": "T10",
         "configurationName": "On Demand 10",
         "header": {
-          "name": "10 player"
+          "type":"T10","name": "10 player","schedule": "onDemand","maxEntriesPerInstance": 10
         },
         "application":
         {
-          "schedule": "onDemand",
-          "durationHours": 24,
-          "maxEntriesPerInstance": 10,
+          "durationHours": 2,
           "durationMinutesPerInstance": 10
         },
         "payload": {},
         "reference": []
       },
       {
+        "configurationTypeId": "TD100",
         "configurationName": "Daily 100",
         "header": {
-          "name": "Daily 100 player"
+          "type":"TD100","name": "Daily 100 player","schedule": "daily","maxEntriesPerInstance": 100
         },
         "application":
         {
-          "schedule": "daily",
-          "maxEntriesPerInstance": 100,
+          "startDate": "2021-10-12",
+          "durationMinutesPerInstance": 30
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationTypeId": "TW100",
+        "configurationName": "Weekly 100",
+        "header": {
+          "type":"TW100","name": "Weekly 100 player","schedule": "weekly","maxEntriesPerInstance": 100
+        },
+        "application":
+        {
+          "startDate": "2021-10-12",
+          "durationMinutesPerInstance": 30
+        },
+        "payload": {},
+        "reference": []
+      },
+      {
+        "configurationTypeId": "TM100",
+        "configurationName": "Monthly 100",
+        "header": {
+          "type":"TM100","name": "Monthly 100 player","schedule": "monthly","maxEntriesPerInstance": 100
+        },
+        "application":
+        {
+          "startDate": "2021-10-12",
           "durationMinutesPerInstance": 30
         },
         "payload": {},

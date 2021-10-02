@@ -8,19 +8,13 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.presence.SubscriptionFee;
 import com.tarantula.platform.presence.User;
 
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import com.sun.tools.attach.*;
+
 
 public class SudoRoleModule implements Module {
 
@@ -28,9 +22,7 @@ public class SudoRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private AccessIndexService accessIndexService;
-    //private DataStore dataStore;
     private GsonBuilder builder;
-    private ConcurrentHashMap<String,Configuration> cMap;
     private DataStore uDatastore;
 
     @Override
@@ -190,7 +182,6 @@ public class SudoRoleModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        this.cMap = new ConcurrentHashMap<>();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
@@ -223,22 +214,6 @@ public class SudoRoleModule implements Module {
             clist.add(d);
         });
         jsonObject.add("list",clist);
-        return jsonObject;
-    }
-    private JsonObject toJson(List<Configuration> configurations){
-        JsonObject jsonObject = new JsonObject();
-        JsonArray clist = new JsonArray();
-        configurations.forEach(configuration ->{
-            JsonObject jc = new JsonObject();
-            jc.addProperty("accessId",configuration.distributionKey());
-            jc.addProperty("type",configuration.configurationType());
-            jc.addProperty("name",configuration.configurationName());
-            configuration.properties().forEach((p)->{
-                jc.addProperty(p.name(),p.value().toString());
-            });
-            clist.add(jc);
-        });
-        jsonObject.add("configurations",clist);
         return jsonObject;
     }
 }

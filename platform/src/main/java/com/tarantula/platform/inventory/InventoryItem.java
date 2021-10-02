@@ -13,7 +13,7 @@ public class InventoryItem extends ConfigurableObject {
     public InventoryItem(){
 
     }
-    public InventoryItem(InventoryRedeemer commodity){
+    public InventoryItem(ApplicationRedeemer commodity){
         this.configurationName = commodity.configurationName();
         this.configurationTypeId = commodity.configurationTypeId();
         this.reference.add(commodity.distributionKey());

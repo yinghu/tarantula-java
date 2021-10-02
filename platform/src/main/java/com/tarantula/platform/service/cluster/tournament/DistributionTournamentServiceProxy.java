@@ -134,16 +134,16 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public Tournament schedule(String serviceName, Tournament.Schedule schedule){
+    public boolean schedule(String serviceName, Tournament.Schedule schedule){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScheduleOperation operation = new TournamentScheduleOperation(serviceName,schedule);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,nodeEngine.getMasterAddress());
-        final Future<Tournament> future = builder.invoke();
+        final Future<Boolean> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            return null;
+            return false;
         }
     }
     public boolean localManaged(String key){

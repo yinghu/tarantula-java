@@ -12,7 +12,7 @@ public interface DistributionTournamentService extends ServiceProvider {
     Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId);
     Tournament.Entry score(String serviceName,String instanceId,String systemId,double delta);
     Tournament.Entry configure(String serviceName,String instanceId,String systemId,byte[] payload);
-    Tournament schedule(String serviceName, Tournament.Schedule schedule);
+    boolean schedule(String serviceName, Tournament.Schedule schedule);
     Tournament.RaceBoard list(String serviceName,String instanceId);
     boolean localManaged(String key);
 }

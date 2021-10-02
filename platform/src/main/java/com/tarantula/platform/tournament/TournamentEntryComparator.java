@@ -15,7 +15,8 @@ public class TournamentEntryComparator implements Comparator<Tournament.Entry> {
             return 1;
         }
         else{
-            return 0;
+            long tf = o1.timestamp()-o2.timestamp();
+            return tf<=0?-1:1;
         }
     }
 }

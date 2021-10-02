@@ -1,0 +1,29 @@
+{
+  "type": "application",
+  "category": "achievement",
+  "version": "1.0",
+  "description": "achievement application template list",
+  "itemList":
+  [
+    {
+      "configurationTypeId": "A1",
+      "configurationName": "Achievement1",
+      "header": {
+        "name": "Achievement1","goal": 30
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "A1",
+      "configurationName": "Achievement2",
+      "header": {
+        "name": "Achievement2","goal": 20
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    }
+  ]
+}

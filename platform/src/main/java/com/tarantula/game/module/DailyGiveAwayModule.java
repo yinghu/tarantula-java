@@ -16,7 +16,7 @@ public class DailyGiveAwayModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("daily giveaway module started", OnLog.WARN);
+        this.context.log("Daily giveaway module started", OnLog.WARN);
     }
     @Override
     public void clear(){

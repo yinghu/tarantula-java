@@ -3,15 +3,12 @@
 </div>
 <script type='module' tx-id='tx-md-tossup' tx-src='resource/tarantula.tossup.js' tx-version='1.1'></script>
 <script type='text/javascript'>
-    console.log(TARA_API.query().stub);
-    let ttc = new TossUp('my ttc');
-    ttc.show_name();
+    let ttc = new TossUp();
     let _oswaldFamily = 'Oswald, Arial';
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tossup'));
-    TARA_API.onGet('tossup/cfg','onList','category/abilities',(resp)=>{
-        console.log(resp);
-    });
+    ttc.commit_config();
+   
     let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     zone.y = 20;
     zone.x = 10;
@@ -31,20 +28,15 @@
     tournament.x = 10;
     app.stage.addChild(tournament);
 
-
-
-    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:30,fill:'yellow'});
+    let messageBox = new PIXI.Text('',{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     messageBox.y = 180;
     messageBox.x = 10;
     app.stage.addChild(messageBox);
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
-    let exit = text_button('EXIT',()=>{
-        let cmd ={serviceTag:TARA_API.query().stub.tag,command:'onLeave'};
-        TARA_API.onService(false,cmd,(resp)=>{
-            console.log(resp);
-            TARA_API.disconnect();
-            TGL.shutdown();
+    
+    let exit = text_button('EXIT',64,64,()=>{
+        ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);
             m3.innerHTML="";
             m3.style.display = 'none';
@@ -54,70 +46,101 @@
     exit.y = 6;
     app.stage.addChild(exit);
    
-    let rating = text_button('Rating',()=>{
-        let payload ={rating:{rank:1,delta:70},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','rating',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+    let rating = text_button('Rating',64,64,()=>{
+        ttc.commit_rating((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     rating.x = window.innerWidth-70;;
     rating.y = 400;
     app.stage.addChild(rating);
 
-    let stats = text_button('Kills',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+    let stats = text_button('Kills',64,64,()=>{
+        ttc.commit_kills((resp)=>{
+            if(resp.successful){
+                let sm =[];
+                resp.stats.forEach(e=>{
+                    sm.push(JSON.stringify(e));
+                });
+                messageBox.text = sm.join('\n');        
+            }else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     stats.x = window.innerWidth-70;;
     stats.y = 480;
     app.stage.addChild(stats);
 
-    let wins = text_button('Wins',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}]}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+    let wins = text_button('Wins',64,64,()=>{
+        ttc.commit_wins((resp)=>{
+            if(resp.successful){
+                let sm =[];
+                resp.stats.forEach(e=>{
+                    sm.push(JSON.stringify(e));
+                });
+                messageBox.text = sm.join('\n');        
+            }else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     wins.x = window.innerWidth-70;;
     wins.y = 560;
     app.stage.addChild(wins);
 
-    let score = text_button('Score',()=>{
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
-        TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','tournament',payload,(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+
+
+    let score = text_button('Score',64,64,()=>{
+        ttc.commit_score((resp)=>{
+            messageBox.text = JSON.stringify(resp);
         });
     });
     score.x = window.innerWidth-70;;
     score.y = 640;
     app.stage.addChild(score);
 
-    let list = text_button('List',()=>{
-        //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
-        TARA_API.onGet(TARA_API.query().stub.tag,'onList','tournament',(resp)=>{
-            messageBox.text = JSON.stringify(resp);    
+    let list = text_button('List',64,64,()=>{
+        ttc.commit_list((resp)=>{
+            if(resp.successful){
+                let bm = [];
+                resp.board.forEach(e => {
+                    bm.push(JSON.stringify(e));
+                });
+                messageBox.text = bm.join('\n');
+            }
+            else{
+                messageBox.text = JSON.stringify(resp);
+            }
         });
     });
     list.x = window.innerWidth-70;;
     list.y = 720;
     app.stage.addChild(list);
 
+    let goal = text_button('Achievement',120,64,()=>{
+        ttc.commit_achievement((resp)=>{
+            messageBox.text = JSON.stringify(resp);
+        });
+    });
+    goal.x = window.innerWidth-128;;
+    goal.y = 800;
+    app.stage.addChild(goal);
 
-    function text_button(cap,cmd){
+
+    function text_button(cap,w,h,cmd){
         let container = new PIXI.Container();
         let rect = new PIXI.Graphics();
         rect.lineStyle(4, 0xFF3300, 1);
         rect.beginFill(0x66CCFF);
-        rect.drawRect(0, 0, 64, 64);
+        rect.drawRect(0, 0, w,h);
         rect.endFill();
         rect.interactive = true;
         rect.buttonMode = true;
         rect.on('pointerdown',cmd);
         let txt = new PIXI.Text(cap,{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
-        txt.x = (64-txt.width)/2;
-        txt.y = (64-txt.height)/2;
+        txt.x = (w-txt.width)/2;
+        txt.y = (h-txt.height)/2;
         container.addChild(rect);
         container.addChild(txt);
         return container;

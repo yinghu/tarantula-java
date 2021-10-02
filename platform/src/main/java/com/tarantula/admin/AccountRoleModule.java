@@ -37,7 +37,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             atc.userList = new ArrayList<>();
             if(account.load(indexSet)){
                 //atc.userList.add()
-                indexSet.keySet.forEach((k)->{
+                indexSet.keySet().forEach((k)->{
                     User u = new User();
                     u.distributionKey(k);
                     if(user.load(u)){

@@ -6,12 +6,13 @@
   "itemList":
   [
       {
+        "configurationTypeId": "Gold",
         "configurationName": "100GoldPack",
         "header": {
           "Name": "GoldPack","Type": "Gold"
         },
         "application": {
-           "Amount": 100
+           "amount": 100
         },
         "payload": {},
         "reference": []

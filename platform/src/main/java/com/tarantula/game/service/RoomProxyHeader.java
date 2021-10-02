@@ -36,10 +36,14 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
     @Override
     public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
         JsonObject jsonObject = JsonUtil.parse(payload);
+        boolean response = false;
         if(jsonObject.has("rating")){
             JsonObject delta = jsonObject.getAsJsonObject("rating");
             stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
-            if(session.name().equals("rating")) session.write(stub.rating.toJson().toString().getBytes());
+            if(session.name().equals("rating")) {
+                session.write(stub.rating.toJson().toString().getBytes());
+                response = true;
+            }
         }
         if(jsonObject.has("stats")){
             JsonArray stats = jsonObject.getAsJsonArray("stats");
@@ -50,14 +54,33 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
             if(session.name().equals("stats")){
                 StatisticsSerializer serializer = new StatisticsSerializer();
                 session.write(serializer.serialize(stub.statistics,Statistics.class,null).toString().getBytes());
+                response = true;
+            }
+        }
+        if(jsonObject.has("achievement")){
+            JsonObject progress = jsonObject.getAsJsonObject("achievement");
+            this.gameServiceProvider.achievementServiceProvider().onProgress(progress.get("goal").getAsString(),progress.get("progress").getAsDouble());
+            if(session.name().equals("achievement")){
+                session.write(payload);
+                response = true;
             }
         }
         if(application.tournamentEnabled()&&jsonObject.has("tournament")){
             JsonObject score = jsonObject.getAsJsonObject("tournament");
-            Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
-            if(session.name().equals("tournament")){
-                session.write(entry.toJson().toString().getBytes());
+            if(stub.room.tournament()!=null){
+                Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
+                if(session.name().equals("tournament")){
+                    session.write(entry.toJson().toString().getBytes());
+                    response = true;
+                }
             }
+            else if(stub.room.tournament()==null&&session.name().equals("tournament")){
+                session.write(JsonUtil.toSimpleResponse(false,"no tournament joined").getBytes());
+                response = true;
+            }
+        }
+        if(!response){
+            session.write(JsonUtil.toSimpleResponse(false,"no response header setup").getBytes());
         }
     }
     public void list(Session session,Stub stub){
@@ -66,7 +89,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
             session.write(board.toJson().toString().getBytes());
         }
         else{
-            session.write(JsonUtil.toSimpleResponse(false,"no tournament").getBytes());
+            session.write(JsonUtil.toSimpleResponse(false,"no tournament joined").getBytes());
         }
     }
     public void close(){

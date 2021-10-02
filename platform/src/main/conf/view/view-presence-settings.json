@@ -10,13 +10,11 @@
 
     {"type": "upgrade.role.account","moduleResourceFile": "presence/upgrade.account.view.html"},
     {"type": "upgrade.role.admin","moduleResourceFile": "presence/upgrade.admin.view.html"},
-    {"type": "game.cluster.price","moduleResourceFile": "presence/game.cluster.price.view.html"},
     {"type": "play.game.tossup","moduleResourceFile": "presence/play.game.tossup.view.html"},
-
-    {"type": "play.game.tictactoe","moduleResourceFile": "presence/play.game.tictactoe.view.html"},
     {"type": "play.game.tossup.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.statistics","moduleResourceFile": "presence/live.game.service.statistics.view.html"},
+    {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.achievement.view.html"},
 
     {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.leaderboard.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},

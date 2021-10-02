@@ -15,7 +15,7 @@ public class TournamentScheduleOperation extends Operation{
 
     private String serviceName;
     private Tournament.Schedule schedule;
-    private Tournament tournament;
+    private boolean tournamentScheduled;
     public TournamentScheduleOperation() {
     }
 
@@ -27,18 +27,19 @@ public class TournamentScheduleOperation extends Operation{
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        tournament = ais.schedule(serviceName,this.schedule);
+        tournamentScheduled = ais.schedule(serviceName,this.schedule);
     }
 
     @Override
     public Object getResponse() {
-        return tournament;
+        return tournamentScheduled;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
+        out.writeUTF(this.schedule.distributionKey());
         out.writeUTF(this.schedule.type());
         out.writeUTF(this.schedule.name());
         out.writeUTF(this.schedule.schedule());
@@ -53,6 +54,7 @@ public class TournamentScheduleOperation extends Operation{
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
+        String scheduleKey = in.readUTF();
         String type = in.readUTF();
         String name = in.readUTF();
         String schedule = in.readUTF();
@@ -62,5 +64,6 @@ public class TournamentScheduleOperation extends Operation{
         LocalDateTime close = TimeUtil.fromUTCMilliseconds(in.readLong());
         LocalDateTime end = TimeUtil.fromUTCMilliseconds(in.readLong());
         this.schedule = new DefaultTournamentSchedule(type,name,schedule,start,close,end,dur,mz);
+        this.schedule.distributionKey(scheduleKey);
     }
 }

@@ -6,17 +6,24 @@
   "itemList":
   [
     {
-      "header": {"type": "tournament","name": "Tournament","enabled": true,"version": 1.0},
+      "header": {"type": "tournament","name": "Tournament","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "tournament-game-application-settings"
       }
     },
     {
-      "header": {"type": "store","name": "Store","enabled": true,"version": 1.0},
+      "header": {"type": "store","name": "Store","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "store-game-application-settings"
+      }
+    },
+    {
+      "header": {"type": "achievement","name": "Achievement","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "application":
+      {
+        "name": "achievement-game-application-settings"
       }
     }
   ]
