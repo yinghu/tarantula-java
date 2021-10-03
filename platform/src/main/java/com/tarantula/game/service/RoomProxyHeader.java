@@ -8,6 +8,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
+import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.tournament.TournamentRaceBoard;
 
@@ -58,10 +59,10 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
             }
         }
         if(jsonObject.has("achievement")){
-            JsonObject progress = jsonObject.getAsJsonObject("achievement");
-            this.gameServiceProvider.achievementServiceProvider().onProgress(progress.get("goal").getAsString(),progress.get("progress").getAsDouble());
+            JsonObject delta = jsonObject.getAsJsonObject("achievement");
+            AchievementProgress progress = this.gameServiceProvider.achievementServiceProvider().onProgress(delta.get("goal").getAsString(),delta.get("progress").getAsDouble());
             if(session.name().equals("achievement")){
-                session.write(payload);
+                session.write(progress.toJson().toString().getBytes());
                 response = true;
             }
         }

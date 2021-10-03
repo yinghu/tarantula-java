@@ -2,22 +2,21 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.ItemApplicationContext;
+import com.tarantula.platform.achievement.Achievement;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AchievementModule implements Module,Configurable.Listener<Application> {
+public class AchievementModule implements Module,Configurable.Listener<Achievement> {
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private ConcurrentHashMap<String,Application> itemList;
+    private ConcurrentHashMap<String,Achievement> itemList;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
-        session.write(new ItemApplicationContext(true,"achievement list",toList()).toJson().toString().getBytes());
+        //session.write(new ItemApplicationContext(true,"achievement list",toList()).toJson().toString().getBytes());
+
         return false;
     }
 
@@ -26,19 +25,19 @@ public class AchievementModule implements Module,Configurable.Listener<Applicati
         this.context = applicationContext;
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.achievementServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("achievement module started", OnLog.WARN);
     }
     @Override
     public void clear(){
 
     }
-    public void onCreated(Application item){
+    public void onCreated(Achievement item){
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
-    private List<Application> toList(){
-        ArrayList<Application> arrayList = new ArrayList<>();
+    private List<Achievement> toList(){
+        ArrayList<Achievement> arrayList = new ArrayList<>();
         itemList.forEach((k,v)->arrayList.add(v));
         return arrayList;
     }

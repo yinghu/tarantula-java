@@ -40,7 +40,7 @@ class TossUp{
         });    
     }
     commit_achievement(callback){
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],achievement:{goal:'kill_boss',progress:1},tournament:{score:100}}; 
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],achievement:{goal:'Achievement1',progress:1},tournament:{score:100}}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','achievement',payload,(resp)=>{
             callback(resp);    
         });    
