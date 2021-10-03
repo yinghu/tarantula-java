@@ -1,9 +1,6 @@
 package com.tarantula.platform.achievement;
 
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
@@ -24,6 +21,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
     private final GameCluster gameCluster;
 
     private ServiceContext serviceContext;
+    private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Achievement> achievements;
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
@@ -52,14 +50,19 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(AchievementServiceProvider.class);
+        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
     }
 
-    public AchievementProgress onProgress(String goal,double delta){
+    public AchievementProgress onProgress(String systemId,String goal,double delta){
         Achievement achievement = achievements.get(goal);
-        
-        logger.warn(achievement.name()+">>>"+achievement.goal());
-        logger.warn("progress->"+goal+">>"+delta);
-        return new AchievementProgress();
+        AchievementProgress achievementProgress = new AchievementProgress(achievement);
+        achievementProgress.distributionKey(systemId);
+        this.dataStore.createIfAbsent(achievementProgress,true);
+        if(achievementProgress.onProgress(delta)){
+            //achievement looting
+        }
+        this.dataStore.update(achievementProgress);
+        return achievementProgress;
     }
 
     @Override

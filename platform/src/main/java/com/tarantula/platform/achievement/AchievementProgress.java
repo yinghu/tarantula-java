@@ -1,5 +1,6 @@
 package com.tarantula.platform.achievement;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
@@ -9,11 +10,14 @@ import java.util.Map;
 
 public class AchievementProgress extends RecoverableObject {
 
+    private double progress;
+    private double goal;
     public AchievementProgress(){
 
     }
-    public AchievementProgress(String name){
-        this.label = name;
+    public AchievementProgress(Achievement achievement){
+        this.label = achievement.name();
+        this.goal = achievement.goal();
     }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -25,11 +29,32 @@ public class AchievementProgress extends RecoverableObject {
 
     @Override
     public Map<String,Object> toMap(){
+        properties.put("1",progress);
+        properties.put("2",goal);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-
+        this.progress = ((Number)properties.get("1")).doubleValue();
+        this.goal = ((Number)properties.get("2")).doubleValue();
+    }
+    public double progress(){
+        return progress;
+    }
+    public double goal(){
+        return goal;
+    }
+    public boolean onProgress(double delta){
+        progress +=delta;
+        return progress>=goal;
+    }
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",label);
+        jsonObject.addProperty("progress",progress);
+        jsonObject.addProperty("goal",goal);
+        return jsonObject;
     }
     @Override
     public Recoverable.Key key(){
