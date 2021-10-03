@@ -6,6 +6,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
+import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.util.SystemUtil;
@@ -21,6 +22,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
     private final GameCluster gameCluster;
 
     private ServiceContext serviceContext;
+    private DistributionAchievementService distributionAchievementService;
     private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Achievement> achievements;
@@ -51,6 +53,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(AchievementServiceProvider.class);
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.distributionAchievementService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionAchievementService.NAME);
     }
 
     public AchievementProgress onProgress(String systemId,String goal,double delta){
@@ -67,9 +70,12 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
 
     @Override
     public <T extends Configurable> void register(T t) {
-
+        //this.rListeners.forEach((k,l)->l.onCreated((Achievement)t));
+        distributionAchievementService.register(name,t.configurationCategory(),t.distributionKey());
     }
-
+    public boolean onRegister(String category,String itemId){
+        return true;
+    }
     @Override
     public <T extends Configurable> void release(T t) {
 
