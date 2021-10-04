@@ -40,7 +40,7 @@ public class DistributionAchievementServiceProxy extends AbstractDistributedObje
         boolean ret = true;
         AchievementRegisterOperation operation = new AchievementRegisterOperation(serviceName,category,itemId);
         for(Member m : mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionAchievementService.NAME,operation,m.getAddress());
             final Future<Boolean> future = builder.invoke();
             try {
                 boolean flag = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);

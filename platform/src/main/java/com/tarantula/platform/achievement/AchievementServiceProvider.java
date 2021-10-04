@@ -4,11 +4,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
-import com.tarantula.platform.item.DistributionItemService;
+import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
@@ -20,7 +18,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
-
+    private final InventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
     private DistributionAchievementService distributionAchievementService;
     private DataStore dataStore;
@@ -28,9 +26,10 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
     private ConcurrentHashMap<String,Achievement> achievements;
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
-    public AchievementServiceProvider(GameCluster gameCluster){
+    public AchievementServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
+        this.inventoryServiceProvider = inventoryServiceProvider;
         this.achievements = new ConcurrentHashMap<>();
     }
     @Override
@@ -63,6 +62,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
         this.dataStore.createIfAbsent(achievementProgress,true);
         if(achievementProgress.onProgress(delta)){
             //achievement looting
+            inventoryServiceProvider.redeem(systemId,achievement);
         }
         this.dataStore.update(achievementProgress);
         return achievementProgress;
@@ -70,10 +70,20 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
 
     @Override
     public <T extends Configurable> void register(T t) {
-        //this.rListeners.forEach((k,l)->l.onCreated((Achievement)t));
         distributionAchievementService.register(name,t.configurationCategory(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
+        Achievement configurableObject = new Achievement();
+        configurableObject.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(category);
+        if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
+            return false;
+        }
+        achievements.put(configurableObject.name(),configurableObject);
+        rListeners.forEach((k,c)->{
+            c.onCreated(configurableObject.setup());
+        });
         return true;
     }
     @Override

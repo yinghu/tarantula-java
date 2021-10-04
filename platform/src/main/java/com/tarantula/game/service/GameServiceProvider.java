@@ -69,7 +69,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
-        this.achievementServiceProvider = new AchievementServiceProvider(gameCluster);
+        this.achievementServiceProvider = new AchievementServiceProvider(gameCluster,inventoryServiceProvider);
         this.achievementServiceProvider.waitForData();
         this.achievementServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);

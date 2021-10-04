@@ -4,6 +4,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.ItemAchievementContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     private ConcurrentHashMap<String,Achievement> itemList;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
-        //session.write(new ItemApplicationContext(true,"achievement list",toList()).toJson().toString().getBytes());
+        session.write(new ItemAchievementContext(true,"achievement list",toList()).toJson().toString().getBytes());
 
         return false;
     }

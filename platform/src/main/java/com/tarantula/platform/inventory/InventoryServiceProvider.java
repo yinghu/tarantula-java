@@ -7,6 +7,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
@@ -64,6 +65,15 @@ public class InventoryServiceProvider implements ServiceProvider {
         return inventory;
     }
     public boolean redeem(String systemId, Application item){
+        ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
+        redeemer.distributionKey(item.distributionKey());
+        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        redeemer.redeem();
+        return true;
+    }
+    public boolean redeem(String systemId, Achievement item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
