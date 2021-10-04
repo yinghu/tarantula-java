@@ -25,6 +25,13 @@
       {
         "name": "achievement-game-application-settings"
       }
+    },
+    {
+      "header": {"type": "dailyLogin","name": "DailyLogin","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "application":
+      {
+        "name": "daily-login-game-application-settings"
+      }
     }
   ]
 }

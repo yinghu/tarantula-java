@@ -1,0 +1,39 @@
+{
+  "type": "application",
+  "category": "dailyLogin",
+  "version": "1.0",
+  "description": "Daily login application template list",
+  "itemList":
+  [
+    {
+      "configurationTypeId": "d1",
+      "configurationName": "DailyLogin1",
+      "header": {
+        "name": "d-day-3"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "d2",
+      "configurationName": "DailyLogin1",
+      "header": {
+        "name": "d-day-1"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "d3",
+      "configurationName": "DailyLogin1",
+      "header": {
+        "name": "d-day-3"
+      },
+      "application": {},
+      "payload": {},
+      "reference": []
+    }
+  ]
+}
