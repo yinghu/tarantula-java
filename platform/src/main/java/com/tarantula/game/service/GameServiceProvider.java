@@ -8,6 +8,7 @@ import com.tarantula.platform.achievement.AchievementServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
+import com.tarantula.platform.presence.PresenceServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
@@ -28,6 +29,7 @@ public class GameServiceProvider implements ServiceProvider{
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private AchievementServiceProvider achievementServiceProvider;
     private DistributedTournamentServiceProvider tournamentServiceProvider;
+    private PresenceServiceProvider presenceServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -66,6 +68,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.leaderBoardProvider = new LeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
+        this.presenceServiceProvider = new PresenceServiceProvider(gameCluster);
+        this.presenceServiceProvider.setup(serviceContext);
+        this.presenceServiceProvider.waitForData();
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
@@ -75,6 +80,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
+
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
@@ -93,6 +99,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
         this.configurationServiceProvider.start();
+        this.presenceServiceProvider.start();
     }
 
     @Override
@@ -136,6 +143,9 @@ public class GameServiceProvider implements ServiceProvider{
     }
     public DailyLoginTrack dailyLogin(String systemId){
         return playerDataProvider.checkDailyLogin(systemId);
+    }
+    public PresenceServiceProvider presenceServiceProvider(){
+        return this.presenceServiceProvider;
     }
     public InventoryServiceProvider inventoryServiceProvider(){
         return this.inventoryServiceProvider;

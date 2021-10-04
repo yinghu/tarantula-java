@@ -6,5 +6,5 @@
   "tag":"game/friendlist",
   "moduleName":"com.tarantula.game.module.FriendListModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
-  "disabled": true
+  "disabled": false
 }
