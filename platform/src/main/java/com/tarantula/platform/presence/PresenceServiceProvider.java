@@ -7,7 +7,10 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PresenceServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -19,6 +22,8 @@ public class PresenceServiceProvider implements ServiceProvider {
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
     private int maxRewardTier;
+
+    private ConcurrentHashMap<Descriptor, TypedListener> tListeners;
 
     public PresenceServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -48,12 +53,18 @@ public class PresenceServiceProvider implements ServiceProvider {
     }
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.tListeners = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
     }
     public void onPlay(String systemId, Descriptor lobby){
         logger.warn("adding recently play list->"+systemId+"on looby->"+lobby.tag());
+        this.tListeners.forEach((k,t)->{
+            if (t.listener instanceof RecentlyPlayList.Listener){
+                ((RecentlyPlayList.Listener)t.listener).onPlay(systemId,lobby);
+            }
+        });
     }
 
     public Rating rating(String systemId){
@@ -80,6 +91,10 @@ public class PresenceServiceProvider implements ServiceProvider {
         dailyLoginTrack.dataStore(dataStore);
         this.dataStore.createIfAbsent(dailyLoginTrack,true);
         return dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier)?dailyLoginTrack:null;
+    }
+
+    public void registerListener(Descriptor descriptor,RecentlyPlayList.Listener listener){
+        this.tListeners.put(descriptor,new TypedListener(descriptor.category(),listener));
     }
 
 }
