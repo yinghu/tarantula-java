@@ -112,7 +112,8 @@
     document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
     TARA_API.onGet('role/lobby','onGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
         if(resp.successful){
-            resp.serviceList.forEach((a,i)=>{
+            let i = 0;
+            resp.serviceList.forEach((a)=>{
                 //console.log(a);
                 if(a.resetEnabled == true){
                     document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
@@ -120,6 +121,7 @@
                     document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-api-view-id','api.service.'+a.category.toLowerCase());
                     document.querySelector('#tx-service-list-api-'+i).setAttribute('tx-service-tag','role/'+a.category.toLowerCase());
                     document.querySelector('#tx-service-list-'+i).style.display='block';
+                    i++;
                 }
             });
         }

@@ -1,11 +1,11 @@
 {
   "typeId":"game-service",
-  "name":"DailyGiveAway",
+  "name":"DailyGiveaway",
   "type":"application",
   "category":"giveaway",
   "tag":"game/giveaway",
   "resetEnabled": true,
-  "moduleName":"com.tarantula.game.module.DailyGiveAwayModule",
+  "moduleName":"com.tarantula.game.module.DailyGiveawayModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
   "disabled": false
 }

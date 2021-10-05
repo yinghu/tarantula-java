@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 
-public class DailyGiveAwayModule implements Module {
+public class DailyGiveawayModule implements Module {
 
     private ApplicationContext context;
 
