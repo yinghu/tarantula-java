@@ -42,7 +42,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private ConcurrentHashMap<String,TournamentInstanceHeader> _instanceIndex;
     private ConcurrentLinkedDeque<TournamentRegistry> pendingRegistryQueue;
 
-    private DistributedTournamentServiceProvider tournamentServiceProvider;
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     public TournamentHeader(Schedule schedule){
         this.scheduleId = schedule.index();
@@ -198,7 +198,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.payload = JsonUtil.parse(portableReader.readUTF("10"));
     }
 
-    public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex,DistributedTournamentServiceProvider tournamentServiceProvider){
+    public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex, PlatformTournamentServiceProvider tournamentServiceProvider){
         this._instanceIndex = instanceIndex;
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.pendingRegistryQueue = new ConcurrentLinkedDeque();

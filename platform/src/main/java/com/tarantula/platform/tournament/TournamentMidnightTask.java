@@ -4,8 +4,8 @@ import com.icodesoftware.SchedulingTask;
 
 public class TournamentMidnightTask implements SchedulingTask {
 
-    private DistributedTournamentServiceProvider tournamentServiceProvider;
-    public TournamentMidnightTask(DistributedTournamentServiceProvider tournamentServiceProvider){
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
+    public TournamentMidnightTask(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
     }
     @Override

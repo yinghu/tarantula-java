@@ -81,5 +81,5 @@ public class PresenceServiceProvider implements ServiceProvider {
         this.dataStore.createIfAbsent(dailyLoginTrack,true);
         return dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier)?dailyLoginTrack:null;
     }
-    
+
 }

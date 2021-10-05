@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DistributedTournamentServiceProvider implements TournamentServiceProvider, ReloadListener {
+public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener {
 
     private static final String CONFIG = "game-tournament-settings";
 
@@ -32,7 +32,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
     private String reloadKey;
     private GameCluster gameCluster;
     private InventoryServiceProvider inventoryServiceProvider;
-    public DistributedTournamentServiceProvider(GameCluster gameCluster,InventoryServiceProvider inventoryServiceProvider){
+    public PlatformTournamentServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
@@ -110,7 +110,7 @@ public class DistributedTournamentServiceProvider implements TournamentServicePr
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
         this.lookupScheduleKey.dataStore(this.dataStore);
-        this.logger = this.serviceContext.logger(DistributedTournamentServiceProvider.class);
+        this.logger = this.serviceContext.logger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
     }

@@ -29,7 +29,7 @@ public class GameServiceProvider implements ServiceProvider{
     private InventoryServiceProvider inventoryServiceProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
     private AchievementServiceProvider achievementServiceProvider;
-    private DistributedTournamentServiceProvider tournamentServiceProvider;
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
     private PresenceServiceProvider presenceServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
@@ -75,7 +75,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.achievementServiceProvider = new AchievementServiceProvider(gameCluster,inventoryServiceProvider);
         this.achievementServiceProvider.waitForData();
         this.achievementServiceProvider.setup(serviceContext);
-        this.tournamentServiceProvider = new DistributedTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
+        this.tournamentServiceProvider = new PlatformTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
 

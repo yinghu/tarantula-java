@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 public class TournamentStartMonitor implements SchedulingTask {
 
     private final TournamentHeader tournamentHeader;
-    private final DistributedTournamentServiceProvider distributedTournamentServiceProvider;
+    private final PlatformTournamentServiceProvider distributedTournamentServiceProvider;
 
-    public TournamentStartMonitor(TournamentHeader tournamentHeader, DistributedTournamentServiceProvider distributedTournamentServiceProvider){
+    public TournamentStartMonitor(TournamentHeader tournamentHeader, PlatformTournamentServiceProvider distributedTournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
         this.distributedTournamentServiceProvider = distributedTournamentServiceProvider;
     }

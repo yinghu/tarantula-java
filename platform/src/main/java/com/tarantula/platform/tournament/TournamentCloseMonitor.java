@@ -6,9 +6,9 @@ import com.icodesoftware.util.TimeUtil;
 public class TournamentCloseMonitor implements SchedulingTask {
 
     private final TournamentHeader tournamentHeader;
-    private final DistributedTournamentServiceProvider distributedTournamentServiceProvider;
+    private final PlatformTournamentServiceProvider distributedTournamentServiceProvider;
 
-    public TournamentCloseMonitor(TournamentHeader tournamentHeader, DistributedTournamentServiceProvider distributedTournamentServiceProvider){
+    public TournamentCloseMonitor(TournamentHeader tournamentHeader, PlatformTournamentServiceProvider distributedTournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
         this.distributedTournamentServiceProvider = distributedTournamentServiceProvider;
     }
