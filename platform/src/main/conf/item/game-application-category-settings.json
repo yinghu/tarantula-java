@@ -27,10 +27,10 @@
       }
     },
     {
-      "header": {"type": "dailyLogin","name": "DailyLogin","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "giveaway","name": "Giveaway","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "daily-login-game-application-settings"
+        "name": "giveaway-game-application-settings"
       }
     }
   ]

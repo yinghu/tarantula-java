@@ -53,7 +53,7 @@ public class GameStoreAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.context.log("game store admin module started", OnLog.WARN);
+        this.context.log("Game store admin module started", OnLog.WARN);
     }
 
 }

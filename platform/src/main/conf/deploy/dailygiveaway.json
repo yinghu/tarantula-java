@@ -2,7 +2,7 @@
   "typeId":"game-service",
   "name":"DailyGiveAway",
   "type":"application",
-  "category":"system",
+  "category":"giveaway",
   "tag":"game/giveaway",
   "resetEnabled": true,
   "moduleName":"com.tarantula.game.module.DailyGiveAwayModule",

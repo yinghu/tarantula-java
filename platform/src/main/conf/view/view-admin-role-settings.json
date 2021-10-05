@@ -24,8 +24,7 @@
     {"type":"api.service.data","moduleResourceFile":"admin/api.service.data.view.html"},
     {"type":"api.game.lobby","moduleResourceFile":"admin/api.game.lobby.view.html"},
     {"type":"api.service.achievement","moduleResourceFile":"admin/api.service.item.view.html"},
-    {"type":"api.service.statistics","moduleResourceFile":"admin/api.service.item.view.html"},
-    {"type":"api.service.leaderboard","moduleResourceFile":"admin/api.service.item.view.html"},
+    {"type":"api.service.giveaway","moduleResourceFile":"admin/api.service.item.view.html"},
     {"type":"api.service.store","moduleResourceFile":"admin/api.service.item.view.html"},
     {"type":"api.service.tournament","moduleResourceFile":"admin/api.service.item.view.html"}
   ]

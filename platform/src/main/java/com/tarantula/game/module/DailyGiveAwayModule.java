@@ -6,6 +6,7 @@ import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 
 public class DailyGiveAwayModule implements Module {
+
     private ApplicationContext context;
 
     @Override

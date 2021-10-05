@@ -58,6 +58,6 @@ public class TournamentAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.context.log("tournament admin module started", OnLog.WARN);
+        this.context.log("Tournament admin module started", OnLog.WARN);
     }
 }

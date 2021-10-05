@@ -89,7 +89,7 @@
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
                 <type>application</type>
-                <category>dailyGiveaway</category>
+                <category>giveaway</category>
                 <tag>role/giveaway</tag>
                 <module-name>com.tarantula.admin.DailyGiveAwayAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
