@@ -1,6 +1,6 @@
 package com.tarantula.platform.presence;
 
-import com.icodesoftware.Distributable;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
@@ -37,7 +37,7 @@ public class PresenceServiceProvider implements ServiceProvider {
         this.serviceContext = serviceContext;
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
     }
-    public void onPlay(String systemId){
-        logger.warn("adding recently play list->"+systemId);
+    public void onPlay(String systemId, Descriptor lobby){
+        logger.warn("adding recently play list->"+systemId+"on looby->"+lobby.tag());
     }
 }

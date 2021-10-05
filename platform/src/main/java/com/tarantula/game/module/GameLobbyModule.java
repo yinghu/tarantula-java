@@ -28,7 +28,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
-        this.gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
+        this.gameServiceProvider.presenceServiceProvider().onPlay(session.systemId(),application);
     }
 
     @Override
