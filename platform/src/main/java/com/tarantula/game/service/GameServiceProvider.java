@@ -7,6 +7,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PresenceServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -23,7 +24,7 @@ public class GameServiceProvider implements ServiceProvider{
     private ServiceContext serviceContext;
 
     private DistributionRoomService distributionRoomService;
-    private PlayerDataProvider playerDataProvider;
+
     private LeaderBoardProvider leaderBoardProvider;
     private InventoryServiceProvider inventoryServiceProvider;
     private ItemConfigurationServiceProvider configurationServiceProvider;
@@ -62,9 +63,6 @@ public class GameServiceProvider implements ServiceProvider{
         this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();
-        this.playerDataProvider = new PlayerDataProvider(NAME);
-        this.playerDataProvider.setup(serviceContext);
-        this.playerDataProvider.waitForData();
         this.leaderBoardProvider = new LeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
@@ -95,7 +93,7 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void start() throws Exception {
         this.inventoryServiceProvider.start();
-        this.playerDataProvider.start();
+        this.presenceServiceProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
         this.configurationServiceProvider.start();
@@ -104,7 +102,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        this.playerDataProvider.shutdown();
+        this.presenceServiceProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.configurationServiceProvider.shutdown();
@@ -136,13 +134,13 @@ public class GameServiceProvider implements ServiceProvider{
 
     //player data service provider hook calls
     public Rating rating(String systemId){
-        return playerDataProvider.rating(systemId);
+        return presenceServiceProvider.rating(systemId);
     }
     public Statistics statistics(String systemId){
-        return playerDataProvider.statistics(systemId,leaderBoardProvider);
+        return presenceServiceProvider.statistics(systemId,leaderBoardProvider);
     }
     public DailyLoginTrack dailyLogin(String systemId){
-        return playerDataProvider.checkDailyLogin(systemId);
+        return presenceServiceProvider.checkDailyLogin(systemId);
     }
     public PresenceServiceProvider presenceServiceProvider(){
         return this.presenceServiceProvider;

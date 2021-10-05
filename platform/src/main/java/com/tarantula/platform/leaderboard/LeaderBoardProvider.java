@@ -1,4 +1,4 @@
-package com.tarantula.game.service;
+package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
@@ -9,8 +9,6 @@ import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
-import com.tarantula.platform.leaderboard.LeaderBoardEntry;
-import com.tarantula.platform.leaderboard.LeaderBoardSync;
 
 import java.util.concurrent.ConcurrentHashMap;
 

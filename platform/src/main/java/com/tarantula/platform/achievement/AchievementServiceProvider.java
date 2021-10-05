@@ -5,7 +5,6 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.Application;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -97,11 +96,6 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
     }
 
     @Override
-    public <T extends Configuration> T configuration(String s) {
-        return null;
-    }
-
-    @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
         List<Achievement> items = applicationPreSetup.list(serviceContext,descriptor,new AchievementObjectQuery("category/"+descriptor.category()));
@@ -112,11 +106,6 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
         this.rListeners.put(rid,listener);
         logger.warn("Listener registered with ->"+descriptor.category());
         return rid;
-    }
-
-    @Override
-    public String registerConfigurableListener(String s, Configurable.Listener listener) {
-        throw new UnsupportedOperationException("using descriptor");
     }
 
     @Override

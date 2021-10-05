@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 
 import java.util.List;
 
-public interface DeploymentServiceProvider extends ServiceProvider,ConfigurationServiceProvider,MetricsListener{
+public interface DeploymentServiceProvider extends ConfigurationServiceProvider,MetricsListener{
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";

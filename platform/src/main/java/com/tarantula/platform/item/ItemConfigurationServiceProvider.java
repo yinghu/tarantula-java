@@ -47,10 +47,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
 
     }
 
-    @Override
-    public <T extends Configuration> T configuration(String s) {
-        return null;
-    }
+
     @Override
     public String registerConfigurableListener(Descriptor application, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();
@@ -103,8 +100,5 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
             }
         });
         return true;
-    }
-    public String registerConfigurableListener(String category, Configurable.Listener listener){
-        throw new UnsupportedOperationException("using descriptor");
     }
 }

@@ -22,7 +22,7 @@ class TossUp{
         });
     }
     commit_kills(callback){
-        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}],achievement:{goal:'kill_boss',progress:1}}; 
+        let payload ={rating:{rank:0,delta:10},stats:[{name:'kills',value:1}]}; 
         TARA_API.onSet(TARA_API.query().stub.tag,'onUpdate','stats',payload,(resp)=>{
             callback(resp);    
         });    
