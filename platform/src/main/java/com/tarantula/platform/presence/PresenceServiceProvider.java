@@ -10,7 +10,7 @@ import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PresenceServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -22,8 +22,10 @@ public class PresenceServiceProvider implements ServiceProvider {
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
     private int maxRewardTier;
+    private int recentlyPlayListSize;
+    private int friendListSize;
 
-    private ConcurrentHashMap<Descriptor, TypedListener> tListeners;
+    private CopyOnWriteArrayList<TypedListener> tListeners;
 
     public PresenceServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -46,21 +48,24 @@ public class PresenceServiceProvider implements ServiceProvider {
     }
     @Override
     public void waitForData(){
-        Configuration configuration = serviceContext.configuration("game-daily-login-settings");
+        Configuration configuration = serviceContext.configuration("game-presence-settings");
         this.dailyLoginPendingHours =((Number)configuration.property("waitingTimeHours")).intValue();
         this.maxConsecutiveDays = ((Number)configuration.property("maxConsecutiveDays")).intValue();
         this.maxRewardTier = ((Number)configuration.property("maxRewardTiers")).intValue();
+        this.recentlyPlayListSize = ((Number)configuration.property("recentlyPlayListSize")).intValue();
+        this.friendListSize = ((Number)configuration.property("friendListSize")).intValue();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.tListeners = new ConcurrentHashMap<>();
+        this.tListeners = new CopyOnWriteArrayList<>();
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
     }
     public void onPlay(String systemId, Descriptor lobby){
-        logger.warn("adding recently play list->"+systemId+"on looby->"+lobby.tag());
-        this.tListeners.forEach((k,t)->{
+        logger.warn("adding recently play list->"+systemId+"on lobby->"+lobby.tag());
+
+        this.tListeners.forEach((t)->{
             if (t.listener instanceof RecentlyPlayList.Listener){
                 ((RecentlyPlayList.Listener)t.listener).onPlay(systemId,lobby);
             }
@@ -94,7 +99,7 @@ public class PresenceServiceProvider implements ServiceProvider {
     }
 
     public void registerListener(Descriptor descriptor,RecentlyPlayList.Listener listener){
-        this.tListeners.put(descriptor,new TypedListener(descriptor.category(),listener));
+        this.tListeners.add(new TypedListener(descriptor.category(),listener));
     }
 
 }

@@ -10,6 +10,7 @@ public class RecentlyPlayListModule implements Module , RecentlyPlayList.Listene
     private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+
         return false;
     }
 

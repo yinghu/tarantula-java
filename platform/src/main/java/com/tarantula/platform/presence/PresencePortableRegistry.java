@@ -20,6 +20,8 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int ACHIEVEMENT_PROGRESS_CID = 4;
 
+    public static final int RECENTLY_PLAY_LIST_CID = 5;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public Recoverable create(int i) {
@@ -39,6 +41,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case ACHIEVEMENT_PROGRESS_CID:
                 pt = new AchievementProgress();
+                break;
+            case RECENTLY_PLAY_LIST_CID:
+                pt = new RecentlyPlayList();
                 break;
             default:
         }
