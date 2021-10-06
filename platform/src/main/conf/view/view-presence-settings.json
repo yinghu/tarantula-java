@@ -15,7 +15,9 @@
     {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.statistics","moduleResourceFile": "presence/live.game.service.statistics.view.html"},
     {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.achievement.view.html"},
-
+    {"type": "live.game.service.recentlyplaylist","moduleResourceFile": "presence/live.game.service.recentlyplaylist.view.html"},
+    {"type": "live.game.service.friendlist","moduleResourceFile": "presence/live.game.service.friendlist.view.html"},
+    {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.inbox.view.html"},
     {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.leaderboard.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.inventory","moduleResourceFile": "presence/live.game.service.inventory.view.html"},
