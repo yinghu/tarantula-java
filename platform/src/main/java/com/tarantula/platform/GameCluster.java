@@ -32,8 +32,7 @@ public class GameCluster extends OnApplicationHeader implements Portable {
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
     public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
-    public final static String RECENTLY_PLAY_LIST_INDEX ="recentlyPlayList";
-    public final static String FRIEND_LIST_INDEX ="friendList";
+    public final static String PLAY_LIST_INDEX ="playlist";
 
     public final static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
     public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "game-component-category-settings";

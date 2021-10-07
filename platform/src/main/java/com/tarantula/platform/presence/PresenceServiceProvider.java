@@ -7,10 +7,10 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
-import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.statistics.StatisticsIndex;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PresenceServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -25,7 +25,7 @@ public class PresenceServiceProvider implements ServiceProvider {
     private int recentlyPlayListSize;
     private int friendListSize;
 
-    private CopyOnWriteArrayList<TypedListener> tListeners;
+    private PlayList recentlyPlayList;
 
     public PresenceServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -39,6 +39,10 @@ public class PresenceServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
+        this.recentlyPlayList = new PlayList(recentlyPlayListSize);
+        this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
+        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.dataStore);
         logger.warn("presence service provider started");
     }
 
@@ -57,19 +61,29 @@ public class PresenceServiceProvider implements ServiceProvider {
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.tListeners = new CopyOnWriteArrayList<>();
         this.serviceContext = serviceContext;
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
     }
-    public void onPlay(String systemId, Descriptor lobby){
-        logger.warn("adding recently play list->"+systemId+"on lobby->"+lobby.tag());
-
-        this.tListeners.forEach((t)->{
-            if (t.listener instanceof RecentlyPlayList.Listener){
-                ((RecentlyPlayList.Listener)t.listener).onPlay(systemId,lobby);
-            }
-        });
+    public void onFriendList(String systemId,String friendSystemId){
+        PlayList playList = new PlayList(friendListSize);
+        playList.distributionKey(systemId);
+        this.dataStore.createIfAbsent(playList,true);
+        playList.playListIndex.push(friendSystemId);
+        this.dataStore.update(playList);
+    }
+    public void onPlay(String systemId){
+        this.recentlyPlayList.playListIndex.push(systemId);
+        this.recentlyPlayList.update();
+    }
+    public List<String> friendList(String systemId){
+        PlayList playList = new PlayList(friendListSize);
+        playList.distributionKey(systemId);
+        this.dataStore.createIfAbsent(playList,true);
+        return playList.playListIndex.list(new ArrayList<>());
+    }
+    public List<String> recentlyPlayList(){
+        return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
     }
 
     public Rating rating(String systemId){
@@ -95,11 +109,8 @@ public class PresenceServiceProvider implements ServiceProvider {
         dailyLoginTrack.distributionKey(systemId);
         dailyLoginTrack.dataStore(dataStore);
         this.dataStore.createIfAbsent(dailyLoginTrack,true);
-        return dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier)?dailyLoginTrack:null;
-    }
 
-    public void registerListener(Descriptor descriptor,RecentlyPlayList.Listener listener){
-        this.tListeners.add(new TypedListener(descriptor.category(),listener));
+        return dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier)?dailyLoginTrack:null;
     }
 
 }

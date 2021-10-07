@@ -1,22 +1,21 @@
 package com.tarantula.platform.presence;
 
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.GameCluster;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class RecentlyPlayList extends RecoverableObject {
+public class PlayList extends RecoverableObject {
 
-    private FIFOBuffer<String> playListIndex;
+    public FIFOBuffer<String> playListIndex;
 
-    public RecentlyPlayList(){}
-    public RecentlyPlayList(int size,Descriptor lobby){
+    public PlayList(){}
+    public PlayList(int size){
         this.playListIndex = new FIFOBuffer<>(size,new String[size]);
     }
     @Override
@@ -26,24 +25,23 @@ public class RecentlyPlayList extends RecoverableObject {
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.ACHIEVEMENT_CID;
+        return PresencePortableRegistry.PLAY_LIST_CID;
     }
 
     @Override
     public Map<String,Object> toMap(){
-        //playListIndex.
+        List<String> list = this.playListIndex.list(new ArrayList<>());
+        list.forEach(a-> this.properties.put(a,"1"));
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-
+        properties.forEach((k,v)->this.playListIndex.push(k));
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid, GameCluster.RECENTLY_PLAY_LIST_INDEX);
+        return new AssociateKey(this.bucket,this.oid, GameCluster.PLAY_LIST_INDEX);
     }
 
-    public interface Listener extends Configurable.Listener {
-        void onPlay(String systemId, Descriptor lobby);
-    }
+
 }

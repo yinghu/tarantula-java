@@ -31,7 +31,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-friendlist"),{mode:'tree'},{});
-    TARA_API.onGet(TARA_API.query().serviceTag,'onFriendlist',"",(resp)=>{
+    TARA_API.onGet(TARA_API.query().serviceTag,'onFriendList',"",(resp)=>{
         editor.set(resp);
     });
     document.querySelector('#tx-friendlist-live-close').onclick=()=>{
