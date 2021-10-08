@@ -85,15 +85,7 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider 
         });
         return true;
     }
-    @Override
-    public <T extends Configurable> void release(T t) {
 
-    }
-
-    @Override
-    public void configure(String s) {
-
-    }
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {

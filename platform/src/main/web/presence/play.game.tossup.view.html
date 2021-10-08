@@ -138,6 +138,15 @@
     goal.y = 800;
     app.stage.addChild(goal);
 
+    let redeem = text_button('DailyReward',120,64,()=>{
+        ttc.commit_daily_reward((resp)=>{
+            messageBox.text = JSON.stringify(resp);
+        });
+    });
+    redeem.x = window.innerWidth-128;;
+    redeem.y = 880;
+    app.stage.addChild(redeem);
+
 
     function text_button(cap,w,h,cmd){
         let container = new PIXI.Container();

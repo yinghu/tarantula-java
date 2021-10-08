@@ -128,11 +128,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("itemId", distributionKey());
-        //jsonObject.addProperty("configurationType", configurationType);
-        //jsonObject.addProperty("configurationTypeId", configurationTypeId);
-        //jsonObject.addProperty("configurationName", configurationName);
-        //jsonObject.addProperty("configurationCategory", configurationCategory);
-        //jsonObject.addProperty("configurationVersion", configurationVersion);
         header.entrySet().forEach((e)->{
             jsonObject.add(e.getKey(),e.getValue());
         });

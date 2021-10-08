@@ -50,4 +50,9 @@ class TossUp{
             callback(resp);    
         });  
     }
+    commit_daily_reward(callback){
+        TARA_API.onGet('tossup/giveaway','onRedeem','',(resp)=>{
+            callback(resp);    
+        });    
+    }
 }

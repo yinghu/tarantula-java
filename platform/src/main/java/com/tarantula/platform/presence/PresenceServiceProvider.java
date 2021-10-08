@@ -1,23 +1,32 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Rating;
+import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class PresenceServiceProvider implements ServiceProvider {
+public class PresenceServiceProvider implements ConfigurationServiceProvider {
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
     private ServiceContext serviceContext;
     private DataStore dataStore;
+    private ApplicationPreSetup applicationPreSetup;
+
 
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
@@ -26,10 +35,13 @@ public class PresenceServiceProvider implements ServiceProvider {
     private int friendListSize;
 
     private PlayList recentlyPlayList;
+    private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
+    private InventoryServiceProvider inventoryServiceProvider;
 
-    public PresenceServiceProvider(GameCluster gameCluster){
+    public PresenceServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
+        this.inventoryServiceProvider = inventoryServiceProvider;
     }
 
     @Override
@@ -39,6 +51,7 @@ public class PresenceServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
+        this.dailyGiveaways = new ConcurrentHashMap<>();
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
@@ -62,8 +75,9 @@ public class PresenceServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
-        this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
+        this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     public void onFriendList(String systemId,String friendSystemId){
         PlayList playList = new PlayList(friendListSize);
@@ -113,8 +127,30 @@ public class PresenceServiceProvider implements ServiceProvider {
         if(rewarded){
             //redeem or inbox
             logger.warn("Rewarding key->"+dailyLoginTrack.rewardKey());
+            DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
+            this.logger.warn(dailyGiveaway.toJson().toString());
         }
         return rewarded?dailyLoginTrack:null;
     }
 
+    public void redeem(String systemId){
+        this.logger.warn("redeem daily reward->"+systemId);
+        dailyGiveaways.forEach((a,v)->{
+            inventoryServiceProvider.redeem(systemId,v);
+        });
+    }
+
+    @Override
+    public <T extends Configurable> void register(T t) {
+        this.logger.warn(t.toJson().toString());
+    }
+
+
+
+
+    public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
+        List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("category/"+application.category()));
+        items.forEach((a)-> dailyGiveaways.put(a.name(),a));
+        return null;
+    }
 }

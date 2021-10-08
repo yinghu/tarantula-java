@@ -66,7 +66,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.leaderBoardProvider = new LeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
-        this.presenceServiceProvider = new PresenceServiceProvider(gameCluster);
+        this.presenceServiceProvider = new PresenceServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.presenceServiceProvider.setup(serviceContext);
         this.presenceServiceProvider.waitForData();
         this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);

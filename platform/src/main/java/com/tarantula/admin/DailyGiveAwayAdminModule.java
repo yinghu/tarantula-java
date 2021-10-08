@@ -10,6 +10,7 @@ import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.ConfigurableHeader;
 import com.tarantula.platform.item.ConfigurableHeaderQuery;
 import com.tarantula.platform.item.ItemHeaderContext;
+import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -30,16 +31,16 @@ public class DailyGiveAwayAdminModule implements Module {
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
-            Achievement app = new Achievement();
+            DailyGiveaway app = new DailyGiveaway();
             app.distributionKey(ks[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
             if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                gameServiceProvider.achievementServiceProvider().register(app.setup());
+                gameServiceProvider.presenceServiceProvider().register(app.setup());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to register achievement item").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"failed to register giveaway item").getBytes());
             }
         }
         else {

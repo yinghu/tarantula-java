@@ -1,0 +1,35 @@
+package com.tarantula.platform.presence;
+
+import com.icodesoftware.RecoverableFactory;
+import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ItemPortableRegistry;
+
+public class DailygGiveawayObjectQuery implements RecoverableFactory<DailyGiveaway> {
+
+    public String label;
+
+
+    public DailygGiveawayObjectQuery(String query){
+        this.label = query;
+    }
+
+    @Override
+    public DailyGiveaway create() {
+        return new DailyGiveaway();
+    }
+
+    @Override
+    public int registryId() {
+        return PresencePortableRegistry.DAILY_GIVEAWAY_CID;
+    }
+
+    @Override
+    public String label() {
+        return label;
+    }
+
+    @Override
+    public String distributionKey() {
+        return null;
+    }
+}

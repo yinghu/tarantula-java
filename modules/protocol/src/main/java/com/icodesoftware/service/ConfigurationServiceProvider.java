@@ -7,15 +7,15 @@ import com.icodesoftware.Descriptor;
 
 public interface ConfigurationServiceProvider extends ServiceProvider{
 
-    <T extends Configurable> void register(T configurable);
-    <T extends Configurable> void release(T configurable);
-    void configure(String key);
+    default <T extends Configurable> void register(T configurable){}
+    default <T extends Configurable> void release(T configurable){}
+    default void configure(String key){}
 
     default <T extends Configuration> T configuration(String config){throw new UnsupportedOperationException();}
 
     default String registerConfigurableListener(Descriptor application, Configurable.Listener listener){throw new UnsupportedOperationException();}
     default String registerConfigurableListener(String category, Configurable.Listener listener){ throw new UnsupportedOperationException();}
 
-    void unregisterConfigurableListener(String registryKey);
+    default void unregisterConfigurableListener(String registryKey){}
 
 }
