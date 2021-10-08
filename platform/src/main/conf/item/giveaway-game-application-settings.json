@@ -6,30 +6,30 @@
   "itemList":
   [
     {
-      "configurationTypeId": "d1",
-      "configurationName": "DailyLogin1",
+      "configurationTypeId": "tier1",
+      "configurationName": "rewardDay1",
       "header": {
-        "name": "d-day-3"
+        "rewardKey": "reward_tier_1_day_1"
       },
       "application": {},
       "payload": {},
       "reference": []
     },
     {
-      "configurationTypeId": "d2",
-      "configurationName": "DailyLogin1",
+      "configurationTypeId": "tier1",
+      "configurationName": "rewardDay2",
       "header": {
-        "name": "d-day-1"
+        "rewardKey": "reward_tier_1_day_2"
       },
       "application": {},
       "payload": {},
       "reference": []
     },
     {
-      "configurationTypeId": "d3",
-      "configurationName": "DailyLogin1",
+      "configurationTypeId": "tier1",
+      "configurationName": "rewardDay3",
       "header": {
-        "name": "d-day-3"
+        "rewardKey": "reward_tier_1_day_3"
       },
       "application": {},
       "payload": {},

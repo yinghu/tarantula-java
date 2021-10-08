@@ -39,7 +39,13 @@
     app.stage.addChild(messageBox);
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
-    
+    let pic = PIXI.Sprite.from('resource/portrait.png');
+    pic.x = 100;
+    pic.y = 260;
+    pic.width = 80;
+    pic.height = 100;
+    app.stage.addChild(pic);
+
     let exit = text_button('EXIT',64,64,()=>{
         ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);

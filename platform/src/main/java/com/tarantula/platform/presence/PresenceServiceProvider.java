@@ -109,8 +109,12 @@ public class PresenceServiceProvider implements ServiceProvider {
         dailyLoginTrack.distributionKey(systemId);
         dailyLoginTrack.dataStore(dataStore);
         this.dataStore.createIfAbsent(dailyLoginTrack,true);
-
-        return dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier)?dailyLoginTrack:null;
+        boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
+        if(rewarded){
+            //redeem or inbox
+            logger.warn("Rewarding key->"+dailyLoginTrack.rewardKey());
+        }
+        return rewarded?dailyLoginTrack:null;
     }
 
 }

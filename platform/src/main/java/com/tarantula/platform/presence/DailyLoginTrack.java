@@ -5,16 +5,15 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
 
-
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class DailyLoginTrack extends RecoverableObject {
 
     public int lastLoginDay;
     public int rewardTier;
+    public int nextRewardTimeSeconds;
 
     public DailyLoginTrack(){
         this.label = "dailyLogin";
@@ -52,8 +51,10 @@ public class DailyLoginTrack extends RecoverableObject {
         if(lastLoginDay==0&&rewardTier==0){
             lastLoginDay = 1;
             rewardTier = 1;
-            timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+            LocalDateTime cur = LocalDateTime.now();
+            timestamp = TimeUtil.toUTCMilliseconds(cur);
             dataStore.update(this);
+            nextRewardTime(cur,pendingHours);
             return true;
         }
         LocalDateTime lastLogin = TimeUtil.fromUTCMilliseconds(this.timestamp);
@@ -69,6 +70,7 @@ public class DailyLoginTrack extends RecoverableObject {
                     }
                     timestamp = TimeUtil.toUTCMilliseconds(current);
                     this.dataStore.update(this);
+                    nextRewardTime(current,pendingHours);
                     return true;
                 }
                 else{
@@ -79,6 +81,7 @@ public class DailyLoginTrack extends RecoverableObject {
             rewardTier = rewardTier<maxTier?(rewardTier+1):1;
             timestamp = TimeUtil.toUTCMilliseconds(current);
             this.dataStore.update(this);
+            nextRewardTime(current,pendingHours);
             return true;
         }
         else{
@@ -95,6 +98,7 @@ public class DailyLoginTrack extends RecoverableObject {
             }
             timestamp = TimeUtil.toUTCMilliseconds(current);
             dataStore.update(this);
+            nextRewardTime(current,pendingHours);
             return true;
         }
     }
@@ -102,7 +106,16 @@ public class DailyLoginTrack extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("lastLoginDay",lastLoginDay);
         jsonObject.addProperty("rewardTier",rewardTier);
-        jsonObject.addProperty("lastLogin",TimeUtil.fromUTCMilliseconds(this.timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("rewardKey",rewardKey());
+        jsonObject.addProperty("nextLoginInSeconds",nextRewardTimeSeconds);
         return jsonObject;
     }
+    public String rewardKey(){
+        return "reward_tier_"+rewardTier+"_day_"+lastLoginDay;
+    }
+    private void nextRewardTime(LocalDateTime current,int pendingHours){
+        int remainingSeconds = 24*60*60-current.getSecond();
+        nextRewardTimeSeconds = remainingSeconds>pendingHours*60*60?remainingSeconds:pendingHours*60*60;
+    }
+
 }
