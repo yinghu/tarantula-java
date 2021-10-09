@@ -34,11 +34,11 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
     }
 
     @Override
-    public boolean register(String serviceName,String category,String itemId) {
+    public boolean register(String gameServiceName,String serviceName,String category,String itemId) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         boolean ret = true;
-        ItemRegisterOperation operation = new ItemRegisterOperation(serviceName,category,itemId);
+        ItemRegisterOperation operation = new ItemRegisterOperation(gameServiceName,serviceName,category,itemId);
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
             final Future<Boolean> future = builder.invoke();

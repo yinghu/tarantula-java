@@ -1,29 +1,27 @@
 package com.tarantula.game.module;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.ItemApplicationContext;
+import com.tarantula.platform.store.ShoppingItem;
+import com.tarantula.platform.store.ShoppingItemContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameStoreModule implements Module,Configurable.Listener<Application>{
+public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private ConcurrentHashMap<String,Application> itemList;
+    private ConcurrentHashMap<String, ShoppingItem> itemList;
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new ItemApplicationContext(true,"shop list",toList()).toJson().toString().getBytes());
+            session.write(new ShoppingItemContext(true,"shop list",toList()).toJson().toString().getBytes());
         }
         if(session.action().equals("onBuy")){
-            Application item = itemList.get(session.name());
+            ShoppingItem item = itemList.get(session.name());
             if(item!=null&&this.gameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),item)){
                 session.write(JsonUtil.toSimpleResponse(true,"inventory redeemed").getBytes());
             }else{
@@ -38,15 +36,15 @@ public class GameStoreModule implements Module,Configurable.Listener<Application
         this.context = applicationContext;
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.storeServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("game store module started", OnLog.WARN);
     }
-    public void onCreated(Application item){
+    public void onCreated(ShoppingItem item){
         itemList.put(item.distributionKey(),item);
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
-    private List<Application> toList(){
-        ArrayList<Application> arrayList = new ArrayList<>();
+    private List<ShoppingItem> toList(){
+        ArrayList<ShoppingItem> arrayList = new ArrayList<>();
         itemList.forEach((k,v)->arrayList.add(v));
         return arrayList;
     }

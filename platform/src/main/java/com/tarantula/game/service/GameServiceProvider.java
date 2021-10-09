@@ -6,11 +6,13 @@ import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.ItemConfigurationServiceProvider;
+import com.tarantula.platform.item.ItemServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PresenceServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.store.StoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -27,7 +29,8 @@ public class GameServiceProvider implements ServiceProvider{
 
     private LeaderBoardProvider leaderBoardProvider;
     private InventoryServiceProvider inventoryServiceProvider;
-    private ItemConfigurationServiceProvider configurationServiceProvider;
+    private ItemServiceProvider itemServiceProvider;
+    private StoreServiceProvider storeServiceProvider;
     private AchievementServiceProvider achievementServiceProvider;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
     private PresenceServiceProvider presenceServiceProvider;
@@ -63,15 +66,18 @@ public class GameServiceProvider implements ServiceProvider{
         this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();
+        this.storeServiceProvider = new StoreServiceProvider(gameCluster,inventoryServiceProvider);
+        this.storeServiceProvider.setup(serviceContext);
+        this.storeServiceProvider.waitForData();
         this.leaderBoardProvider = new LeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
         this.presenceServiceProvider = new PresenceServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.presenceServiceProvider.setup(serviceContext);
         this.presenceServiceProvider.waitForData();
-        this.configurationServiceProvider = new ItemConfigurationServiceProvider(gameCluster);
-        this.configurationServiceProvider.setup(serviceContext);
-        this.configurationServiceProvider.waitForData();
+        this.itemServiceProvider = new ItemServiceProvider(gameCluster);
+        this.itemServiceProvider.setup(serviceContext);
+        this.itemServiceProvider.waitForData();
         this.achievementServiceProvider = new AchievementServiceProvider(gameCluster,inventoryServiceProvider);
         this.achievementServiceProvider.waitForData();
         this.achievementServiceProvider.setup(serviceContext);
@@ -96,7 +102,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.presenceServiceProvider.start();
         this.leaderBoardProvider.start();
         this.tournamentServiceProvider.start();
-        this.configurationServiceProvider.start();
+        this.itemServiceProvider.start();
         this.presenceServiceProvider.start();
     }
 
@@ -105,7 +111,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.presenceServiceProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
-        this.configurationServiceProvider.shutdown();
+        this.itemServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
     public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
@@ -148,15 +154,15 @@ public class GameServiceProvider implements ServiceProvider{
     public InventoryServiceProvider inventoryServiceProvider(){
         return this.inventoryServiceProvider;
     }
-
+    public StoreServiceProvider storeServiceProvider(){ return this.storeServiceProvider; }
     //leader service provider hook calls
     public LeaderBoard leaderBoard(String category){
         return leaderBoardProvider.leaderBoard(category);
     }
 
     //configuration service provider hood calls
-    public ItemConfigurationServiceProvider configurationServiceProvider(){
-        return this.configurationServiceProvider;
+    public ItemServiceProvider itemServiceProvider(){
+        return this.itemServiceProvider;
     }
 
     //Achievement service provider
@@ -182,6 +188,22 @@ public class GameServiceProvider implements ServiceProvider{
     }
     public Tournament.RaceBoard onRaceBoard(String instanceId){
         return this.tournamentServiceProvider.instance(instanceId).raceBoard();
+    }
+
+    public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){
+        if(serviceName.equals(itemServiceProvider.name())){
+            return itemServiceProvider;
+        }
+        if(serviceName.equals(presenceServiceProvider.name())){
+            return presenceServiceProvider;
+        }
+        if(serviceName.equals(achievementServiceProvider.name())){
+            return achievementServiceProvider;
+        }
+        if(serviceName.equals(storeServiceProvider.name())){
+            return storeServiceProvider;
+        }
+        return null;
     }
 
 }

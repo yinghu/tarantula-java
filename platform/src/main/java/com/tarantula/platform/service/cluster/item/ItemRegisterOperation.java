@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class ItemRegisterOperation extends Operation {
 
+    private String gameServiceName;
     private String serviceName;
     private String category;
     private String itemId;
@@ -18,7 +19,8 @@ public class ItemRegisterOperation extends Operation {
     }
 
 
-    public ItemRegisterOperation(String serviceName,String category,String itemId) {
+    public ItemRegisterOperation(String gameServiceName,String serviceName,String category,String itemId) {
+        this.gameServiceName = gameServiceName;
         this.serviceName = serviceName;
         this.category = category;
         this.itemId = itemId;
@@ -27,7 +29,7 @@ public class ItemRegisterOperation extends Operation {
     @Override
     public void run() throws Exception {
         ItemClusterService cis = this.getService();
-        this.ret = cis.register(serviceName,category,itemId);
+        this.ret = cis.register(gameServiceName,serviceName,category,itemId);
     }
 
     @Override
@@ -38,6 +40,7 @@ public class ItemRegisterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
+        out.writeUTF(gameServiceName);
         out.writeUTF(serviceName);
         out.writeUTF(category);
         out.writeUTF(itemId);
@@ -46,6 +49,7 @@ public class ItemRegisterOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
+        gameServiceName = in.readUTF();
         serviceName = in.readUTF();
         category = in.readUTF();
         itemId = in.readUTF();

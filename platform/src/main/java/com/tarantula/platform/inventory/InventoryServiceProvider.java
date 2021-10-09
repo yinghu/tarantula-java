@@ -11,6 +11,7 @@ import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.util.SystemUtil;
 
 
@@ -44,7 +45,7 @@ public class InventoryServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
+        this.logger = serviceContext.logger(ItemServiceProvider.class);
     }
     public Category category(){
         GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -84,6 +85,15 @@ public class InventoryServiceProvider implements ServiceProvider {
         return true;
     }
     public boolean redeem(String systemId, DailyGiveaway item){
+        ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
+        redeemer.distributionKey(item.distributionKey());
+        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        redeemer.redeem();
+        return true;
+    }
+    public boolean redeem(String systemId, ShoppingItem item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());

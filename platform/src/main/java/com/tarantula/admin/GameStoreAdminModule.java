@@ -8,6 +8,7 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
@@ -27,13 +28,13 @@ public class GameStoreAdminModule implements Module {
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
-            ConfigurableObject app = new ConfigurableObject();
+            ShoppingItem app = new ShoppingItem();
             app.distributionKey(ks[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
             if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                gameServiceProvider.configurationServiceProvider().register(app.setup());
+                gameServiceProvider.storeServiceProvider().register(app.setup());
             }
             else{
                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());

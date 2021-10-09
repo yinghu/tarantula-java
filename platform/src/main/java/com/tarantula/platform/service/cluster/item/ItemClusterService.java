@@ -8,7 +8,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.item.Item;
+
 
 import java.util.Properties;
 
@@ -47,8 +47,8 @@ public class ItemClusterService implements ManagedService, RemoteService {
 
     }
 
-    public boolean register(String serviceName, String category,String itemId){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.configurationServiceProvider().onRegister(category,itemId);
+    public boolean register(String gameServiceName,String serviceName, String category,String itemId){
+        GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
+        return gameServiceProvider.clusterConfigurationCallback(serviceName).onRegister(category,itemId);
     }
 }

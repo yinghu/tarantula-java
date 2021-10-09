@@ -3,15 +3,13 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
+import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ItemConfigurationServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -19,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PresenceServiceProvider implements ConfigurationServiceProvider {
+public class PresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
@@ -37,6 +35,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider {
     private PlayList recentlyPlayList;
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
     private InventoryServiceProvider inventoryServiceProvider;
+    private DistributionItemService distributionItemService;
 
     public PresenceServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -46,7 +45,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider {
 
     @Override
     public String name() {
-        return name;
+        return "PresenceService";
     }
 
     @Override
@@ -77,6 +76,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     public void onFriendList(String systemId,String friendSystemId){
@@ -142,7 +142,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider {
 
     @Override
     public <T extends Configurable> void register(T t) {
-        this.logger.warn(t.toJson().toString());
+        this.distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
     }
 
 
@@ -152,5 +152,19 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider {
         List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("category/"+application.category()));
         items.forEach((a)-> dailyGiveaways.put(a.name(),a));
         return null;
+    }
+
+    @Override
+    public boolean onRegister(String category, String itemId) {
+        DailyGiveaway dailyGiveaway = new DailyGiveaway();
+        dailyGiveaway.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(category);
+        if(!applicationPreSetup.load(serviceContext,app,dailyGiveaway)){
+            return false;
+        }
+        logger.warn("daily reward registered->"+dailyGiveaway.name());
+        dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
+        return true;
     }
 }

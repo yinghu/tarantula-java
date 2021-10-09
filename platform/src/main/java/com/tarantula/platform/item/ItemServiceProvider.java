@@ -6,6 +6,7 @@ import com.icodesoftware.service.ServiceContext;
 
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.service.deployment.TypedListener;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ItemConfigurationServiceProvider implements ConfigurationServiceProvider {
+public class ItemServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
@@ -23,7 +24,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
-    public ItemConfigurationServiceProvider(GameCluster gameCluster){
+    public ItemServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
@@ -34,7 +35,7 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
 
     @Override
     public <T extends Configurable> void register(T config) {
-        distributionItemService.register(name,config.configurationCategory(),config.distributionKey());
+        distributionItemService.register(name,name(),config.configurationCategory(),config.distributionKey());
     }
 
 
@@ -57,17 +58,17 @@ public class ItemConfigurationServiceProvider implements ConfigurationServicePro
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(ItemConfigurationServiceProvider.class);
+        this.logger = serviceContext.logger(ItemServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
     @Override
     public String name() {
-        return name;
+        return "ItemService";
     }
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("item configuration service provider started");
+        this.logger.warn("Item service provider started");
     }
 
     @Override
