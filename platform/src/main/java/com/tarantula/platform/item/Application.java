@@ -56,6 +56,7 @@ public class Application extends ConfigurableObject{
                 break;
             }
         }
+        this.disabled = true;
         return passed;
     }
     @Override

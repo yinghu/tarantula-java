@@ -167,4 +167,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
         return true;
     }
+    public boolean onRelease(String category,String itemId){
+        return false;
+    }
 }

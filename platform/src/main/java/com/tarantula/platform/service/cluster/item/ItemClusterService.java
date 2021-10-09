@@ -51,4 +51,8 @@ public class ItemClusterService implements ManagedService, RemoteService {
         GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
         return gameServiceProvider.clusterConfigurationCallback(serviceName).onRegister(category,itemId);
     }
+    public boolean release(String gameServiceName,String serviceName, String category,String itemId){
+        GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
+        return gameServiceProvider.clusterConfigurationCallback(serviceName).onRelease(category,itemId);
+    }
 }

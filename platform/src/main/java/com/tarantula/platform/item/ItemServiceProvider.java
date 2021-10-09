@@ -88,4 +88,7 @@ public class ItemServiceProvider implements ConfigurationServiceProvider, Cluste
         });
         return true;
     }
+    public boolean onRelease(String category,String itemId){
+        return false;
+    }
 }

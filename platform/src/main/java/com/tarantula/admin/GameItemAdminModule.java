@@ -152,10 +152,11 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
-                    GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                    gameServiceProvider.itemServiceProvider().register(app);
+                    session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
                 }
-                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+                }
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
@@ -170,7 +171,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save application").getBytes());
             }
         }
         else if(session.action().equals("onCategory")){

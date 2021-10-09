@@ -17,11 +17,12 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected static String NAME_KEY = "3";
     protected static String CATEGORY_KEY = "4";
     protected static String VERSION_KEY = "5";
+    protected static String DISABLED_KEY = "6";
 
-    protected static String HEADER_KEY = "6";
-    protected static String APPLICATION_KEY = "7";
-    protected static String PAYLOAD_KEY = "8";
-    protected static String REFERENCE_KEY = "9";
+    protected static String HEADER_KEY = "7";
+    protected static String APPLICATION_KEY = "8";
+    protected static String PAYLOAD_KEY = "9";
+    protected static String REFERENCE_KEY = "10";
 
 
     protected String configurationType;
@@ -42,6 +43,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = configurableObject.configurationName;
         this.configurationCategory = configurableObject.configurationCategory;
         this.configurationVersion = configurableObject.configurationVersion;
+        this.disabled = configurableObject.disabled;
         this.header = configurableObject.header;
         this.application = configurableObject.application;
         this.payload = configurableObject.payload;
@@ -91,12 +93,24 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
 
     @Override
+    public void registered(){
+        this.disabled = false;
+        this.dataStore.update(this);
+    }
+    @Override
+    public void released(){
+        this.disabled = true;
+        this.dataStore.update(this);
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         this.properties.put(TYPE_KEY, this.configurationType);
         this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
         this.properties.put(NAME_KEY, this.configurationName);
         this.properties.put(CATEGORY_KEY, this.configurationCategory);
         this.properties.put(VERSION_KEY, this.configurationVersion);
+        this.properties.put(DISABLED_KEY,this.disabled);
         this.properties.put(HEADER_KEY,header.toString());
         this.properties.put(PAYLOAD_KEY,payload.toString());
         this.properties.put(APPLICATION_KEY,application.toString());
@@ -111,6 +125,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = (String) properties.get(NAME_KEY);
         this.configurationCategory = (String) properties.get(CATEGORY_KEY);
         this.configurationVersion = (String) properties.get(VERSION_KEY);
+        this.disabled = (boolean)properties.getOrDefault(DISABLED_KEY,false);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
         this.payload = JsonUtil.parse((String) properties.getOrDefault(PAYLOAD_KEY, "{}"));

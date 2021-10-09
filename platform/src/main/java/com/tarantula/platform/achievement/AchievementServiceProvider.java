@@ -87,7 +87,9 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider,
         });
         return true;
     }
-
+    public boolean onRelease(String category,String itemId){
+        return false;
+    }
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {

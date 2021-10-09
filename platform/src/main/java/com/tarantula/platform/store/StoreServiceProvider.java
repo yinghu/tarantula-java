@@ -61,7 +61,12 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
 
     @Override
     public <T extends Configurable> void register(T t) {
+        t.registered();
         distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+    }
+    @Override
+    public <T extends Configurable> void release(T t){
+        t.released();
     }
     public boolean onRegister(String category,String itemId){
         ShoppingItem configurableObject = new ShoppingItem();
@@ -78,7 +83,9 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
         //});
         return true;
     }
-
+    public boolean onRelease(String category,String itemId){
+        return false;
+    }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         String rid = UUID.randomUUID().toString();

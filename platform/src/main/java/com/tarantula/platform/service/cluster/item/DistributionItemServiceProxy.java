@@ -55,7 +55,28 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
         }
         return ret;
     }
-
+    @Override
+    public boolean release(String gameServiceName,String serviceName,String category,String itemId) {
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        boolean ret = true;
+        ItemReleaseOperation operation = new ItemReleaseOperation(gameServiceName,serviceName,category,itemId);
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
+            final Future<Boolean> future = builder.invoke();
+            try {
+                boolean flag = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+                if(!flag){
+                    ret = false;
+                }
+            } catch (Exception e) {
+                future.cancel(true);
+                ret = false;
+                //goes to next node if failed
+            }
+        }
+        return ret;
+    }
     @Override
     public String name() {
         return DistributionItemService.NAME;
