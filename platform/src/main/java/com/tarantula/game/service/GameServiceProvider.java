@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
+import com.tarantula.platform.inbox.InboxServiceProvider;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.ItemServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
@@ -34,6 +35,7 @@ public class GameServiceProvider implements ServiceProvider{
     private AchievementServiceProvider achievementServiceProvider;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
     private PresenceServiceProvider presenceServiceProvider;
+    private InboxServiceProvider inboxServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -78,6 +80,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.itemServiceProvider = new ItemServiceProvider(gameCluster);
         this.itemServiceProvider.setup(serviceContext);
         this.itemServiceProvider.waitForData();
+        this.inboxServiceProvider = new InboxServiceProvider(gameCluster,inventoryServiceProvider);
+        this.inboxServiceProvider.setup(serviceContext);
+        this.inboxServiceProvider.waitForData();
         this.achievementServiceProvider = new AchievementServiceProvider(gameCluster,inventoryServiceProvider);
         this.achievementServiceProvider.waitForData();
         this.achievementServiceProvider.setup(serviceContext);
@@ -104,6 +109,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider.start();
         this.itemServiceProvider.start();
         this.presenceServiceProvider.start();
+        this.inboxServiceProvider.start();
     }
 
     @Override
@@ -155,6 +161,7 @@ public class GameServiceProvider implements ServiceProvider{
         return this.inventoryServiceProvider;
     }
     public StoreServiceProvider storeServiceProvider(){ return this.storeServiceProvider; }
+    public InboxServiceProvider inboxServiceProvider() { return this.inboxServiceProvider; }
     //leader service provider hook calls
     public LeaderBoard leaderBoard(String category){
         return leaderBoardProvider.leaderBoard(category);
