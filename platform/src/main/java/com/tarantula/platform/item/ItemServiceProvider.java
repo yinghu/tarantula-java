@@ -79,17 +79,12 @@ public class ItemServiceProvider implements ConfigurationServiceProvider, Cluste
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(category);
+        Descriptor app = _gc.serviceWithCategory("item");
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
             return false;
         }
         rListeners.forEach((k,c)->{
-            if(c.type==null||c.type.equals("item")){
-                c.listener.onCreated(configurableObject.setup());
-            }
-            else if(c.type.equals(configurableObject.configurationCategory())){
-                c.listener.onCreated(configurableObject.setup());
-            }
+            c.listener.onCreated(configurableObject);
         });
         return true;
     }

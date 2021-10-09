@@ -4,6 +4,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -151,6 +152,8 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
+                    GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                    gameServiceProvider.itemServiceProvider().register(app);
                 }
                 session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
             }

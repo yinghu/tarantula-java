@@ -3,7 +3,7 @@ class TossUp{
     constructor(){   
     }
     commit_config(){
-        TARA_API.onGet('tossup/item','onList','category/abilities',(resp)=>{
+        TARA_API.onGet('tossup/item','onList','category/loadouts',(resp)=>{
             console.log(resp);
         });
     }
