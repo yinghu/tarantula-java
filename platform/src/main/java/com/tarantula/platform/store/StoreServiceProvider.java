@@ -5,15 +5,13 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StoreServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
@@ -24,7 +22,6 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
     private final InventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
     private DistributionItemService distributionItemService;
-    private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
 
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
@@ -54,11 +51,21 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(StoreServiceProvider.class);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
 
-
+    public List<ShoppingItem> list(){
+        ArrayList<ShoppingItem> _items = new ArrayList<>();
+        shoppingItems.forEach((k,v)->_items.add(v));
+        return _items;
+    }
+    public boolean buy(String systemId,String itemId){
+        ShoppingItem shoppingItem = shoppingItems.get(itemId);
+        if(shoppingItem==null){
+            return false;
+        }
+        return this.inventoryServiceProvider.redeem(systemId,shoppingItem);
+    }
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
@@ -67,6 +74,7 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
     @Override
     public <T extends Configurable> void release(T t){
         t.released();
+        this.distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
         ShoppingItem configurableObject = new ShoppingItem();
@@ -76,30 +84,19 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
             return false;
         }
-        this.logger.warn(configurableObject.name()+" registered");
-
-        //rListeners.forEach((k,c)->{
-            //c.onCreated(configurableObject.setup());
-        //});
+        shoppingItems.put(configurableObject.distributionKey(),configurableObject);
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        return false;
+        shoppingItems.remove(itemId);
+        return true;
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        String rid = UUID.randomUUID().toString();
         List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/"+descriptor.category()));
         items.forEach((a)-> {
-            listener.onCreated(a);
+            if (!a.disabled()) shoppingItems.put(a.distributionKey(), a);
         });
-        //this.rListeners.put(rid,listener);
-        logger.warn("Listener registered with ->"+descriptor.category());
-        return rid;
-    }
-
-    @Override
-    public void unregisterConfigurableListener(String registerKey) {
-        //this.rListeners.remove(registerKey);
+        return null;
     }
 }

@@ -14,6 +14,7 @@ public class DailyLoginTrack extends RecoverableObject {
     public int lastLoginDay;
     public int rewardTier;
     public int nextRewardTimeSeconds;
+    public boolean rewardPending;
 
     public DailyLoginTrack(){
         this.label = "dailyLogin";
@@ -24,6 +25,7 @@ public class DailyLoginTrack extends RecoverableObject {
         this.properties.put("1",lastLoginDay);
         this.properties.put("2",rewardTier);
         this.properties.put("3",timestamp);
+        this.properties.put("4",rewardPending);
         return this.properties;
     }
     @Override
@@ -31,6 +33,7 @@ public class DailyLoginTrack extends RecoverableObject {
         this.lastLoginDay = ((Number) properties.get("1")).intValue();
         this.rewardTier = ((Number) properties.get("2")).intValue();
         this.timestamp = ((Number) properties.get("3")).longValue();
+        this.rewardPending = (boolean) properties.getOrDefault("4",false);
     }
 
     @Override
@@ -53,6 +56,7 @@ public class DailyLoginTrack extends RecoverableObject {
             rewardTier = 1;
             LocalDateTime cur = LocalDateTime.now();
             timestamp = TimeUtil.toUTCMilliseconds(cur);
+            rewardPending = true;
             dataStore.update(this);
             nextRewardTime(cur,pendingHours);
             return true;
@@ -69,6 +73,7 @@ public class DailyLoginTrack extends RecoverableObject {
                         rewardTier = rewardTier<maxTier?(rewardTier+1):1;
                     }
                     timestamp = TimeUtil.toUTCMilliseconds(current);
+                    rewardPending = true;
                     this.dataStore.update(this);
                     nextRewardTime(current,pendingHours);
                     return true;
@@ -80,6 +85,7 @@ public class DailyLoginTrack extends RecoverableObject {
             lastLoginDay = 1;
             rewardTier = rewardTier<maxTier?(rewardTier+1):1;
             timestamp = TimeUtil.toUTCMilliseconds(current);
+            rewardPending = true;
             this.dataStore.update(this);
             nextRewardTime(current,pendingHours);
             return true;
@@ -96,6 +102,7 @@ public class DailyLoginTrack extends RecoverableObject {
                 lastLoginDay = 1;
                 rewardTier = rewardTier<maxTier?(rewardTier+1):1;
             }
+            rewardPending = true;
             timestamp = TimeUtil.toUTCMilliseconds(current);
             dataStore.update(this);
             nextRewardTime(current,pendingHours);

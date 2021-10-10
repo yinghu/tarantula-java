@@ -126,31 +126,45 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         if(rewarded){
             //redeem or inbox
-            logger.warn("Rewarding key->"+dailyLoginTrack.rewardKey());
             DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
-            this.logger.warn(dailyGiveaway.toJson().toString());
+            inventoryServiceProvider.redeem(systemId,dailyGiveaway);
         }
         return rewarded?dailyLoginTrack:null;
     }
-
-    public void redeem(String systemId){
-        this.logger.warn("redeem daily reward->"+systemId);
-        dailyGiveaways.forEach((a,v)->{
-            inventoryServiceProvider.redeem(systemId,v);
-        });
+    public List<DailyGiveaway> list(){
+        ArrayList<DailyGiveaway> _items = new ArrayList<>();
+        dailyGiveaways.forEach((k,v)-> _items.add(v));
+        return _items;
+    }
+    public boolean redeem(String systemId){
+        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
+        dailyLoginTrack.distributionKey(systemId);
+        dailyLoginTrack.dataStore(dataStore);
+        this.dataStore.createIfAbsent(dailyLoginTrack,true);
+        if(!dailyLoginTrack.rewardPending) return false;
+        dailyLoginTrack.rewardPending = false;
+        dailyLoginTrack.update();
+        return this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
     }
 
     @Override
     public <T extends Configurable> void register(T t) {
+        t.registered();
         this.distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
     }
 
-
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        this.distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+    }
 
 
     public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
         List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("category/"+application.category()));
-        items.forEach((a)-> dailyGiveaways.put(a.name(),a));
+        items.forEach((a)-> {
+            if(!application.disabled()) dailyGiveaways.put(a.name(),a);
+        });
         return null;
     }
 
@@ -163,11 +177,15 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         if(!applicationPreSetup.load(serviceContext,app,dailyGiveaway)){
             return false;
         }
-        logger.warn("daily reward registered->"+dailyGiveaway.name());
         dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
         return true;
     }
     public boolean onRelease(String category,String itemId){
+        String[] released ={null};
+        dailyGiveaways.forEach((k,v)->{
+            if(v.distributionKey().equals(itemId)) released[0]=k;
+        });
+        if(released[0]!=null) dailyGiveaways.remove(released[0]);
         return false;
     }
 }

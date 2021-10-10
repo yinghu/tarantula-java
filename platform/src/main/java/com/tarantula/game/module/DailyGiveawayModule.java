@@ -4,16 +4,21 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.presence.ItemDailyGiveawayContext;
+import com.tarantula.platform.presence.PresenceServiceProvider;
 
 public class DailyGiveawayModule implements Module, Configurable.Listener {
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PresenceServiceProvider presenceServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
-        if(session.action().equals("onRedeem")){
-            this.gameServiceProvider.presenceServiceProvider().redeem(session.systemId());
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+        if(session.action().equals("onList")){
+            session.write(new ItemDailyGiveawayContext(true, "daily giveaway list", this.presenceServiceProvider.list()).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onRedeem")){
+            boolean rewarded = this.presenceServiceProvider.redeem(session.systemId());
+            session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -24,13 +29,9 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.presenceServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        GameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
+        this.presenceServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Daily Giveaway module started", OnLog.WARN);
     }
-    @Override
-    public void clear(){
-
-    }
-
 }

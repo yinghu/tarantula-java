@@ -31,7 +31,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-achievement"),{mode:'tree'},{});
-    TARA_API.onGet(TARA_API.query().serviceTag,'onAchievement',"",(resp)=>{
+    TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         editor.set(resp);
     });
     document.querySelector('#tx-achievement-live-close').onclick=()=>{

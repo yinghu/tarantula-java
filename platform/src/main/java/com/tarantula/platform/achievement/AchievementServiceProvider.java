@@ -10,6 +10,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,6 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider,
     private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Achievement> achievements;
-    private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
     public AchievementServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -63,15 +63,26 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider,
         this.dataStore.createIfAbsent(achievementProgress,true);
         if(achievementProgress.onProgress(delta)){
             //achievement looting
+            achievementProgress.disabled(true);
             inventoryServiceProvider.redeem(systemId,achievement);
         }
         this.dataStore.update(achievementProgress);
         return achievementProgress;
     }
-
+    public List<Achievement> list(){
+        ArrayList<Achievement> _item = new ArrayList<>();
+        achievements.forEach((k,v)->_item.add(v));
+        return _item;
+    }
     @Override
     public <T extends Configurable> void register(T t) {
+        t.registered();
         distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+    }
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
         Achievement configurableObject = new Achievement();
@@ -82,30 +93,23 @@ public class AchievementServiceProvider implements ConfigurationServiceProvider,
             return false;
         }
         achievements.put(configurableObject.name(),configurableObject);
-        rListeners.forEach((k,c)->{
-            c.onCreated(configurableObject.setup());
-        });
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        return false;
+        String[] released = {null};
+        achievements.forEach((k,v)->{
+            if(v.distributionKey().equals(itemId)) released[0] = k;
+        });
+        if(released[0]!=null) achievements.remove(released[0]);
+        return true;
     }
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        String rid = UUID.randomUUID().toString();
         List<Achievement> items = applicationPreSetup.list(serviceContext,descriptor,new AchievementObjectQuery("category/"+descriptor.category()));
         items.forEach((a)-> {
-            listener.onCreated(a);
-            achievements.put(a.name(),a);
+            if(!a.disabled()) achievements.put(a.name(),a);
         });
-        this.rListeners.put(rid,listener);
-        logger.warn("Listener registered with ->"+descriptor.category());
-        return rid;
-    }
-
-    @Override
-    public void unregisterConfigurableListener(String registerKey) {
-        this.rListeners.remove(registerKey);
+        return null;
     }
 }

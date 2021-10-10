@@ -42,6 +42,21 @@ public class DailyGiveAwayAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to register giveaway item").getBytes());
             }
         }
+        else if (session.action().equals("onRelease")){
+            String[] ks = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
+            DailyGiveaway app = new DailyGiveaway();
+            app.distributionKey(ks[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+                session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
+                GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+                gameServiceProvider.presenceServiceProvider().release(app.setup());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to register giveaway item").getBytes());
+            }
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

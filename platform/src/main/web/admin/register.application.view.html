@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Game Item Register</span>
+            <span class="tx-margin-left-8 tx-text-24">Game Application Register</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -37,10 +37,13 @@
 <script>
     let itemTemplate = TARA_API.query().item;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'tree'},itemTemplate);
+    if(!itemTemplate.disabled){
+        document.querySelector('#tx-register-item-register').innerHTML = "Release";    
+    }
     document.querySelector('#tx-register-item-register').onclick=()=>{
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
-        TARA_API.onSet(TARA_API.query().serviceTag,'onRegister',query,item,(resp)=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,itemTemplate.disabled?'onRegister':'onRelease',query,item,(resp)=>{
             editor.set(resp);   
         });
     };
