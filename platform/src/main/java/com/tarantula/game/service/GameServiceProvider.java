@@ -210,6 +210,9 @@ public class GameServiceProvider implements ServiceProvider{
         if(serviceName.equals(storeServiceProvider.name())){
             return storeServiceProvider;
         }
+        if(serviceName.equals(tournamentServiceProvider.name())){
+            return tournamentServiceProvider;
+        }
         return null;
     }
 

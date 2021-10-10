@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
@@ -8,18 +9,21 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.item.DistributionItemService;
+import com.tarantula.platform.service.ClusterConfigurationCallback;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener {
+public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private static final String CONFIG = "game-tournament-settings";
 
     private TarantulaLogger logger;
     private ServiceContext serviceContext;
     private DistributionTournamentService distributionTournamentService;
+    private DistributionItemService distributionItemService;
     private final String name;
     private DataStore dataStore;
     private ConcurrentHashMap<String,Tournament.Listener> listeners = new ConcurrentHashMap<>();
@@ -95,7 +99,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return ins;
     }
     public String name(){
-        return name;
+        return "TournamentService";
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -113,6 +117,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.logger = this.serviceContext.logger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
+        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
     @Override
     public void waitForData(){
@@ -260,5 +265,28 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void log(String message){
         logger.warn(message);
+    }
+
+
+    @Override
+    public <T extends Configurable> void register(T t) {
+        t.registered();
+        distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+    }
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+    }
+
+    @Override
+    public boolean onRegister(String category, String itemId) {
+        
+        return false;
+    }
+
+    @Override
+    public boolean onRelease(String category, String itemId) {
+        return false;
     }
 }
