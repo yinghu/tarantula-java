@@ -34,7 +34,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_PARSER_CID;
     }
 
-    public Tournament.Schedule schedule(){
+    public DefaultTournamentSchedule schedule(){
         String type = header.get("type").getAsString();
         String name = header.get("name").getAsString();
         String _schedule = header.get("schedule").getAsString();

@@ -9,6 +9,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.tournament.DefaultTournamentSchedule;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
@@ -86,8 +87,5 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.onRaceBoard(instanceId);
     }
-    public boolean schedule(String serviceName, Tournament.Schedule schedule){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.onSchedule(schedule);
-    }
+
 }

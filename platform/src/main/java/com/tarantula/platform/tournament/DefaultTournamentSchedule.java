@@ -1,13 +1,12 @@
 package com.tarantula.platform.tournament;
 
-import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class DefaultTournamentSchedule extends RecoverableObject implements Tournament.Schedule {
+public class DefaultTournamentSchedule extends RecoverableObject {
 
     private String type;
 
@@ -33,34 +32,34 @@ public class DefaultTournamentSchedule extends RecoverableObject implements Tour
         this.duration = duration;
         this.maxEntries = maxEntries;
     }
-    @Override
+    //@Override
     public String type() {
         return type;
     }
 
-    @Override
+    //@Override
     public String schedule(){ return schedule;}
-    @Override
+    //@Override
     public LocalDateTime startTime() {
         return start;
     }
 
-    @Override
+    //@Override
     public LocalDateTime closeTime() {
         return close;
     }
 
-    @Override
+    ///@Override
     public LocalDateTime endTime() {
         return end;
     }
 
-    @Override
+    //@Override
     public int maxEntriesPerInstance() {
         return maxEntries;
     }
 
-    @Override
+    //@Override
     public int instanceDurationInMinutes() {
         return duration;
     }

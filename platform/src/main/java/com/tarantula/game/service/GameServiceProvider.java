@@ -177,12 +177,10 @@ public class GameServiceProvider implements ServiceProvider{
         return achievementServiceProvider;
     }
     //tournament service provider hook calls
-    public PlatformTournamentServiceProvider tournamentServiceProvider(){
+    public TournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
     }
-    public boolean onSchedule(Tournament.Schedule schedule) { //all nodes
-        return this.tournamentServiceProvider.schedule(schedule);
-    }
+
     public Tournament onTournament(String tournamentId){ //register node
         return this.tournamentServiceProvider.tournament(tournamentId);
     }

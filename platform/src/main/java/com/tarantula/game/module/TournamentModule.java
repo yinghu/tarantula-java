@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.tournament.TournamentContext;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +20,7 @@ public class TournamentModule implements Module , Tournament.Listener {
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            session.write(toList().toString().getBytes());
+            session.write(new TournamentContext(true,"",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onPlayerHistory")){
             session.write(toHistory(this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());

@@ -29,7 +29,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     protected String scheduleId;
     protected String schedule;
     protected String type;
-    protected Status status = Status.SCHEDULED;
+    protected Status status = Status.STARTED;
     protected LocalDateTime startTime;
     protected LocalDateTime closeTime;
     protected LocalDateTime endTime;
@@ -44,7 +44,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     private PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentHeader(Schedule schedule){
+    public TournamentHeader(DefaultTournamentSchedule schedule){
         this.scheduleId = schedule.index();
         this.schedule = schedule.schedule();
         this.type = schedule.type();
@@ -284,6 +284,14 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             if(prize!=null) this.tournamentServiceProvider.onPrize(entry.systemId(),prize);
             rank++;
         }
+    }
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("tournamentId",this.distributionKey());
+        jsonObject.addProperty("type",type);
+        jsonObject.addProperty("name",name);
+        return jsonObject;
     }
 
 }

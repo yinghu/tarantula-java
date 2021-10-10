@@ -6,6 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.tournament.DefaultTournamentSchedule;
 import com.tarantula.platform.tournament.DistributionTournamentService;
 
 import java.util.concurrent.Future;
@@ -134,18 +135,6 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public boolean schedule(String serviceName, Tournament.Schedule schedule){
-        NodeEngine nodeEngine = getNodeEngine();
-        TournamentScheduleOperation operation = new TournamentScheduleOperation(serviceName,schedule);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,nodeEngine.getMasterAddress());
-        final Future<Boolean> future = builder.invoke();
-        try {
-            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            return false;
-        }
-    }
     public boolean localManaged(String key){
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
         return getNodeEngine().getPartitionService().getPartition(pid).isLocal();
