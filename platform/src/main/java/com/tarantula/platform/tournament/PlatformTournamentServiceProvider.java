@@ -10,7 +10,9 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.InventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,6 +37,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private Configuration configuration;
     private String reloadKey;
     private GameCluster gameCluster;
+    private ApplicationPreSetup applicationPreSetup;
     private InventoryServiceProvider inventoryServiceProvider;
     public PlatformTournamentServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -104,6 +107,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.configuration = serviceContext.configuration(CONFIG);
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
@@ -281,8 +285,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRegister(String category, String itemId) {
-        
-        return false;
+        TournamentScheduleParser tournamentScheduleParser = new TournamentScheduleParser();
+        tournamentScheduleParser.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory(category);
+        if(!applicationPreSetup.load(serviceContext,app,tournamentScheduleParser)){
+            return false;
+        }
+        Tournament.Schedule schedule = tournamentScheduleParser.schedule();
+        this.schedule(schedule);
+        return true;
     }
 
     @Override

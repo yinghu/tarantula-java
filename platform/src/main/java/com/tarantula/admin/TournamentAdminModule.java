@@ -38,11 +38,29 @@ public class TournamentAdminModule implements Module {
             boolean loaded = applicationPreSetup.load(context,desc,app);
             if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
                 JsonObject config = JsonUtil.parse(payload);
-                Tournament.Schedule schedule = app.schedule(config.getAsJsonObject("application"));
+                app.schedule(config.getAsJsonObject("application"));
                 String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
                 GameServiceProvider tsp = this.context.serviceProvider(serviceName);
-                boolean scheduled = tsp.tournamentServiceProvider().register(schedule);
-                session.write(JsonUtil.toSimpleResponse(scheduled,"tournament scheduled").getBytes());
+                tsp.tournamentServiceProvider().register(app);
+                session.write(JsonUtil.toSimpleResponse(true,"tournament scheduled").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());
+            }
+        }
+        else if(session.action().equals("onRelease")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            TournamentScheduleParser app = new TournamentScheduleParser();
+            app.distributionKey(query[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            boolean loaded = applicationPreSetup.load(context,desc,app);
+            if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
+                String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+                GameServiceProvider tsp = this.context.serviceProvider(serviceName);
+                tsp.tournamentServiceProvider().release(app);
+                session.write(JsonUtil.toSimpleResponse(true,"tournament scheduled").getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());

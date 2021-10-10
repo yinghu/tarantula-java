@@ -22,6 +22,9 @@ public class TournamentScheduleParser extends ConfigurableObject {
 
     public TournamentScheduleParser(){}
 
+    public void schedule(JsonObject application){
+        this.application = application;
+    }
 
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
@@ -31,7 +34,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_PARSER_CID;
     }
 
-    public Tournament.Schedule schedule(JsonObject application ){
+    public Tournament.Schedule schedule(){
         String type = header.get("type").getAsString();
         String name = header.get("name").getAsString();
         String _schedule = header.get("schedule").getAsString();
