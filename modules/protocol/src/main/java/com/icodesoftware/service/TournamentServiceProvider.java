@@ -4,13 +4,12 @@ import com.icodesoftware.Tournament;
 
 import java.util.List;
 
-public interface TournamentServiceProvider extends ServiceProvider{
+public interface TournamentServiceProvider extends ConfigurationServiceProvider{
 
     String registerTournamentListener(Tournament.Listener listener);
     void unregisterTournamentListener(String registryKey);
 
-    boolean register(Tournament.Schedule schedule);
-
+    List<Tournament> list();
     boolean available(String tournamentId);
     Tournament.Instance join(String tournamentId,String systemId);
     Tournament.Entry score(String instanceId,String systemId, double delta);

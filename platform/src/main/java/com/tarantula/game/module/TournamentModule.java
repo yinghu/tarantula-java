@@ -1,15 +1,13 @@
 package com.tarantula.game.module;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
+import com.tarantula.platform.tournament.TournamentHistoryContext;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentModule implements Module , Tournament.Listener {
@@ -20,10 +18,10 @@ public class TournamentModule implements Module , Tournament.Listener {
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new TournamentContext(true,"",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
+            session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onPlayerHistory")){
-            session.write(toHistory(this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
+            session.write(new TournamentHistoryContext(true,"player tournament list",this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
         }
         else if(session.action().equals("onTournamentHistory")){
             Tournament.Instance ht = this.tournamentServiceProvider.tournamentHistory(session.name());
@@ -62,30 +60,6 @@ public class TournamentModule implements Module , Tournament.Listener {
     }
     public void tournamentEnded(Tournament tournament){
         this.context.log("tournament ended->"+tournament.distributionKey(),OnLog.WARN);
-    }
-    private JsonObject toList(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        tournaments.forEach((k,v)->{
-            JsonObject tt = new JsonObject();
-            tt.addProperty("tournamentId",k);
-            tt.addProperty("type",v.type());
-            tt.addProperty("name",v.name());
-            alist.add(tt);
-        });
-        jsonObject.add("tournamentList",alist);
-        return jsonObject;
-    }
-    private JsonObject toHistory(List<Tournament.History> histories){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray alist = new JsonArray();
-        histories.forEach((h)->{
-            alist.add(h.toJson());
-        });
-        jsonObject.add("onList",alist);
-        return jsonObject;
     }
 
 }

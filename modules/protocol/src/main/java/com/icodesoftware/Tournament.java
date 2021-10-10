@@ -8,14 +8,13 @@ public interface Tournament extends Configurable {
     String ENTRY_LABEL = "TEE";
     String HISTORY_LABEL = "History";
 
-
     String DAILY_SCHEDULE = "daily";
     String WEEKLY_SCHEDULE = "weekly";
     String MONTHLY_SCHEDULE = "monthly";
     String ON_DEMAND_SCHEDULE = "onDemand";
 
     enum Status{
-        SCHEDULED,STARTED,CLOSED,ENDED
+        STARTED,CLOSED,ENDED
     }
     String schedule();
     String type();
@@ -60,23 +59,13 @@ public interface Tournament extends Configurable {
         double score();
         LocalDateTime dateTime();
     }
+
     interface Listener{
-        default void tournamentScheduled(Tournament tournament){}
         default void tournamentStarted(Tournament tournament){}
         default void tournamentClosed(Tournament tournament){}
         default void tournamentEnded(Tournament tournament){}
     }
 
-    interface Schedule extends Configurable{
-        String type();
-        String schedule();
-        String name();
-        LocalDateTime startTime();
-        LocalDateTime closeTime();
-        LocalDateTime endTime();
-        int maxEntriesPerInstance();
-        int instanceDurationInMinutes();
-    }
     interface OnEntry{
         void on(Entry entry);
     }
