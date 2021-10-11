@@ -195,6 +195,13 @@ public class GameServiceProvider implements ServiceProvider{
         return this.tournamentServiceProvider.instance(instanceId).raceBoard();
     }
 
+    public boolean onTryScheduleTournament(String scheduleId){
+        return this.tournamentServiceProvider.trySchedule(scheduleId);
+    }
+    public boolean onTournamentScheduleFinished(String scheduleId){
+        return this.tournamentServiceProvider.finishSchedule(scheduleId);
+    }
+
     public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(itemServiceProvider.name())){
             return itemServiceProvider;

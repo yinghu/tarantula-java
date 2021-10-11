@@ -6,8 +6,7 @@ import java.util.List;
 
 public interface TournamentServiceProvider extends ConfigurationServiceProvider{
 
-    String registerTournamentListener(Tournament.Listener listener);
-    void unregisterTournamentListener(String registryKey);
+    void registerTournamentListener(Tournament.Listener listener);
 
     List<Tournament> list();
     boolean available(String tournamentId);

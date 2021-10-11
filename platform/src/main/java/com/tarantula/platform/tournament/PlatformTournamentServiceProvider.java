@@ -17,6 +17,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ClusterConfigurationCallback {
 
@@ -28,10 +29,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private DistributionItemService distributionItemService;
     private final String name;
     private DataStore dataStore;
-    private ConcurrentHashMap<String,Tournament.Listener> listeners = new ConcurrentHashMap<>();
+    private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
     private ConcurrentHashMap<String,TournamentHeader> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex = new ConcurrentHashMap<>();
+
     private IndexSet lookupTournamentKey;
     private IndexSet lookupScheduleKey;
     private Configuration configuration;
@@ -46,26 +48,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     @Override
-    public String registerTournamentListener(Tournament.Listener listener) {
-        String key = UUID.randomUUID().toString();
-        listeners.put(key,listener);
-        tournamentIndex.forEach((k,v)->{
-            listeners.forEach((s,l)->{
-                l.tournamentStarted(v);
-            });
-        });
-        return key;
+    public void registerTournamentListener(Tournament.Listener listener) {
+        listeners.add(listener);
     }
 
-    @Override
-    public void unregisterTournamentListener(String key) {
-        listeners.remove(key);
-    }
 
-    //@Override
-    //public boolean register(Tournament.Schedule schedule) {
-        //return distributionTournamentService.schedule(name(),schedule);
-    //}
 
     @Override
     public boolean available(String tournamentId) {
@@ -218,23 +205,26 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
         this.lookupScheduleKey.keySet().forEach(k->{
-            TournamentSchedule schedule = new TournamentSchedule();
-            schedule.distributionKey(k);
-            if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
-                Tournament tournament = createTournament(schedule);
-                this.distributionItemService.register(name,name(),"tournament",tournament.distributionKey());
-            }
+                TournamentSchedule schedule = new TournamentSchedule();
+                schedule.distributionKey(k);
+                if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
+                    if(distributionTournamentService.trySchedule(name,k)){
+                        Tournament tournament = createTournament(schedule);
+                        this.distributionItemService.register(name,name(),"tournament",tournament.distributionKey());
+                        distributionTournamentService.scheduleFinished(name,k);
+                    }
+                }
+
         });
     }
     void onTournamentStart(TournamentHeader tournamentHeader){
-        listeners.forEach((k,l)->l.tournamentStarted(tournamentHeader));
+
     }
     void onTournamentClose(TournamentHeader tournamentHeader){
-        listeners.forEach((k,l)->l.tournamentClosed(tournamentHeader));
         this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
-        listeners.forEach((k,l)->l.tournamentEnded(tournamentHeader));
+
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
@@ -305,5 +295,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.tournamentIndex.put(tournament.distributionKey(),tournament);
         this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
         if(this.distributionTournamentService.localManaged(tournament.distributionKey())) tournament.setup(instanceIndex,this);
+    }
+    public boolean trySchedule(String scheduleId){
+        logger.warn("tournament schedule ready to launch ->"+scheduleId);
+        return true;
+    }
+    public boolean finishSchedule(String scheduleId){
+        logger.warn("tournament schedule launched ->"+scheduleId);
+        return true;
     }
 }

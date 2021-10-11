@@ -138,4 +138,31 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
         return getNodeEngine().getPartitionService().getPartition(pid).isLocal();
     }
+
+    public boolean trySchedule(String serviceName,String scheduleId){
+        NodeEngine nodeEngine = getNodeEngine();
+        TournamentTryScheduleOperation operation = new TournamentTryScheduleOperation(serviceName,scheduleId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(scheduleId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        final Future<Boolean> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return false;
+        }
+    }
+    public boolean scheduleFinished(String serviceName,String scheduleId){
+        NodeEngine nodeEngine = getNodeEngine();
+        TournamentScheduleFinishedOperation operation = new TournamentScheduleFinishedOperation(serviceName,scheduleId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(scheduleId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        final Future<Boolean> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return false;
+        }
+    }
 }
