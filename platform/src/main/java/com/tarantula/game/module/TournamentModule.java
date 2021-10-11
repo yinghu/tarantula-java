@@ -8,13 +8,9 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class TournamentModule implements Module , Tournament.Listener {
     private ApplicationContext context;
     private TournamentServiceProvider tournamentServiceProvider;
-    private String regKey;
-    private ConcurrentHashMap<String,Tournament> tournaments = new ConcurrentHashMap<>();
     @Override
     public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
         if(session.action().equals("onList")){
@@ -43,23 +39,9 @@ public class TournamentModule implements Module , Tournament.Listener {
         this.context = applicationContext;
         GameServiceProvider gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
-        regKey = this.tournamentServiceProvider.registerTournamentListener(this);
-        this.context.log("tournament module started", OnLog.WARN);
+        this.tournamentServiceProvider.registerTournamentListener(this);
+        this.context.log("Tournament module started", OnLog.WARN);
     }
-    @Override
-    public void clear(){
-        this.tournamentServiceProvider.unregisterTournamentListener(regKey);
-    }
-    public void tournamentStarted(Tournament tournament){
-        this.context.log("tournament started->"+tournament.distributionKey(),OnLog.WARN);
-        tournaments.put(tournament.distributionKey(),tournament);
-    }
-    public void tournamentClosed(Tournament tournament){
-        this.context.log("tournament closed->"+tournament.distributionKey(),OnLog.WARN);
-        tournaments.remove(tournament.distributionKey());
-    }
-    public void tournamentEnded(Tournament tournament){
-        this.context.log("tournament ended->"+tournament.distributionKey(),OnLog.WARN);
-    }
+
 
 }

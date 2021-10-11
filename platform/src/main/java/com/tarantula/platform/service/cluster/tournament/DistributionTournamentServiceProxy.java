@@ -6,7 +6,6 @@ import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.tournament.DefaultTournamentSchedule;
 import com.tarantula.platform.tournament.DistributionTournamentService;
 
 import java.util.concurrent.Future;

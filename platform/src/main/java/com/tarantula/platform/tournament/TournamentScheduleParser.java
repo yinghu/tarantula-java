@@ -34,12 +34,12 @@ public class TournamentScheduleParser extends ConfigurableObject {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_PARSER_CID;
     }
 
-    public DefaultTournamentSchedule schedule(){
+    public TournamentSchedule schedule(){
         String type = header.get("type").getAsString();
         String name = header.get("name").getAsString();
         String _schedule = header.get("schedule").getAsString();
         int entries = header.get("maxEntriesPerInstance").getAsInt();
-        DefaultTournamentSchedule schedule;
+        TournamentSchedule schedule;
         if(_schedule.equals(Tournament.ON_DEMAND_SCHEDULE)){
             LocalDateTime _start = LocalDateTime.now().plusMinutes(ON_DEMAND_START_DELAY_MINUTES);//delay 5 minutes to start
             long durationMinutes = application.get("durationHours").getAsLong()*60;
@@ -48,7 +48,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
             if(minutes<MIN_DURATION_MINUTES_PER_INSTANCE) throw new UnsupportedOperationException("duration per instance cannot be less < 3 minutes");
             LocalDateTime _close = _start.plusMinutes(durationMinutes-minutes);
             LocalDateTime _end  = _start.plusMinutes(durationMinutes+ENDING_BUFFER_MINUTES);
-            schedule = new DefaultTournamentSchedule(type,name,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new TournamentSchedule(type,name,Tournament.ON_DEMAND_SCHEDULE,_start,_close,_end,minutes,entries);
         }
         else if(_schedule.equals(Tournament.DAILY_SCHEDULE)){//RUN ONE DAY FROM MIDNIGHT
             LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
@@ -57,7 +57,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
             if(minutes<MIN_DURATION_MINUTES_PER_INSTANCE) throw new UnsupportedOperationException("duration per instance cannot be less < 3 minutes");
             LocalDateTime _close = _start.plusMinutes(DAILY_MINUTES-minutes);
             LocalDateTime _end  = _start.plusMinutes(DAILY_MINUTES);
-            schedule = new DefaultTournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new TournamentSchedule(type,name,Tournament.DAILY_SCHEDULE,_start,_close,_end,minutes,entries);
         }
         else if(_schedule.equals(Tournament.WEEKLY_SCHEDULE)){//RUN 7 DAYS FROM START DAY
             LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
@@ -66,7 +66,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
             if(minutes<MIN_DURATION_MINUTES_PER_INSTANCE) throw new UnsupportedOperationException("duration per instance cannot be less < 3 minutes");
             LocalDateTime _close = _start.plusMinutes(WEEKLY_MINUTES-minutes);
             LocalDateTime _end  = _start.plusMinutes(WEEKLY_MINUTES);
-            schedule = new DefaultTournamentSchedule(type,name,Tournament.WEEKLY_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new TournamentSchedule(type,name,Tournament.WEEKLY_SCHEDULE,_start,_close,_end,minutes,entries);
         }
         else if(_schedule.equals(Tournament.MONTHLY_SCHEDULE)){//RUN 30 DAYS FROM START DAY
             LocalDateTime _start = TimeUtil.toMidnight(application.get("startDate").getAsString());
@@ -75,7 +75,7 @@ public class TournamentScheduleParser extends ConfigurableObject {
             if(minutes<MIN_DURATION_MINUTES_PER_INSTANCE) throw new UnsupportedOperationException("duration per instance cannot be less < 3 minutes");
             LocalDateTime _close = _start.plusMinutes(MONTHLY_MINUTES-minutes);
             LocalDateTime _end  = _start.plusHours(MONTHLY_MINUTES);
-            schedule = new DefaultTournamentSchedule(type,name,Tournament.MONTHLY_SCHEDULE,_start,_close,_end,minutes,entries);
+            schedule = new TournamentSchedule(type,name,Tournament.MONTHLY_SCHEDULE,_start,_close,_end,minutes,entries);
         }
         else{
             throw new UnsupportedOperationException(_schedule+" not supported");

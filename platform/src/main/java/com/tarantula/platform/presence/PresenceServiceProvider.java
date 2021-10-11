@@ -124,11 +124,6 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         dailyLoginTrack.dataStore(dataStore);
         this.dataStore.createIfAbsent(dailyLoginTrack,true);
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
-        if(rewarded){
-            //redeem or inbox
-            DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
-            inventoryServiceProvider.redeem(systemId,dailyGiveaway);
-        }
         return rewarded?dailyLoginTrack:null;
     }
     public List<DailyGiveaway> list(){

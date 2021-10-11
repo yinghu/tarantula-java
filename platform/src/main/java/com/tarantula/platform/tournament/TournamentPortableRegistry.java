@@ -38,7 +38,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 pt = new TournamentEntry();
                 break;
             case TOURNAMENT_SCHEDULE_CID:
-                pt = new DefaultTournamentSchedule();
+                pt = new TournamentSchedule();
                 break;
             case TOURNAMENT_REGISTRY_CID:
                 pt = new TournamentRegistry();

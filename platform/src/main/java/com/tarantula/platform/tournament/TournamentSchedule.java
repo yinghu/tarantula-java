@@ -6,7 +6,7 @@ import com.icodesoftware.util.TimeUtil;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class DefaultTournamentSchedule extends RecoverableObject {
+public class TournamentSchedule extends RecoverableObject {
 
     private String type;
 
@@ -18,11 +18,11 @@ public class DefaultTournamentSchedule extends RecoverableObject {
     private String schedule;
 
 
-    public DefaultTournamentSchedule(){
+    public TournamentSchedule(){
 
     }
 
-    public DefaultTournamentSchedule(String type, String name, String schedule,LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
+    public TournamentSchedule(String type, String name, String schedule, LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
         this.type = type;
         this.name = name;
         this.schedule = schedule;

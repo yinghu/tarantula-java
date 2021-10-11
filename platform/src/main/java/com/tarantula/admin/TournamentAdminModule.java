@@ -48,24 +48,6 @@ public class TournamentAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());
             }
         }
-        else if(session.action().equals("onRelease")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            TournamentScheduleParser app = new TournamentScheduleParser();
-            app.distributionKey(query[1]);
-            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            boolean loaded = applicationPreSetup.load(context,desc,app);
-            if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
-                String serviceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-                GameServiceProvider tsp = this.context.serviceProvider(serviceName);
-                tsp.tournamentServiceProvider().release(app);
-                session.write(JsonUtil.toSimpleResponse(true,"tournament scheduled").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"tournament not supported").getBytes());
-            }
-        }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

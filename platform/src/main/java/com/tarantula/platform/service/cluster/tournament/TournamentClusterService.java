@@ -9,9 +9,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.tournament.DefaultTournamentSchedule;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class TournamentClusterService implements ManagedService, RemoteService {

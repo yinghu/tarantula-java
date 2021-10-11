@@ -14,6 +14,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -202,7 +203,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex,this);
         return true;
     }
-    private void createSchedule(DefaultTournamentSchedule schedule){
+    private void createSchedule(TournamentSchedule schedule){
         this.dataStore.create(schedule);
         lookupScheduleKey.addKey(schedule.distributionKey());
         lookupScheduleKey.update();
@@ -216,11 +217,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
-        //this.lookupScheduleKey.keySet().forEach(k->{
-            //DefaultTournamentSchedule schedule = new DefaultTournamentSchedule();
-            //schedule.distributionKey(k);
-            //if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear()==LocalDateTime.now().getDayOfYear()) launch(schedule);
-        //});
+        this.lookupScheduleKey.keySet().forEach(k->{
+            TournamentSchedule schedule = new TournamentSchedule();
+            schedule.distributionKey(k);
+            if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
+                Tournament tournament = createTournament(schedule);
+                this.distributionItemService.register(name,name(),"tournament",tournament.distributionKey());
+            }
+        });
     }
     void onTournamentStart(TournamentHeader tournamentHeader){
         listeners.forEach((k,l)->l.tournamentStarted(tournamentHeader));
@@ -252,29 +256,23 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public <T extends Configurable> void register(T t) {
         TournamentScheduleParser parser = (TournamentScheduleParser)t;
-        parser.registered();
-        DefaultTournamentSchedule schedule = parser.schedule();
+        TournamentSchedule schedule = parser.schedule();
         if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)){
             Tournament tournament = createTournament(schedule);
             distributionItemService.register(name,name(),t.configurationCategory(),tournament.distributionKey());
         }
         else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-
+            this.createSchedule(schedule);
         }
         else if(schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)){
-
+            this.createSchedule(schedule);
         }
         else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-
+            this.createSchedule(schedule);
         }
         else{
             throw new UnsupportedOperationException(schedule.schedule());
         }
-    }
-    @Override
-    public <T extends Configurable> void release(T t) {
-        t.released();
-        //distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
     }
 
     @Override
@@ -293,7 +291,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public boolean onRelease(String category, String itemId) {
         return false;
     }
-    private Tournament createTournament(DefaultTournamentSchedule schedule){
+    private Tournament createTournament(TournamentSchedule schedule){
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
