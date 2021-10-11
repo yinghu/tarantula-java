@@ -261,13 +261,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.tournamentServiceProvider.log("Tournament ended->"+ended.distributionKey());
         tournamentPlayIndex.removeKey(ended.distributionKey());
         tournamentPlayIndex.update();
-        TournamentScheduleParser parser = new TournamentScheduleParser();
-        parser.distributionKey(this.scheduleId);
-        Map<Integer,TournamentPrize> _prizes = new HashMap<>();
-        if(this.dataStore.load(parser)){
-            parser.dataStore(dataStore);
-            _prizes = parser.prize();
-        }
+        Map<Integer,TournamentPrize> _prizes = this.tournamentServiceProvider.prize(this.scheduleId);
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
         int rank =1;
         for(TournamentEntry entry : _ended.end()){

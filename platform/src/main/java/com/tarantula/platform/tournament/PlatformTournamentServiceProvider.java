@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private static final String CONFIG = "game-tournament-settings";
+    private static final String DS_SUFFIX = "_tournament";
 
     private TarantulaLogger logger;
     private ServiceContext serviceContext;
@@ -40,6 +41,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private String reloadKey;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
+    private Descriptor application;
     private InventoryServiceProvider inventoryServiceProvider;
     public PlatformTournamentServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -51,7 +53,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void registerTournamentListener(Tournament.Listener listener) {
         listeners.add(listener);
     }
-
+    @Override
+    public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        application = descriptor;
+        return null;
+    }
 
 
     @Override
@@ -105,7 +111,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
         this.lookupScheduleKey.distributionKey(gameCluster.distributionKey());
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
@@ -241,7 +247,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void log(String message){
         logger.warn(message);
     }
-
+    Map<Integer,TournamentPrize> prize(String scheduleId){
+        TournamentScheduleParser parser = new TournamentScheduleParser();
+        parser.distributionKey(scheduleId);
+        if(this.applicationPreSetup.load(serviceContext,application,parser)) return parser.prize();
+        return new HashMap<>();
+    }
 
     @Override
     public <T extends Configurable> void register(T t) {

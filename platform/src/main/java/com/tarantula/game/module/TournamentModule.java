@@ -8,7 +8,7 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
 
-public class TournamentModule implements Module , Tournament.Listener {
+public class TournamentModule implements Module , Tournament.Listener,Configurable.Listener {
     private ApplicationContext context;
     private TournamentServiceProvider tournamentServiceProvider;
     @Override
@@ -40,6 +40,7 @@ public class TournamentModule implements Module , Tournament.Listener {
         GameServiceProvider gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerTournamentListener(this);
+        this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
 
