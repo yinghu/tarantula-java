@@ -1,9 +1,10 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.Subscription;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
-import com.icodesoftware.util.RecoverableObject;
+
 public class Membership extends RecoverableObject implements Subscription {
 
 

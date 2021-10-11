@@ -55,7 +55,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
         this.recentlyPlayList.dataStore(this.dataStore);
-        logger.warn("presence service provider started");
+        logger.warn("Presence service provider started");
     }
 
     @Override
@@ -100,6 +100,13 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
     }
 
+    public Profile profile(String systemId){
+        Profile profile = new Profile();
+        profile.distributionKey(systemId);
+        this.dataStore.createIfAbsent(profile,true);
+        profile.dataStore(this.dataStore);
+        return profile;
+    }
     public Rating rating(String systemId){
         Rating rating = new Rating();
         rating.distributionKey(systemId);
