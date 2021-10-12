@@ -46,7 +46,18 @@ public class Profile extends RecoverableObject implements Configurable {
     @Override
     public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
-        return configureAndValidate(config);
+        if(config.has("displayName")){
+            displayName = config.get("displayName").getAsString();
+        }
+        if(config.has("iconUrl")){
+            iconUrl = config.get("iconUrl").getAsString();
+        }
+        if(config.has("payload")){
+            return configureAndValidate(config.getAsJsonObject("payload"));
+        }
+        else{
+            return configureAndValidate(config);
+        }
     }
     @Override
     public boolean configureAndValidate(JsonObject data) {

@@ -39,13 +39,18 @@
     app.stage.addChild(messageBox);
     messageBox.text = JSON.stringify(TARA_API.query().stub.rating); 
 
-    let pic = PIXI.Sprite.from('resource/portrait.png');
-    pic.x = 100;
-    pic.y = 260;
-    pic.width = 80;
-    pic.height = 100;
-    app.stage.addChild(pic);
-
+    ttc.commit_profile((profile)=>{
+        let pic = PIXI.Sprite.from(profile.iconUrl);
+        pic.x = 100;
+        pic.y = 270;
+        pic.width = 80;
+        pic.height = 100;
+        let nm = new PIXI.Text(profile.displayName,{fontFamily:_oswaldFamily,fontSize:16,fill:'yellow'});
+        nm.x = 100;
+        nm.y = pic.y+pic.height;
+        app.stage.addChild(pic);
+        app.stage.addChild(nm);
+    });
     let exit = text_button('EXIT',64,64,()=>{
         ttc.commit_leave((resp)=>{
             let m3 = document.querySelector(TARA_API.query().gamePopup);

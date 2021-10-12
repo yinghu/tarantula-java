@@ -55,4 +55,9 @@ class TossUp{
             callback(resp);    
         });    
     }
+    commit_profile(callback){
+        TARA_API.onGet('tossup/profile','onLoad','',(resp)=>{
+            callback(resp);    
+        });    
+    }
 }
