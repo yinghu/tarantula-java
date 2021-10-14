@@ -36,6 +36,7 @@ public class RelayService implements Runnable{
                 DatagramPacket buffer = new DatagramPacket(new byte[512],512);
                 this.datagramChannel.receive(buffer);
                 byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
+                this.datagramChannel.send(new DatagramPacket(payload,payload.length,buffer.getSocketAddress()));
                 //mQueue.offer(new PendingMessage(payload,buffer.getSocketAddress()));
             }catch (Exception ex){
                 //ignore
