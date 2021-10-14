@@ -19,7 +19,7 @@ public class RelayService implements Runnable{
 
     public void start() throws Exception{
         this.datagramChannel = new DatagramSocket(null);
-        InetSocketAddress addr = new InetSocketAddress("10.0.0.192",11933);
+        InetSocketAddress addr = new InetSocketAddress("10.0.0.153",11933);
         this.datagramChannel.bind(addr);
     }
     public void shutdown() throws Exception{
