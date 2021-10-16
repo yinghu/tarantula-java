@@ -20,10 +20,14 @@ public class RelayService implements Runnable{
 
     private DatagramSocket datagramChannel;
     private HashSet<SocketAddress> socketAddresses = new HashSet<>();
+    private String host;
+    public RelayService(String host){
+        this.host = host;
+    }
 
     public void start() throws Exception{
         this.datagramChannel = new DatagramSocket(null);
-        InetSocketAddress addr = new InetSocketAddress("10.0.0.153",11933);
+        InetSocketAddress addr = new InetSocketAddress(host,11933);
         this.datagramChannel.bind(addr);
     }
     public void shutdown() throws Exception{
@@ -34,7 +38,7 @@ public class RelayService implements Runnable{
     @Override
     public void run() {
         //String _app = application.substring(application.lastIndexOf(".")+1);
-        log.warn("Relay service is ready");
+        log.warn("Relay service is ready on ["+host+": 11933]");
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[512],512);

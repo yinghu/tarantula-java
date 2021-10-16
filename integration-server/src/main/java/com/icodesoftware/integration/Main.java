@@ -37,7 +37,7 @@ public class Main {
                 //throw new RuntimeException("No endpoint IP found from /etc/tarantula/ip.txt");
             }
             //UDPService udpReceiver = new UDPService(config);
-            RelayService udpReceiver = new RelayService();
+            RelayService udpReceiver = new RelayService(config.getAsJsonObject("connection").get("host").getAsString());
             udpReceiver.start();
             Thread t = new Thread(udpReceiver,"udp-service");
             t.start();
