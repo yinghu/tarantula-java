@@ -16,7 +16,8 @@ import java.util.HashSet;
 public class RelayService implements Runnable{
 
     private static TarantulaLogger log = JDKLogger.getLogger(RelayService.class);
-
+    private static int BUFFER_SIZE = 576;
+    private static int PORT = 11933;
 
     private DatagramSocket datagramChannel;
     private HashSet<SocketAddress> socketAddresses = new HashSet<>();
@@ -27,7 +28,7 @@ public class RelayService implements Runnable{
 
     public void start() throws Exception{
         this.datagramChannel = new DatagramSocket(null);
-        InetSocketAddress addr = new InetSocketAddress(host,11933);
+        InetSocketAddress addr = new InetSocketAddress(host,PORT);
         this.datagramChannel.bind(addr);
     }
     public void shutdown() throws Exception{
@@ -41,7 +42,7 @@ public class RelayService implements Runnable{
         log.warn("Relay service is ready on ["+host+": 11933]");
         while (true){
             try{
-                DatagramPacket buffer = new DatagramPacket(new byte[512],512);
+                DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
                 this.datagramChannel.receive(buffer);
                 SocketAddress source = buffer.getSocketAddress();
                 socketAddresses.add(source);
