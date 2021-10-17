@@ -43,11 +43,12 @@ public class RelayService implements Runnable{
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[512],512);
                 this.datagramChannel.receive(buffer);
-                socketAddresses.add(buffer.getSocketAddress());
+                SocketAddress source = buffer.getSocketAddress();
+                socketAddresses.add(source);
                 byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
                 socketAddresses.forEach((s)->{
                     try{
-                        this.datagramChannel.send(new DatagramPacket(payload, payload.length,s));
+                        if(!s.equals(source)) this.datagramChannel.send(new DatagramPacket(payload, payload.length,s));
                     }
                     catch (IOException ioex){
                         ioex.printStackTrace();
