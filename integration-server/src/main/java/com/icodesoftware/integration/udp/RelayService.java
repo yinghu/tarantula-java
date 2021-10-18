@@ -10,8 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Arrays;
-import java.util.HashSet;
-
+import java.util.HashMap;
 
 public class RelayService implements Runnable{
 
@@ -20,7 +19,7 @@ public class RelayService implements Runnable{
     private static int PORT = 11933;
 
     private DatagramSocket datagramChannel;
-    private HashSet<SocketAddress> socketAddresses = new HashSet<>();
+    private HashMap<String,RemoteClient> socketAddresses = new HashMap<>();
     private String host;
     public RelayService(String host){
         this.host = host;
@@ -45,11 +44,20 @@ public class RelayService implements Runnable{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
                 this.datagramChannel.receive(buffer);
                 SocketAddress source = buffer.getSocketAddress();
-                socketAddresses.add(source);
+                String[] ip = source.toString().split(":");
+                RemoteClient rc = socketAddresses.get(ip[0]);
+                if(rc==null){
+                    socketAddresses.put(ip[0],new RemoteClient(ip[1],source));
+                }
+                else if(rc!=null && !rc.suffix.equals(ip[1])){
+                    socketAddresses.replace(ip[0],new RemoteClient(ip[1],source));
+                }
                 byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
-                socketAddresses.forEach((s)->{
+                socketAddresses.forEach((k,s)->{
                     try{
-                        if(!s.equals(source)) this.datagramChannel.send(new DatagramPacket(payload, payload.length,s));
+                        if(!k.equals(ip[0])){
+                            this.datagramChannel.send(new DatagramPacket(payload,payload.length,s.socketAddress));
+                        }
                     }
                     catch (IOException ioex){
                         ioex.printStackTrace();
@@ -61,6 +69,15 @@ public class RelayService implements Runnable{
                 ex.printStackTrace();
                 //try{Thread.sleep(50);}catch (Exception exx){}
             }
+        }
+    }
+    private class RemoteClient{
+        public String suffix;
+        public SocketAddress socketAddress;
+
+        public RemoteClient(String suffix,SocketAddress socketAddress){
+            this.suffix = suffix;
+            this.socketAddress = socketAddress;
         }
     }
 }
