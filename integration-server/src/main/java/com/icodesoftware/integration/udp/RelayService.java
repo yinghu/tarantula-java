@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class RelayService implements Runnable{
 
     private static TarantulaLogger log = JDKLogger.getLogger(RelayService.class);
-    private static int BUFFER_SIZE = 576;
+    private static int BUFFER_SIZE = 508;
     private static int PORT = 11933;
 
     private DatagramSocket datagramChannel;
