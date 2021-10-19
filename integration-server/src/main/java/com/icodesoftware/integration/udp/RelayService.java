@@ -39,6 +39,7 @@ public class RelayService implements Runnable{
     public void run() {
         //String _app = application.substring(application.lastIndexOf(".")+1);
         log.warn("Relay service is ready on ["+host+": 11933]");
+        MessageBuffer messageBuffer = new MessageBuffer();
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
@@ -53,6 +54,9 @@ public class RelayService implements Runnable{
                     socketAddresses.replace(ip[0],new RemoteClient(ip[1],source));
                 }
                 byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
+                //messageBuffer.reset(payload);
+                //MessageBuffer.MessageHeader header = messageBuffer.readHeader();
+                //log.warn(header.toString());
                 socketAddresses.forEach((k,s)->{
                     try{
                         if(!k.equals(ip[0])){
