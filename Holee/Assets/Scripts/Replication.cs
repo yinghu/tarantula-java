@@ -12,6 +12,7 @@ namespace Holee
         private GameManager _gameManager;
         private Rigidbody _rigidbody;
         private MessageHeader _messageHeader;
+        
         private void Start()
         {
             Debug.Log("Starting networking object->"+networkingId);
