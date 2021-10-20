@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Holee
 {
@@ -12,6 +13,9 @@ namespace Holee
         private GameManager _gameManager;
         private Rigidbody _rigidbody;
         private MessageHeader _messageHeader;
+        
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
+
         
         private void Start()
         {
@@ -43,10 +47,32 @@ namespace Holee
 
         public void OnTrigger()
         {
+            var header = new MessageHeader
+            {
+                ObjectId = networkingId,
+                Sequence = _sequence,
+                Broadcasting = true,
+                CommandId = 2
+
+            };
+            _gameManager.Send(header, buffer =>
+            {
+                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
+                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
+                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
+            });
             _isTriggering = true;
         }
         public void OnMessage(MessageHeader header,MessageBuffer messageBuffer)
         {
+            if (header.CommandId == 2)
+            {
+                var resp = messageBuffer.ReadUTF8();
+                Debug.Log("RSP->"+resp.Length);
+                Debug.Log("RSP->"+resp);
+                return;
+            }
+
             if(header.Sequence<=_sequence) return;
             _isTriggering = false;
             _sequence = header.Sequence;

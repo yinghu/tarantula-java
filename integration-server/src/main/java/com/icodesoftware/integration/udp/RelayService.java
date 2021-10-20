@@ -54,12 +54,14 @@ public class RelayService implements Runnable{
                     socketAddresses.replace(ip[0],new RemoteClient(ip[1],source));
                 }
                 byte[] payload = Arrays.copyOf(buffer.getData(),buffer.getLength());
-                //messageBuffer.reset(payload);
-                //MessageBuffer.MessageHeader header = messageBuffer.readHeader();
-                //log.warn(header.toString());
+                messageBuffer.reset(payload);
+                MessageBuffer.MessageHeader header = messageBuffer.readHeader();
                 socketAddresses.forEach((k,s)->{
                     try{
-                        if(!k.equals(ip[0])){
+                        if(header.broadcasting){
+                            this.datagramChannel.send(new DatagramPacket(payload,payload.length,s.socketAddress));
+                        }
+                        else if(!k.equals(ip[0])){
                             this.datagramChannel.send(new DatagramPacket(payload,payload.length,s.socketAddress));
                         }
                     }

@@ -38,7 +38,7 @@ namespace Holee
         
         public MessageBuffer(Rijndael cipher)
         {
-            _memoryStream = new MemoryStream(Size);
+            _memoryStream = new MemoryStream(new byte[Size]);
             _memoryStream.Position = 0;
             _tem4 = new byte[4];
             _tem2 = new byte[2];
@@ -48,6 +48,7 @@ namespace Holee
 
         public MessageBuffer WriteHeader(MessageHeader header)
         {
+            CheckAvailability(HeaderSize);
             _encrypted = header.Encrypted;
             WriteByte(header.Ack?(byte)1:(byte)0).WriteInt(header.ChannelId).WriteInt(header.SessionId);
             WriteInt(header.ObjectId).WriteInt(header.Sequence).WriteShort(header.CommandId);
@@ -70,6 +71,7 @@ namespace Holee
 
         public MessageBuffer WriteVector3(Vector3 vector3)
         {
+            CheckAvailability(12);
             return WriteFloat(vector3.x).WriteFloat(vector3.y).WriteFloat(vector3.z);
         }
 
@@ -85,6 +87,7 @@ namespace Holee
 
         public MessageBuffer WriteQuaternion(Quaternion quaternion)
         {
+            CheckAvailability(16);
             return WriteFloat(quaternion.w).WriteFloat(quaternion.x).WriteFloat(quaternion.y).WriteFloat(quaternion.z);
         }
         public Quaternion ReadQuaternion()
@@ -100,6 +103,7 @@ namespace Holee
 
         public MessageBuffer WriteByte(byte data)
         {
+            CheckAvailability(1);
             _memoryStream.WriteByte(data);
             return this;
         }
@@ -112,6 +116,7 @@ namespace Holee
         public MessageBuffer WriteUTF8(string data)
         {
             var bytes = _utf8Encoding.GetBytes(data);
+            CheckAvailability(bytes.Length+4);
             WriteInt(bytes.Length);
             _memoryStream.Write(bytes,0,bytes.Length);
             return this;
@@ -121,12 +126,14 @@ namespace Holee
         {
             var len = ReadInt();
             var data = new byte[len];
+            if (len <= 0 || len >= Size - HeaderSize) throw new OverflowException();
             _memoryStream.Read(data, 0, len);
             return _utf8Encoding.GetString(data);
         }
 
         public MessageBuffer WriteShort(short data)
         {
+            CheckAvailability(2);
             _memoryStream.Write(FromShort(data),0,2);
             return this;
         }
@@ -138,6 +145,7 @@ namespace Holee
 
         public MessageBuffer WriteInt(int data)
         {
+            CheckAvailability(4);
             _memoryStream.Write(FromInt(data),0,4);
             return this;
         }
@@ -149,6 +157,7 @@ namespace Holee
         
         public MessageBuffer WriteFloat(float data)
         {
+            CheckAvailability(4);
             _memoryStream.Write(FromFloat(data),0,4);
             return this;
         }
@@ -161,6 +170,7 @@ namespace Holee
         public void Reset(byte[] data)
         {
             _memoryStream.Position = 0;
+            CheckAvailability(data.Length);
             _memoryStream.Write(data,0,data.Length);
             _memoryStream.Position = 0;
             if (!ReadHeader().Encrypted)
@@ -184,6 +194,7 @@ namespace Holee
             if (!_encrypted) return buffer;
             var encrypted = Encrypt(buffer,HeaderSize,len-HeaderSize);
             _memoryStream.Position = HeaderSize;
+            CheckAvailability(encrypted.Length);
             _memoryStream.Write(encrypted,0,encrypted.Length);
             _memoryStream.Position = 0;
             buffer = new byte[HeaderSize + encrypted.Length];
@@ -206,7 +217,13 @@ namespace Holee
             _disposed = true;
         }
         ~MessageBuffer() => Dispose(false);
-        
+
+        private void CheckAvailability(int size)
+        {
+            if (_memoryStream.Position + size < Size) return;
+            throw new OverflowException("Max message size is [" + Size + "]");
+        }
+
         private static byte[] FromInt(int data)
         {
             var ret = BitConverter.GetBytes(data);
