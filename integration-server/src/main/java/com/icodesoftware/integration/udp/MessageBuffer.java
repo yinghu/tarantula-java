@@ -24,6 +24,7 @@ public class MessageBuffer {
         header.objectId = byteBuffer.getInt();
         header.sequence = byteBuffer.getInt();
         header.commandId = byteBuffer.getShort();
+        header.broadcasting = byteBuffer.get()==1;
         header.encrypted = byteBuffer.get()==1;
         return header;
     }
@@ -35,10 +36,11 @@ public class MessageBuffer {
         public int objectId;
         public int sequence;
         public int commandId;
+        public boolean broadcasting;
         public boolean encrypted;
         @Override
         public String toString(){
-            return "MSG->"+channelId+"<>"+sessionId+"<>"+ack+"<>"+objectId+"<>"+sequence+"<>"+commandId+"<>"+encrypted;
+            return "MSH->"+channelId+"<>"+sessionId+"<>"+ack+"<>"+objectId+"<>"+sequence+"<>"+commandId+"<>"+broadcasting+"<>"+encrypted;
         }
     }
 
