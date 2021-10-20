@@ -17,6 +17,7 @@ import com.tarantula.platform.store.StoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameServiceProvider implements ServiceProvider{
@@ -219,6 +220,9 @@ public class GameServiceProvider implements ServiceProvider{
             return tournamentServiceProvider;
         }
         return null;
+    }
+    public String base64ServerKey(){
+        return Base64.getEncoder().encodeToString(this.serviceContext.deploymentServiceProvider().serverKey());
     }
 
 }

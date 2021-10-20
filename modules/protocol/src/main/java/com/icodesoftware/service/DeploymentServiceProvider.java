@@ -18,6 +18,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     Connection onConnection(String typeId);
     void onRemoteConnection(Session session,Descriptor descriptor);
     byte[] serverKey(Connection connection);
+    byte[] serverKey();
     void registerOnConnectionListener(Connection.OnConnectionListener listener);
     void registerOnConnectionStateListener(Connection.OnStateListener listener);
 

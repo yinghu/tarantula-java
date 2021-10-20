@@ -905,12 +905,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(key!=null){
             return key;
         }
-        key = new byte[KEY_SIZE];
-        secureRandom.nextBytes(key);
+        key = serverKey();//new byte[KEY_SIZE];
+        //secureRandom.nextBytes(key);
         //connection.server().connectionId(integrationCluster.sequence());
         connection.connectionId(connection.server().connectionId());
         connection.server().sequence(secureRandom.nextInt());
         this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
+        return key;
+    }
+    public byte[] serverKey(){
+        byte[] key = new byte[KEY_SIZE];
+        secureRandom.nextBytes(key);
         return key;
     }
     public void stopAccessIndex(){

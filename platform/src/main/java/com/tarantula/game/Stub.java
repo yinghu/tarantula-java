@@ -12,6 +12,7 @@ import java.util.Map;
 public class Stub extends PlayerGameObject {
 
     public boolean joined;
+    public String serverKey;
     public GameRoom room;
 
     public GameZone zone;
@@ -42,6 +43,7 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",room.tournamentEnabled());
         jo.addProperty("offline",room.offline());
+        jo.addProperty("serverKey",serverKey);
         return jo;
     }
     @Override

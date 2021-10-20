@@ -8,7 +8,7 @@
     let _felipaFamily = 'Felipa, Arial';
     let app = TGL.start(document.querySelector('#tx-game-tossup'));
     ttc.commit_config();
-   
+    console.log(TARA_API.query().stub);
     let zone = new PIXI.Text('Zone=>'+JSON.stringify(TARA_API.query().stub.zone),{fontFamily:_oswaldFamily,fontSize:20,fill:'yellow'});
     zone.y = 20;
     zone.x = 10;

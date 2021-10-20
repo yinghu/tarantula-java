@@ -49,6 +49,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         this.dataStore.update(room);
         stub.zone = gameZone;
         stub.joined = true;
+        stub.serverKey = serverKey;
         stub.tag = application.tag();
         stub.rating = rating;
         stub.statistics = gameServiceProvider.statistics(session.systemId());
