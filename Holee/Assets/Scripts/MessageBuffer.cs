@@ -126,7 +126,7 @@ namespace Holee
         {
             var len = ReadInt();
             var data = new byte[len];
-            if (len <= 0 || len >= Size - HeaderSize) throw new OverflowException();
+            if (len <= 0 || len > Size - HeaderSize) throw new OverflowException();
             _memoryStream.Read(data, 0, len);
             return _utf8Encoding.GetString(data);
         }
@@ -220,7 +220,7 @@ namespace Holee
 
         private void CheckAvailability(int size)
         {
-            if (_memoryStream.Position + size < Size) return;
+            if (_memoryStream.Position + size <= Size) return;
             throw new OverflowException("Max message size is [" + Size + "]");
         }
 

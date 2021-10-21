@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Holee
 {
@@ -14,8 +13,6 @@ namespace Holee
         private Rigidbody _rigidbody;
         private MessageHeader _messageHeader;
         
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore};
-
         
         private void Start()
         {
@@ -24,7 +21,8 @@ namespace Holee
             _sequence = 0;
             _messageHeader = new MessageHeader
             {
-                ObjectId = networkingId
+                ObjectId = networkingId,
+                CommandId = 1
             };
         }
         
@@ -51,34 +49,35 @@ namespace Holee
             {
                 ObjectId = networkingId,
                 Sequence = _sequence,
-                Broadcasting = true,
                 CommandId = 2
 
             };
             _gameManager.Send(header, buffer =>
             {
-                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
-                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
-                buffer.WriteUTF8(JsonConvert.SerializeObject(header,JsonSerializerSettings));
+                buffer.WriteUTF8("my turn");
             });
             _isTriggering = true;
         }
         public void OnMessage(MessageHeader header,MessageBuffer messageBuffer)
         {
-            if (header.CommandId == 2)
+            switch (header.CommandId)
             {
-                var resp = messageBuffer.ReadUTF8();
-                Debug.Log("RSP->"+resp.Length);
-                Debug.Log("RSP->"+resp);
-                return;
+                case 1:
+                    if (header.Sequence > _sequence)
+                    {
+                        _sequence = header.Sequence;
+                        _rigidbody.velocity = messageBuffer.ReadVector3();
+                        _rigidbody.position = messageBuffer.ReadVector3();
+                        _rigidbody.angularVelocity = messageBuffer.ReadVector3();
+                    }
+                    break;
+                case 2:
+                    var resp = messageBuffer.ReadUTF8();
+                    Debug.Log("RSP->"+resp.Length);
+                    Debug.Log("RSP->"+resp);
+                    _isTriggering = false;
+                    break;
             }
-
-            if(header.Sequence<=_sequence) return;
-            _isTriggering = false;
-            _sequence = header.Sequence;
-            _rigidbody.velocity = messageBuffer.ReadVector3();
-            _rigidbody.position = messageBuffer.ReadVector3();
-            _rigidbody.angularVelocity = messageBuffer.ReadVector3();
         }
     }
 }
