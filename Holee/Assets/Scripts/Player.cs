@@ -23,7 +23,8 @@ namespace Holee
             _sequence = 0;
             _messageHeader = new MessageHeader
             {
-                ObjectId = playerId
+                ObjectId = playerId,
+                CommandId = Command.Replication
             };
         }
 

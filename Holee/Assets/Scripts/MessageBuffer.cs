@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace Holee
 {
+    public class Command
+    {
+        public const short Ack = 0;
+        public const short Replication = 1;
+        public const short Join = 100;
+    }
     public interface IMessage
     {
         void OnMessage(MessageHeader header,MessageBuffer messageBuffer);
@@ -19,6 +25,8 @@ namespace Holee
         public int ObjectId;
         public int Sequence;
         public short CommandId;
+        public short BatchSize;
+        public short Batch;
         public bool Broadcasting;
         public bool Encrypted; //21
     }
@@ -26,7 +34,7 @@ namespace Holee
     public class MessageBuffer :IDisposable
     {
         private const int Size = 508;
-        private const int HeaderSize = 21;
+        private const int HeaderSize = 25;
         private bool _disposed;
         private readonly MemoryStream _memoryStream;
         private readonly byte[] _tem4;
@@ -52,6 +60,7 @@ namespace Holee
             _encrypted = header.Encrypted;
             WriteByte(header.Ack?(byte)1:(byte)0).WriteInt(header.ChannelId).WriteInt(header.SessionId);
             WriteInt(header.ObjectId).WriteInt(header.Sequence).WriteShort(header.CommandId);
+            WriteShort(header.BatchSize).WriteShort(header.Batch);
             return WriteByte(header.Broadcasting?(byte)1:(byte)0).WriteByte(header.Encrypted?(byte)1:(byte)0);
         }
         public MessageHeader ReadHeader()
@@ -64,6 +73,8 @@ namespace Holee
                 ObjectId = ReadInt(),
                 Sequence = ReadInt(),
                 CommandId =  ReadShort(),
+                BatchSize = ReadShort(),
+                Batch = ReadShort(),
                 Broadcasting = ReadByte()==1,
                 Encrypted = ReadByte()==1
             };

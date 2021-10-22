@@ -36,6 +36,8 @@ public interface MessageHandler {
     int DISCHARGE = 500;
 
     int type();
-    void onMessage(InboundMessage pendingInboundMessage);
-    void relay();
+    default void onMessage(InboundMessage pendingInboundMessage){}
+    default void relay(){}
+
+    default void onMessage(MessageBuffer.MessageHeader messageHeader, byte[] payload){}
 }

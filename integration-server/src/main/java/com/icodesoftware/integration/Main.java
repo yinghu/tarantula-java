@@ -2,9 +2,8 @@ package com.icodesoftware.integration;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.icodesoftware.integration.udp.RelayService;
 import com.icodesoftware.logging.TarantulaLogManager;
-import com.icodesoftware.integration.udp.UDPService;
+import com.icodesoftware.protocol.UDPEndpointService;
 
 import java.io.*;
 
@@ -37,10 +36,11 @@ public class Main {
                 //throw new RuntimeException("No endpoint IP found from /etc/tarantula/ip.txt");
             }
             //UDPService udpReceiver = new UDPService(config);
-            RelayService udpReceiver = new RelayService(config.getAsJsonObject("connection").get("host").getAsString());
+            UDPEndpointService udpReceiver = new UDPEndpointService(config);
             udpReceiver.start();
-            Thread t = new Thread(udpReceiver,"udp-service");
-            t.start();
+            udpReceiver.run();
+            //Thread t = new Thread(udpReceiver,"udp-service");
+            //t.start();
             Runtime.getRuntime().addShutdownHook(new Thread(()->{
                 try{udpReceiver.shutdown();}catch (Exception ex){}
                 TarantulaLogManager.shutdown();//shutdown log manager

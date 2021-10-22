@@ -53,6 +53,11 @@ namespace Holee
         {
             message(_outboundBuffer.WriteHeader(header));
             var outbound = _outboundBuffer.Drain();
+            if (header.Ack)
+            {
+                
+            }
+
             NetworkingManager.Send(outbound,outbound.Length);
         }
 
@@ -61,13 +66,12 @@ namespace Holee
             _messageQueue.Enqueue(message);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
             _inboundBuffer.Reset(message);
             var header = _inboundBuffer.ReadHeader();
-            Debug.Log("pid->"+header.ObjectId);
             switch (header.ObjectId)
             {
                 case 0:
