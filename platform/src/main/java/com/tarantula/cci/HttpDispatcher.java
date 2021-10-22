@@ -1,9 +1,10 @@
 package com.tarantula.cci;
 
+import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.service.RequestHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.tarantula.cci.http.HttpSession;
-import com.tarantula.platform.service.EndPoint;
 
 import java.io.IOException;
 import java.util.UUID;

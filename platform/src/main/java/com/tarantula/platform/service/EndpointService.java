@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
-import com.icodesoftware.service.Serviceable;
+import com.icodesoftware.service.*;
+import com.icodesoftware.service.RequestHandler;
 import com.tarantula.cci.*;
 import com.tarantula.platform.TarantulaContext;
 
@@ -10,7 +11,7 @@ import java.util.HashMap;
 public class EndpointService implements Serviceable,EndPoint.Resource{
 
     private TarantulaContext tarantulaContext;
-    private HashMap<String,RequestHandler> rMap = new HashMap<>();
+    private HashMap<String, RequestHandler> rMap = new HashMap<>();
     private final ArrayList<EndPoint> endPointList;
     private final PushEventHandler pushEventHandler;
 

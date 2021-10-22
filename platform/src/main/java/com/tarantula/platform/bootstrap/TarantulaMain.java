@@ -4,10 +4,10 @@ import java.io.*;
 import java.util.Properties;
 
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.EndPoint;
 import com.tarantula.licensing.Validator;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.EndPoint;
 import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
 
 public class TarantulaMain {

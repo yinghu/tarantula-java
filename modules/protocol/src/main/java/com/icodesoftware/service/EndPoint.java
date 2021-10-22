@@ -1,7 +1,5 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
-import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.cci.RequestHandler;
 
 public interface EndPoint extends ServiceProvider {
 

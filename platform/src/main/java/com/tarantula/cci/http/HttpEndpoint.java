@@ -3,11 +3,11 @@ package com.tarantula.cci.http;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
+import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.sun.net.httpserver.HttpServer;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.service.EndPoint;
 
 public class HttpEndpoint implements EndPoint {
 

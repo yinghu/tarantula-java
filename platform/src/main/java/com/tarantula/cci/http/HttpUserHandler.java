@@ -1,8 +1,8 @@
 package com.tarantula.cci.http;
 
+import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.service.RequestHandler;
 import com.tarantula.cci.HttpDispatcher;
-import com.tarantula.cci.RequestHandler;
-import com.tarantula.platform.service.EndPoint;
 
 public class HttpUserHandler extends HttpDispatcher {
 

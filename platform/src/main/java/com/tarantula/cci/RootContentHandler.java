@@ -1,9 +1,7 @@
 package com.tarantula.cci;
 
 import com.icodesoftware.Event;
-import com.icodesoftware.service.Content;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.Metrics;

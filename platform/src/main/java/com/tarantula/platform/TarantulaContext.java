@@ -16,7 +16,6 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.RequestHandler;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;

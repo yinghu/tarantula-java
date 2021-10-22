@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class MessageBuffer {
     private static int SIZE = 508;
+    private static int HEADER_SIZE = 25;
 
     private ByteBuffer byteBuffer;
 
@@ -46,6 +47,11 @@ public class MessageBuffer {
         header.broadcasting = byteBuffer.get()==1;
         header.encrypted = byteBuffer.get()==1;
         return header;
+    }
+    public byte[] readPayload(){
+        byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];
+        byteBuffer.get(_payload);
+        return _payload;
     }
     public byte[] toArray(){
         byteBuffer.flip();

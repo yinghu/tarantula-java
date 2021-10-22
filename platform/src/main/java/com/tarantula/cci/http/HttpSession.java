@@ -1,13 +1,13 @@
 package com.tarantula.cci.http;
 import com.icodesoftware.Event;
 import com.icodesoftware.Session;
+import com.icodesoftware.service.OnExchange;
 import com.sun.net.httpserver.HttpExchange;
-import com.tarantula.cci.OnExchange;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class HttpSession extends RequestParser implements OnExchange{
+public class HttpSession extends RequestParser implements OnExchange {
 
 	private final HttpExchange hex;
     private final String id;

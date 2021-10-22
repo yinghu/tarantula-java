@@ -10,6 +10,7 @@ import com.icodesoftware.util.TarantulaThreadFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,11 +33,12 @@ public class UDPEndpointService implements Runnable, Serviceable,Messenger {
     private ExecutorService executorService;
 
     private MessageHandlerHeader messageHandlerHeader;
-    //private ConcurrentHashMap<>
+    private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
     private String host;
 
     public UDPEndpointService(JsonObject config){
         this.host = config.getAsJsonObject("connection").get("host").getAsString();
+        this.userChannelIndex.put(1,new UserChannel(1,this));
     }
 
     public void start() throws Exception{
@@ -47,19 +49,20 @@ public class UDPEndpointService implements Runnable, Serviceable,Messenger {
                 MessageBuffer messageBuffer = new MessageBuffer();
                 while(true){
                     try{
-                    DatagramPacket packet = pendingMessageQueue.poll();
-                    if(packet!=null){
-                        byte[] payload = Arrays.copyOf(packet.getData(),packet.getLength());
-                        messageBuffer.reset(payload);
-                        MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
-
-                        //this.messageHandlerHeader.onMessage();
-                    }
-                    else{
-                        Thread.sleep(5);
-                    }
+                        DatagramPacket packet = pendingMessageQueue.poll();
+                        if(packet!=null){
+                            byte[] data = Arrays.copyOf(packet.getData(),packet.getLength());
+                            messageBuffer.reset(data);
+                            MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
+                            UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);
+                            userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
+                        }
+                        else{
+                            Thread.sleep(5);
+                        }
                     }catch (Exception ex){
                         //ignore
+                        ex.printStackTrace();
                     }
                 }
             });
@@ -83,14 +86,20 @@ public class UDPEndpointService implements Runnable, Serviceable,Messenger {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                //ex.printStackTrace();
+                ex.printStackTrace();
                 //try{Thread.sleep(50);}catch (Exception exx){}
             }
         }
     }
 
     @Override
-    public void send(MessageBuffer.MessageHeader messageHeader, byte[] payload) {
-
+    public void send(MessageBuffer messageBuffer, SocketAddress destination) {
+        try {
+            byte[] data = messageBuffer.toArray();
+            DatagramPacket packet = new DatagramPacket(data,data.length,destination);
+            this.datagramChannel.send(packet);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }
