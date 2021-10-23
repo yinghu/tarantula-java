@@ -74,19 +74,19 @@ public class MessageBuffer {
         public boolean encrypted;
         @Override
         public String toString(){
-            return "MSH->"+channelId+"<>"+sessionId+"<>"+ack+"<>"+objectId+"<>"+sequence+"<>"+commandId+"<>"+broadcasting+"<>"+encrypted;
+            return "MSH->"+channelId+"<>"+sessionId+"<>"+objectId+"<>"+sequence;
         }
 
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             MessageHeader header = (MessageHeader) obj;
-            return channelId == header.channelId && sessionId == header.sessionId && objectId == header.objectId && sequence == header.sequence && commandId == header.commandId;
+            return channelId == header.channelId && sessionId == header.sessionId && objectId == header.objectId && sequence == header.sequence;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(channelId, sessionId, objectId, sequence, commandId);
+            return Objects.hash(channelId, sessionId, objectId, sequence);
         }
     }
 

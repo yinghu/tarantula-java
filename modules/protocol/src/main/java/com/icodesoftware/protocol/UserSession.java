@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserSession {
-    public int sessionId;
+    public final int sessionId;
     public SocketAddress source;
     public FIFOBuffer<MessageBuffer.MessageHeader> pendingAck;
     private AtomicBoolean onJoined;
