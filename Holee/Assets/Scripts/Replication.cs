@@ -47,6 +47,7 @@ namespace Holee
         {
             var header = new MessageHeader
             {
+                Ack = true,
                 ObjectId = networkingId,
                 Sequence = _sequence,
                 CommandId = 2

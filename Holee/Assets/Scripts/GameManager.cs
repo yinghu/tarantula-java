@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Holee
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour,IMessage
     {
        
         public Player playerA;
@@ -17,6 +17,7 @@ namespace Holee
         private MessageBuffer _inboundBuffer;
         private Rijndael _cipher;
         private MessageHeader _header;
+        private float _timer;
         private void Start()
         {
             foreach (var r in replications)
@@ -83,20 +84,43 @@ namespace Holee
 
         private void FixedUpdate()
         {
+            _timer += Time.deltaTime;//20ms per frame 
+            if (_timer >= 1)
+            {
+                _timer = 0;
+                _header.Ack = false;
+                _header.CommandId = Command.Ping;
+                _outboundBuffer.WriteHeader(_header);
+                var _ping = _outboundBuffer.Drain();
+                NetworkingManager.Send(_ping, _ping.Length);
+            }
+
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
             _inboundBuffer.Reset(message);
             var header = _inboundBuffer.ReadHeader();
             if (header.CommandId == Command.Ack)
             {
-                Debug.Log("ACK->"+header.ChannelId+"<>"+header.SessionId+"<>"+header.CommandId);    
+                Debug.Log("ACK->"+header);
+                for (var i = 0; i < 10; i++)
+                {
+                    Debug.Log("ACK->"+i+">>>"+_inboundBuffer.ReadHeader());
+                }
+
                 return;
             }
+
+            if (header.CommandId == Command.OnJoin)
+            {
+                Debug.Log("ON JOIN->"+header);
+                return;
+            }
+
             switch (header.ObjectId)
             {
                 case 0:
-                    //replications[0].OnMessage(header,_inboundBuffer);
-                    Debug.Log("MSG->"+header.ChannelId+"<>"+header.SessionId+"<>"+header.CommandId);
+                    replications[0].OnMessage(header,_inboundBuffer);
+                    //Debug.Log("MSG->"+header.ChannelId+"<>"+header.SessionId+"<>"+header.CommandId);
                     break;
                 case 1:
                     playerA.OnMessage(header,_inboundBuffer);
@@ -119,6 +143,11 @@ namespace Holee
             _outboundBuffer.Dispose();
             _inboundBuffer.Dispose();
             NetworkingManager.OnReceived -= OnMessage;
+        }
+
+        public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
+        {
+            
         }
     }
 }

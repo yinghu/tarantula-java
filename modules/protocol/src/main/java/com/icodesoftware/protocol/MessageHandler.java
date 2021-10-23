@@ -39,5 +39,5 @@ public interface MessageHandler {
     default void onMessage(InboundMessage pendingInboundMessage){}
     default void relay(){}
 
-    default void onMessage(MessageBuffer.MessageHeader messageHeader, byte[] payload){}
+    default void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){}
 }

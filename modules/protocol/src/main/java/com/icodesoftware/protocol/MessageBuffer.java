@@ -61,7 +61,7 @@ public class MessageBuffer {
         return _payload;
     }
 
-    public class MessageHeader{
+    public static class MessageHeader{
         public boolean ack;
         public int channelId;
         public int sessionId;

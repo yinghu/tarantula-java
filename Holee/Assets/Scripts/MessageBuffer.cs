@@ -10,7 +10,12 @@ namespace Holee
     {
         public const short Ack = 0;
         public const short Replication = 1;
+        
         public const short Join = 100;
+        public const short Ping = 101;
+        
+        //server notification
+        public const short OnJoin = 200;
     }
     public interface IMessage
     {
@@ -29,6 +34,12 @@ namespace Holee
         public short Batch;
         public bool Broadcasting;
         public bool Encrypted; //21
+
+        public override string ToString()
+        {
+            return "HEADER->" + ChannelId + "<>" + SessionId + "<>" + ObjectId + "<>" + Sequence + "><>" + CommandId +
+                   "<>" + BatchSize + "<>" + Batch;
+        }
     }
 
     public class MessageBuffer :IDisposable
