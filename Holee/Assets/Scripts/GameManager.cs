@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Holee
         public Player playerB;
         [SerializeField] private Replication[] replications;
         private ConcurrentQueue<byte[]> _messageQueue;
-       
+        private Dictionary<string, byte[]> _pendingAckMessage;
         private MessageBuffer _outboundBuffer;
         private MessageBuffer _inboundBuffer;
         private Rijndael _cipher;
@@ -20,6 +21,7 @@ namespace Holee
         private float _timer;
         private void Start()
         {
+            _pendingAckMessage = new Dictionary<string, byte[]>();
             foreach (var r in replications)
             {
                 r.Setup(this);    
@@ -38,7 +40,6 @@ namespace Holee
             _inboundBuffer = new MessageBuffer(_cipher);
             _header = new MessageHeader
             {
-                Ack = true,
                 ChannelId = 1,
                 SessionId = 2,
                 ObjectId = 0,
@@ -48,6 +49,7 @@ namespace Holee
             _outboundBuffer.WriteHeader(_header);
             _outboundBuffer.WriteInt(2);
             var outbound = _outboundBuffer.Drain();
+            _pendingAckMessage[_header.ToString()] = outbound;
             NetworkingManager.Send(outbound,outbound.Length);
         }
 
@@ -71,7 +73,7 @@ namespace Holee
             var outbound = _outboundBuffer.Drain();
             if (header.Ack)
             {
-                
+                _pendingAckMessage[header.ToString()] = outbound;
             }
 
             NetworkingManager.Send(outbound,outbound.Length);
@@ -91,8 +93,8 @@ namespace Holee
                 _header.Ack = false;
                 _header.CommandId = Command.Ping;
                 _outboundBuffer.WriteHeader(_header);
-                var _ping = _outboundBuffer.Drain();
-                NetworkingManager.Send(_ping, _ping.Length);
+                var ping = _outboundBuffer.Drain();
+                NetworkingManager.Send(ping, ping.Length);
             }
 
             var suc = _messageQueue.TryDequeue(out var message);
@@ -101,10 +103,14 @@ namespace Holee
             var header = _inboundBuffer.ReadHeader();
             if (header.CommandId == Command.Ack)
             {
-                Debug.Log("ACK->"+header);
+                //Debug.Log("ACK->"+header);
                 for (var i = 0; i < 10; i++)
                 {
-                    Debug.Log("ACK->"+i+">>>"+_inboundBuffer.ReadHeader());
+                    var ack = _inboundBuffer.ReadHeader();
+                    if (_pendingAckMessage.ContainsKey(ack.ToString()))
+                    {
+                        Debug.Log("ACK->"+i+">>>"+ack+" removed->"+_pendingAckMessage.Remove(ack.ToString()));
+                    }
                 }
 
                 return;
@@ -113,7 +119,17 @@ namespace Holee
             if (header.CommandId == Command.OnJoin)
             {
                 Debug.Log("ON JOIN->"+header);
+                header.Sequence = 0;
+                if (_pendingAckMessage.ContainsKey(header.ToString()))
+                {
+                    Debug.Log("ACK removed->"+_pendingAckMessage.Remove(header.ToString()));
+                }
                 return;
+            }
+
+            if (header.Ack)
+            {
+                //use outbound buffer to send ack back to server
             }
 
             switch (header.ObjectId)

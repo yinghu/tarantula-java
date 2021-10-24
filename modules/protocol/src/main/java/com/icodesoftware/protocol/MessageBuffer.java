@@ -1,7 +1,6 @@
 package com.icodesoftware.protocol;
 
 import java.nio.ByteBuffer;
-import java.util.Objects;
 
 public class MessageBuffer {
     private static int SIZE = 508;
@@ -75,18 +74,6 @@ public class MessageBuffer {
         @Override
         public String toString(){
             return "MSH->"+channelId+"<>"+sessionId+"<>"+objectId+"<>"+sequence;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            MessageHeader header = (MessageHeader) obj;
-            return channelId == header.channelId && sessionId == header.sessionId && objectId == header.objectId && sequence == header.sequence;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(channelId, sessionId, objectId, sequence);
         }
     }
 

@@ -50,6 +50,16 @@ public class UserChannel {
             if(messageHeader.sessionId!=sid) messenger.send(messageBuffer,session.source);
         });
         if(!messageHeader.ack) return;
+        onAck(userSession,messageHeader,messageBuffer,source);
+    }
+    public void onTimer(){
+        userSessionIndex.forEach((k,v)->{
+            if(!v.online()) _offline.add(k);
+        });
+        _offline.forEach((i)-> userSessionIndex.remove(i));
+        _offline.clear();
+    }
+    private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck.push(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAck.list(new ArrayList<>());
         messageBuffer.reset();
@@ -59,14 +69,6 @@ public class UserChannel {
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));
         messenger.send(messageBuffer,source);
     }
-    public void onTimer(){
-        userSessionIndex.forEach((k,v)->{
-            if(!v.online()) _offline.add(k);
-        });
-        _offline.forEach((i)-> userSessionIndex.remove(i));
-        _offline.clear();
-    }
-
     private void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
         messageHeader.ack = true;
@@ -75,7 +77,6 @@ public class UserChannel {
         messageBuffer.writeHeader(messageHeader);
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer);
         userSessionIndex.forEach((sid,session)->messenger.send(messageBuffer,session.source));
-
     }
 
     private class PendingAckMessage{

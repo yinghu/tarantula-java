@@ -39,19 +39,7 @@ namespace Holee
         {
             return "HEADER->" + ChannelId + "<>" + SessionId + "<>" + ObjectId + "<>" + Sequence;
         }
-        public override bool Equals(object obj)
-        {
-            if(obj == null) return false;
-            var messageHeader = (MessageHeader)obj;
-            return ChannelId == messageHeader.ChannelId && SessionId == messageHeader.SessionId &&
-                   ObjectId == messageHeader.ObjectId && Sequence == messageHeader.Sequence;
-        }
-        public override int GetHashCode()
-        {
-            return Tuple.Create(ChannelId, SessionId, ObjectId, Sequence).GetHashCode();
-        }
-        
-        
+
     }
 
     public class MessageBuffer :IDisposable
