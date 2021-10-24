@@ -2,6 +2,7 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.logging.TarantulaLogManager;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
 import java.net.DatagramPacket;
@@ -140,4 +141,5 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId,userChannel);
     }
+
 }

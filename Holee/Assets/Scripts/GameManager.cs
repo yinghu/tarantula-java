@@ -14,6 +14,7 @@ namespace Holee
         [SerializeField] private Replication[] replications;
         private ConcurrentQueue<byte[]> _messageQueue;
         private Dictionary<string, byte[]> _pendingAckMessage;
+        private MessageHeader[] _pendingAck;
         private MessageBuffer _outboundBuffer;
         private MessageBuffer _inboundBuffer;
         private MessageBuffer _ackOutboundBuffer;
@@ -23,6 +24,12 @@ namespace Holee
         private void Start()
         {
             _pendingAckMessage = new Dictionary<string, byte[]>();
+            _pendingAck = new MessageHeader[10];
+            for (var i = 0; i < 10; i++)
+            {
+                _pendingAck[i] = new MessageHeader();
+            }
+
             foreach (var r in replications)
             {
                 r.Setup(this);    
@@ -121,20 +128,13 @@ namespace Holee
             }
             if (header.Ack)
             {
-                //use outbound buffer to send ack back to server
-                var pendingAck = new MessageHeader[10];
-                _ackOutboundBuffer.Reset();
-                var ackHeader = _ackOutboundBuffer.ReadHeader();
-                for (var i = 0; i < 10; i++)
-                {
-                    pendingAck[i] = _ackOutboundBuffer.ReadHeader();
-                }
-                _ackOutboundBuffer.Reset();
-                _ackOutboundBuffer.WriteHeader(ackHeader);
+                _ackOutboundBuffer.Reset(MessageBuffer.HeaderSize);
                 for (var i = 1; i < 10; i++)
                 {
-                    _ackOutboundBuffer.WriteHeader(pendingAck[i]);
+                    _ackOutboundBuffer.WriteHeader(_pendingAck[i]);
+                    _pendingAck[i - 1] = _pendingAck[i];
                 }
+                _pendingAck[9] = header;
                 _ackOutboundBuffer.WriteHeader(header);
                 var acks = _ackOutboundBuffer.Drain();
                 NetworkingManager.Send(acks,acks.Length);

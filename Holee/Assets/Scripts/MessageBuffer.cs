@@ -44,8 +44,8 @@ namespace Holee
 
     public class MessageBuffer :IDisposable
     {
-        private const int Size = 508;
-        private const int HeaderSize = 25;
+        public const int Size = 508;
+        public const int HeaderSize = 25;
         private bool _disposed;
         private readonly MemoryStream _memoryStream;
         private readonly byte[] _tem4;
@@ -209,6 +209,10 @@ namespace Holee
         public void Reset()
         {
             _memoryStream.Position = 0;
+        }
+        public void Reset(int start)
+        {
+            _memoryStream.Position = start;
         }
 
         public byte[] Drain()
