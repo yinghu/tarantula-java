@@ -16,6 +16,7 @@ namespace Holee
         private Dictionary<string, byte[]> _pendingAckMessage;
         private MessageBuffer _outboundBuffer;
         private MessageBuffer _inboundBuffer;
+        private MessageBuffer _ackOutboundBuffer;
         private Rijndael _cipher;
         private MessageHeader _header;
         private float _timer;
@@ -38,13 +39,16 @@ namespace Holee
             _messageQueue = new ConcurrentQueue<byte[]>();
             _outboundBuffer = new MessageBuffer(_cipher);
             _inboundBuffer = new MessageBuffer(_cipher);
+            _ackOutboundBuffer = new MessageBuffer(_cipher);
             _header = new MessageHeader
             {
                 ChannelId = 1,
                 SessionId = 2,
                 ObjectId = 0,
-                CommandId = Command.Join
+                CommandId = Command.Ack
             };
+            _ackOutboundBuffer.WriteHeader(_header);
+            _header.CommandId = Command.Join;
             NetworkingManager.OnReceived += OnMessage;
             _outboundBuffer.WriteHeader(_header);
             _outboundBuffer.WriteInt(2);
@@ -115,21 +119,36 @@ namespace Holee
 
                 return;
             }
-
-            if (header.CommandId == Command.OnJoin)
-            {
-                Debug.Log("ON JOIN->"+header);
-                header.Sequence = 0;
-                if (_pendingAckMessage.ContainsKey(header.ToString()))
-                {
-                    Debug.Log("ACK removed->"+_pendingAckMessage.Remove(header.ToString()));
-                }
-                return;
-            }
-
             if (header.Ack)
             {
                 //use outbound buffer to send ack back to server
+                var pendingAck = new MessageHeader[10];
+                _ackOutboundBuffer.Reset();
+                var ackHeader = _ackOutboundBuffer.ReadHeader();
+                for (var i = 0; i < 10; i++)
+                {
+                    pendingAck[i] = _ackOutboundBuffer.ReadHeader();
+                }
+                _ackOutboundBuffer.Reset();
+                _ackOutboundBuffer.WriteHeader(ackHeader);
+                for (var i = 1; i < 10; i++)
+                {
+                    _ackOutboundBuffer.WriteHeader(pendingAck[i]);
+                }
+                _ackOutboundBuffer.WriteHeader(header);
+                var acks = _ackOutboundBuffer.Drain();
+                NetworkingManager.Send(acks,acks.Length);
+            }
+            if (header.CommandId == Command.OnJoin)
+            {
+                Debug.Log("ON JOIN->" + header);
+                header.Sequence = 0;
+                if (_pendingAckMessage.ContainsKey(header.ToString()))
+                {
+                    Debug.Log("ACK removed->" + _pendingAckMessage.Remove(header.ToString()));
+                }
+
+                return;
             }
 
             switch (header.ObjectId)

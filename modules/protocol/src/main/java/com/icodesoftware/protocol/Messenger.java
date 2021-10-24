@@ -12,5 +12,5 @@ public interface Messenger {
     //SERVER PUSH NOTIFICATION
     short ON_JOIN  = 200;
 
-    void send(MessageBuffer messageBuffer, SocketAddress destination);
+    byte[] send(MessageBuffer messageBuffer, SocketAddress destination);
 }

@@ -75,6 +75,20 @@ public class MessageBuffer {
         public String toString(){
             return "MSH->"+channelId+"<>"+sessionId+"<>"+objectId+"<>"+sequence;
         }
+        public MessageHeader copy(){
+            MessageHeader copy = new MessageHeader();
+            copy.ack = ack;
+            copy.channelId = channelId;
+            copy.sessionId = sessionId;
+            copy.objectId = objectId;
+            copy.sequence = sequence;
+            copy.commandId = commandId;
+            copy.batchSize = batchSize;
+            copy.batch = batch;
+            copy.broadcasting = broadcasting;
+            copy.encrypted = encrypted;
+            return copy;
+        }
     }
 
 }

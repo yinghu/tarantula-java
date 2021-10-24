@@ -206,6 +206,11 @@ namespace Holee
             _memoryStream.Position = 0;
         }
 
+        public void Reset()
+        {
+            _memoryStream.Position = 0;
+        }
+
         public byte[] Drain()
         {
             var len = (int)_memoryStream.Position;

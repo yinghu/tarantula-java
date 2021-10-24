@@ -94,13 +94,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     @Override
-    public void send(MessageBuffer messageBuffer, SocketAddress destination) {
+    public byte[] send(MessageBuffer messageBuffer, SocketAddress destination) {
         try {
             byte[] data = messageBuffer.toArray();
             DatagramPacket packet = new DatagramPacket(data,data.length,destination);
             this.datagramChannel.send(packet);
+            return data;
         }catch (Exception ex){
             ex.printStackTrace();
+            return null;
         }
     }
 
