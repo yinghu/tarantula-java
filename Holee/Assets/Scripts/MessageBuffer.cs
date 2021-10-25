@@ -55,14 +55,17 @@ namespace Holee
         
         private readonly Rijndael _cipher;
         
-        public MessageBuffer(Rijndael cipher)
+        public MessageBuffer(Rijndael cipher) : this()
+        {
+            _cipher = cipher;
+        }
+        public MessageBuffer()
         {
             _memoryStream = new MemoryStream(new byte[Size]);
             _memoryStream.Position = 0;
             _tem4 = new byte[4];
             _tem2 = new byte[2];
             _utf8Encoding = new UTF8Encoding();
-            _cipher = cipher;
         }
 
         public MessageBuffer WriteHeader(MessageHeader header)

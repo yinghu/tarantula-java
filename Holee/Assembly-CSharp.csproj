@@ -57,10 +57,12 @@
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\NetworkingManager.cs" />
-     <Compile Include="Assets\Scripts\Obstacle.cs" />
+     <Compile Include="Assets\Scripts\Ping.cs" />
      <Compile Include="Assets\Scripts\HttpCaller.cs" />
      <Compile Include="Assets\Scripts\ServiceManager.cs" />
      <Compile Include="Assets\Scripts\PlayerCollider.cs" />
+     <Compile Include="Assets\Scripts\Retry.cs" />
+     <Compile Include="Assets\Scripts\Ack.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
