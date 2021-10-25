@@ -17,6 +17,7 @@ public class UserChannel {
     private UserSessionValidator userSessionValidator;
     private AtomicInteger sequence;
     private ArrayList<Integer> _offline;
+    private ArrayList<String> _retried;
     private ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
     //private
     public UserChannel(int channelId,Messenger messenger,UserSessionValidator userSessionValidator){
@@ -27,6 +28,7 @@ public class UserChannel {
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
         this.sequence = new AtomicInteger(0);
         this._offline = new ArrayList<>();
+        this._retried = new ArrayList<>();
     }
 
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
@@ -66,12 +68,25 @@ public class UserChannel {
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
     }
-    public void onTimer(){
+    public void onKickoff(){
         userSessionIndex.forEach((k,v)->{
             if(!v.online()) _offline.add(k);
         });
         _offline.forEach((i)-> userSessionIndex.remove(i));
         _offline.clear();
+    }
+    public void onRetry(){
+        _retried.clear();
+        pendingAckMessageIndex.forEach((k,v)-> {
+           userSessionIndex.forEach((uk, uu) -> {
+               messenger.send(v.data, uu.source);
+           });
+           v.retries--;
+           if(v.retries<=0){
+               _retried.add(k);
+           }
+        });
+        _retried.forEach(k->pendingAckMessageIndex.remove(k));
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);
@@ -87,10 +102,11 @@ public class UserChannel {
         messageBuffer.reset();
         messageHeader.ack = true;
         messageHeader.commandId = Messenger.ON_JOIN;
+        messageHeader.sequence = sequence.incrementAndGet();
         messageBuffer.writeHeader(messageHeader);
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(messageBuffer,session.source);
+            messenger.send(pendingAckMessage.data,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -98,11 +114,12 @@ public class UserChannel {
 
     private class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
-        public MessageBuffer messageBuffer;
+        public byte[] data;
+        public int retries = 3;
         public int pendingAck;
-        public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] data){
             this.messageHeader = messageHeader;
-            this.messageBuffer = messageBuffer;
+            this.data = data;
         }
     }
 

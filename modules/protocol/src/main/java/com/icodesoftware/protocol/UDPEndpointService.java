@@ -60,10 +60,16 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             });
         }
         executorService.execute(()->{
+            long kickoffTimer = 5000;
             while (true){
                 try{
-                    Thread.sleep(5000);
-                    userChannelIndex.forEach((k,v)->v.onTimer());
+                    Thread.sleep(200);
+                    userChannelIndex.forEach((k,v)->v.onRetry());
+                    kickoffTimer -= 200;
+                    if(kickoffTimer<=0){
+                        userChannelIndex.forEach((k,v)->v.onKickoff());
+                        kickoffTimer = 5000;
+                    }
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
@@ -81,6 +87,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     @Override
     public void run() {
         log.warn("UDP endpoint service is ready on ["+host+": 11933]");
+        //this.datagramChannel.setSoTimeout();
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
@@ -95,18 +102,23 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     @Override
-    public byte[] send(MessageBuffer messageBuffer, SocketAddress destination) {
+    public void send(MessageBuffer messageBuffer, SocketAddress destination) {
         try {
             byte[] data = messageBuffer.toArray();
             DatagramPacket packet = new DatagramPacket(data,data.length,destination);
             this.datagramChannel.send(packet);
-            return data;
         }catch (Exception ex){
             ex.printStackTrace();
-            return null;
         }
     }
-
+    public void send(byte[] data,SocketAddress destination){
+        try {
+            DatagramPacket packet = new DatagramPacket(data,data.length,destination);
+            this.datagramChannel.send(packet);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
     @Override
     public void address(String address) {
         this.host = address;

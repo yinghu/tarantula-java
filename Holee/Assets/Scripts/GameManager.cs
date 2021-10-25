@@ -7,7 +7,7 @@ namespace Holee
 {
     public class GameManager : MonoBehaviour,IMessage
     {
-       
+        private GameClusterManager _gameClusterManager;
         public Player playerA;
         public Player playerB;
         [SerializeField] private Replication[] replications;
@@ -22,7 +22,7 @@ namespace Holee
         private MessageHeader _header;
         private void Start()
         {
-            
+            _gameClusterManager = new GameClusterManager();
             foreach (var r in replications)
             {
                 r.Setup(this);    
@@ -45,15 +45,15 @@ namespace Holee
                 SessionId = 2,
                 ObjectId = 0,
                 Sequence = 1,
-                CommandId = Command.Join
+                CommandId = Command.Ack
             };
+            ack.OnJoin(_header);
             _header.Sequence = 2;
             _header.CommandId = Command.Join;
             NetworkingManager.OnReceived += OnMessage;
             _outboundBuffer.WriteHeader(_header);
             _outboundBuffer.WriteInt(2);
             var outbound = _outboundBuffer.Drain();
-            retry.PendingAck(_header.ToString(),outbound,3);
             NetworkingManager.Send(outbound,outbound.Length);
         }
 
@@ -68,7 +68,13 @@ namespace Holee
             playerA.OffPlay();
             playerB.OnPlay();
         }
-        
+
+        public async void OnDevice()
+        {
+            var suc = await _gameClusterManager.Device(this);
+            if (suc) await _gameClusterManager.Join(this);
+        }
+
         public void Send(MessageHeader header,Action<MessageBuffer> message)
         {
             header.ChannelId = 1;
@@ -104,14 +110,12 @@ namespace Holee
             }
             if (header.CommandId == Command.OnJoin)
             {
-                if (!retry.Ack(header.ToString())) return;
                 Debug.Log("On JOINED->" + header);
                 header.CommandId = Command.Ping;
                 _outboundBuffer.Reset();
                 _outboundBuffer.WriteHeader(header);
                 var data = _outboundBuffer.Drain();
                 ping.OnJoin(data);
-                ack.OnJoin(header);
                 return;
             }
 
