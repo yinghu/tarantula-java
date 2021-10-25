@@ -33,7 +33,7 @@ namespace Holee
         public short BatchSize;
         public short Batch;
         public bool Broadcasting;
-        public bool Encrypted; //21
+        public bool Encrypted; //25
 
         public override string ToString()
         {
@@ -298,21 +298,23 @@ namespace Holee
         }
         private byte[] Encrypt(byte[] data,int start,int size)
         {
-            using var stream = new MemoryStream();
-            using var cryptStream = new CryptoStream(stream, _cipher.CreateEncryptor(), CryptoStreamMode.Write);
+            var stream = new MemoryStream();
+            var cryptStream = new CryptoStream(stream, _cipher.CreateEncryptor(), CryptoStreamMode.Write);
             cryptStream.Write(data,  start,size);
             cryptStream.FlushFinalBlock();
             var ret = stream.ToArray();
+            stream.Dispose();
             return ret;
         }
         
         private byte[] Decrypt(byte[] data,int start,int size)
         {
-            using var stream = new MemoryStream();
-            using var cryptStream = new CryptoStream(stream, _cipher.CreateDecryptor(), CryptoStreamMode.Write);
+            var stream = new MemoryStream();
+            var cryptStream = new CryptoStream(stream, _cipher.CreateDecryptor(), CryptoStreamMode.Write);
             cryptStream.Write(data, start, size);
             cryptStream.FlushFinalBlock();
             var ret = stream.ToArray();
+            stream.Dispose();
             return ret;
         }
     }

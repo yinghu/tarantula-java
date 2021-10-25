@@ -103,13 +103,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     @Override
     public void send(MessageBuffer messageBuffer, SocketAddress destination) {
-        try {
-            byte[] data = messageBuffer.toArray();
-            DatagramPacket packet = new DatagramPacket(data,data.length,destination);
-            this.datagramChannel.send(packet);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
+        byte[] data = messageBuffer.toArray();
+        this.send(data,destination);
     }
     public void send(byte[] data,SocketAddress destination){
         try {

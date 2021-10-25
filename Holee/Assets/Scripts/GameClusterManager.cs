@@ -26,6 +26,7 @@ namespace Holee
         public Presence Presence { get; private set; }
         public Exception Exception { get; private set; }
         private readonly string _deviceId;
+        public string ServerKey { get; private set; }
 
         public GameClusterManager()
         {
@@ -86,8 +87,9 @@ namespace Holee
                     Exception = new Exception((string)jo.SelectToken("message"));
                     return false;
                 }
-                /**
-                Room = new Room
+                ServerKey = (string)jo.SelectToken("serverKey");
+                Debug.Log("SERVER KEY->"+ServerKey);
+                /**Room = new Room
                 {
                     //Id = (string) jo.SelectToken("roomId"),
                     Tag = (string) jo.SelectToken("tag"),

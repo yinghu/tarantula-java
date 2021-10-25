@@ -17,6 +17,9 @@ import com.tarantula.platform.store.StoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +44,8 @@ public class GameServiceProvider implements ServiceProvider{
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
+
+    private String serverKey;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -90,7 +95,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new PlatformTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
-
+        this.serverKey = Base64.getEncoder().encodeToString(this.serviceContext.deploymentServiceProvider().serverKey());
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
@@ -222,7 +227,7 @@ public class GameServiceProvider implements ServiceProvider{
         return null;
     }
     public String base64ServerKey(){
-        return Base64.getEncoder().encodeToString(this.serviceContext.deploymentServiceProvider().serverKey());
+        return serverKey;
     }
 
 }

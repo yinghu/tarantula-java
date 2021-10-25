@@ -47,15 +47,9 @@ public class MessageBuffer {
         header.encrypted = byteBuffer.get()==1;
         return header;
     }
-    public byte[] readPayload(){
-        byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];
-        byteBuffer.get(_payload);
-        return _payload;
-    }
     public byte[] toArray(){
-        byteBuffer.flip();
+        byteBuffer.rewind();
         byte[] _payload = new byte[byteBuffer.limit()];
-        byteBuffer.position(0);
         byteBuffer.get(_payload);
         return _payload;
     }

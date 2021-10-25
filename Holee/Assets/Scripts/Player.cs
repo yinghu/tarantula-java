@@ -24,7 +24,7 @@ namespace Holee
             _messageHeader = new MessageHeader
             {
                 ObjectId = playerId,
-                CommandId = Command.Replication
+                CommandId = Command.Replication,
             };
         }
 

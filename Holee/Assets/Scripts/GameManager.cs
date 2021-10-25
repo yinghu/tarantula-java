@@ -20,6 +20,7 @@ namespace Holee
         private MessageBuffer _inboundBuffer;
         private Rijndael _cipher;
         private MessageHeader _header;
+        
         private void Start()
         {
             _gameClusterManager = new GameClusterManager();
@@ -27,16 +28,20 @@ namespace Holee
             {
                 r.Setup(this);    
             }
+            _messageQueue = new ConcurrentQueue<byte[]>();
+        }
+        private void OnPlay()
+        {
+            var key = Convert.FromBase64String(_gameClusterManager.ServerKey);
             _cipher = new RijndaelManaged
             {
-                //Key = serverKey,
+                Key = key,
                 Padding = PaddingMode.PKCS7,
                 Mode = CipherMode.CBC,
-                //IV = serverKey
+                IV = key
             };
-            _cipher.GenerateKey();
-            _cipher.GenerateIV();
-            _messageQueue = new ConcurrentQueue<byte[]>();
+            //_cipher.GenerateKey();
+            //_cipher.GenerateIV();
             _outboundBuffer = new MessageBuffer(_cipher);
             _inboundBuffer = new MessageBuffer(_cipher);
             _header = new MessageHeader
@@ -71,8 +76,10 @@ namespace Holee
 
         public async void OnDevice()
         {
-            var suc = await _gameClusterManager.Device(this);
-            if (suc) await _gameClusterManager.Join(this);
+            if(!await _gameClusterManager.Device(this)) return;
+            if (!await _gameClusterManager.Join(this)) return;
+            OnPlay();
+            OnPlayA();
         }
 
         public void Send(MessageHeader header,Action<MessageBuffer> message)
@@ -97,6 +104,7 @@ namespace Holee
         {
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
+            Debug.Log(message.Length);
             _inboundBuffer.Reset(message);
             var header = _inboundBuffer.ReadHeader();
             if (header.CommandId == Command.Ack)

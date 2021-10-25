@@ -63,7 +63,12 @@ public class UserChannel {
             return;
         }
         userSessionIndex.forEach((sid,session)->{
-            if(messageHeader.sessionId!=sid) messenger.send(messageBuffer,session.source);
+            if(!messageHeader.broadcasting){
+                if(messageHeader.sessionId!=sid) messenger.send(messageBuffer,session.source);
+            }
+            else{
+                messenger.send(messageBuffer,session.source);
+            }
         });
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
