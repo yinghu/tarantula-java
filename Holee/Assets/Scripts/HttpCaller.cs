@@ -24,6 +24,7 @@ namespace Holee
         public const string TarantulaMagicKey = "Tarantula-magic-key";
         public const string TarantulaToken = "Tarantula-token";
         public const string TarantulaName = "Tarantula-name";
+        public const string TarantulaTournamentId = "Tarantula-tournament-id";
         public string Name { get; set; }
         public string Value { get; set; }
     }

@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.Rating;
@@ -14,7 +13,6 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 public class GameLobbyModule implements Module, Connection.OnConnectionListener {
 
     private ApplicationContext context;
-    private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private GameLobby gameLobby;
     private GsonBuilder builder;
@@ -58,7 +56,6 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         this.application = this.context.descriptor();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.deploymentServiceProvider = applicationContext.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         this.gameLobby = this.gameServiceProvider.lobby(this.context.descriptor());
         this.gameLobby.setup(context);

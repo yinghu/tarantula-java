@@ -72,7 +72,7 @@ namespace Holee
             {
                 var headers = new[]
                 {
-                    new Header {Name = Header.TarantulaTag, Value = "tossup/mmk"},
+                    new Header {Name = Header.TarantulaTag, Value = "robotquest/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
                     new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };

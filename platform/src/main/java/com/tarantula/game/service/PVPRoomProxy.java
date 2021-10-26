@@ -19,9 +19,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         //GameRoom room = gameServiceProvider.roomServiceProvider().join(zoneId,rating);
         String roomId = gameServiceProvider.distributionRoomService().register(gameServiceProvider.name(),gameZone.distributionKey(),rating);
         GameRoom _rm = gameServiceProvider.distributionRoomService().join(gameServiceProvider.name(),gameZone.arena(rating.arenaLevel),roomId,session.systemId());
-        this.context.log("RoomId->"+roomId,OnLog.WARN);
-        gameServiceProvider.distributionRoomService().leave(gameServiceProvider.name(),gameZone.distributionKey(),roomId,session.systemId());
-
+        //gameServiceProvider.distributionRoomService().leave(gameServiceProvider.name(),gameZone.distributionKey(),roomId,session.systemId());
         return new Stub();
     }
     public void leave(Stub stub){
