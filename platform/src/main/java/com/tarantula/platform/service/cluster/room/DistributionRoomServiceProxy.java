@@ -45,10 +45,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public GameRoom join(String serviceName,Arena arena,String roomId, String systemId){
+    public GameRoom join(String serviceName,String roomId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,arena,roomId,systemId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {
@@ -71,7 +71,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-
+    public boolean localManaged(String key){
+        int pid = getNodeEngine().getPartitionService().getPartitionId(key);
+        return getNodeEngine().getPartitionService().getPartition(pid).isLocal();
+    }
     @Override
     public String name() {
         return DistributionRoomService.NAME;

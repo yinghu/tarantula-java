@@ -29,20 +29,10 @@ public class PVPRoomProxy extends RoomProxyHeader{
         return stub;
     }
     public void leave(Stub stub){
-        //this.gameServiceProvider.distributionRoomService().leave(stub.room.roomId(),stub.owner());
+        //this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.owner());
     }
     @Override
     public void onTimer(Module.OnUpdate onUpdate) {
         //this.context.log("calling on ->"+registerKey,OnLog.WARN);
     }
-    public String onRegister(Rating rating){
-        return this.gameServiceProvider.roomServiceProvider().onRegister(gameZone,rating);
-    }
-    public GameRoom onJoin(Arena arena,String roomId,String systemId){
-        return this.gameServiceProvider.roomServiceProvider().onJoin(arena,roomId,systemId);
-    }
-    public void onLeave(String roomId,String systemId){
-        this.gameServiceProvider.roomServiceProvider().onLeave(roomId,systemId);
-    }
-
 }

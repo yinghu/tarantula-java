@@ -12,15 +12,15 @@ import java.io.IOException;
 public class RoomJoinOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private Arena arena;
+
     private String roomId;
     private String systemId;
 
     private GameRoom stub;
     public RoomJoinOperation(){}
-    public RoomJoinOperation(String serviceName, Arena arena, String roomId, String systemId){
+    public RoomJoinOperation(String serviceName, String roomId, String systemId){
         this.serviceName = serviceName;
-        this.arena = arena;
+
         this.roomId = roomId;
         this.systemId = systemId;
     }
@@ -28,7 +28,7 @@ public class RoomJoinOperation extends Operation implements PartitionAwareOperat
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        stub = ais.join(serviceName,arena,roomId,systemId);
+        stub = ais.join(serviceName,roomId,systemId);
     }
 
     @Override
@@ -40,7 +40,6 @@ public class RoomJoinOperation extends Operation implements PartitionAwareOperat
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeObject(arena);
         out.writeUTF(roomId);
         out.writeUTF(systemId);
     }
@@ -49,7 +48,6 @@ public class RoomJoinOperation extends Operation implements PartitionAwareOperat
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        arena = in.readObject();
         roomId = in.readUTF();
         systemId = in.readUTF();
     }
