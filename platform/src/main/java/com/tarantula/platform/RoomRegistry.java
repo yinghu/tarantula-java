@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -56,7 +57,12 @@ public class RoomRegistry extends RecoverableObject {
             totalJoined++;
         });
     }
-
+    public int getFactoryId() {
+        return PortableRegistry.OID;
+    }
+    public int getClassId() {
+        return PortableRegistry.ROOM_REGISTRY_CID;
+    }
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);

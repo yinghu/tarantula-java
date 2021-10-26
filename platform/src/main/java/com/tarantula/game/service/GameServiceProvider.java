@@ -11,15 +11,13 @@ import com.tarantula.platform.item.ItemServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PresenceServiceProvider;
+import com.tarantula.platform.room.RoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.store.StoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +28,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     private ServiceContext serviceContext;
 
-    private DistributionRoomService distributionRoomService;
+    private RoomServiceProvider roomServiceProvider;
 
     private LeaderBoardProvider leaderBoardProvider;
     private InventoryServiceProvider inventoryServiceProvider;
@@ -69,7 +67,6 @@ public class GameServiceProvider implements ServiceProvider{
         serviceContext.setup(gameCluster);
         this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.distributionRoomService = serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
@@ -95,6 +92,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new PlatformTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
+        this.roomServiceProvider = new RoomServiceProvider(gameCluster);
+        this.roomServiceProvider.setup(serviceContext);
+        this.roomServiceProvider.waitForData();
         this.serverKey = Base64.getEncoder().encodeToString(this.serviceContext.deploymentServiceProvider().serverKey());
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
@@ -116,6 +116,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.itemServiceProvider.start();
         this.presenceServiceProvider.start();
         this.inboxServiceProvider.start();
+        this.roomServiceProvider.start();
     }
 
     @Override
@@ -124,6 +125,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.itemServiceProvider.shutdown();
+        this.roomServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
     public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
@@ -134,8 +136,8 @@ public class GameServiceProvider implements ServiceProvider{
     }
 
     //room service provider hool calls
-    public DistributionRoomService distributionRoomService(){
-        return distributionRoomService;
+    public RoomServiceProvider roomServiceProvider(){
+        return roomServiceProvider;
     }
     public String onRegisterRoom(String zoneId,Rating rating){
         GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);

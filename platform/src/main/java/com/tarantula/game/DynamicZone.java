@@ -260,4 +260,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         jzon.addProperty("capacity",capacity);
         return jzon;
     }
+    public void close(){
+        this.roomProxy.close();
+    }
 }

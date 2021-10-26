@@ -35,6 +35,8 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int CLIENT_CONNECTION_CID = 29;
 
+    public static final int ROOM_REGISTRY_CID = 30;
+
 
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
@@ -103,6 +105,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
+                break;
+            case ROOM_REGISTRY_CID:
+                _ins = new RoomRegistry();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

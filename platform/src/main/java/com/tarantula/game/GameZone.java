@@ -40,6 +40,7 @@ public interface GameZone extends Configurable{
     void setup(ApplicationContext applicationContext,GameLobby gameLobby);
     DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);
+    void close();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);

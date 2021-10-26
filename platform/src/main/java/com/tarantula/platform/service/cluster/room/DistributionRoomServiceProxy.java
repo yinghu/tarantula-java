@@ -6,7 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
-import com.tarantula.game.service.DistributionRoomService;
+import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.concurrent.Future;

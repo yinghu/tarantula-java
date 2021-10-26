@@ -1,4 +1,4 @@
-package com.tarantula.game.service;
+package com.tarantula.platform.room;
 
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Arena;

@@ -2,7 +2,6 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
-import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 
@@ -20,8 +19,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.distributionKey(session.systemId());
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
-        String roomId = gameServiceProvider.distributionRoomService().register(gameServiceProvider.name(),gameZone.distributionKey(),rating);
-        GameRoom _rm = gameServiceProvider.distributionRoomService().join(gameServiceProvider.name(),gameZone.arena(rating.arenaLevel),roomId,session.systemId());
+        GameRoom _rm = gameServiceProvider.roomServiceProvider().join(gameZone,rating);
         stub.room = _rm;
         stub.joined = _rm!=null;
         stub.zone = gameZone;
@@ -37,14 +35,14 @@ public class PVPRoomProxy extends RoomProxyHeader{
     public void onTimer(Module.OnUpdate onUpdate) {
         //this.context.log("calling on ->"+registerKey,OnLog.WARN);
     }
-    public String onRegister(Rating rating){ return rating.systemId();}
+    public String onRegister(Rating rating){
+        return this.gameServiceProvider.roomServiceProvider().onRegister(gameZone,rating);
+    }
     public GameRoom onJoin(Arena arena,String roomId,String systemId){
-        GameRoom gameRoom = new GameRoom(true);
-        gameRoom.setup(arena,null);
-        return gameRoom;
+        return this.gameServiceProvider.roomServiceProvider().onJoin(arena,roomId,systemId);
     }
     public void onLeave(String roomId,String systemId){
-        this.context.log(systemId+" leave distributed room", OnLog.WARN);
+        this.gameServiceProvider.roomServiceProvider().onLeave(roomId,systemId);
     }
 
 }

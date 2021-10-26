@@ -162,15 +162,18 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
                 zoneIndex.put(i,lastZone);
             }
         }
-        //zoneIndex.forEach((k,v)->{
-            //context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
-        //});
+        zoneIndex.forEach((k,v)->{
+            this.gameServiceProvider.roomServiceProvider().register(v);
+            context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
+        });
     }
 
     @Override
     public void shutdown() throws Exception{
         for(GameZone gameZone : zoneList){
+            gameZone.close();
             this.deploymentServiceProvider.release(gameZone);
+            this.gameServiceProvider.roomServiceProvider().release(gameZone);
         }
     }
     public  void onLoaded(GameZone loaded){
