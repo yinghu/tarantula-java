@@ -30,7 +30,7 @@ namespace Holee
 
         public GameClusterManager()
         {
-            _httpCaller = new HttpCaller("http://10.0.0.153:8090");
+            _httpCaller = new HttpCaller("http://10.0.0.192:8090");
             _deviceId = SystemInfo.deviceUniqueIdentifier;
         }
 
@@ -72,7 +72,7 @@ namespace Holee
             {
                 var headers = new[]
                 {
-                    new Header {Name = Header.TarantulaTag, Value = "robotquest/mmk"},
+                    new Header {Name = Header.TarantulaTag, Value = "tossup/mmk"},
                     new Header {Name = Header.TarantulaToken, Value = Presence.Token},
                     new Header {Name = Header.TarantulaAction, Value = "onPlay"}
                 };

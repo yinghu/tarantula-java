@@ -49,6 +49,7 @@ public class GameRoom extends RecoverableObject implements Portable {
         return this.instance;
     }
     public GameRoom(boolean offline){
+        this();
         this.offline = offline;
     }
 

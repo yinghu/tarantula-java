@@ -16,25 +16,31 @@ public class PVPRoomProxy extends RoomProxyHeader{
     }
     @Override
     public Stub join(Session session, Rating rating) {
-        //GameRoom room = gameServiceProvider.roomServiceProvider().join(zoneId,rating);
+        Stub stub = new Stub();
+        stub.distributionKey(session.systemId());
+        stub.label(application.tag());
+        this.dataStore.createIfAbsent(stub,true);
         String roomId = gameServiceProvider.distributionRoomService().register(gameServiceProvider.name(),gameZone.distributionKey(),rating);
         GameRoom _rm = gameServiceProvider.distributionRoomService().join(gameServiceProvider.name(),gameZone.arena(rating.arenaLevel),roomId,session.systemId());
-        //gameServiceProvider.distributionRoomService().leave(gameServiceProvider.name(),gameZone.distributionKey(),roomId,session.systemId());
-        return new Stub();
+        stub.room = _rm;
+        stub.joined = _rm!=null;
+        stub.zone = gameZone;
+        stub.rating = rating;
+        stub.tag = application.tag();
+        stub.serverKey = serverKey;
+        return stub;
     }
     public void leave(Stub stub){
-        //this.gameServiceProvider.roomServiceProvider().leave(stub.arena,stub.room.roomId(),stub.owner());
+        //this.gameServiceProvider.distributionRoomService().leave(stub.room.roomId(),stub.owner());
     }
     @Override
     public void onTimer(Module.OnUpdate onUpdate) {
         //this.context.log("calling on ->"+registerKey,OnLog.WARN);
     }
-    public String onRegister(Rating rating){
-        return rating.systemId();
-    }
+    public String onRegister(Rating rating){ return rating.systemId();}
     public GameRoom onJoin(Arena arena,String roomId,String systemId){
         GameRoom gameRoom = new GameRoom(true);
-        gameRoom.distributionKey(roomId);
+        gameRoom.setup(arena,null);
         return gameRoom;
     }
     public void onLeave(String roomId,String systemId){
