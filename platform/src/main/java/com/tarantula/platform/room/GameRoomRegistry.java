@@ -13,7 +13,7 @@ import java.util.Map;
 public class GameRoomRegistry extends RoomRegistry implements Portable {
 
     public int arenaLevel;
-
+    public String joinTicket;
     public GameRoomRegistry(){
         super();
     }
@@ -27,12 +27,14 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         super.toMap();
         properties.put("level",arenaLevel);
         properties.put("size",maxSize);
+        properties.put("ticket",joinTicket);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         arenaLevel = ((Number)properties.remove("level")).intValue();
         maxSize = ((Number)properties.remove("size")).intValue();
+        joinTicket = (String)properties.remove("ticket");
         super.fromMap(properties);
     }
 
@@ -48,6 +50,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         portableWriter.writeUTF("1",this.bucket);
         portableWriter.writeUTF("2",this.oid);
         portableWriter.writeInt("3",arenaLevel);
+        portableWriter.writeUTF("4",joinTicket);
     }
 
     @Override
@@ -55,5 +58,6 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         this.bucket = portableReader.readUTF("1");
         this.oid = portableReader.readUTF("2");
         this.arenaLevel = portableReader.readInt("3");
+        this.joinTicket = portableReader.readUTF("4");
     }
 }

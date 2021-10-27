@@ -6,10 +6,8 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Module;
-import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
-import com.tarantula.game.GameEntry;
 import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -18,40 +16,24 @@ import java.util.Map;
 
 public class GameRoom extends RecoverableObject implements Portable {
 
-    private boolean offline;
     private int capacity;
-    private boolean tournamentEnabled;
     private long duration;
     private int round;
     private Arena arena;
-    private Tournament.Instance instance;
 
-    private GameEntry[] playList;
+    private GameEntry[] entries;
 
     public GameRoom(){
-    }
-    public GameRoom(Arena arena){
-        this();
-        this.offline = arena.capacity==1;
-        playList = new GameEntry[capacity];
+        this.entries = new GameEntry[10];
     }
     public int round(){
         return round;
     }
-    public boolean offline(){
-        return offline;
-    }
     public int capacity(){
         return capacity;
     }
-    public boolean tournamentEnabled(){
-        return tournamentEnabled;
-    }
     public Arena arena(){
         return this.arena;
-    }
-    public Tournament.Instance tournament(){
-        return this.instance;
     }
 
 
@@ -60,20 +42,12 @@ public class GameRoom extends RecoverableObject implements Portable {
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",offline);
-        this.properties.put("2",capacity);
-        this.properties.put("3",tournamentEnabled);
-        this.properties.put("4",duration);
-        this.properties.put("5",round);
+        this.properties.put("1",round);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.offline = (boolean)properties.getOrDefault("1",true);
-        this.capacity = ((Number)properties.getOrDefault("2",0)).intValue();
-        this.tournamentEnabled = (boolean)properties.getOrDefault("3",false);
-        this.duration = ((Number)properties.getOrDefault("4",0)).longValue();
-        this.round = ((Number)properties.getOrDefault("5",0)).intValue();
+        this.round = ((Number)properties.getOrDefault("1",0)).intValue();
     }
     @Override
     public int getFactoryId() {
@@ -87,54 +61,70 @@ public class GameRoom extends RecoverableObject implements Portable {
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",this.distributionKey());
-        portableWriter.writeBoolean("2",offline);
-        portableWriter.writeInt("3",capacity);
-        portableWriter.writeLong("4",duration);
-        portableWriter.writeInt("5",round);
+        portableWriter.writeInt("2",round);
+        portableWriter.writePortableArray("3",entries);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.distributionKey(portableReader.readUTF("1"));
-        this.offline = portableReader.readBoolean("2");
-        this.capacity = portableReader.readInt("3");
-        this.duration = portableReader.readLong("4");
-        this.round = portableReader.readInt("5");
+        this.round = portableReader.readInt("2");
+        entries = new GameEntry[10];
+        for(Portable p : portableReader.readPortableArray("3")){
+            GameEntry gameEntry = (GameEntry)p;
+            entries[gameEntry.seatIndex]=gameEntry;
+        }
     }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("roomId",distributionKey());
-        jsonObject.addProperty("offline",offline);
-        jsonObject.addProperty("totalJoined",capacity);
-        jsonObject.addProperty("tournamentEnabled",tournamentEnabled);
+        jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
         JsonArray plist = new JsonArray();
+        for(GameEntry ge : entries){
+            if(ge==null) continue;
+            plist.add(ge.toJson());
+        }
         jsonObject.add("list",plist);
         return jsonObject;
     }
     public void onTimer(Module.OnUpdate onUpdate){
         
     }
-    public void setup(Arena arena,Tournament.Instance instance){
+    public void setup(Arena arena){
         this.arena = arena;
-        this.instance = instance;
-        this.tournamentEnabled = this.instance!=null;
+        this.capacity = arena.capacity;
         this.duration = arena.duration;
-        this.offline = arena.capacity==1;
-        this.round++;
-    }
-    public void reset(){
-
     }
     public void load(){
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
-            playList[ge.seat]=ge;
+            entries[ge.seatIndex]=ge;
             return true;
         });
     }
-    public void join(String systemId){
+    @Override
+    public void update(){
 
+    }
+    public synchronized void join(String systemId){
+        for(int i=0;i<10;i++){
+            GameEntry e = entries[i];
+            if(e!=null&&e.occupied) continue;
+            if(e==null){
+                e = new GameEntry(i);
+                e.owner(this.distributionKey());
+                this.dataStore.create(e);
+                entries[i]=e;
+            }
+            e.systemId = systemId;
+            e.occupied = true;
+            this.dataStore.update(e);
+            break;
+        }
+    }
+    public synchronized boolean leave(String systemId){
+
+        return true;
     }
 }

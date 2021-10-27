@@ -58,9 +58,14 @@ public class RoomClusterService implements ManagedService, RemoteService {
         gameServiceProvider.roomServiceProvider().onRelease(zoneId,roomId);
     }
 
-    public GameRoom join(String serviceName,String roomId,String systemId){
+    public GameRoom view(String serviceName,String roomId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.roomServiceProvider().onJoin(roomId,systemId);
+        return gameServiceProvider.roomServiceProvider().onView(roomId);
+    }
+
+    public GameRoom join(String serviceName,String ticket,String roomId,String systemId){
+        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
+        return gameServiceProvider.roomServiceProvider().onJoin(ticket,roomId,systemId);
     }
 
     public void leave(String serviceName,String roomId,String systemId){

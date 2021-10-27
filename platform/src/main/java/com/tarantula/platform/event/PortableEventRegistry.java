@@ -3,6 +3,7 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.game.Arena;
+import com.tarantula.platform.room.GameEntry;
 import com.tarantula.platform.room.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessIndexTrack;
@@ -72,6 +73,8 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int TOURNAMENT_RACE_BOARD_CID = 116;
 
     public static final int GAME_ROOM_REGISTRY_CID = 117;
+
+    public static final int GAME_ENTRY_CID = 118;
 
 
     public Portable create(int cid) {
@@ -150,6 +153,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case GAME_ROOM_REGISTRY_CID:
                 _ins = new GameRoomRegistry();
+                break;
+            case GAME_ENTRY_CID:
+                _ins = new GameEntry();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

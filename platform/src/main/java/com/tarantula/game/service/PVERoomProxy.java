@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.tarantula.game.*;
+import com.tarantula.platform.room.GameEntry;
 import com.tarantula.platform.room.GameRoom;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +24,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
         GameRoom room = stub.room;
+        room.setup(gameZone.arena(rating.arenaLevel));
         if(room.distributionKey()==null){//create new one
             this.dataStore.create(room);
             GameEntry gameEntry = new GameEntry(1);
@@ -42,14 +44,12 @@ public class PVERoomProxy extends RoomProxyHeader {
         }
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
-            room.setup(gameZone.arena(rating.arenaLevel),instance);
-        }
-        else{
-            room.setup(gameZone.arena(rating.arenaLevel),null);
+            stub.tournament = instance;
         }
         this.dataStore.update(room);
         stub.zone = gameZone;
         stub.joined = true;
+        stub.offline = true;
         stub.serverKey = serverKey;
         stub.tag = application.tag();
         stub.rating = rating;
@@ -62,10 +62,9 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.joined = false;
         this.dataStore.update(stub);
         activeRoomIndex.remove(stub.room.distributionKey());
-        stub.room.reset();
         this.dataStore.update(stub.room);
-        if(application.tournamentEnabled()){
-            //gameServiceProvider.tournamentServiceProvider().leave();
+        if(application.tournamentEnabled()&&stub.tournament!=null){
+            gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());
         }
     }
     @Override

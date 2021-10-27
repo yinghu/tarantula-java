@@ -45,6 +45,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
+        this.gameRoomIndex = new ConcurrentHashMap<>();
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override
@@ -59,8 +60,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     public GameRoom join(GameZone gameZone, Rating rating){
         GameRoomRegistry roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
-        GameRoom room = this.distributionRoomService.join(name,roomRegistry.instanceId(),rating.owner());
-        room.setup(gameZone.arena(roomRegistry.arenaLevel),null);
+        GameRoom room = this.distributionRoomService.join(name,roomRegistry.joinTicket,roomRegistry.instanceId(),rating.systemId());
+        room.setup(gameZone.arena(roomRegistry.arenaLevel));
         return room;
     }
     public void leave(String roomId,String systemId){
@@ -69,6 +70,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     public GameRoomRegistry onRegister(String gameZoneId,Rating rating){
         Arena arena = gameZoneIndex.get(gameZoneId).arena(rating.arenaLevel);
         GameRoomRegistry gameRoomRegistry = new GameRoomRegistry(arena);
+        gameRoomRegistry.joinTicket = "joinTicket";
         gameRoomRegistry.addPlayer(rating.systemId());
         this.dataStore.create(gameRoomRegistry);
         return gameRoomRegistry;
@@ -76,7 +78,19 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     public void onRelease(String zoneId,String roomId){
 
     }
-    public GameRoom onJoin(String roomId, String systemId){
+    public GameRoom onView(String roomId){
+        GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
+            GameRoom _gameRoom = new GameRoom();
+            _gameRoom.distributionKey(roomId);
+            this.dataStore.createIfAbsent(_gameRoom,true);
+            _gameRoom.dataStore(this.dataStore);
+            _gameRoom.load();
+            return _gameRoom;
+        });
+        return gameRoom;
+    }
+    public GameRoom onJoin(String ticket,String roomId, String systemId){
+        if(!validateTicket(ticket)) return null;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
             GameRoom _gameRoom = new GameRoom();
             _gameRoom.distributionKey(roomId);
@@ -104,5 +118,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     public <T extends Configurable> void release(T t) {
         gameZoneIndex.remove(t.distributionKey());
     }
-    
+
+    private boolean validateTicket(String ticket){
+        return ticket.equals("joinTicket");
+    }
 }

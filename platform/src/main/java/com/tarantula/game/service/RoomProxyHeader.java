@@ -70,14 +70,14 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         }
         if(application.tournamentEnabled()&&jsonObject.has("tournament")){
             JsonObject score = jsonObject.getAsJsonObject("tournament");
-            if(stub.room.tournament()!=null){
-                Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.room.tournament().distributionKey(),session.systemId(),score.get("score").getAsDouble());
+            if(stub.tournament!=null){
+                Tournament.Entry entry = gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),session.systemId(),score.get("score").getAsDouble());
                 if(session.name().equals("tournament")){
                     session.write(entry.toJson().toString().getBytes());
                     response = true;
                 }
             }
-            else if(stub.room.tournament()==null&&session.name().equals("tournament")){
+            else if(stub.tournament==null&&session.name().equals("tournament")){
                 session.write(JsonUtil.toSimpleResponse(false,"no tournament joined").getBytes());
                 response = true;
             }
@@ -87,8 +87,8 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         }
     }
     public void list(Session session,Stub stub){
-        if(session.name().equals("tournament")&&stub.room.tournament()!=null){
-            Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.room.tournament().distributionKey());
+        if(session.name().equals("tournament")&&stub.tournament!=null){
+            Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournament.distributionKey());
             session.write(board.toJson().toString().getBytes());
         }
         else{

@@ -57,10 +57,23 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public GameRoom join(String serviceName,String roomId, String systemId){
+    public GameRoom view(String serviceName,String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,roomId,systemId);
+        RoomViewOperation roomViewOperation = new RoomViewOperation(serviceName,roomId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomViewOperation,partitionId);
+        final Future<GameRoom> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            return null;
+        }
+    }
+    public GameRoom join(String serviceName,String ticket,String roomId, String systemId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,ticket,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {

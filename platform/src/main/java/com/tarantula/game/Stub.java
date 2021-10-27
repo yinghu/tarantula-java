@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
@@ -13,9 +14,10 @@ import java.util.Map;
 public class Stub extends PlayerGameObject {
 
     public boolean joined;
+    public boolean offline;
     public String serverKey;
     public GameRoom room;
-
+    public Tournament.Instance tournament;
     public GameZone zone;
     public String tag;
     public Rating rating;
@@ -38,12 +40,12 @@ public class Stub extends PlayerGameObject {
         jo.add("room",room.toJson());
         jo.add("rating",rating.toJson());
         if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
-        if(room.tournamentEnabled()){
-            jo.add("tournament",room.tournament().toJson());
+        if(tournament!=null){
+            jo.add("tournament",tournament.toJson());
         }
         jo.addProperty("tag",tag);
-        jo.addProperty("tournamentEnabled",room.tournamentEnabled());
-        jo.addProperty("offline",room.offline());
+        jo.addProperty("tournamentEnabled",tournament!=null);
+        jo.addProperty("offline",offline);
         jo.addProperty("serverKey",serverKey);
         return jo;
     }
