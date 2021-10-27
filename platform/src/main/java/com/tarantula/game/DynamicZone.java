@@ -8,6 +8,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.DynamicGameLobbySetup;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 
 import java.time.LocalDateTime;
@@ -262,5 +263,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     }
     public void close(){
         this.roomProxy.close();
+    }
+    public ConcurrentHashMap<Integer,GameRoomRegistry> gameRoomRegistry(){
+        return null;
     }
 }

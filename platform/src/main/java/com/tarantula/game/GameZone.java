@@ -3,8 +3,10 @@ package com.tarantula.game;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface GameZone extends Configurable{
 
@@ -42,6 +44,8 @@ public interface GameZone extends Configurable{
     DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);
     void close();
+
+    ConcurrentHashMap<Integer,GameRoomRegistry> gameRoomRegistry();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);

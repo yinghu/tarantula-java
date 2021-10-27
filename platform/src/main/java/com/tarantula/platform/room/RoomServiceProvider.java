@@ -27,6 +27,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String,GameRoom> gameRoomIndex;
+
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
@@ -38,6 +39,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     }
     @Override
     public void waitForData(){
+
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -109,9 +111,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     @Override
     public <T extends Configurable> void register(T t) {
-        if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
         GameZone gameZone = (GameZone)t;
         gameZoneIndex.put(gameZone.distributionKey(),gameZone);
+        if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
+
     }
 
     @Override

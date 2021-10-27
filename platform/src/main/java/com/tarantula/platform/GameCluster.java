@@ -31,6 +31,8 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public Lobby dataLobby;
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
+    public final static String GAME_ROOM_REGISTRY_LOOKUP_INDEX = "registry";
+
     public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
     public final static String PLAY_LIST_INDEX ="playlist";
 
