@@ -10,13 +10,11 @@ import java.io.IOException;
 public class RoomLeaveOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private String zoneId;
     private String roomId;
     private String systemId;
     public RoomLeaveOperation(){}
-    public RoomLeaveOperation(String serviceName,String zoneId, String roomId, String systemId){
+    public RoomLeaveOperation(String serviceName, String roomId, String systemId){
         this.serviceName = serviceName;
-        this.zoneId = zoneId;
         this.roomId = roomId;
         this.systemId = systemId;
     }
@@ -24,7 +22,7 @@ public class RoomLeaveOperation extends Operation implements PartitionAwareOpera
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        ais.leave(serviceName,zoneId,roomId,systemId);
+        ais.leave(serviceName,roomId,systemId);
     }
 
     @Override
@@ -36,7 +34,6 @@ public class RoomLeaveOperation extends Operation implements PartitionAwareOpera
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeUTF(zoneId);
         out.writeUTF(roomId);
         out.writeUTF(systemId);
     }
@@ -45,7 +42,6 @@ public class RoomLeaveOperation extends Operation implements PartitionAwareOpera
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        zoneId = in.readUTF();
         roomId = in.readUTF();
         systemId = in.readUTF();
     }

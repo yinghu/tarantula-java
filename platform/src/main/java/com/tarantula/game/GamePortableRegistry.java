@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 public class GamePortableRegistry  extends AbstractRecoverableListener {
 
@@ -12,13 +13,13 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int GAME_ZONE_CID = 2;
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
-    public static final int ROOM_REGISTRY_CID = 5;
+
     public static final int GAME_ENTRY_CID = 6;
 
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
     public static final int ARENA_CID = PortableEventRegistry.ARENA_CID;//112
     public static final int ROOM_CID = PortableEventRegistry.ROOM_CID;//111
-
+    public static final int GAME_ROOM_REGISTRY_CID = PortableEventRegistry.GAME_ROOM_REGISTRY_CID;
     @Override
     public int registryId() {
         return OID;
@@ -49,7 +50,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
                 break;
-            case ROOM_REGISTRY_CID:
+            case GAME_ROOM_REGISTRY_CID:
                 pt = new GameRoomRegistry();
                 break;
             case GAME_ENTRY_CID:

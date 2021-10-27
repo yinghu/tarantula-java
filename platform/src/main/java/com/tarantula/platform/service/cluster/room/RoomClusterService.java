@@ -11,6 +11,7 @@ import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.Properties;
 
@@ -48,9 +49,14 @@ public class RoomClusterService implements ManagedService, RemoteService {
 
     }
 
-    public String register(String serviceName,String zoneId,Rating rating){
+    public GameRoomRegistry register(String serviceName, String zoneId, Rating rating){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         return gameServiceProvider.roomServiceProvider().onRegister(zoneId,rating);
+    }
+
+    public void release(String serviceName,String zoneId,String roomId){
+        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
+        gameServiceProvider.roomServiceProvider().onRelease(zoneId,roomId);
     }
 
     public GameRoom join(String serviceName,String roomId,String systemId){
@@ -58,8 +64,8 @@ public class RoomClusterService implements ManagedService, RemoteService {
         return gameServiceProvider.roomServiceProvider().onJoin(roomId,systemId);
     }
 
-    public void leave(String serviceName,String zoneId,String roomId,String systemId){
+    public void leave(String serviceName,String roomId,String systemId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.onLeaveRoom(zoneId,roomId,systemId);
+        gameServiceProvider.roomServiceProvider().onLeave(roomId,systemId);
     }
 }

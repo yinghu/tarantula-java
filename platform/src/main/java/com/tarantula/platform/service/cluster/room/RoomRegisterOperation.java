@@ -7,6 +7,7 @@ import com.hazelcast.spi.PartitionAwareOperation;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ public class RoomRegisterOperation extends Operation implements PartitionAwareOp
     private String serviceName;
     private String zoneId;
     private Rating rating;
-    private String roomId;
+    private GameRoomRegistry gameRoomRegistry;
     public RoomRegisterOperation(){}
     public RoomRegisterOperation(String serviceName, String zoneId, Rating rating){
         this.serviceName = serviceName;
@@ -26,12 +27,12 @@ public class RoomRegisterOperation extends Operation implements PartitionAwareOp
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        roomId = ais.register(serviceName,zoneId,rating);
+        gameRoomRegistry = ais.register(serviceName,zoneId,rating);
     }
 
     @Override
     public Object getResponse() {
-        return roomId;
+        return gameRoomRegistry;
     }
 
     @Override

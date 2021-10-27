@@ -41,7 +41,6 @@ public class GameServiceProvider implements ServiceProvider{
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
-    private ConcurrentHashMap<String, GameZone.RoomProxy> roomProxyIndex;
 
     private String serverKey;
 
@@ -65,7 +64,6 @@ public class GameServiceProvider implements ServiceProvider{
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
         serviceContext.setup(gameCluster);
-        this.roomProxyIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
@@ -128,28 +126,11 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
-    public void registerRoomProxy(String zoneId, GameZone.RoomProxy roomProxy){
-        roomProxyIndex.put(zoneId,roomProxy);
-    }
-    public void releaseRoomProxy(String zoneId){
-        roomProxyIndex.remove(zoneId);
-    }
+
 
     //room service provider hool calls
     public RoomServiceProvider roomServiceProvider(){
         return roomServiceProvider;
-    }
-    public String onRegisterRoom(String zoneId,Rating rating){
-        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
-        return proxy.onRegister(rating);
-    }
-    public GameRoom onJoinRoom(Arena arena,String roomId,String systemId){
-        GameZone.RoomProxy proxy = roomProxyIndex.get(arena.owner());
-        return proxy.onJoin(arena,roomId,systemId);
-    }
-    public void onLeaveRoom(String zoneId,String roomId,String systemId){
-        GameZone.RoomProxy proxy = roomProxyIndex.get(zoneId);
-        proxy.onLeave(roomId,systemId);
     }
 
     //player data service provider hook calls

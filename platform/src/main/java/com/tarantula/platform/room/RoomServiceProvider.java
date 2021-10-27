@@ -11,7 +11,6 @@ import com.tarantula.game.GameRoom;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.PresenceServiceProvider;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,8 +26,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private DistributionRoomService distributionRoomService;
     private DataStore dataStore;
 
-    private ConcurrentHashMap<String,IndexSet> roomRegistryIndex;
-    private ConcurrentHashMap<String,IndexSet> roomIndex;
+    private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
@@ -46,8 +44,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.serviceContext = serviceContext;
         this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
-        this.roomRegistryIndex = new ConcurrentHashMap<>();
-        this.roomIndex = new ConcurrentHashMap<>();
+        this.gameZoneIndex = new ConcurrentHashMap<>();
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override
@@ -61,33 +58,45 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     }
 
     public GameRoom join(GameZone gameZone, Rating rating){
-        String roomId = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
-        return this.distributionRoomService.join(name,roomId,rating.owner());
+        GameRoomRegistry roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
+        GameRoom room = this.distributionRoomService.join(name,roomRegistry.instanceId(),rating.owner());
+        room.setup(gameZone.arena(roomRegistry.arenaLevel),null);
+        return room;
     }
+    public void leave(String roomId,String systemId){
+        this.distributionRoomService.leave(name,roomId,systemId);
+    }
+    public GameRoomRegistry onRegister(String gameZoneId,Rating rating){
+        Arena arena = gameZoneIndex.get(gameZoneId).arena(rating.arenaLevel);
+        GameRoomRegistry gameRoomRegistry = new GameRoomRegistry(arena);
+        gameRoomRegistry.addPlayer(rating.systemId());
+        this.dataStore.create(gameRoomRegistry);
+        return gameRoomRegistry;
+    }
+    public void onRelease(String zoneId,String roomId){
 
-    public String onRegister(String gameZoneId,Rating rating){
-        //Arena arena = gameZone.arena(rating.arenaLevel);
-
-        return rating.systemId();
     }
     public GameRoom onJoin(String roomId, String systemId){
         GameRoom gameRoom = new GameRoom(true);
-        //gameRoom.setup(arena,null);
+        gameRoom.distributionKey(roomId);
+
         return gameRoom;
     }
-    public void onLeave(String roomId,String systemId){}
+    public void onLeave(String roomId,String systemId){
+
+    }
 
 
     @Override
     public <T extends Configurable> void register(T t) {
         if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
         GameZone gameZone = (GameZone)t;
-
+        gameZoneIndex.put(gameZone.distributionKey(),gameZone);
     }
 
     @Override
     public <T extends Configurable> void release(T t) {
-        logger.warn("release->"+t.distributionKey());
+        gameZoneIndex.remove(t.distributionKey());
     }
     
 }

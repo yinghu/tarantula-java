@@ -7,8 +7,9 @@ import com.tarantula.game.Rating;
 public interface DistributionRoomService extends ServiceProvider {
 
     String NAME = "DistributionRoomService";
-    String register(String serviceName,String zoneId,Rating rating);
+    GameRoomRegistry register(String serviceName,String zoneId,Rating rating);
+    void release(String serviceName,String zoneId,String roomId);
     GameRoom join(String serviceName,String roomId, String systemId);
-    void leave(String serviceName,String zoneId,String roomId,String systemId);
+    void leave(String serviceName,String roomId,String systemId);
     boolean localManaged(String key);
 }

@@ -11,7 +11,6 @@ public class PVPRoomProxy extends RoomProxyHeader{
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby, GameZone gameZone) {
         super.setup(applicationContext,gameLobby,gameZone);
-        this.gameServiceProvider.registerRoomProxy(gameZone.distributionKey(),this);
     }
     @Override
     public Stub join(Session session, Rating rating) {
@@ -21,7 +20,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         this.dataStore.createIfAbsent(stub,true);
         GameRoom _rm = gameServiceProvider.roomServiceProvider().join(gameZone,rating);
         stub.room = _rm;
-        stub.joined = _rm!=null;
+        stub.joined = _rm.roomId()!=null;
         stub.zone = gameZone;
         stub.rating = rating;
         stub.tag = application.tag();
@@ -29,7 +28,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         return stub;
     }
     public void leave(Stub stub){
-        //this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.owner());
+        this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.owner());
     }
     @Override
     public void onTimer(Module.OnUpdate onUpdate) {

@@ -96,6 +96,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         }
     }
     public void close(){
-        gameServiceProvider.releaseRoomProxy(registerKey);
+
     }
 }

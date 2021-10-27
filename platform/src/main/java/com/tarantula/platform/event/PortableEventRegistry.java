@@ -9,6 +9,7 @@ import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.room.GameRoomRegistry;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentHeader;
@@ -70,6 +71,9 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int TOURNAMENT_ENTRY_CID = 115;
 
     public static final int TOURNAMENT_RACE_BOARD_CID = 116;
+
+    public static final int GAME_ROOM_REGISTRY_CID = 117;
+
 
     public Portable create(int cid) {
         Portable _ins;
@@ -144,6 +148,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case TOURNAMENT_RACE_BOARD_CID:
                 _ins = new TournamentRaceBoard();
+                break;
+            case GAME_ROOM_REGISTRY_CID:
+                _ins = new GameRoomRegistry();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

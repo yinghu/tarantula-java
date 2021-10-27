@@ -8,6 +8,7 @@ import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -32,17 +33,29 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public String register(String serviceName, String zoneId, Rating rating) {
+    public GameRoomRegistry register(String serviceName, String zoneId, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
-        RoomRegisterOperation roomJoinOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
-        final Future<String> future = builder.invoke();
+        RoomRegisterOperation roomRegisterOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomRegisterOperation,partitionId);
+        final Future<GameRoomRegistry> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
             return null;
+        }
+    }
+    public void release(String serviceName,String zoneId,String roomId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
+        RoomReleaseOperation roomReleaseOperation = new RoomReleaseOperation(serviceName,zoneId,roomId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomReleaseOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
         }
     }
     public GameRoom join(String serviceName,String roomId, String systemId){
@@ -59,10 +72,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
-    public void leave(String serviceName,String zoneId,String roomId,String systemId){
+    public void leave(String serviceName,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,zoneId,roomId,systemId);
+        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
