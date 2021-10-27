@@ -4,6 +4,7 @@ import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
+import com.tarantula.platform.room.GameRoom;
 
 public class PVPRoomProxy extends RoomProxyHeader{
 

@@ -7,6 +7,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.room.GameRoom;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

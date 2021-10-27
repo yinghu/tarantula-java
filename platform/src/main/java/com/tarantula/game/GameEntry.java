@@ -9,7 +9,7 @@ import java.util.Map;
 public class GameEntry extends RecoverableObject implements Configurable {
     public static final String LABEL = "GGE";
     public String systemId;
-    private int seat;
+    public int seat;
     public GameEntry(){
         this.label = LABEL;
         this.onEdge = true;

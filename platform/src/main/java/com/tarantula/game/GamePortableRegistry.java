@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.room.GameRoom;
 import com.tarantula.platform.room.GameRoomRegistry;
 
 public class GamePortableRegistry  extends AbstractRecoverableListener {

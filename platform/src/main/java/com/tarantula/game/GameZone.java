@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.tarantula.platform.room.GameRoom;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ public interface GameZone extends Configurable{
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
         default void close(){}
         default String onRegister(Rating rating){ return null;}
-        default GameRoom onJoin(Arena arena,String roomId,String systemId){return null;}
+        default GameRoom onJoin(Arena arena, String roomId, String systemId){return null;}
         default void onLeave(String roomId,String systemId){}
     }
 }

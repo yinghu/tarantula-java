@@ -3,12 +3,13 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.tarantula.game.*;
+import com.tarantula.platform.room.GameRoom;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PVERoomProxy extends RoomProxyHeader {
 
-    private ConcurrentHashMap<String,GameRoom> activeRoomIndex;
+    private ConcurrentHashMap<String, GameRoom> activeRoomIndex;
 
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {

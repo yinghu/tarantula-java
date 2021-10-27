@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.DailyLoginTrack;
+import com.tarantula.platform.room.GameRoom;
 
 import java.util.Map;
 

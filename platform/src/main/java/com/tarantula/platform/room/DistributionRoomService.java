@@ -1,7 +1,6 @@
 package com.tarantula.platform.room;
 
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.GameRoom;
 import com.tarantula.game.Rating;
 
 public interface DistributionRoomService extends ServiceProvider {

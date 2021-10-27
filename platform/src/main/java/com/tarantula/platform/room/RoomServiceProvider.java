@@ -7,7 +7,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Arena;
-import com.tarantula.game.GameRoom;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
@@ -27,6 +26,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private DataStore dataStore;
 
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
+    private ConcurrentHashMap<String,GameRoom> gameRoomIndex;
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
@@ -77,9 +77,15 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     }
     public GameRoom onJoin(String roomId, String systemId){
-        GameRoom gameRoom = new GameRoom(true);
-        gameRoom.distributionKey(roomId);
-
+        GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
+            GameRoom _gameRoom = new GameRoom();
+            _gameRoom.distributionKey(roomId);
+            this.dataStore.createIfAbsent(_gameRoom,true);
+            _gameRoom.dataStore(this.dataStore);
+            _gameRoom.load();
+            return _gameRoom;
+        });
+        gameRoom.join(systemId);
         return gameRoom;
     }
     public void onLeave(String roomId,String systemId){
