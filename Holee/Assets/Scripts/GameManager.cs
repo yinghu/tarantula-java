@@ -104,9 +104,9 @@ namespace Holee
         {
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
-            Debug.Log(message.Length);
             _inboundBuffer.Reset(message);
             var header = _inboundBuffer.ReadHeader();
+            Debug.Log(message.Length+">>>>>"+header.CommandId);
             if (header.CommandId == Command.Ack)
             {
                 retry.OnAck(_inboundBuffer);

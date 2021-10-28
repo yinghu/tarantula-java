@@ -2,11 +2,13 @@ package com.tarantula.game;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.room.GameRoom;
 import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public interface GameZone extends Configurable{
 
@@ -45,7 +47,8 @@ public interface GameZone extends Configurable{
     void roomProxy(RoomProxy roomProxy);
     void close();
 
-    ConcurrentHashMap<Integer,GameRoomRegistry> gameRoomRegistry();
+    ConcurrentHashMap<String,GameRoomRegistry> roomRegistry();
+    ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);

@@ -8,6 +8,7 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.room.GameRoomRegistry;
+import com.tarantula.platform.room.RoomJoinStub;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -32,12 +33,12 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public GameRoomRegistry register(String serviceName, String zoneId, Rating rating) {
+    public RoomJoinStub register(String serviceName, String zoneId, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
         RoomRegisterOperation roomRegisterOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomRegisterOperation,partitionId);
-        final Future<GameRoomRegistry> future = builder.invoke();
+        final Future<RoomJoinStub> future = builder.invoke();
         try {
             return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
@@ -89,6 +90,30 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+        }
+    }
+    public void create(String serviceName,String roomId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomCreateOperation roomCreateOperation = new RoomCreateOperation(serviceName,roomId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomCreateOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+        }
+    }
+    public void load(String serviceName,String roomId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomLoadOperation roomLoadOperation = new RoomLoadOperation(serviceName,roomId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLoadOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
             future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);

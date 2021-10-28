@@ -45,6 +45,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         if(packet!=null){
                             byte[] data = Arrays.copyOf(packet.getData(),packet.getLength());
                             messageBuffer.reset(data);
+                            messageBuffer.flip();
                             MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
                             UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);
                             userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());

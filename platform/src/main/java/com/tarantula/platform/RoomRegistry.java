@@ -41,7 +41,15 @@ public class RoomRegistry extends RecoverableObject {
         }
     }
     public boolean fullJoined(){
-        return totalJoined==maxSize;
+        synchronized (players){
+            return totalJoined!=0&&totalJoined==maxSize;
+        }
+    }
+
+    public boolean empty(){
+        synchronized (players){
+            return totalJoined==0;
+        }
     }
     @Override
     public Map<String,Object> toMap(){

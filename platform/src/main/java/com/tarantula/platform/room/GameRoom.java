@@ -86,7 +86,7 @@ public class GameRoom extends RecoverableObject implements Portable {
             if(ge==null) continue;
             plist.add(ge.toJson());
         }
-        jsonObject.add("list",plist);
+        jsonObject.add("onList",plist);
         return jsonObject;
     }
     public void onTimer(Module.OnUpdate onUpdate){

@@ -15,10 +15,12 @@ public class MessageBuffer {
     public void reset(byte[] data){
         byteBuffer.clear();
         byteBuffer.put(data);
-        byteBuffer.flip();
     }
     public void reset(){
         byteBuffer.clear();
+    }
+    public void flip(){
+        byteBuffer.flip();
     }
     public MessageBuffer writeHeader(MessageHeader header){
         byteBuffer.put(header.ack?(byte) 1:0);
@@ -48,7 +50,7 @@ public class MessageBuffer {
         return header;
     }
     public byte[] toArray(){
-        byteBuffer.rewind();
+        byteBuffer.flip();
         byte[] _payload = new byte[byteBuffer.limit()];
         byteBuffer.get(_payload);
         return _payload;

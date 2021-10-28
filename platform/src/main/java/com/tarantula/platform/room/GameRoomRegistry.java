@@ -12,13 +12,18 @@ import java.util.Map;
 
 public class GameRoomRegistry extends RoomRegistry implements Portable {
 
+    public static final String LABEL = "GRY";
     public int arenaLevel;
     public String joinTicket;
     public GameRoomRegistry(){
         super();
+        this.label = LABEL;
+        this.onEdge = true;
     }
     public GameRoomRegistry(Arena arena){
         super(arena.capacity);
+        this.label = LABEL;
+        this.onEdge = true;
         this.arenaLevel = arena.level;
     }
 
@@ -59,5 +64,10 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         this.oid = portableReader.readUTF("2");
         this.arenaLevel = portableReader.readInt("3");
         this.joinTicket = portableReader.readUTF("4");
+    }
+    public void reset(Arena arena){
+        maxSize = arena.capacity;
+        arenaLevel = arena.level;
+        players.clear();
     }
 }
