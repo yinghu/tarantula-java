@@ -47,7 +47,7 @@ namespace Holee
             _header = new MessageHeader
             {
                 ChannelId = 1,
-                SessionId = 2,
+                SessionId = _gameClusterManager.SessionId,
                 ObjectId = 0,
                 Sequence = 1,
                 CommandId = Command.Ack
@@ -78,8 +78,16 @@ namespace Holee
         {
             if(!await _gameClusterManager.Device(this)) return;
             if (!await _gameClusterManager.Join(this)) return;
+            Debug.Log("SESSION ID->"+_gameClusterManager.SessionId);
             OnPlay();
-            OnPlayA();
+            if (_gameClusterManager.SessionId == 1)
+            {
+                OnPlayA();
+            }
+            else
+            { 
+                OnPlayB();
+            }
         }
 
         public void Send(MessageHeader header,Action<MessageBuffer> message)

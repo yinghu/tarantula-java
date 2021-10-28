@@ -27,6 +27,7 @@ namespace Holee
         public Exception Exception { get; private set; }
         private readonly string _deviceId;
         public string ServerKey { get; private set; }
+        public int SessionId { get; private set; }
 
         public GameClusterManager()
         {
@@ -88,7 +89,15 @@ namespace Holee
                     return false;
                 }
                 ServerKey = (string)jo.SelectToken("serverKey");
-                Debug.Log("SERVER KEY->"+ServerKey);
+                var list = (JArray)jo.SelectToken("room").SelectToken("list");
+                foreach (var je in list)
+                {
+                    var sid = (string)je.SelectToken("systemId");
+                    if (sid.Equals(Presence.SystemId))
+                    {
+                        SessionId = (int)je.SelectToken("seat");
+                    }
+                }
                 /**Room = new Room
                 {
                     //Id = (string) jo.SelectToken("roomId"),
