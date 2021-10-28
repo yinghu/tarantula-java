@@ -68,14 +68,25 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     public void reset(Arena arena){
         maxSize = arena.capacity;
         arenaLevel = arena.level;
+        totalJoined = 0;
         players.clear();
     }
     public void reset(){
         maxSize = 0;
         arenaLevel = 0;
+        totalJoined = 0;
         players.clear();
     }
     public String toString(){
-        return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined;
+        return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined+" Set: "+players.size();
+    }
+    @Override
+    public boolean equals(Object obj){
+        if(obj==this) return true;
+        return ((GameRoomRegistry)obj).distributionKey().equals(this.distributionKey());
+    }
+    @Override
+    public int hashCode(){
+        return this.distributionKey().hashCode();
     }
 }

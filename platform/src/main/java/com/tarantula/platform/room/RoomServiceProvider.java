@@ -57,7 +57,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     }
     @Override
     public void start() throws Exception {
-        logger.warn("Room service provider started");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+gameCluster.property(GameCluster.MODE)+"]");
     }
 
     @Override
@@ -81,20 +81,25 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         GameRoomRegistry pending = gameZone.roomRegistryQueue().poll();
         if(pending==null) return new RoomJoinStub();
         if(pending.empty()) pending.reset(arena);
+        this.logger.warn(pending.distributionKey()+" polled");
+        this.logger.warn(pending+" status1>>");
         int ret = pending.addPlayer(rating.systemId());
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
-        if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().addFirst(pending);
+        if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offer(pending);
         this.dataStore.update(pending);
-        this.logger.warn(pending+" status>>"+ret);
+        this.logger.warn(pending+" status2>>"+ret);
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),pending.joinTicket);
     }
     public void onRelease(String zoneId,String roomId){
         GameZone gameZone = gameZoneIndex.get(zoneId);
         if(gameZone!=null){
             GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
+            boolean removed = gameZone.roomRegistryQueue().remove(released);
             released.reset();
+            this.dataStore.update(released);
+            logger.warn(released.distributionKey()+" released->"+removed);
+            logger.warn(released+" released");
             gameZone.roomRegistryQueue().offer(released);
-            logger.warn(released.distributionKey()+" released");
         }
     }
     public GameRoom onView(String roomId){
@@ -106,7 +111,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
             _gameRoom.load();
             return _gameRoom;
         });
-        return gameRoom;
+        return gameRoom.view();
     }
     public GameRoom onJoin(String ticket,String roomId, String systemId){
         if(!validateTicket(ticket)) return null;
@@ -118,8 +123,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
             _gameRoom.load();
             return _gameRoom;
         });
-        gameRoom.join(systemId);
-        return gameRoom;
+        return gameRoom.join(systemId);
     }
     public void onLeave(String roomId,String systemId){
         GameRoom gameRoom = gameRoomIndex.get(roomId);

@@ -24,6 +24,7 @@ public class GameRoom extends RecoverableObject implements Portable {
 
     private HashMap<String,GameEntry> joinIndex;
     private GameEntry[] entries;
+    private HashMap<String, GameEntry> joinIndex1;
 
     public GameRoom(int capacity){
         this.capacity = capacity;
@@ -120,8 +121,8 @@ public class GameRoom extends RecoverableObject implements Portable {
     public void update(){
 
     }
-    public synchronized void join(String systemId){
-        if(joinIndex.containsKey(systemId)) return;
+    public synchronized GameRoom join(String systemId){
+        if(joinIndex.containsKey(systemId)) return duplicate();
         for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];
             if(e!=null&&e.occupied) continue;
@@ -137,6 +138,7 @@ public class GameRoom extends RecoverableObject implements Portable {
             joinIndex.put(systemId,e);
             break;
         }
+        return duplicate();
     }
     public synchronized boolean leave(String systemId){
         GameEntry rm = joinIndex.remove(systemId);
@@ -145,5 +147,18 @@ public class GameRoom extends RecoverableObject implements Portable {
             this.dataStore.update(rm);
         }
         return joinIndex.isEmpty();
+    }
+    public synchronized GameRoom view(){
+        return this.duplicate();
+    }
+    private GameRoom duplicate(){
+        GameRoom _room = new GameRoom();
+        _room.entries = new GameEntry[joinIndex.size()];
+        joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
+        _room.capacity = _room.entries.length;
+        _room.round = this.round;
+        _room.bucket(this.bucket);
+        _room.oid(this.oid);
+        return this;
     }
 }

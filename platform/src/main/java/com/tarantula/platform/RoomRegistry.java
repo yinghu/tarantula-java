@@ -40,6 +40,13 @@ public class RoomRegistry extends RecoverableObject {
             return totalJoined==maxSize?FULLY_JOINED:JOINED;
         }
     }
+    public boolean removePlayer(String systemId){
+        synchronized (players){
+            players.remove(systemId);
+            totalJoined--;
+            return totalJoined==0;
+        }
+    }
     public boolean fullJoined(){
         synchronized (players){
             return totalJoined!=0&&totalJoined==maxSize;

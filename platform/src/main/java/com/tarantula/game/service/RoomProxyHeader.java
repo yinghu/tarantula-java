@@ -14,7 +14,7 @@ import com.tarantula.platform.tournament.TournamentRaceBoard;
 
 import java.util.List;
 
-abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.TimerListener {
+abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
     protected ApplicationContext context;
     protected GameServiceProvider gameServiceProvider;
@@ -22,7 +22,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
     protected GameLobby gameLobby;
     protected GameZone gameZone;
     protected DataStore dataStore;
-    protected String registerKey;
     protected String serverKey;
 
     @Override
@@ -34,7 +33,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy, GameLobby.T
         this.gameLobby = gameLobby;
         this.gameZone = gameZone;
         this.dataStore = gameZone.dataStore();
-        this.registerKey = this.gameLobby.registerTimerListener(this);
     }
     @Override
     public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){

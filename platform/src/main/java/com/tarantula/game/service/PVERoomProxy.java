@@ -67,14 +67,4 @@ public class PVERoomProxy extends RoomProxyHeader {
             gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());
         }
     }
-    @Override
-    public void onTimer(Module.OnUpdate onUpdate) {
-        //this.context.log("calling on ->"+registerKey,OnLog.WARN);
-        activeRoomIndex.forEach((k,v)->{
-            //v.duration -= application.timerOnModule();
-            //if(v.duration <=0){
-                //gameLobby.timeout(v);
-            //}
-        });
-    }
 }

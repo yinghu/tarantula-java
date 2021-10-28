@@ -7,6 +7,7 @@ import com.tarantula.platform.room.GameRoom;
 import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -48,7 +49,7 @@ public interface GameZone extends Configurable{
     void close();
 
     ConcurrentHashMap<String,GameRoomRegistry> roomRegistry();
-    ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue();
+    ArrayBlockingQueue<GameRoomRegistry> roomRegistryQueue();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);
