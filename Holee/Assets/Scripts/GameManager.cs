@@ -74,6 +74,18 @@ namespace Holee
             playerB.OnPlay();
         }
 
+        public async void OnLeave()
+        {
+            if (_gameClusterManager.SessionId == 1)
+            {
+                playerA.OffPlay();
+            }
+            else{
+                playerB.OffPlay();
+            }
+            await _gameClusterManager.Leave(this);
+        }
+
         public async void OnDevice()
         {
             if(!await _gameClusterManager.Device(this)) return;
@@ -93,7 +105,7 @@ namespace Holee
         public void Send(MessageHeader header,Action<MessageBuffer> message)
         {
             header.ChannelId = 1;
-            header.SessionId = 2;
+            header.SessionId = _gameClusterManager.SessionId;
             message(_outboundBuffer.WriteHeader(header));
             var outbound = _outboundBuffer.Drain();
             if (header.Ack)
@@ -127,6 +139,7 @@ namespace Holee
             if (header.CommandId == Command.OnJoin)
             {
                 Debug.Log("On JOINED->" + header);
+                if(header.SessionId != _gameClusterManager.SessionId) return;
                 header.CommandId = Command.Ping;
                 _outboundBuffer.Reset();
                 _outboundBuffer.WriteHeader(header);

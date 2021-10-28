@@ -27,6 +27,9 @@ namespace Holee
         public Exception Exception { get; private set; }
         private readonly string _deviceId;
         public string ServerKey { get; private set; }
+        
+        public string Tag { get; private set; }
+
         public int SessionId { get; private set; }
 
         public GameClusterManager()
@@ -67,7 +70,7 @@ namespace Holee
             }
         }
         
-         public async Task<bool> Join(MonoBehaviour caller)
+        public async Task<bool> Join(MonoBehaviour caller)
         {
             try
             {
@@ -89,7 +92,8 @@ namespace Holee
                     return false;
                 }
                 ServerKey = (string)jo.SelectToken("serverKey");
-                var list = (JArray)jo.SelectToken("room").SelectToken("list");
+                Tag = (string)jo.SelectToken("tag");
+                var list = (JArray)jo.SelectToken("room").SelectToken("onList");
                 foreach (var je in list)
                 {
                     var sid = (string)je.SelectToken("systemId");
@@ -98,39 +102,6 @@ namespace Holee
                         SessionId = (int)je.SelectToken("seat");
                     }
                 }
-                /**Room = new Room
-                {
-                    //Id = (string) jo.SelectToken("roomId"),
-                    Tag = (string) jo.SelectToken("tag"),
-                    Seat = (int)jo.SelectToken("seat"),
-                    Capacity = (int)jo.SelectToken("capacity"),
-                    Arena = (string) jo.SelectToken("arena"),
-                    Offline =   (bool) jo.SelectToken("offline")
-                };
-                if (Room.Offline)
-                {
-                    return true;
-                }
-
-                var pc = jo.SelectToken("connection");
-                var connection = new Connection
-                {
-                    ConnectionId = (int)pc.SelectToken("connectionId"),
-                    Type =  (string)pc.SelectToken("type"),
-                    Host = (string)pc.SelectToken("host"),
-                    Port = (int)pc.SelectToken("port"),
-                    Secured = (bool)pc.SelectToken("secured")
-                };
-                Presence.Ticket = (string)jo.SelectToken("ticket");
-                Connect(connection,(string) jo.SelectToken("serverKey"));
-                using (var buffer = new DataBuffer())
-                {
-                    buffer.PutInt(Presence.Stub);
-                    buffer.PutUTF8String(Presence.Login);
-                    buffer.PutUTF8String(Presence.Ticket);
-                    buffer.PutInt(Room.Seat);
-                    await Messenger.SendAsync(MessageType.Join, 0, true, buffer);
-                }**/
                 return true;
             }
             catch (Exception ex)
@@ -138,6 +109,25 @@ namespace Holee
                 Exception = ex;
                 return false;
             }    
+        }
+        
+        public  async Task<bool> Leave(MonoBehaviour caller){
+            try{
+                var headers = new []
+                {
+                    new Header{ Name = Header.TarantulaTag,Value = Tag},
+                    new Header {Name = Header.TarantulaToken, Value = Presence.Token},
+                    new Header{ Name = Header.TarantulaAction, Value = "onLeave"}
+                };
+                var response = await _httpCaller.GetJson(caller,"/service/action",headers);
+                var jo = JObject.Parse(response);
+                return (bool)jo.SelectToken("successful");
+            }
+            catch(Exception ex)
+            {
+                Exception = ex;
+                return false;
+            }
         }
     }
 }

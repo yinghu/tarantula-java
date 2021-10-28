@@ -7,9 +7,9 @@ import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.presence.PresenceServiceProvider;
+import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +25,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private DistributionRoomService distributionRoomService;
     private DataStore dataStore;
     private Configuration configuration;
-
+    private int roomCapacity;
+    private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String,GameRoom> gameRoomIndex;
 
@@ -50,6 +51,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
         this.configuration = serviceContext.configuration(CONFIG);
+        this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
+        this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override
@@ -81,10 +84,18 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         int ret = pending.addPlayer(rating.systemId());
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().addFirst(pending);
+        this.dataStore.update(pending);
+        this.logger.warn(pending+" status>>"+ret);
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),pending.joinTicket);
     }
     public void onRelease(String zoneId,String roomId){
-
+        GameZone gameZone = gameZoneIndex.get(zoneId);
+        if(gameZone!=null){
+            GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
+            released.reset();
+            gameZone.roomRegistryQueue().offer(released);
+            logger.warn(released.distributionKey()+" released");
+        }
     }
     public GameRoom onView(String roomId){
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
@@ -111,10 +122,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         return gameRoom;
     }
     public void onLeave(String roomId,String systemId){
-
+        GameRoom gameRoom = gameRoomIndex.get(roomId);
+        if(gameRoom.leave(systemId)) this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId)));
     }
-    public void onCreate(String roomId){
-        GameRoom gameRoom = new GameRoom();
+    public void onCreate(String zoneId,String roomId){
+        GameRoom gameRoom = new GameRoom(roomCapacity);
+        gameRoom.index(zoneId);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
         gameRoom.dataStore(dataStore);
@@ -134,7 +147,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         GameZone gameZone = (GameZone)t;
         gameZoneIndex.put(gameZone.distributionKey(),gameZone);
         if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
-        int[] pendingRoomSize = new int[]{((Number)configuration.property("pendingRoomPoolSize")).intValue()};
+        int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
             if(!r.fullJoined()) gameZone.roomRegistryQueue().offer(r);
@@ -149,7 +162,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
             gameRoomRegistry.joinTicket = "joinTicket";
             this.dataStore.create(gameRoomRegistry);
             gameZone.roomRegistry().put(gameRoomRegistry.instanceId(),gameRoomRegistry);
-            distributionRoomService.create(name,gameRoomRegistry.instanceId());
+            distributionRoomService.create(name,gameZone.distributionKey(),gameRoomRegistry.instanceId());
         }
     }
 

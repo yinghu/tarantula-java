@@ -24,7 +24,7 @@ public class RoomReleaseOperation extends Operation implements PartitionAwareOpe
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        //gameRoomRegistry = ais.register(serviceName,zoneId,rating);
+        ais.release(serviceName,zoneId,roomId);
     }
 
     @Override

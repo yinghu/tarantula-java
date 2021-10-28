@@ -97,10 +97,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public void create(String serviceName,String roomId){
+    public void create(String serviceName,String zoneId,String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomCreateOperation roomCreateOperation = new RoomCreateOperation(serviceName,roomId);
+        RoomCreateOperation roomCreateOperation = new RoomCreateOperation(serviceName,zoneId,roomId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomCreateOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {

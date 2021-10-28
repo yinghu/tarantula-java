@@ -1,3 +1,4 @@
 {
-  "pendingRoomPoolSize": 100
+  "roomCapacity": 12,
+  "roomPoolSizePerZone": 10
 }

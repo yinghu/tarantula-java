@@ -22,6 +22,9 @@ public class MessageBuffer {
     public void flip(){
         byteBuffer.flip();
     }
+    public void rewind(){
+        byteBuffer.rewind();
+    }
     public MessageBuffer writeHeader(MessageHeader header){
         byteBuffer.put(header.ack?(byte) 1:0);
         byteBuffer.putInt(header.channelId);
@@ -50,7 +53,6 @@ public class MessageBuffer {
         return header;
     }
     public byte[] toArray(){
-        byteBuffer.flip();
         byte[] _payload = new byte[byteBuffer.limit()];
         byteBuffer.get(_payload);
         return _payload;

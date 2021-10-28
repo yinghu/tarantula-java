@@ -12,6 +12,7 @@ import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GameRoom extends RecoverableObject implements Portable {
@@ -21,10 +22,15 @@ public class GameRoom extends RecoverableObject implements Portable {
     private int round;
     private Arena arena;
 
+    private HashMap<String,GameEntry> joinIndex;
     private GameEntry[] entries;
 
+    public GameRoom(int capacity){
+        this.capacity = capacity;
+        joinIndex = new HashMap<>(capacity);
+    }
     public GameRoom(){
-        this.entries = new GameEntry[10];
+        this(12);
     }
     public int round(){
         return round;
@@ -42,12 +48,16 @@ public class GameRoom extends RecoverableObject implements Portable {
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",round);
+        this.properties.put("1",capacity);
+        this.properties.put("2",round);
+        this.properties.put("3",this.index);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.round = ((Number)properties.getOrDefault("1",0)).intValue();
+        this.capacity = ((Number)properties.getOrDefault("1",12)).intValue();
+        this.round = ((Number)properties.getOrDefault("2",0)).intValue();
+        this.index = (String)properties.getOrDefault("3","");
     }
     @Override
     public int getFactoryId() {
@@ -62,15 +72,16 @@ public class GameRoom extends RecoverableObject implements Portable {
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",this.distributionKey());
         portableWriter.writeInt("2",round);
-        portableWriter.writePortableArray("3",entries);
+        portableWriter.writeInt("3",capacity);
+        portableWriter.writePortableArray("4",entries);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.distributionKey(portableReader.readUTF("1"));
         this.round = portableReader.readInt("2");
-        entries = new GameEntry[10];
-        for(Portable p : portableReader.readPortableArray("3")){
+        entries = new GameEntry[portableReader.readInt("3")];
+        for(Portable p : portableReader.readPortableArray("4")){
             GameEntry gameEntry = (GameEntry)p;
             entries[gameEntry.seatIndex]=gameEntry;
         }
@@ -98,8 +109,10 @@ public class GameRoom extends RecoverableObject implements Portable {
         this.duration = arena.duration;
     }
     public void load(){
+        entries = new GameEntry[capacity];
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
             entries[ge.seatIndex]=ge;
+            if(ge.occupied) joinIndex.put(ge.systemId,ge);
             return true;
         });
     }
@@ -108,7 +121,8 @@ public class GameRoom extends RecoverableObject implements Portable {
 
     }
     public synchronized void join(String systemId){
-        for(int i=0;i<10;i++){
+        if(joinIndex.containsKey(systemId)) return;
+        for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];
             if(e!=null&&e.occupied) continue;
             if(e==null){
@@ -120,11 +134,16 @@ public class GameRoom extends RecoverableObject implements Portable {
             e.systemId = systemId;
             e.occupied = true;
             this.dataStore.update(e);
+            joinIndex.put(systemId,e);
             break;
         }
     }
     public synchronized boolean leave(String systemId){
-
-        return true;
+        GameEntry rm = joinIndex.remove(systemId);
+        if(rm!=null){
+            rm.occupied = false;
+            this.dataStore.update(rm);
+        }
+        return joinIndex.isEmpty();
     }
 }

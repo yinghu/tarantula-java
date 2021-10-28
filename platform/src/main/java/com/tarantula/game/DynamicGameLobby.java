@@ -165,7 +165,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         }
         zoneIndex.forEach((k,v)->{
             this.gameServiceProvider.roomServiceProvider().register(v);
-            context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
+            //context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
         });
     }
 

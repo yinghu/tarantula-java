@@ -21,28 +21,26 @@ public class MessageBufferTest {
         for(int i=0;i<10;i++){
             messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         }
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,25*11);
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,25*11);
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,25*11);
-    }
-    @Test(groups = { "message buffer" })
-    public void joinMessageBufferTest(){
-        MessageBuffer messageBuffer = new MessageBuffer();
-        messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
-        Assert.assertEquals(messageBuffer.toArray().length,25);
-        Assert.assertEquals(messageBuffer.toArray().length,25);
-        Assert.assertEquals(messageBuffer.toArray().length,25);
     }
     @Test(groups = { "message buffer" })
     public void resetMessageBufferTest(){
         MessageBuffer messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,25);
         messageBuffer.reset("123".getBytes());
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,28);
         messageBuffer.reset();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
+        messageBuffer.flip();
         Assert.assertEquals(messageBuffer.toArray().length,25);
 
     }
@@ -50,9 +48,11 @@ public class MessageBufferTest {
     public void readMessageBufferTest(){
         MessageBuffer messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
+        messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         messageBuffer.flip();
         messageBuffer.readHeader();
-        Assert.assertEquals(messageBuffer.toArray().length,25);
+        messageBuffer.rewind();
+        Assert.assertEquals(messageBuffer.toArray().length,50);
 
     }
 }

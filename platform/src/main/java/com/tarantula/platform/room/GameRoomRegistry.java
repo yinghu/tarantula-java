@@ -70,4 +70,12 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         arenaLevel = arena.level;
         players.clear();
     }
+    public void reset(){
+        maxSize = 0;
+        arenaLevel = 0;
+        players.clear();
+    }
+    public String toString(){
+        return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined;
+    }
 }

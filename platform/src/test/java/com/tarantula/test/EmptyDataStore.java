@@ -6,7 +6,7 @@ import com.icodesoftware.RecoverableFactory;
 
 import java.util.List;
 
-public class MockDataStore implements DataStore {
+public class EmptyDataStore implements DataStore {
     @Override
     public int scope() {
         return 0;
@@ -14,22 +14,22 @@ public class MockDataStore implements DataStore {
 
     @Override
     public String bucket() {
-        return "BCD01";
+        return null;
     }
 
     @Override
     public String node() {
-        return "NOD01";
+        return null;
     }
 
     @Override
     public String name() {
-        return "Mock";
+        return null;
     }
 
     @Override
     public long count() {
-        return 1;
+        return 0;
     }
 
     @Override

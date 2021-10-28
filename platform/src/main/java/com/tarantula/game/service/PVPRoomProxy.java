@@ -26,10 +26,13 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.rating = rating;
         stub.tag = application.tag();
         stub.serverKey = serverKey;
+        this.dataStore.update(stub);
         return stub;
     }
     public void leave(Stub stub){
-        this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.owner());
+        stub.joined = false;
+        this.dataStore.update(stub);
+        this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.systemId());
     }
     @Override
     public void onTimer(Module.OnUpdate onUpdate) {

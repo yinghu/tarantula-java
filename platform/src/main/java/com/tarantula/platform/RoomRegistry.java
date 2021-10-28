@@ -17,7 +17,7 @@ public class RoomRegistry extends RecoverableObject {
 
     protected Set<String> players = new HashSet<>();
     protected int maxSize;
-    private int totalJoined;
+    protected int totalJoined;
 
     public RoomRegistry(){
         this.label = "register";

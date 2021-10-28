@@ -52,7 +52,6 @@ public class UserChannel {
                     PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
                     pendingAckMessage.pendingAck--;
                     if(pendingAckMessage.pendingAck<=0) pendingAckMessageIndex.remove(h);
-                    log.warn("<<<<<<<<<<"+h);
                 }
             }
             return;
@@ -62,12 +61,14 @@ public class UserChannel {
             userSession.ping();
             return;
         }
+        messageBuffer.rewind();
+        byte[] payload = messageBuffer.toArray();
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
-                if(messageHeader.sessionId!=sid) messenger.send(messageBuffer,session.source);
+                if(messageHeader.sessionId!=sid) messenger.send(payload,session.source);
             }
             else{
-                messenger.send(messageBuffer,session.source);
+                messenger.send(payload,session.source);
             }
         });
         if(!messageHeader.ack) return;
@@ -101,7 +102,9 @@ public class UserChannel {
         ackHeader.commandId = Messenger.ACK;
         messageBuffer.writeHeader(ackHeader);
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));
-        messenger.send(messageBuffer,source);
+        messageBuffer.flip();
+        byte[] payload = messageBuffer.toArray();
+        messenger.send(payload,source);
     }
     private void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
@@ -109,6 +112,7 @@ public class UserChannel {
         messageHeader.commandId = Messenger.ON_JOIN;
         messageHeader.sequence = sequence.incrementAndGet();
         messageBuffer.writeHeader(messageHeader);
+        messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{
             messenger.send(pendingAckMessage.data,session.source);
