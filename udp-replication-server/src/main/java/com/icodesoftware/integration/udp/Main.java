@@ -1,0 +1,56 @@
+package com.icodesoftware.integration.udp;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.icodesoftware.logging.TarantulaLogManager;
+
+import com.icodesoftware.protocol.UDPEndpointService;
+import com.icodesoftware.protocol.UserChannel;
+
+import java.io.*;
+
+public class Main {
+    static {//set log manager
+        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
+    }
+    public static void main(String[] args){
+        try{
+            JsonParser jsonParser = new JsonParser();
+            File f = new File("/etc/tarantula/udp.conf");
+            JsonObject config;
+            if(f.exists()){
+                config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
+            }
+            else{
+                config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
+            }
+            try{
+                File fp = new File("/etc/tarantula/ip.txt");
+                if(fp.exists()){
+                    //read line
+                    BufferedReader reader = new BufferedReader(new FileReader(fp));
+                    String endpointIp = reader.readLine();
+                    config.getAsJsonObject("connection").addProperty("host",endpointIp);
+                    config.getAsJsonObject("connection").getAsJsonObject("server").addProperty("host",endpointIp);
+                    reader.close();
+                }
+            }catch (Exception ex){
+                //throw new RuntimeException("No endpoint IP found from /etc/tarantula/ip.txt");
+            }
+            UDPEndpointService udpReceiver = new UDPEndpointService();
+            udpReceiver.address(config.getAsJsonObject("connection").get("host").getAsString());
+            udpReceiver.registerUserChannel(new UserChannel(1,udpReceiver,(h,m)->true));
+            udpReceiver.start();
+            udpReceiver.run();
+            //Thread t = new Thread(udpReceiver,"udp-service");
+            //t.start();
+            Runtime.getRuntime().addShutdownHook(new Thread(()->{
+                try{udpReceiver.shutdown();}catch (Exception ex){}
+                TarantulaLogManager.shutdown();//shutdown log manager
+            }));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            System.exit(-1);
+        }
+    }
+}
