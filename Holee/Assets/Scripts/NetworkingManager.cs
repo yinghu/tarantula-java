@@ -10,7 +10,7 @@ namespace Holee
     {
         public static event OnReceived OnReceived;
 
-        private const string Host = "192.168.1.2";//"34.75.132.16";
+        private const string Host = "10.0.0.192";//"34.75.132.16";
         private const int Port = 11933;
 
         private static readonly UdpClient UdpClient;

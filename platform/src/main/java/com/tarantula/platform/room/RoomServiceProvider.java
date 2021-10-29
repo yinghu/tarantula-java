@@ -68,7 +68,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     public GameRoom join(GameZone gameZone, Rating rating){
         RoomJoinStub roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
-        logger.warn(roomRegistry.toString());
         GameRoom room = this.distributionRoomService.join(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
         room.setup(gameZone.arena(roomRegistry.level));
         return room;

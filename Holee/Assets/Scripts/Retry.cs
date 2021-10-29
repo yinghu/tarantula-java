@@ -19,7 +19,7 @@ namespace Holee
             if (_timer < 0.2) return; 
             foreach (var keyValue in _pendingAckMessage)
             {
-                Debug.Log("Retry->"+keyValue.Key);
+                //Debug.Log("Retry->"+keyValue.Key);
                 var retry = keyValue.Value;
                 retry.Retries--;
                 NetworkingManager.Send(retry.Data,retry.Data.Length);
