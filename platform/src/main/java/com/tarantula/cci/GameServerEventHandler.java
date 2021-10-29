@@ -125,7 +125,7 @@ public class GameServerEventHandler implements RequestHandler {
            }
         }
         else{
-           log.warn(event.toString()+" unexpected removed on game server push");
+           log.warn(event+" unexpected removed on game server push");
         }
         return true;
     }

@@ -6,7 +6,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -31,7 +30,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public Lobby dataLobby;
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
-    public final static String GAME_ROOM_REGISTRY_LOOKUP_INDEX = "registry";
 
     public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
     public final static String PLAY_LIST_INDEX ="playlist";
@@ -42,8 +40,10 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
     public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
 
-
-
+    public final static String PVE_MODE = "pve";
+    public final static String PVP_MODE = "pvp";
+    public final static String TVE_MODE = "tve";
+    public final static String TVT_MODE = "tvt";
 
     @Override
     public int getClassId() {

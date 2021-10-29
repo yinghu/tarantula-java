@@ -30,6 +30,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String,GameRoom> gameRoomIndex;
 
+    private boolean distributed;
+
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
@@ -53,6 +55,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
+        this.distributed = !gameCluster.property(GameCluster.MODE).equals(GameCluster.PVE_MODE);
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override

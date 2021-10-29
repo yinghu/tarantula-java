@@ -3,7 +3,7 @@ package com.icodesoftware.integration;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.logging.TarantulaLogManager;
-import com.icodesoftware.protocol.MessageBuffer;
+
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UserChannel;
 
