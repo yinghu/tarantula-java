@@ -46,11 +46,23 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public void release(String serviceName,String zoneId,String roomId){
+    public void release(String serviceName,String zoneId,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
-        RoomReleaseOperation roomReleaseOperation = new RoomReleaseOperation(serviceName,zoneId,roomId);
+        RoomReleaseOperation roomReleaseOperation = new RoomReleaseOperation(serviceName,zoneId,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomReleaseOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+        }
+    }
+    public void sync(String serviceName,String zoneId,String roomId,String[] joined){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
+        RoomSyncOperation roomSyncOperation = new RoomSyncOperation(serviceName,zoneId,roomId,joined);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomSyncOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
             future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);

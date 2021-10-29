@@ -147,10 +147,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         this.context.log("game start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
         for(GameZone gameZone : zoneList){
             if(gameZone.disabled()) continue;
-            //gameZone.registerListener(this.gameServiceProvider.roomServiceProvider());
             gameZone.registerListener(this);
             gameZone.setup(this.context,this);
             deploymentServiceProvider.register(gameZone);
+            gameServiceProvider.roomServiceProvider().register(gameZone);
             for(int i=levelStart;i<gameZone.levelMatch();i++){
                 zoneIndex.put(i,gameZone);
             }
@@ -163,10 +163,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
                 zoneIndex.put(i,lastZone);
             }
         }
-        zoneIndex.forEach((k,v)->{
-            this.gameServiceProvider.roomServiceProvider().register(v);
+        //zoneIndex.forEach((k,v)->{
             //context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
-        });
+        //});
     }
 
     @Override

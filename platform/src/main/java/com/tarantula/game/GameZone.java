@@ -49,7 +49,7 @@ public interface GameZone extends Configurable{
     void close();
 
     ConcurrentHashMap<String,GameRoomRegistry> roomRegistry();
-    ArrayBlockingQueue<GameRoomRegistry> roomRegistryQueue();
+    ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,14 +42,14 @@ public class DynamicZone extends RecoverableObject implements GameZone {
 
     protected ConcurrentHashMap<String,GameRoomRegistry> roomRegistry;
 
-    protected ArrayBlockingQueue<GameRoomRegistry> roomRegistryQueue;
+    protected ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue;
 
     public DynamicZone(){
         this.arenaList = new ArrayList<>();
         this.levelIndex = new ConcurrentHashMap<>();
         this.listeners = new CopyOnWriteArrayList<>();
         this.roomRegistry = new ConcurrentHashMap<>();
-        this.roomRegistryQueue = new ArrayBlockingQueue<>(100);
+        this.roomRegistryQueue = new ConcurrentLinkedDeque<>();
     }
     
     public DynamicZone(String name,String playMode,int levelMatch,int arenaLimit,int capacity,int roomCapacity,int joinsOnStart,long roundDuration){
@@ -276,7 +275,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         return this.roomRegistry;
     }
 
-    public ArrayBlockingQueue<GameRoomRegistry> roomRegistryQueue(){
+    public ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue(){
         return roomRegistryQueue;
     }
 }

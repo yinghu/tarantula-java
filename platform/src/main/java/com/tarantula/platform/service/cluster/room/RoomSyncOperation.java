@@ -7,24 +7,24 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-public class RoomReleaseOperation extends Operation implements PartitionAwareOperation {
+public class RoomSyncOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
     private String zoneId;
     private String roomId;
-    private String systemId;
-    public RoomReleaseOperation(){}
-    public RoomReleaseOperation(String serviceName, String zoneId,String roomId,String systemId){
+    private String[] joined;
+    public RoomSyncOperation(){}
+    public RoomSyncOperation(String serviceName, String zoneId, String roomId, String[] joined){
         this.serviceName = serviceName;
         this.zoneId = zoneId;
         this.roomId = roomId;
-        this.systemId = systemId;
+        this.joined = joined;
     }
 
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        ais.release(serviceName,zoneId,roomId,systemId);
+        ais.sync(serviceName,zoneId,roomId,joined);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class RoomReleaseOperation extends Operation implements PartitionAwareOpe
         out.writeUTF(serviceName);
         out.writeUTF(zoneId);
         out.writeUTF(roomId);
-        out.writeUTF(systemId);
+        out.writeUTFArray(joined);
     }
 
     @Override
@@ -47,6 +47,6 @@ public class RoomReleaseOperation extends Operation implements PartitionAwareOpe
         serviceName = in.readUTF();
         zoneId = in.readUTF();
         roomId = in.readUTF();
-        systemId = in.readUTF();
+        joined = in.readUTFArray();
     }
 }

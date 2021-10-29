@@ -8,7 +8,8 @@ public interface DistributionRoomService extends ServiceProvider {
     String NAME = "DistributionRoomService";
     RoomJoinStub register(String serviceName,String zoneId,Rating rating);
 
-    void release(String serviceName,String zoneId,String roomId);
+    void release(String serviceName,String zoneId,String roomId,String systemId);
+    void sync(String serviceName,String zoneId,String roomId,String[] joined);
     GameRoom view(String serviceName,String roomId);
     GameRoom join(String serviceName,String ticket,String roomId, String systemId);
     void leave(String serviceName,String roomId,String systemId);

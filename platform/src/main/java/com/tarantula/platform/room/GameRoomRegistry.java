@@ -77,6 +77,11 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         totalJoined = 0;
         players.clear();
     }
+    public boolean sync(String[] joined){
+        if(players.size()==joined.length) return true;
+        reset();
+        return false;
+    }
     public String toString(){
         return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined+" Set: "+players.size();
     }

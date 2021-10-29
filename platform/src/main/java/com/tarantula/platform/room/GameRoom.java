@@ -151,6 +151,16 @@ public class GameRoom extends RecoverableObject implements Portable {
     public synchronized GameRoom view(){
         return this.duplicate();
     }
+    public synchronized String[] joined(){
+        if(joinIndex.isEmpty()) return new String[0];
+        String[] joined = new String[joinIndex.size()];
+        int[] i={0};
+        joinIndex.forEach((k,v)->{
+            joined[i[0]]=v.systemId;
+            i[0]++;
+        });
+        return joined;
+    }
     private GameRoom duplicate(){
         GameRoom _room = new GameRoom();
         _room.entries = new GameEntry[joinIndex.size()];

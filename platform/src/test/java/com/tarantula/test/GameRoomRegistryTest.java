@@ -72,9 +72,6 @@ public class GameRoomRegistryTest {
         Assert.assertEquals(_rm==roomRegistry,true);
         Assert.assertEquals(_rm==_rq,true);
         roomRegistry.addPlayer("abc");
-        System.out.println(roomRegistry);
-        System.out.println(_rm);
-        System.out.println(_rq);
         Assert.assertEquals(roomRegistry.empty(),false);
         Assert.assertEquals(_rm.empty(),false);
         Assert.assertEquals(_rq.empty(),false);

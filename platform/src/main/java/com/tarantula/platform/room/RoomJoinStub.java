@@ -45,4 +45,8 @@ public class RoomJoinStub implements Portable {
         level = portableReader.readInt("3");
         joined = portableReader.readBoolean("4");
     }
+    @Override
+    public String toString() {
+        return "Room["+roomId+"]["+ticket+"]["+level+"]["+joined+"]";
+    }
 }
