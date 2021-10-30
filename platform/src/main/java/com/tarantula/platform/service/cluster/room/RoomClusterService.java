@@ -7,10 +7,10 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.PVPGameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.room.GameRoomRegistry;
 import com.tarantula.platform.room.RoomJoinStub;
 
 import java.util.Properties;
@@ -63,12 +63,12 @@ public class RoomClusterService implements ManagedService, RemoteService {
         gameServiceProvider.roomServiceProvider().onSync(zoneId,roomId,joined);
     }
 
-    public GameRoom view(String serviceName,String roomId){
+    public GameRoom view(String serviceName, String roomId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         return gameServiceProvider.roomServiceProvider().onView(roomId);
     }
 
-    public GameRoom join(String serviceName,String ticket,String roomId,String systemId){
+    public GameRoom join(String serviceName, String ticket, String roomId, String systemId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         return gameServiceProvider.roomServiceProvider().onJoin(ticket,roomId,systemId);
     }

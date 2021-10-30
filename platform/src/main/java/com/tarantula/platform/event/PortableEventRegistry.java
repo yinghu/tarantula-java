@@ -3,14 +3,11 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.game.Arena;
-import com.tarantula.platform.room.GameEntry;
-import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.*;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.room.GameRoomRegistry;
-import com.tarantula.platform.room.RoomJoinStub;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentHeader;
@@ -61,8 +58,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int RATING_CID = 110;
 
-    public static final int ROOM_CID = 111;
-
     public static final int ARENA_CID = 112;
 
     public static final int TOURNAMENT_CID = 113;
@@ -78,6 +73,13 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int GAME_ENTRY_CID = 118;
 
     public static final int ROOM_JOIN_STUB = 119;
+
+    public static final int PVE_ROOM_CID = 120;
+    public static final int PVP_ROOM_CID = 121;
+    public static final int TVE_ROOM_CID = 122;
+    public static final int TVT_ROOM_CID = 123;
+
+
 
     public Portable create(int cid) {
         Portable _ins;
@@ -135,9 +137,6 @@ public class PortableEventRegistry implements PortableFactory {
             case RATING_CID:
                 _ins = new Rating();
                 break;
-            case ROOM_CID:
-                _ins = new GameRoom();
-                break;
             case ARENA_CID:
                 _ins = new Arena();
                 break;
@@ -161,6 +160,18 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ROOM_JOIN_STUB:
                 _ins = new RoomJoinStub();
+                break;
+            case PVE_ROOM_CID:
+                _ins = new PVEGameRoom();
+                break;
+            case PVP_ROOM_CID:
+                _ins = new PVPGameRoom();
+                break;
+            case TVE_ROOM_CID:
+                _ins = new TVEGameRoom();
+                break;
+            case TVT_ROOM_CID:
+                _ins = new TVTGameRoom();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

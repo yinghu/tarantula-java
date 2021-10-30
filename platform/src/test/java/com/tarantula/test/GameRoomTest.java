@@ -2,7 +2,7 @@ package com.tarantula.test;
 
 
 import com.tarantula.game.Arena;
-import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.PVPGameRoom;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -15,7 +15,7 @@ public class GameRoomTest {
 
     @Test(groups = { "GameRoom" })
     public void setupTest() {
-        GameRoom room = new GameRoom(10);
+        PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
         Assert.assertEquals(room.capacity(),10);
@@ -27,7 +27,7 @@ public class GameRoomTest {
     }
     @Test(groups = { "GameRoom" })
     public void joinTest() {
-        GameRoom room = new GameRoom(10);
+        PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
         room.join("player1");
@@ -40,7 +40,7 @@ public class GameRoomTest {
 
     @Test(groups = { "GameRoom" })
     public void leaveTest() {
-        GameRoom room = new GameRoom(10);
+        PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
         room.join("player1");

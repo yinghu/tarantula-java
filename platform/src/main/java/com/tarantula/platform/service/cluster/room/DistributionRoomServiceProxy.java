@@ -7,7 +7,6 @@ import com.tarantula.platform.room.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.room.GameRoomRegistry;
 import com.tarantula.platform.room.RoomJoinStub;
 
 import java.util.concurrent.Future;
@@ -70,7 +69,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public GameRoom view(String serviceName,String roomId){
+    public GameRoom view(String serviceName, String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomViewOperation roomViewOperation = new RoomViewOperation(serviceName,roomId);
@@ -83,7 +82,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public GameRoom join(String serviceName,String ticket,String roomId, String systemId){
+    public GameRoom join(String serviceName, String ticket, String roomId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,ticket,roomId,systemId);

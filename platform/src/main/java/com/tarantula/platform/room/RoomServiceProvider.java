@@ -28,9 +28,9 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private int roomCapacity;
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
-    private ConcurrentHashMap<String,GameRoom> gameRoomIndex;
+    private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
 
-    private boolean distributed;
+    private String type;
 
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -55,12 +55,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
-        this.distributed = !gameCluster.property(GameCluster.MODE).equals(GameZone.PLAY_MODE_PVE);
+        this.type = (String) gameCluster.property(GameCluster.MODE);
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override
     public void start() throws Exception {
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+gameCluster.property(GameCluster.MODE)+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+type+"]");
     }
 
     @Override
@@ -69,6 +69,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     }
 
     public GameRoom join(GameZone gameZone, Rating rating){
+        if(type.equals(GameZone.PLAY_MODE_PVE)){
+            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(rating.systemId(),k-> new PVEGameRoom());
+            gameRoom.join(rating.systemId());
+            gameRoom.setup(gameZone.arena(rating.arenaLevel));
+            return gameRoom;
+        }
         RoomJoinStub roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
         GameRoom room = this.distributionRoomService.join(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
@@ -76,6 +82,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         return room;
     }
     public void leave(String roomId,String systemId){
+        if(type.equals(GameZone.PLAY_MODE_PVE)) {
+            GameRoom gameRoom = gameRoomIndex.remove(systemId);
+            gameRoom.leave(systemId);
+            return;
+        }
         this.distributionRoomService.leave(name,roomId,systemId);
     }
     public RoomJoinStub onRegister(String gameZoneId,Rating rating){
@@ -110,7 +121,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     }
     public GameRoom onView(String roomId){
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = new GameRoom();
+            PVPGameRoom _gameRoom = new PVPGameRoom();
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -119,10 +130,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         });
         return gameRoom!=null?gameRoom.view():null;
     }
-    public GameRoom onJoin(String ticket,String roomId, String systemId){
+    public GameRoom onJoin(String ticket, String roomId, String systemId){
         if(!validateTicket(ticket)) return null;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = new GameRoom();
+            PVPGameRoom _gameRoom = new PVPGameRoom();
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -137,7 +148,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
     }
     public void onCreate(String zoneId,String roomId){
-        GameRoom gameRoom = new GameRoom(roomCapacity);
+        PVPGameRoom gameRoom = new PVPGameRoom(roomCapacity);
         gameRoom.index(zoneId);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
@@ -149,7 +160,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         }));
     }
     public void onLoad(String roomId){
-        GameRoom gameRoom = new GameRoom();
+        PVPGameRoom gameRoom = new PVPGameRoom();
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
         gameRoom.dataStore(dataStore);
@@ -163,6 +174,9 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
         gameZoneIndex.put(gameZone.distributionKey(),gameZone);
+        if(type.equals(GameZone.PLAY_MODE_PVE)){
+            return;
+        }
         if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{

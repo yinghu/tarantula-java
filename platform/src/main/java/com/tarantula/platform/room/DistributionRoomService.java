@@ -10,8 +10,8 @@ public interface DistributionRoomService extends ServiceProvider {
 
     void release(String serviceName,String zoneId,String roomId,String systemId);
     void sync(String serviceName,String zoneId,String roomId,String[] joined);
-    GameRoom view(String serviceName,String roomId);
-    GameRoom join(String serviceName,String ticket,String roomId, String systemId);
+    GameRoom view(String serviceName, String roomId);
+    GameRoom join(String serviceName, String ticket, String roomId, String systemId);
     void leave(String serviceName,String roomId,String systemId);
     boolean localManaged(String key);
     void create(String serviceName,String zoneId,String roomId);
