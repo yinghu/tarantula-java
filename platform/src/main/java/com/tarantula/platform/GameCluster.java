@@ -40,11 +40,6 @@ public class GameCluster extends OnApplicationHeader implements Portable {
     public final static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
     public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
 
-    public final static String PVE_MODE = "pve";
-    public final static String PVP_MODE = "pvp";
-    public final static String TVE_MODE = "tve";
-    public final static String TVT_MODE = "tvt";
-
     @Override
     public int getClassId() {
        return PortableEventRegistry.GAME_CLUSTER_CID;

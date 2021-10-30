@@ -24,7 +24,6 @@ public class GameRoom extends RecoverableObject implements Portable {
 
     private HashMap<String,GameEntry> joinIndex;
     private GameEntry[] entries;
-    private HashMap<String, GameEntry> joinIndex1;
 
     public GameRoom(int capacity){
         this.capacity = capacity;

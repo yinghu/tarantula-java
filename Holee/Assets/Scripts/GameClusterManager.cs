@@ -34,7 +34,7 @@ namespace Holee
 
         public GameClusterManager()
         {
-            _httpCaller = new HttpCaller("http://10.0.0.192:8090");
+            _httpCaller = new HttpCaller("http://10.0.0.153:8090");
             _deviceId = SystemInfo.deviceUniqueIdentifier;
         }
 

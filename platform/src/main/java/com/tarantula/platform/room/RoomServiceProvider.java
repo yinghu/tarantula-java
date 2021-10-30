@@ -55,7 +55,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
-        this.distributed = !gameCluster.property(GameCluster.MODE).equals(GameCluster.PVE_MODE);
+        this.distributed = !gameCluster.property(GameCluster.MODE).equals(GameZone.PLAY_MODE_PVE);
         this.logger = serviceContext.logger(PresenceServiceProvider.class);
     }
     @Override
