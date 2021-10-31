@@ -1,7 +1,6 @@
 package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
-import com.icodesoftware.Module;
 import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -28,10 +27,6 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         return PortableEventRegistry.PVP_ROOM_CID;
     }
 
-
-    public void onTimer(Module.OnUpdate onUpdate){
-        
-    }
     public void load(){
         entries = new GameEntry[capacity];
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
@@ -40,10 +35,7 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
             return true;
         });
     }
-    @Override
-    public void update(){
 
-    }
     public synchronized GameRoom join(String systemId){
         if(joinIndex.containsKey(systemId)) return duplicate();
         for(int i=0;i<capacity;i++){

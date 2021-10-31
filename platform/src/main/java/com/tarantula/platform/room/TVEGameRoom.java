@@ -83,9 +83,7 @@ public class TVEGameRoom extends GameRoomHeader implements Portable {
         jsonObject.add("onList",plist);
         return jsonObject;
     }
-    public void onTimer(Module.OnUpdate onUpdate){
-        
-    }
+
     public void setup(Arena arena){
         this.arena = arena;
         this.capacity = arena.capacity;
@@ -99,10 +97,7 @@ public class TVEGameRoom extends GameRoomHeader implements Portable {
             return true;
         });
     }
-    @Override
-    public void update(){
 
-    }
     public synchronized TVEGameRoom join(String systemId){
         if(joinIndex.containsKey(systemId)) return duplicate();
         for(int i=0;i<capacity;i++){
