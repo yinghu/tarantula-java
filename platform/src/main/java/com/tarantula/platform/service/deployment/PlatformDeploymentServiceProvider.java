@@ -79,8 +79,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentLinkedDeque<PendingMessage> pendingData;
     private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
-    private ExecutorService udpPool;
-    private int workSize;
+    //private ExecutorService udpPool;
+    //private int workSize;
     private long metricsFreshRate;
     private static long TIMER = 10000;
 
@@ -97,9 +97,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void shutdown() throws Exception {
-        if(tarantulaContext.udpEndpointEnabled){
-            udpPool.shutdown();
-        }
+        //if(tarantulaContext.udpEndpointEnabled){
+            //udpPool.shutdown();
+        //}
         log.info("Platform deployment service provider shut down");
     }
     @Override
@@ -509,38 +509,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             return false;
         });
-        if(this.tarantulaContext.udpEndpointEnabled){
-            TarantulaExecutorServiceFactory.createExecutorService(this.tarantulaContext.udpReceiverThreadPoolSetting,(pool, psize, rh)->{
-                this.udpPool = pool;
-                this.workSize = psize;
-            });
-            for(int i=0;i<workSize;i++){
-                udpPool.execute(()->{
-                    while (true){
-                        try{
-                            PendingMessage pendingMessage = pendingData.poll();
-                            if(pendingMessage!=null){
-                                if(pendingMessage.outbound){
-                                    PendingServerPushMessage pending = pendingMessage.pendingServerPushMessage;
-                                    pending.ack();
-                                    if(pending.retry()){
-                                        pendingData.offer(pendingMessage);
-                                    }
-                                }
-                                else{
-                                    pendingMessage.runnable.run();
-                                }
-                            }
-                            else{
-                                Thread.sleep(50);
-                            }
-                        }catch (Exception ex){
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-            }
-        }
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
     public void memberRemoved(String memberId){

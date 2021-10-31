@@ -42,7 +42,6 @@ public class TarantulaMain {
 			Properties _config = new Properties();
 			_config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-default.properties"));
 			Properties _user = new Properties();
-			///String endpointIp ="localhost";
 			boolean overriding = true;
 			try{
 				log.info("Loading user configuration from /etc/tarantula/tarantula.properties");
@@ -102,6 +101,14 @@ public class TarantulaMain {
 				he.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.http.pool.in.setting",_user,_config));
 				he.port(Integer.parseInt(override(overriding,"tarantula.endpoint.http.port",_user,_config)));
 				btx.endpointService().addEndPoint(he);
+			}
+			if(btx.udpEndpointEnabled){
+				EndPoint ud = (EndPoint)Class.forName(override(overriding,"tarantula.endpoint.udp",_user,_config)).getConstructor().newInstance();
+				ud.address(override(overriding,"tarantula.endpoint.udp.address",_user,_config));
+				ud.backlog(Integer.parseInt(override(overriding,"tarantula.endpoint.udp.backlog",_user,_config)));
+				ud.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.udp.pool.in.setting",_user,_config));
+				ud.port(Integer.parseInt(override(overriding,"tarantula.endpoint.udp.port",_user,_config)));
+				btx.endpointService().addEndPoint(ud);
 			}
 			btx.start();
 			hook = new ShutdownHook();

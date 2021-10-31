@@ -2,7 +2,7 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.logging.TarantulaLogManager;
+import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
 import java.net.DatagramPacket;
@@ -31,12 +31,23 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
 
     private String host;
-    private int port;
-    private int backlog = 100;
+    private int port = PORT;
+    private int backlog = BACK_LOG;
+    private String inboundThreadPoolSetting;
+    private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
+    private boolean daemon;
 
     public void start() throws Exception{
-        executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE+1,new TarantulaThreadFactory("messaging"));
-        for(int i=0;i<MESSAGE_HANDLER_POOL_SIZE;i++){
+
+        if(inboundThreadPoolSetting!=null){
+            TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
+                this.executorService = pool;
+                this.messageHandlerSize = poolSize-(daemon?2:1);
+            });
+        }else{
+            executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE+(daemon?2:1),new TarantulaThreadFactory("udp-messaging"));
+        }
+        for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
                 while(true){
@@ -77,18 +88,20 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             }
         });
         this.datagramChannel = new DatagramSocket(null);
-        InetSocketAddress addr = new InetSocketAddress(host,PORT);
+        InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
+        if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
+        if(daemon) executorService.execute(this);
     }
     public void shutdown() throws Exception{
         log.warn("UDP endpoint service is going down");
+        this.executorService.shutdownNow();
         this.datagramChannel.close();
     }
 
     @Override
     public void run() {
-        log.warn("UDP endpoint service is ready on ["+host+": 11933]");
-        //this.datagramChannel.setSoTimeout();
+        log.warn("UDP endpoint service is ready on ["+host+":"+port+"]");
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
@@ -96,7 +109,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                ex.printStackTrace();
+                //ex.printStackTrace();
                 //try{Thread.sleep(50);}catch (Exception exx){}
             }
         }
@@ -127,7 +140,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     @Override
     public void inboundThreadPoolSetting(String inboundThreadPoolSetting) {
-
+        this.inboundThreadPoolSetting = inboundThreadPoolSetting;
     }
 
     @Override
@@ -140,6 +153,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         return "UDPEndpointService";
     }
 
+    public void daemon(boolean daemon){
+        this.daemon = daemon;
+    }
     @Override
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId,userChannel);
