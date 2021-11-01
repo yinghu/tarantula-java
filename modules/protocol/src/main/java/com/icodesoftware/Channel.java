@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface Channel {
+public interface Channel extends Configurable{
 
     int channelId();
     int sessionId();

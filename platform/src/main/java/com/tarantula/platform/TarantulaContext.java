@@ -12,10 +12,12 @@ import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
@@ -131,8 +133,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
     public String authContext = "localhost";
-    public boolean udpEndpointEnabled;
-    public String udpReceiverThreadPoolSetting;
+
 
  	private TarantulaContext(){
  	    this.endpointService = new EndpointService(this);

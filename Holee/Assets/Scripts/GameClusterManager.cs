@@ -21,6 +21,8 @@ namespace Holee
 
     public class Channel
     {
+        public int ChannelId { set; get; }
+        public int SessionId { set; get; }
         public string Host { set; get; }
         public int Port { set; get; }
     }
@@ -36,9 +38,7 @@ namespace Holee
         public string ServerKey { get; private set; }
         
         public string Tag { get; private set; }
-
-        public int SessionId { get; private set; }
-
+        
         public Channel Channel { get; private set; }
 
         public GameClusterManager()
@@ -108,12 +108,17 @@ namespace Holee
                     var sid = (string)je.SelectToken("systemId");
                     if (sid.Equals(Presence.SystemId))
                     {
-                        SessionId = (int)je.SelectToken("seat");
+                        var seat = (int)je.SelectToken("seat");
+                        Debug.Log("seat no->"+seat);
                     }
                 }
-                var conn = (JObject)jo.SelectToken("connection");
+
+                var chan = jo.SelectToken("pushChannel");
+                var conn = (JObject)chan.SelectToken("connection");
                 Channel = new Channel
                 {
+                    ChannelId = (int)chan.SelectToken("channelId"),
+                    SessionId = (int)chan.SelectToken("sessionId"),
                     Host = (string)conn.SelectToken("host"),
                     Port = (int)conn.SelectToken("port")
                 };

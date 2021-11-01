@@ -20,7 +20,8 @@ namespace Holee
         private MessageBuffer _inboundBuffer;
         private Rijndael _cipher;
         private MessageHeader _header;
-        
+        private Channel _channel;
+
         private void Start()
         {
             _gameClusterManager = new GameClusterManager();
@@ -40,15 +41,15 @@ namespace Holee
                 Mode = CipherMode.CBC,
                 IV = key
             };
-            NetworkingManager.Init(_gameClusterManager.Channel.Host,_gameClusterManager.Channel.Port);
+            NetworkingManager.Init(_channel.Host,_channel.Port);
             //_cipher.GenerateKey();
             //_cipher.GenerateIV();
             _outboundBuffer = new MessageBuffer(_cipher);
             _inboundBuffer = new MessageBuffer(_cipher);
             _header = new MessageHeader
             {
-                ChannelId = 1,
-                SessionId = _gameClusterManager.SessionId,
+                ChannelId = _channel.ChannelId,
+                SessionId = _channel.SessionId,
                 ObjectId = 0,
                 Sequence = 1,
                 CommandId = Command.Ack
@@ -77,7 +78,7 @@ namespace Holee
 
         public async void OnLeave()
         {
-            if (_gameClusterManager.SessionId == 1)
+            if (_channel.SessionId == 1)
             {
                 playerA.OffPlay();
             }
@@ -91,9 +92,10 @@ namespace Holee
         {
             if(!await _gameClusterManager.Device(this)) return;
             if (!await _gameClusterManager.Join(this)) return;
-            Debug.Log("SESSION ID->"+_gameClusterManager.SessionId);
+            _channel = _gameClusterManager.Channel;
+            Debug.Log("SESSION ID->"+_channel.SessionId);
             OnPlay();
-            if (_gameClusterManager.SessionId == 1)
+            if (_channel.SessionId == 1)
             {
                 OnPlayA();
             }
@@ -106,7 +108,7 @@ namespace Holee
         public void Send(MessageHeader header,Action<MessageBuffer> message)
         {
             header.ChannelId = 1;
-            header.SessionId = _gameClusterManager.SessionId;
+            header.SessionId = _channel.SessionId;
             message(_outboundBuffer.WriteHeader(header));
             var outbound = _outboundBuffer.Drain();
             if (header.Ack)
@@ -140,7 +142,7 @@ namespace Holee
             if (header.CommandId == Command.OnJoin)
             {
                 Debug.Log("On JOINED->" + header);
-                if(header.SessionId != _gameClusterManager.SessionId) return;
+                if(header.SessionId != _channel.SessionId) return;
                 header.CommandId = Command.Ping;
                 _outboundBuffer.Reset();
                 _outboundBuffer.WriteHeader(header);

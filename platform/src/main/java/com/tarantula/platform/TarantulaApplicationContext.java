@@ -3,6 +3,7 @@ package com.tarantula.platform;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
+import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.platform.event.*;
@@ -166,6 +167,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public Channel register(String systemId){
-       return new UDPChannel();
+        EndPoint udp = (EndPoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+        return udp.register(systemId);
     }
 }

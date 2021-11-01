@@ -84,9 +84,8 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
-            endPoint.setup(this.tarantulaContext);
+            this.tarantulaContext.deployServiceProvider(endPoint);
             endPoint.start();
-            endPoint.waitForData();
             this.tarantulaContext.node_started.set(true);
         }
     }

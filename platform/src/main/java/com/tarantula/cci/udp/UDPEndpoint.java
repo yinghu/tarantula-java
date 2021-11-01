@@ -1,5 +1,6 @@
 package com.tarantula.cci.udp;
 
+import com.icodesoftware.Channel;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
@@ -8,7 +9,7 @@ import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceContext;
 
 
-public class UDPEndpoint implements EndPoint {
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener {
 
     private static final JDKLogger log = JDKLogger.getLogger(UDPEndpoint.class);
 
@@ -19,7 +20,7 @@ public class UDPEndpoint implements EndPoint {
     }
     public void setup(ServiceContext serviceContext){
         udpEndpointServiceProvider.daemon(true);
-        udpEndpointServiceProvider.registerUserChannel(new UserChannel(1,udpEndpointServiceProvider,(h, m)->true));
+        udpEndpointServiceProvider.registerUserChannel(new UserChannel(1,udpEndpointServiceProvider,(h, m)->true,this));
         log.warn("UDP Endpoint running as a daemon!");
     }
 
@@ -35,7 +36,7 @@ public class UDPEndpoint implements EndPoint {
 
     @Override
     public String name() {
-        return "UDPEndpoint";
+        return EndPoint.UDP_ENDPOINT;
     }
 
     @Override
@@ -61,5 +62,14 @@ public class UDPEndpoint implements EndPoint {
     @Override
     public void resource(Resource resource) {
 
+    }
+
+    public Channel register(String systemId){
+        return new UDPChannel();
+    }
+
+    @Override
+    public void onTimeout(int channelId, int sessionId) {
+        log.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
     }
 }

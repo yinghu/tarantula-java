@@ -152,13 +152,12 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public String name() {
         return "UDPEndpointService";
     }
-
     public void daemon(boolean daemon){
         this.daemon = daemon;
     }
+
     @Override
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId,userChannel);
     }
-
 }

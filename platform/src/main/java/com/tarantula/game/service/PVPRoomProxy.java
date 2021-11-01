@@ -27,7 +27,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined = true;
         stub.zone = gameZone;
         stub.rating = rating;
-        stub.connection = context.register(session.systemId()).connection();
+        stub.channel = context.register(session.systemId());
         stub.tag = application.tag();
         stub.serverKey = serverKey;
         this.dataStore.update(stub);

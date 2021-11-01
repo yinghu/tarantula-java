@@ -120,7 +120,7 @@ public class HttpEndpoint implements EndPoint {
 	}
 
 	public String name(){
-		return "HTTP-endpoint";
+		return EndPoint.HTTP_ENDPOINT;
 	}
 
 	public void resource(Resource resource){

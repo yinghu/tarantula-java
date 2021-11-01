@@ -7,4 +7,8 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
     void daemon(boolean daemon);
     void registerUserChannel(UserChannel userChannel);
 
+    interface SessionListener{
+        void onTimeout(int channelId,int sessionId);
+    }
+
 }
