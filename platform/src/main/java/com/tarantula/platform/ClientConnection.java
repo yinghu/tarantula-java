@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -16,17 +17,11 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     protected String type;
     protected String serverId;
     protected int connectionId;
-    protected int sessionId;
-    protected int sequence;
     protected boolean secured;
     protected String protocol;
     protected String host;
     protected int port;
     protected String path;
-    protected int messageId;
-    protected int messageIdOffset;
-    protected int maxConnections;
-    protected Connection server;
 
     @Override
     public String type() {
@@ -58,25 +53,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.connectionId = connectionId;
     }
 
-    @Override
-    public int sessionId() {
-        return this.sessionId;
-    }
-
-    @Override
-    public void sessionId(int sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    @Override
-    public int sequence() {
-        return sequence;
-    }
-
-    @Override
-    public void sequence(int sequence) {
-        this.sequence = sequence;
-    }
 
     @Override
     public boolean secured() {
@@ -139,45 +115,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     }
 
     @Override
-    public int messageId() {
-        return messageId;
-    }
-
-    @Override
-    public int messageIdOffset() {
-        return 0;
-    }
-
-    @Override
-    public void messageId(int messageId) {
-        this.messageId = messageId;
-    }
-
-    @Override
-    public void messageIdOffset(int messageIdOffset) {
-        this.messageIdOffset = messageIdOffset;
-    }
-
-    @Override
-    public int maxConnections() {
-        return maxConnections;
-    }
-
-    @Override
-    public void maxConnections(int maxConnections) {
-        this.maxConnections = maxConnections;
-    }
-
-    @Override
-    public Connection server() {
-        return server;
-    }
-
-    @Override
-    public void server(Connection connection) {
-        this.server = connection;
-    }
-    @Override
     public byte[] toBinary(){
         DataBuffer dataBuffer = new DataBuffer();
         dataBuffer.putUTF8(type);
@@ -223,5 +160,20 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.host = portableReader.readUTF("4");
         this.port = portableReader.readInt("5");
         this.secured = portableReader.readBoolean("6");
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type",type);
+        jsonObject.addProperty("serverId",serverId);
+        jsonObject.addProperty("connectionId",connectionId);
+        jsonObject.addProperty("secured",secured);
+        jsonObject.addProperty("protocol",protocol);
+        jsonObject.addProperty("subProtocol",subProtocol());
+        jsonObject.addProperty("host",host);
+        jsonObject.addProperty("port",port);
+        jsonObject.addProperty("path",path);
+        return jsonObject;
     }
 }

@@ -43,10 +43,6 @@ public interface Session extends OnApplication {
     boolean joined();
     void joined(boolean joined);
 
-    //write back on http batch
-    //void write(byte[] delta,int batch,String contentType);
-    //void write(byte[] delta,int batch,String contentType,boolean closed);
-
     //write back on label ( ignore on http )
     void write(byte[] payload);
     void write(byte[] payload,boolean closed);

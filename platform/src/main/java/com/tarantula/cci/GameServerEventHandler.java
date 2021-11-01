@@ -63,15 +63,15 @@ public class GameServerEventHandler implements RequestHandler {
             Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
             resp.addProperty("connectionId",connection.connectionId());
-            resp.addProperty("sequence",connection.sequence());
+            //resp.addProperty("sequence",connection.sequence());
             ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
             pushEvent.typeId(typeId);
             deployService.addServerPushEvent(pushEvent);
             JsonArray cids = new JsonArray();
-            for(int i=1;i<=connection.maxConnections();i++){
-                Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
-                cids.add(conn.connectionId());
-            }
+            //for(int i=1;i<=connection.maxConnections();i++){
+                //Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
+                //cids.add(conn.connectionId());
+            //}
             resp.add("connections",cids);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }

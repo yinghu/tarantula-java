@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface Connection extends Recoverable {
+public interface Connection extends Configurable {
 
     String WEB_HOOK = "webhook";
     String UDP = "udp";
@@ -15,11 +15,11 @@ public interface Connection extends Recoverable {
     int connectionId();
     void connectionId(int connectionId);
 
-    int sessionId();
-    void sessionId(int sessionId);
+    //int sessionId();
+    //void sessionId(int sessionId);
 
-    int sequence();
-    void sequence(int sequence);
+    //int sequence();
+    //void sequence(int sequence);
 
     boolean secured();
     void secured(boolean secured);
@@ -39,17 +39,17 @@ public interface Connection extends Recoverable {
     String path();
     void path(String path);
 
-    int messageId();
-    int messageIdOffset();
+    //int messageId();
+    //int messageIdOffset();
 
-    void messageId(int messageId);
-    void messageIdOffset(int messageIdOffset);
+    //void messageId(int messageId);
+    //void messageIdOffset(int messageIdOffset);
 
-    int maxConnections();
-    void maxConnections(int maxConnections);
+    //int maxConnections();
+    //void maxConnections(int maxConnections);
 
-    Connection server();
-    void server(Connection connection);
+    //Connection server();
+    //void server(Connection connection);
 
     interface OnStateListener{
         String typeId();

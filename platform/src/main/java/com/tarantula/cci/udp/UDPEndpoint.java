@@ -13,6 +13,7 @@ public class UDPEndpoint implements EndPoint {
     private static final JDKLogger log = JDKLogger.getLogger(UDPEndpoint.class);
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
+
     public UDPEndpoint(){
         udpEndpointServiceProvider = new UDPEndpointService();
     }

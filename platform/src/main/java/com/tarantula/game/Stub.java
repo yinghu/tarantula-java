@@ -1,12 +1,14 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Connection;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.Tournament;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.util.ConnectionSerializer;
 
 import java.util.Map;
 
@@ -25,6 +27,8 @@ public class Stub extends PlayerGameObject {
     public DailyLoginTrack dailyLogin;
     public Statistics statistics;
 
+    public Connection connection;
+
     public Stub(){
     }
 
@@ -42,6 +46,9 @@ public class Stub extends PlayerGameObject {
         if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(tournament!=null){
             jo.add("tournament",tournament.toJson());
+        }
+        if(connection!=null){
+            jo.add("connection",new ConnectionSerializer().serialize(connection,Connection.class,null));
         }
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);

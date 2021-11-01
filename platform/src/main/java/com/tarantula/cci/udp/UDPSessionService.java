@@ -28,14 +28,12 @@ public class UDPSessionService implements ConnectionEventService {
 
     private final Cipher encrypt;
     private final Cipher decrypt;
-    private final AtomicInteger messageId;
 
     public UDPSessionService(Connection connection, ConcurrentLinkedDeque<PendingMessage> pendingData, Cipher encrypt, Cipher decrypt){
         this.serverConnection = connection;
         this.pendingData = pendingData;
         this.encrypt = encrypt;
         this.decrypt = decrypt;
-        messageId = new AtomicInteger(connection.messageId());
         pendingAck = new ConcurrentHashMap<>();
     }
 
@@ -92,7 +90,7 @@ public class UDPSessionService implements ConnectionEventService {
         String[] params = label.split(Recoverable.PATH_SEPARATOR);
         int seq = Integer.parseInt(params[0]);
         boolean ack = params.length==2?Boolean.parseBoolean(params[1]):false;
-        int _mid = messageId.incrementAndGet();
+        int _mid = 1;
         DatagramPacket data = send(payload,seq,ack,_mid,connection);
         if(ack&&data!=null){
             pendingAck.put(_mid,true);

@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 
@@ -154,6 +155,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void resource(String name, Module.OnResource onResource){
         this.tarantulaContext.deploymentService().resource(this.descriptor(),name,onResource);
     }
+
     public PostOffice postOffice(){
         return this.tarantulaContext.deploymentService().registerPostOffice();
     }
@@ -161,5 +163,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public void clear(){
         this.application.clear();
         rMap.clear();
+    }
+
+    public Channel register(String systemId){
+       return new UDPChannel();
     }
 }

@@ -54,10 +54,6 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.descriptor();
     }
 
-    //@Override
-    //public Statistics statistics() {
-        //return this.tarantulaApplicationContext.statistics();
-    //}
 
     @Override
     public DataStore dataStore(String name) {
@@ -96,5 +92,7 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.postOffice();
     }
 
-
+    public Channel register(String systemId){
+        return this.tarantulaApplicationContext.register(systemId);
+    }
 }

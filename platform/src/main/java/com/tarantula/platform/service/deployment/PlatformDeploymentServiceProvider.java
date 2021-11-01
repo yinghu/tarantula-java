@@ -644,8 +644,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
             occ.disabled(false);
             serverPushEvent.connection(occ);
-            log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
-            if(occ.server().type().equals(Connection.UDP)){
+            //log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
+            if(occ.type().equals(Connection.UDP)){
                 try{
                     byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());
                     IvParameterSpec iv = new IvParameterSpec(key);
@@ -654,9 +654,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
                     Cipher decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
                     decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
-                    UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt,decrypt);
-                    udpSessionService.start();
-                    serverPushEvent.eventService(udpSessionService);
+                    //UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt,decrypt);
+                    //udpSessionService.start();
+                    //serverPushEvent.eventService(udpSessionService);
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
@@ -665,9 +665,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 try{
                     AccessIndex _serverPush = this.tarantulaContext.accessIndexService().get("serverPush");
                     _serverPush.owner("serverPush");
-                    WebSocketSessionService wss = new WebSocketSessionService(occ.server(),this.tarantulaContext.tokenValidatorProvider(),_serverPush);
-                    wss.start();
-                    serverPushEvent.eventService(wss);
+                    //WebSocketSessionService wss = new WebSocketSessionService(occ.server(),this.tarantulaContext.tokenValidatorProvider(),_serverPush);
+                    //wss.start();
+                    //serverPushEvent.eventService(wss);
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
@@ -876,8 +876,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         key = serverKey();//new byte[KEY_SIZE];
         //secureRandom.nextBytes(key);
         //connection.server().connectionId(integrationCluster.sequence());
-        connection.connectionId(connection.server().connectionId());
-        connection.server().sequence(secureRandom.nextInt());
+        //connection.connectionId(connection.server().connectionId());
+        //connection.server().sequence(secureRandom.nextInt());
         this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
         return key;
     }

@@ -1,8 +1,5 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.logging.JDKLogger;
-
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
-    private static TarantulaLogger log = JDKLogger.getLogger(UserChannel.class);
+    //private static TarantulaLogger log = JDKLogger.getLogger(UserChannel.class);
     public final int channelId;
     private ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     private Messenger messenger;
@@ -101,7 +98,7 @@ public class UserChannel {
         MessageBuffer.MessageHeader ackHeader = new MessageBuffer.MessageHeader();
         ackHeader.commandId = Messenger.ACK;
         messageBuffer.writeHeader(ackHeader);
-        _acks.forEach((mh)->messageBuffer.writeHeader(mh));
+        _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
         messageBuffer.flip();
         byte[] payload = messageBuffer.toArray();
         messenger.send(payload,source);

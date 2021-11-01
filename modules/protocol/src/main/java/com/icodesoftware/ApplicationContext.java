@@ -33,5 +33,7 @@ public interface ApplicationContext {
 
     void resource(String name,Module.OnResource onResource);
 
+    Channel register(String systemId);
+
     PostOffice postOffice();
 }
