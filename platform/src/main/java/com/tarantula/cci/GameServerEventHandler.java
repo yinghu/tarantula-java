@@ -62,7 +62,7 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("successful",true);
             Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-            resp.addProperty("connectionId",connection.connectionId());
+            resp.addProperty("connectionId",connection.channelId());
             //resp.addProperty("sequence",connection.sequence());
             ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
             pushEvent.typeId(typeId);
@@ -139,7 +139,7 @@ public class GameServerEventHandler implements RequestHandler {
         conn.host(connection.host());
         conn.port(connection.port());
         conn.secured(connection.secured());
-        conn.connectionId(connectionId);
+        conn.channelId(connectionId);
         return conn;
     }
 }

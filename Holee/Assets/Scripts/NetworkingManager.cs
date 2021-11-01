@@ -9,22 +9,24 @@ namespace Holee
     public static class NetworkingManager
     {
         public static event OnReceived OnReceived;
-
-        private const string Host = "10.0.0.192";//"34.75.132.16";
-        private const int Port = 11933;
-
+        
         private static readonly UdpClient UdpClient;
         private static IPEndPoint _ipEndPoint;
         
         static NetworkingManager()
         {
-            _ipEndPoint = new IPEndPoint(IPAddress.Parse(Host), Port);
             UdpClient = new UdpClient();
+        }
+
+        public static void Init(string host,int port)
+        {
+            _ipEndPoint = new IPEndPoint(IPAddress.Parse(host), port);
             UdpClient.Connect(_ipEndPoint);
             UdpClient.BeginReceive(ReceiveCallback, null);
-            Debug.Log("Starting udp client");
+            Debug.Log("Starting udp client on ["+host+":"+port+"]");
+            
         }
-        
+
         public static void Send(byte[] payload,int length)
         {
             UdpClient.BeginSend(payload,length, SendCallback,null);

@@ -18,6 +18,13 @@ namespace Holee
         public string Login { set; get; }
         public int Stub { set; get; }
     }
+
+    public class Channel
+    {
+        public string Host { set; get; }
+        public int Port { set; get; }
+    }
+
     public class GameClusterManager
     {
         
@@ -31,6 +38,8 @@ namespace Holee
         public string Tag { get; private set; }
 
         public int SessionId { get; private set; }
+
+        public Channel Channel { get; private set; }
 
         public GameClusterManager()
         {
@@ -102,6 +111,12 @@ namespace Holee
                         SessionId = (int)je.SelectToken("seat");
                     }
                 }
+                var conn = (JObject)jo.SelectToken("connection");
+                Channel = new Channel
+                {
+                    Host = (string)conn.SelectToken("host"),
+                    Port = (int)conn.SelectToken("port")
+                };
                 return true;
             }
             catch (Exception ex)

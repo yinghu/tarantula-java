@@ -32,7 +32,7 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
             try {
                 String ticket = tokenValidatorProvider.tokenValidator().ticket(serverLogin.distributionKey(),presence.count(0));
                 StringBuffer query = new StringBuffer();
-                query.append("connectionId="+serverConnection.connectionId());
+                query.append("connectionId="+serverConnection.channelId());
                 query.append("&accessKey="+ticket);
                 query.append("&stub="+presence.count(0));
                 query.append("&systemId="+serverLogin.owner());
@@ -49,7 +49,7 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
         boolean ack = params.length==2?Boolean.parseBoolean(params[1]):false;
         OutboundMessage pendingOutboundMessage = new OutboundMessage();
         pendingOutboundMessage.ack(ack);
-        pendingOutboundMessage.connectionId(connection.connectionId());
+        pendingOutboundMessage.connectionId(connection.channelId());
         pendingOutboundMessage.sessionId(0);
         pendingOutboundMessage.type(MessageHandler.SERVER_PUSH);
         pendingOutboundMessage.sequence(seq);//client message type

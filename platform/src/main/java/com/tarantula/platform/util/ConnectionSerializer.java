@@ -12,7 +12,7 @@ public class ConnectionSerializer implements JsonSerializer<Connection> {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type",connection.type());
         jsonObject.addProperty("serverId",connection.serverId());
-        jsonObject.addProperty("connectionId",connection.connectionId());
+        jsonObject.addProperty("channelId",connection.channelId());
         jsonObject.addProperty("secured",connection.secured());
         jsonObject.addProperty("protocol",connection.protocol());
         jsonObject.addProperty("subProtocol",connection.subProtocol());

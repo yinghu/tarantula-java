@@ -23,6 +23,10 @@ public class UDPChannel implements Channel {
 
     public Connection connection(){
         Connection connection = new UniverseConnection();
+        connection.serverId("serverId");
+        connection.type("udp");
+        connection.secured(true);
+        connection.channelId(1);
         connection.host("10.0.0.192");
         connection.port(11933);
         return connection;

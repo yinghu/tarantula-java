@@ -40,6 +40,7 @@ namespace Holee
                 Mode = CipherMode.CBC,
                 IV = key
             };
+            NetworkingManager.Init(_gameClusterManager.Channel.Host,_gameClusterManager.Channel.Port);
             //_cipher.GenerateKey();
             //_cipher.GenerateIV();
             _outboundBuffer = new MessageBuffer(_cipher);

@@ -101,7 +101,7 @@ public class UDPSessionService implements ConnectionEventService {
         try{
             OutboundMessage pendingOutboundMessage = new OutboundMessage();
             pendingOutboundMessage.ack(ack);
-            pendingOutboundMessage.connectionId(connection.connectionId());
+            pendingOutboundMessage.connectionId(connection.channelId());
             pendingOutboundMessage.sessionId(0);
             pendingOutboundMessage.type(MessageHandler.SERVER_PUSH);
             pendingOutboundMessage.sequence(sequence);//client message type

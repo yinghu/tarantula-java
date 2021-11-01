@@ -16,7 +16,7 @@ public class UniverseConnection extends ClientConnection {
     public Map<String,Object> toMap(){
         this.properties.put("type",this.type);
         this.properties.put("serverId",this.serverId);
-        this.properties.put("connectionId",this.connectionId);
+        this.properties.put("channelId",this.channelId());
         this.properties.put("secured",this.secured);
         this.properties.put("protocol",this.protocol);
         this.properties.put("host",this.host);
@@ -29,7 +29,7 @@ public class UniverseConnection extends ClientConnection {
     public void fromMap(Map<String,Object> properties){
         this.type = (String)properties.get("type");
         this.serverId = (String)properties.get("serverId");
-        this.connectionId = ((Number)properties.get("connectionId")).intValue();
+        this.channelId = ((Number)properties.get("channelId")).intValue();
         this.secured =(Boolean)properties.get("secured");
         this.protocol = (String)properties.get("protocol");
         this.host = (String)properties.get("host");

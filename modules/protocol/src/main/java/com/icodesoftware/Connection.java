@@ -12,14 +12,8 @@ public interface Connection extends Configurable {
     String serverId();
     void serverId(String serverId);
 
-    int connectionId();
-    void connectionId(int connectionId);
-
-    //int sessionId();
-    //void sessionId(int sessionId);
-
-    //int sequence();
-    //void sequence(int sequence);
+    int channelId();
+    void channelId(int channelId);
 
     boolean secured();
     void secured(boolean secured);
@@ -39,17 +33,6 @@ public interface Connection extends Configurable {
     String path();
     void path(String path);
 
-    //int messageId();
-    //int messageIdOffset();
-
-    //void messageId(int messageId);
-    //void messageIdOffset(int messageIdOffset);
-
-    //int maxConnections();
-    //void maxConnections(int maxConnections);
-
-    //Connection server();
-    //void server(Connection connection);
 
     interface OnStateListener{
         String typeId();

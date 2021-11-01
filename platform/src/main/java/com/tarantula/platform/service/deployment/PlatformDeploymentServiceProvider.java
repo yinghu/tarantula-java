@@ -763,7 +763,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return null;
         }
         Connection client = serverPushEvent.connection();
-        client.connectionId(connectionId);
+        client.channelId(connectionId);
         this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
         //log.warn("add connection->["+ client.connectionId()+"] on "+serverPushEvent.typeId());
         return client;

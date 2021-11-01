@@ -23,7 +23,7 @@ public class ConnectionDeserializer implements JsonDeserializer<Connection> {
             desc.serverId(jo.get("serverId").getAsString());
         }
         if(jo.has("connectionId")){
-            desc.connectionId(jo.get("connectionId").getAsInt());
+            desc.channelId(jo.get("connectionId").getAsInt());
         }
         if(jo.has("secured")){
             desc.secured(jo.get("secured").getAsBoolean());
