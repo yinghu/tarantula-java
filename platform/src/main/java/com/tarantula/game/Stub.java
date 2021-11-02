@@ -5,7 +5,6 @@ import com.icodesoftware.*;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.util.ConnectionSerializer;
 
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public class Stub extends PlayerGameObject {
     public boolean joined;
     public boolean offline;
     public String roomId;
-    public String serverKey;
+
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
@@ -50,7 +49,6 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);
         jo.addProperty("offline",offline);
-        jo.addProperty("serverKey",serverKey);
         return jo;
     }
     @Override

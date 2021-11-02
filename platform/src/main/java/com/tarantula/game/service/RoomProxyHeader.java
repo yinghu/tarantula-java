@@ -22,14 +22,12 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     protected GameLobby gameLobby;
     protected GameZone gameZone;
     protected DataStore dataStore;
-    protected String serverKey;
 
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
         this.context = applicationContext;
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = applicationContext.serviceProvider(application.typeId().replace("lobby","service"));
-        this.serverKey = this.gameServiceProvider.base64ServerKey();
         this.gameLobby = gameLobby;
         this.gameZone = gameZone;
         this.dataStore = gameZone.dataStore();

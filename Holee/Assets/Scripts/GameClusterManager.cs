@@ -23,6 +23,8 @@ namespace Holee
     {
         public int ChannelId { set; get; }
         public int SessionId { set; get; }
+
+        public byte[] ServerKey { set; get; }
         public string Host { set; get; }
         public int Port { set; get; }
     }
@@ -35,8 +37,7 @@ namespace Holee
         public Presence Presence { get; private set; }
         public Exception Exception { get; private set; }
         private readonly string _deviceId;
-        public string ServerKey { get; private set; }
-        
+       
         public string Tag { get; private set; }
         
         public Channel Channel { get; private set; }
@@ -100,7 +101,7 @@ namespace Holee
                     Exception = new Exception((string)jo.SelectToken("message"));
                     return false;
                 }
-                ServerKey = (string)jo.SelectToken("serverKey");
+                //ServerKey = (string)jo.SelectToken("serverKey");
                 Tag = (string)jo.SelectToken("tag");
                 var list = (JArray)jo.SelectToken("room").SelectToken("onList");
                 foreach (var je in list)
@@ -119,6 +120,7 @@ namespace Holee
                 {
                     ChannelId = (int)chan.SelectToken("channelId"),
                     SessionId = (int)chan.SelectToken("sessionId"),
+                    ServerKey = Convert.FromBase64String((string)chan.SelectToken("serverKey")),
                     Host = (string)conn.SelectToken("host"),
                     Port = (int)conn.SelectToken("port")
                 };

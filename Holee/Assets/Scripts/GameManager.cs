@@ -33,7 +33,7 @@ namespace Holee
         }
         private void OnPlay()
         {
-            var key = Convert.FromBase64String(_gameClusterManager.ServerKey);
+            var key = _channel.ServerKey;
             _cipher = new RijndaelManaged
             {
                 Key = key,

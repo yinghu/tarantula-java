@@ -12,11 +12,13 @@ public class UDPChannel extends RecoverableObject implements Channel {
     private UserChannel userChannel;
     private int channelId;
     private int sessionId;
-    public UDPChannel(Connection connection,UserChannel userChannel,int sessionId){
+    private String serverKey;
+    public UDPChannel(Connection connection,UserChannel userChannel,int sessionId,String serverKey){
         this.connection = connection;
         this.userChannel = userChannel;
         this.channelId = userChannel.channelId;
         this.sessionId = sessionId;
+        this.serverKey = serverKey;
     }
     @Override
     public int channelId() {
@@ -42,6 +44,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("channelId",channelId);
         jsonObject.addProperty("sessionId",sessionId);
+        jsonObject.addProperty("serverKey",serverKey);
         jsonObject.add("connection",connection.toJson());
         return jsonObject;
     }

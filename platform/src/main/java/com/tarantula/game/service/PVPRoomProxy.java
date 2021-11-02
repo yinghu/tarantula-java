@@ -29,7 +29,6 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.rating = rating;
         stub.channel = context.register(session.systemId());
         stub.tag = application.tag();
-        stub.serverKey = serverKey;
         this.dataStore.update(stub);
         return stub;
     }

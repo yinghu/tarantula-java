@@ -52,11 +52,44 @@ public class MessageBuffer {
         header.encrypted = byteBuffer.get()==1;
         return header;
     }
+    public int readInt(){
+        return byteBuffer.getInt();
+    }
+    public MessageBuffer writeInt(int data){
+        byteBuffer.putInt(data);
+        return this;
+    }
+    public short readShort(){
+        return byteBuffer.getShort();
+    }
+    public MessageBuffer writeShort(short data){
+        byteBuffer.putShort(data);
+        return this;
+    }
+    public byte readByte(){
+        return byteBuffer.get();
+    }
+    public MessageBuffer writeByte(byte data){
+        byteBuffer.put(data);
+        return this;
+    }
+    public float readFloat(){
+        return byteBuffer.getFloat();
+    }
+    public MessageBuffer writeFloat(float data){
+        byteBuffer.putFloat(data);
+        return this;
+    }
     public String readUTF8(){
         int len = byteBuffer.getInt();
         byte[] ret = new byte[len];
         byteBuffer.get(ret);
         return new String(ret);
+    }
+    public MessageBuffer writeUTF8(String data){
+        byteBuffer.putInt(data.length());
+        byteBuffer.put(data.getBytes());
+        return this;
     }
     public byte[] toPayload(){
         byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];

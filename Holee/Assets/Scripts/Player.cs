@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Holee
@@ -51,7 +52,7 @@ namespace Holee
             };
             gameManager.Send(req, buffer =>
             {
-                buffer.WriteUTF8("abs");
+                buffer.WriteUTF8(JsonConvert.SerializeObject(req));
             });
         }
 

@@ -42,7 +42,7 @@ public class GameServiceProvider implements ServiceProvider{
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
-    private String serverKey;
+
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -93,7 +93,6 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomServiceProvider = new RoomServiceProvider(gameCluster);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
-        this.serverKey = Base64.getEncoder().encodeToString(this.serviceContext.deploymentServiceProvider().serverKey());
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
@@ -208,9 +207,6 @@ public class GameServiceProvider implements ServiceProvider{
             return tournamentServiceProvider;
         }
         return null;
-    }
-    public String base64ServerKey(){
-        return serverKey;
     }
 
 }
