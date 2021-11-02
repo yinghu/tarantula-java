@@ -52,6 +52,17 @@ public class MessageBuffer {
         header.encrypted = byteBuffer.get()==1;
         return header;
     }
+    public String readUTF8(){
+        int len = byteBuffer.getInt();
+        byte[] ret = new byte[len];
+        byteBuffer.get(ret);
+        return new String(ret);
+    }
+    public byte[] toPayload(){
+        byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];
+        byteBuffer.get(_payload);
+        return _payload;
+    }
     public byte[] toArray(){
         byte[] _payload = new byte[byteBuffer.limit()];
         byteBuffer.get(_payload);

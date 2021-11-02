@@ -11,17 +11,19 @@ public class UserChannel {
     public final int channelId;
     private ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     private Messenger messenger;
-    private UserSessionValidator userSessionValidator;
+    private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
+    private UDPEndpointServiceProvider.RequestListener requestListener;
     private AtomicInteger sequence;
     private ArrayList<Integer> _offline;
     private ArrayList<String> _retried;
     private ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
     //private
-    public UserChannel(int channelId, Messenger messenger, UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
+    public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
         this.messenger = messenger;
         this.userSessionValidator = userSessionValidator;
+        this.requestListener = requestListener;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
         this.sequence = new AtomicInteger(0);
@@ -60,6 +62,10 @@ public class UserChannel {
             userSession.ping();
             return;
         }
+        if(messageHeader.commandId == Messenger.REQUEST){
+            requestListener.onMessage(messageHeader,messageBuffer);
+            return;
+        }
         messageBuffer.rewind();
         byte[] payload = messageBuffer.toArray();
         userSessionIndex.forEach((sid,session)->{
@@ -95,6 +101,9 @@ public class UserChannel {
            }
         });
         _retried.forEach(k->pendingAckMessageIndex.remove(k));
+    }
+    public void write(int sessionId,byte[] data){
+        messenger.send(data,userSessionIndex.get(sessionId).source);
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);

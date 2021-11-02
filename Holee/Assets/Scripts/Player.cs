@@ -45,6 +45,14 @@ namespace Holee
             var ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             if (plane.Raycast(ray, out var point)) _targetPos = ray.GetPoint(point);
             _isMoving = true;
+            var req = new MessageHeader
+            {
+                CommandId = Command.Request
+            };
+            gameManager.Send(req, buffer =>
+            {
+                buffer.WriteUTF8("abs");
+            });
         }
 
         private void FixedUpdate()

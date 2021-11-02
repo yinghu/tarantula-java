@@ -16,7 +16,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
 
     protected String type;
     protected String serverId;
-    protected int channelId;
+
     protected boolean secured;
     protected String protocol;
     protected String subProtocol;
@@ -43,17 +43,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     public void serverId(String serverId) {
         this.serverId = serverId;
     }
-
-    @Override
-    public int channelId() {
-        return channelId;
-    }
-
-    @Override
-    public void channelId(int channelId) {
-        this.channelId = channelId;
-    }
-
 
     @Override
     public boolean secured() {
@@ -119,7 +108,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     public byte[] toBinary(){
         DataBuffer dataBuffer = new DataBuffer();
         dataBuffer.putUTF8(type);
-        dataBuffer.putInt(channelId);
         dataBuffer.putUTF8(serverId);
         dataBuffer.putUTF8(host);
         dataBuffer.putInt(port);
@@ -130,7 +118,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     public void fromBinary(byte[] payload){
         DataBuffer dataBuffer = new DataBuffer(payload);
         this.type = dataBuffer.getUTF8();
-        this.channelId = dataBuffer.getInt();
         this.serverId = dataBuffer.getUTF8();
         this.host = dataBuffer.getUTF8();
         this.port = dataBuffer.getInt();
@@ -146,7 +133,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",type);
-        portableWriter.writeInt("2",channelId);
         portableWriter.writeUTF("3",serverId);
         portableWriter.writeUTF("4",host);
         portableWriter.writeInt("5",port);
@@ -156,7 +142,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.type = portableReader.readUTF("1");
-        this.channelId = portableReader.readInt("2");
         this.serverId = portableReader.readUTF("3");
         this.host = portableReader.readUTF("4");
         this.port = portableReader.readInt("5");
@@ -168,7 +153,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type",type);
         jsonObject.addProperty("serverId",serverId);
-        jsonObject.addProperty("channelId",channelId);
         jsonObject.addProperty("secured",secured);
         jsonObject.addProperty("protocol",protocol);
         jsonObject.addProperty("subProtocol",subProtocol());

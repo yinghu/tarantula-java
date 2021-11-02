@@ -132,7 +132,6 @@ public class PushEventHandler implements RequestHandler {
         conn.host(connection.host());
         conn.port(connection.port());
         conn.secured(connection.secured());
-        conn.channelId(connectionId);
         return conn;
     }
 }

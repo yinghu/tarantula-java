@@ -12,9 +12,6 @@ public interface Connection extends Configurable {
     String serverId();
     void serverId(String serverId);
 
-    int channelId();
-    void channelId(int channelId);
-
     boolean secured();
     void secured(boolean secured);
 

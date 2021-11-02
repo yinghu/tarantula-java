@@ -1,26 +1,39 @@
 package com.tarantula.cci.udp;
 
 import com.icodesoftware.Channel;
+import com.icodesoftware.Connection;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.UniverseConnection;
 
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener {
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener {
 
     private static final JDKLogger log = JDKLogger.getLogger(UDPEndpoint.class);
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
+    private int channelId;
+    private int sessionId;
+    private Connection connection;
 
     public UDPEndpoint(){
+        connection = new UniverseConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
+        channelId = 1;
+        sessionId = 1;
     }
     public void setup(ServiceContext serviceContext){
+        connection.serverId("serverId");
+        connection.type("udp");
+        connection.secured(true);
+        connection.host("10.0.0.192");
+        connection.port(11933);
         udpEndpointServiceProvider.daemon(true);
-        udpEndpointServiceProvider.registerUserChannel(new UserChannel(1,udpEndpointServiceProvider,(h, m)->true,this));
         log.warn("UDP Endpoint running as a daemon!");
     }
 
@@ -65,11 +78,24 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     public Channel register(String systemId){
-        return new UDPChannel();
+        UserChannel userChannel = new UserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
+        udpEndpointServiceProvider.registerUserChannel(userChannel);
+        return new UDPChannel(this.connection,userChannel,sessionId++);
     }
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
         log.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
+    }
+
+    @Override
+    public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        return true;
+    }
+
+    @Override
+    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        log.warn(messageHeader.toString()+">>"+messageHeader.commandId);
+        log.warn("Payload->"+messageBuffer.readUTF8());
     }
 }

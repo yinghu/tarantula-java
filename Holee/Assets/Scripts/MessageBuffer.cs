@@ -13,12 +13,14 @@ namespace Holee
         
         public const short Join = 100;
         public const short Ping = 101;
-        public const short Leave = 102;
+        public const short Request = 102;
+        public const short Leave = 103;
 
         
         //server notification
         public const short OnJoin = 200;
-        public const short OnLeave = 202;
+        public const short OnRequest = 202;
+        public const short OnLeave = 203;
     }
     public interface IMessage
     {

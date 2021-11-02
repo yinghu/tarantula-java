@@ -39,7 +39,7 @@ public class Main {
             }
             UDPEndpointService udpReceiver = new UDPEndpointService();
             udpReceiver.address(config.getAsJsonObject("connection").get("host").getAsString());
-            udpReceiver.registerUserChannel(new UserChannel(1,udpReceiver,(h,m)->true,(c,s)->{}));
+            udpReceiver.registerUserChannel(new UserChannel(1,udpReceiver,(h,m)->true,(c,s)->{},(h,m)->{}));
             udpReceiver.start();
             udpReceiver.run();
             //Thread t = new Thread(udpReceiver,"udp-service");

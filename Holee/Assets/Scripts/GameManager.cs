@@ -93,6 +93,7 @@ namespace Holee
             if(!await _gameClusterManager.Device(this)) return;
             if (!await _gameClusterManager.Join(this)) return;
             _channel = _gameClusterManager.Channel;
+            Debug.Log("CHANNEL ID->"+_channel.ChannelId);
             Debug.Log("SESSION ID->"+_channel.SessionId);
             OnPlay();
             if (_channel.SessionId == 1)

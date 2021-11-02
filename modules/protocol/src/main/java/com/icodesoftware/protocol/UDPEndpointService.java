@@ -26,19 +26,19 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private DatagramSocket datagramChannel;
 
     private ConcurrentLinkedDeque<DatagramPacket> pendingMessageQueue = new ConcurrentLinkedDeque();
-    private ExecutorService executorService;
 
     private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
 
     private String host;
     private int port = PORT;
     private int backlog = BACK_LOG;
+
+    private ExecutorService executorService;
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
 
     public void start() throws Exception{
-
         if(inboundThreadPoolSetting!=null){
             TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
                 this.executorService = pool;
@@ -160,4 +160,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId,userChannel);
     }
+    
+    public void releaseUserChannel(UserChannel userChannel){
+        this.userChannelIndex.remove(userChannel.channelId);
+    }
+
 }

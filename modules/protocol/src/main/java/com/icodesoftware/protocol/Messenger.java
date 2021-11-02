@@ -8,11 +8,13 @@ public interface Messenger {
 
     short JOIN = 100;
     short PING = 101;
-    short LEAVE =102;
+    short REQUEST = 102;
+    short LEAVE =103;
 
     //SERVER PUSH NOTIFICATION
     short ON_JOIN  = 200;
-    short ON_LEAVE = 202;
+    short ON_REQUEST = 202;
+    short ON_LEAVE = 203;
 
     //Message deliver mode channel-broadcasting-no-sender 0, channel-broadcasting 1, sender-request 2
     short CHANNEL_BROADCASTING_NO_SENDER = 0;
