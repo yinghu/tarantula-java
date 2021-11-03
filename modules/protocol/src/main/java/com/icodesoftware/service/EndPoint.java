@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 
 import com.icodesoftware.Channel;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 
 public interface EndPoint extends ServiceProvider {
 
@@ -12,8 +13,8 @@ public interface EndPoint extends ServiceProvider {
     void backlog(int backlog);
     void port(int port);
     void inboundThreadPoolSetting(String inboundThreadPoolSetting);
-    void resource(Resource resource);
-    default Channel register(String systemId){return  null;}
+    default void resource(Resource resource){}
+    default Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){return  null;}
 
     interface Resource{
         RequestHandler requestHandler(String name);

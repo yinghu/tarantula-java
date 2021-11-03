@@ -1,10 +1,12 @@
 package com.icodesoftware;
 
+import com.icodesoftware.protocol.MessageBuffer;
+
 public interface Channel extends Configurable{
 
     int channelId();
     int sessionId();
-    void write(byte[] payload);
+    void write(MessageBuffer.MessageHeader messageHeader,byte[] payload);
 
     Connection connection();
 

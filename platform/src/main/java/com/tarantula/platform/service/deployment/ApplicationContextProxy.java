@@ -2,6 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
 
@@ -92,7 +93,7 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.postOffice();
     }
 
-    public Channel register(String systemId){
-        return this.tarantulaApplicationContext.register(systemId);
+    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
+        return this.tarantulaApplicationContext.register(systemId,requestListener);
     }
 }

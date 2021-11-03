@@ -14,6 +14,7 @@ import com.tarantula.platform.UniverseConnection;
 import javax.crypto.Cipher;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener {
@@ -28,7 +29,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private String serverKey;
     private Connection connection;
 
+    private ConcurrentHashMap<Integer,Channel> channels;
+
     public UDPEndpoint(){
+        channels = new ConcurrentHashMap<>();
         connection = new UniverseConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
         channelId = 1;
@@ -84,15 +88,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(poolSetting);
     }
 
-    @Override
-    public void resource(Resource resource) {
-
-    }
-
-    public Channel register(String systemId){
+    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
         UserChannel userChannel = new UserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
         udpEndpointServiceProvider.registerUserChannel(userChannel);
-        return new UDPChannel(this.connection,userChannel,sessionId++,serverKey);
+        return new UDPChannel(this.connection,userChannel,sessionId++,serverKey,requestListener);
     }
 
     @Override

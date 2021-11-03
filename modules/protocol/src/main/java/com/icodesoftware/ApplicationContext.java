@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ServiceProvider;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface ApplicationContext {
 
     void resource(String name,Module.OnResource onResource);
 
-    Channel register(String systemId);
+    Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener);
 
     PostOffice postOffice();
 }
