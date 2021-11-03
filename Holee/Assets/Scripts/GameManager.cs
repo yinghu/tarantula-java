@@ -14,6 +14,7 @@ namespace Holee
         [SerializeField] private Ping ping;
         [SerializeField] private Retry retry;
         [SerializeField] private Ack ack;
+        [SerializeField] private RequestPopup requestPopup;
         private ConcurrentQueue<byte[]> _messageQueue;
      
         private MessageBuffer _outboundBuffer;
@@ -42,8 +43,6 @@ namespace Holee
                 IV = key
             };
             NetworkingManager.Init(_channel.Host,_channel.Port);
-            //_cipher.GenerateKey();
-            //_cipher.GenerateIV();
             _outboundBuffer = new MessageBuffer(_cipher);
             _inboundBuffer = new MessageBuffer(_cipher);
             _header = new MessageHeader
@@ -76,7 +75,7 @@ namespace Holee
             playerA.OffPlay();
             playerB.OnPlay();
         }
-
+        
         public async void OnLeave()
         {
             if (_channel.SessionId == 1)

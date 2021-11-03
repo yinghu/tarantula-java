@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
-import com.tarantula.cci.webhook.WebhookSessionService;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -667,7 +665,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 }
             }
             else if(occ.type().equals(Connection.WEB_HOOK)){
-                serverPushEvent.eventService(new WebhookSessionService());
+                //serverPushEvent.eventService(new WebhookSessionService());
             }
             else{
                 serverPushEvent.eventService(this.integrationEventService);
