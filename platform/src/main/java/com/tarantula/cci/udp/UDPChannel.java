@@ -36,7 +36,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
 
     @Override
     public void write(MessageBuffer.MessageHeader messageHeader,byte[] bytes) {
-            
+        System.out.println(new String(bytes));
         //userChannel.write(sessionId,bytes);
     }
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){

@@ -2,8 +2,10 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Session;
+import com.icodesoftware.Statistics;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 
 public class PVPRoomProxy extends RoomProxyHeader{
 
@@ -27,7 +29,11 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined = true;
         stub.zone = gameZone;
         stub.rating = rating;
-        stub.channel = context.register(session.systemId(),(h,m)->{});
+        stub.channel = context.register(session.systemId(),(h,m)->{
+            StatisticsSerializer serializer = new StatisticsSerializer();
+            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
+            stub.channel.write(h,serializer.serialize(statistics,Statistics.class,null).toString().getBytes());
+        });
         stub.tag = application.tag();
         this.dataStore.update(stub);
         return stub;

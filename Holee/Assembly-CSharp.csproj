@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\MessageBuffer.cs" />
      <Compile Include="Assets\Scripts\GameClusterManager.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\RequestPopup.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Ack.cs" />
      <Compile Include="Assets\Scripts\NetworkingManager.cs" />
@@ -64,7 +65,6 @@
      <Compile Include="Assets\Scripts\HttpCaller.cs" />
      <Compile Include="Assets\Scripts\ServiceManager.cs" />
      <Compile Include="Assets\Scripts\PlayerCollider.cs" />
-     <Compile Include="Assets\Scripts\RequestPopup.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />

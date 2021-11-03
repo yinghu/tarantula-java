@@ -108,7 +108,7 @@ namespace Holee
 
         public void Send(MessageHeader header,Action<MessageBuffer> message)
         {
-            header.ChannelId = 1;
+            header.ChannelId = _channel.ChannelId;
             header.SessionId = _channel.SessionId;
             message(_outboundBuffer.WriteHeader(header));
             var outbound = _outboundBuffer.Drain();

@@ -29,7 +29,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private String serverKey;
     private Connection connection;
 
-    private ConcurrentHashMap<Integer,Channel> channels;
+    private ConcurrentHashMap<Integer,UDPChannel> channels;
 
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
@@ -91,7 +91,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
         UserChannel userChannel = new UserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
         udpEndpointServiceProvider.registerUserChannel(userChannel);
-        return new UDPChannel(this.connection,userChannel,sessionId++,serverKey,requestListener);
+        UDPChannel uch = new UDPChannel(this.connection,userChannel,sessionId++,serverKey,requestListener);
+        channels.put(uch.sessionId(),uch);
+        return uch;
     }
 
     @Override
@@ -111,6 +113,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
+        UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         if(messageHeader.encrypted){
             try{
                 Cipher cipher = CipherUtil.decrypt(key);
@@ -120,15 +123,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 messageBuffer.writePayload(plain);
                 messageBuffer.flip();
                 messageBuffer.readHeader();
-                String ret = messageBuffer.readUTF8();
-                logger.warn(ret);
+                udpChannel.onMessage(messageHeader,messageBuffer);
 
             }catch (Exception ex){
                 logger.error("error",ex);
             }
         }
         else{
-            logger.warn(messageBuffer.readUTF8());
+            udpChannel.onMessage(messageHeader,messageBuffer);
         }
     }
 }
