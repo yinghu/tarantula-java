@@ -59,7 +59,8 @@ namespace Holee
             _header.CommandId = Command.Join;
             NetworkingManager.OnReceived += OnMessage;
             _outboundBuffer.WriteHeader(_header);
-            _outboundBuffer.WriteInt(2);
+            _outboundBuffer.WriteInt(_channel.SessionId);
+            _outboundBuffer.WriteUTF8(_gameClusterManager.Presence.Token);
             var outbound = _outboundBuffer.Drain();
             NetworkingManager.Send(outbound,outbound.Length);
         }

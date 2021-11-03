@@ -91,7 +91,11 @@ public class MessageBuffer {
         byteBuffer.put(data.getBytes());
         return this;
     }
-    public byte[] toPayload(){
+    public MessageBuffer writePayload(byte[] payload){
+        byteBuffer.put(payload);
+        return this;
+    }
+    public byte[] readPayload(){
         byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];
         byteBuffer.get(_payload);
         return _payload;
