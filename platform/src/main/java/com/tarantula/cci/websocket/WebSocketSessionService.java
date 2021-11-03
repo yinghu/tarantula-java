@@ -1,14 +1,13 @@
 package com.tarantula.cci.websocket;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.MessageHandler;
-import com.icodesoftware.protocol.OutboundMessage;
+
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.net.http.WebSocket;
-import java.nio.ByteBuffer;
+
 
 public class WebSocketSessionService implements ConnectionEventService,WebSocket.Listener {
 
@@ -47,14 +46,14 @@ public class WebSocketSessionService implements ConnectionEventService,WebSocket
         String[] params = label.split(Recoverable.PATH_SEPARATOR);
         int seq = Integer.parseInt(params[0]);
         boolean ack = params.length==2?Boolean.parseBoolean(params[1]):false;
-        OutboundMessage pendingOutboundMessage = new OutboundMessage();
-        pendingOutboundMessage.ack(ack);
+        ///OutboundMessage pendingOutboundMessage = new OutboundMessage();
+        //pendingOutboundMessage.ack(ack);
         //pendingOutboundMessage.connectionId(connection.channelId());
-        pendingOutboundMessage.sessionId(0);
-        pendingOutboundMessage.type(MessageHandler.SERVER_PUSH);
-        pendingOutboundMessage.sequence(seq);//client message type
-        pendingOutboundMessage.payload(payload);
-        webSocket.sendBinary(ByteBuffer.wrap(pendingOutboundMessage.message()),true);
+        //pendingOutboundMessage.sessionId(0);
+        //pendingOutboundMessage.type(MessageHandler.SERVER_PUSH);
+        //pendingOutboundMessage.sequence(seq);//client message type
+        //pendingOutboundMessage.payload(payload);
+        //webSocket.sendBinary(ByteBuffer.wrap(pendingOutboundMessage.message()),true);
     }
 
 

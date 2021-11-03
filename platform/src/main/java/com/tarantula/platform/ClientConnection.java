@@ -6,7 +6,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 
-import com.icodesoftware.protocol.DataBuffer;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.io.IOException;
@@ -104,25 +103,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.path = path;
     }
 
-    @Override
-    public byte[] toBinary(){
-        DataBuffer dataBuffer = new DataBuffer();
-        dataBuffer.putUTF8(type);
-        dataBuffer.putUTF8(serverId);
-        dataBuffer.putUTF8(host);
-        dataBuffer.putInt(port);
-        dataBuffer.putByte(secured?(byte)1:0);
-        return dataBuffer.toArray();
-    }
-    @Override
-    public void fromBinary(byte[] payload){
-        DataBuffer dataBuffer = new DataBuffer(payload);
-        this.type = dataBuffer.getUTF8();
-        this.serverId = dataBuffer.getUTF8();
-        this.host = dataBuffer.getUTF8();
-        this.port = dataBuffer.getInt();
-        this.secured = dataBuffer.getByte()==1;
-    }
+
     public int getFactoryId() {
         return PortableRegistry.OID;
     }

@@ -6,12 +6,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
-import com.tarantula.cci.udp.PendingServerPushMessage;
-import com.tarantula.cci.udp.UDPSessionService;
 import com.tarantula.cci.webhook.WebhookSessionService;
-import com.tarantula.cci.websocket.WebSocketSessionService;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
@@ -35,7 +30,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
@@ -76,7 +70,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentLinkedDeque<PendingMessage> pendingData;
+    //private ConcurrentLinkedDeque<PendingMessage> pendingData;
     private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
     //private ExecutorService udpPool;
@@ -88,7 +82,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
-        this.pendingData = new ConcurrentLinkedDeque<>();
+        //this.pendingData = new ConcurrentLinkedDeque<>();
         this.onAccessIndex = new AtomicBoolean(true);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
@@ -784,7 +778,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void getConnection(String lobbyTag,Session session){
         ((Event)session).eventService(this.integrationEventService);
-        pendingData.offer(new PendingMessage(()-> cCallbacks.get(lobbyTag).onConnection(session)));
+        //pendingData.offer(new PendingMessage(()-> cCallbacks.get(lobbyTag).onConnection(session)));
     }
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();

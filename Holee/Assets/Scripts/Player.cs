@@ -48,7 +48,8 @@ namespace Holee
             _isMoving = true;
             var req = new MessageHeader
             {
-                CommandId = Command.Request
+                CommandId = Command.Request,
+                Encrypted = true
             };
             gameManager.Send(req, buffer =>
             {

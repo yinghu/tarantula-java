@@ -1,7 +1,5 @@
 package com.icodesoftware.test;
 
-import com.google.gson.JsonObject;
-import com.icodesoftware.protocol.DataBuffer;
 import com.icodesoftware.protocol.MessageBuffer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

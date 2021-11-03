@@ -9,8 +9,10 @@ import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.UniverseConnection;
 
+import javax.crypto.Cipher;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -21,6 +23,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private int channelId;
     private int sessionId;
+    private byte[] key;
     private String serverKey;
     private Connection connection;
 
@@ -32,7 +35,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
     public void setup(ServiceContext serviceContext){
         logger = serviceContext.logger(UDPEndpoint.class);
-        this.serverKey = Base64.getEncoder().encodeToString(serviceContext.deploymentServiceProvider().serverKey());
+        this.key = serviceContext.deploymentServiceProvider().serverKey();
+        this.serverKey = Base64.getEncoder().encodeToString(key);
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
         connection.secured(true);
@@ -101,7 +105,16 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
-        String req = messageBuffer.readUTF8();
-        logger.warn("Payload->"+req.length()+">>>"+req);
+        //String req = messageBuffer.readUTF8();
+        //logger.warn("Payload->"+req.length()+">>>"+req);
+        if(messageHeader.encrypted){
+            try{
+                Cipher cipher = CipherUtil.decrypt(key);
+                byte[] plain = cipher.doFinal(messageBuffer.toPayload());
+                logger.warn(new String(plain));
+            }catch (Exception ex){
+                logger.error("error",ex);
+            }
+        }
     }
 }
