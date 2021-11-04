@@ -59,7 +59,8 @@ namespace Holee
         private readonly UTF8Encoding _utf8Encoding;
         
         private readonly Rijndael _cipher;
-        
+
+        private int _limit;
         public MessageBuffer(Rijndael cipher) : this()
         {
             _cipher = cipher;
@@ -68,6 +69,7 @@ namespace Holee
         {
             _memoryStream = new MemoryStream(new byte[Size]);
             _memoryStream.Position = 0;
+            _limit = 0;
             _tem4 = new byte[4];
             _tem2 = new byte[2];
             _utf8Encoding = new UTF8Encoding();
@@ -200,6 +202,7 @@ namespace Holee
         public void Reset(byte[] data)
         {
             _memoryStream.Position = 0;
+            _limit = data.Length;
             CheckAvailability(data.Length);
             _memoryStream.Write(data,0,data.Length);
             _memoryStream.Position = 0;
