@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public class MessageBuffer {
     public final static int PAYLOAD_SIZE = 483;
-    private final static int SIZE = 508;
+    public final static int SIZE = 508;
     private final static int HEADER_SIZE = 25;
 
     private ByteBuffer byteBuffer;

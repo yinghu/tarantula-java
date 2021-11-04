@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UDPEndpointService.class);
-    private static int BUFFER_SIZE = 508;
+    private static int BUFFER_SIZE = MessageBuffer.SIZE;
     private static int PORT = 11933;
     private static int BACK_LOG = 100;
     private static int MESSAGE_HANDLER_POOL_SIZE = 3;
@@ -28,6 +28,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private ConcurrentLinkedDeque<DatagramPacket> pendingMessageQueue = new ConcurrentLinkedDeque();
 
     private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
+
+    private ConcurrentLinkedDeque<PendingOutboundMessage> pendingOutboundMessageQueue = new ConcurrentLinkedDeque();
 
     private String host;
     private int port = PORT;
@@ -42,11 +44,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         if(inboundThreadPoolSetting!=null){
             TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
                 this.executorService = pool;
-                this.messageHandlerSize = poolSize-(daemon?2:1);
+                this.messageHandlerSize = poolSize-(daemon?3:2);
             });
         }else{
-            executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE+(daemon?2:1),new TarantulaThreadFactory("udp-messaging"));
+            executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE+(daemon?3:2),new TarantulaThreadFactory("udp-messaging"));
         }
+        log.warn("Inbound message handler number ["+messageHandlerSize+"]");
+        log.warn("Ping handler number ["+1+"]");
+        log.warn("Outbound message handler number ["+1+"]");
+        log.warn("Message receiver handler number ["+1+"]");
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
@@ -81,6 +87,21 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
                         kickoffTimer = 5000;
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        });
+        executorService.execute(()->{
+            while (true){
+                try{
+                    PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
+                    if(pendingOutboundMessage!=null){
+                        send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
+                    }
+                    else{
+                        Thread.sleep(5);
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -124,7 +145,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         }
     }
     public void queue(byte[] data,SocketAddress destination){
-        send(data,destination);
+        pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,destination));
+        //send(data,destination);
     }
     @Override
     public void address(String address) {
