@@ -123,6 +123,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             ex.printStackTrace();
         }
     }
+    public void queue(byte[] data,SocketAddress destination){
+        send(data,destination);
+    }
     @Override
     public void address(String address) {
         this.host = address;

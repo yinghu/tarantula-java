@@ -99,6 +99,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onTimeout(int channelId, int sessionId) {
         logger.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
+        channels.remove(sessionId);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         if(messageHeader.encrypted){
@@ -132,5 +133,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         else{
             udpChannel.onMessage(messageHeader,messageBuffer);
         }
+        return null;
     }
 }

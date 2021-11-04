@@ -22,4 +22,5 @@ public interface Messenger {
     short SENDER_REQUEST = 2;
 
     void send(byte[] data,SocketAddress destination);
+    void queue(byte[] data,SocketAddress destination);
 }

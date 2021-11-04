@@ -17,7 +17,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
     }
 
     interface RequestListener{
-        void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+        byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
 }

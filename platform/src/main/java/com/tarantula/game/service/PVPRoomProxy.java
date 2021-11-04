@@ -32,7 +32,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.channel = context.register(session.systemId(),(h,m)->{
             StatisticsSerializer serializer = new StatisticsSerializer();
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            stub.channel.write(h,serializer.serialize(statistics,Statistics.class,null).toString().getBytes());
+            return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
         });
         stub.tag = application.tag();
         this.dataStore.update(stub);

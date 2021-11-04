@@ -30,6 +30,7 @@ namespace Holee
             {
                 r.Setup(this);    
             }
+            requestPopup.Setup(this);
             _messageQueue = new ConcurrentQueue<byte[]>();
         }
         private void OnPlay()
@@ -149,6 +150,12 @@ namespace Holee
                 _outboundBuffer.WriteHeader(header);
                 var data = _outboundBuffer.Drain();
                 ping.OnJoin(data);
+                return;
+            }
+
+            if (header.CommandId == Command.OnRequest)
+            {
+                requestPopup.OnMessage(header,_inboundBuffer);
                 return;
             }
 

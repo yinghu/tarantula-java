@@ -15,7 +15,7 @@ public class UserSession {
     private AtomicBoolean onJoined;
     private AtomicInteger sequence;
     private int lastSequence;
-    private List<MessageBuffer.MessageHeader> pendingAckList;
+    //private List<MessageBuffer.MessageHeader> pendingAckList;
     public UserSession(int sessionId,SocketAddress source){
         this.sessionId = sessionId;
         this.source = source;
@@ -23,7 +23,7 @@ public class UserSession {
         onJoined = new AtomicBoolean(true);
         sequence = new AtomicInteger(1);
         lastSequence = 0;
-        pendingAckList = new ArrayList<>(10);
+        //pendingAckList = new ArrayList<>(10);
     }
     public boolean onJoin(){
         return onJoined.getAndSet(false);
@@ -41,8 +41,8 @@ public class UserSession {
         pendingAckBuffer.push(ack);
     }
     public List<MessageBuffer.MessageHeader> pendingAckList(){
-        pendingAckList.clear();
-        return pendingAckBuffer.list(pendingAckList);
+        //pendingAckList.clear();
+        return pendingAckBuffer.list(new ArrayList<>(10));
     }
 
 

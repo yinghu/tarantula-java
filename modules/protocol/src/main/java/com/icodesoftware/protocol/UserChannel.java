@@ -103,7 +103,7 @@ public class UserChannel {
         _retried.forEach(k->pendingAckMessageIndex.remove(k));
     }
     public void write(int sessionId,byte[] data){
-        messenger.send(data,userSessionIndex.get(sessionId).source);
+        messenger.queue(data,userSessionIndex.get(sessionId).source);
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.util.RecoverableObject;
@@ -36,11 +37,18 @@ public class UDPChannel extends RecoverableObject implements Channel {
 
     @Override
     public void write(MessageBuffer.MessageHeader messageHeader,byte[] bytes) {
-        System.out.println(new String(bytes));
         //userChannel.write(sessionId,bytes);
     }
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        this.requestListener.onMessage(messageHeader,messageBuffer);
+        byte[] ret = this.requestListener.onMessage(messageHeader,messageBuffer);
+        if(ret!=null){
+            messageBuffer.reset();
+            messageHeader.commandId = Messenger.ON_REQUEST;
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(ret);
+            messageBuffer.flip();
+            userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
+        }
     }
     public Connection connection(){
         return this.connection;

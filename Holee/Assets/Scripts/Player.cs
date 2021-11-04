@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Holee
@@ -46,16 +45,6 @@ namespace Holee
             var ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             if (plane.Raycast(ray, out var point)) _targetPos = ray.GetPoint(point);
             _isMoving = true;
-            var header = new MessageHeader
-            {
-                CommandId = Command.Request,
-                ObjectId = playerId,
-                Encrypted = true
-            };
-            gameManager.Send(header, buffer =>
-            {
-                buffer.WriteUTF8(JsonConvert.SerializeObject(header));
-            });
         }
 
         private void FixedUpdate()
