@@ -7,7 +7,11 @@ import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
+import com.icodesoftware.util.BatchUtil;
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.RecoverableObject;
+
+import java.util.Base64;
 
 public class UDPChannel extends RecoverableObject implements Channel {
 
@@ -15,9 +19,9 @@ public class UDPChannel extends RecoverableObject implements Channel {
     private UserChannel userChannel;
     private int channelId;
     private int sessionId;
-    private String serverKey;
+    private byte[] serverKey;
     private UDPEndpointServiceProvider.RequestListener requestListener;
-    public UDPChannel(Connection connection, UserChannel userChannel, int sessionId, String serverKey, UDPEndpointServiceProvider.RequestListener requestListener){
+    public UDPChannel(Connection connection, UserChannel userChannel, int sessionId, byte[] serverKey, UDPEndpointServiceProvider.RequestListener requestListener){
         this.connection = connection;
         this.userChannel = userChannel;
         this.channelId = userChannel.channelId;
@@ -42,12 +46,34 @@ public class UDPChannel extends RecoverableObject implements Channel {
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         byte[] ret = this.requestListener.onMessage(messageHeader,messageBuffer);
         if(ret!=null){
-            messageBuffer.reset();
-            messageHeader.commandId = Messenger.ON_REQUEST;
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(ret);
-            messageBuffer.flip();
-            userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
+            try{
+                //byte[] payload = CipherUtil.encrypt(serverKey).doFinal(ret);
+                if(ret.length <= MessageBuffer.PAYLOAD_SIZE){
+                    messageBuffer.reset();
+                    messageHeader.commandId = Messenger.ON_REQUEST;
+                    messageHeader.encrypted = false;
+                    messageBuffer.writeHeader(messageHeader);
+                    messageBuffer.writePayload(ret);
+                    messageBuffer.flip();
+                    userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
+                }
+                else{
+                    BatchUtil.Batch batch = BatchUtil.batch(ret.length,MessageBuffer.PAYLOAD_SIZE);
+                    for(BatchUtil.Offset offset : batch.offsets){
+                        messageBuffer.reset();
+                        messageHeader.commandId = Messenger.ON_REQUEST;
+                        messageHeader.encrypted = false;
+                        messageHeader.batch = offset.batch;
+                        messageHeader.batchSize = batch.size;
+                        messageBuffer.writeHeader(messageHeader);
+                        messageBuffer.writePayload(ret,offset.offset,offset.length);
+                        messageBuffer.flip();
+                        userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
+                    }
+                }
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
     public Connection connection(){
@@ -59,7 +85,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("channelId",channelId);
         jsonObject.addProperty("sessionId",sessionId);
-        jsonObject.addProperty("serverKey",serverKey);
+        jsonObject.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
         jsonObject.add("connection",connection.toJson());
         return jsonObject;
     }

@@ -12,7 +12,6 @@ import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.UniverseConnection;
 
 import javax.crypto.Cipher;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,7 +25,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private int channelId;
     private int sessionId;
     private byte[] key;
-    private String serverKey;
     private Connection connection;
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
@@ -43,7 +41,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
         this.key = serviceContext.deploymentServiceProvider().serverKey();
-        this.serverKey = Base64.getEncoder().encodeToString(key);
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
         connection.secured(true);
@@ -91,7 +88,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
         UserChannel userChannel = new UserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
         udpEndpointServiceProvider.registerUserChannel(userChannel);
-        UDPChannel uch = new UDPChannel(this.connection,userChannel,sessionId++,serverKey,requestListener);
+        UDPChannel uch = new UDPChannel(this.connection,userChannel,sessionId++,key,requestListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }
@@ -113,7 +110,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
+        //logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         if(messageHeader.encrypted){
             try{

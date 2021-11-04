@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Holee
@@ -30,8 +31,8 @@ namespace Holee
         public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
         {
             var payload = messageBuffer.ReadPayload();
-            Debug.Log(header.ToString());
-            //Debug.Log();
+            Debug.Log(header+">>"+header.Batch+" of "+header.BatchSize);
+            Debug.Log(Encoding.UTF8.GetString(payload));
         }
         
         public void Setup(GameManager gameManager)

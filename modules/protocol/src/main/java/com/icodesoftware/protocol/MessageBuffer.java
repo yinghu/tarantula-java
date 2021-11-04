@@ -3,8 +3,9 @@ package com.icodesoftware.protocol;
 import java.nio.ByteBuffer;
 
 public class MessageBuffer {
-    private static int SIZE = 508;
-    private static int HEADER_SIZE = 25;
+    public final static int PAYLOAD_SIZE = 483;
+    private final static int SIZE = 508;
+    private final static int HEADER_SIZE = 25;
 
     private ByteBuffer byteBuffer;
 
@@ -93,6 +94,10 @@ public class MessageBuffer {
     }
     public MessageBuffer writePayload(byte[] payload){
         byteBuffer.put(payload);
+        return this;
+    }
+    public MessageBuffer writePayload(byte[] payload,int offset,int length){
+        byteBuffer.put(payload,offset,length);
         return this;
     }
     public byte[] readPayload(){
