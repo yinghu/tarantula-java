@@ -29,7 +29,9 @@ namespace Holee
 
         public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
         {
-            Debug.Log(header.ToString());    
+            var payload = messageBuffer.ReadPayload();
+            Debug.Log(header.ToString());
+            //Debug.Log();
         }
         
         public void Setup(GameManager gameManager)

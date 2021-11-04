@@ -199,22 +199,35 @@ namespace Holee
             return ToFloat(_tem4);
         }
 
+        public byte[] ReadPayload()
+        {
+            var payload = new byte[_limit-HeaderSize];
+            _memoryStream.Read(payload, 0, payload.Length);
+            return payload;
+        }
+
+        public void WritePayload(byte[] payload)
+        {
+            _memoryStream.Write(payload,0,payload.Length);
+        }
+
         public void Reset(byte[] data)
         {
             _memoryStream.Position = 0;
-            _limit = data.Length;
             CheckAvailability(data.Length);
             _memoryStream.Write(data,0,data.Length);
             _memoryStream.Position = 0;
             if (!ReadHeader().Encrypted)
             {
                 _memoryStream.Position = 0;
+                _limit = data.Length;
                 return;
             }
             var decrypted = Decrypt(data,HeaderSize,data.Length-HeaderSize);
             _memoryStream.Position = HeaderSize;
             _memoryStream.Write(decrypted,0,decrypted.Length);
             _memoryStream.Position = 0;
+            _limit = decrypted.Length + HeaderSize;
         }
 
         public void Reset()
