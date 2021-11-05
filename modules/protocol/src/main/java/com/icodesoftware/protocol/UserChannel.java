@@ -66,6 +66,10 @@ public class UserChannel {
             requestListener.onMessage(messageHeader,messageBuffer);
             return;
         }
+        if(messageHeader.channelId == Messenger.LEAVE){
+            onLeave(messageHeader,messageBuffer);
+            return;
+        }
         messageBuffer.rewind();
         byte[] payload = messageBuffer.toArray();
         userSessionIndex.forEach((sid,session)->{
@@ -131,7 +135,9 @@ public class UserChannel {
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
-
+    private void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        userSessionIndex.remove(messageHeader.sessionId);
+    }
 
     private class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;

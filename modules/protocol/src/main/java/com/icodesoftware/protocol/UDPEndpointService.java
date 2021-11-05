@@ -20,8 +20,13 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private static TarantulaLogger log = JDKLogger.getLogger(UDPEndpointService.class);
     private static int BUFFER_SIZE = MessageBuffer.SIZE;
     private static int PORT = 11933;
-    private static int BACK_LOG = 100;
-    private static int MESSAGE_HANDLER_POOL_SIZE = 3;
+    private static int MESSAGE_HANDLER_POOL_SIZE = 1;
+
+    private static int RECEIVE_TIMEOUT = 200;
+    private static int SLEEP_TIMEOUT = 5;
+
+    private static int SESSION_TIMEOUT = 5000;
+    private static int RETRY_TIMEOUT = 200;
 
     private DatagramSocket datagramChannel;
 
@@ -33,7 +38,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private String host;
     private int port = PORT;
-    private int backlog = BACK_LOG;
 
     private ExecutorService executorService;
     private String inboundThreadPoolSetting;
@@ -68,7 +72,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                             userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
                         }
                         else{
-                            Thread.sleep(5);
+                            Thread.sleep(SLEEP_TIMEOUT);
                         }
                     }catch (Exception ex){
                         //ignore
@@ -78,15 +82,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             });
         }
         executorService.execute(()->{
-            long kickoffTimer = 5000;
+            long kickoffTimer = SESSION_TIMEOUT;
             while (true){
                 try{
-                    Thread.sleep(200);
+                    Thread.sleep(RETRY_TIMEOUT);
                     userChannelIndex.forEach((k,v)->v.onRetry());
-                    kickoffTimer -= 200;
+                    kickoffTimer -= RETRY_TIMEOUT;
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
-                        kickoffTimer = 5000;
+                        kickoffTimer = SESSION_TIMEOUT;
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -101,7 +105,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
                     }
                     else{
-                        Thread.sleep(5);
+                        Thread.sleep(SLEEP_TIMEOUT);
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -109,6 +113,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             }
         });
         this.datagramChannel = new DatagramSocket(null);
+        this.datagramChannel.setSoTimeout(RECEIVE_TIMEOUT);
         InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
         if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
@@ -131,7 +136,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             }catch (Exception ex){
                 //ignore
                 //ex.printStackTrace();
-                //try{Thread.sleep(50);}catch (Exception exx){}
+                try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
             }
         }
     }
@@ -150,11 +155,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     @Override
     public void address(String address) {
         this.host = address;
-    }
-
-    @Override
-    public void backlog(int backlog) {
-
     }
 
     @Override

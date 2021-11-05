@@ -1,6 +1,7 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
@@ -27,7 +28,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.zone = gameZone;
         stub.rating = rating;
         stub.channel = context.register(session.systemId(),(h,m)->{
-            //this.context.log(m.readUTF8(), OnLog.WARN);
+            this.context.log(m.readUTF8(), OnLog.WARN);
             //StatisticsSerializer serializer = new StatisticsSerializer();
             //Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             //return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();

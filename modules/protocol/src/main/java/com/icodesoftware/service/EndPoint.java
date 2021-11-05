@@ -10,7 +10,7 @@ public interface EndPoint extends ServiceProvider {
     String UDP_ENDPOINT = "UDPEndpoint";
 
     void address(String address);
-    void backlog(int backlog);
+    default void backlog(int backlog){}
     void port(int port);
     void inboundThreadPoolSetting(String inboundThreadPoolSetting);
     default void resource(Resource resource){}
