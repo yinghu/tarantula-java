@@ -8,7 +8,6 @@ import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.util.BatchUtil;
-import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Base64;
@@ -21,6 +20,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
     private int sessionId;
     private byte[] serverKey;
     private UDPEndpointServiceProvider.RequestListener requestListener;
+    private MessageBuffer messageBuffer;
     public UDPChannel(Connection connection, UserChannel userChannel, int sessionId, byte[] serverKey, UDPEndpointServiceProvider.RequestListener requestListener){
         this.connection = connection;
         this.userChannel = userChannel;
@@ -28,6 +28,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
         this.sessionId = sessionId;
         this.serverKey = serverKey;
         this.requestListener = requestListener;
+        messageBuffer = new MessageBuffer();
     }
     @Override
     public int channelId() {
@@ -40,40 +41,39 @@ public class UDPChannel extends RecoverableObject implements Channel {
     }
 
     @Override
-    public void write(MessageBuffer.MessageHeader messageHeader,byte[] bytes) {
-        //userChannel.write(sessionId,bytes);
+    public void write(MessageBuffer.MessageHeader messageHeader,byte[] payload) {
+        if(payload==null||payload.length==0) return;
+        BatchUtil.Batch batch = BatchUtil.batch(payload.length,MessageBuffer.PAYLOAD_SIZE);
+        synchronized (messageBuffer){
+            for(BatchUtil.Offset offset : batch.offsets){
+                messageBuffer.reset();
+                messageHeader.commandId = Messenger.ON_REQUEST;
+                messageHeader.channelId = channelId;
+                messageHeader.sessionId = sessionId;
+                messageHeader.encrypted = false;
+                messageHeader.batch = offset.batch;
+                messageHeader.batchSize = batch.size;
+                messageBuffer.writeHeader(messageHeader);
+                messageBuffer.writePayload(payload,offset.offset,offset.length);
+                messageBuffer.flip();
+                userChannel.queue(messageHeader.sessionId,messageBuffer.toArray());
+            }
+        }
     }
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         byte[] ret = this.requestListener.onMessage(messageHeader,messageBuffer);
-        if(ret!=null){
-            try{
-                //byte[] payload = CipherUtil.encrypt(serverKey).doFinal(ret);
-                if(ret.length <= MessageBuffer.PAYLOAD_SIZE){
-                    messageBuffer.reset();
-                    messageHeader.commandId = Messenger.ON_REQUEST;
-                    messageHeader.encrypted = false;
-                    messageBuffer.writeHeader(messageHeader);
-                    messageBuffer.writePayload(ret);
-                    messageBuffer.flip();
-                    userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
-                }
-                else{
-                    BatchUtil.Batch batch = BatchUtil.batch(ret.length,MessageBuffer.PAYLOAD_SIZE);
-                    for(BatchUtil.Offset offset : batch.offsets){
-                        messageBuffer.reset();
-                        messageHeader.commandId = Messenger.ON_REQUEST;
-                        messageHeader.encrypted = false;
-                        messageHeader.batch = offset.batch;
-                        messageHeader.batchSize = batch.size;
-                        messageBuffer.writeHeader(messageHeader);
-                        messageBuffer.writePayload(ret,offset.offset,offset.length);
-                        messageBuffer.flip();
-                        userChannel.write(messageHeader.sessionId,messageBuffer.toArray());
-                    }
-                }
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+        if(ret==null) return;
+        BatchUtil.Batch batch = BatchUtil.batch(ret.length,MessageBuffer.PAYLOAD_SIZE);
+        for(BatchUtil.Offset offset : batch.offsets){
+            messageBuffer.reset();
+            messageHeader.commandId = Messenger.ON_REQUEST;
+            messageHeader.encrypted = false;
+            messageHeader.batch = offset.batch;
+            messageHeader.batchSize = batch.size;
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(ret,offset.offset,offset.length);
+            messageBuffer.flip();
+            userChannel.queue(messageHeader.sessionId,messageBuffer.toArray());
         }
     }
     public Connection connection(){

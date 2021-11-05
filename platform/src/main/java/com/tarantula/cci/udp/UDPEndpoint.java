@@ -104,7 +104,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         int sessionId = messageBuffer.readInt();
         String token = messageBuffer.readUTF8();
         OnSession session = tokenValidator.tokenValidator().validateToken(token);
-        logger.warn(session.systemId());
         return sessionId==messageHeader.sessionId;
     }
 

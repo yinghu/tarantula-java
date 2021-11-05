@@ -146,7 +146,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public void queue(byte[] data,SocketAddress destination){
         pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,destination));
-        //send(data,destination);
     }
     @Override
     public void address(String address) {

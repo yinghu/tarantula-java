@@ -18,7 +18,7 @@ public class UserChannel {
     private ArrayList<String> _retried;
     private ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
-    //private
+
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
         this.messenger = messenger;
@@ -102,7 +102,7 @@ public class UserChannel {
         });
         _retried.forEach(k->pendingAckMessageIndex.remove(k));
     }
-    public void write(int sessionId,byte[] data){
+    public void queue(int sessionId,byte[] data){
         messenger.queue(data,userSessionIndex.get(sessionId).source);
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
