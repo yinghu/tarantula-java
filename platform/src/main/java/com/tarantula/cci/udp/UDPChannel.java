@@ -21,14 +21,16 @@ public class UDPChannel extends RecoverableObject implements Channel {
     private byte[] serverKey;
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private MessageBuffer messageBuffer;
-    public UDPChannel(Connection connection, UserChannel userChannel, int sessionId, byte[] serverKey, UDPEndpointServiceProvider.RequestListener requestListener){
+    public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey){
         this.connection = connection;
         this.userChannel = userChannel;
         this.channelId = userChannel.channelId();
-        this.sessionId = sessionId;
         this.serverKey = serverKey;
-        this.requestListener = requestListener;
         messageBuffer = new MessageBuffer();
+    }
+    public void register(int sessionId, UDPEndpointServiceProvider.RequestListener requestListener){
+        this.sessionId = sessionId;
+        this.requestListener = requestListener;
     }
     @Override
     public int channelId() {
@@ -88,5 +90,8 @@ public class UDPChannel extends RecoverableObject implements Channel {
         jsonObject.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
         jsonObject.add("connection",connection.toJson());
         return jsonObject;
+    }
+    public void sessionId(int sessionId){
+        this.sessionId = sessionId;
     }
 }

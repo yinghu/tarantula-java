@@ -8,16 +8,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
 
-    private int channelId;
-    private ConcurrentHashMap<Integer,UserSession> userSessionIndex;
-    private Messenger messenger;
-    private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
-    private UDPEndpointServiceProvider.RequestListener requestListener;
-    private AtomicInteger sequence;
-    private ArrayList<Integer> _offline;
-    private ArrayList<String> _retried;
-    private ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
-    private UDPEndpointServiceProvider.SessionListener sessionListener;
+    protected int channelId;
+    protected ConcurrentHashMap<Integer,UserSession> userSessionIndex;
+    protected Messenger messenger;
+    protected UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
+    protected UDPEndpointServiceProvider.RequestListener requestListener;
+    protected AtomicInteger sequence;
+    protected ArrayList<Integer> _offline;
+    protected ArrayList<String> _retried;
+    protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
+    protected UDPEndpointServiceProvider.SessionListener sessionListener;
 
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
@@ -77,14 +77,7 @@ public class UserChannel {
         }
         messageBuffer.rewind();
         byte[] payload = messageBuffer.toArray();
-        userSessionIndex.forEach((sid,session)->{
-            if(!messageHeader.broadcasting){
-                if(messageHeader.sessionId!=sid) messenger.send(payload,session.source);
-            }
-            else{
-                messenger.send(payload,session.source);
-            }
-        });
+        onRelay(messageHeader,payload);
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
     }
@@ -126,7 +119,7 @@ public class UserChannel {
         byte[] payload = messageBuffer.toArray();
         messenger.send(payload,source);
     }
-    private void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+    protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
         messageHeader.ack = true;
         messageHeader.encrypted = false;
@@ -142,11 +135,20 @@ public class UserChannel {
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
-    private void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+    protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
     }
-
-    private class PendingAckMessage{
+    protected void onRelay(MessageBuffer.MessageHeader messageHeader,byte[] payload){
+        userSessionIndex.forEach((sid,session)->{
+            if(!messageHeader.broadcasting){
+                if(messageHeader.sessionId!=sid) messenger.send(payload,session.source);
+            }
+            else{
+                messenger.send(payload,session.source);
+            }
+        });
+    }
+    protected class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
         public byte[] data;
         public int retries = 3;

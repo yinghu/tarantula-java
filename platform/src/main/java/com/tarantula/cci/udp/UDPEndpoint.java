@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -14,6 +13,7 @@ import com.tarantula.platform.UniverseConnection;
 import javax.crypto.Cipher;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 
 public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener {
@@ -21,7 +21,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    //private ServiceContext serviceContext;
+    private PushUserChannel pushUserChannel;
     private TokenValidatorProvider tokenValidator;
     private int channelId;
     private int sessionId;
@@ -29,9 +29,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private Connection connection;
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
-
+    private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
+        pendingQueue = new ConcurrentLinkedDeque<>();
         connection = new UniverseConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
         channelId = 1;
@@ -48,12 +49,18 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.secured(true);
         connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
+        pushUserChannel = new PushUserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
+        int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
+        for(int i=0;i<sessionPoolSize;i++){
+            pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key));
+        }
         logger.warn("UDP Endpoint running as a daemon!");
     }
 
     @Override
     public void start() throws Exception {
         udpEndpointServiceProvider.start();
+        this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
     }
 
     @Override
@@ -83,9 +90,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
-        UserChannel userChannel = new UserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
-        udpEndpointServiceProvider.registerUserChannel(userChannel);
-        UDPChannel uch = new UDPChannel(this.connection,userChannel,sessionId++,key,requestListener);
+        UDPChannel uch = this.pendingQueue.poll();
+        uch.register(sessionId++,requestListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }
@@ -93,9 +99,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onTimeout(int channelId, int sessionId) {
         logger.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
-        channels.remove(sessionId);
-        UserChannel userChannel = udpEndpointServiceProvider.releaseUserChannel(channelId);
-        //logger.warn(">>>>>"+userChannel.channelId);
+        UDPChannel removed = channels.remove(sessionId);
+        if(removed != null) pendingQueue.offer(removed);
     }
 
     @Override
