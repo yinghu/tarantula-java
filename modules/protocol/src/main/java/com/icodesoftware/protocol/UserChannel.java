@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
-    //private static TarantulaLogger log = JDKLogger.getLogger(UserChannel.class);
-    public final int channelId;
+
+    private int channelId;
     private ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     private Messenger messenger;
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
@@ -31,7 +31,12 @@ public class UserChannel {
         this._retried = new ArrayList<>();
         this.sessionListener = sessionListener;
     }
-
+    public int channelId(){
+        return this.channelId;
+    }
+    public void channelId(int channelId){
+        this.channelId = channelId;
+    }
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
         UserSession userSession = userSessionIndex.computeIfAbsent(messageHeader.sessionId,k-> {
             if(messageHeader.commandId != Messenger.JOIN) return null;

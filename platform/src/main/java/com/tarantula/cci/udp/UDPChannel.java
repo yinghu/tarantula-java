@@ -24,7 +24,7 @@ public class UDPChannel extends RecoverableObject implements Channel {
     public UDPChannel(Connection connection, UserChannel userChannel, int sessionId, byte[] serverKey, UDPEndpointServiceProvider.RequestListener requestListener){
         this.connection = connection;
         this.userChannel = userChannel;
-        this.channelId = userChannel.channelId;
+        this.channelId = userChannel.channelId();
         this.sessionId = sessionId;
         this.serverKey = serverKey;
         this.requestListener = requestListener;

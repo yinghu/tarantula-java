@@ -182,11 +182,11 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     @Override
     public void registerUserChannel(UserChannel userChannel){
-        this.userChannelIndex.put(userChannel.channelId,userChannel);
+        this.userChannelIndex.put(userChannel.channelId(),userChannel);
     }
     
-    public void releaseUserChannel(UserChannel userChannel){
-        this.userChannelIndex.remove(userChannel.channelId);
+    public UserChannel releaseUserChannel(int channelId){
+        return this.userChannelIndex.remove(channelId);
     }
 
 }

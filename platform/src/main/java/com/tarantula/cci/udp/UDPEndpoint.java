@@ -21,7 +21,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    private ServiceContext serviceContext;
+    //private ServiceContext serviceContext;
     private TokenValidatorProvider tokenValidator;
     private int channelId;
     private int sessionId;
@@ -38,7 +38,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         sessionId = 1;
     }
     public void setup(ServiceContext serviceContext){
-        this.serviceContext = serviceContext;
+        //this.serviceContext = serviceContext;
         Configuration cfg = serviceContext.configuration(CONFIG);
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
@@ -72,11 +72,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void backlog(int backlog) {
-        this.udpEndpointServiceProvider.backlog(backlog);
-    }
-
-    @Override
     public void port(int port) {
         this.udpEndpointServiceProvider.port(port);
         this.connection.port(port);
@@ -99,6 +94,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void onTimeout(int channelId, int sessionId) {
         logger.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
         channels.remove(sessionId);
+        UserChannel userChannel = udpEndpointServiceProvider.releaseUserChannel(channelId);
+        //logger.warn(">>>>>"+userChannel.channelId);
     }
 
     @Override
