@@ -16,7 +16,7 @@ public class FriendListModule implements Module {
     private GameServiceProvider gameServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onFriendList")){
             List<String> list = this.gameServiceProvider.presenceServiceProvider().friendList(session.systemId());
             session.write(toJson(list).toString().getBytes());

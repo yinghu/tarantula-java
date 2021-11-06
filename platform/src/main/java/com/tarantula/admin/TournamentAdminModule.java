@@ -20,7 +20,7 @@ public class TournamentAdminModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());

@@ -63,13 +63,13 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         if(stub==null) return;
         stub.zone.leave(stub);
     }
-    public void update(Session session, byte[] payload, Module.OnUpdate onUpdate){
+    public void update(Session session, byte[] payload){
         Stub stub = stubIndex.get(session.systemId());
         if(stub==null){
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return;
         }
-        stub.zone.update(session,stub,payload,onUpdate);
+        stub.zone.update(session,stub,payload);
     }
     public void list(Session session){
         Stub stub = stubIndex.get(session.systemId());
@@ -79,9 +79,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         }
         stub.zone.list(session,stub);
     }
-    public void onTimer(Module.OnUpdate onUpdate){
+    public void onTimer(){
         timerListenerIndex.forEach((k,v)->{
-            v.onTimer(onUpdate);
+            v.onTimer();
         });
     }
     public String registerTimerListener(TimerListener timerListener){

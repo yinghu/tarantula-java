@@ -12,7 +12,7 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
     private PresenceServiceProvider presenceServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
             session.write(new ItemDailyGiveawayContext(true, "daily giveaway list", this.presenceServiceProvider.list()).toJson().toString().getBytes());
         }

@@ -11,7 +11,7 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     private ApplicationContext context;
     private AchievementServiceProvider achievementServiceProvider;
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
         }

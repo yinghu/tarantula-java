@@ -18,7 +18,7 @@ public class KeyValueDataStoreModule implements Module {
     private GameServiceProvider gameServiceProvider;
     private int maxSizeOnSet;
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onSet")){
             if(payload.length>maxSizeOnSet){
                 ResponseHeader resp = new ResponseHeader("onSet","payload size ["+payload.length+"] cannot be over ["+maxSizeOnSet+"]",false);

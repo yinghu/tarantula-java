@@ -19,7 +19,7 @@ public class GameLobbyAdminModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameLobbyCount;
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             session.write(toJson(gameCluster.gameLobby).toString().getBytes());

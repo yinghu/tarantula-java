@@ -26,7 +26,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     private TokenValidatorProvider tokenValidatorProvider;
     private AtomicBoolean accessIndexEnabled;
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
         if(session.action().equals("onUserList")){
             User access = _user(session.systemId());

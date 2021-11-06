@@ -1,6 +1,5 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.Module;
 import com.icodesoftware.Session;
 
 import com.tarantula.game.Rating;
@@ -17,7 +16,7 @@ public class TVTRoomProxy extends RoomProxyHeader {
 
     }
 
-    public void onTimer(Module.OnUpdate onUpdate){
+    public void onTimer(){
 
     }
 }

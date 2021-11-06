@@ -12,7 +12,7 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
     private ApplicationContext context;
     private TournamentServiceProvider tournamentServiceProvider;
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
             session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }

@@ -14,7 +14,7 @@ public class InventoryModule implements Module {
     private GameServiceProvider gameServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onCategory")){
             Category category = gameServiceProvider.inventoryServiceProvider().category();
             session.write(category.toJson().toString().getBytes());

@@ -1031,21 +1031,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.descriptor = descriptor;
         }
         @Override
-        public void onJoin(Session session,OnUpdate onUpdate) throws Exception {
-            this.module.onJoin(session,onUpdate);
+        public void onJoin(Session session) throws Exception {
+            this.module.onJoin(session);
         }
 
         @Override
-        public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
-            return this.module.onRequest(session,payload,update);
+        public boolean onRequest(Session session, byte[] payload) throws Exception {
+            return this.module.onRequest(session,payload);
         }
         @Override
-        public void onTimeout(Session session, OnUpdate onUpdate){
-            this.module.onTimeout(session,onUpdate);
+        public void onTimeout(Session session){
+            this.module.onTimeout(session);
         }
         @Override
-        public void onIdle(Session session,OnUpdate onUpdate){
-            this.module.onIdle(session,onUpdate);
+        public void onIdle(Session session){
+            this.module.onIdle(session);
         }
         @Override
         public void setup(ApplicationContext context) throws Exception {
@@ -1069,8 +1069,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.module = moduleClassLoader.newModule(descriptor.moduleName());
         }
         @Override
-        public void onTimer(OnUpdate update){
-            module.onTimer(update);
+        public void onTimer(){
+            module.onTimer();
         }
         @Override
         public void onConnection(Connection connection){

@@ -17,11 +17,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     private ScheduledFuture scheduledFuture;
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if(this.module.onRequest(session,payload,((connection,label,delta) ->{
-            this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta);
-        }))){
-            //clean up on leave if any
-        }
+        this.module.onRequest(session,payload);
     }
 
     @Override
@@ -54,9 +50,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void run() {
         try{
-            this.module.onTimer(((connection,label,delta) ->
-                    this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta)
-            ));
+            this.module.onTimer();
         }catch (Exception ex){
             //ignore it
             this.context.log("error",ex, OnLog.ERROR);
@@ -65,9 +59,7 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
-                this.module.onJoin(event,(connection,label,delta)->
-                    this.serviceProvider.registerPostOffice().onConnection(connection).send(label,delta)
-                );
+                this.module.onJoin(event);
             }
             else{
                 context.log("event->"+event.toString(),OnLog.WARN);

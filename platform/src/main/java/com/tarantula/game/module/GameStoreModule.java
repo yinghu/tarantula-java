@@ -13,7 +13,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     private StoreServiceProvider storeServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
             session.write(new ShoppingItemContext(true,"shop list",this.storeServiceProvider.list()).toJson().toString().getBytes());
         }

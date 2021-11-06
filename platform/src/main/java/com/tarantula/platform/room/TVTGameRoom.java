@@ -83,7 +83,7 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
         jsonObject.add("onList",plist);
         return jsonObject;
     }
-    public void onTimer(Module.OnUpdate onUpdate){
+    public void onTimer(){
         
     }
     public void setup(Arena arena){

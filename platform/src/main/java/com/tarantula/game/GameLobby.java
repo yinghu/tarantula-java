@@ -2,7 +2,6 @@ package com.tarantula.game;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Initializer;
-import com.icodesoftware.Module;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.Serviceable;
 
@@ -13,9 +12,9 @@ public interface GameLobby extends Configurable, Initializer, Serviceable,GameRo
     List<GameZone> list();
     Stub join(Session session, Rating rating);
     void leave(Session session);
-    void update(Session session, byte[] payload, Module.OnUpdate onUpdate);
+    void update(Session session, byte[] payload);
     void list(Session session);
-    void onTimer(Module.OnUpdate onUpdate);
+    void onTimer();
     String registerTimerListener(TimerListener timerListener);
     void releaseTimerListener(String registerKey);
 
@@ -24,6 +23,6 @@ public interface GameLobby extends Configurable, Initializer, Serviceable,GameRo
     void reload();
 
     interface TimerListener{
-        void onTimer(Module.OnUpdate onUpdate);
+        void onTimer();
     }
 }

@@ -12,7 +12,7 @@ public class RecentlyPlayListModule implements Module  {
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         List<String> list = this.gameServiceProvider.presenceServiceProvider().recentlyPlayList();
         session.write(toJson(list).toString().getBytes());
         return false;

@@ -67,8 +67,8 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public Stub join(Session session,Rating rating){
         return roomProxy.join(session,rating);
     }
-    public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
-        roomProxy.update(session,stub,payload,onUpdate);
+    public void update(Session session, Stub stub, byte[] payload){
+        roomProxy.update(session,stub,payload);
     }
     public void leave(Stub stub){
         roomProxy.leave(stub);

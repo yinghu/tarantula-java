@@ -26,7 +26,7 @@ public class SudoRoleModule implements Module {
     private DataStore uDatastore;
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
             User acc = new User();
             acc.distributionKey(session.systemId());

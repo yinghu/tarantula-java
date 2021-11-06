@@ -23,7 +23,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
     private String lobbyId;
     private int maxRank;
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());

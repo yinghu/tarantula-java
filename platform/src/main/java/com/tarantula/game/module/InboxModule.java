@@ -9,7 +9,7 @@ public class InboxModule implements Module {
     private ApplicationContext context;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         return false;
     }
 

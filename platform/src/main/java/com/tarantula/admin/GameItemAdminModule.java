@@ -17,7 +17,7 @@ public class GameItemAdminModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onTemplateAssetCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);

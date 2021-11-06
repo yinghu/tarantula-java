@@ -23,7 +23,7 @@ public class StatisticsModule implements Module {
     private GsonBuilder builder;
     private GameServiceProvider gameServiceProvider;
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         //fetch statistics from systemId
         if(session.action().equals("onStatistics")){
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());

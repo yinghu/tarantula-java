@@ -3,16 +3,13 @@ package com.tarantula.game.service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.statistics.StatisticsSerializer;
-import com.tarantula.platform.tournament.TournamentRaceBoard;
 
-import java.util.List;
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -33,7 +30,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.dataStore = gameZone.dataStore();
     }
     @Override
-    public void update(Session session, Stub stub, byte[] payload, Module.OnUpdate onUpdate){
+    public void update(Session session, Stub stub, byte[] payload){
         JsonObject jsonObject = JsonUtil.parse(payload);
         boolean response = false;
         if(jsonObject.has("rating")){

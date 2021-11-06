@@ -15,7 +15,7 @@ public class ProfileModule implements Module  {
     private PresenceServiceProvider presenceServiceProvider;
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onLoad")){
             session.write(this.presenceServiceProvider.profile(session.systemId()).toJson().toString().getBytes());
         }

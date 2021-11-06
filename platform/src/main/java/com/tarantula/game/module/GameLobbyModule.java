@@ -18,7 +18,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     private GsonBuilder builder;
     private Descriptor application;
     @Override
-    public void onJoin(Session session, Module.OnUpdate onUpdate) throws Exception{
+    public void onJoin(Session session) throws Exception{
         if(application.tournamentEnabled()&&session.tournamentId()!=null&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).getBytes());
             return;
@@ -30,13 +30,13 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     }
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onLeave")){
             gameLobby.leave(session);
             session.write(toMessage("left room",true).getBytes());
         }
         else if(session.action().equals("onUpdate")){
-            this.gameLobby.update(session,payload,onUpdate);
+            this.gameLobby.update(session,payload);
         }
         else if(session.action().equals("onList")){
             this.gameLobby.list(session);
@@ -47,8 +47,8 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         return false;
     }
     @Override
-    public void onTimer(Module.OnUpdate update){
-        this.gameLobby.onTimer(update);
+    public void onTimer(){
+        this.gameLobby.onTimer();
     }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {

@@ -1,6 +1,5 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.Module;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 
@@ -14,7 +13,7 @@ public class TVERoomProxy extends RoomProxyHeader {
 
     }
 
-    public void onTimer(Module.OnUpdate onUpdate){
+    public void onTimer(){
 
     }
 

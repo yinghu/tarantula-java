@@ -15,7 +15,7 @@ public class GameItemModule implements Module,Configurable.Listener<Configurable
     private ConcurrentHashMap<String,ConfigurableObject> itemList;
 
     @Override
-    public boolean onRequest(Session session, byte[] bytes, OnUpdate onUpdate) throws Exception {
+    public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
             List<ConfigurableObject> _item = this.gameServiceProvider.itemServiceProvider().list(this.context.descriptor(),session.name());
             session.write(new ItemContext(true,session.name(),_item).toString().getBytes());

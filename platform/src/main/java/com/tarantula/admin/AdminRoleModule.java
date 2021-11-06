@@ -32,7 +32,7 @@ public class AdminRoleModule implements Module{
     private int maxGameClusterCount;
 
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate update) throws Exception {
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
             User user = _user(session.systemId());
             Account acc = new UserAccount();
