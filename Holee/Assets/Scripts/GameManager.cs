@@ -55,12 +55,19 @@ namespace Holee
                 CommandId = Command.Ack
             };
             ack.OnJoin(_header);
-            _header.Sequence = 2;
-            _header.CommandId = Command.Join;
             NetworkingManager.OnReceived += OnMessage;
-            _outboundBuffer.WriteHeader(_header);
+            _outboundBuffer.WriteHeader(new MessageHeader
+            {
+                ChannelId = _channel.ChannelId,
+                SessionId = _channel.SessionId,
+                ObjectId = 0,
+                Sequence = 2,
+                CommandId = Command.Join,
+                Encrypted = true
+            });
             _outboundBuffer.WriteInt(_channel.SessionId);
             _outboundBuffer.WriteUTF8(_gameClusterManager.Presence.Token);
+            _outboundBuffer.WriteUTF8(_gameClusterManager.Ticket);
             var outbound = _outboundBuffer.Drain();
             NetworkingManager.Send(outbound,outbound.Length);
         }

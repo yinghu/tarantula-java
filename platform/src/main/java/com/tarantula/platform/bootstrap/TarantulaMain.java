@@ -104,7 +104,6 @@ public class TarantulaMain {
 			if(udpEndpointEnabled){
 				EndPoint ud = (EndPoint)Class.forName(override(overriding,"tarantula.endpoint.udp",_user,_config)).getConstructor().newInstance();
 				ud.address(override(overriding,"tarantula.endpoint.udp.address",_user,_config));
-				ud.backlog(Integer.parseInt(override(overriding,"tarantula.endpoint.udp.backlog",_user,_config)));
 				ud.inboundThreadPoolSetting(override(overriding,"tarantula.endpoint.udp.pool.in.setting",_user,_config));
 				ud.port(Integer.parseInt(override(overriding,"tarantula.endpoint.udp.port",_user,_config)));
 				btx.endpointService().addEndPoint(ud);

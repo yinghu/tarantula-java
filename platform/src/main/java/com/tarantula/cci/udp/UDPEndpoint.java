@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener {
 
+    private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private ServiceContext serviceContext;
@@ -38,14 +39,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+        Configuration cfg = serviceContext.configuration(CONFIG);
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
         this.key = serviceContext.deploymentServiceProvider().serverKey();
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
         connection.secured(true);
-        connection.host("10.0.0.192");
-        connection.port(11933);
+        connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
         logger.warn("UDP Endpoint running as a daemon!");
     }
@@ -78,6 +79,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void port(int port) {
         this.udpEndpointServiceProvider.port(port);
+        this.connection.port(port);
     }
 
     @Override
@@ -101,10 +103,24 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        int sessionId = messageBuffer.readInt();
-        String token = messageBuffer.readUTF8();
-        OnSession session = tokenValidator.tokenValidator().validateToken(token);
-        return sessionId==messageHeader.sessionId;
+        try{
+            if(!messageHeader.encrypted) return false;
+            Cipher cipher = CipherUtil.decrypt(key);
+            byte[] plain = cipher.doFinal(messageBuffer.readPayload());
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(plain);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            int sessionId = messageBuffer.readInt();
+            String token = messageBuffer.readUTF8();
+            String ticket = messageBuffer.readUTF8();
+            OnSession session = tokenValidator.tokenValidator().validateToken(token);
+            boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
+            return sessionId==messageHeader.sessionId && suc;
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     @Override

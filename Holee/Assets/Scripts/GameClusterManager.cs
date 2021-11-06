@@ -40,6 +40,8 @@ namespace Holee
        
         public string Tag { get; private set; }
         
+        public string Ticket { get; private set; }
+        
         public Channel Channel { get; private set; }
 
         public GameClusterManager()
@@ -114,6 +116,7 @@ namespace Holee
                     }
                 }
 
+                Ticket = (string)jo.SelectToken("ticket");
                 var chan = jo.SelectToken("pushChannel");
                 var conn = (JObject)chan.SelectToken("connection");
                 Channel = new Channel

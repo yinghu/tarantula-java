@@ -14,7 +14,7 @@ public class Stub extends PlayerGameObject {
     public boolean joined;
     public boolean offline;
     public String roomId;
-
+    public String ticket;
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
@@ -49,6 +49,7 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);
         jo.addProperty("offline",offline);
+        jo.addProperty("ticket",ticket);
         return jo;
     }
     @Override

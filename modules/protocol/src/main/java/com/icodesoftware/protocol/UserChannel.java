@@ -124,9 +124,11 @@ public class UserChannel {
     private void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
         messageHeader.ack = true;
+        messageHeader.encrypted = false;
         messageHeader.commandId = Messenger.ON_JOIN;
         messageHeader.sequence = sequence.incrementAndGet();
         messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{

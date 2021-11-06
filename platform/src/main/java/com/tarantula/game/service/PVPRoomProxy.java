@@ -43,6 +43,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
             //return (stub.toJson().toString()).getBytes();
         });
         stub.tag = application.tag();
+        stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         this.dataStore.update(stub);
         return stub;
     }
