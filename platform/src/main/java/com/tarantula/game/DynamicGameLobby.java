@@ -2,7 +2,6 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
@@ -24,14 +23,13 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-    private ConcurrentHashMap<String,TimerListener> timerListenerIndex;
+
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
         stubIndex = new ConcurrentHashMap<>();
-        timerListenerIndex = new ConcurrentHashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -79,19 +77,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         }
         stub.zone.list(session,stub);
     }
-    public void onTimer(){
-        timerListenerIndex.forEach((k,v)->{
-            v.onTimer();
-        });
-    }
-    public String registerTimerListener(TimerListener timerListener){
-        String regKey = UUID.randomUUID().toString();
-        this.timerListenerIndex.put(regKey,timerListener);
-        return regKey;
-    }
-    public void releaseTimerListener(String registerKey){
-        this.timerListenerIndex.remove(registerKey);
-    }
+
 
     @Override
     public Map<String,Object> toMap(){

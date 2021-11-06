@@ -46,10 +46,7 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
         }
         return false;
     }
-    @Override
-    public void onTimer(){
-        this.gameLobby.onTimer();
-    }
+
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;

@@ -32,11 +32,6 @@ public interface Descriptor extends Recoverable {
     String moduleName();
     void moduleName(String moduleName);
 
-    //module update timer milliseconds. 50ms per server frame
-    long timerOnModule();
-    void timerOnModule(long timerOnModule);
-
-
     boolean logEnabled();
     void logEnabled(boolean logEnabled);
 

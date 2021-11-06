@@ -1069,10 +1069,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.module = moduleClassLoader.newModule(descriptor.moduleName());
         }
         @Override
-        public void onTimer(){
-            module.onTimer();
-        }
-        @Override
         public void onConnection(Connection connection){
             module.onConnection(connection);
         }

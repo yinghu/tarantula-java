@@ -26,7 +26,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected int deployPriority;
     protected int deployCode = DeployCode.SYSTEM_APPLICATION;
 
-    protected long timerOnModule;
     protected boolean logEnabled =true;
 
     protected  String applicationClassName;
@@ -73,12 +72,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     }
     public String moduleName(){return this.moduleName;}
     public void moduleName(String moduleName){ this.moduleName = moduleName;}
-    public long timerOnModule(){
-        return this.timerOnModule;
-    }
-    public void timerOnModule(long timerOnModule){
-        this.timerOnModule = timerOnModule;
-    }
+
     public boolean logEnabled(){
         return this.logEnabled;
     }
@@ -177,7 +171,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("moduleArtifact",this.moduleArtifact);
         _props.put("moduleVersion",this.moduleVersion);
         _props.put("moduleName",this.moduleName);
-        _props.put("timerOnModule",this.timerOnModule);
         _props.put("logEnabled",this.logEnabled);
         _props.put("applicationClassName",this.applicationClassName);
         _props.put("resetEnabled",this.resetEnabled);
@@ -205,7 +198,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.moduleId = properties.get("moduleId")!=null?(String)properties.get("moduleId"):typeId;//
         this.codebase =properties.get("codebase")!=null?(String)properties.get("codebase"):null;
         this.moduleName = properties.get("moduleName")!=null?(String)properties.get("moduleName"):null;
-        this.timerOnModule =properties.get("timerOnModule")!=null?((Number)properties.get("timerOnModule")).longValue():50;
         this.logEnabled = properties.get("logEnabled")!=null?(Boolean)properties.get("logEnabled"):true;
         this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
         this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;

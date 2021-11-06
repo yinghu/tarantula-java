@@ -14,15 +14,9 @@ public interface GameLobby extends Configurable, Initializer, Serviceable,GameRo
     void leave(Session session);
     void update(Session session, byte[] payload);
     void list(Session session);
-    void onTimer();
-    String registerTimerListener(TimerListener timerListener);
-    void releaseTimerListener(String registerKey);
 
     boolean configureGameZone(byte[] payload);
     boolean configureArena(byte[] payload);
     void reload();
 
-    interface TimerListener{
-        void onTimer();
-    }
 }

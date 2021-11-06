@@ -6,15 +6,11 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
 
-import java.util.concurrent.ScheduledFuture;
-
-public class SingletonModuleApplication extends TarantulaApplicationHeader implements SchedulingTask {
-
-    private long SERVER_PUSH_INTERVAL;
+public class SingletonModuleApplication extends TarantulaApplicationHeader{
 
     private Module module;
     private DeploymentServiceProvider serviceProvider;
-    private ScheduledFuture scheduledFuture;
+
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         this.module.onRequest(session,payload);
@@ -25,37 +21,10 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.module = this.serviceProvider.module(this.descriptor);
-        SERVER_PUSH_INTERVAL = descriptor.timerOnModule();
-        if(SERVER_PUSH_INTERVAL>0){
-            this.scheduledFuture = this.context.schedule(this);
-        }
         this.serviceProvider.registerOnConnectionStateListener(this);
         module.setup(context);
     }
-    @Override
-    public boolean oneTime() {
-        return false;
-    }
 
-    @Override
-    public long initialDelay() {
-        return SERVER_PUSH_INTERVAL;
-    }
-
-    @Override
-    public long delay() {
-        return SERVER_PUSH_INTERVAL;
-    }
-
-    @Override
-    public void run() {
-        try{
-            this.module.onTimer();
-        }catch (Exception ex){
-            //ignore it
-            this.context.log("error",ex, OnLog.ERROR);
-        }
-    }
     public boolean onEvent(Event event){
         try{
             if(event instanceof FastPlayEvent){
@@ -78,9 +47,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader imple
     @Override
     public void clear(){
         this.module.clear();
-        if(scheduledFuture!=null){
-            scheduledFuture.cancel(true);
-        }
     }
     @Override
     public String typeId(){

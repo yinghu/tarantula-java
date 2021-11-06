@@ -59,7 +59,6 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.applicationClassName(this.applicationClassName);
         _copy.moduleName(this.moduleName);
         _copy.accessRank(this.accessRank);
-        _copy.timerOnModule(this.timerOnModule);
         _copy.tournamentEnabled(this.tournamentEnabled);
         return _copy;
     }
