@@ -42,6 +42,8 @@ namespace Holee
         
         public string Ticket { get; private set; }
         
+        public int Seat { get; private set; }
+        
         public Channel Channel { get; private set; }
 
         public GameClusterManager()
@@ -109,11 +111,9 @@ namespace Holee
                 foreach (var je in list)
                 {
                     var sid = (string)je.SelectToken("systemId");
-                    if (sid.Equals(Presence.SystemId))
-                    {
-                        var seat = (int)je.SelectToken("seat");
-                        Debug.Log("seat no->"+seat);
-                    }
+                    if (!sid.Equals(Presence.SystemId)) continue;
+                    Seat = (int)je.SelectToken("seat");
+                    break;
                 }
 
                 Ticket = (string)jo.SelectToken("ticket");

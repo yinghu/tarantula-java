@@ -1,9 +1,6 @@
 package com.tarantula.cci.udp;
 
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.Messenger;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UserChannel;
+import com.icodesoftware.protocol.*;
 
 public class PushUserChannel extends UserChannel {
 
@@ -18,7 +15,19 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        super.onJoin(messageHeader, messageBuffer);
+        messageBuffer.reset();
+        messageHeader.ack = true;
+        messageHeader.encrypted = false;
+        messageHeader.commandId = Messenger.ON_JOIN;
+        messageHeader.sequence = sequence.incrementAndGet();
+        messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeInt(messageHeader.sessionId);
+        messageBuffer.flip();
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
+        messenger.send(pendingAckMessage.data,userSession.source);
+        pendingAckMessage.pendingAck=1;
+        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
 
     @Override

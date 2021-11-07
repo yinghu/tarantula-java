@@ -86,7 +86,7 @@ namespace Holee
         
         public async void OnLeave()
         {
-            if (_channel.SessionId == 1)
+            if (_gameClusterManager.Seat == 1)
             {
                 playerA.OffPlay();
             }
@@ -104,7 +104,7 @@ namespace Holee
             Debug.Log("CHANNEL ID->"+_channel.ChannelId);
             Debug.Log("SESSION ID->"+_channel.SessionId);
             OnPlay();
-            if (_channel.SessionId == 1)
+            if (_gameClusterManager.Seat == 1)
             {
                 OnPlayA();
             }

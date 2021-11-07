@@ -129,8 +129,9 @@ public class UserChannel {
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        byte[] message = messageBuffer.toArray();
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.data,session.source);
+            messenger.send(message,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
