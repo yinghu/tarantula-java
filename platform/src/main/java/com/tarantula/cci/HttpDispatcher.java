@@ -26,7 +26,7 @@ abstract public class HttpDispatcher implements HttpHandler {
         try{
             requestHandler.onRequest(exchange);
         }catch (Exception ex){
-            exchange.onError(ex,ex.getMessage());
+            exchange.onError(ex,"expected error");
         }
     }
 }

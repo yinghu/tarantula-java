@@ -28,6 +28,10 @@ public class UDPChannel extends RecoverableObject implements Channel {
         this.serverKey = serverKey;
         messageBuffer = new MessageBuffer();
     }
+    public UDPChannel(int channelId,int sessionId){
+        this.channelId = channelId;
+        this.sessionId = sessionId;
+    }
     public void register(int sessionId, UDPEndpointServiceProvider.RequestListener requestListener){
         this.sessionId = sessionId;
         this.requestListener = requestListener;

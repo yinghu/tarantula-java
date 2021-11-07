@@ -11,6 +11,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.GameUpdateEvent;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServerPushEvent;
+import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -42,11 +43,11 @@ public class GameServerEventHandler implements RequestHandler {
 
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-        String zoneId = exchange.header(Session.TARANTULA_ZONE_ID);
-        String roomId = exchange.header(Session.TARANTULA_ROOM_ID);
-        String type = exchange.header(Session.TARANTULA_NAME);//update action
-        String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
+        //String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+        //String zoneId = exchange.header(Session.TARANTULA_ZONE_ID);
+        //String roomId = exchange.header(Session.TARANTULA_ROOM_ID);
+        //String type = exchange.header(Session.TARANTULA_NAME);//update action
+        //String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
         byte[] _payload = exchange.payload();
         String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
         if(typeId==null){
@@ -56,38 +57,26 @@ public class GameServerEventHandler implements RequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            //Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-            //resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
-
-            //resp.addProperty("sequence",connection.sequence());
-            //ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-            //pushEvent.typeId(typeId);
-            //deployService.addServerPushEvent(pushEvent);
-            //JsonArray cids = new JsonArray();
-            //for(int i=1;i<=connection.maxConnections();i++){
-                //Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
-                //cids.add(conn.connectionId());
-            //}
-            //resp.add("connections",cids);
+            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+            this.deploymentServiceProvider.register(connection);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
-        else if(action.equals("onConnection")){
-            Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
-            exchange.onEvent(new ResponsiveEvent("", "", builder.create().toJson(connection).getBytes(), true));
-        }
-        else if(action.equals("onUpdate")){
-            exchange.onEvent(new ResponsiveEvent("","", "{}".getBytes(),true));
-            //publish event to zone subscription/trackId
-            eventService.publish(new GameUpdateEvent(zoneId,roomId,type,_payload));
+        else if(action.equals("onChannel")){
+            Channel channel = this.builder.create().fromJson(new String(_payload),Channel.class);
+            //Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            exchange.onEvent(new ResponsiveEvent("", "",_payload, true));
         }
         else if(action.equals("onStop")){//stop the game server
-            deployService.removeServerPushEvent(serverId);
-            _hex.forEach((k,v)->{//removed session if any
-                if(v.id().equals(serverId)){
-                    _hex.remove(k);
-                }
-            });
-            exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            this.deploymentServiceProvider.release(connection);
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
     }
 
@@ -97,6 +86,7 @@ public class GameServerEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
+        this.builder.registerTypeAdapter(Channel.class,new ChannelDeserializer());
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Game server event handler started");
@@ -127,14 +117,5 @@ public class GameServerEventHandler implements RequestHandler {
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-    private Connection toClientConnection(Connection connection,int connectionId){
-        Connection conn = new ClientConnection();
-        conn.type(connection.type());
-        conn.serverId(connection.serverId());
-        conn.host(connection.host());
-        conn.port(connection.port());
-        conn.secured(connection.secured());
-        return conn;
     }
 }

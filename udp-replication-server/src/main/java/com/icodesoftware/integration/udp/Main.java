@@ -8,10 +8,10 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.logging.TarantulaLogManager;
 
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.util.HttpCaller;
 
 import java.io.*;
+import java.util.UUID;
 
 public class Main {
     static {//set log manager
@@ -42,7 +42,7 @@ public class Main {
                 //throw new RuntimeException("No endpoint IP found from /etc/tarantula/ip.txt");
             }
             UDPEndpointServiceProvider udpReceiver = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
-            ReplicationEndpoint replicationEndpoint = new ReplicationEndpoint(udpReceiver,config.get("daemon").getAsBoolean());
+            ReplicationEndpoint replicationEndpoint = new ReplicationEndpoint(udpReceiver, UUID.randomUUID().toString(),config.get("daemon").getAsBoolean());
             replicationEndpoint.address(config.get("binding").getAsString());
             replicationEndpoint.port(config.get("port").getAsInt());
             replicationEndpoint.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
@@ -52,15 +52,30 @@ public class Main {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,
                     register.get("accessKey").getAsString(),
-                    Session.TARANTULA_SERVER_ID,
-                    "SERVERid",
                     Session.TARANTULA_ACTION,
                     "onStart"
             };
-            String resp = httpCaller.get(register.get("path").getAsString(),headers);
+            JsonObject conn = config.getAsJsonObject("connection");
+            conn.addProperty("serverId",replicationEndpoint.serverId);
+            String resp = httpCaller.post(register.get("path").getAsString(),conn.toString().getBytes(),headers);
             logger.warn(resp);
+            for(int i=0;i<100;i++){
+                JsonObject channel = new JsonObject();
+                channel.addProperty("channelId",1);
+                channel.addProperty("sessionId",i);
+                headers[3]="onChannel";
+                resp = httpCaller.post(register.get("path").getAsString(),channel.toString().getBytes(),headers);
+                logger.warn(resp);
+            }
             Runtime.getRuntime().addShutdownHook(new Thread(()->{
-                try{replicationEndpoint.shutdown();}catch (Exception ex){}
+                try{
+                    headers[3]="onStop";
+                    String _resp = httpCaller.post(register.get("path").getAsString(),conn.toString().getBytes(),headers);
+                    logger.warn(_resp);
+                    replicationEndpoint.shutdown();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 TarantulaLogManager.shutdown();//shutdown log manager
             }));
             replicationEndpoint.start();

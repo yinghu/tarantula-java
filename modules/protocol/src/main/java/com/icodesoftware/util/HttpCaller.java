@@ -54,6 +54,7 @@ public class HttpCaller {
     }
     public String post(String path,byte[] payload, String[] headers) throws Exception{
         HttpRequest request = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(host+"/"+path))
                 .timeout(Duration.ofSeconds(TIME_OUT))
                 .header(ACCEPT, ACCEPT_JSON)

@@ -2,14 +2,18 @@ package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.util.HttpCaller;
 
 public class ReplicationEndpoint implements EndPoint {
 
     private final UDPEndpointServiceProvider udpEndpointServiceProvider;
-    private boolean daemon;
+    private final boolean daemon;
+    public final String serverId;
+    private HttpCaller httpCaller;
 
-    public ReplicationEndpoint(UDPEndpointServiceProvider udpEndpointServiceProvider,boolean daemon){
+    public ReplicationEndpoint(UDPEndpointServiceProvider udpEndpointServiceProvider,String serverId,boolean daemon){
         this.udpEndpointServiceProvider = udpEndpointServiceProvider;
+        this.serverId = serverId;
         this.udpEndpointServiceProvider.daemon(daemon);
         this.daemon = daemon;
     }

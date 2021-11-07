@@ -730,8 +730,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             updateView((OnView)configurable);
             return;
         }
-        else if(configurable instanceof OnLobby){
+        if(configurable instanceof OnLobby){
             register((OnLobby)configurable);
+            return;
+        }
+        if(configurable instanceof Connection){
+            //log.warn(configurable.toJson()+" registered");
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -865,11 +869,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(key!=null){
             return key;
         }
-        key = serverKey();//new byte[KEY_SIZE];
-        //secureRandom.nextBytes(key);
-        //connection.server().connectionId(integrationCluster.sequence());
-        //connection.connectionId(connection.server().connectionId());
-        //connection.server().sequence(secureRandom.nextInt());
+        key = serverKey();
         this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
         return key;
     }
@@ -958,6 +958,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends Configurable> void release(T configurable){
+        //log.warn(configurable.toJson().toString()+ " released");
         Configurable removed = this.vMap.remove(configurable.distributionKey());
         removed.released();
     }
