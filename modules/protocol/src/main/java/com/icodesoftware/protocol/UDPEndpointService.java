@@ -56,7 +56,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         log.warn("Inbound message handler number ["+messageHandlerSize+"]");
         log.warn("Ping handler number ["+1+"]");
         log.warn("Outbound message handler number ["+1+"]");
-        log.warn("Message receiver handler number ["+1+"]");
+        //log.warn("Message receiver handler number ["+1+"]");
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
@@ -127,7 +127,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     @Override
     public void run() {
-        log.warn("UDP endpoint service is ready on ["+host+":"+port+"]");
+        log.warn("UDP endpoint service is ready on ["+host+":"+port+"] on ["+(daemon?"daemon thread":"main thread")+"]");
         while (true){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);

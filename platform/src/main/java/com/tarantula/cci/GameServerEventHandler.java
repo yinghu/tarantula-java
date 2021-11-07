@@ -52,27 +52,23 @@ public class GameServerEventHandler implements RequestHandler {
         if(typeId==null){
             throw new RuntimeException("Illegal access");
         }
-        if(action.equals("onAck")){
-            exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
-            deployService.ackServerPushEvent(serverId);
-        }
-        else if(action.equals("onStart")){//start game server
+        if(action.equals("onStart")){//start game server
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+            //Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            //resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
 
             //resp.addProperty("sequence",connection.sequence());
-            ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
-            pushEvent.typeId(typeId);
-            deployService.addServerPushEvent(pushEvent);
-            JsonArray cids = new JsonArray();
+            //ServerPushEvent pushEvent = new ServerPushEvent(this.serverTopic,serverId,serverId,this.builder.create().toJson(connection).getBytes());
+            //pushEvent.typeId(typeId);
+            //deployService.addServerPushEvent(pushEvent);
+            //JsonArray cids = new JsonArray();
             //for(int i=1;i<=connection.maxConnections();i++){
                 //Connection conn = this.deploymentServiceProvider.distributionCallback().addConnection(typeId,toClientConnection(connection,connection.connectionId()+i));
                 //cids.add(conn.connectionId());
             //}
-            resp.add("connections",cids);
+            //resp.add("connections",cids);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
         else if(action.equals("onConnection")){
