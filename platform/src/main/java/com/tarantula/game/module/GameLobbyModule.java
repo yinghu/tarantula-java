@@ -10,7 +10,7 @@ import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class GameLobbyModule implements Module, Connection.OnConnectionListener {
+public class GameLobbyModule implements Module {
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
@@ -63,16 +63,6 @@ public class GameLobbyModule implements Module, Connection.OnConnectionListener 
     public void clear() {
         try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
-    }
-    //connection listener
-    @Override
-    public String lobbyTag() {
-        return this.context.descriptor().tag();
-    }
-
-    @Override
-    public void onConnection(Session session) {
-
     }
 
     private String toMessage(String msg, boolean successful){

@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 import com.icodesoftware.service.BucketListener;
 
-public interface TarantulaApplication extends Initializer, EventListener, BucketListener, Connection.OnStateListener{
+public interface TarantulaApplication extends Initializer, EventListener, BucketListener{
 
 
     default void initialize(Session session) throws Exception{}

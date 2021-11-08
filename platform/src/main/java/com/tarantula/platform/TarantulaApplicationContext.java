@@ -6,7 +6,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 
@@ -16,7 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 
 
 
-public class TarantulaApplicationContext implements ApplicationContext, EventListener, Connection.OnStateListener{
+public class TarantulaApplicationContext implements ApplicationContext, EventListener{
 
     private Descriptor _descriptor;
 	private TarantulaApplication application;
@@ -36,13 +35,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         this._descriptor = descriptor;
         this.application = application;
     }
-    public String typeId(){
-        return this._descriptor.typeId();
-    }
-    public synchronized void onState(Connection onConnection){
-        this.application.onState(onConnection);
-    }
-
     public void onError(Event me,Exception ex){
         this.application.onError(me, ex);
     }

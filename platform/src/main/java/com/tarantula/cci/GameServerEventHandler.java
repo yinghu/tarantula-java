@@ -59,6 +59,7 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("successful",true);
             Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+            connection.configurationTypeId(typeId);
             this.deploymentServiceProvider.register(connection);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }

@@ -30,13 +30,4 @@ public interface Connection extends Configurable {
     String path();
     void path(String path);
 
-
-    interface OnStateListener{
-        String typeId();
-        void onState(Connection connection);
-    }
-    interface OnConnectionListener{
-        String lobbyTag();
-        void onConnection(Session session);
-    }
 }

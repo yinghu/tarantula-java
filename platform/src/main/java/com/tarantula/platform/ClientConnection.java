@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class ClientConnection extends ResponseHeader implements Connection, Portable {
 
+    protected String configurationTypeId;
     protected String type;
     protected String serverId;
 
@@ -22,6 +23,14 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     protected String host;
     protected int port;
     protected String path;
+
+    public String configurationTypeId() {
+        return this.configurationTypeId;
+    }
+
+    public void configurationTypeId(String configurationTypeId) {
+        this.configurationTypeId = configurationTypeId;
+    }
 
     @Override
     public String type() {
@@ -113,7 +122,8 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",type);
+        portableWriter.writeUTF("1",configurationTypeId);
+        portableWriter.writeUTF("2",type);
         portableWriter.writeUTF("3",serverId);
         portableWriter.writeUTF("4",host);
         portableWriter.writeInt("5",port);
@@ -122,7 +132,8 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.type = portableReader.readUTF("1");
+        this.configurationTypeId = portableReader.readUTF("1");
+        this.type = portableReader.readUTF("2");
         this.serverId = portableReader.readUTF("3");
         this.host = portableReader.readUTF("4");
         this.port = portableReader.readInt("5");

@@ -19,7 +19,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     private DataStore accountDs;
     private DataStore memberDs;
     private LiveGameContext liveGameContext;
-    private Connection connection;
+
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -31,7 +31,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
         memberDs = this.context.dataStore(Subscription.DataStore);
-        this.deploymentServiceProvider.registerOnConnectionStateListener(this);
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
@@ -45,23 +44,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             pc.access = user(session.systemId());
             pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
-            session.write(this.builder.create().toJson(pc).getBytes());
-        }
-        else if(session.action().equals("onConnection")){
-            PresenceContext pc = new PresenceContext(session.action());
-            pc.successful(false);
-            if(this.connection!=null){
-                Connection conn = this.deploymentServiceProvider.onConnection(this.typeId());
-                if(conn!=null){
-                    //conn.connectionId(connection.connectionId());
-                    pc.connection = conn;
-                    byte[] key = this.deploymentServiceProvider.serverKey(this.connection);
-                    pc.serverKey = Base64.getEncoder().encodeToString(key);
-                    pc.presence= new OnSessionTrack(session.systemId());
-                    pc.presence.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
-                    pc.successful(true);
-                }
-            }
             session.write(this.builder.create().toJson(pc).getBytes());
         }
         //public lobby access by page number
@@ -227,12 +209,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             liveGameContext.removeGameIndex(ps[0]);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
-    }
-    @Override
-    public void onState(Connection c) {
-        //this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"]",OnLog.WARN);
-        //this.context.log("Server->"+c.server().host(),OnLog.WARN);
-        this.connection = c;
     }
     @Override
     public boolean onEvent(Event event){

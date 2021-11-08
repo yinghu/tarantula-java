@@ -40,7 +40,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
 
-    private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
+    //private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
 
     //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
@@ -69,7 +69,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private AtomicBoolean onAccessIndex;
 
     //private ConcurrentLinkedDeque<PendingMessage> pendingData;
-    private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
     //private ExecutorService udpPool;
     //private int workSize;
@@ -672,11 +672,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             ///serverPushEvent.addConnection(occ);
             pushRegistry.put(occ.serverId(),serverPushEvent);//serverId cache
-            this.wListeners.forEach((l) -> {
-                if(l.typeId().equals(serverPushEvent.typeId())){
-                    l.onState(occ);
-                }
-            });
+
         }
     }
     public void releaseServerPushEvent(String serverId){
@@ -690,11 +686,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(occ.type().equals(Connection.UDP)){
                 try{pes.eventService().shutdown();}catch (Exception ex){}
             }
-            this.wListeners.forEach((l)->{
-                if(pes.typeId().equals(l.typeId())){
-                    l.onState(occ);
-                }
-            });
+
         }
     }
     public void syncServerPushEvent(String memberId){
@@ -710,18 +702,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
         serverPushEvent.ack();
     }
-    public void registerOnConnectionStateListener(Connection.OnStateListener listener){
-        pushRegistry.forEach((k,v)->{
-            Connection connection = this.builder.create().fromJson(new String(v.payload()), Connection.class);
-            if(v.typeId().equals(listener.typeId())){
-                listener.onState(connection);
-            }
-        });
-        wListeners.add(listener);
-    }
-    public void registerOnConnectionListener(Connection.OnConnectionListener listener){
-        this.cCallbacks.put(listener.lobbyTag(),listener);
-    }
+
     public <T extends Configuration> T configuration(String config){
         return (T)tarantulaContext.configuration(config);
     }
@@ -735,7 +716,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         if(configurable instanceof Connection){
-            //log.warn(configurable.toJson()+" registered");
+            log.warn(configurable.toJson()+" registered->"+configurable.configurationTypeId());
+            Connection connection = (Connection)configurable;
+            oListeners.forEach((s,v)->{
+                if(v.type.equals(connection.configurationTypeId())) v.listener.onCreated(connection);
+            });
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -746,42 +731,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.tarantulaContext.integrationCluster().deployService().sync(key);
         }
     }
-    //register/cache connection
-    public Connection addConnection(String typeId,Connection connection){
-        byte[] bytes = connection.toBinary();
-        this.integrationCluster.index(typeId,bytes);
-        //log.warn("add connection->["+ connection.connectionId()+"] on "+typeId);
-        return connection;
-    }
-    public Connection addConnection(String serverId,int connectionId){
-        ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
-        if(serverPushEvent==null){
-            return null;
-        }
-        Connection client = serverPushEvent.connection();
-        //client.channelId(connectionId);
-        this.integrationCluster.index(serverPushEvent.typeId(),client.toBinary());
-        //log.warn("add connection->["+ client.connectionId()+"] on "+serverPushEvent.typeId());
-        return client;
-    }
-    //use connection
-    public Connection onConnection(String typeId){
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
-        byte[] ret = icp.firstIndex(typeId);
-        if(ret==null){
-            return null;
-        }
-        Connection connection = new ClientConnection();
-        connection.fromBinary(ret);
-        return connection;
-    }
-    public void onRemoteConnection(Session session,Descriptor descriptor){
-        this.integrationCluster.deployService().getConnection(descriptor.typeId(),descriptor.tag(),session);
-    }
-    public void getConnection(String lobbyTag,Session session){
-        ((Event)session).eventService(this.integrationEventService);
-        //pendingData.offer(new PendingMessage(()-> cCallbacks.get(lobbyTag).onConnection(session)));
-    }
+   
+
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){

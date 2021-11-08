@@ -101,7 +101,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 }
             }
         });
-        this.deploymentServiceProvider.registerOnConnectionStateListener(this);
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }

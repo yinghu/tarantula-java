@@ -6,7 +6,6 @@ import com.icodesoftware.Connection;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.ClientConnection;
-import com.tarantula.platform.UniverseConnection;
 import com.tarantula.platform.service.ConnectionEventService;
 
 import java.io.IOException;

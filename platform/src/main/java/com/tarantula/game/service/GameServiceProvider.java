@@ -2,6 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
@@ -21,7 +22,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GameServiceProvider implements ServiceProvider{
+public class GameServiceProvider implements ServiceProvider,Configurable.Listener<Connection>{
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -41,7 +42,7 @@ public class GameServiceProvider implements ServiceProvider{
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
-
+    private String registerKey;
 
 
     public GameServiceProvider(GameCluster gameCluster){
@@ -93,7 +94,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomServiceProvider = new RoomServiceProvider(gameCluster);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
-        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
+        String typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerConfigurableListener(typeLobby,this);
+        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]["+typeLobby+"]");
     }
     @Override
     public void waitForData(){
@@ -118,6 +121,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
+        this.serviceContext.deploymentServiceProvider().unregisterConfigurableListener(registerKey);
         this.presenceServiceProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
@@ -126,6 +130,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
 
+    public Channel gameChannel(){
+        return new UDPChannel(1,1);
+    }
 
     //room service provider hool calls
     public RoomServiceProvider roomServiceProvider(){
@@ -208,5 +215,12 @@ public class GameServiceProvider implements ServiceProvider{
         }
         return null;
     }
+
+    public void onCreated(Connection created){
+        logger.warn("connection ->"+created.toJson().toString());
+    }
+    public void onLoaded(Connection loaded){}
+    public void onUpdated(Connection updated){}
+    public void onRemoved(Connection removed){}
 
 }

@@ -21,7 +21,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader{
         super.setup(context);
         this.serviceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.module = this.serviceProvider.module(this.descriptor);
-        this.serviceProvider.registerOnConnectionStateListener(this);
         module.setup(context);
     }
 
@@ -48,13 +47,6 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader{
     public void clear(){
         this.module.clear();
     }
-    @Override
-    public String typeId(){
-        return this.descriptor.typeId();
-    }
-    @Override
-    public void onState(Connection c) {
-        this.context.log(c.type()+"/"+c.serverId()+"/"+(c.disabled()?"closed":"open")+"/ on lobby ["+descriptor.tag()+"//"+descriptor.typeId()+"]",OnLog.WARN);
-        this.module.onConnection(c);
-    }
+
+
 }
