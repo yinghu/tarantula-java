@@ -31,14 +31,6 @@ public interface DeployService extends ServiceProvider {
     boolean launchGameCluster(String gameClusterKey);
     boolean shutdownGameCluster(String gameClusterKey);
 
-    //void addServerPushEvent(Event serverPushEvent);
-    //void ackServerPushEvent(String serverId);
-    //void removeServerPushEvent(String serverId);
-
-
-    //void syncServerPushEvent();
-    //boolean addServerPushEvent(String memberId,Event serverPushEvent);
-
     //distribute the module or view content in cluster
     boolean upload(String fileName,byte[] content);
 
