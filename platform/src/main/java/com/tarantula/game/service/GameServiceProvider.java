@@ -2,7 +2,6 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
@@ -20,7 +19,7 @@ import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
 
-public class GameServiceProvider implements ServiceProvider,Configurable.Listener<Connection>{
+public class GameServiceProvider implements ServiceProvider{
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -40,9 +39,6 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
-    private String registerKey;
-
-    private Connection connection;
 
 
     public GameServiceProvider(GameCluster gameCluster){
@@ -94,9 +90,7 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
         this.roomServiceProvider = new RoomServiceProvider(gameCluster);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
-        String typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
-        this.registerKey = this.serviceContext.deploymentServiceProvider().registerConfigurableListener(typeLobby,this);
-        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]["+typeLobby+"]");
+        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
     public void waitForData(){
@@ -121,19 +115,12 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
 
     @Override
     public void shutdown() throws Exception {
-        this.serviceContext.deploymentServiceProvider().unregisterConfigurableListener(registerKey);
         this.presenceServiceProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
         this.itemServiceProvider.shutdown();
         this.roomServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
-    }
-
-    public Channel gameChannel(){
-        byte[] serverKey = this.serviceContext.deploymentServiceProvider().serverKey(connection);
-        Channel gameChannel = this.serviceContext.deploymentServiceProvider().distributionCallback().getChannel(connection.serverId());
-        return new GameChannel(gameChannel.channelId(),gameChannel.sessionId(),connection,serverKey);
     }
 
     //room service provider hool calls
@@ -217,14 +204,4 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
         }
         return null;
     }
-
-    public void onCreated(Connection created){
-        this.connection = created;
-    }
-    public void onLoaded(Connection loaded){}
-    public void onUpdated(Connection updated){}
-    public void onRemoved(Connection removed){
-        logger.warn("close ->"+removed.toJson().toString());
-    }
-
 }

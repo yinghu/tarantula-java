@@ -8,12 +8,11 @@ import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
-import com.tarantula.platform.presence.PresenceServiceProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RoomServiceProvider  implements ConfigurationServiceProvider {
+public class RoomServiceProvider  implements ConfigurationServiceProvider,Configurable.Listener<Connection> {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -31,6 +30,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
 
     private String type;
+    private String registerKey;
 
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -56,7 +56,9 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
         this.type = (String) gameCluster.property(GameCluster.MODE);
-        this.logger = serviceContext.logger(PresenceServiceProvider.class);
+        String typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerConfigurableListener(typeLobby,this);
+        this.logger = serviceContext.logger(RoomServiceProvider.class);
     }
     @Override
     public void start() throws Exception {
@@ -65,7 +67,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     @Override
     public void shutdown() throws Exception {
-
+        this.serviceContext.deploymentServiceProvider().unregisterConfigurableListener(registerKey);
     }
 
     public GameRoom join(GameZone gameZone, Rating rating){
@@ -203,5 +205,15 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider {
 
     private boolean validateTicket(String ticket){
         return ticket.equals("joinTicket");
+    }
+
+    public void onCreated(Connection created){
+        logger.warn("open->"+created.toJson().toString());
+        //this.connection = created;
+    }
+    public void onLoaded(Connection loaded){}
+    public void onUpdated(Connection updated){}
+    public void onRemoved(Connection removed){
+        logger.warn("close ->"+removed.toJson().toString());
     }
 }
