@@ -868,10 +868,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnConnection onConnection(Connection connection){
             return (label,data)->{
                 //lookup push event via serverId
-                ServerPushEvent sc = null;//pushRegistry.get(connection.serverId());
-                if(sc!=null){
-                    sc.onMessage(data,label,connection);
-                }
             };
         }
 
