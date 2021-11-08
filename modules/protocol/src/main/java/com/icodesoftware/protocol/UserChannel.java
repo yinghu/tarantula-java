@@ -138,6 +138,7 @@ public class UserChannel {
     }
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
+        if(sessionListener!=null) sessionListener.onTimeout(channelId,messageHeader.sessionId);
     }
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,byte[] payload){
         userSessionIndex.forEach((sid,session)->{

@@ -11,6 +11,7 @@ import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RoomServiceProvider  implements ConfigurationServiceProvider,Configurable.Listener<Connection> {
 
@@ -28,6 +29,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
+    private ConcurrentLinkedDeque<Connection> pendingGameConnections;
 
     private String type;
     private String registerKey;
@@ -43,7 +45,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
     }
     @Override
     public void waitForData(){
-
+        //pull connection
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -52,6 +54,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
+        this.pendingGameConnections = new ConcurrentLinkedDeque<>();
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
@@ -209,11 +212,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
 
     public void onCreated(Connection created){
         logger.warn("open->"+created.toJson().toString());
-        //this.connection = created;
+        pendingGameConnections.offer(created);
     }
     public void onLoaded(Connection loaded){}
     public void onUpdated(Connection updated){}
     public void onRemoved(Connection removed){
         logger.warn("close ->"+removed.toJson().toString());
+        pendingGameConnections.remove(removed);
     }
 }

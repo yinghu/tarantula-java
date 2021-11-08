@@ -1,0 +1,68 @@
+package com.icodesoftware.util;
+
+
+import java.security.MessageDigest;
+import java.time.LocalDateTime;
+
+public class ValidationUtil {
+
+
+    private static String toHexString(byte[] hash){
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < hash.length; i++){
+            int v = hash[i] & 0xff;
+            if (v < 16) {
+                sb.append('0');
+            }
+            sb.append(Integer.toHexString(v));
+        }
+        return sb.toString().toUpperCase();
+    }
+
+    public static boolean validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
+        String[] tlist = ticket.split(" ");//validate
+        long end = Long.parseLong(tlist[1]);
+        messageDigest.reset();
+        messageDigest.update(systemId.getBytes());
+        messageDigest.update(Integer.toHexString(stub).getBytes());
+        messageDigest.update(Long.toHexString(end).getBytes());
+        if(tlist[2].equals(toHexString(messageDigest.digest()))){
+            LocalDateTime ending = TimeUtil.fromUTCMilliseconds(end);
+            return ending.isAfter(LocalDateTime.now());
+        }
+        else{
+            return false;
+        }
+    }
+
+    public  static Token validToken(MessageDigest messageDigest, String token) {
+        //System.out.println(token);
+        int sp = token.indexOf(" ");
+        String systemId = token.substring(0,sp);
+        String[] vm = token.substring(sp+1).split("-");
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
+        messageDigest.reset();
+        messageDigest.update(systemId.getBytes());//systemId
+        messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
+        messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
+        if(toHexString(messageDigest.digest()).equals(vm[3])){// hash
+            return new Token(true,systemId,Integer.parseInt(vm[1]));
+        }
+        else{
+            return new Token(false);//throw new RuntimeException("Wrong session token");
+        }
+    }
+    public static class Token{
+        public boolean valid;
+        public String systemId;
+        public int stub;
+        public Token(boolean valid){
+            this.valid = valid;
+        }
+        public Token(boolean valid,String systemId,int stub){
+            this.valid = valid;
+            this.systemId = systemId;
+            this.stub = stub;
+        }
+    }
+}

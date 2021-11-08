@@ -1,7 +1,6 @@
 package com.tarantula.cci.udp;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.Messenger;
