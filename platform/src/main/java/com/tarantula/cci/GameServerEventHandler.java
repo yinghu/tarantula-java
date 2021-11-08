@@ -26,15 +26,11 @@ public class GameServerEventHandler implements RequestHandler {
     private static TarantulaLogger log = JDKLogger.getLogger(GameServerEventHandler.class);
 
     //private String bucket;
-    private EventService eventService;
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private String serverTopic;
-    private final ConcurrentHashMap<String, OnExchange> _hex = new ConcurrentHashMap<>();
     private GsonBuilder builder;
 
-    private DeployService deployService;
     public String name(){
         return GAME_SERVER_PATH;
     }
@@ -43,11 +39,7 @@ public class GameServerEventHandler implements RequestHandler {
 
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        //String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
-        //String zoneId = exchange.header(Session.TARANTULA_ZONE_ID);
-        //String roomId = exchange.header(Session.TARANTULA_ROOM_ID);
-        //String type = exchange.header(Session.TARANTULA_NAME);//update action
-        //String connectionId = exchange.header(Session.TARANTULA_CONNECTION_ID);
+        String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
         byte[] _payload = exchange.payload();
         String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
         if(typeId==null){
@@ -65,7 +57,7 @@ public class GameServerEventHandler implements RequestHandler {
         }
         else if(action.equals("onChannel")){
             Channel channel = this.builder.create().fromJson(new String(_payload),Channel.class);
-            //Connection connection = this.deploymentServiceProvider.distributionCallback().addConnection(serverId,Integer.parseInt(connectionId));
+            this.deploymentServiceProvider.distributionCallback().addChannel(serverId,channel);
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
@@ -73,6 +65,7 @@ public class GameServerEventHandler implements RequestHandler {
         }
         else if(action.equals("onStop")){//stop the game server
             Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            connection.configurationTypeId(typeId);
             this.deploymentServiceProvider.release(connection);
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
@@ -88,8 +81,6 @@ public class GameServerEventHandler implements RequestHandler {
         this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
         this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
         this.builder.registerTypeAdapter(Channel.class,new ChannelDeserializer());
-        this.serverTopic = UUID.randomUUID().toString();
-        this.eventService.registerEventListener(this.serverTopic,this);
         log.info("Game server event handler started");
     }
 
@@ -99,24 +90,15 @@ public class GameServerEventHandler implements RequestHandler {
     }
 
     public void setup(ServiceContext tcx){
-        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
-        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
     }
-    public  boolean onEvent(Event event){
-        OnExchange hx = this._hex.get(event.sessionId());
-        if(hx!=null){
-           if(hx.onEvent(event)){ //remove on true marked as closed connect or session
-               _hex.remove(event.sessionId());
-           }
-        }
-        else{
-           log.warn(event+" unexpected removed on game server push");
-        }
-        return true;
-    }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
+    }
+
+    @Override
+    public boolean onEvent(Event event) {
+        return false;
     }
 }

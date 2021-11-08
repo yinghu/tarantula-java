@@ -2,7 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.tarantula.cci.udp.UDPChannel;
+import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.AchievementServiceProvider;
@@ -19,8 +19,6 @@ import com.tarantula.platform.store.StoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.util.Base64;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameServiceProvider implements ServiceProvider,Configurable.Listener<Connection>{
 
@@ -43,6 +41,8 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private String registerKey;
+
+    private Connection connection;
 
 
     public GameServiceProvider(GameCluster gameCluster){
@@ -131,7 +131,9 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
     }
 
     public Channel gameChannel(){
-        return new UDPChannel(1,1);
+        byte[] serverKey = this.serviceContext.deploymentServiceProvider().serverKey(connection);
+        Channel gameChannel = this.serviceContext.deploymentServiceProvider().distributionCallback().getChannel(connection.serverId());
+        return new GameChannel(gameChannel.channelId(),gameChannel.sessionId(),connection,serverKey);
     }
 
     //room service provider hool calls
@@ -217,10 +219,12 @@ public class GameServiceProvider implements ServiceProvider,Configurable.Listene
     }
 
     public void onCreated(Connection created){
-        logger.warn("connection ->"+created.toJson().toString());
+        this.connection = created;
     }
     public void onLoaded(Connection loaded){}
     public void onUpdated(Connection updated){}
-    public void onRemoved(Connection removed){}
+    public void onRemoved(Connection removed){
+        logger.warn("close ->"+removed.toJson().toString());
+    }
 
 }

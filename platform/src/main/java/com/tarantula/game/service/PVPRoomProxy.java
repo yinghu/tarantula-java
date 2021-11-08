@@ -29,7 +29,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined = true;
         stub.zone = gameZone;
         stub.rating = rating;
-        stub.channel = context.register(session.systemId(),(h,m)->{
+        stub.pushChannel = context.register(session.systemId(),(h,m)->{
             //this.context.log(m.readUTF8(), OnLog.WARN);
             Statistics statistics = gameServiceProvider.statistics(stub.systemId());
             statistics.entry("kills").update(1).update();
@@ -42,6 +42,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
             return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
             //return (stub.toJson().toString()).getBytes();
         });
+        stub.gameChannel = this.gameServiceProvider.gameChannel();
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         this.dataStore.update(stub);

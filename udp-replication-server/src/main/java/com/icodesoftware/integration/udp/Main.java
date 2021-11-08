@@ -52,6 +52,8 @@ public class Main {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY,
                     register.get("accessKey").getAsString(),
+                    Session.TARANTULA_SERVER_ID,
+                    replicationEndpoint.serverId,
                     Session.TARANTULA_ACTION,
                     "onStart"
             };
@@ -61,15 +63,15 @@ public class Main {
             logger.warn(resp);
             for(int i=0;i<100;i++){
                 JsonObject channel = new JsonObject();
-                channel.addProperty("channelId",1);
-                channel.addProperty("sessionId",i);
-                headers[3]="onChannel";
+                channel.addProperty("channelId",i+1);
+                channel.addProperty("sessionId",i+1);
+                headers[5]="onChannel";
                 resp = httpCaller.post(register.get("path").getAsString(),channel.toString().getBytes(),headers);
                 logger.warn(resp);
             }
             Runtime.getRuntime().addShutdownHook(new Thread(()->{
                 try{
-                    headers[3]="onStop";
+                    headers[5]="onStop";
                     String _resp = httpCaller.post(register.get("path").getAsString(),conn.toString().getBytes(),headers);
                     logger.warn(_resp);
                     replicationEndpoint.shutdown();

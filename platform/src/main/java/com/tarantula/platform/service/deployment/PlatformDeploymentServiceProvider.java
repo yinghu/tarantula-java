@@ -7,6 +7,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.*;
@@ -716,7 +717,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return;
         }
         if(configurable instanceof Connection){
-            log.warn(configurable.toJson()+" registered->"+configurable.configurationTypeId());
             Connection connection = (Connection)configurable;
             oListeners.forEach((s,v)->{
                 if(v.type.equals(connection.configurationTypeId())) v.listener.onCreated(connection);
@@ -731,7 +731,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             this.tarantulaContext.integrationCluster().deployService().sync(key);
         }
     }
-   
+
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
@@ -829,6 +829,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         secureRandom.nextBytes(key);
         return key;
     }
+    public void addChannel(String serverId,Channel channel){
+        this.integrationCluster.index(serverId,channel.toBinary());
+    }
+    public Channel getChannel(String serverId){
+        byte[] data = this.integrationCluster.firstIndex(serverId);
+        GameChannel gameChannel = new GameChannel();
+        gameChannel.fromBinary(data);
+        return gameChannel;
+    }
     public void stopAccessIndex(){
         onAccessIndex.set(false);
         aListeners.forEach((a)->a.onStop());
@@ -909,7 +918,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends Configurable> void release(T configurable){
-        //log.warn(configurable.toJson().toString()+ " released");
+        if(configurable instanceof Connection){
+            Connection connection = (Connection)configurable;
+            oListeners.forEach((s,v)->{
+                if(v.type.equals(connection.configurationTypeId())) v.listener.onRemoved(connection);
+            });
+            return;
+        }
         Configurable removed = this.vMap.remove(configurable.distributionKey());
         removed.released();
     }

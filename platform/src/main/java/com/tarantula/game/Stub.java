@@ -23,7 +23,8 @@ public class Stub extends PlayerGameObject {
     public DailyLoginTrack dailyLogin;
     public Statistics statistics;
 
-    public Channel channel;
+    public Channel pushChannel;
+    public Channel gameChannel;
 
     public Stub(){
     }
@@ -43,8 +44,11 @@ public class Stub extends PlayerGameObject {
         if(tournament!=null){
             jo.add("tournament",tournament.toJson());
         }
-        if(channel!=null){
-            jo.add("pushChannel",channel.toJson());
+        if(pushChannel!=null){
+            jo.add("pushChannel",pushChannel.toJson());
+        }
+        if(gameChannel!=null){
+            jo.add("gameChannel",gameChannel.toJson());
         }
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);

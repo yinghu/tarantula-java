@@ -12,13 +12,10 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Base64;
 
-public class UDPChannel extends RecoverableObject implements Channel {
+public class UDPChannel extends GameChannel {
 
-    private Connection connection;
     private UserChannel userChannel;
-    private int channelId;
-    private int sessionId;
-    private byte[] serverKey;
+
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private MessageBuffer messageBuffer;
     public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey){
@@ -27,10 +24,6 @@ public class UDPChannel extends RecoverableObject implements Channel {
         this.channelId = userChannel.channelId();
         this.serverKey = serverKey;
         messageBuffer = new MessageBuffer();
-    }
-    public UDPChannel(int channelId,int sessionId){
-        this.channelId = channelId;
-        this.sessionId = sessionId;
     }
     public void register(int sessionId, UDPEndpointServiceProvider.RequestListener requestListener){
         this.sessionId = sessionId;

@@ -99,6 +99,9 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void ackServerPushEvent(String serverId);
         void syncServerPushEvent(String memberId);
 
+        void addChannel(String serverId,Channel channel);
+        Channel getChannel(String serverId);
+
         void stopAccessIndex();
         void startAccessIndex();
 
