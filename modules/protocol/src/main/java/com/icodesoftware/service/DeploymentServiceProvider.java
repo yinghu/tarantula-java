@@ -94,10 +94,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void updateView(OnView onView);
         void updateModule(String contentUrl,String resourceName);
         void updateResource(String contentUrl,String resourceName);
-        void registerServerPushEvent(Event event);
-        void releaseServerPushEvent(String serverId);
-        void ackServerPushEvent(String serverId);
-        void syncServerPushEvent(String memberId);
+        //void registerServerPushEvent(Event event);
+        //void releaseServerPushEvent(String serverId);
+        //void ackServerPushEvent(String serverId);
+        //void syncServerPushEvent(String memberId);
 
         void addChannel(String serverId,Channel channel);
         Channel getChannel(String serverId);

@@ -11,14 +11,9 @@ import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.*;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +45,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
-    private ConcurrentHashMap<String,ServerPushEvent> pushRegistry = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,ServerPushEvent> pushRegistry = new ConcurrentHashMap<>();
 
     //module class loader mappings
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
@@ -493,7 +488,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void waitForData() {
         this.tarantulaContext.schedule(this);
-        this.tarantulaContext.tarantulaCluster().deployService().syncServerPushEvent();
         this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
             String tp = e.trackId();
             RecoverableListener listener = tMap.get(tp);
@@ -506,12 +500,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void memberRemoved(String memberId){
         //removed push event from the dead node
-        this.pushRegistry.forEach((k,v)->{
-            if(v.clientId().equals(memberId)){
-                log.warn("Member removed->"+k);
-                this.pushRegistry.remove(k);
-            }
-        });
+
     }
     public void memberAdded(String memberId){
         log.warn("Member added->"+memberId);
@@ -630,78 +619,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void unregisterConfigurableListener(String registryKey){
         oListeners.remove(registryKey);
-    }
-    public void registerServerPushEvent(Event event){
-        if(event instanceof ServerPushEvent){
-            ServerPushEvent serverPushEvent = (ServerPushEvent)event;
-            Connection occ = this.builder.create().fromJson(new String(serverPushEvent.payload()), Connection.class);
-            occ.disabled(false);
-            serverPushEvent.connection(occ);
-            //log.warn("add server push->"+occ.connectionId()+"//"+occ.sequence()+"//"+occ.messageId()+"//"+occ.messageIdOffset()+"//"+serverPushEvent.payload().length);
-            if(occ.type().equals(Connection.UDP)){
-                try{
-                    byte[] key = tarantulaContext.integrationCluster().get(occ.serverId().getBytes());
-                    IvParameterSpec iv = new IvParameterSpec(key);
-                    SecretKey secretKey = new SecretKeySpec(key,DeploymentServiceProvider.SERVER_KEY_SPEC);
-                    Cipher encrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
-                    encrypt.init(Cipher.ENCRYPT_MODE,secretKey,iv);
-                    Cipher decrypt = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
-                    decrypt.init(Cipher.DECRYPT_MODE,secretKey,iv);
-                    //UDPSessionService udpSessionService = new UDPSessionService(occ.server(),pendingData,encrypt,decrypt);
-                    //udpSessionService.start();
-                    //serverPushEvent.eventService(udpSessionService);
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else if(occ.type().equals(Connection.WEB_SOCKET)){
-                try{
-                    AccessIndex _serverPush = this.tarantulaContext.accessIndexService().get("serverPush");
-                    _serverPush.owner("serverPush");
-                    //WebSocketSessionService wss = new WebSocketSessionService(occ.server(),this.tarantulaContext.tokenValidatorProvider(),_serverPush);
-                    //wss.start();
-                    //serverPushEvent.eventService(wss);
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-            else if(occ.type().equals(Connection.WEB_HOOK)){
-                //serverPushEvent.eventService(new WebhookSessionService());
-            }
-            else{
-                serverPushEvent.eventService(this.integrationEventService);
-            }
-            ///serverPushEvent.addConnection(occ);
-            pushRegistry.put(occ.serverId(),serverPushEvent);//serverId cache
-
-        }
-    }
-    public void releaseServerPushEvent(String serverId){
-        //log.warn("remove server push->"+serverId);
-        ServerPushEvent pes = pushRegistry.remove(serverId);
-        if(pes!=null){
-            this.integrationCluster.remove(serverId.getBytes());//remove key
-            this.integrationCluster.removeIndex(pes.typeId());
-            Connection occ = this.builder.create().fromJson(new String(pes.payload()), Connection.class);
-            occ.disabled(true);
-            if(occ.type().equals(Connection.UDP)){
-                try{pes.eventService().shutdown();}catch (Exception ex){}
-            }
-
-        }
-    }
-    public void syncServerPushEvent(String memberId){
-        this.tarantulaContext.schedule(new OneTimeRunner(1,()->{
-            log.warn("push event distributing...");
-            pushRegistry.forEach((k,v)->{
-                tarantulaContext.tarantulaCluster().deployService().addServerPushEvent(memberId,v);
-            });
-        }));
-    }
-    public void ackServerPushEvent(String serverId){
-        //log.warn("ack->"+serverId);
-        ServerPushEvent serverPushEvent = pushRegistry.get(serverId);
-        serverPushEvent.ack();
     }
 
     public <T extends Configuration> T configuration(String config){
@@ -898,14 +815,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void run() {
-        pushRegistry.forEach((k,e)->{
-            if(!e.check()){
-                log.warn("Server push event ack timeout->["+k+"]");
-                this.tarantulaContext.schedule(new OneTimeRunner(1000,()->{
-                    this.tarantulaContext.integrationCluster().deployService().removeServerPushEvent(k);
-                }));
-            }
-        });
         metricsFreshRate -= TIMER;
         if(metricsFreshRate<=0){
             metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
@@ -959,7 +868,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnConnection onConnection(Connection connection){
             return (label,data)->{
                 //lookup push event via serverId
-                ServerPushEvent sc = pushRegistry.get(connection.serverId());
+                ServerPushEvent sc = null;//pushRegistry.get(connection.serverId());
                 if(sc!=null){
                     sc.onMessage(data,label,connection);
                 }

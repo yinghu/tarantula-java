@@ -375,83 +375,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-
-    public void addServerPushEvent(Event serverPushEvent){
-        NodeEngine nodeEngine = getNodeEngine();
-        serverPushEvent.clientId(nodeEngine.getLocalMember().getUuid());
-        AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        //int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                //expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
-        }
-        //return expected==0;
-    }
-    public boolean addServerPushEvent(String memberId,Event serverPushEvent){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddServerPushEventOperation operation = new AddServerPushEventOperation(serverPushEvent);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = 1;
-        for(Member m :mlist){
-            if(m.getUuid().equals(memberId)){
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-                final Future<Void> future = builder.invoke();
-                try {
-                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    expected--;
-                } catch (Exception e) {
-                    future.cancel(true);
-                    //goes to next node if failed
-                }
-            }
-        }
-        return expected==0;
-    }
-    public void removeServerPushEvent(String serverId){
-        NodeEngine nodeEngine = getNodeEngine();
-        RemoveServerPushEventOperation operation = new RemoveServerPushEventOperation(serverId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        //int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                //expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
-        }
-        //return expected==0;
-    }
-    public void ackServerPushEvent(String serverId){
-        NodeEngine nodeEngine = getNodeEngine();
-        AckServerPushEventOperation operation = new AckServerPushEventOperation(serverId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        //int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                //expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
-        }
-        //return expected==0;
-    }
-
     public boolean upload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
         DeployServiceUploadOperation operation = new DeployServiceUploadOperation(fileName,content);
@@ -470,17 +393,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public void syncServerPushEvent(){
-        NodeEngine nodeEngine = getNodeEngine();
-        ServerPushEventSyncOperation operation = new ServerPushEventSyncOperation(nodeEngine.getLocalMember().getUuid());
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean sync(String key){
         NodeEngine nodeEngine = getNodeEngine();
         DataSyncOperation operation = new DataSyncOperation(key);
