@@ -24,7 +24,6 @@ public class Stub extends PlayerGameObject {
     public Statistics statistics;
 
     public Channel pushChannel;
-    public Channel gameChannel;
 
     public Stub(){
     }
@@ -46,9 +45,6 @@ public class Stub extends PlayerGameObject {
         }
         if(pushChannel!=null){
             jo.add("pushChannel",pushChannel.toJson());
-        }
-        if(gameChannel!=null){
-            jo.add("gameChannel",gameChannel.toJson());
         }
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);

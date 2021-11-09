@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.GameChannelListener;
 
 import java.util.List;
 
@@ -15,8 +16,11 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER/PUSH SERVER APIs
-    byte[] serverKey(Connection connection);
+    //byte[] serverKey(Connection connection);
     byte[] serverKey();
+    void registerChannel(String typeId,Channel channel);
+    String registerGameChannelListener(GameChannelListener gameChannelListener);
+    void unregisterGameChannelListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs
 
     /**
@@ -95,8 +99,9 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void updateModule(String contentUrl,String resourceName);
         void updateResource(String contentUrl,String resourceName);
 
-        void addChannel(String serverId,Channel channel);
-        Channel getChannel(String serverId);
+        void addChannel(String typeId,Channel channel);
+        void addConnection(String typeId,Connection connection);
+        void removeConnection(String typeId,Connection connection);
 
         void stopAccessIndex();
         void startAccessIndex();

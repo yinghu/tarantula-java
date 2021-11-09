@@ -2,20 +2,20 @@ package com.tarantula.platform.util;
 
 import com.google.gson.*;
 
-import com.icodesoftware.Connection;
-import com.tarantula.platform.UniverseConnection;
+
+import com.tarantula.platform.room.ConnectionStub;
+
 import java.lang.reflect.Type;
 
-public class ConnectionDeserializer implements JsonDeserializer<Connection> {
+public class ConnectionDeserializer implements JsonDeserializer<ConnectionStub> {
 
     @Override
-    public Connection deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public ConnectionStub deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        Connection desc = toConnection(jo);
-        return desc;
+        return toConnection(jo);
     }
-    private Connection toConnection(JsonObject jo){
-        Connection desc = new UniverseConnection();
+    private ConnectionStub toConnection(JsonObject jo){
+        ConnectionStub desc = new ConnectionStub();
         if(jo.has("type")){
             desc.type(jo.get("type").getAsString());
         }

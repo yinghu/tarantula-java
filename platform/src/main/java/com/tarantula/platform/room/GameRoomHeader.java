@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Channel;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
 
@@ -18,10 +19,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected long duration;
     protected int round;
     protected Arena arena;
-
+    protected Channel channel;
     protected HashMap<String,GameEntry> joinIndex;
     protected GameEntry[] entries;
-
 
     @Override
     public String roomId(){
@@ -46,6 +46,13 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return arena;
     }
 
+    @Override
+    public Channel channel(){
+        return this.channel;
+    }
+    public void channel(Channel channel){
+        this.channel = channel;
+    }
     public void setup(Arena arena){
         this.arena = arena;
         this.capacity = arena.capacity;
@@ -71,6 +78,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
+        jsonObject.add("channel",channel.toJson());
         JsonArray plist = new JsonArray();
         for(GameEntry ge : entries){
             if(ge==null) continue;
@@ -82,14 +90,16 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",this.distributionKey());
-        portableWriter.writeInt("3",round);
+        portableWriter.writeInt("2",round);
+        portableWriter.writePortable("3",(Portable)channel);
         portableWriter.writeInt("4",capacity);
         portableWriter.writePortableArray("5",entries);
     }
 
     public void readPortable(PortableReader portableReader) throws IOException {
         this.distributionKey(portableReader.readUTF("1"));
-        this.round = portableReader.readInt("3");
+        this.round = portableReader.readInt("2");
+        this.channel = portableReader.readPortable("3");
         entries = new GameEntry[portableReader.readInt("4")];
         for(Portable p : portableReader.readPortableArray("5")){
             GameEntry gameEntry = (GameEntry)p;

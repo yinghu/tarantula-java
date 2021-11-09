@@ -6,7 +6,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 
-import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
@@ -114,11 +114,11 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
 
 
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PortableEventRegistry.OID;
     }
 
     public int getClassId() {
-        return PortableRegistry.CLIENT_CONNECTION_CID;
+        return PortableEventRegistry.CLIENT_CONNECTION_CID;
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
@@ -147,7 +147,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         jsonObject.addProperty("serverId",serverId);
         jsonObject.addProperty("secured",secured);
         jsonObject.addProperty("protocol",protocol);
-        jsonObject.addProperty("subProtocol",subProtocol());
+        jsonObject.addProperty("subProtocol",subProtocol);
         jsonObject.addProperty("host",host);
         jsonObject.addProperty("port",port);
         jsonObject.addProperty("path",path);

@@ -58,10 +58,7 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
         if(presenceContext.subscription!=null){
             pc.add("subscription",new SubscriptionSerializer().serialize(presenceContext.subscription,type,jsonSerializationContext));
         }
-        if(presenceContext.connection!=null){
-            pc.add("connection",new ConnectionSerializer().serialize(presenceContext.connection,type,jsonSerializationContext));
-            pc.addProperty("serverKey",presenceContext.serverKey);
-        }
+
         return pc;
     }
 }

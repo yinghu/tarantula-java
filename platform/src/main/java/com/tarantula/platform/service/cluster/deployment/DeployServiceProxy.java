@@ -6,9 +6,11 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.*;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.accessindex.AccessIndexSetOperation;
 import com.tarantula.platform.service.cluster.recover.LoadOperation;
 
 import java.util.Set;
@@ -411,5 +413,48 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
         return expected==0;
+    }
+
+    public void registerChannel(String typeId,Channel channel){
+        NodeEngine nodeEngine = getNodeEngine();
+        RegisterChannelOperation operation = new RegisterChannelOperation(typeId,channel);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(channel.channelId());
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+        }
+    }
+    public void registerConnection(Connection connection){
+        NodeEngine nodeEngine = getNodeEngine();
+        RegisterConnectionOperation operation = new RegisterConnectionOperation(connection.configurationTypeId(),connection);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+    }
+    public void releaseConnection(Connection connection){
+        NodeEngine nodeEngine = getNodeEngine();
+        ReleaseConnectionOperation operation = new ReleaseConnectionOperation(connection.configurationTypeId(),connection);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
     }
 }

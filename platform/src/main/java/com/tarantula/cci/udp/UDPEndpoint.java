@@ -8,7 +8,7 @@ import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
-import com.tarantula.platform.UniverseConnection;
+import com.tarantula.platform.ClientConnection;
 
 import javax.crypto.Cipher;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
-        connection = new UniverseConnection();
+        connection = new ClientConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
         channelId = 1;
         sessionId = 1;

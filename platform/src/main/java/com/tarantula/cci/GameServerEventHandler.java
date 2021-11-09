@@ -7,9 +7,10 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
+import com.tarantula.platform.room.ChannelStub;
+import com.tarantula.platform.room.ConnectionStub;
 import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
-import com.tarantula.platform.util.ConnectionSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.Base64;
@@ -22,6 +23,7 @@ public class GameServerEventHandler implements RequestHandler {
     //private String bucket;
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private DeployService deployService;
 
     private GsonBuilder builder;
 
@@ -43,22 +45,25 @@ public class GameServerEventHandler implements RequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
-            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(this.deploymentServiceProvider.serverKey(connection)));
+            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
+            byte[] serverKey = this.deploymentServiceProvider.serverKey();
+            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
             connection.configurationTypeId(typeId);
+            connection.serverKey = serverKey;
             this.deploymentServiceProvider.register(connection);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
         else if(action.equals("onChannel")){
-            Channel channel = this.builder.create().fromJson(new String(_payload),Channel.class);
-            this.deploymentServiceProvider.distributionCallback().addChannel(serverId,channel);
+            ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
+            channel.serverId = serverId;
+            deploymentServiceProvider.registerChannel(typeId,channel);
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            exchange.onEvent(new ResponsiveEvent("", "",_payload, true));
+            exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
         }
         else if(action.equals("onStop")){//stop the game server
-            Connection connection = builder.create().fromJson(new String(_payload),Connection.class);
+            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             connection.configurationTypeId(typeId);
             this.deploymentServiceProvider.release(connection);
             JsonObject resp = new JsonObject();
@@ -72,9 +77,8 @@ public class GameServerEventHandler implements RequestHandler {
     public void start() throws Exception {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
-        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
-        this.builder.registerTypeAdapter(Channel.class,new ChannelDeserializer());
+        this.builder.registerTypeAdapter(ConnectionStub.class,new ConnectionDeserializer());
+        this.builder.registerTypeAdapter(ChannelStub.class,new ChannelDeserializer());
         log.info("Game server event handler started");
     }
 
@@ -86,6 +90,7 @@ public class GameServerEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
+        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

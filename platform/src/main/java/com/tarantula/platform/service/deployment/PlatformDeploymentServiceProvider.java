@@ -5,11 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
+import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.*;
@@ -36,8 +37,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
 
-    //private CopyOnWriteArrayList<Connection.OnStateListener> wListeners = new CopyOnWriteArrayList<>();
-
     //callback on access index service
     private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
@@ -45,7 +44,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
-    //private ConcurrentHashMap<String,ServerPushEvent> pushRegistry = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
 
     //module class loader mappings
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
@@ -57,18 +56,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
     private EventService publisher;
     private TarantulaContext tarantulaContext;
-    private GsonBuilder builder;
 
 
     private String contentDir;
 
     private AtomicBoolean onAccessIndex;
 
-    //private ConcurrentLinkedDeque<PendingMessage> pendingData;
-    //private ConcurrentHashMap<String,Connection.OnConnectionListener> cCallbacks = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
-    //private ExecutorService udpPool;
-    //private int workSize;
+
     private long metricsFreshRate;
     private static long TIMER = 10000;
 
@@ -76,18 +71,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
-        //this.pendingData = new ConcurrentLinkedDeque<>();
         this.onAccessIndex = new AtomicBoolean(true);
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(Connection.class,new ConnectionDeserializer());
-        this.builder.registerTypeAdapter(Connection.class,new ConnectionSerializer());
     }
 
     @Override
     public void shutdown() throws Exception {
-        //if(tarantulaContext.udpEndpointEnabled){
-            //udpPool.shutdown();
-        //}
         log.info("Platform deployment service provider shut down");
     }
     @Override
@@ -635,9 +623,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            oListeners.forEach((s,v)->{
-                if(v.type.equals(connection.configurationTypeId())) v.listener.onCreated(connection);
-            });
+            this.integrationCluster.deployService().registerConnection(connection);
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -732,29 +718,40 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
     }
-    public byte[] serverKey(Connection connection){
-        byte[] key = this.tarantulaContext.integrationCluster().get(connection.serverId().getBytes());
-        if(key!=null){
-            return key;
-        }
-        key = serverKey();
-        this.tarantulaContext.integrationCluster().set(connection.serverId().getBytes(),key);
-        return key;
-    }
+
     public byte[] serverKey(){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
         return key;
     }
-    public void addChannel(String serverId,Channel channel){
-        this.integrationCluster.index(serverId,channel.toBinary());
+    public void registerChannel(String typeId,Channel channel){
+        ChannelStub channelStub = (ChannelStub)channel;
+        this.integrationCluster.deployService().registerChannel(typeId,channelStub);
     }
-    public Channel getChannel(String serverId){
-        byte[] data = this.integrationCluster.firstIndex(serverId);
-        GameChannel gameChannel = new GameChannel();
-        gameChannel.fromBinary(data);
-        return gameChannel;
+    public String registerGameChannelListener(GameChannelListener gameChannelListener){
+        String regKey = UUID.randomUUID().toString();
+        cListeners.put(regKey,gameChannelListener);
+        return regKey;
     }
+    public void unregisterGameChannelListener(String registerKey){
+        cListeners.remove(registerKey);
+    }
+    public void addChannel(String typeId,Channel channel){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(typeId)) v.onChannel(channel);
+        });
+    }
+    public void addConnection(String typeId,Connection connection){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(typeId)) v.onConnection(connection);
+        });
+    }
+    public void removeConnection(String typeId,Connection connection){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(typeId)) v.onDisConnection(connection);
+        });
+    }
+
     public void stopAccessIndex(){
         onAccessIndex.set(false);
         aListeners.forEach((a)->a.onStop());
@@ -829,9 +826,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            oListeners.forEach((s,v)->{
-                if(v.type.equals(connection.configurationTypeId())) v.listener.onRemoved(connection);
-            });
+            this.integrationCluster.deployService().releaseConnection(connection);
             return;
         }
         Configurable removed = this.vMap.remove(configurable.distributionKey());

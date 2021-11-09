@@ -2,7 +2,9 @@ package com.tarantula.platform.event;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
+import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
+import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.room.*;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessIndexTrack;
@@ -31,13 +33,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
-    public static final int CONNECTION_STATE_EVENT_CID = 21;
-
     public static final int GAME_UPDATE_EVENT_CID = 22;
 
     public static final int TOPIC_MAP_STORE_SYNC_EVENT_CID = 23;
-
-
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -77,7 +75,13 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int TVE_ROOM_CID = 122;
     public static final int TVT_ROOM_CID = 123;
 
+    public static final int CLIENT_CONNECTION_CID = 124;
 
+    public static final int GAME_CHANNEL_CID = 125;
+
+    public static final int CHANNEL_STUB_CID = 126;
+
+    public static final int CONNECTION_STUB_CID = 127;
 
     public Portable create(int cid) {
         Portable _ins;
@@ -120,9 +124,7 @@ public class PortableEventRegistry implements PortableFactory {
             case LEADER_BOARD_GLOBAL_EVENT_CID:
                 _ins = new LeaderBoardGlobalEvent();
                 break;
-            case CONNECTION_STATE_EVENT_CID:
-                _ins = new ConnectionStateEvent();
-                break;
+
             case GAME_CLUSTER_CID:
                 _ins = new GameCluster();
                 break;
@@ -167,6 +169,18 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case TVT_ROOM_CID:
                 _ins = new TVTGameRoom();
+                break;
+            case CLIENT_CONNECTION_CID:
+                _ins = new ClientConnection();
+                break;
+            case GAME_CHANNEL_CID:
+                _ins = new GameChannel();
+                break;
+            case CHANNEL_STUB_CID:
+                _ins = new ChannelStub();
+                break;
+            case CONNECTION_STUB_CID:
+                _ins = new ConnectionStub();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

@@ -1,8 +1,10 @@
 package com.tarantula.platform.room;
 
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -13,7 +15,7 @@ import com.tarantula.platform.service.cluster.OneTimeRunner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class RoomServiceProvider  implements ConfigurationServiceProvider,Configurable.Listener<Connection> {
+public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -29,10 +31,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
-    private ConcurrentLinkedDeque<Connection> pendingGameConnections;
+    private ConcurrentLinkedDeque<ChannelStub> pendingChannels;
+    private ConcurrentHashMap<String,ConnectionStub>  pendingConnections;
 
     private String type;
     private String registerKey;
+    private String typeLobby;
 
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -54,13 +58,14 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
-        this.pendingGameConnections = new ConcurrentLinkedDeque<>();
+        this.pendingConnections = new ConcurrentHashMap<>();
+        this.pendingChannels = new ConcurrentLinkedDeque<>();
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
         this.type = (String) gameCluster.property(GameCluster.MODE);
-        String typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
-        this.registerKey = this.serviceContext.deploymentServiceProvider().registerConfigurableListener(typeLobby,this);
+        typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
         this.logger = serviceContext.logger(RoomServiceProvider.class);
     }
     @Override
@@ -145,7 +150,13 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
             _gameRoom.load();
             return _gameRoom;
         });
-        return gameRoom!=null?gameRoom.join(systemId):null;
+        if(gameRoom==null) return null;
+        ChannelStub channelStub = this.pendingChannels.poll();
+        if(channelStub!=null){
+            ConnectionStub connection = pendingConnections.get(channelStub.serverId);
+            gameRoom.channel(connection.gameChannel());
+        }
+        return gameRoom.join(systemId);
     }
     public void onLeave(String roomId,String systemId){
         GameRoom gameRoom = gameRoomIndex.get(roomId);
@@ -210,14 +221,23 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider,Config
         return ticket.equals("joinTicket");
     }
 
-    public void onCreated(Connection created){
-        logger.warn("open->"+created.toJson().toString());
-        pendingGameConnections.offer(created);
+
+    @Override
+    public String typeId() {
+        return this.typeLobby;
     }
-    public void onLoaded(Connection loaded){}
-    public void onUpdated(Connection updated){}
-    public void onRemoved(Connection removed){
-        logger.warn("close ->"+removed.toJson().toString());
-        pendingGameConnections.remove(removed);
+
+    @Override
+    public void onConnection(Connection connection) {
+        pendingConnections.put(connection.serverId(),(ConnectionStub)connection);
+    }
+
+    @Override
+    public void onChannel(Channel channel) {
+        ChannelStub channelStub = (ChannelStub)channel;
+        pendingChannels.offer(channelStub);
+    }
+    public void onDisConnection(Connection connection){
+        pendingConnections.remove(connection.serverId());
     }
 }

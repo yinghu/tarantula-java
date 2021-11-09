@@ -29,11 +29,10 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int INDEX_SET_CID = 26;
 
-    public static final int ON_CONNECTION_CID = 27;
 
     public static final int ON_VIEW_OID = 28;
 
-    public static final int CLIENT_CONNECTION_CID = 29;
+    public static final int ROOM_REGISTRY_CID = 30;
 
 
     //START 100 working with EVENT PORTABLE on same OID
@@ -45,10 +44,10 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int APPLICATION_DESCRIPTOR_CID = PortableEventRegistry.APPLICATION_DESCRIPTOR_CID; //DEPLOY OBJECT
 
-    public static final int ROOM_REGISTRY_CID = 30;
-
-
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
+
+    public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
+
 
     public Recoverable create(int cid) {
         Recoverable _ins;
@@ -97,10 +96,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
-                break;
-
-            case ON_CONNECTION_CID:
-                _ins = new UniverseConnection();
                 break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();

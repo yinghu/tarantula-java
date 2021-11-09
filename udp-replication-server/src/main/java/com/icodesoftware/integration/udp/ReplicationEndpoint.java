@@ -99,7 +99,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
                 Session.TARANTULA_ACTION,
                 "onStop"
         };
-        httpCaller.post(registerPath,connection.toString().getBytes(),headers);
+        logger.warn(httpCaller.post(registerPath,connection.toString().getBytes(),headers));
         this.udpEndpointServiceProvider.shutdown();
     }
 

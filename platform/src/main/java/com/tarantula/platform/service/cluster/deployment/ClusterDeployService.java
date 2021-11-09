@@ -407,4 +407,14 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void sync(String key){
         this.deploymentServiceProvider.distributionCallback().syncKey(key);
     }
+
+    public void registerChannel(String typeId,Channel channel){
+        this.deploymentServiceProvider.distributionCallback().addChannel(typeId,channel);
+    }
+    public void registerConnection(String typeId,Connection connection){
+        this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
+    }
+    public void releaseConnection(String typeId,Connection connection){
+        this.deploymentServiceProvider.distributionCallback().removeConnection(typeId,connection);
+    }
 }

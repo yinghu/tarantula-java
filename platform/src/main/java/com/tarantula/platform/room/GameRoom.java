@@ -1,5 +1,6 @@
 package com.tarantula.platform.room;
 
+import com.icodesoftware.Channel;
 import com.icodesoftware.Configurable;
 import com.tarantula.game.Arena;
 
@@ -17,4 +18,6 @@ public interface GameRoom extends Configurable {
     GameRoom view();
     boolean leave(String systemId);
 
+    Channel channel();
+    void channel(Channel channel);
 }

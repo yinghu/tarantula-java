@@ -1,15 +1,20 @@
 package com.tarantula.cci.udp;
 
 import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.PortableEventRegistry;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-public class GameChannel extends RecoverableObject implements Channel {
+public class GameChannel extends RecoverableObject implements Channel, Portable {
 
     protected int channelId;
     protected int sessionId;
@@ -66,5 +71,29 @@ public class GameChannel extends RecoverableObject implements Channel {
         jsonObject.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
         jsonObject.add("connection",connection.toJson());
         return jsonObject;
+    }
+    @Override
+    public int getFactoryId() {
+        return PortableEventRegistry.OID;
+    }
+
+    @Override
+    public int getClassId() {
+        return PortableEventRegistry.GAME_CHANNEL_CID;
+    }
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+        portableWriter.writeInt("1",channelId);
+        portableWriter.writeInt("2",sessionId);
+        portableWriter.writeByteArray("3",serverKey);
+        portableWriter.writePortable("4",(Portable) connection);
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+        channelId = portableReader.readInt("1");
+        sessionId = portableReader.readInt("2");
+        serverKey = portableReader.readByteArray("3");
+        connection = portableReader.readPortable("4");
     }
 }
