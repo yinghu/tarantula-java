@@ -442,6 +442,21 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
+    public void ping(String typeId,String serverId){
+        NodeEngine nodeEngine = getNodeEngine();
+        PingConnectionOperation operation = new PingConnectionOperation(typeId,serverId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+            }
+        }
+    }
     public void releaseConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         ReleaseConnectionOperation operation = new ReleaseConnectionOperation(connection.configurationTypeId(),connection);

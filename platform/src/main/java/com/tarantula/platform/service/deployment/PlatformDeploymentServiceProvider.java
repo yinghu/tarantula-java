@@ -728,6 +728,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ChannelStub channelStub = (ChannelStub)channel;
         this.integrationCluster.deployService().registerChannel(typeId,channelStub);
     }
+    public void ping(String typeId,String serverId){
+        this.integrationCluster.deployService().ping(typeId,serverId);
+    }
     public String registerGameChannelListener(GameChannelListener gameChannelListener){
         String regKey = UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
@@ -751,7 +754,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(v.typeId().equals(typeId)) v.onDisConnection(connection);
         });
     }
-
+    public void pingConnection(String typeId,String serverId){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(typeId)) v.onPing(serverId);
+        });
+    }
     public void stopAccessIndex(){
         onAccessIndex.set(false);
         aListeners.forEach((a)->a.onStop());

@@ -417,4 +417,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void releaseConnection(String typeId,Connection connection){
         this.deploymentServiceProvider.distributionCallback().removeConnection(typeId,connection);
     }
+    public void pingConnection(String typeId,String serverId){
+        this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
+    }
 }

@@ -20,10 +20,8 @@ public class GameServerEventHandler implements RequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(GameServerEventHandler.class);
 
-    //private String bucket;
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private DeployService deployService;
 
     private GsonBuilder builder;
 
@@ -62,6 +60,13 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
         }
+        else if(action.equals("onPing")){
+            deploymentServiceProvider.ping(typeId,serverId);
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
+        }
         else if(action.equals("onStop")){//stop the game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             connection.configurationTypeId(typeId);
@@ -90,7 +95,6 @@ public class GameServerEventHandler implements RequestHandler {
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
-        this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

@@ -248,4 +248,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             connectionStub.close();
         }
     }
+    public void onPing(String serverId){
+        logger.warn("ping->"+serverId);
+    }
 }
