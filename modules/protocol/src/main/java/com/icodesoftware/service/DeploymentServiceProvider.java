@@ -16,7 +16,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER/PUSH SERVER APIs
-    //byte[] serverKey(Connection connection);
+
     byte[] serverKey();
     void registerChannel(String typeId,Channel channel);
     String registerGameChannelListener(GameChannelListener gameChannelListener);

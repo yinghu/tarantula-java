@@ -31,8 +31,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
-    private ConcurrentLinkedDeque<ChannelStub> pendingChannels;
-    private ConcurrentHashMap<String,ConnectionStub>  pendingConnections;
+    private ConcurrentLinkedDeque<ConnectionStub>  pendingConnections;
+    private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
 
     private String type;
     private String registerKey;
@@ -58,8 +58,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
-        this.pendingConnections = new ConcurrentHashMap<>();
-        this.pendingChannels = new ConcurrentLinkedDeque<>();
+        this.pendingConnections = new ConcurrentLinkedDeque<>();
+        this.connectionIndex = new ConcurrentHashMap<>();
         this.configuration = serviceContext.configuration(CONFIG);
         this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
         this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
@@ -151,10 +151,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             return _gameRoom;
         });
         if(gameRoom==null) return null;
-        ChannelStub channelStub = this.pendingChannels.poll();
-        if(channelStub!=null){
-            ConnectionStub connection = pendingConnections.get(channelStub.serverId);
-            gameRoom.channel(connection.gameChannel());
+        ConnectionStub connectionStub = pendingConnections.poll();
+        if(connectionStub!=null){
+            gameRoom.channel(connectionStub.gameChannel());
+            pendingConnections.offer(connectionStub);
         }
         return gameRoom.join(systemId);
     }
@@ -229,15 +229,23 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public void onConnection(Connection connection) {
-        pendingConnections.put(connection.serverId(),(ConnectionStub)connection);
+        ConnectionStub connectionStub = (ConnectionStub)connection;
+        pendingConnections.offer(connectionStub);
+        connectionIndex.put(connection.serverId(),connectionStub);
     }
 
     @Override
     public void onChannel(Channel channel) {
         ChannelStub channelStub = (ChannelStub)channel;
-        pendingChannels.offer(channelStub);
+        String serverId = channelStub.serverId;
+        ConnectionStub connectionStub = connectionIndex.get(serverId);
+        connectionStub.addChannel(channelStub);
     }
     public void onDisConnection(Connection connection){
-        pendingConnections.remove(connection.serverId());
+        ConnectionStub connectionStub = connectionIndex.remove(connection.serverId());
+        if(connectionStub!=null){
+            pendingConnections.remove(connectionStub);
+            connectionStub.close();
+        }
     }
 }

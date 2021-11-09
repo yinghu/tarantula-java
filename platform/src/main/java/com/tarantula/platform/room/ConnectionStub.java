@@ -8,10 +8,15 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionStub extends ClientConnection implements Portable {
 
     public byte[] serverKey;
+
+    public ConcurrentLinkedDeque<ChannelStub> channelStubs;
+    public AtomicInteger sessionId;
 
     public ConnectionStub(){
 
@@ -39,8 +44,40 @@ public class ConnectionStub extends ClientConnection implements Portable {
         super.readPortable(portableReader);
         serverKey = portableReader.readByteArray("sk");
     }
-
-    public GameChannel gameChannel(){
-        return new GameChannel(1,1,this,serverKey);
+    public void addChannel(ChannelStub channelStub){
+        if(channelStubs==null) {
+            channelStubs = new ConcurrentLinkedDeque<>();
+            sessionId = new AtomicInteger(0);
+        }
+        channelStubs.offer(channelStub);
     }
+    public GameChannel gameChannel(){
+        ChannelStub channelStub = channelStubs.poll();
+        return new GameChannel(channelStub.channelId(),sessionId.incrementAndGet(),clientConnection(),serverKey);
+    }
+    public void close(){
+        channelStubs.clear();
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj==this) return true;
+        return ((ConnectionStub)obj).serverId.equals(serverId);
+    }
+    @Override
+    public int hashCode(){
+        return serverId.hashCode();
+    }
+    private ClientConnection clientConnection(){
+        ClientConnection clientConnection = new ClientConnection();
+        clientConnection.host(host);
+        clientConnection.port(port);
+        clientConnection.type(type);
+        clientConnection.protocol(protocol);
+        clientConnection.subProtocol(subProtocol);
+        clientConnection.secured(secured);
+        clientConnection.path(path);
+        return clientConnection;
+    }
+
 }
