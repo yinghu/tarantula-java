@@ -34,8 +34,10 @@ public class GameRoomTest {
         room.join("player1",r->true);
         room.join("player1",r->true);
         room.join("player1",r->true);
-        Assert.assertEquals(room.leave("player1"),true);
-
+        room.leave("player1",(r)->{
+            Assert.assertEquals(true,r.resetIfEmpty());
+            return true;
+        });
     }
 
     @Test(groups = { "GameRoom" })
@@ -47,10 +49,23 @@ public class GameRoomTest {
         room.join("player2",r->true);
         room.join("player3",r->true);
         room.join("player4",r->true);
-        Assert.assertEquals(room.leave("player1"),false);
-        Assert.assertEquals(room.leave("player2"),false);
-        Assert.assertEquals(room.leave("player3"),false);
-        Assert.assertEquals(room.leave("player4"),true);
+
+        room.leave("player1",(r)->{
+            Assert.assertEquals(false,r.resetIfEmpty());
+            return false;
+        });
+        room.leave("player2",(r)->{
+            Assert.assertEquals(false,r.resetIfEmpty());
+            return false;
+        });
+        room.leave("player3",(r)->{
+            Assert.assertEquals(false,r.resetIfEmpty());
+            return false;
+        });
+        room.leave("player4",(r)->{
+            Assert.assertEquals(true,r.resetIfEmpty());
+            return false;
+        });
     }
 
 }

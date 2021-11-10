@@ -37,6 +37,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private JsonObject connection;
 
     private JsonObject config;
+
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
             "",

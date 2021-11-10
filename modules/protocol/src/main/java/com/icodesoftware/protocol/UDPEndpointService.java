@@ -70,7 +70,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                             messageBuffer.flip();
                             MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
                             UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);
-                            userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
+                            if(userChannel!=null) userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
                         }
                         else{
                             Thread.sleep(SLEEP_TIMEOUT);

@@ -22,12 +22,17 @@ public interface GameRoom extends Configurable {
 
     GameRoom join(String systemId,RoomListener roomListener);
     GameRoom view();
-    boolean leave(String systemId);
+    void leave(String systemId,RoomListener roomListener);
+    boolean resetIfEmpty();
 
     Channel channel();
     void channel(Channel channel);
 
     interface RoomListener{
-        boolean onJoin(GameRoom gameRoom);
+        boolean onRoom(GameRoom gameRoom);
+    }
+
+    interface RoomRegistryListener{
+        boolean onRegistry(GameRoomRegistry gameRoomRegistry);
     }
 }

@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -14,7 +15,7 @@ import com.tarantula.platform.service.cluster.OneTimeRunner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener {
+public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -87,13 +88,14 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         RoomJoinStub roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
         GameRoom room = this.distributionRoomService.join(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
+        if(room==null) return null;
         room.setup(gameZone.arena(roomRegistry.level));
         return room;
     }
     public void leave(String roomId,String systemId){
         if(type.equals(GameZone.PLAY_MODE_PVE)) {
             GameRoom gameRoom = gameRoomIndex.remove(systemId);
-            gameRoom.leave(systemId);
+            gameRoom.leave(systemId,room->true);
             return;
         }
         this.distributionRoomService.leave(name,roomId,systemId);
@@ -103,8 +105,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         Arena arena = gameZoneIndex.get(gameZoneId).arena(rating.arenaLevel);
         GameRoomRegistry pending = gameZone.roomRegistryQueue().poll();
         if(pending==null) return new RoomJoinStub();
-        if(pending.empty()) pending.reset(arena);
-        int ret = pending.addPlayer(rating.systemId());
+        int ret = pending.addPlayer(rating.systemId(),room->{
+            if(room.empty()) room.reset(arena);
+            return true;
+        });
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
@@ -114,9 +118,14 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         GameZone gameZone = gameZoneIndex.get(zoneId);
         if(gameZone!=null){
             GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
-            if(released.removePlayer(systemId)) released.reset();
+            released.removePlayer(systemId,room->{
+                if(room.empty()) {
+                    room.reset();
+                    gameZone.roomRegistryQueue().offer(released);
+                }
+                return true;
+            });
             this.dataStore.update(released);
-            if(released.empty()) gameZone.roomRegistryQueue().offer(released);
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
@@ -153,7 +162,9 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         return gameRoom.join(systemId,room->{
             ConnectionStub connectionStub = pendingConnections.poll();
             if(connectionStub==null) return false;
-            gameRoom.channel(connectionStub.gameChannel());
+            GameChannel gameChannel = connectionStub.gameChannel();
+            if(gameChannel==null) return false;
+            gameRoom.channel(gameChannel);
             pendingConnections.offer(connectionStub);
             return true;
         });
@@ -161,7 +172,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     }
     public void onLeave(String roomId,String systemId){
         GameRoom gameRoom = gameRoomIndex.get(roomId);
-        gameRoom.leave(systemId);
+        gameRoom.leave(systemId,room-> {
+                room.resetIfEmpty();
+                return true;
+            }
+        );
         this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
     }
     public void onCreate(String zoneId,String roomId){
@@ -250,6 +265,27 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }
     }
     public void onPing(String serverId){
-        //logger.warn("ping->"+serverId);
+        ConnectionStub connectionStub = connectionIndex.get(serverId);
+        if(connectionStub!=null) connectionStub.ping();
+    }
+
+    @Override
+    public boolean oneTime() {
+        return false;
+    }
+
+    @Override
+    public long initialDelay() {
+        return 5000;
+    }
+
+    @Override
+    public long delay() {
+        return 5000;
+    }
+
+    @Override
+    public void run() {
+
     }
 }

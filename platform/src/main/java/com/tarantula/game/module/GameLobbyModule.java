@@ -32,8 +32,8 @@ public class GameLobbyModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onLeave")){
-            gameLobby.leave(session);
             session.write(toMessage("left room",true).getBytes());
+            gameLobby.leave(session);
         }
         else if(session.action().equals("onUpdate")){
             this.gameLobby.update(session,payload);

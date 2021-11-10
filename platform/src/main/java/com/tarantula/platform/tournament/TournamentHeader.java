@@ -133,7 +133,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             tournamentRegisterIndex.update();
             this.tournamentServiceProvider.monitorRegistry(this,tournamentRegistry);
         }
-        int joinStatus = tournamentRegistry.addPlayer(systemId);
+        int joinStatus = tournamentRegistry.register(systemId);
         dataStore.update(tournamentRegistry);
         if(joinStatus == RoomRegistry.NOT_JOINED){
             return null; //caller to retry

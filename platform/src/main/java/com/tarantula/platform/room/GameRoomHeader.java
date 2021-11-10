@@ -95,6 +95,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("roomId",distributionKey());
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
@@ -136,5 +137,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             GameEntry gameEntry = (GameEntry)p;
             entries[gameEntry.seatIndex]=gameEntry;
         }
+    }
+    public boolean resetIfEmpty(){
+        if(!joinIndex.isEmpty()) return false;
+        //reset
+        channel = null;
+        return true;
     }
 }

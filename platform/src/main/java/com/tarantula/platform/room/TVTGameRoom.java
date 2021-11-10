@@ -122,13 +122,12 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
         }
         return duplicate();
     }
-    public synchronized boolean leave(String systemId){
+    public synchronized void leave(String systemId,RoomListener roomListener){
         GameEntry rm = joinIndex.remove(systemId);
         if(rm!=null){
             rm.occupied = false;
             this.dataStore.update(rm);
         }
-        return joinIndex.isEmpty();
     }
     public synchronized TVTGameRoom view(){
         return this.duplicate();

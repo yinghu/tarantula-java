@@ -71,12 +71,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         totalJoined = 0;
         players.clear();
     }
-    public void reset(){
-        maxSize = 0;
-        arenaLevel = 0;
-        totalJoined = 0;
-        players.clear();
-    }
+
     public boolean sync(String[] joined){
         if(players.size()==joined.length) return true;
         reset();
@@ -85,6 +80,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     public String toString(){
         return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined+" Set: "+players.size();
     }
+
     @Override
     public boolean equals(Object obj){
         if(obj==this) return true;
@@ -94,4 +90,29 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     public int hashCode(){
         return this.distributionKey().hashCode();
     }
+
+    public synchronized int addPlayer(String systemId, GameRoom.RoomRegistryListener roomRegistryListener){
+        roomRegistryListener.onRegistry(this);
+        return super.addPlayer(systemId);
+    }
+
+    public synchronized void removePlayer(String systemId, GameRoom.RoomRegistryListener roomRegistryListener){
+        super.removePlayer(systemId);
+        roomRegistryListener.onRegistry(this);
+    }
+
+    //methods should be called in addPlayer and removePlayer callback
+    public boolean empty(){
+        return this.totalJoined==0;
+    }
+    public boolean fullJoined(){
+        return totalJoined!=0&&totalJoined==maxSize;
+    }
+    public void reset(){
+        maxSize = 0;
+        arenaLevel = 0;
+        totalJoined = 0;
+        players.clear();
+    }
+
 }

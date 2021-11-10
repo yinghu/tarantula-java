@@ -29,6 +29,17 @@ namespace Holee
         public int Port { set; get; }
     }
 
+    public class Room
+    {
+        public string RoomId { set; get; }
+        public int Capacity { set; get; }
+        public int Round { set; get; }
+        public int Duration { set; get; }
+
+        public int Seat { set; get; }
+        public Channel Channel { set; get; }
+    }
+
     public class GameClusterManager
     {
         
@@ -42,7 +53,7 @@ namespace Holee
         
         public string Ticket { get; private set; }
         
-        public int Seat { get; private set; }
+        public Room Room { get; private set; }
         
         public Channel Channel { get; private set; }
 
@@ -107,12 +118,29 @@ namespace Holee
                 }
                 //ServerKey = (string)jo.SelectToken("serverKey");
                 Tag = (string)jo.SelectToken("tag");
-                var list = (JArray)jo.SelectToken("room").SelectToken("onList");
+                var room = (JObject)jo.SelectToken("room");
+                var rcc = (JObject)room.SelectToken("connection");
+                Room = new Room
+                {
+                    RoomId = (string)room.SelectToken("roomId"),
+                    Capacity = (int)room.SelectToken("capacity"),
+                    Round =  (int)room.SelectToken("round"),
+                    Duration =  (int)room.SelectToken("duration"),
+                    Channel = new Channel
+                    {
+                        ChannelId = (int)room.SelectToken("channelId"),
+                        SessionId = (int)room.SelectToken("sessionId"),
+                        ServerKey = Convert.FromBase64String((string)room.SelectToken("serverKey")),
+                        Host = (string)rcc.SelectToken("host"),
+                        Port = (int)rcc.SelectToken("port")    
+                    }
+                };
+                var list = (JArray)room.SelectToken("onList");
                 foreach (var je in list)
                 {
                     var sid = (string)je.SelectToken("systemId");
                     if (!sid.Equals(Presence.SystemId)) continue;
-                    Seat = (int)je.SelectToken("seat");
+                    Room.Seat = (int)je.SelectToken("seat");
                     break;
                 }
 

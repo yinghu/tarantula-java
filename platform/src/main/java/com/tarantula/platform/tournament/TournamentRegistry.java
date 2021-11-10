@@ -44,5 +44,11 @@ public class TournamentRegistry extends RoomRegistry {
     boolean expired(){
         return TimeUtil.expired(closeTime);
     }
+    boolean fullJoined(){
+        return totalJoined!=0&&totalJoined==maxSize;
+    }
+    public int register(String systemId){
+        return super.addPlayer(systemId);
+    }
 
 }

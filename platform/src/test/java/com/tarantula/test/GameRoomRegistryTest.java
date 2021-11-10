@@ -23,13 +23,13 @@ public class GameRoomRegistryTest {
         arena.level = 1;
         arena.capacity = 2;
         GameRoomRegistry roomRegistry = new GameRoomRegistry(arena);
-        Assert.assertEquals(roomRegistry.addPlayer("player1"), RoomRegistry.JOINED);
+        Assert.assertEquals(roomRegistry.addPlayer("player1",r->true), RoomRegistry.JOINED);
         Assert.assertEquals(roomRegistry.fullJoined(),false);
-        Assert.assertEquals(roomRegistry.addPlayer("player2"), RoomRegistry.FULLY_JOINED);
+        Assert.assertEquals(roomRegistry.addPlayer("player2",r->true), RoomRegistry.FULLY_JOINED);
         Assert.assertEquals(roomRegistry.fullJoined(),true);
-        Assert.assertEquals(roomRegistry.addPlayer("player1"), RoomRegistry.ALREADY_JOINED);
-        Assert.assertEquals(roomRegistry.addPlayer("player2"), RoomRegistry.ALREADY_JOINED);
-        Assert.assertEquals(roomRegistry.addPlayer("player3"), RoomRegistry.NOT_JOINED);
+        Assert.assertEquals(roomRegistry.addPlayer("player1",r->true), RoomRegistry.ALREADY_JOINED);
+        Assert.assertEquals(roomRegistry.addPlayer("player2",r->true), RoomRegistry.ALREADY_JOINED);
+        Assert.assertEquals(roomRegistry.addPlayer("player3",r->true), RoomRegistry.NOT_JOINED);
 
     }
     @Test(groups = { "GameRoomRegistry" })
@@ -48,9 +48,9 @@ public class GameRoomRegistryTest {
         Assert.assertEquals(roomRegistry.fullJoined(),false);
         Assert.assertEquals(roomRegistry.empty(),true);
         roomRegistry.reset(arena);
-        roomRegistry.addPlayer("player1");
+        roomRegistry.addPlayer("player1",r->true);
         Assert.assertEquals(roomRegistry.fullJoined(),false);
-        roomRegistry.addPlayer("player2");
+        roomRegistry.addPlayer("player2",r->true);
         Assert.assertEquals(roomRegistry.fullJoined(),true);
         Assert.assertEquals(roomRegistry.empty(),false);
     }
@@ -71,7 +71,7 @@ public class GameRoomRegistryTest {
         Assert.assertEquals(_rq==roomRegistry,true);
         Assert.assertEquals(_rm==roomRegistry,true);
         Assert.assertEquals(_rm==_rq,true);
-        roomRegistry.addPlayer("abc");
+        roomRegistry.addPlayer("abc",r->true);
         Assert.assertEquals(roomRegistry.empty(),false);
         Assert.assertEquals(_rm.empty(),false);
         Assert.assertEquals(_rq.empty(),false);

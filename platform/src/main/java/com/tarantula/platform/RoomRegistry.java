@@ -27,37 +27,29 @@ public class RoomRegistry extends RecoverableObject {
         this();
         this.maxSize = maxSize;
     }
-    public int addPlayer(String systemId){
-        synchronized (players){
-            if(players.contains(systemId)){
-                return ALREADY_JOINED;
-            }
-            if(totalJoined+1>maxSize){
-                return NOT_JOINED;
-            }
-            totalJoined++;
-            players.add(systemId);
-            return totalJoined==maxSize?FULLY_JOINED:JOINED;
+    protected int addPlayer(String systemId){
+        if(players.contains(systemId)){
+            return ALREADY_JOINED;
         }
-    }
-    public boolean removePlayer(String systemId){
-        synchronized (players){
-            players.remove(systemId);
-            totalJoined--;
-            return totalJoined==0;
+        if(totalJoined+1>maxSize){
+            return NOT_JOINED;
         }
+        totalJoined++;
+        players.add(systemId);
+        return totalJoined==maxSize?FULLY_JOINED:JOINED;
     }
-    public boolean fullJoined(){
-        synchronized (players){
-            return totalJoined!=0&&totalJoined==maxSize;
-        }
+    protected boolean removePlayer(String systemId){
+        players.remove(systemId);
+        totalJoined--;
+        return totalJoined==0;
     }
+    //public boolean fullJoined(){
+        //return totalJoined!=0&&totalJoined==maxSize;
+    //}
 
-    public boolean empty(){
-        synchronized (players){
-            return totalJoined==0;
-        }
-    }
+    //public boolean empty(){
+        //return totalJoined==0;
+    //}
     @Override
     public Map<String,Object> toMap(){
         players.forEach((k)->{

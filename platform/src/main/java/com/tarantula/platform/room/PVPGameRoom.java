@@ -38,7 +38,9 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
 
     public synchronized GameRoom join(String systemId,RoomListener roomListener){
         if(joinIndex.containsKey(systemId)) return duplicate();
-        if(channel==null) roomListener.onJoin(this);
+        if(channel==null){
+            if(!roomListener.onRoom(this)) return null;
+        }
         for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];
             if(e!=null&&e.occupied) continue;
@@ -56,13 +58,13 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         }
         return duplicate();
     }
-    public synchronized boolean leave(String systemId){
+    public synchronized void leave(String systemId,RoomListener roomListener){
         GameEntry rm = joinIndex.remove(systemId);
         if(rm!=null){
             rm.occupied = false;
             this.dataStore.update(rm);
         }
-        return joinIndex.isEmpty();
+        roomListener.onRoom(this);
     }
     public synchronized GameRoom view(){
         return this.duplicate();

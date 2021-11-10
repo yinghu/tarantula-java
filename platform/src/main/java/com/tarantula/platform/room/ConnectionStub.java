@@ -53,7 +53,7 @@ public class ConnectionStub extends ClientConnection implements Portable {
     }
     public GameChannel gameChannel(){
         ChannelStub channelStub = channelStubs.poll();
-        return new GameChannel(channelStub.channelId(),sessionId.incrementAndGet(),clientConnection(),serverKey);
+        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.incrementAndGet(),clientConnection(),serverKey):null;
     }
     public void close(){
         channelStubs.clear();
@@ -78,6 +78,9 @@ public class ConnectionStub extends ClientConnection implements Portable {
         clientConnection.secured(secured);
         clientConnection.path(path);
         return clientConnection;
+    }
+    public void ping(){
+
     }
 
 }

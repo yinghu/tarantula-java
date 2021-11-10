@@ -71,7 +71,7 @@ public class UserChannel {
             requestListener.onMessage(messageHeader,messageBuffer);
             return;
         }
-        if(messageHeader.channelId == Messenger.LEAVE){
+        if(messageHeader.commandId == Messenger.LEAVE){
             onLeave(messageHeader,messageBuffer);
             return;
         }
@@ -129,9 +129,8 @@ public class UserChannel {
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
-        byte[] message = messageBuffer.toArray();
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(message,session.source);
+            messenger.send(pendingAckMessage.data,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -139,6 +138,20 @@ public class UserChannel {
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
         if(sessionListener!=null) sessionListener.onTimeout(channelId,messageHeader.sessionId);
+        messageBuffer.reset();
+        messageHeader.ack = true;
+        messageHeader.encrypted = false;
+        messageHeader.commandId = Messenger.ON_LEAVE;
+        messageHeader.sequence = sequence.incrementAndGet();
+        messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeInt(messageHeader.sessionId);
+        messageBuffer.flip();
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        userSessionIndex.forEach((sid,session)->{
+            messenger.send(pendingAckMessage.data,session.source);
+            pendingAckMessage.pendingAck++;
+        });
+        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,byte[] payload){
         userSessionIndex.forEach((sid,session)->{

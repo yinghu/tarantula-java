@@ -86,7 +86,7 @@ namespace Holee
         
         public async void OnLeave()
         {
-            if (_gameClusterManager.Seat == 1)
+            if (_gameClusterManager.Room.Seat == 1)
             {
                 playerA.OffPlay();
             }
@@ -94,17 +94,31 @@ namespace Holee
                 playerB.OffPlay();
             }
             await _gameClusterManager.Leave(this);
+            _outboundBuffer.Reset();
+            _outboundBuffer.WriteHeader(new MessageHeader
+            {
+                ChannelId = _channel.ChannelId,
+                SessionId = _channel.SessionId,
+                ObjectId = 0,
+                Sequence = 3,
+                CommandId = Command.Leave,
+            });
+            _outboundBuffer.WriteInt(_channel.SessionId);
+            var outbound = _outboundBuffer.Drain();
+            NetworkingManager.Send(outbound,outbound.Length);
+            Debug.Log("disconnected->"+_channel.ChannelId);
         }
 
         public async void OnDevice()
         {
             if(!await _gameClusterManager.Device(this)) return;
             if (!await _gameClusterManager.Join(this)) return;
-            _channel = _gameClusterManager.Channel;
+            _channel = _gameClusterManager.Room.Channel;
+            Debug.Log("ROOM ID->"+_gameClusterManager.Room.RoomId);
             Debug.Log("CHANNEL ID->"+_channel.ChannelId);
             Debug.Log("SESSION ID->"+_channel.SessionId);
             OnPlay();
-            if (_gameClusterManager.Seat == 1)
+            if (_gameClusterManager.Room.Seat == 1)
             {
                 OnPlayA();
             }
@@ -157,6 +171,12 @@ namespace Holee
                 _outboundBuffer.WriteHeader(header);
                 var data = _outboundBuffer.Drain();
                 ping.OnJoin(data);
+                return;
+            }
+
+            if (header.CommandId == Command.OnLeave)
+            {
+                Debug.Log("On LEFT->" + header);
                 return;
             }
 
