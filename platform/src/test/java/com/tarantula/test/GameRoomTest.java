@@ -30,10 +30,10 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1");
-        room.join("player1");
-        room.join("player1");
-        room.join("player1");
+        room.join("player1",r->true);
+        room.join("player1",r->true);
+        room.join("player1",r->true);
+        room.join("player1",r->true);
         Assert.assertEquals(room.leave("player1"),true);
 
     }
@@ -43,10 +43,10 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1");
-        room.join("player2");
-        room.join("player3");
-        room.join("player4");
+        room.join("player1",r->true);
+        room.join("player2",r->true);
+        room.join("player3",r->true);
+        room.join("player4",r->true);
         Assert.assertEquals(room.leave("player1"),false);
         Assert.assertEquals(room.leave("player2"),false);
         Assert.assertEquals(room.leave("player3"),false);

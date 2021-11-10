@@ -28,8 +28,7 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
         return jsonObject;
     }
 
-
-    public synchronized PVEGameRoom join(String systemId){
+    public synchronized PVEGameRoom join(String systemId,RoomListener roomListener){
         return this;
     }
     public synchronized boolean leave(String systemId){

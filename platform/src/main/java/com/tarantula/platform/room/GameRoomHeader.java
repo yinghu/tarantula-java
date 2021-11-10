@@ -6,14 +6,21 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Channel;
+import com.icodesoftware.Connection;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
+
+    protected int channelId;
+    protected int sessionId;
+    protected byte[] serverKey;
+    protected Connection connection;
 
     protected int capacity;
     protected long duration;
@@ -22,6 +29,19 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected Channel channel;
     protected HashMap<String,GameEntry> joinIndex;
     protected GameEntry[] entries;
+
+    public int channelId(){
+        return channelId;
+    }
+    public int sessionId(){
+        return sessionId;
+    }
+    public byte[] serverKey(){
+        return serverKey;
+    }
+    public Connection connection(){
+        return connection;
+    }
 
     @Override
     public String roomId(){
@@ -78,7 +98,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
-        jsonObject.add("channel",channel.toJson());
+        if(connection!=null){
+            jsonObject.addProperty("channelId",channelId);
+            jsonObject.addProperty("sessionId",sessionId);
+            jsonObject.addProperty("serverKey",Base64.getEncoder().encodeToString(serverKey));
+            jsonObject.add("connection",connection.toJson());
+        }
         JsonArray plist = new JsonArray();
         for(GameEntry ge : entries){
             if(ge==null) continue;
@@ -89,19 +114,25 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",this.distributionKey());
-        portableWriter.writeInt("2",round);
-        portableWriter.writePortable("3",(Portable)channel);
-        portableWriter.writeInt("4",capacity);
-        portableWriter.writePortableArray("5",entries);
+        portableWriter.writeInt("1",channelId);
+        portableWriter.writeInt("2",sessionId);
+        portableWriter.writeByteArray("3",serverKey);
+        portableWriter.writePortable("4",(Portable)connection);
+        portableWriter.writeUTF("5",this.distributionKey());
+        portableWriter.writeInt("6",round);
+        portableWriter.writeInt("7",capacity);
+        portableWriter.writePortableArray("8",entries);
     }
 
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.distributionKey(portableReader.readUTF("1"));
-        this.round = portableReader.readInt("2");
-        this.channel = portableReader.readPortable("3");
-        entries = new GameEntry[portableReader.readInt("4")];
-        for(Portable p : portableReader.readPortableArray("5")){
+        channelId = portableReader.readInt("1");
+        sessionId = portableReader.readInt("2");
+        serverKey = portableReader.readByteArray("3");
+        connection = portableReader.readPortable("4");
+        this.distributionKey(portableReader.readUTF("5"));
+        this.round = portableReader.readInt("6");
+        entries = new GameEntry[portableReader.readInt("7")];
+        for(Portable p : portableReader.readPortableArray("8")){
             GameEntry gameEntry = (GameEntry)p;
             entries[gameEntry.seatIndex]=gameEntry;
         }

@@ -7,6 +7,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
     void daemon(boolean daemon);
     void registerUserChannel(UserChannel userChannel);
     UserChannel releaseUserChannel(int channelId);
+    void registerPingListener(PingListener pingListener);
 
     interface SessionListener{
         void onTimeout(int channelId,int sessionId);
@@ -18,6 +19,10 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
     interface RequestListener{
         byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+    }
+
+    interface PingListener{
+        void onPing();
     }
 
 

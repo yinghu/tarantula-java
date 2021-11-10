@@ -15,7 +15,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     String NAME = "DeploymentServiceProvider";
 
-    //GAME SERVER/PUSH SERVER APIs
+    //GAME SERVER APIs
 
     byte[] serverKey();
     void registerChannel(String typeId,Channel channel);
@@ -34,7 +34,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     OnView onView(String viewId);
     Response createView(OnView onView);
     Response deployResource(String contentUrl,String resourceName);
-    //void registerOnLobbyListener(OnLobby.Listener onLobbyListener);
 
     Content resource(String name);
 

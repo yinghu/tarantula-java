@@ -36,8 +36,9 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         });
     }
 
-    public synchronized GameRoom join(String systemId){
+    public synchronized GameRoom join(String systemId,RoomListener roomListener){
         if(joinIndex.containsKey(systemId)) return duplicate();
+        if(channel==null) roomListener.onJoin(this);
         for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];
             if(e!=null&&e.occupied) continue;
@@ -78,12 +79,18 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
     }
     private PVPGameRoom duplicate(){
         PVPGameRoom _room = new PVPGameRoom();
+        if(channel!=null){
+            _room.channelId = channel.channelId();
+            _room.sessionId = channel.sessionId();
+            _room.serverKey = channel.serverKey();
+            _room.connection = channel.connection();
+        }
         _room.entries = new GameEntry[joinIndex.size()];
         joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
         _room.capacity = _room.entries.length;
         _room.round = this.round;
         _room.bucket(this.bucket);
         _room.oid(this.oid);
-        return this;
+        return _room;
     }
 }

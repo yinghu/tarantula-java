@@ -103,7 +103,7 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
     public void update(){
 
     }
-    public synchronized TVTGameRoom join(String systemId){
+    public synchronized TVTGameRoom join(String systemId,RoomListener roomListener){
         if(joinIndex.containsKey(systemId)) return duplicate();
         for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];

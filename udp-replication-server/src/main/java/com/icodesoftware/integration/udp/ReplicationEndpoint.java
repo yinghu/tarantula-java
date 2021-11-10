@@ -19,7 +19,7 @@ import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;
 
-public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.RequestListener {
+public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.PingListener {
 
     TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
@@ -37,7 +37,14 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private JsonObject connection;
 
     private JsonObject config;
-
+    private String[] headers = new String[]{
+            Session.TARANTULA_ACCESS_KEY,
+            "",
+            Session.TARANTULA_SERVER_ID,
+            "",
+            Session.TARANTULA_ACTION,
+            "",
+    };
     public ReplicationEndpoint(JsonObject config){
         this.config = config;
     }
@@ -53,6 +60,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         boolean daemon = config.get("daemon").getAsBoolean();
         this.udpEndpointServiceProvider.daemon(daemon);
+        this.udpEndpointServiceProvider.registerPingListener(this);
         this.udpEndpointServiceProvider.start();
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
@@ -61,14 +69,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.connection = config.getAsJsonObject("connection");
         this.httpCaller = new HttpCaller(register.get("url").getAsString());
         this.httpCaller._init();
-        String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,
-                accessKey,
-                Session.TARANTULA_SERVER_ID,
-                serverId,
-                Session.TARANTULA_ACTION,
-                "onStart"
-        };
+        headers[1]=accessKey;
+        headers[3]=serverId;
+        headers[5]="onStart";
         connection.addProperty("serverId",serverId);
         String resp = httpCaller.post(register.get("path").getAsString(),connection.toString().getBytes(),headers);
         JsonObject jo = JsonUtil.parse(resp);
@@ -91,14 +94,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void shutdown() throws Exception {
-        String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,
-                accessKey,
-                Session.TARANTULA_SERVER_ID,
-                serverId,
-                Session.TARANTULA_ACTION,
-                "onStop"
-        };
+        headers[5]="onStop";
         logger.warn(httpCaller.post(registerPath,connection.toString().getBytes(),headers));
         this.udpEndpointServiceProvider.shutdown();
     }
@@ -133,6 +129,16 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             return sessionId==messageHeader.sessionId && suc;
         }catch (Exception ex){
             return false;
+        }
+    }
+
+    @Override
+    public void onPing() {
+        try{
+            headers[5]="onPing";
+            httpCaller.get(registerPath,headers);
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 }

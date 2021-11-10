@@ -43,6 +43,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
+    private PingListener pingListener;
 
     public void start() throws Exception{
         if(inboundThreadPoolSetting!=null){
@@ -91,6 +92,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
                         kickoffTimer = SESSION_TIMEOUT;
+                        if(pingListener!=null) pingListener.onPing();
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -187,6 +189,10 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     
     public UserChannel releaseUserChannel(int channelId){
         return this.userChannelIndex.remove(channelId);
+    }
+
+    public void registerPingListener(PingListener pingListener){
+        this.pingListener = pingListener;
     }
 
 }

@@ -24,10 +24,6 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
     public GameChannel(){
 
     }
-    public GameChannel(int channelId,int sessionId){
-        this.channelId = channelId;
-        this.sessionId = sessionId;
-    }
     public GameChannel(int channelId,int sessionId,Connection connection,byte[] serverKey){
         this.channelId = channelId;
         this.sessionId = sessionId;
@@ -42,7 +38,10 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
 
     @Override
     public int sessionId() {
-        return sessionId;
+        return sessionId++;
+    }
+    public byte[] serverKey(){
+        return serverKey;
     }
     public byte[] toBinary(){
         ByteBuffer byteBuffer = ByteBuffer.allocate(8);

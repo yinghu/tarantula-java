@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -81,7 +80,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     public GameRoom join(GameZone gameZone, Rating rating){
         if(type.equals(GameZone.PLAY_MODE_PVE)){
             GameRoom gameRoom =gameRoomIndex.computeIfAbsent(rating.systemId(),k-> new PVEGameRoom());
-            gameRoom.join(rating.systemId());
+            gameRoom.join(rating.systemId(),room->true);
             gameRoom.setup(gameZone.arena(rating.arenaLevel));
             return gameRoom;
         }
@@ -151,12 +150,14 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             return _gameRoom;
         });
         if(gameRoom==null) return null;
-        ConnectionStub connectionStub = pendingConnections.poll();
-        if(connectionStub!=null){
+        return gameRoom.join(systemId,room->{
+            ConnectionStub connectionStub = pendingConnections.poll();
+            if(connectionStub==null) return false;
             gameRoom.channel(connectionStub.gameChannel());
             pendingConnections.offer(connectionStub);
-        }
-        return gameRoom.join(systemId);
+            return true;
+        });
+
     }
     public void onLeave(String roomId,String systemId){
         GameRoom gameRoom = gameRoomIndex.get(roomId);
@@ -249,6 +250,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }
     }
     public void onPing(String serverId){
-        logger.warn("ping->"+serverId);
+        //logger.warn("ping->"+serverId);
     }
 }
