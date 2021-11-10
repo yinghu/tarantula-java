@@ -64,6 +64,12 @@ public class GameServerEventHandler implements RequestHandler {
             exchange.onEvent(new ResponsiveEvent("", "","{}".getBytes(), true));
             deploymentServiceProvider.ping(typeId,serverId);
         }
+        else if(action.equals("onPingAndChannel")){
+            exchange.onEvent(new ResponsiveEvent("", "","{}".getBytes(), true));
+            ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
+            channel.serverId = serverId;
+            deploymentServiceProvider.ping(typeId,serverId);
+        }
         else if(action.equals("onStop")){//stop the game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             connection.configurationTypeId(typeId);

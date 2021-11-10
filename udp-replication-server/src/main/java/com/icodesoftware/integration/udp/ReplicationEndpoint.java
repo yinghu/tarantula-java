@@ -1,7 +1,6 @@
 package com.icodesoftware.integration.udp;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -18,6 +17,8 @@ import javax.crypto.Cipher;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.PingListener {
 
@@ -38,6 +39,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     private JsonObject config;
 
+    private ConcurrentHashMap<Integer,ActiveChannel> activeChannelIndex;
+    private ConcurrentLinkedDeque<ActiveChannel> pendingActiveChannelQueue;
+
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
             "",
@@ -53,6 +57,8 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void start() throws Exception {
+        this.activeChannelIndex = new ConcurrentHashMap<>();
+        this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.udpEndpointServiceProvider = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
@@ -74,7 +80,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         headers[3]=serverId;
         headers[5]="onStart";
         connection.addProperty("serverId",serverId);
-        String resp = httpCaller.post(register.get("path").getAsString(),connection.toString().getBytes(),headers);
+        String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
@@ -83,13 +89,15 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             JsonObject channel = new JsonObject();
             channel.addProperty("channelId",i);
             channel.addProperty("sessionId",i);
+            ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
+            activeChannelIndex.put(i,activeChannel);
             headers[5]="onChannel";
-            resp = httpCaller.post(register.get("path").getAsString(),channel.toString().getBytes(),headers);
+            resp = httpCaller.post(registerPath,activeChannel.payload,headers);
             jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
             udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i,udpEndpointServiceProvider,this,this,this));
         }
-        logger.warn("Game server is running on ["+typeId+"]");
+        logger.warn("Game server is running on ["+typeId+"] with max channels ["+maxChannelSize+"]");
         if(!daemon) this.udpEndpointServiceProvider.run();
     }
 
@@ -108,6 +116,10 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     @Override
     public void onTimeout(int channelId, int sessionId) {
         logger.warn("Session ["+sessionId+"] removed from ["+channelId+"]");
+        ActiveChannel activeChannel = activeChannelIndex.get(channelId);
+        if(activeChannel.totalJoined.decrementAndGet()==0){
+            pendingActiveChannelQueue.offer(activeChannel);
+        }
     }
 
     @Override
@@ -127,7 +139,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             MessageDigest mda = (MessageDigest)messageDigest.clone();
             ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
             boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket);
-            return sessionId==messageHeader.sessionId && suc;
+            if(suc&&sessionId==messageHeader.sessionId){
+                activeChannelIndex.get(messageHeader.channelId).totalJoined.incrementAndGet();
+                return true;
+            }
+            return false;
         }catch (Exception ex){
             return false;
         }
