@@ -161,9 +161,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(gameRoom==null) return null;
         return gameRoom.join(systemId,room->{
             ConnectionStub connectionStub = pendingConnections.poll();
-            if(connectionStub==null) return false;
-            GameChannel gameChannel = connectionStub.gameChannel();
-            if(gameChannel==null) return false;
+            GameChannel gameChannel;
+            if(connectionStub==null || (gameChannel=connectionStub.gameChannel())==null) {
+                this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
+                return false;
+            }
             gameRoom.channel(gameChannel);
             pendingConnections.offer(connectionStub);
             return true;
