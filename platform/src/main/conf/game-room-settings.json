@@ -1,4 +1,18 @@
 {
-  "roomCapacity": 12,
-  "roomPoolSizePerZone": 10
+  "pve": {
+    "roomCapacity": 1,
+    "roomPoolSizePerZone": 10
+  },
+  "pvp": {
+    "roomCapacity": 2,
+    "roomPoolSizePerZone": 10
+  },
+  "tve": {
+    "roomCapacity": 6,
+    "roomPoolSizePerZone": 10
+  },
+  "tvt": {
+    "roomCapacity": 12,
+    "roomPoolSizePerZone": 10
+  }
 }

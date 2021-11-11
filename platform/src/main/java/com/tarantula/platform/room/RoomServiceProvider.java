@@ -1,5 +1,7 @@
 package com.tarantula.platform.room;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.ConfigurationServiceProvider;
@@ -12,8 +14,10 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ScheduledFuture;
 
 public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask {
 
@@ -37,6 +41,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     private String type;
     private String registerKey;
     private String typeLobby;
+    private ScheduledFuture scheduledFuture;
+    ArrayList<String> kickoff = new ArrayList<>();
 
     public RoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -61,11 +67,13 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.pendingConnections = new ConcurrentLinkedDeque<>();
         this.connectionIndex = new ConcurrentHashMap<>();
         this.configuration = serviceContext.configuration(CONFIG);
-        this.roomCapacity = ((Number)configuration.property("roomCapacity")).intValue();
-        this.roomPoolSizePerZone =((Number)configuration.property("roomPoolSizePerZone")).intValue();
         this.type = (String) gameCluster.property(GameCluster.MODE);
+        JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
+        this.roomCapacity = jsonObject.get("roomCapacity").getAsInt();
+        this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
+        this.scheduledFuture = this.serviceContext.schedule(this);
         this.logger = serviceContext.logger(RoomServiceProvider.class);
     }
     @Override
@@ -75,7 +83,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public void shutdown() throws Exception {
-        this.serviceContext.deploymentServiceProvider().unregisterConfigurableListener(registerKey);
+        this.serviceContext.deploymentServiceProvider().unregisterGameChannelListener(registerKey);
+        scheduledFuture.cancel(true);
     }
 
     public GameRoom join(GameZone gameZone, Rating rating){
@@ -239,6 +248,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         return ticket.equals("joinTicket");
     }
 
+    private void onDisConnection(String serverId){
+        ConnectionStub connectionStub = connectionIndex.remove(serverId);
+        if(connectionStub==null) return;
+        pendingConnections.remove(connectionStub);
+        connectionStub.close();
+    }
 
     @Override
     public String typeId() {
@@ -248,6 +263,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public void onConnection(Connection connection) {
         ConnectionStub connectionStub = (ConnectionStub)connection;
+        connectionStub.maxCapacity = roomCapacity;
         pendingConnections.offer(connectionStub);
         connectionIndex.put(connection.serverId(),connectionStub);
     }
@@ -258,19 +274,15 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         String serverId = channelStub.serverId;
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         connectionStub.addChannel(channelStub);
+        connectionStub.ping();
     }
     public void onDisConnection(Connection connection){
-        ConnectionStub connectionStub = connectionIndex.remove(connection.serverId());
-        if(connectionStub!=null){
-            pendingConnections.remove(connectionStub);
-            connectionStub.close();
-        }
+        onDisConnection(connection.serverId());
     }
     public void onPing(String serverId){
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         if(connectionStub!=null) connectionStub.ping();
     }
-
     @Override
     public boolean oneTime() {
         return false;
@@ -288,6 +300,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public void run() {
-
+        kickoff.clear();
+        connectionIndex.forEach((k,v)->{
+            if(!v.check()) kickoff.add(k);
+        });
+        kickoff.forEach(k->{
+            onDisConnection(k);
+        });
     }
 }

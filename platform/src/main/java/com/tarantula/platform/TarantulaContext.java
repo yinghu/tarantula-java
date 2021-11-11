@@ -769,7 +769,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public Configuration configuration(String config){
  	    try{
-
             Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
             ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
             kv.forEach((k,v)->applicationConfiguration.property(k,v));

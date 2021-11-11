@@ -10,13 +10,18 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ConnectionStub extends ClientConnection implements Portable {
 
     public byte[] serverKey;
 
     public ConcurrentLinkedDeque<ChannelStub> channelStubs;
-    public AtomicInteger sessionId;
+    public int maxCapacity;
+    private AtomicInteger sessionId;
+    private AtomicLong pingSequence;
+    private long lastPing;
+    private int tries;
 
     public ConnectionStub(){
 
@@ -47,13 +52,15 @@ public class ConnectionStub extends ClientConnection implements Portable {
     public void addChannel(ChannelStub channelStub){
         if(channelStubs==null) {
             channelStubs = new ConcurrentLinkedDeque<>();
-            sessionId = new AtomicInteger(0);
+            sessionId = new AtomicInteger(1);
+            pingSequence = new AtomicLong(0);
+            lastPing = 0;
         }
         channelStubs.offer(channelStub);
     }
     public GameChannel gameChannel(){
         ChannelStub channelStub = channelStubs.poll();
-        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.incrementAndGet(),clientConnection(),serverKey):null;
+        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.getAndAdd(maxCapacity),clientConnection(),serverKey):null;
     }
     public void close(){
         channelStubs.clear();
@@ -80,7 +87,16 @@ public class ConnectionStub extends ClientConnection implements Portable {
         return clientConnection;
     }
     public void ping(){
-
+        pingSequence.incrementAndGet();
+    }
+    public boolean check(){
+        long ping;
+        if((ping=pingSequence.get())-lastPing>0){
+            lastPing = ping;
+            return true;
+        }
+        tries++;
+        return tries<2;
     }
 
 }

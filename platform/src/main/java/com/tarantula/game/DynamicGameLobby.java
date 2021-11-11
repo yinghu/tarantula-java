@@ -43,7 +43,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
 
     public Stub join(Session session, Rating rating){
         Stub stub = stubIndex.get(session.systemId());
-        if(stub!=null) return stub;
+        if(stub!=null&&stub.joined) return stub;
         GameZone _zone = zoneIndex.get(rating.level);
         Stub _stub = _zone.join(session,rating);
         stubIndex.put(session.systemId(),_stub);

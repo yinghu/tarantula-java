@@ -152,8 +152,16 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     @Override
     public void onPing() {
         try{
-            headers[5]="onPing";
-            httpCaller.get(registerPath,headers);
+            ActiveChannel activeChannel = pendingActiveChannelQueue.poll();
+            if(activeChannel==null){
+                headers[5]="onPing";
+                httpCaller.get(registerPath,headers);
+            }
+            else{
+                headers[5]="onChannel";
+                JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
+                if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+            }
         }catch (Exception ex){
             ex.printStackTrace();
         }
