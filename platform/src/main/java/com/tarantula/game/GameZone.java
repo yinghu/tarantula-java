@@ -2,6 +2,7 @@ package com.tarantula.game;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.MessageBuffer;
 import com.tarantula.platform.room.GameRoom;
 import com.tarantula.platform.room.GameRoomRegistry;
 
@@ -55,9 +56,7 @@ public interface GameZone extends Configurable{
         void list(Session session,Stub stub);
         void leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
-        default void close(){}
-        default String onRegister(Rating rating){ return null;}
-        default GameRoom onJoin(Arena arena, String roomId, String systemId){return null;}
-        default void onLeave(String roomId,String systemId){}
+        void close();
+        byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 }

@@ -18,16 +18,7 @@ namespace Holee
         public string Login { set; get; }
         public int Stub { set; get; }
     }
-
-    public class Channel
-    {
-        public int ChannelId { set; get; }
-        public int SessionId { set; get; }
-
-        public byte[] ServerKey { set; get; }
-        public string Host { set; get; }
-        public int Port { set; get; }
-    }
+    
 
     public class Room
     {

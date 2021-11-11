@@ -2,7 +2,6 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 
 public class PVERoomProxy extends RoomProxyHeader {
 
@@ -21,7 +20,7 @@ public class PVERoomProxy extends RoomProxyHeader {
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
-        stub.pushChannel = context.register(session.systemId(),(h,m)->null);
+        stub.pushChannel = context.register(session.systemId(),(h,m)->super.update(stub,h,m));
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.joined = true;

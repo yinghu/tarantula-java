@@ -22,7 +22,7 @@ namespace Holee
 
         public void OnRequest()
         {
-            _gameManager.Send(_messageHeader, buffer =>
+            _gameManager.GameClusterManager.Channel.Send(_messageHeader, buffer =>
             {
                 buffer.WriteUTF8(JsonConvert.SerializeObject(_messageHeader));
             });
@@ -38,6 +38,7 @@ namespace Holee
         public void Setup(GameManager gameManager)
         {
             _gameManager = gameManager;
+            _gameManager.GameClusterManager.Channel.OnMessage += OnMessage;
         }
 
     }

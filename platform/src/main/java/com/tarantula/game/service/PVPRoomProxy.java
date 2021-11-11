@@ -1,12 +1,9 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
-import com.icodesoftware.Statistics;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 
 public class PVPRoomProxy extends RoomProxyHeader{
 
@@ -29,19 +26,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined = true;
         stub.zone = gameZone;
         stub.rating = rating;
-        stub.pushChannel = context.register(session.systemId(),(h,m)->{
-            //this.context.log(m.readUTF8(), OnLog.WARN);
-            Statistics statistics = gameServiceProvider.statistics(stub.systemId());
-            statistics.entry("kills").update(1).update();
-            statistics.entry("wins").update(1).update();
-            statistics.entry("hits").update(1).update();
-            statistics.entry("healthy").update(1).update();
-            statistics.entry("roll").update(1).update();
-            statistics.entry("poll").update(1).update();
-            StatisticsSerializer serializer = new StatisticsSerializer();
-            return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
-            //return (stub.toJson().toString()).getBytes();
-        });
+        stub.pushChannel = context.register(session.systemId(),(h,m)->super.update(stub,h,m));
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         this.dataStore.update(stub);

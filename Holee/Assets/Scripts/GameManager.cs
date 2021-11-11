@@ -7,7 +7,7 @@ namespace Holee
 {
     public class GameManager : MonoBehaviour,IMessage
     {
-        private GameClusterManager _gameClusterManager;
+        
         public Player playerA;
         public Player playerB;
         [SerializeField] private Replication[] replications;
@@ -23,14 +23,15 @@ namespace Holee
         private MessageHeader _header;
         private Channel _channel;
 
+        public GameClusterManager GameClusterManager { get; private set; }
+
         private void Start()
         {
-            _gameClusterManager = new GameClusterManager();
+            GameClusterManager = new GameClusterManager();
             foreach (var r in replications)
             {
                 r.Setup(this);    
             }
-            requestPopup.Setup(this);
             _messageQueue = new ConcurrentQueue<byte[]>();
         }
         private void OnPlay()
@@ -66,8 +67,8 @@ namespace Holee
                 Encrypted = true
             });
             _outboundBuffer.WriteInt(_channel.SessionId);
-            _outboundBuffer.WriteUTF8(_gameClusterManager.Presence.Token);
-            _outboundBuffer.WriteUTF8(_gameClusterManager.Ticket);
+            _outboundBuffer.WriteUTF8(GameClusterManager.Presence.Token);
+            _outboundBuffer.WriteUTF8(GameClusterManager.Ticket);
             var outbound = _outboundBuffer.Drain();
             NetworkingManager.Send(outbound,outbound.Length);
         }
@@ -86,14 +87,14 @@ namespace Holee
         
         public async void OnLeave()
         {
-            if (_gameClusterManager.Room.Seat == 1)
+            if (GameClusterManager.Room.Seat == 1)
             {
                 playerA.OffPlay();
             }
             else{
                 playerB.OffPlay();
             }
-            await _gameClusterManager.Leave(this);
+            await GameClusterManager.Leave(this);
             _outboundBuffer.Reset();
             _outboundBuffer.WriteHeader(new MessageHeader
             {
@@ -111,14 +112,16 @@ namespace Holee
 
         public async void OnDevice()
         {
-            if(!await _gameClusterManager.Device(this)) return;
-            if (!await _gameClusterManager.Join(this)) return;
-            _channel = _gameClusterManager.Room.Channel;
-            Debug.Log("ROOM ID->"+_gameClusterManager.Room.RoomId);
+            if(!await GameClusterManager.Device(this)) return;
+            if (!await GameClusterManager.Join(this)) return;
+            GameClusterManager.Channel.Init();
+            requestPopup.Setup(this);
+            _channel = GameClusterManager.Room.Channel;
+            Debug.Log("ROOM ID->"+GameClusterManager.Room.RoomId);
             Debug.Log("CHANNEL ID->"+_channel.ChannelId);
             Debug.Log("SESSION ID->"+_channel.SessionId);
             OnPlay();
-            if (_gameClusterManager.Room.Seat == 1)
+            if (GameClusterManager.Room.Seat == 1)
             {
                 OnPlayA();
             }

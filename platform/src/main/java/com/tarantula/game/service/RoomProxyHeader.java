@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
@@ -90,5 +91,17 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     public void close(){
 
+    }
+    public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
+
+        Statistics statistics = gameServiceProvider.statistics(stub.systemId());
+        statistics.entry("kills").update(1).update();
+        statistics.entry("wins").update(1).update();
+        statistics.entry("hits").update(1).update();
+        statistics.entry("healthy").update(1).update();
+        statistics.entry("roll").update(1).update();
+        statistics.entry("poll").update(1).update();
+        StatisticsSerializer serializer = new StatisticsSerializer();
+        return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
     }
 }
