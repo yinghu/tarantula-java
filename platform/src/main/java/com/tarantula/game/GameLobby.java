@@ -7,7 +7,7 @@ import com.icodesoftware.service.Serviceable;
 
 import java.util.List;
 
-public interface GameLobby extends Configurable, Initializer, Serviceable,GameRoomListener {
+public interface GameLobby extends Configurable, Initializer, Serviceable {
 
     List<GameZone> list();
     Stub join(Session session, Rating rating);

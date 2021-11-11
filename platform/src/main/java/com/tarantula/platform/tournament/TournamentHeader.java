@@ -141,7 +141,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         if(joinStatus == RoomRegistry.FULLY_JOINED){
             return tournamentRegistry.instanceId();
         }
-        if(joinStatus == RoomRegistry.JOINED || joinStatus == RoomRegistry.ALREADY_JOINED) pendingRegistryQueue.offer(tournamentRegistry);
+        pendingRegistryQueue.offer(tournamentRegistry);
         return tournamentRegistry.instanceId();
     }
     public Tournament.Instance lookup(String instanceId){

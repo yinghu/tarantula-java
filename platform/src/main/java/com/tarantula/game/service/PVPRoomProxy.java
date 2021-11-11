@@ -42,7 +42,6 @@ public class PVPRoomProxy extends RoomProxyHeader{
             return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
             //return (stub.toJson().toString()).getBytes();
         });
-        //stub.gameChannel = this.gameServiceProvider.gameChannel();
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         this.dataStore.update(stub);
