@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Holee
 {
-    public delegate void OnMessage(MessageHeader messageHeader,MessageBuffer message);
+    public delegate void OnMessage(MessageBuffer message);
     public class Channel
     {
         public event OnMessage OnMessage;
@@ -70,8 +70,7 @@ namespace Holee
         {
             var ret = _udpClient.EndReceive(asyncResult, ref _ipEndPoint);
             _inboundBuffer.Reset(ret);
-            var messageHeader = _inboundBuffer.ReadHeader();
-            OnMessage?.Invoke(messageHeader,_inboundBuffer);
+            OnMessage?.Invoke(_inboundBuffer);
             _udpClient.BeginReceive(ReceiveCallback, null);
         }
     }
