@@ -53,7 +53,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
-            pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key));
+            pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
         }
         logger.warn("UDP Endpoint running as a daemon!");
     }
@@ -99,7 +99,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
-
+        logger.warn("Session timeout->"+sessionId+" from->"+channelId);
         UDPChannel removed = channels.remove(sessionId);
         if(removed != null) pendingQueue.offer(removed);
     }

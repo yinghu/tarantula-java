@@ -35,6 +35,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
     public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
+        stub.pushChannel.close();
         this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.systemId());
     }
 }

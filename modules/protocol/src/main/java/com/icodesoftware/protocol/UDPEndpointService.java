@@ -186,6 +186,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void sessionTimeout(int timeout){
         sessionTimeout = timeout;
     }
+    public int sessionTimeout(){return sessionTimeout;}
     public  void retryInterval(int interval){
         retryInterval = interval;
     }

@@ -16,6 +16,7 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
 
     protected int channelId;
     protected int sessionId;
+    protected int timeout;
     protected byte[] serverKey;
     protected Connection connection;
 
@@ -37,6 +38,10 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
     @Override
     public int sessionId() {
         return sessionId++;
+    }
+
+    public int timeout(){
+        return this.timeout;
     }
     public byte[] serverKey(){
         return serverKey;
@@ -77,4 +82,5 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
         serverKey = portableReader.readByteArray("3");
         connection = portableReader.readPortable("4");
     }
+    public void close(){}
 }

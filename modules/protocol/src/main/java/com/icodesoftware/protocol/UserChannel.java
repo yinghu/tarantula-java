@@ -107,6 +107,9 @@ public class UserChannel {
     public void queue(int sessionId,byte[] data){
         messenger.queue(data,userSessionIndex.get(sessionId).source);
     }
+    public void kickoff(int sessionId){
+        userSessionIndex.remove(sessionId);
+    }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAckList();

@@ -7,7 +7,6 @@ import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.util.BatchUtil;
-import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Base64;
 
@@ -17,11 +16,12 @@ public class UDPChannel extends GameChannel {
 
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private MessageBuffer messageBuffer;
-    public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey){
+    public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey,int timeout){
         this.connection = connection;
         this.userChannel = userChannel;
         this.channelId = userChannel.channelId();
         this.serverKey = serverKey;
+        this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
     public void register(int sessionId, UDPEndpointServiceProvider.RequestListener requestListener){
@@ -37,6 +37,7 @@ public class UDPChannel extends GameChannel {
     public int sessionId() {
         return sessionId;
     }
+
 
     @Override
     public void write(MessageBuffer.MessageHeader messageHeader,byte[] payload) {
@@ -83,11 +84,16 @@ public class UDPChannel extends GameChannel {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("channelId",channelId);
         jsonObject.addProperty("sessionId",sessionId);
+        jsonObject.addProperty("timeout",timeout);
         jsonObject.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
         jsonObject.add("connection",connection.toJson());
         return jsonObject;
     }
     public void sessionId(int sessionId){
         this.sessionId = sessionId;
+    }
+
+    public void close(){
+        userChannel.kickoff(sessionId);
     }
 }

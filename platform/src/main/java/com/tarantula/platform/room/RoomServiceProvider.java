@@ -305,6 +305,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             if(!v.check()) kickoff.add(k);
         });
         kickoff.forEach(k->{
+            logger.warn("Connection kickoff->"+k);
             onDisConnection(k);
         });
     }
