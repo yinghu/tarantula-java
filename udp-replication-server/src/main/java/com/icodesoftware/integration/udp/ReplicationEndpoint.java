@@ -88,7 +88,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         for(int i=1;i<=maxChannelSize;i++){
             JsonObject channel = new JsonObject();
             channel.addProperty("channelId",i);
-            channel.addProperty("sessionId",i);
+            channel.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
             ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
             activeChannelIndex.put(i,activeChannel);
             headers[5]="onChannel";

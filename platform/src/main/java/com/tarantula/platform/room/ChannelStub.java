@@ -16,8 +16,9 @@ public class ChannelStub extends GameChannel implements Portable {
     public ChannelStub(){
 
     }
-    public ChannelStub(int channelId){
+    public ChannelStub(int channelId,int timeout){
         this.channelId = channelId;
+        this.timeout = timeout;
     }
     public ChannelStub(int channelId,String serverId){
         this.channelId = channelId;
@@ -38,11 +39,13 @@ public class ChannelStub extends GameChannel implements Portable {
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",channelId);
         portableWriter.writeUTF("2",serverId);
+        portableWriter.writeInt("3",timeout);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         channelId = portableReader.readInt("1");
         serverId = portableReader.readUTF("2");
+        timeout = portableReader.readInt("3");
     }
 }

@@ -37,7 +37,10 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
     }
 
     public synchronized GameRoom join(String systemId,RoomListener roomListener){
-        if(joinIndex.containsKey(systemId)) return duplicate();
+        if(joinIndex.containsKey(systemId)) {
+            if(channel==null && !roomListener.onRoom(this)) return null;
+            return duplicate();
+        };
         if(channel==null){
             if(!roomListener.onRoom(this)) return null;
         }
@@ -84,6 +87,7 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         if(channel!=null){
             _room.channelId = channel.channelId();
             _room.sessionId = channel.sessionId();
+            _room.timeout = channel.timeout();
             _room.serverKey = channel.serverKey();
             _room.connection = channel.connection();
         }

@@ -9,6 +9,7 @@ public interface GameRoom extends Configurable {
 
     int channelId();
     int sessionId();
+    int timeout();
     byte[] serverKey();
     Connection connection();
 

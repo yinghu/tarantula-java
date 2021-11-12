@@ -23,11 +23,12 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
     public GameChannel(){
 
     }
-    public GameChannel(int channelId,int sessionId,Connection connection,byte[] serverKey){
+    public GameChannel(int channelId,int sessionId,Connection connection,byte[] serverKey,int timeout){
         this.channelId = channelId;
         this.sessionId = sessionId;
         this.connection = connection;
         this.serverKey = serverKey;
+        this.timeout = timeout;
     }
 
     @Override

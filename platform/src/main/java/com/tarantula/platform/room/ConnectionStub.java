@@ -60,7 +60,7 @@ public class ConnectionStub extends ClientConnection implements Portable {
     }
     public GameChannel gameChannel(){
         ChannelStub channelStub = channelStubs.poll();
-        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.getAndAdd(maxCapacity),clientConnection(),serverKey):null;
+        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.getAndAdd(maxCapacity),clientConnection(),serverKey,channelStub.timeout()):null;
     }
     public void close(){
         channelStubs.clear();

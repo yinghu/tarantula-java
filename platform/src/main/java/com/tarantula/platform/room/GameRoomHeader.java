@@ -19,6 +19,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     protected int channelId;
     protected int sessionId;
+    protected int timeout;
     protected byte[] serverKey;
     protected Connection connection;
 
@@ -36,6 +37,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public int sessionId(){
         return sessionId;
     }
+    public int timeout(){return timeout;}
     public byte[] serverKey(){
         return serverKey;
     }
@@ -102,6 +104,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         if(connection!=null){
             jsonObject.addProperty("channelId",channelId);
             jsonObject.addProperty("sessionId",sessionId);
+            jsonObject.addProperty("timeout",timeout);
             jsonObject.addProperty("serverKey",Base64.getEncoder().encodeToString(serverKey));
             jsonObject.add("connection",connection.toJson());
         }

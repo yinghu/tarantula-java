@@ -113,7 +113,7 @@ namespace Holee
             }
         }
 
-        public void Ack(MessageHeader messageHeader)
+        private void Ack(MessageHeader messageHeader)
         {
             _ackOutboundBuffer.Reset(MessageBuffer.HeaderSize);
             for (var i = 1; i < AckSize; i++)
@@ -142,6 +142,10 @@ namespace Holee
             var ret = _udpClient.EndReceive(asyncResult, ref _ipEndPoint);
             _inboundBuffer.Reset(ret);
             var messageHeader = _inboundBuffer.ReadHeader();
+            if (messageHeader.Ack)
+            {
+                Ack(messageHeader);
+            }
             switch (messageHeader.CommandId)
             {
                 case Command.OnJoin:
