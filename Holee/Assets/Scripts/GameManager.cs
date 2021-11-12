@@ -68,7 +68,7 @@ namespace Holee
             });
             _outboundBuffer.WriteInt(_channel.SessionId);
             _outboundBuffer.WriteUTF8(GameClusterManager.Presence.Token);
-            _outboundBuffer.WriteUTF8(GameClusterManager.Ticket);
+            _outboundBuffer.WriteUTF8(GameClusterManager.Presence.Ticket);
             var outbound = _outboundBuffer.Drain();
             NetworkingManager.Send(outbound,outbound.Length);
         }

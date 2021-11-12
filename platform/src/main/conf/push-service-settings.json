@@ -1,5 +1,5 @@
 {
-  "sessionTimeout" : 5000,
-  "sessionPoolSize": 10,
+  "sessionTimeout" : 30000,
+  "sessionPoolSize": 100,
   "IP": "10.0.0.192"
 }

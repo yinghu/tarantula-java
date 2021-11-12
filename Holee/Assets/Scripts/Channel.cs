@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Holee
 {
-    public delegate void OnMessage(MessageBuffer message);
+    public delegate void OnMessage(MessageHeader messageHeader,MessageBuffer message);
     public class Channel
     {
         public event OnMessage OnMessage;
@@ -16,7 +16,7 @@ namespace Holee
         private Rijndael _cipher;
         private MessageBuffer _outboundBuffer;
         private MessageBuffer _inboundBuffer;
-        
+        public Presence Presence { set; get; }
         public int ChannelId { set; get; }
         public int SessionId { set; get; }
 
@@ -43,11 +43,22 @@ namespace Holee
             _ipEndPoint = new IPEndPoint(IPAddress.Parse(Host), Port);
             _udpClient.Connect(_ipEndPoint);
             _udpClient.BeginReceive(ReceiveCallback, null);
+            Send(new MessageHeader
+            {
+                CommandId = Command.Join,
+                Encrypted = true
+            }, buffer =>
+            {
+                buffer.WriteInt(SessionId);
+                buffer.WriteUTF8(Presence.Token);
+                buffer.WriteUTF8(Presence.Ticket);
+            });
             Debug.Log("Starting udp client on ["+Host+":"+Port+"]");
         }
 
         public void Send(MessageHeader messageHeader, Action<MessageBuffer> buffer)
         {
+            Debug.Log("SENDING->"+messageHeader+">>"+messageHeader.CommandId);
             _outboundBuffer.Reset();
             messageHeader.ChannelId = ChannelId;
             messageHeader.SessionId = SessionId;
@@ -70,7 +81,9 @@ namespace Holee
         {
             var ret = _udpClient.EndReceive(asyncResult, ref _ipEndPoint);
             _inboundBuffer.Reset(ret);
-            OnMessage?.Invoke(_inboundBuffer);
+            var messageHeader = _inboundBuffer.ReadHeader();
+            Debug.Log(">>>>>>>>>>>>>>>"+messageHeader+">>"+messageHeader.CommandId);
+            OnMessage?.Invoke(messageHeader,_inboundBuffer);
             _udpClient.BeginReceive(ReceiveCallback, null);
         }
     }

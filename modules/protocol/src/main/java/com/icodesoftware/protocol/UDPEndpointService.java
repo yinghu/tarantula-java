@@ -22,7 +22,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private static int PORT = 11933;
     private static int MESSAGE_HANDLER_POOL_SIZE = 1;
 
-    private static int RECEIVE_TIMEOUT = 200;
     private static int SLEEP_TIMEOUT = 5;
 
     private static int SESSION_TIMEOUT = 5000;
@@ -43,6 +42,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
+    private int sessionTimeout = SESSION_TIMEOUT;
+    private int retryInterval = RETRY_TIMEOUT;
+    private int receiverTimeout = 0;
     private PingListener pingListener;
 
     public void start() throws Exception{
@@ -83,15 +85,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             });
         }
         executorService.execute(()->{
-            long kickoffTimer = SESSION_TIMEOUT;
+            long kickoffTimer = sessionTimeout;
             while (true){
                 try{
-                    Thread.sleep(RETRY_TIMEOUT);
+                    Thread.sleep(retryInterval);
                     userChannelIndex.forEach((k,v)->v.onRetry());
-                    kickoffTimer -= RETRY_TIMEOUT;
+                    kickoffTimer -= retryInterval;
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
-                        kickoffTimer = SESSION_TIMEOUT;
+                        kickoffTimer = sessionTimeout;
                         if(pingListener!=null) pingListener.onPing();
                     }
                 }catch (Exception ex){
@@ -115,7 +117,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             }
         });
         this.datagramChannel = new DatagramSocket(null);
-        this.datagramChannel.setSoTimeout(RECEIVE_TIMEOUT);
+        if(receiverTimeout>0) this.datagramChannel.setSoTimeout(receiverTimeout);
         InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
         if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
@@ -181,7 +183,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void daemon(boolean daemon){
         this.daemon = daemon;
     }
+    public void sessionTimeout(int timeout){
+        sessionTimeout = timeout;
+    }
+    public  void retryInterval(int interval){
+        retryInterval = interval;
+    }
+    public void receiverTimeout(int timeout){
 
+    }
     @Override
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId(),userChannel);

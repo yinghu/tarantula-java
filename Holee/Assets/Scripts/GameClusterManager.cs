@@ -42,7 +42,7 @@ namespace Holee
        
         public string Tag { get; private set; }
         
-        public string Ticket { get; private set; }
+        //public string Ticket { get; private set; }
         
         public Room Room { get; private set; }
         
@@ -119,6 +119,7 @@ namespace Holee
                     Duration =  (int)room.SelectToken("duration"),
                     Channel = new Channel
                     {
+                        Presence = Presence,
                         ChannelId = (int)room.SelectToken("channelId"),
                         SessionId = (int)room.SelectToken("sessionId"),
                         ServerKey = Convert.FromBase64String((string)room.SelectToken("serverKey")),
@@ -135,11 +136,12 @@ namespace Holee
                     break;
                 }
 
-                Ticket = (string)jo.SelectToken("ticket");
+                Presence.Ticket = (string)jo.SelectToken("ticket");
                 var chan = jo.SelectToken("pushChannel");
                 var conn = (JObject)chan.SelectToken("connection");
                 Channel = new Channel
                 {
+                    Presence = Presence,
                     ChannelId = (int)chan.SelectToken("channelId"),
                     SessionId = (int)chan.SelectToken("sessionId"),
                     ServerKey = Convert.FromBase64String((string)chan.SelectToken("serverKey")),

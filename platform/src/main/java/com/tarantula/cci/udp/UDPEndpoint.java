@@ -23,7 +23,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private PushUserChannel pushUserChannel;
     private TokenValidatorProvider tokenValidator;
-    private int channelId;
+    private final int singleChannelId = 1000;
     private int sessionId;
     private byte[] key;
     private Connection connection;
@@ -35,7 +35,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         pendingQueue = new ConcurrentLinkedDeque<>();
         connection = new ClientConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
-        channelId = 1;
+        //channelId = 1;
         sessionId = 1;
     }
     public void setup(ServiceContext serviceContext){
@@ -49,7 +49,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.secured(true);
         connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
-        pushUserChannel = new PushUserChannel(channelId++,udpEndpointServiceProvider,this,this,this);
+        udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
+        pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key));
@@ -98,7 +99,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
-        logger.warn("Session->["+sessionId+"] timed out from channel ["+channelId+"]");
+
         UDPChannel removed = channels.remove(sessionId);
         if(removed != null) pendingQueue.offer(removed);
     }

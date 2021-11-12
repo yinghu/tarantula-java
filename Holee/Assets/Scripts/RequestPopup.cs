@@ -35,13 +35,6 @@ namespace Holee
             Debug.Log(Encoding.UTF8.GetString(payload));
         }
         
-        public void OnMessage(MessageBuffer messageBuffer)
-        {
-            var header = messageBuffer.ReadHeader();
-            var payload = messageBuffer.ReadPayload();
-            Debug.Log(header+">>"+header.Batch+" of "+header.BatchSize);
-            Debug.Log(Encoding.UTF8.GetString(payload));
-        }
         public void Setup(GameManager gameManager)
         {
             _gameManager = gameManager;
