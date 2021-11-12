@@ -8,8 +8,11 @@ namespace Holee
     {
         [SerializeField] private int networkingId;
 
-        private GameManager _gameManager;
+        private Channel _channel;
         private MessageHeader _messageHeader;
+        private float _timerOnPing;
+        private float _timerOnRetry;
+        private bool _started;
         private void Start()
         {
             Debug.Log("start popup");
@@ -19,10 +22,23 @@ namespace Holee
                 ObjectId = networkingId
             };
         }
-
+        private void FixedUpdate()
+        {
+            if(!_started) return;
+            _timerOnPing += Time.deltaTime;//20ms per frame
+            _timerOnRetry += Time.deltaTime;
+            if (_timerOnRetry >= 0.2)
+            {
+                _channel.Retry();
+                _timerOnRetry = 0;
+            }
+            if (_timerOnPing < 1) return;
+            _channel.Ping();
+            _timerOnPing = 0;
+        }
         public void OnRequest()
         {
-            _gameManager.GameClusterManager.Channel.Send(_messageHeader, buffer =>
+            _channel.Send(_messageHeader, buffer =>
             {
                 buffer.WriteUTF8(JsonConvert.SerializeObject(_messageHeader));
             });
@@ -37,8 +53,9 @@ namespace Holee
         
         public void Setup(GameManager gameManager)
         {
-            _gameManager = gameManager;
-            _gameManager.GameClusterManager.Channel.OnMessage += OnMessage;
+            _channel = gameManager.GameClusterManager.Channel;
+            _channel.OnRequest += OnMessage;
+            _started = true;
         }
 
     }
