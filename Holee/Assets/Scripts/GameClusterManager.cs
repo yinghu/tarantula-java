@@ -41,9 +41,7 @@ namespace Holee
         private readonly string _deviceId;
        
         public string Tag { get; private set; }
-        
-        //public string Ticket { get; private set; }
-        
+
         public Room Room { get; private set; }
         
         public Channel Channel { get; private set; }
@@ -122,6 +120,7 @@ namespace Holee
                         Presence = Presence,
                         ChannelId = (int)room.SelectToken("channelId"),
                         SessionId = (int)room.SelectToken("sessionId"),
+                        Timeout =  (int)room.SelectToken("timeout"),
                         ServerKey = Convert.FromBase64String((string)room.SelectToken("serverKey")),
                         Host = (string)rcc.SelectToken("host"),
                         Port = (int)rcc.SelectToken("port")    
@@ -144,6 +143,7 @@ namespace Holee
                     Presence = Presence,
                     ChannelId = (int)chan.SelectToken("channelId"),
                     SessionId = (int)chan.SelectToken("sessionId"),
+                    Timeout =  (int)room.SelectToken("timeout"),
                     ServerKey = Convert.FromBase64String((string)chan.SelectToken("serverKey")),
                     Host = (string)conn.SelectToken("host"),
                     Port = (int)conn.SelectToken("port")

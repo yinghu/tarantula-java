@@ -117,6 +117,7 @@ namespace Holee
             GameClusterManager.Channel.Init();
             requestPopup.Setup(this);
             _channel = GameClusterManager.Room.Channel;
+            _channel.Init();
             Debug.Log("ROOM ID->"+GameClusterManager.Room.RoomId);
             Debug.Log("CHANNEL ID->"+_channel.ChannelId);
             Debug.Log("SESSION ID->"+_channel.SessionId);

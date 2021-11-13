@@ -31,6 +31,8 @@ namespace Holee
         public int ChannelId { set; get; }
         public int SessionId { set; get; }
 
+        public int Timeout { set; get; }
+
         public byte[] ServerKey { set; get; }
         public string Host { set; get; }
         public int Port { set; get; }

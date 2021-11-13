@@ -12,6 +12,7 @@ import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
+import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     private final GameCluster gameCluster;
     private ServiceContext serviceContext;
     private DistributionRoomService distributionRoomService;
+    private SystemValidatorProvider systemValidatorProvider;
     private DataStore dataStore;
     private Configuration configuration;
     private int roomCapacity;
@@ -60,6 +62,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.systemValidatorProvider  = (SystemValidatorProvider)serviceContext.serviceProvider(SystemValidatorProvider.NAME);
         this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
@@ -121,7 +124,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
-        return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),pending.joinTicket);
+        return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
     }
     public void onRelease(String zoneId,String roomId,String systemId){
         GameZone gameZone = gameZoneIndex.get(zoneId);
@@ -158,7 +161,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         return gameRoom!=null?gameRoom.view():null;
     }
     public GameRoom onJoin(String ticket, String roomId, String systemId){
-        if(!validateTicket(ticket)) return null;
+        if(!systemValidatorProvider.validHash(roomId,systemId,ticket)) return null;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
             PVPGameRoom _gameRoom = new PVPGameRoom();
             _gameRoom.distributionKey(roomId);
@@ -232,7 +235,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         for(int i=0;i<pendingRoomSize[0];i++){
             GameRoomRegistry gameRoomRegistry = new GameRoomRegistry();
             gameRoomRegistry.owner(gameZone.distributionKey());
-            gameRoomRegistry.joinTicket = "joinTicket";
             this.dataStore.create(gameRoomRegistry);
             gameZone.roomRegistry().put(gameRoomRegistry.instanceId(),gameRoomRegistry);
             distributionRoomService.create(name,gameZone.distributionKey(),gameRoomRegistry.instanceId());
@@ -244,9 +246,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         gameZoneIndex.remove(t.distributionKey());
     }
 
-    private boolean validateTicket(String ticket){
-        return ticket.equals("joinTicket");
-    }
 
     private void onDisConnection(String serverId){
         ConnectionStub connectionStub = connectionIndex.remove(serverId);

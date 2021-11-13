@@ -98,9 +98,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }
         return null;
     }
+    public String hashJoinTicket(String roomId,String systemId){
+        return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId);
+    }
+    public boolean validHash(String roomId,String systemId,String hash){
+        return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId).equals(hash);
+    }
 
     public String validateGameClusterAccessKey(String accessKey){
-        String[] sp = accessKey.split("-");
+        String[] sp = accessKey.split("-.");
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(sp[0]);
         if(gameCluster==null){
             return null;
