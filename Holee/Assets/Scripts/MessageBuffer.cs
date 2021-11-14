@@ -50,7 +50,7 @@ namespace Holee
     public struct PendingMessage
     {
         public MessageHeader MessageHeader;
-        public MessageBuffer MessageBuffer;
+        public byte[] Message;
     }
 
     public struct RetryData
@@ -222,7 +222,7 @@ namespace Holee
         {
             _memoryStream.Write(payload,0,payload.Length);
         }
-
+        
         public void Reset(byte[] data)
         {
             _memoryStream.Position = 0;

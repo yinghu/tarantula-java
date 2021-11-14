@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Holee
 {
-    public delegate void OnMessage(MessageHeader messageHeader,MessageBuffer message);
-    public delegate void OnRequest(MessageHeader messageHeader,MessageBuffer message);
+    public delegate void OnMessage(MessageHeader messageHeader,byte[] message);
+    public delegate void OnRequest(MessageHeader messageHeader,byte[] message);
     
     public delegate void OnJoin(int sessionId);
 
@@ -70,6 +70,11 @@ namespace Holee
             _udpClient.Connect(_ipEndPoint);
             _udpClient.BeginReceive(ReceiveCallback, null);
             Debug.Log("Starting udp client on ["+Host+":"+Port+"]");
+        }
+
+        public MessageBuffer CreateMessageBuffer()
+        {
+            return new MessageBuffer(_cipher);
         }
 
         public void Join()
@@ -191,17 +196,18 @@ namespace Holee
                 case Command.OnLeave:
                     break;
                 case Command.OnRequest:
-                    OnRequest?.Invoke(messageHeader,_inboundBuffer);
+                    
+                    OnRequest?.Invoke(messageHeader,ret);
                     break;
                 case Command.Ack:
-                    for (var i = 0; i < 10; i++)
+                    for (var i = 0; i < AckSize; i++)
                     {
                         var ack = _inboundBuffer.ReadHeader();
                         _pendingAckMessage.Remove(ack.ToString());
                     }
                     break;
                 default:
-                    OnMessage?.Invoke(messageHeader,_inboundBuffer);        
+                    OnMessage?.Invoke(messageHeader,ret);        
                     break;
             }
             _udpClient.BeginReceive(ReceiveCallback, null);

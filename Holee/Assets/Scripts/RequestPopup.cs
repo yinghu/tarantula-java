@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Holee
 {
-    public class RequestPopup : MonoBehaviour,IMessage
+    public class RequestPopup : MonoBehaviour
     {
         [SerializeField] private int networkingId;
 
@@ -13,6 +13,7 @@ namespace Holee
         private float _timerOnPing;
         private float _timerOnRetry;
         private bool _started;
+        private MessageBuffer _messageBuffer;
         private void Start()
         {
             Debug.Log("start popup");
@@ -44,15 +45,18 @@ namespace Holee
             });
         }
 
-        public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
+        public void OnMessage(MessageHeader header, byte[] data)
         {
-            var payload = messageBuffer.ReadPayload();
+            _messageBuffer.Reset(data);
+            _messageBuffer.ReadHeader();
+            var payload = _messageBuffer.ReadPayload();
             Debug.Log(header+">>"+header.Batch+" of "+header.BatchSize);
             Debug.Log(Encoding.UTF8.GetString(payload));
         }
 
         public void OnJoin(int sessionId)
         {
+            _messageBuffer = _channel.CreateMessageBuffer();
             _started = true;
             Debug.Log("Session joined on popup->"+sessionId);
         }

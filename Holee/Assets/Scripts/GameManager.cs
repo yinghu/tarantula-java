@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Holee
 {
-    public class GameManager : MonoBehaviour,IMessage
+    public class GameManager : MonoBehaviour
     {
         
         public Player playerA;
@@ -18,6 +18,7 @@ namespace Holee
         private bool _started;
         private float _timerOnPing;
         private float _timerOnRetry;
+        private MessageBuffer _messageBuffer;
 
         public GameClusterManager GameClusterManager { get; private set; }
 
@@ -29,6 +30,7 @@ namespace Holee
                 r.Setup(this);    
             }
             _messageQueue = new ConcurrentQueue<PendingMessage>();
+            
         }
         
        
@@ -96,23 +98,25 @@ namespace Holee
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
             var header = message.MessageHeader;
+            _messageBuffer.Reset(message.Message);
+            _messageBuffer.ReadHeader();
             switch (header.ObjectId)
             {
                 case 0:
-                    replications[0].OnMessage(header,message.MessageBuffer);
+                    replications[0].OnMessage(header,_messageBuffer);
                     //Debug.Log("MSG->"+header.ChannelId+"<>"+header.SessionId+"<>"+header.CommandId);
                     break;
                 case 1:
-                    playerA.OnMessage(header,message.MessageBuffer);
+                    playerA.OnMessage(header,_messageBuffer);
                     break;
                 case 2:
-                    playerB.OnMessage(header,message.MessageBuffer);
+                    playerB.OnMessage(header,_messageBuffer);
                     break;
                 case 3:
-                    replications[1].OnMessage(header,message.MessageBuffer);
+                    replications[1].OnMessage(header,_messageBuffer);
                     break;
                 case 4:
-                    replications[0].OnMessage(header,message.MessageBuffer);
+                    replications[0].OnMessage(header,_messageBuffer);
                     break;
             }
         }
@@ -125,6 +129,7 @@ namespace Holee
 
         public void OnJoin(int sessionId)
         {
+            _messageBuffer = _channel.CreateMessageBuffer();
             _started = true;
             Debug.Log("Session joined->"+sessionId);
             if (GameClusterManager.Room.Seat == 1)
@@ -137,12 +142,12 @@ namespace Holee
             }
         }
 
-        public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
+        public void OnMessage(MessageHeader header, byte[] data)
         {
             _messageQueue.Enqueue(new PendingMessage
             {
                 MessageHeader = header,
-                MessageBuffer = messageBuffer
+                Message = data
             });             
         }
     }

@@ -55,6 +55,7 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
             }
             e.systemId = systemId;
             e.occupied = true;
+            e.seatIndex = i;
             this.dataStore.update(e);
             joinIndex.put(systemId,e);
             break;
