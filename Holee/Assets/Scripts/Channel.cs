@@ -9,11 +9,15 @@ namespace Holee
 {
     public delegate void OnMessage(MessageHeader messageHeader,MessageBuffer message);
     public delegate void OnRequest(MessageHeader messageHeader,MessageBuffer message);
+    
+    public delegate void OnJoin(int sessionId);
 
     public class Channel
     {
         public event OnMessage OnMessage;
         public event OnRequest OnRequest;
+
+        public event OnJoin OnJoin;
 
         private const int AckSize = 10;
         private const int Retries = 3;
@@ -24,7 +28,7 @@ namespace Holee
         private MessageBuffer _outboundBuffer;
         private MessageBuffer _inboundBuffer;
         private byte[] _ping;
-        private readonly Dictionary<string,Retry.RetryData> _pendingAckMessage;
+        private readonly Dictionary<string,RetryData> _pendingAckMessage;
         private readonly MessageHeader[] _pendingAck;
         private readonly MessageBuffer _ackOutboundBuffer;
         public Presence Presence { set; get; }
@@ -42,7 +46,7 @@ namespace Holee
         public Channel()
         {
             _udpClient = new UdpClient();
-            _pendingAckMessage = new Dictionary<string,Retry.RetryData>();
+            _pendingAckMessage = new Dictionary<string,RetryData>();
             _pendingAck = new MessageHeader[AckSize];
             for (var i = 0; i < AckSize; i++)
             {
@@ -65,17 +69,28 @@ namespace Holee
             _ipEndPoint = new IPEndPoint(IPAddress.Parse(Host), Port);
             _udpClient.Connect(_ipEndPoint);
             _udpClient.BeginReceive(ReceiveCallback, null);
-            Send(new MessageHeader
-            {
-                CommandId = Command.Join,
-                Encrypted = true
-            }, buffer =>
-            {
-                buffer.WriteInt(SessionId);
-                buffer.WriteUTF8(Presence.Token);
-                buffer.WriteUTF8(Presence.Ticket);
-            });
             Debug.Log("Starting udp client on ["+Host+":"+Port+"]");
+        }
+
+        public void Join()
+        {
+            var messageHeader = new MessageHeader
+            {
+                ChannelId = ChannelId,
+                SessionId = SessionId,
+                CommandId = Command.Join,
+                Encrypted = true,
+            };
+            _outboundBuffer.Reset();
+            _outboundBuffer.WriteHeader(messageHeader);
+            _outboundBuffer.WriteInt(SessionId);
+            _outboundBuffer.WriteUTF8(Presence.Token);
+            _outboundBuffer.WriteUTF8(Presence.Ticket);
+            var outData = _outboundBuffer.Drain();
+            Send(outData,outData.Length);
+            messageHeader.CommandId = Command.Ack;
+            messageHeader.Encrypted = false;
+            _ackOutboundBuffer.WriteHeader(messageHeader);
         }
 
         public void Send(MessageHeader messageHeader, Action<MessageBuffer> buffer)
@@ -83,15 +98,27 @@ namespace Holee
             _outboundBuffer.Reset();
             messageHeader.ChannelId = ChannelId;
             messageHeader.SessionId = SessionId;
-            if (messageHeader.CommandId == Command.Join) _ackOutboundBuffer.WriteHeader(messageHeader);
             _outboundBuffer.WriteHeader(messageHeader);
-            buffer(_outboundBuffer);
+            buffer(_outboundBuffer);    
             var outData = _outboundBuffer.Drain();
-            if (messageHeader.Ack)
-            {
-                _pendingAckMessage[messageHeader.ToString()] = new Retry.RetryData { Retries = Retries,Data = outData};    
-            }
+            if (messageHeader.Ack) _pendingAckMessage[messageHeader.ToString()] = new RetryData { Retries = Retries,Data = outData};
             Send(outData,outData.Length);
+        }
+
+        public void Leave()
+        {
+            var messageHeader = new MessageHeader
+            {
+                ChannelId = ChannelId,
+                SessionId = SessionId,
+                CommandId = Command.Leave
+            };
+            _outboundBuffer.Reset();
+            _outboundBuffer.WriteHeader(messageHeader);
+            _outboundBuffer.WriteInt(SessionId);
+            var outData = _outboundBuffer.Drain();
+            Send(outData,outData.Length);
+            _ackOutboundBuffer.WriteHeader(messageHeader);
         }
 
         public void Ping()
@@ -153,12 +180,14 @@ namespace Holee
                 case Command.OnJoin:
                     if (messageHeader.SessionId == SessionId)
                     {
-                        Joined = true;
                         messageHeader.CommandId = Command.Ping;
                         _inboundBuffer.Reset();
                         _inboundBuffer.WriteHeader(messageHeader);
                         _ping = _inboundBuffer.Drain();
+                        Joined = true;
                     }
+                    Debug.Log("c->"+messageHeader.ChannelId+">S->"+messageHeader.SessionId);
+                    OnJoin?.Invoke(messageHeader.SessionId);
                     break;
                 case Command.OnLeave:
                     break;
@@ -177,6 +206,12 @@ namespace Holee
                     break;
             }
             _udpClient.BeginReceive(ReceiveCallback, null);
+        }
+
+        public void Close()
+        {
+            _udpClient.Close();
+            _udpClient.Dispose();
         }
     }
 }

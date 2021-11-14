@@ -47,6 +47,18 @@ namespace Holee
 
     }
 
+    public struct PendingMessage
+    {
+        public MessageHeader MessageHeader;
+        public MessageBuffer MessageBuffer;
+    }
+
+    public struct RetryData
+    {
+        public int Retries;
+        public byte[] Data;
+    }
+
     public class MessageBuffer :IDisposable
     {
         public const int Size = 508;

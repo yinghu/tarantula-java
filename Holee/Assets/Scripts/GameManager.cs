@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Security.Cryptography;
 using UnityEngine;
 
 namespace Holee
@@ -11,17 +10,14 @@ namespace Holee
         public Player playerA;
         public Player playerB;
         [SerializeField] private Replication[] replications;
-        [SerializeField] private Ping ping;
-        [SerializeField] private Retry retry;
-        [SerializeField] private Ack ack;
+       
         [SerializeField] private RequestPopup requestPopup;
-        private ConcurrentQueue<byte[]> _messageQueue;
-     
-        private MessageBuffer _outboundBuffer;
-        private MessageBuffer _inboundBuffer;
-        private Rijndael _cipher;
-        private MessageHeader _header;
+        private ConcurrentQueue<PendingMessage> _messageQueue;
+        
         private Channel _channel;
+        private bool _started;
+        private float _timerOnPing;
+        private float _timerOnRetry;
 
         public GameClusterManager GameClusterManager { get; private set; }
 
@@ -32,47 +28,10 @@ namespace Holee
             {
                 r.Setup(this);    
             }
-            _messageQueue = new ConcurrentQueue<byte[]>();
+            _messageQueue = new ConcurrentQueue<PendingMessage>();
         }
-        private void OnPlay()
-        {
-            var key = _channel.ServerKey;
-            _cipher = new RijndaelManaged
-            {
-                Key = key,
-                Padding = PaddingMode.PKCS7,
-                Mode = CipherMode.CBC,
-                IV = key
-            };
-            NetworkingManager.Init(_channel.Host,_channel.Port);
-            _outboundBuffer = new MessageBuffer(_cipher);
-            _inboundBuffer = new MessageBuffer(_cipher);
-            _header = new MessageHeader
-            {
-                ChannelId = _channel.ChannelId,
-                SessionId = _channel.SessionId,
-                ObjectId = 0,
-                Sequence = 1,
-                CommandId = Command.Ack
-            };
-            ack.OnJoin(_header);
-            NetworkingManager.OnReceived += OnMessage;
-            _outboundBuffer.WriteHeader(new MessageHeader
-            {
-                ChannelId = _channel.ChannelId,
-                SessionId = _channel.SessionId,
-                ObjectId = 0,
-                Sequence = 2,
-                CommandId = Command.Join,
-                Encrypted = true
-            });
-            _outboundBuffer.WriteInt(_channel.SessionId);
-            _outboundBuffer.WriteUTF8(GameClusterManager.Presence.Token);
-            _outboundBuffer.WriteUTF8(GameClusterManager.Presence.Ticket);
-            var outbound = _outboundBuffer.Drain();
-            NetworkingManager.Send(outbound,outbound.Length);
-        }
-
+        
+       
         public void OnPlayA()
         {
             playerB.OffPlay();
@@ -95,18 +54,8 @@ namespace Holee
                 playerB.OffPlay();
             }
             await GameClusterManager.Leave(this);
-            _outboundBuffer.Reset();
-            _outboundBuffer.WriteHeader(new MessageHeader
-            {
-                ChannelId = _channel.ChannelId,
-                SessionId = _channel.SessionId,
-                ObjectId = 0,
-                Sequence = 3,
-                CommandId = Command.Leave,
-            });
-            _outboundBuffer.WriteInt(_channel.SessionId);
-            var outbound = _outboundBuffer.Drain();
-            NetworkingManager.Send(outbound,outbound.Length);
+            _channel.Leave();
+            GameClusterManager.Channel.Leave();
             Debug.Log("disconnected->"+_channel.ChannelId);
         }
 
@@ -114,114 +63,88 @@ namespace Holee
         {
             if(!await GameClusterManager.Device(this)) return;
             if (!await GameClusterManager.Join(this)) return;
-            GameClusterManager.Channel.Init();
-            requestPopup.Setup(this);
             _channel = GameClusterManager.Room.Channel;
             _channel.Init();
-            Debug.Log("ROOM ID->"+GameClusterManager.Room.RoomId);
-            Debug.Log("CHANNEL ID->"+_channel.ChannelId);
-            Debug.Log("SESSION ID->"+_channel.SessionId);
-            OnPlay();
-            if (GameClusterManager.Room.Seat == 1)
-            {
-                OnPlayA();
-            }
-            else
-            { 
-                OnPlayB();
-            }
+            _channel.OnMessage += OnMessage;
+            _channel.OnJoin += OnJoin;
+            _channel.Join();
+            requestPopup.Setup(this);
         }
 
         public void Send(MessageHeader header,Action<MessageBuffer> message)
         {
-            header.ChannelId = _channel.ChannelId;
-            header.SessionId = _channel.SessionId;
-            message(_outboundBuffer.WriteHeader(header));
-            var outbound = _outboundBuffer.Drain();
-            if (header.Ack)
-            {
-                retry.PendingAck(header.ToString(),outbound,3);
-            }
-            NetworkingManager.Send(outbound,outbound.Length);
+            _channel.Send(header,message);
         }
-
-        private void OnMessage(byte[] message)
-        {
-            _messageQueue.Enqueue(message);
-        }
-
+        
         private void FixedUpdate()
         {
+            if(!_started) return;
+            _timerOnPing += Time.deltaTime;//20ms per frame
+            _timerOnRetry += Time.deltaTime;
+            if (_timerOnRetry >= 0.2)
+            {
+                _channel.Retry();
+                _timerOnRetry = 0;
+            }
+
+            if (_timerOnPing >= 1)
+            { 
+                _channel.Ping();
+                _timerOnPing = 0;
+            }
+
             var suc = _messageQueue.TryDequeue(out var message);
             if(!suc) return;
-            _inboundBuffer.Reset(message);
-            var header = _inboundBuffer.ReadHeader();
-            Debug.Log(message.Length+">>>>>"+header.CommandId);
-            if (header.CommandId == Command.Ack)
-            {
-                retry.OnAck(_inboundBuffer);
-                return;     
-            }
-            if (header.Ack)
-            {
-                ack.OnAck(header);
-            }
-            if (header.CommandId == Command.OnJoin)
-            {
-                Debug.Log("On JOINED->" + header);
-                if(header.SessionId != _channel.SessionId) return;
-                header.CommandId = Command.Ping;
-                _outboundBuffer.Reset();
-                _outboundBuffer.WriteHeader(header);
-                var data = _outboundBuffer.Drain();
-                ping.OnJoin(data);
-                return;
-            }
-
-            if (header.CommandId == Command.OnLeave)
-            {
-                Debug.Log("On LEFT->" + header);
-                return;
-            }
-
-            if (header.CommandId == Command.OnRequest)
-            {
-                requestPopup.OnMessage(header,_inboundBuffer);
-                return;
-            }
-
+            var header = message.MessageHeader;
             switch (header.ObjectId)
             {
                 case 0:
-                    replications[0].OnMessage(header,_inboundBuffer);
+                    replications[0].OnMessage(header,message.MessageBuffer);
                     //Debug.Log("MSG->"+header.ChannelId+"<>"+header.SessionId+"<>"+header.CommandId);
                     break;
                 case 1:
-                    playerA.OnMessage(header,_inboundBuffer);
+                    playerA.OnMessage(header,message.MessageBuffer);
                     break;
                 case 2:
-                    playerB.OnMessage(header,_inboundBuffer);
+                    playerB.OnMessage(header,message.MessageBuffer);
                     break;
                 case 3:
-                    replications[1].OnMessage(header,_inboundBuffer);
+                    replications[1].OnMessage(header,message.MessageBuffer);
                     break;
                 case 4:
-                    replications[0].OnMessage(header,_inboundBuffer);
+                    replications[0].OnMessage(header,message.MessageBuffer);
                     break;
             }
         }
 
         private void OnDestroy()
         {
-            NetworkingManager.Close();
-            _outboundBuffer.Dispose();
-            _inboundBuffer.Dispose();
-            NetworkingManager.OnReceived -= OnMessage;
+            _channel.Close();
+            GameClusterManager.Channel.Close();
+        }
+
+        public void OnJoin(int sessionId)
+        {
+            _started = true;
+            Debug.Log("Session joined->"+sessionId);
+            playerA.OnPlay();
+            //if (GameClusterManager.Room.Seat == 1)
+            //{
+                //OnPlayA();
+            //}
+            //else
+            //{ 
+                //OnPlayB();
+            //}
         }
 
         public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)
         {
-            
+            _messageQueue.Enqueue(new PendingMessage
+            {
+                MessageHeader = header,
+                MessageBuffer = messageBuffer
+            });             
         }
     }
 }

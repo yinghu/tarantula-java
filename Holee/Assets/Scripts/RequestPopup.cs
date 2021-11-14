@@ -50,12 +50,21 @@ namespace Holee
             Debug.Log(header+">>"+header.Batch+" of "+header.BatchSize);
             Debug.Log(Encoding.UTF8.GetString(payload));
         }
-        
+
+        public void OnJoin(int sessionId)
+        {
+            _started = true;
+            Debug.Log("Session joined on popup->"+sessionId);
+        }
+
         public void Setup(GameManager gameManager)
         {
+            Debug.Log("POPUP SETUP");
             _channel = gameManager.GameClusterManager.Channel;
+            _channel.Init();
             _channel.OnRequest += OnMessage;
-            _started = true;
+            _channel.OnJoin += OnJoin;
+            _channel.Join();
         }
 
     }
