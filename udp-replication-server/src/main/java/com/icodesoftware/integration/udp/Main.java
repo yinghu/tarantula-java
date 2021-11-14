@@ -15,12 +15,12 @@ public class Main {
             JsonParser jsonParser = new JsonParser();
             File f = new File("/etc/tarantula/udp.conf");
             JsonObject config;
-            //if(f.exists()){
-                //config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
-            //}
-            //else{
+            if(f.exists()){
+                config = jsonParser.parse(new InputStreamReader(new FileInputStream(f))).getAsJsonObject();
+            }
+            else{
                 config = jsonParser.parse(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("udp.conf"))).getAsJsonObject();
-            //}
+            }
             try{
                 File fp = new File("/etc/tarantula/ip.txt");
                 if(fp.exists()){

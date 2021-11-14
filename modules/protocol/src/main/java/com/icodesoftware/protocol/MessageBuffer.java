@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 public class MessageBuffer {
     public final static int PAYLOAD_SIZE = 483;
     public final static int SIZE = 508;
+    public final static int PENDING_ACK_SIZE = 10;
+    public final static int RETRIES = 3;
     private final static int HEADER_SIZE = 25;
 
     private ByteBuffer byteBuffer;

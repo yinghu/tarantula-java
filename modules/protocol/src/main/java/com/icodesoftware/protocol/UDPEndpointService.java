@@ -59,7 +59,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         log.warn("Inbound message handler number ["+messageHandlerSize+"]");
         log.warn("Ping handler number ["+1+"]");
         log.warn("Outbound message handler number ["+1+"]");
-        //log.warn("Message receiver handler number ["+1+"]");
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
@@ -139,7 +138,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                //ex.printStackTrace();
+                ex.printStackTrace();
                 try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
             }
         }
@@ -172,11 +171,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     @Override
-    public void resource(Resource resource) {
-
-    }
-
-    @Override
     public String name() {
         return "UDPEndpointService";
     }
@@ -191,7 +185,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         retryInterval = interval;
     }
     public void receiverTimeout(int timeout){
-
+        this.receiverTimeout = timeout;
     }
     @Override
     public void registerUserChannel(UserChannel userChannel){

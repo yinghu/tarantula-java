@@ -52,7 +52,7 @@ public class UserChannel {
         }
         if(messageHeader.commandId == Messenger.ACK){
             //server clear on ack
-            for(int i=0;i<10;i++){
+            for(int i=0;i<MessageBuffer.PENDING_ACK_SIZE;i++){
                 String h = messageBuffer.readHeader().toString();
                 if(pendingAckMessageIndex.containsKey(h)){
                     PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
@@ -169,7 +169,7 @@ public class UserChannel {
     protected class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
         public byte[] data;
-        public int retries = 3;
+        public int retries = MessageBuffer.RETRIES;
         public int pendingAck;
         public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] data){
             this.messageHeader = messageHeader;
