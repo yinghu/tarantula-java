@@ -45,40 +45,15 @@ namespace Holee
 
         public void OnTrigger()
         {
-            var header = new MessageHeader
-            {
-                Ack = true,
-                ObjectId = networkingId,
-                Sequence = _sequence,
-                CommandId = 2
-
-            };
-            _gameManager.Send(header, buffer =>
-            {
-                buffer.WriteUTF8("my turn");
-            });
             _isTriggering = true;
         }
         public void OnMessage(MessageHeader header,MessageBuffer messageBuffer)
         {
-            switch (header.CommandId)
-            {
-                case 1:
-                    if (header.Sequence > _sequence)
-                    {
-                        _sequence = header.Sequence;
-                        _rigidbody.velocity = messageBuffer.ReadVector3();
-                        _rigidbody.position = messageBuffer.ReadVector3();
-                        _rigidbody.angularVelocity = messageBuffer.ReadVector3();
-                    }
-                    break;
-                case 2:
-                    var resp = messageBuffer.ReadUTF8();
-                    Debug.Log("RSP->"+resp.Length);
-                    Debug.Log("RSP->"+resp);
-                    _isTriggering = false;
-                    break;
-            }
+            if (header.Sequence <= _sequence) return;
+            _sequence = header.Sequence;
+            _rigidbody.velocity = messageBuffer.ReadVector3();
+            _rigidbody.position = messageBuffer.ReadVector3();
+            _rigidbody.angularVelocity = messageBuffer.ReadVector3();
         }
     }
 }

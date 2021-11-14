@@ -127,15 +127,14 @@ namespace Holee
         {
             _started = true;
             Debug.Log("Session joined->"+sessionId);
-            playerA.OnPlay();
-            //if (GameClusterManager.Room.Seat == 1)
-            //{
-                //OnPlayA();
-            //}
-            //else
-            //{ 
-                //OnPlayB();
-            //}
+            if (GameClusterManager.Room.Seat == 1)
+            {
+                playerA.OnPlay();
+            }
+            else
+            { 
+                playerB.OnPlay();
+            }
         }
 
         public void OnMessage(MessageHeader header, MessageBuffer messageBuffer)

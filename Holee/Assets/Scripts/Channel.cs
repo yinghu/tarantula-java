@@ -186,7 +186,6 @@ namespace Holee
                         _ping = _inboundBuffer.Drain();
                         Joined = true;
                     }
-                    Debug.Log("c->"+messageHeader.ChannelId+">S->"+messageHeader.SessionId);
                     OnJoin?.Invoke(messageHeader.SessionId);
                     break;
                 case Command.OnLeave:
