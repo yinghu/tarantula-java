@@ -4,6 +4,8 @@ import com.icodesoftware.service.EndPoint;
 
 public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
+    int SESSION_CHECK_INTERVAL = 5000;
+
     void daemon(boolean daemon);
     void sessionTimeout(int timeout);
     int sessionTimeout();

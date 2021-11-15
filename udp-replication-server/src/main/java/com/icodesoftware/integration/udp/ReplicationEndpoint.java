@@ -145,6 +145,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             }
             return false;
         }catch (Exception ex){
+            logger.error("unexpected error on validate",ex);
             return false;
         }
     }
@@ -160,10 +161,10 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             else{
                 headers[5]="onChannel";
                 JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
-                if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+                if(ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("unexpected error on ->"+registerPath+"/"+headers[5]+"/"+headers[3],ex);
         }
     }
 }

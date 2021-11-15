@@ -20,7 +20,9 @@ public class PVERoomProxy extends RoomProxyHeader {
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
-        stub.pushChannel = context.register(session.systemId(),(h,m)->super.update(stub,h,m));
+        stub.pushChannel = context.register(session.systemId(),(h,m)->super.update(stub,h,m),(s)->{
+            gameLobby.timeout(s);
+        });
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.joined = true;

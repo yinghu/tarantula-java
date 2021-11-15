@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener {
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.PingListener {
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -50,6 +50,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
+        udpEndpointServiceProvider.registerPingListener(this);
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
@@ -90,9 +91,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(poolSetting);
     }
 
-    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
+    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         UDPChannel uch = this.pendingQueue.poll();
-        uch.register(sessionId++,requestListener);
+        uch.register(systemId,sessionId++,requestListener,timeoutListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }
@@ -101,7 +102,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void onTimeout(int channelId, int sessionId) {
         logger.warn("Session timeout->"+sessionId+" from->"+channelId);
         UDPChannel removed = channels.remove(sessionId);
-        if(removed != null) pendingQueue.offer(removed);
+        if(removed != null) {
+            pendingQueue.offer(removed);
+            removed.kickoff();
+        }
     }
 
     @Override
@@ -122,6 +126,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
             return sessionId==messageHeader.sessionId && suc;
         }catch (Exception ex){
+            logger.error("unexpected error on validate",ex);
             return false;
         }
     }
@@ -149,5 +154,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             udpChannel.onMessage(messageHeader,messageBuffer);
         }
         return null;
+    }
+
+    @Override
+    public void onPing() {
+
     }
 }

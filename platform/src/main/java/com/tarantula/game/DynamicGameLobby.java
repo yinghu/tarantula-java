@@ -43,7 +43,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
 
     public Stub join(Session session, Rating rating){
         Stub stub = stubIndex.get(session.systemId());
-        if(stub!=null&&stub.joined) return stub;
+        if(stub!=null&&stub.joined) {
+            stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            return stub;
+        }
         GameZone _zone = zoneIndex.get(rating.level);
         Stub _stub = _zone.join(session,rating);
         stubIndex.put(session.systemId(),_stub);
@@ -78,6 +81,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         stub.zone.list(session,stub);
     }
 
+    public void timeout(String systemId){
+        stubIndex.remove(systemId);
+        this.context.log("time out->"+systemId,OnLog.WARN);
+    }
 
     @Override
     public Map<String,Object> toMap(){

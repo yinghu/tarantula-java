@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.cci.udp.GameChannel;
@@ -127,6 +128,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
     }
     public void onRelease(String zoneId,String roomId,String systemId){
+        logger.warn("room released->"+roomId+"//"+systemId);
         GameZone gameZone = gameZoneIndex.get(zoneId);
         if(gameZone!=null){
             GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
@@ -289,12 +291,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public long initialDelay() {
-        return 5000;
+        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL;
     }
 
     @Override
     public long delay() {
-        return 5000;
+        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL;
     }
 
     @Override

@@ -22,14 +22,14 @@ public class UserChannel {
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
         this.messenger = messenger;
-        this.userSessionValidator = userSessionValidator;
-        this.requestListener = requestListener;
+        this.userSessionValidator = userSessionValidator!=null?userSessionValidator:(h,m)->false;
+        this.requestListener = requestListener!=null?requestListener:(h,m)->null;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
         this.sequence = new AtomicInteger(0);
         this._offline = new ArrayList<>();
         this._retried = new ArrayList<>();
-        this.sessionListener = sessionListener;
+        this.sessionListener = sessionListener!=null?sessionListener:(c,s)->{};
     }
     public int channelId(){
         return this.channelId;
@@ -45,7 +45,7 @@ public class UserChannel {
         if(userSession==null){
             return;
         }
-        if(userSession.onJoin()){
+        if(userSession.onJoin()||(messageHeader.commandId==Messenger.JOIN&&userSessionValidator.validate(messageHeader,messageBuffer))){
             //server push onJoin 200
             onJoin(messageHeader,messageBuffer);
             return;
@@ -87,7 +87,7 @@ public class UserChannel {
         });
         _offline.forEach((i)-> {
             userSessionIndex.remove(i);
-            if(sessionListener!=null) sessionListener.onTimeout(channelId,i);
+            sessionListener.onTimeout(channelId,i);
         });
         _offline.clear();
     }
@@ -109,6 +109,7 @@ public class UserChannel {
     }
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
+        sessionListener.onTimeout(channelId,sessionId);
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);

@@ -24,7 +24,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private static int SLEEP_TIMEOUT = 5;
 
-    private static int SESSION_TIMEOUT = 5000;
     private static int RETRY_TIMEOUT = 200;
 
     private DatagramSocket datagramChannel;
@@ -42,10 +41,10 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
-    private int sessionTimeout = SESSION_TIMEOUT;
+    private int sessionTimeout = SESSION_CHECK_INTERVAL;
     private int retryInterval = RETRY_TIMEOUT;
     private int receiverTimeout = 0;
-    private PingListener pingListener;
+    private PingListener pingListener  = ()->{};
 
     public void start() throws Exception{
         if(inboundThreadPoolSetting!=null){
@@ -78,25 +77,30 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         }
                     }catch (Exception ex){
                         //ignore
-                        ex.printStackTrace();
+                        log.error("unexpected error",ex);
                     }
                 }
             });
         }
         executorService.execute(()->{
             long kickoffTimer = sessionTimeout;
+            long pingTimer = SESSION_CHECK_INTERVAL;
             while (true){
                 try{
                     Thread.sleep(retryInterval);
                     userChannelIndex.forEach((k,v)->v.onRetry());
                     kickoffTimer -= retryInterval;
+                    pingTimer -= retryInterval;
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
                         kickoffTimer = sessionTimeout;
-                        if(pingListener!=null) pingListener.onPing();
+                    }
+                    if(pingTimer<=0){
+                        pingListener.onPing();
+                        pingTimer = SESSION_CHECK_INTERVAL;
                     }
                 }catch (Exception ex){
-                    ex.printStackTrace();
+                    log.error("unexpected error",ex);
                 }
             }
         });
@@ -111,7 +115,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         Thread.sleep(SLEEP_TIMEOUT);
                     }
                 }catch (Exception ex){
-                    ex.printStackTrace();
+                    log.error("unexpected error",ex);
                 }
             }
         });
@@ -138,7 +142,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                ex.printStackTrace();
+                log.error("unexpected error",ex);
                 try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
             }
         }
@@ -149,7 +153,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             DatagramPacket packet = new DatagramPacket(data,data.length,destination);
             this.datagramChannel.send(packet);
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("unexpected error",ex);
         }
     }
     public void queue(byte[] data,SocketAddress destination){
@@ -197,7 +201,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     public void registerPingListener(PingListener pingListener){
-        this.pingListener = pingListener;
+        this.pingListener = pingListener!=null?pingListener:()->{};
     }
 
 }

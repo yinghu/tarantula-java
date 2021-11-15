@@ -2,6 +2,7 @@ package com.tarantula.cci.udp;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
@@ -15,6 +16,7 @@ public class UDPChannel extends GameChannel {
     private UserChannel userChannel;
 
     private UDPEndpointServiceProvider.RequestListener requestListener;
+    private Session.TimeoutListener timeoutListener;
     private MessageBuffer messageBuffer;
     public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey,int timeout){
         this.connection = connection;
@@ -24,9 +26,11 @@ public class UDPChannel extends GameChannel {
         this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
-    public void register(int sessionId, UDPEndpointServiceProvider.RequestListener requestListener){
+    public void register(String systemId,int sessionId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+        this.owner = systemId;
         this.sessionId = sessionId;
         this.requestListener = requestListener;
+        this.timeoutListener = timeoutListener;
     }
     @Override
     public int channelId() {
@@ -95,5 +99,8 @@ public class UDPChannel extends GameChannel {
 
     public void close(){
         userChannel.kickoff(sessionId);
+    }
+    public void kickoff(){
+        this.timeoutListener.timeout(this.owner);
     }
 }

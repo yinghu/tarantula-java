@@ -19,4 +19,6 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     boolean configureArena(byte[] payload);
     void reload();
 
+    void timeout(String systemId);
+
 }

@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 
@@ -159,8 +160,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         rMap.clear();
     }
 
-    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener){
-        EndPoint udp = (EndPoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        return udp.register(systemId,requestListener);
+    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+        EndPoint udp = (UDPEndpoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+        return udp.register(systemId,requestListener,timeoutListener);
     }
 }

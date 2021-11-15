@@ -96,7 +96,7 @@ public class ConnectionStub extends ClientConnection implements Portable {
             return true;
         }
         tries++;
-        return tries<2;
+        return tries<3;
     }
 
 }
