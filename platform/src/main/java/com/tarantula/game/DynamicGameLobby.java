@@ -81,9 +81,8 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         stub.zone.list(session,stub);
     }
 
-    public void timeout(String systemId){
-        stubIndex.remove(systemId);
-        this.context.log("time out->"+systemId,OnLog.WARN);
+    public boolean timeout(String systemId){
+        return stubIndex.remove(systemId)!=null;
     }
 
     @Override

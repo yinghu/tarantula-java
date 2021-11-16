@@ -45,8 +45,19 @@ public class UserChannel {
         if(userSession==null){
             return;
         }
-        if(userSession.onJoin()||(messageHeader.commandId==Messenger.JOIN&&userSessionValidator.validate(messageHeader,messageBuffer))){
+        if(userSession.onJoin()){
             //server push onJoin 200
+            onJoin(messageHeader,messageBuffer);
+            return;
+        }
+        if(messageHeader.commandId == Messenger.JOIN){
+            if(!userSessionValidator.validate(messageHeader,messageBuffer)){
+                //kickoff
+                userSessionIndex.remove(messageHeader.sessionId);
+                sessionListener.onTimeout(channelId,messageHeader.sessionId);
+                return;
+            }
+            userSession.source = source;
             onJoin(messageHeader,messageBuffer);
             return;
         }

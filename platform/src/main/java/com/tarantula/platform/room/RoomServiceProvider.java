@@ -125,10 +125,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
+        logger.warn(pending+">join>>>>"+ret);
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
     }
     public void onRelease(String zoneId,String roomId,String systemId){
-        logger.warn("room released->"+roomId+"//"+systemId);
         GameZone gameZone = gameZoneIndex.get(zoneId);
         if(gameZone!=null){
             GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
@@ -140,16 +140,19 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
                 return true;
             });
             this.dataStore.update(released);
+            logger.warn("release>>>"+released);
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
         GameZone gameZone = gameZoneIndex.get(zoneId);
         GameRoomRegistry roomRegistry = gameZone.roomRegistry().get(roomId);
-        if(!roomRegistry.sync(joined)){
-            logger.warn("RoomRegistry Synced->"+roomRegistry.distributionKey()+">>>"+roomRegistry);
-            this.dataStore.update(roomRegistry);
-        }
-        if(!roomRegistry.fullJoined()) gameZone.roomRegistryQueue().offer(roomRegistry);
+        if(joined.length>0)
+            logger.warn("Sync->"+roomRegistry);
+        roomRegistry.sync(joined,room->{
+            if(!room.fullJoined())gameZone.roomRegistryQueue().offer(room);
+            this.dataStore.update(room);
+            return true;
+        });
     }
     public GameRoom onView(String roomId){
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{

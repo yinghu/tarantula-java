@@ -39,17 +39,9 @@ public class RoomRegistry extends RecoverableObject {
         return totalJoined==maxSize?FULLY_JOINED:JOINED;
     }
     protected boolean removePlayer(String systemId){
-        players.remove(systemId);
-        totalJoined--;
+        if(players.remove(systemId)) totalJoined--;
         return totalJoined==0;
     }
-    //public boolean fullJoined(){
-        //return totalJoined!=0&&totalJoined==maxSize;
-    //}
-
-    //public boolean empty(){
-        //return totalJoined==0;
-    //}
     @Override
     public Map<String,Object> toMap(){
         players.forEach((k)->{

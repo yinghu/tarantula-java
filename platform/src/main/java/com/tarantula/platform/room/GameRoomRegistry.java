@@ -32,14 +32,12 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         super.toMap();
         properties.put("level",arenaLevel);
         properties.put("size",maxSize);
-        properties.put("ticket",joinTicket);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         arenaLevel = ((Number)properties.remove("level")).intValue();
         maxSize = ((Number)properties.remove("size")).intValue();
-        joinTicket = (String)properties.remove("ticket");
         super.fromMap(properties);
     }
 
@@ -68,14 +66,16 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     public void reset(Arena arena){
         maxSize = arena.capacity;
         arenaLevel = arena.level;
-        totalJoined = 0;
-        players.clear();
     }
 
-    public boolean sync(String[] joined){
-        if(players.size()==joined.length) return true;
-        reset();
-        return false;
+    public void sync(String[] joined,GameRoom.RoomRegistryListener roomRegistryListener){
+        players.clear();
+        totalJoined = 0;
+        for(String p : joined){
+            players.add(p);
+            totalJoined++;
+        }
+        roomRegistryListener.onRegistry(this);
     }
     public String toString(){
         return "Level: "+arenaLevel+" Size: "+maxSize+" Joined: "+totalJoined+" Set: "+players.size();
