@@ -58,6 +58,7 @@ public class UserChannel {
                 return;
             }
             userSession.source = source;
+            userSession.ping();
             onJoin(messageHeader,messageBuffer);
             return;
         }

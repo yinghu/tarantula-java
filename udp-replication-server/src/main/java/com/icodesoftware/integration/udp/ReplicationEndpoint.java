@@ -67,6 +67,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         boolean daemon = config.get("daemon").getAsBoolean();
         this.udpEndpointServiceProvider.daemon(daemon);
+        this.udpEndpointServiceProvider.sessionTimeout(config.get("sessionTimeout").getAsInt());
         this.udpEndpointServiceProvider.registerPingListener(this);
         this.udpEndpointServiceProvider.start();
         JsonObject register = config.getAsJsonObject("register");
