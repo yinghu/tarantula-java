@@ -296,7 +296,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public long delay() {
-        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL;
+        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL+1000;
     }
 
     @Override
