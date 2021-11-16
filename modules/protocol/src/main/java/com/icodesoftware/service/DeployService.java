@@ -41,8 +41,8 @@ public interface DeployService extends ServiceProvider {
 
     boolean sync(String key);
 
-    void registerChannel(String typeId,Channel channel);
-    void ping(String typeId,String serverId);
+    boolean registerChannel(String typeId,Channel channel);
+    boolean ping(String typeId,String serverId);
     void registerConnection(Connection connection);
     void releaseConnection(Connection connection);
 

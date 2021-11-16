@@ -13,7 +13,7 @@ public class RegisterChannelOperation extends Operation implements PartitionAwar
 
     private String  typeId;
     private Channel channel;
-
+    private boolean suc;
 
     public RegisterChannelOperation() {
     }
@@ -26,12 +26,12 @@ public class RegisterChannelOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.registerChannel(typeId,channel);
+        suc = cds.registerChannel(typeId,channel);
     }
 
     @Override
     public Object getResponse() {
-        return null;
+        return suc;
     }
 
     @Override

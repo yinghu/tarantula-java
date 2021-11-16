@@ -6,6 +6,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService {
 
     private final String objectName;
-
+    private TarantulaLogger logger = JDKLogger.getLogger(DeployServiceProxy.class);
 
     public DeployServiceProxy(String objectName, NodeEngine nodeEngine, ClusterDeployService deployServiceService){
         super(nodeEngine,deployServiceService);
@@ -415,16 +416,18 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public void registerChannel(String typeId,Channel channel){
+    public boolean registerChannel(String typeId,Channel channel){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterChannelOperation operation = new RegisterChannelOperation(typeId,channel);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(channel.channelId());
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
-        final Future<Void> future = builder.invoke();
+        final Future<Boolean> future = builder.invoke();
         try {
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
+            logger.error("error on registerChannel",e);
             future.cancel(true);
+            return false;
         }
     }
     public void registerConnection(Connection connection){
@@ -442,20 +445,22 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
-    public void ping(String typeId,String serverId){
+    public boolean ping(String typeId,String serverId){
         NodeEngine nodeEngine = getNodeEngine();
         PingConnectionOperation operation = new PingConnectionOperation(typeId,serverId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
+            final Future<Boolean> future = builder.invoke();
             try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             } catch (Exception e) {
                 future.cancel(true);
                 //goes to next node if failed
+                return true;
             }
         }
+        return true;
     }
     public void releaseConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();

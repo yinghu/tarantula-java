@@ -408,8 +408,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().syncKey(key);
     }
 
-    public void registerChannel(String typeId,Channel channel){
-        this.deploymentServiceProvider.distributionCallback().addChannel(typeId,channel);
+    public boolean registerChannel(String typeId,Channel channel){
+        return this.deploymentServiceProvider.distributionCallback().addChannel(typeId,channel);
     }
     public void registerConnection(String typeId,Connection connection){
         this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
@@ -417,7 +417,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void releaseConnection(String typeId,Connection connection){
         this.deploymentServiceProvider.distributionCallback().removeConnection(typeId,connection);
     }
-    public void pingConnection(String typeId,String serverId){
-        this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
+    public boolean pingConnection(String typeId,String serverId){
+        return this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
     }
 }

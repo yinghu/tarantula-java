@@ -18,8 +18,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //GAME SERVER APIs
 
     byte[] serverKey();
-    void registerChannel(String typeId,Channel channel);
-    void ping(String typeId,String serverId);
+    boolean registerChannel(String typeId,Channel channel);
+    boolean ping(String typeId,String serverId);
 
 
     String registerGameChannelListener(GameChannelListener gameChannelListener);
@@ -101,9 +101,9 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void updateModule(String contentUrl,String resourceName);
         void updateResource(String contentUrl,String resourceName);
 
-        void addChannel(String typeId,Channel channel);
+        boolean addChannel(String typeId,Channel channel);
         void addConnection(String typeId,Connection connection);
-        void pingConnection(String typeId,String serverId);
+        boolean pingConnection(String typeId,String serverId);
         void removeConnection(String typeId,Connection connection);
 
         void stopAccessIndex();

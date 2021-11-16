@@ -29,6 +29,9 @@ public interface GameRoom extends Configurable {
     Channel channel();
     void channel(Channel channel);
 
+    void load();
+    String[] joined();
+
     interface RoomListener{
         boolean onRoom(GameRoom gameRoom);
     }

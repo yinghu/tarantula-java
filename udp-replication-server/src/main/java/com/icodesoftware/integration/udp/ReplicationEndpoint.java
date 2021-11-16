@@ -116,7 +116,6 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
-        logger.warn("Session ["+sessionId+"] removed from ["+channelId+"]");
         ActiveChannel activeChannel = activeChannelIndex.get(channelId);
         if(activeChannel.totalJoined.decrementAndGet()==0){
             pendingActiveChannelQueue.offer(activeChannel);
@@ -153,19 +152,25 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void onPing() {
+        ActiveChannel activeChannel = pendingActiveChannelQueue.poll();
         try{
-            ActiveChannel activeChannel = pendingActiveChannelQueue.poll();
             if(activeChannel==null){
-                headers[5]="onPing";
-                httpCaller.get(registerPath,headers);
+                ping();
             }
             else{
-                headers[5]="onChannel";
-                JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
-                if(ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+                if(ping()){
+                    headers[5]="onChannel";
+                    JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
+                    if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+                }
             }
         }catch (Exception ex){
             logger.error("unexpected error on ->"+registerPath+"/"+headers[5]+"/"+headers[3],ex);
+            if(activeChannel!=null) pendingActiveChannelQueue.offer(activeChannel);
         }
+    }
+    private boolean ping() throws Exception{
+        headers[5]="onPing";
+        return JsonUtil.parse(httpCaller.get(registerPath,headers)).get("successful").getAsBoolean();
     }
 }

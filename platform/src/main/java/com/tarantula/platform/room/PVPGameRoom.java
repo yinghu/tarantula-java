@@ -14,7 +14,7 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
        joinIndex = new HashMap<>(capacity);
     }
     public PVPGameRoom(){
-        this(12);
+        this(2);
     }
 
     @Override
@@ -27,14 +27,6 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         return PortableEventRegistry.PVP_ROOM_CID;
     }
 
-    public void load(){
-        entries = new GameEntry[capacity];
-        dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
-            entries[ge.seatIndex]=ge;
-            if(ge.occupied) joinIndex.put(ge.systemId,ge);
-            return true;
-        });
-    }
 
     public synchronized GameRoom join(String systemId,RoomListener roomListener){
         if(joinIndex.containsKey(systemId)) {
@@ -71,18 +63,16 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         roomListener.onRoom(this);
     }
     public synchronized GameRoom view(){
-        return this.duplicate();
+        PVPGameRoom _room = new PVPGameRoom();
+        _room.entries = new GameEntry[joinIndex.size()];
+        joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
+        _room.capacity = _room.entries.length;
+        _room.round = this.round;
+        _room.bucket(this.bucket);
+        _room.oid(this.oid);
+        return _room;
     }
-    public synchronized String[] joined(){
-        if(joinIndex.isEmpty()) return new String[0];
-        String[] joined = new String[joinIndex.size()];
-        int[] i={0};
-        joinIndex.forEach((k,v)->{
-            joined[i[0]]=v.systemId;
-            i[0]++;
-        });
-        return joined;
-    }
+
     private PVPGameRoom duplicate(){
         PVPGameRoom _room = new PVPGameRoom();
         if(channel!=null){

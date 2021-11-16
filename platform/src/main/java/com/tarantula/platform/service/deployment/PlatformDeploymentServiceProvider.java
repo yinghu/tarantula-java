@@ -723,12 +723,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         secureRandom.nextBytes(key);
         return key;
     }
-    public void registerChannel(String typeId,Channel channel){
+    public boolean registerChannel(String typeId,Channel channel){
         ChannelStub channelStub = (ChannelStub)channel;
-        this.integrationCluster.deployService().registerChannel(typeId,channelStub);
+        return this.integrationCluster.deployService().registerChannel(typeId,channelStub);
     }
-    public void ping(String typeId,String serverId){
-        this.integrationCluster.deployService().ping(typeId,serverId);
+    public boolean ping(String typeId,String serverId){
+        return this.integrationCluster.deployService().ping(typeId,serverId);
     }
     public String registerGameChannelListener(GameChannelListener gameChannelListener){
         String regKey = UUID.randomUUID().toString();
@@ -738,10 +738,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void unregisterGameChannelListener(String registerKey){
         cListeners.remove(registerKey);
     }
-    public void addChannel(String typeId,Channel channel){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onChannel(channel);
-        });
+    public boolean addChannel(String typeId,Channel channel){
+        try{
+            cListeners.forEach((k,v)->{
+                if(v.typeId().equals(typeId)) v.onChannel(channel);
+            });
+            return true;
+        }catch (Exception ex){
+            log.error("error on add channel",ex);
+            return false;
+        }
     }
     public void addConnection(String typeId,Connection connection){
         cListeners.forEach((k,v)->{
@@ -753,10 +759,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             if(v.typeId().equals(typeId)) v.onDisConnection(connection);
         });
     }
-    public void pingConnection(String typeId,String serverId){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onPing(serverId);
-        });
+    public boolean pingConnection(String typeId,String serverId){
+        try{
+            cListeners.forEach((k,v)->{
+                if(v.typeId().equals(typeId)) v.onPing(serverId);
+            });
+            return true;
+        }catch (Exception ex){
+            log.error("error on ping",ex);
+            return false;
+        }
     }
     public void stopAccessIndex(){
         onAccessIndex.set(false);

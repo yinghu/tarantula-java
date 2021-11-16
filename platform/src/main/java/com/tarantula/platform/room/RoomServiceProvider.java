@@ -9,6 +9,7 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
+import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
@@ -93,7 +94,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     public GameRoom join(GameZone gameZone, Rating rating){
         if(type.equals(GameZone.PLAY_MODE_PVE)){
-            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(rating.systemId(),k-> new PVEGameRoom());
+            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(rating.systemId(),k-> this.createGameRoom(type,0));
             gameRoom.join(rating.systemId(),room->true);
             gameRoom.setup(gameZone.arena(rating.arenaLevel));
             return gameRoom;
@@ -125,7 +126,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
-        logger.warn(pending+">join>>>>"+ret);
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
     }
     public void onRelease(String zoneId,String roomId,String systemId){
@@ -140,7 +140,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
                 return true;
             });
             this.dataStore.update(released);
-            logger.warn("release>>>"+released);
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
@@ -155,7 +154,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     }
     public GameRoom onView(String roomId){
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            PVPGameRoom _gameRoom = new PVPGameRoom();
+            GameRoom _gameRoom = this.createGameRoom(type,0);
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -167,7 +166,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     public GameRoom onJoin(String ticket, String roomId, String systemId){
         if(!systemValidatorProvider.validHash(roomId,systemId,ticket)) return null;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            PVPGameRoom _gameRoom = new PVPGameRoom();
+            GameRoom _gameRoom = this.createGameRoom(type,0);
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -198,7 +197,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
     }
     public void onCreate(String zoneId,String roomId){
-        PVPGameRoom gameRoom = new PVPGameRoom(roomCapacity);
+        GameRoom gameRoom = this.createGameRoom(this.type,roomCapacity);
         gameRoom.index(zoneId);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
@@ -210,7 +209,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }));
     }
     public void onLoad(String roomId){
-        PVPGameRoom gameRoom = new PVPGameRoom();
+        GameRoom gameRoom = this.createGameRoom(type,0);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
         gameRoom.dataStore(dataStore);
@@ -277,14 +276,13 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         String serverId = channelStub.serverId;
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         connectionStub.addChannel(channelStub);
-        connectionStub.ping();
     }
     public void onDisConnection(Connection connection){
         onDisConnection(connection.serverId());
     }
     public void onPing(String serverId){
         ConnectionStub connectionStub = connectionIndex.get(serverId);
-        if(connectionStub!=null) connectionStub.ping();
+        connectionStub.ping();
     }
     @Override
     public boolean oneTime() {
@@ -311,5 +309,15 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             logger.warn("Connection kickoff->"+k);
             onDisConnection(k);
         });
+    }
+    private GameRoom createGameRoom(String type,int roomCapacity){
+        GameRoom gameRoom = null;
+        if(type.equals(GameZone.PLAY_MODE_PVE)){
+            gameRoom = new PVEGameRoom();
+        }
+        else if(type.equals(GameZone.PLAY_MODE_PVP)){
+            gameRoom = roomCapacity>0?new PVPGameRoom(roomCapacity):new PVPGameRoom();
+        }
+        return gameRoom;
     }
 }

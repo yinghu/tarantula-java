@@ -14,6 +14,7 @@ import javax.crypto.Cipher;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.PingListener {
@@ -24,19 +25,19 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private PushUserChannel pushUserChannel;
     private TokenValidatorProvider tokenValidator;
     private final int singleChannelId = 1000;
-    private int sessionId;
+    private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
+
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
         connection = new ClientConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
-        //channelId = 1;
-        sessionId = 1;
+        sessionId = new AtomicInteger(0);
     }
     public void setup(ServiceContext serviceContext){
         //this.serviceContext = serviceContext;
@@ -93,14 +94,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         UDPChannel uch = this.pendingQueue.poll();
-        uch.register(systemId,sessionId++,requestListener,timeoutListener);
+        uch.register(systemId,sessionId.incrementAndGet(),requestListener,timeoutListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
-        logger.warn("Session timeout->"+sessionId+" from->"+channelId);
         UDPChannel removed = channels.remove(sessionId);
         if(removed != null) {
             pendingQueue.offer(removed);
@@ -133,7 +133,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //logger.warn(messageHeader.toString()+">>"+messageHeader.commandId);
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         if(messageHeader.encrypted){
             try{
@@ -147,7 +146,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 udpChannel.onMessage(messageHeader,messageBuffer);
 
             }catch (Exception ex){
-                logger.error("error",ex);
+                logger.error("error on message",ex);
             }
         }
         else{

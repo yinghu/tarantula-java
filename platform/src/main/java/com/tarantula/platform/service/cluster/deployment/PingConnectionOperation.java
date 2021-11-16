@@ -13,7 +13,7 @@ public class PingConnectionOperation extends Operation {
 
     private String  typeId;
     private String serverId;
-
+    private boolean suc;
 
     public PingConnectionOperation() {
     }
@@ -26,12 +26,12 @@ public class PingConnectionOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.pingConnection(typeId,serverId);
+        suc = cds.pingConnection(typeId,serverId);
     }
 
     @Override
     public Object getResponse() {
-        return null;
+        return suc;
     }
 
     @Override

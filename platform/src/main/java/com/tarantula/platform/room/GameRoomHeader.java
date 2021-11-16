@@ -9,6 +9,7 @@ import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
+import com.tarantula.game.service.GameEntryQuery;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -74,6 +75,25 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     public void channel(Channel channel){
         this.channel = channel;
+    }
+
+    public void load(){
+        entries = new GameEntry[capacity];
+        dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
+            entries[ge.seatIndex]=ge;
+            if(ge.occupied) joinIndex.put(ge.systemId,ge);
+            return true;
+        });
+    }
+    public String[] joined(){
+        if(joinIndex.isEmpty()) return new String[0];
+        String[] joined = new String[joinIndex.size()];
+        int[] i={0};
+        joinIndex.forEach((k,v)->{
+            joined[i[0]]=v.systemId;
+            i[0]++;
+        });
+        return joined;
     }
     public void setup(Arena arena){
         this.arena = arena;
