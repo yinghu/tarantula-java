@@ -3,6 +3,7 @@ package com.tarantula.platform.room;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -93,10 +94,11 @@ public class ConnectionStub extends ClientConnection implements Portable {
         long ping;
         if((ping=pingSequence.get())-lastPing>0){
             lastPing = ping;
+            tries=0;
             return true;
         }
         tries++;
-        return tries<3;
+        return tries< UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES;
     }
 
 }

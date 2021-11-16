@@ -41,7 +41,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     private ConcurrentHashMap<Integer,ActiveChannel> activeChannelIndex;
     private ConcurrentLinkedDeque<ActiveChannel> pendingActiveChannelQueue;
-
+    private int pingRetries;
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
             "",
@@ -152,9 +152,10 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void onPing() {
+        if(pingRetries>UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES) return;
         ActiveChannel activeChannel = pendingActiveChannelQueue.poll();
         try{
-            if(activeChannel==null){
+            if(activeChannel==null) {
                 ping();
             }
             else{
@@ -171,6 +172,8 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     }
     private boolean ping() throws Exception{
         headers[5]="onPing";
-        return JsonUtil.parse(httpCaller.get(registerPath,headers)).get("successful").getAsBoolean();
+        boolean suc = JsonUtil.parse(httpCaller.get(registerPath,headers)).get("successful").getAsBoolean();
+        pingRetries = suc?0:pingRetries+1;
+        return suc;
     }
 }
