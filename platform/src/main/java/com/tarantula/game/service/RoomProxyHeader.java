@@ -93,15 +93,32 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
     }
     public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-
+        short cmd = messageBuffer.readShort();
+        byte[] ret;
+        switch (cmd){
+            case ServiceCommand.REQUEST_STATISTICS:
+                ret = query(stub);
+                break;
+            case ServiceCommand.COMMIT_STATISTICS:
+                ret = commit(stub,messageBuffer.readUTF8(),messageBuffer.readInt());
+                break;
+            default:
+                ret = error();
+                break;
+        }
+        return ret;
+    }
+    private byte[] error(){
+        return JsonUtil.toSimpleResponse(false,"wrong command").getBytes();
+    }
+    private byte[] query(Stub stub){
         Statistics statistics = gameServiceProvider.statistics(stub.systemId());
-        statistics.entry("kills").update(1).update();
-        statistics.entry("wins").update(1).update();
-        statistics.entry("hits").update(1).update();
-        statistics.entry("healthy").update(1).update();
-        statistics.entry("roll").update(1).update();
-        statistics.entry("poll").update(1).update();
         StatisticsSerializer serializer = new StatisticsSerializer();
         return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
+    }
+    private byte[] commit(Stub stub,String name,double delta){
+        Statistics statistics = gameServiceProvider.statistics(stub.systemId());
+        statistics.entry(name).update(delta).update();
+        return null;
     }
 }
