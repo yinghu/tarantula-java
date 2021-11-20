@@ -57,7 +57,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         for(int i=0;i<sessionPoolSize;i++){
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
         }
-        logger.warn("UDP Endpoint running as a daemon!");
+        logger.warn("UDP Endpoint running as a daemon with pool size ->"+sessionPoolSize);
     }
 
     @Override

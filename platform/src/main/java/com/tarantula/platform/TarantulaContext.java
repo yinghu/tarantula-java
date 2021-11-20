@@ -769,7 +769,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public Configuration configuration(String config){
  	    try{
-            Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
+
+ 	        Map<String,Object> kv = loadConfigurationFromEtc(config);
+ 	        if(kv==null) kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(config+".json"));
             ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
             kv.forEach((k,v)->applicationConfiguration.property(k,v));
             return applicationConfiguration;
@@ -778,7 +780,19 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return  null;
         }
     }
-
+    private Map<String,Object> loadConfigurationFromEtc(String config){
+ 	    try{
+            File f = new File("/etc/tarantula/"+config+".json");
+            if(!f.exists()) return null;
+            InputStream in = new FileInputStream(f);
+            Map<String,Object> ret = JsonUtil.toMap(in);
+            in.close();
+            return ret;
+        }catch (Exception ex){
+ 	        log.warn("using default config->"+config);
+ 	        return null;
+        }
+    }
     public List<Descriptor> availableServices(){
  	    URL url = Thread.currentThread().getContextClassLoader().getResource("deploy");
  	    File f = new File(url.getFile());
