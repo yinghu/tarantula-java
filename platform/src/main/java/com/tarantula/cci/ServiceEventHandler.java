@@ -55,7 +55,7 @@ public class ServiceEventHandler implements RequestHandler {
             actionEvent.routingNumber(routingKey.routingNumber());
             actionEvent.destination(routingKey.route());
             actionEvent.streaming(exchange.streaming());
-            actionEvent.tournamentId(tournamentId);
+            if(tournamentId!=null&&tournamentId.length()>5) actionEvent.tournamentId(tournamentId);
             actionEvent.name(name);
             actionEvent.accessMode(playMode);
             this.eventService.publish(actionEvent);
