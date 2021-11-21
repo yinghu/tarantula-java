@@ -102,6 +102,12 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
             case ServiceCommand.COMMIT_STATISTICS:
                 ret = commit(stub,messageBuffer.readUTF8(),messageBuffer.readInt());
                 break;
+            case ServiceCommand.REQUEST_TOURNAMENT_LEADERBOARD:
+                ret = queryTournament(stub);
+                break;
+            case ServiceCommand.COMMIT_TOURNAMENT_SCORE:
+                ret = commitScore(stub,messageBuffer.readDouble());
+                break;
             default:
                 ret = error();
                 break;
@@ -110,6 +116,16 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     private byte[] error(){
         return JsonUtil.toSimpleResponse(false,"wrong command").getBytes();
+    }
+    private byte[] queryTournament(Stub stub){
+        if(!application.tournamentEnabled() || stub.tournament==null) return null;
+        Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournament.distributionKey());
+        return board.toJson().toString().getBytes();
+    }
+    private byte[] commitScore(Stub stub,double delta){
+        if(!application.tournamentEnabled() || stub.tournament==null) return null;
+        this.gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),stub.systemId(),delta);
+        return null;
     }
     private byte[] query(Stub stub){
         Statistics statistics = gameServiceProvider.statistics(stub.systemId());

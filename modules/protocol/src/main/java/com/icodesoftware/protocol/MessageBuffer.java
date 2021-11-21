@@ -83,6 +83,13 @@ public class MessageBuffer {
         byteBuffer.putFloat(data);
         return this;
     }
+    public double readDouble(){
+        return byteBuffer.getDouble();
+    }
+    public MessageBuffer writeDouble(double data){
+        byteBuffer.putDouble(data);
+        return this;
+    }
     public String readUTF8(){
         int len = byteBuffer.getInt();
         byte[] ret = new byte[len];
