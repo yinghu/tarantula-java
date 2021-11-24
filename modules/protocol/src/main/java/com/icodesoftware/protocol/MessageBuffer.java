@@ -133,7 +133,7 @@ public class MessageBuffer {
         public boolean encrypted;
         @Override
         public String toString(){
-            return "MSH->"+channelId+"<>"+sessionId+"<>"+objectId+"<>"+sequence;
+            return "H_"+channelId+"_"+sessionId+"_"+objectId+"_"+sequence;
         }
         public MessageHeader copy(){
             MessageHeader copy = new MessageHeader();

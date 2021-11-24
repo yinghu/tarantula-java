@@ -16,11 +16,6 @@ public interface Messenger {
     short ON_REQUEST = 202;
     short ON_LEAVE = 203;
 
-    //Message deliver mode channel-broadcasting-no-sender 0, channel-broadcasting 1, sender-request 2
-    short CHANNEL_BROADCASTING_NO_SENDER = 0;
-    short CHANNEL_BROADCASTING = 1;
-    short SENDER_REQUEST = 2;
-
     void send(byte[] data,SocketAddress destination);
     void queue(byte[] data,SocketAddress destination);
 }
