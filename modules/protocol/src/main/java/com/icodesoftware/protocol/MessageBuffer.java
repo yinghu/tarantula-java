@@ -3,11 +3,11 @@ package com.icodesoftware.protocol;
 import java.nio.ByteBuffer;
 
 public class MessageBuffer {
-    public final static int PAYLOAD_SIZE = 483;
+    public final static int PAYLOAD_SIZE = 485;//SIZE - HEADER_SIZE
     public final static int SIZE = 508;
     public final static int PENDING_ACK_SIZE = 10;
     public final static int RETRIES = 3;
-    private final static int HEADER_SIZE = 25;
+    public final static int HEADER_SIZE = 23;
 
     private ByteBuffer byteBuffer;
 
@@ -29,7 +29,11 @@ public class MessageBuffer {
         byteBuffer.rewind();
     }
     public MessageBuffer writeHeader(MessageHeader header){
-        byteBuffer.put(header.ack?(byte) 1:0);
+        int bits = header.ack?1:0;
+        bits = header.broadcasting?bits|2:bits|0;
+        bits = header.encrypted?bits|4:bits|0;
+        //byteBuffer.put(header.ack?(byte) 1:0);
+        byteBuffer.put((byte)bits);
         byteBuffer.putInt(header.channelId);
         byteBuffer.putInt(header.sessionId);
         byteBuffer.putInt(header.objectId);
@@ -37,13 +41,16 @@ public class MessageBuffer {
         byteBuffer.putShort(header.commandId);
         byteBuffer.putShort(header.batchSize);
         byteBuffer.putShort(header.batch);
-        byteBuffer.put(header.broadcasting?(byte) 1:0);
-        byteBuffer.put(header.encrypted?(byte) 1:0);
+        //byteBuffer.put(header.broadcasting?(byte) 1:0);
+        //byteBuffer.put(header.encrypted?(byte) 1:0);
         return this;
     }
     public MessageHeader readHeader(){
         MessageHeader header = new MessageHeader();
-        header.ack = byteBuffer.get()==1;
+        int bits = byteBuffer.get();
+        header.ack = (bits&1) == 1;
+        header.broadcasting = (bits&2) == 2;
+        header.encrypted = (bits&4) == 4;
         header.channelId = byteBuffer.getInt();
         header.sessionId = byteBuffer.getInt();
         header.objectId = byteBuffer.getInt();
@@ -51,8 +58,8 @@ public class MessageBuffer {
         header.commandId = byteBuffer.getShort();
         header.batchSize = byteBuffer.getShort();
         header.batch = byteBuffer.getShort();
-        header.broadcasting = byteBuffer.get()==1;
-        header.encrypted = byteBuffer.get()==1;
+        //header.broadcasting = byteBuffer.get()==1;
+        //header.encrypted = byteBuffer.get()==1;
         return header;
     }
     public int readInt(){
