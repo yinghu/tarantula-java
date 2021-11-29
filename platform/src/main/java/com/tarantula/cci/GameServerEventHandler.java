@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.room.ChannelStub;
@@ -13,6 +14,7 @@ import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
+import javax.crypto.Cipher;
 import java.util.Base64;
 
 
@@ -72,6 +74,16 @@ public class GameServerEventHandler implements RequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
+            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+        }
+        else if(action.equals("OnTest")){
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            byte[] serverKey = this.deploymentServiceProvider.serverKey();
+            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
+            Cipher cipher = CipherUtil.encrypt(serverKey);
+            resp.addProperty("token", Base64.getEncoder().encodeToString(cipher.doFinal("hello".getBytes())));
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
     }
