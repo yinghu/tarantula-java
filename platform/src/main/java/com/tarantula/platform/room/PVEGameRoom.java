@@ -25,6 +25,7 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
+        jsonObject.addProperty("timeout",0);
         return jsonObject;
     }
 

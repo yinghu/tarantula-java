@@ -76,7 +76,7 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
-        else if(action.equals("OnTest")){
+        else if(action.equals("onTest")){
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);

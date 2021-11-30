@@ -1,7 +1,6 @@
 package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
-import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.util.HashMap;
