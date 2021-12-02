@@ -170,7 +170,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public boolean resetModule(Descriptor descriptor){
         //update app desc via typeId
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean suc = deployService.resetModule(descriptor);
         if(suc){
             this.integrationCluster.deployService().updateModule(descriptor);
@@ -280,7 +280,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!response.successful()){
             return response;
         }
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         LobbyConfiguration a = xmlParser.configurations.get(0);
         AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId(),0);
         if(publishId==null){
@@ -309,7 +309,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean createApplication(Descriptor descriptor, String postSetup,String configName,boolean launching){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         String  suc = deployService.addApplication(descriptor,postSetup,configName);
         if(suc!=null&&launching){//launch if lobby on line
             this.integrationCluster.deployService().launchApplication(descriptor.typeId(),suc);
@@ -321,7 +321,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean enableApplication(String applicationId){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         String suc = deployService.enableApplication(applicationId);
         if(suc!=null){//return the lobby typeId
             deployService = this.tarantulaContext.integrationCluster().deployService();
@@ -330,7 +330,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc!=null;
     }
     public boolean disableApplication(String applicationId){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         String suc = deployService.disableApplication(applicationId);
         if(suc!=null){//return the lobby typeId
             deployService = this.tarantulaContext.integrationCluster().deployService();
@@ -349,7 +349,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     }//removed lobby entry
                 });
                 //rListeners.remove(d.tag()); //remove instance entry
-                this.tarantulaContext.tarantulaCluster().deployService().disableLobby(d.typeId());
+                this.tarantulaContext.integrationCluster().deployService().disableLobby(d.typeId());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
@@ -361,7 +361,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public boolean launchModule(String typeId){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean suc = deployService.enableLobby(typeId);
         if(suc){
             this.integrationCluster.deployService().launchModule(typeId);
@@ -369,7 +369,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc;
     }
     public boolean shutdownModule(String typeId){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean suc = deployService.disableLobby(typeId);
         if(suc){
             this.integrationCluster.deployService().shutdownModule(typeId);
@@ -575,7 +575,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!response.successful()){
             return response;
         }
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean updated = deployService.addView(onView);
         if(updated){
             this.tarantulaContext.integrationCluster().deployService().updateView(onView);
@@ -636,7 +636,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(deployService.enableGameCluster(gameCluster.distributionKey())){
             return tarantulaContext.integrationCluster().deployService().launchGameCluster(gameCluster.distributionKey());
         }
@@ -645,7 +645,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
-        DeployService deployService = this.tarantulaContext.tarantulaCluster().deployService();
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(deployService.disableGameCluster(gameCluster.distributionKey())){
             return this.tarantulaContext.integrationCluster().deployService().shutdownGameCluster(gameCluster.distributionKey());
         }
@@ -667,7 +667,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        return this.tarantulaContext.tarantulaCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
+        return this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
     }
     public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){
         return (T)this.tarantulaContext.configuration((GameCluster)gameCluster,config);
@@ -687,12 +687,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public Lobby lobby(String typeId){
         //DataStore mds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
-        byte[] v = this.tarantulaContext.tarantulaCluster().recoverService().load(null,tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
+        byte[] v = this.tarantulaContext.integrationCluster().recoverService().load(null,tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
         if(v==null){
             return null;
         }
         lobbyTypeIdIndex.fromBinary(v);
-        v = this.tarantulaContext.tarantulaCluster().recoverService().load(null,this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
+        v = this.tarantulaContext.integrationCluster().recoverService().load(null,this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
         if(v==null){
             return null;
         }

@@ -26,7 +26,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	public void start() throws Exception {
 		this.context._registerNode();
-		RecoverService recoverService = this.context.tarantulaCluster().recoverService();
+		RecoverService recoverService = this.context.integrationCluster().recoverService();
 		String bucketId = this.context.bucketId();
 		List<LobbyDescriptor> bList = query(recoverService,PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
 		if(bList.isEmpty()){

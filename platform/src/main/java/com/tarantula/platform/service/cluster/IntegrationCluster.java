@@ -333,9 +333,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
     }
     public String registerReloadListener(ReloadListener listener){
-        return this.tarantulaContext.tarantulaCluster().registerReloadListener(listener);
+        return "";//this.tarantulaContext.tarantulaCluster().registerReloadListener(listener);
     }
     public void unregisterReloadListener(String regKey){
-        this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
+        //this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
     }
 }

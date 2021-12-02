@@ -77,7 +77,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().set(key,value);
     }
     public int syncStart(String memberId,String source){
-        RecoverService recoverService = scope==1?tarantulaContext.tarantulaCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
+        RecoverService recoverService = scope==1?tarantulaContext.integrationCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
         new Thread(()->{
             int[] total={0};
             long st = System.currentTimeMillis();
@@ -117,7 +117,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){
         RecoverableFactory fac = this.tarantulaContext.recoverableRegistry(factoryId).query(classId,params);
-        RecoverService recoverService = scope==1?tarantulaContext.tarantulaCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
+        RecoverService recoverService = scope==1?tarantulaContext.integrationCluster().recoverService():tarantulaContext.integrationCluster().recoverService();
         new Thread(()->{
             this.tarantulaContext.dataStore(dataStore,tarantulaContext.partitionNumber()).backup().list(fac,(k,v)->{
                 recoverService.query(memberId,source,k,v);

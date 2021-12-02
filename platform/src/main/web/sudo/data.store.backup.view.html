@@ -29,7 +29,7 @@
 <script>
     //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
     document.querySelector('#tx-data-store-backup-ok').onclick=()=>{
-        TARA_API.onService(false,{serviceTag:'role/sudo',command:'onBackupDataStore'},(resp)=>{
+        TARA_API.onService(false,{serviceTag:'role/datastore',command:'onBackupDataStore'},(resp)=>{
             document.querySelector('#tx-data-store-backup-message').innerHTML = resp.message;  
         });    
     };

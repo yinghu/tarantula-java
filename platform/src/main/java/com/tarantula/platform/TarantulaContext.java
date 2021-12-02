@@ -43,7 +43,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
 	public static  CountDownLatch _storageInstanceStarted ;
  	
- 	public static  CountDownLatch _tarantulaClusterStarted ;
+ 	private static  CountDownLatch _tarantulaClusterStarted ;
     public static  CountDownLatch _integrationClusterStarted ;
  	
  	public static  CountDownLatch _tarantulaApplicationStarted ;
@@ -190,7 +190,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 	    this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
-        this.tarantulaCluster.shutdown();
+        //this.tarantulaCluster.shutdown();
         for(ServiceProvider ds : serviceProviders.values()){
             ds.shutdown();
         }
@@ -465,11 +465,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     @Override
     public ClusterProvider clusterProvider(int scope){
-        return scope== Distributable.INTEGRATION_SCOPE?integrationCluster:tarantulaCluster;
+        return integrationCluster;
     }
 
     public EventService eventService(int scope){
- 	    return scope==Distributable.DATA_SCOPE?tarantulaCluster.publisher():integrationCluster.publisher();
+ 	    return integrationCluster.publisher();
     }
     @Override
     public AccessIndexService accessIndexService(){
@@ -493,9 +493,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public EndpointService endpointService(){
  	    return this.endpointService;
     }
-    public TarantulaCluster tarantulaCluster(){
- 	    return tarantulaCluster;
-    }
+    //public TarantulaCluster tarantulaCluster(){
+ 	    //return tarantulaCluster;
+    //}
     public IntegrationCluster integrationCluster(){
         return integrationCluster;
     }
@@ -516,7 +516,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    this.accessIndexService().disable();
  	    _syc_finished = new CountDownLatch(2);
  	    this.accessIndexService().syncStart();
- 	    this.tarantulaCluster.recoverService().syncStart(dataStoreMaster);
+ 	    this.integrationCluster.recoverService().syncStart(dataStoreMaster);
         log.warn("Waiting for data sync from access index and "+dataStoreMaster);
         try{_syc_finished.await();}catch (Exception ex){
             throw new RuntimeException(ex);
@@ -537,7 +537,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         nodeMetrics.distributionKey(node.nodeId);
         nodeMetrics.dataStore(masterDataStore());
         masterDataStore().createIfAbsent(nodeMetrics,true);
-        this.tarantulaCluster.registerMetricsListener(this);
+        //this.tarantulaCluster.registerMetricsListener(this);
         this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
@@ -668,7 +668,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
 
     public <T extends Recoverable> List<T> queryFromDataMaster(int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
-        RecoverService recoverService = tarantulaCluster.recoverService();
+        RecoverService recoverService = integrationCluster.recoverService();
  	    List<T> tlist = new ArrayList<>();
         CountDownLatch _lock = new CountDownLatch(1);
         String cid = this.deploymentService().distributionCallback().registerQueryCallback((k,v)->{

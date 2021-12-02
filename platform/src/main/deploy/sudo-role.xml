@@ -19,6 +19,17 @@
                 <deploy-version>1</deploy-version>
                 <access-control>100</access-control>
             </application>
+           <application>
+               <type-id>sudo-role</type-id>
+               <name>DataStoreRole</name>
+               <type>application</type>
+               <category>sudo</category>
+               <tag>role/datastore</tag>
+               <module-name>com.tarantula.admin.DataStoreRoleModule</module-name>
+               <deploy-priority>10</deploy-priority>
+               <deploy-version>1</deploy-version>
+               <access-control>100</access-control>
+           </application>
         </application-list>
     </lobby-context>
 </tarantula>

@@ -38,7 +38,7 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-load"),options,{});
     document.querySelector('#tx-data-store-load').onclick=()=>{
         let _c = document.querySelector('#tx-data-store-name').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onLoadDataStore',dataStore:_c},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/datastore',command:'onLoadDataStore',dataStore:_c},(resp)=>{
             editor.set(resp);                          
         });    
     };

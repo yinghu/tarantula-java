@@ -188,7 +188,7 @@ public class SudoRoleModule implements Module {
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.context.log("Admin setup module started", OnLog.INFO);
+        this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
     private JsonElement _parse(JsonParser parser, byte[] k,byte[] payload){
