@@ -20,12 +20,15 @@ public interface AccessIndexService extends ServiceProvider {
     boolean replicate(int partition,byte[] key,byte[] value);
     byte[] recover(int partition,byte[] key);
 
-    int syncStart();
-    void sync(int size,byte[][] keys,byte[][] values,String memberId);
-    void syncEnd(String memberId);
 
     interface Listener{
         void onStop();
         void onStart();
+    }
+
+    interface AccessIndexStore{
+        boolean available(byte[] key);
+        void setAccessIndex(byte[] key,AccessIndex value);
+        AccessIndex getAccessIndex(byte[] key);
     }
 }

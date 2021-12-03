@@ -118,42 +118,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected==0;
     }
-    public int syncStart(){
-        NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSyncStartOperation operation = new AccessIndexSyncStartOperation(nodeEngine.getLocalMember().getUuid());
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Integer> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            //throw ExceptionUtil.rethrow(e);
-            return 0;
-        }
-    }
-    public void sync(int partition,byte[][] keys,byte[][] values,String memberId){
-        NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSyncBatchOperation operation = new AccessIndexSyncBatchOperation(partition,keys,values);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            e.printStackTrace();
-            //throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public void syncEnd(String memberId){
-        NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexSyncEndOperation operation = new AccessIndexSyncEndOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            e.printStackTrace();
-            //throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean replicate(int partition,byte[] key,byte[] value){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

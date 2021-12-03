@@ -43,7 +43,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	
  	public static  CountDownLatch _tarantulaApplicationStarted ;
 
-    public static  CountDownLatch _integrationInstanceStarted ;
     public static  CountDownLatch _tarantulaInstanceStarted;
 
     public static  CountDownLatch _accessIndexServiceStarted ;
@@ -142,12 +141,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);
-        _integrationInstanceStarted = new CountDownLatch(1);
         _tarantulaInstanceStarted = new CountDownLatch(1);
         _accessIndexServiceStarted = new CountDownLatch(1);
         _storageStarted = new CountDownLatch(1);
         _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
+        _syc_finished = new CountDownLatch(2);
         node_started = new AtomicBoolean(false);
 
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -499,10 +498,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public void _registerNode(){
  	    this.accessIndexService().disable();
- 	    _syc_finished = new CountDownLatch(2);
- 	    this.accessIndexService().syncStart();
  	    this.integrationCluster.recoverService().syncStart(dataStoreMaster);
-        log.warn("Waiting for data sync from access index and "+dataStoreMaster);
         try{_syc_finished.await();}catch (Exception ex){
             throw new RuntimeException(ex);
         }

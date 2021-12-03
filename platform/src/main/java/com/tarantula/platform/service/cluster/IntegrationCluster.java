@@ -21,13 +21,14 @@ import com.icodesoftware.util.JsonUtil;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener{
+public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener, AccessIndexService.AccessIndexStore {
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
     private final Config config;
     private final String bucket;
-    private final String INDEX_MAP = "integration.recoverable.index.Key";
-    private final String VALUE_MAP = "integration.recoverable.data.Value";
+    private final String INDEX_MAP = "integration.recoverable.index";
+    private final String DATA_MAP = "integration.recoverable.data";
+    private final String ACCESS_MAP = "integration.recoverable.access";
     private HazelcastInstance _cluster;
 
     private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
@@ -45,13 +46,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final TarantulaContext tarantulaContext;
 
     private MultiMap<String, byte[]> mIndex;
-    private Map<byte[],byte[]> vMap;
-
+    private IMap<byte[],byte[]> vMap;
+    private IMap<byte[],byte[]> aMap;
+    private ConcurrentHashMap<byte[],AccessIndex> aCache;
     //private String memberId;
     private DeployService deployService;
     private RecoverService recoverService;
     //private ConcurrentHashMap<String, EventListener> eMap = new ConcurrentHashMap<>();
-
+    private CountDownLatch _integrationInstanceStarted ;
     private MetricsListener metricsListener;
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -62,6 +64,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
             this.partitionStates[i]=new PartitionState(i,false);
         }
+        _integrationInstanceStarted = new CountDownLatch(1);
         //_start = new AtomicBoolean(false);
     }
     public String name(){
@@ -88,16 +91,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
+        aCache = new ConcurrentHashMap<>();
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
-        this.tarantulaContext._integrationInstanceStarted.await();
+        _integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP);
-        vMap = this._cluster.getMap(VALUE_MAP);
+        vMap = this._cluster.getMap(DATA_MAP);
+        aMap = this._cluster.getMap(ACCESS_MAP);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
-        //this.memberId = this._cluster.getCluster().getLocalMember().getUuid();
-        //this.subscribe(this.memberId,this);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
@@ -244,7 +247,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public <T extends ServiceProvider> T serviceProvider(String name){
         return this._cluster.getDistributedObject(name,name);
-        ///throw new UnsupportedOperationException(name);
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback
@@ -319,7 +321,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         log.warn("Integration state changed->"+state);
         switch(cs){
             case STARTED:
-                TarantulaContext._integrationInstanceStarted.countDown();
+                _integrationInstanceStarted.countDown();
                 break;
             case MERGING:
                 //TarantulaContext.getInstance().integrationCluster.onMerging();
@@ -339,4 +341,32 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void unregisterReloadListener(String regKey){
         //this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
     }
+    public AccessIndexService.AccessIndexStore accessIndexStore(){
+        return this;
+    }
+    //access index store API
+    public void setAccessIndex(byte[] key,AccessIndex value){
+        aCache.putIfAbsent(key,value);
+        aMap.lock(key);
+        aMap.putIfAbsent(key,value.toBinary());
+        aMap.unlock(key);
+    }
+    public boolean available(byte[] key){
+        boolean available = aCache.containsKey(key);
+        if(available) return true;
+        aMap.lock(key);
+        available = aMap.containsKey(key);
+        aMap.unlock(key);
+        return available;
+    }
+    public AccessIndex getAccessIndex(byte[] key){
+        AccessIndex accessIndex;
+        if((accessIndex=aCache.get(key))!=null) return accessIndex;
+        byte[] value = aMap.get(key);
+        if(value==null) return null;
+        accessIndex = new AccessIndexTrack();
+        accessIndex.fromMap(JsonUtil.toMap(value));
+        return accessIndex;
+    }
+
 }
