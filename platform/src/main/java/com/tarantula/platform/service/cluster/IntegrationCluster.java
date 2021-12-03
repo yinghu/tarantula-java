@@ -243,7 +243,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this.recoverService;
     }
     public <T extends ServiceProvider> T serviceProvider(String name){
-        throw new UnsupportedOperationException(name);
+        return this._cluster.getDistributedObject(name,name);
+        ///throw new UnsupportedOperationException(name);
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback

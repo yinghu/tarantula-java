@@ -12,12 +12,10 @@ import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
@@ -39,12 +37,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 	
 	private static final TarantulaContext BC = new TarantulaContext();
 
-    //public static  CountDownLatch _systemStorageInstanceStarted ;
-
 	public static  CountDownLatch _storageInstanceStarted ;
  	
- 	private static  CountDownLatch _tarantulaClusterStarted ;
-    public static  CountDownLatch _integrationClusterStarted ;
+ 	public static  CountDownLatch _integrationClusterStarted ;
  	
  	public static  CountDownLatch _tarantulaApplicationStarted ;
 
@@ -63,10 +58,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public static CountDownLatch _syc_finished;
 
-
-	private static final String CONFIG_DATA = "hazelcast-bucket.xml";
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
-	private TarantulaCluster tarantulaCluster;
+
     private IntegrationCluster integrationCluster;
 	
 	private final EndpointService endpointService;
@@ -146,16 +139,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.node = new Node(this.dataBucketGroup,this.dataBucketNode);
- 	    //_systemStorageInstanceStarted = new CountDownLatch(1);
-         _storageInstanceStarted = new CountDownLatch(1);
-        _tarantulaClusterStarted = new CountDownLatch(1);
+ 	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);
         _integrationInstanceStarted = new CountDownLatch(1);
-         _tarantulaInstanceStarted = new CountDownLatch(1);
+        _tarantulaInstanceStarted = new CountDownLatch(1);
         _accessIndexServiceStarted = new CountDownLatch(1);
         _storageStarted = new CountDownLatch(1);
-        _deployServiceStarted = new CountDownLatch(2);
+        _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
 
@@ -167,14 +158,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         new ServiceBootstrap(new CountDownLatch(0),null,spc,"service-provider",true).start();
         DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this,this.dataStoreProviders);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
-        Config cfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_DATA);
-        cfg.getGroupConfig().setName(this.clusterNamePrefix+"-"+this.dataBucketGroup);
-        this.tarantulaCluster= new TarantulaCluster(cfg,this.dataBucketGroup,this);
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
         gcfg.getGroupConfig().setName(this.clusterNamePrefix+"-integration");
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
-        new ServiceBootstrap(_storageInstanceStarted,_tarantulaClusterStarted,this.tarantulaCluster,"data-cluster",true).start();//data cluster start
-        new ServiceBootstrap(_tarantulaClusterStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
+        new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
         new ServiceBootstrap(_accessIndexServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
         this.tokenValidatorProvider = (TokenValidatorProvider)Class.forName(this.tarantulaServerValidator).getConstructor().newInstance();
         this.tokenValidatorProvider.timeout(this.tokenTimeout,this.ticketTimeout);
@@ -286,7 +273,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.start();
         }catch (Exception ex){
-            throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
+ 	        throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
         }
  	    List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
@@ -493,9 +480,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public EndpointService endpointService(){
  	    return this.endpointService;
     }
-    //public TarantulaCluster tarantulaCluster(){
- 	    //return tarantulaCluster;
-    //}
+
     public IntegrationCluster integrationCluster(){
         return integrationCluster;
     }
@@ -551,6 +536,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             });
             return true;
         }catch (Exception ex){
+            log.error("error->",ex);
             throw new RuntimeException("Failed to deploy service provider ["+serviceProvider.name()+"]");
         }
     }

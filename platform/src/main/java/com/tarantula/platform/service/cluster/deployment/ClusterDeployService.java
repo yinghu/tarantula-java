@@ -216,7 +216,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
-        if(this.scope == Distributable.DATA_SCOPE){
+        //if(this.scope == Distributable.DATA_SCOPE){
             Member lm = nodeEngine.getLocalMember();
             int sz = nodeEngine.getClusterService().getSize();
             int pt = 0;
@@ -231,13 +231,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
             //this.tarantulaContext.integrationCluster().onReload();
-        }
+        //}
         this.deploymentServiceProvider.distributionCallback().memberAdded(membershipServiceEvent.getMember().getUuid());
     }
 
     @Override
     public void memberRemoved(MembershipServiceEvent membershipServiceEvent) {
-        if(this.scope==Distributable.DATA_SCOPE){
+        //if(this.scope==Distributable.DATA_SCOPE){
             Member lm = nodeEngine.getLocalMember();
             int sz = nodeEngine.getClusterService().getSize();
             int pt = 0;
@@ -252,7 +252,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
             }
             //this.tarantulaContext.integrationCluster().onReload();
-        }
+        //}
         this.deploymentServiceProvider.distributionCallback().memberRemoved(membershipServiceEvent.getMember().getUuid());
     }
 

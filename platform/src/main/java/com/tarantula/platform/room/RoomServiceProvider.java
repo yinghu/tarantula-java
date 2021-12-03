@@ -65,7 +65,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.systemValidatorProvider  = (SystemValidatorProvider)serviceContext.serviceProvider(SystemValidatorProvider.NAME);
-        this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionRoomService.NAME);
+        this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
