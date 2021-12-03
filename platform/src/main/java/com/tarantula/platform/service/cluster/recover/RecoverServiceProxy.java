@@ -170,10 +170,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         return ret;
     }
     @Override
-    public void replicate(String source,int partition,byte[] key,byte[] value){
+    public int replicate(String source,int partition,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int maxReplicationNode = 3;
+        int expected = nodeNumber;
         for(Member m :mlist){
             if(!m.localMember()){
                 ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,partition,key,value);
@@ -181,16 +181,15 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 final Future<Void> future = builder.invoke();
                 try {
                     future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    maxReplicationNode--;
-                    if(maxReplicationNode==0){
-                        break;
-                    }
+                    expected--;
+                    if(expected==0) break;
                 } catch (Exception e) {
                     future.cancel(true);
                     //goes to next node if failed
                 }
             }
         }
+        return expected;
     }
     public int syncStart(String source){
         NodeEngine nodeEngine = getNodeEngine();

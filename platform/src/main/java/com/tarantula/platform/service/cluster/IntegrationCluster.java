@@ -366,6 +366,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(value==null) return null;
         accessIndex = new AccessIndexTrack();
         accessIndex.fromMap(JsonUtil.toMap(value));
+        aCache.putIfAbsent(key,accessIndex);
         return accessIndex;
     }
 

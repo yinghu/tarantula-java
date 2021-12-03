@@ -50,6 +50,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
+    private int replicationNodeNumber = 3;
 
     private Node node;
 
@@ -302,10 +303,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().replicate(metadata.source(),metadata.partition(),key,value));
+            replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().replicate(metadata.source(),metadata.partition(),key,value,replicationNodeNumber));
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value));
+            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value,replicationNodeNumber));
         }
     }
     @Override

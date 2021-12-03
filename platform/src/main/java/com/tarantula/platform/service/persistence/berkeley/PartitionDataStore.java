@@ -257,8 +257,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
                 _put(dso,key,value);
             }
-            //Map<String,Object> _map = SystemUtil.toMap(value);
-            t.fromBinary(value);//fromMap(_map);
+            t.fromBinary(value);
             return true;
         }catch (Exception ex){
             log.error("Error on load",ex);

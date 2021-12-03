@@ -17,7 +17,7 @@ public interface AccessIndexService extends ServiceProvider {
     boolean enable();
     boolean disable();
 
-    boolean replicate(int partition,byte[] key,byte[] value);
+    int replicate(int partition,byte[] key,byte[] value,int nodeNumber);
     byte[] recover(int partition,byte[] key);
 
 

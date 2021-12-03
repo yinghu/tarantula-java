@@ -119,10 +119,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return expected==0;
     }
 
-    public boolean replicate(int partition,byte[] key,byte[] value){
+    public int replicate(int partition,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
+        int expected = nodeNumber;
         for(Member m :mlist){
             if(!m.localMember()){
                 ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
@@ -131,13 +131,14 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 try {
                     future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
                     expected--;
+                    if(expected==0) break;
                 } catch (Exception e) {
                     future.cancel(true);
                     //goes to next node if failed
                 }
             }
         }
-        return expected==0;
+        return expected;
     }
     public byte[] recover(int partition,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
