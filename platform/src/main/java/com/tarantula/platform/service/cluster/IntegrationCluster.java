@@ -347,7 +347,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     //access index store API
     public void setAccessIndex(byte[] key,AccessIndex value){
         aCache.computeIfAbsent(key,k->{
-            aMap.putIfAbsent(key,value.toBinary());
+            //aMap.putIfAbsent(key,value.toBinary());
             return value;
         });
         //aMap.lock(key);
