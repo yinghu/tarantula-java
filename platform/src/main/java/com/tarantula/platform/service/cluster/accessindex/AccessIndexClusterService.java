@@ -117,7 +117,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }
         TarantulaContext._syc_finished.countDown();
         this.tarantulaContext.integrationCluster().registerEventListener(AccessIndexService.NAME,e->{
-            log.warn(e.toString());
+            
             return true;
         });
         this.publisher = this.tarantulaContext.integrationCluster().publisher();
