@@ -1,21 +1,27 @@
 package com.tarantula.platform.service.cluster.accessindex;
 
 import com.hazelcast.core.DistributedObject;
-import com.hazelcast.spi.*;
+
+import com.hazelcast.spi.ManagedService;
+import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.EventService;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.event.AccessIndexSyncEvent;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class AccessIndexClusterService implements ManagedService,RemoteService {
+public class AccessIndexClusterService implements ManagedService, RemoteService {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AccessIndexClusterService.class);
 
@@ -25,11 +31,13 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
 
     private TarantulaContext tarantulaContext;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private AccessIndexService.AccessIndexStore accessIndexStore;
+    private ConcurrentHashMap<String,AccessIndex> accessCache;
     private String bucket;
+    private EventService publisher;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
+        accessCache = new ConcurrentHashMap<>();
         this.bucket = this.tarantulaContext.bucket();
         this.nodeEngine = nodeEngine;
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
@@ -62,13 +70,11 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
 
 
     public AccessIndex set(String accessKey,int referenceId){
-        byte[] key = accessKey.getBytes();
-        if(this.accessIndexStore.available(key)) return null;
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket, SystemUtil.oid(),referenceId);
+        if(this.accessCache.putIfAbsent(accessKey,accessIndex)!=null) return null;//block duplicate access key
         if(!dso.dataStore.createIfAbsent(accessIndex,false)) return null;
-        this.accessIndexStore.setAccessIndex(key,accessIndex);
-        log.warn("set->"+accessKey+">>"+dso.partition);
+        publisher.publish(new AccessIndexSyncEvent(AccessIndexService.NAME,accessKey,accessIndex.toBinary()));
         return accessIndex;
     }
     public AccessIndex setIfAbsent(String accessKey,int referenceId){
@@ -78,10 +84,13 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
         return accessIndex;
     }
     public AccessIndex get(String accessKey){
+        AccessIndex accessIndex = accessCache.get(accessKey);
+        if(accessIndex!=null) return accessIndex;
         DataStoreOnPartition dso = this.onPartition(accessKey);
-        log.warn("set->"+accessKey+">>"+dso.partition);
-        return accessIndexStore.getAccessIndex(accessKey.getBytes());//new AccessIndexTrack(accessKey);
-        //return dataStore.load(suc)?suc:null;
+        accessIndex = new AccessIndexTrack(accessKey);
+        if(!dso.dataStore.load(accessIndex)) return null;
+        accessCache.put(accessKey,accessIndex);
+        return accessIndex;
     }
     public void enable(){
         this.deploymentServiceProvider.distributionCallback().startAccessIndex();
@@ -94,7 +103,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
-        this.accessIndexStore = this.tarantulaContext.integrationCluster().accessIndexStore();
         int[] totalLoaded = {0};
         log.warn("Loading access index from local storage. It will take some time due to data size.");
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
@@ -103,11 +111,16 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
                 totalLoaded[0]++;
                 AccessIndex accessIndex = new AccessIndexTrack();
                 accessIndex.fromBinary(v);
-                this.accessIndexStore.setAccessIndex(k,accessIndex);
+                this.accessCache.put(new String(k),accessIndex);
                 return true;
             });
         }
         TarantulaContext._syc_finished.countDown();
+        this.tarantulaContext.integrationCluster().registerEventListener(AccessIndexService.NAME,e->{
+            log.warn(e.toString());
+            return true;
+        });
+        this.publisher = this.tarantulaContext.integrationCluster().publisher();
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"] with total access index loaded ["+totalLoaded[0]+"]");
     }
 
@@ -117,7 +130,6 @@ public class AccessIndexClusterService implements ManagedService,RemoteService {
     }
 
     public void replicate(int partition,byte[] key,byte[] value){
-        log.warn("replicating ->"+new String(key)+">>"+new String(value));
         this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
     }
 

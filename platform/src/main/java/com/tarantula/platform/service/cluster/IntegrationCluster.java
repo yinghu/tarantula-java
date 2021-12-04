@@ -344,24 +344,24 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public AccessIndexService.AccessIndexStore accessIndexStore(){
         return this;
     }
+
     //access index store API
     public void setAccessIndex(byte[] key,AccessIndex value){
-        aCache.computeIfAbsent(key,k->{
-            //aMap.putIfAbsent(key,value.toBinary());
-            return value;
-        });
+        aCache.putIfAbsent(key,value);
     }
     public boolean available(byte[] key){
-        return aCache.compute(key,(k,v)->{
-            if(v==null){
-                byte[] cv = aMap.get(key);
-                if(cv!=null){
-                    v = new AccessIndexTrack();
-                    v.fromBinary(cv);
-                }
-            }
-            return v;
-        })!=null;
+        return aCache.containsKey(key);
+        //return aCache.computeIfAbsent(key,(k)->{
+            //if(v==null){
+                //byte[] cv = aMap.get(key);
+                //if(cv!=null){
+                    //v = new AccessIndexTrack();
+                    //v.fromBinary(cv);
+                //}
+            //}
+            //return v;
+        //})!=null;
+        //return false;
     }
     public AccessIndex getAccessIndex(byte[] key){
         AccessIndex accessIndex;
@@ -373,5 +373,4 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         aCache.putIfAbsent(key,accessIndex);
         return accessIndex;
     }
-
 }

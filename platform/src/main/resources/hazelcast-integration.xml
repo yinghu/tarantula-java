@@ -82,11 +82,6 @@
         <eviction-policy>NONE</eviction-policy>
         <max-size policy="PER_NODE">100000</max-size>
     </map>
-    <map name="integration.recoverable.access">
-        <async-backup-count>1</async-backup-count>
-        <eviction-policy>NONE</eviction-policy>
-        <max-size policy="PER_NODE">100000</max-size>
-    </map>
     <multimap name="integration.recoverable.index">
         <async-backup-count>1</async-backup-count>
         <value-collection-type>SET</value-collection-type>
