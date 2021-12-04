@@ -117,7 +117,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }
         TarantulaContext._syc_finished.countDown();
         this.tarantulaContext.integrationCluster().registerEventListener(AccessIndexService.NAME,e->{
-            
+            byte[] key = e.trackId().getBytes();
+            DataStoreOnPartition dso = this.onPartition(e.trackId());
+            if(dso.dataStore.backup().get(key)==null) dso.dataStore.backup().set(key,e.payload());
             return true;
         });
         this.publisher = this.tarantulaContext.integrationCluster().publisher();

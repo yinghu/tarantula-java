@@ -21,7 +21,7 @@ import com.icodesoftware.util.JsonUtil;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener, AccessIndexService.AccessIndexStore {
+public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener {
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
     private final Config config;
@@ -341,36 +341,5 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void unregisterReloadListener(String regKey){
         //this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
     }
-    public AccessIndexService.AccessIndexStore accessIndexStore(){
-        return this;
-    }
 
-    //access index store API
-    public void setAccessIndex(byte[] key,AccessIndex value){
-        aCache.putIfAbsent(key,value);
-    }
-    public boolean available(byte[] key){
-        return aCache.containsKey(key);
-        //return aCache.computeIfAbsent(key,(k)->{
-            //if(v==null){
-                //byte[] cv = aMap.get(key);
-                //if(cv!=null){
-                    //v = new AccessIndexTrack();
-                    //v.fromBinary(cv);
-                //}
-            //}
-            //return v;
-        //})!=null;
-        //return false;
-    }
-    public AccessIndex getAccessIndex(byte[] key){
-        AccessIndex accessIndex;
-        if((accessIndex=aCache.get(key))!=null) return accessIndex;
-        byte[] value = aMap.get(key);
-        if(value==null) return null;
-        accessIndex = new AccessIndexTrack();
-        accessIndex.fromMap(JsonUtil.toMap(value));
-        aCache.putIfAbsent(key,accessIndex);
-        return accessIndex;
-    }
 }

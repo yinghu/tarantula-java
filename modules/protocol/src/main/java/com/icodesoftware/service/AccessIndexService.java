@@ -25,10 +25,5 @@ public interface AccessIndexService extends ServiceProvider {
         void onStop();
         void onStart();
     }
-
-    interface AccessIndexStore{
-        boolean available(byte[] key);
-        void setAccessIndex(byte[] key,AccessIndex value);
-        AccessIndex getAccessIndex(byte[] key);
-    }
+    
 }
