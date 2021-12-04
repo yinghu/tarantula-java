@@ -350,9 +350,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             //aMap.putIfAbsent(key,value.toBinary());
             return value;
         });
-        //aMap.lock(key);
-        //aMap.putIfAbsent(key,value.toBinary());
-        //aMap.unlock(key);
     }
     public boolean available(byte[] key){
         return aCache.compute(key,(k,v)->{
@@ -365,12 +362,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             }
             return v;
         })!=null;
-        //boolean available = aCache.containsKey(key);
-        //if(available) return true;
-        //aMap.lock(key);
-        //available = aMap.containsKey(key);
-        //aMap.unlock(key);
-        //return available;
     }
     public AccessIndex getAccessIndex(byte[] key){
         AccessIndex accessIndex;
