@@ -9,7 +9,6 @@
     <management-center enabled="false">http://10.0.0.6:8080/mancenter</management-center>
     <properties>
 		<property name="hazelcast.logging.type">jdk</property>
-        <property name="hazelcast.partition.count">271</property>
         <property name="hazelcast.initial.min.cluster.size">1</property>
         <property name="hazelcast.heartbeat.failuredetector.type">deadline</property>
         <property name="hazelcast.heartbeat.interval.seconds">5</property>

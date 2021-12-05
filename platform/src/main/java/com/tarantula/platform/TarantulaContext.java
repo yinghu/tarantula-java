@@ -158,6 +158,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this,this.dataStoreProviders);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
+        gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);
         gcfg.getGroupConfig().setName(this.clusterNamePrefix+"-integration");
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
         new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
