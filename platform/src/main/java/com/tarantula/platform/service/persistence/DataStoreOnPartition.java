@@ -4,6 +4,8 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Metadata;
 import com.sleepycat.je.Database;
 
+import java.util.concurrent.locks.Lock;
+
 public class DataStoreOnPartition {
     public final int partition;
     public final String name;
@@ -11,6 +13,7 @@ public class DataStoreOnPartition {
 
     public Database database;
     public Metadata metadata;
+    public Lock lock;
     public DataStoreOnPartition(int partition,String name){
         this.partition = partition;
         this.name = name;

@@ -8,7 +8,6 @@ import com.sleepycat.je.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 
-import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.MapStoreListener;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
@@ -17,9 +16,8 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PartitionDataStore extends ReplicatedDataStore{
 
@@ -34,8 +32,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
 
     private static TarantulaLogger log = JDKLogger.getLogger(PartitionDataStore.class);
 
-    private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
-
     public PartitionDataStore(int partition, String bucket, String node, String prefix, Database[] shards,MapStoreListener mapStoreListener){
         this.partition = partition;
         this.bucket = bucket;
@@ -46,6 +42,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         for(int i=0;i<this.partition;i++){
             this.partitions[i]=new DataStoreOnPartition(i,shards[i]);
             this.partitions[i].metadata = new RecoverableMetadata(this.prefix,i,Distributable.DATA_SCOPE);
+            this.partitions[i].lock = new ReentrantLock();
         }
     }
     @Override
@@ -81,7 +78,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public <T extends Recoverable> boolean create(T t) {
         try {
-            pass.acquire();
             String okey = t.key().asString();
             if (okey == null) {
                 //use bucket/oid as the key
@@ -113,9 +109,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }catch (Exception ex){
             log.error("Error on create",ex);
             return false;
-        }
-        finally {
-            pass.release();
         }
     }
     private <T extends Recoverable> boolean onEdge(T t,String okey){
@@ -157,7 +150,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public <T extends Recoverable> boolean update(T t) {
         try{
-            pass.acquire();
             String akey = t.key().asString();
             if(akey==null){
                 return false;
@@ -185,15 +177,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
             log.error("Error on update",ex);
             return false;
         }
-        finally {
-            pass.release();
-        }
     }
 
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
         try{
-            pass.acquire();
             String akey = t.key().asString();
             if(akey==null){
                 t.bucket(this.bucket);
@@ -236,9 +224,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
             log.error("Error on createIfAbsent",ex);
             return false;
         }
-        finally {
-            pass.release();
-        }
     }
 
     @Override
@@ -268,15 +253,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public void set(byte[] key, byte[] value) {
         try{
-            pass.acquire();
             int pt = SystemUtil.partition(key,partition);
             _put(this.partitions[pt],key,value);
         }
         catch (Exception ex){
             log.error("Error on set",ex);
-        }
-        finally {
-            pass.release();
         }
     }
     public byte[] get(byte[] key){
@@ -385,14 +366,24 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return this;
     }
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
-        return dso.database.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
+        try {
+            dso.lock.lock();
+            return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
+        }finally {
+            dso.lock.unlock();
+        }
     }
     public void registerListener(int registerId,Listener listener){
         rMap.putIfAbsent(registerId,listener);
     }
     private byte[] _get(DataStoreOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
-        OperationStatus status = dso.database.get(null,new DatabaseEntry(key),ve,null);
-        return status==OperationStatus.SUCCESS?ve.getData():null;
+        try {
+            dso.lock.lock();
+            OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
+            return status==OperationStatus.SUCCESS?ve.getData():null;
+        }finally {
+            dso.lock.unlock();
+        }
     }
 }

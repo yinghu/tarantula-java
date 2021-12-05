@@ -474,6 +474,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         private final String dataStore;
         private final int partition;
         private final Metadata metadata1;
+
         private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
 
         public AccessIndexDataStore(Node node,Database database,MapStoreListener mapStoreListener){
@@ -552,6 +553,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         @Override
         public <T extends Recoverable> boolean load(T t) {
             try{
+                pass.acquire();
                 String akey = t.key().asString();
                 if(akey==null){
                     return false;
@@ -578,14 +580,35 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 log.error("error on load",ex);
                 return false;
             }
+            finally {
+                pass.release();
+            }
         }
         public void set(byte[] key,byte[] value){
-            if(!_set(key,value)){
-                log.warn("failed to se key/value->"+new String(key));
+            try{
+                pass.acquire();
+                if(!_set(key,value)){
+                    log.warn("failed to se key/value->"+new String(key));
+                }
+            }
+            catch (Exception ex){
+                log.error("error on set",ex);
+            }
+            finally {
+                pass.release();
             }
         }
         public byte[] get(byte[] key){
-            return _get(key);
+            try{
+                pass.acquire();
+                return _get(key);
+            }catch (Exception ex){
+                log.error("error on get",ex);
+                return null;
+            }
+            finally {
+                pass.release();
+            }
         }
         public void list(Binary binary){
             Cursor cursor = berkeleyStore.openCursor(null,null);

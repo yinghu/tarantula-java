@@ -103,6 +103,13 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
+        this.tarantulaContext.integrationCluster().registerEventListener(AccessIndexService.NAME,e->{
+            byte[] key = e.trackId().getBytes();
+            DataStoreOnPartition dso = this.onPartition(e.trackId());
+            if(dso.dataStore.backup().get(key)==null) dso.dataStore.backup().set(key,e.payload());
+            return true;
+        });
+        this.publisher = this.tarantulaContext.integrationCluster().publisher();
         int[] totalLoaded = {0};
         log.warn("Loading access index from local storage. It will take some time due to data size.");
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
@@ -111,18 +118,13 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                 totalLoaded[0]++;
                 AccessIndex accessIndex = new AccessIndexTrack();
                 accessIndex.fromBinary(v);
-                this.accessCache.put(new String(k),accessIndex);
+                String aKey = new String(k);
+                this.accessCache.put(aKey,accessIndex);
+                publisher.publish(new AccessIndexSyncEvent(AccessIndexService.NAME,aKey,v));//redundancy sync
                 return true;
             });
         }
         TarantulaContext._syc_finished.countDown();
-        this.tarantulaContext.integrationCluster().registerEventListener(AccessIndexService.NAME,e->{
-            byte[] key = e.trackId().getBytes();
-            DataStoreOnPartition dso = this.onPartition(e.trackId());
-            if(dso.dataStore.backup().get(key)==null) dso.dataStore.backup().set(key,e.payload());
-            return true;
-        });
-        this.publisher = this.tarantulaContext.integrationCluster().publisher();
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"] with total access index loaded ["+totalLoaded[0]+"]");
     }
 
