@@ -7,6 +7,7 @@
     {"type":"deploy.view","moduleResourceFile":"sudo/deploy.view.html"},
     {"type":"deploy.resource","moduleResourceFile":"sudo/deploy.resource.view.html"},
     {"type":"data.store.load","moduleResourceFile":"sudo/data.store.load.view.html"},
+    {"type":"access.index.store","moduleResourceFile":"sudo/access.index.store.view.html"},
     {"type":"find.user","moduleResourceFile":"sudo/find.user.view.html"},
     {"type":"data.store.count.list","moduleResourceFile":"sudo/data.store.count.list.view.html"},
     {"type":"create.labeled.key","moduleResourceFile":"sudo/create.labeled.key.view.html"},

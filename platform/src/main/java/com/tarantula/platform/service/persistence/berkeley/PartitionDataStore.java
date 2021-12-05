@@ -66,7 +66,14 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
         return ct;
     }
+    public int partitionNumber(){
+        return this.partition;
+    }
 
+    public long count(int partition){
+        if(partition<0||partition>=this.partition) return 0;
+        return partitions[partition].database.count();
+    }
     public void close(){
         for(DataStoreOnPartition dso : partitions){
             dso.database.close();

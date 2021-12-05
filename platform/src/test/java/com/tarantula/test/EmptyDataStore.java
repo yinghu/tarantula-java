@@ -31,7 +31,13 @@ public class EmptyDataStore implements DataStore {
     public long count() {
         return 0;
     }
+    public int partitionNumber(){
+        return 0;
+    }
 
+    public long count(int partition){
+        return 0;
+    }
     @Override
     public <T extends Recoverable> boolean create(T t) {
         return false;

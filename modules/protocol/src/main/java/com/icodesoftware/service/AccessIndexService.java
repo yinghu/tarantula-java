@@ -25,5 +25,12 @@ public interface AccessIndexService extends ServiceProvider {
         void onStop();
         void onStart();
     }
-    
+
+    interface AccessIndexStore{
+        String STORE_NAME_PREFIX = "p_";
+        String name();
+        int partitionNumber();
+        long count();
+        long count(int partition);
+    }
 }

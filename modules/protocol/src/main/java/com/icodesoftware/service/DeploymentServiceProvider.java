@@ -76,6 +76,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     //Access index set operation API
     void registerAccessIndexListener(AccessIndexService.Listener listener);
+    AccessIndexService.AccessIndexStore accessIndexStore();
 
     //data store backup operation API
     void issueDataStoreBackup();

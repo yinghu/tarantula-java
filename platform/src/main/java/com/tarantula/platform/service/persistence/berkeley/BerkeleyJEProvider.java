@@ -502,6 +502,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public long count(){
             return this.berkeleyStore.count();
         }
+        public int partitionNumber(){
+            return partition;
+        }
+
+        public long count(int partition){
+            return this.berkeleyStore.count();
+        }
         @Override
         public <T extends Recoverable> boolean create(T t) {
             throw new UnsupportedOperationException();

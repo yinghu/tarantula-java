@@ -15,6 +15,10 @@ public interface DataStore {
 
     long count();
 
+    int partitionNumber();
+
+    long count(int partition);
+
     <T extends Recoverable> boolean create(T t);
 
     <T extends Recoverable> boolean update(T t);
@@ -51,6 +55,5 @@ public interface DataStore {
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();
-        //default boolean load(){return false;}
     }
 }

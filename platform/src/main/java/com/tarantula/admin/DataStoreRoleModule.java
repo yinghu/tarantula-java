@@ -52,22 +52,29 @@ public class DataStoreRoleModule implements Module {
             String dataStore = onAccess.property("dataStore").toString();
             if(this.deploymentServiceProvider.validDataStore(dataStore)){
                 DataStore ds = this.context.dataStore(dataStore);
-                JsonArray list = new JsonArray();
-                JsonParser parser = new JsonParser();
-                ds.backup().list((k,v)->{
-                    JsonObject r = new JsonObject();
-                    r.addProperty("id",new String(k));
-                    r.add("payload",_parse(parser,k,v));
-                    list.add(r);
-                    return true;
-                });
-                JsonObject ret = new JsonObject();
-                ret.add("resultRet",list);
-                session.write(ret.toString().getBytes());
+                JsonObject summary = new JsonObject();
+                summary.addProperty("name",ds.name());
+                summary.addProperty("partitionNumber",ds.partitionNumber());
+                summary.addProperty("totalRecords",ds.count());
+                for(int i=0;i<ds.partitionNumber();i++){
+                    summary.addProperty("records on partition["+i+"]",ds.count(i));
+                }
+                session.write(summary.toString().getBytes());
             }else{
                 session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes());
             }
 
+        }
+        else if(session.action().equals("onAccessIndexStore")){
+            AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
+            JsonObject summary = new JsonObject();
+            summary.addProperty("name",accessIndexStore.name());
+            summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
+            summary.addProperty("totalRecords",accessIndexStore.count());
+            for(int i=0;i<accessIndexStore.partitionNumber();i++){
+                summary.addProperty("records on partition["+i+"]",accessIndexStore.count(i));
+            }
+            session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();

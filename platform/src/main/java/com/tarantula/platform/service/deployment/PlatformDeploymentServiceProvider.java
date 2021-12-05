@@ -787,6 +787,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         aListeners.add(listener);
     }
+    public AccessIndexService.AccessIndexStore accessIndexStore(){
+        return new AccessIndexStoreViewer(this.tarantulaContext);
+    }
     public void issueDataStoreBackup(){
 
     }
