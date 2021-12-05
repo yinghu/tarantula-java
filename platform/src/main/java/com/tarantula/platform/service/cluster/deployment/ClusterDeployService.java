@@ -216,43 +216,39 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
-        //if(this.scope == Distributable.DATA_SCOPE){
-            Member lm = nodeEngine.getLocalMember();
-            int sz = nodeEngine.getClusterService().getSize();
-            int pt = 0;
-            for(Member m : nodeEngine.getClusterService().getMembers()){
-                if(lm.getUuid().equals(m.getUuid())){
-                    break;
-                }
-                pt++;
+        Member lm = nodeEngine.getLocalMember();
+        int sz = nodeEngine.getClusterService().getSize();
+        int pt = 0;
+        for(Member m : nodeEngine.getClusterService().getMembers()){
+            if(lm.getUuid().equals(m.getUuid())){
+                break;
             }
-            log.warn("partition updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
-            for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
-            }
-            //this.tarantulaContext.integrationCluster().onReload();
-        //}
+            pt++;
+        }
+        log.warn("partition updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
+        for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
+            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+        }
+        this.tarantulaContext.integrationCluster().onReload();
         this.deploymentServiceProvider.distributionCallback().memberAdded(membershipServiceEvent.getMember().getUuid());
     }
 
     @Override
     public void memberRemoved(MembershipServiceEvent membershipServiceEvent) {
-        //if(this.scope==Distributable.DATA_SCOPE){
-            Member lm = nodeEngine.getLocalMember();
-            int sz = nodeEngine.getClusterService().getSize();
-            int pt = 0;
-            for(Member m : nodeEngine.getClusterService().getMembers()){
-                if(lm.getUuid().equals(m.getUuid())){
-                    break;
-                }
-                pt++;
+        Member lm = nodeEngine.getLocalMember();
+        int sz = nodeEngine.getClusterService().getSize();
+        int pt = 0;
+        for(Member m : nodeEngine.getClusterService().getMembers()){
+            if(lm.getUuid().equals(m.getUuid())){
+                break;
             }
-            log.warn("partition updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
-            for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-                this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
-            }
-            //this.tarantulaContext.integrationCluster().onReload();
-        //}
+            pt++;
+        }
+        log.warn("partition updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
+        for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
+            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+        }
+        this.tarantulaContext.integrationCluster().onReload();
         this.deploymentServiceProvider.distributionCallback().memberRemoved(membershipServiceEvent.getMember().getUuid());
     }
 

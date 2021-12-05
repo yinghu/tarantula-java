@@ -28,7 +28,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final String bucket;
     private final String INDEX_MAP = "integration.recoverable.index";
     private final String DATA_MAP = "integration.recoverable.data";
-    private final String ACCESS_MAP = "integration.recoverable.access";
+
     private HazelcastInstance _cluster;
 
     private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
@@ -38,23 +38,21 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
     public PartitionState[] partitionStates;
-    //private AtomicBoolean _start;
 
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
-    //private int partitionCount;
     private final TarantulaContext tarantulaContext;
 
     private MultiMap<String, byte[]> mIndex;
     private IMap<byte[],byte[]> vMap;
-    private IMap<byte[],byte[]> aMap;
-    private ConcurrentHashMap<byte[],AccessIndex> aCache;
-    //private String memberId;
+
     private DeployService deployService;
     private RecoverService recoverService;
-    //private ConcurrentHashMap<String, EventListener> eMap = new ConcurrentHashMap<>();
     private CountDownLatch _integrationInstanceStarted ;
     private MetricsListener metricsListener;
+
+    private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
+
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.config = config;
@@ -65,14 +63,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             this.partitionStates[i]=new PartitionState(i,false);
         }
         _integrationInstanceStarted = new CountDownLatch(1);
-        //_start = new AtomicBoolean(false);
     }
     public String name(){
         return "IntegrationCluster";
     }
-    //public String subscription(){
-        //return this.memberId;
-    //}
+
     public String bucket(){
         return this.bucket;
     }
@@ -91,14 +86,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
-        aCache = new ConcurrentHashMap<>();
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         _integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP);
         vMap = this._cluster.getMap(DATA_MAP);
-        aMap = this._cluster.getMap(ACCESS_MAP);
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
@@ -109,16 +102,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void shutdown() throws Exception {
         try{
-            //this.inboundEventPool.shutdown();
             bMap.forEach((k,b)->{
                 b.shutdown();
             });
-            //for(Closable e : wlist){
-                //e.close();
-            //}
         }catch (Exception ex){
             log.error("error on event shutdown",ex);
-            //this.inboundEventPool.shutdownNow();
         }
         if(_cluster!=null){
             _cluster.getLifecycleService().shutdown();
@@ -254,7 +242,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
-        //log.warn("["+bucketReceiver.bucket()+"] registered on cluster");
         BucketReceiver br = bMap.computeIfAbsent(bucketReceiver.bucket(),(b)->bucketReceiver);
         PartitionState ps = this.partitionStates[br.partition()];
         if(ps.opening){
@@ -263,7 +250,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
     }
     public void unregisterBucketReceiver(String bucket){
-        //log.warn("Bucket Receiver ["+bucket+"] unregistered from integration cluster");
         this.unsubscribe(bucket);
         bMap.remove(bucket);
     }
@@ -335,11 +321,17 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             default:
         }
     }
+
     public String registerReloadListener(ReloadListener listener){
-        return "";//this.tarantulaContext.tarantulaCluster().registerReloadListener(listener);
+        String regKey = UUID.randomUUID().toString();
+        rMap.put(regKey,listener);
+        return regKey;
     }
     public void unregisterReloadListener(String regKey){
-        //this.tarantulaContext.tarantulaCluster().unregisterReloadListener(regKey);
+        rMap.remove(regKey);
+    }
+    public void onReload(){
+        rMap.forEach((k,v)->v.reload());
     }
 
 }
