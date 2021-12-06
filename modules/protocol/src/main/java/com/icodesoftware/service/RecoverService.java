@@ -8,6 +8,7 @@ public interface RecoverService extends ServiceProvider{
     int ROLE_MATCHED = 0;
     int ROLE_NOT_MATCHED = 1;
     int CHECK_SKIPPED = 2;
+
     //operates master or member node
     boolean checkAccessControl(String systemId, Access.Role role);
     String findDataNode(String source,byte[] key);

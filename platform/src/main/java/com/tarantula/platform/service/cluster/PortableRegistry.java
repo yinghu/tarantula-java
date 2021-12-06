@@ -113,6 +113,7 @@ public class PortableRegistry extends AbstractRecoverableListener {
     public int registryId() {
         return OID;
     }
+
     public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
         RecoverableFactory _fac = null;
         switch (registerId){

@@ -2,7 +2,6 @@ package com.icodesoftware;
 
 public interface RecoverableFactory<T extends Recoverable>{
 
-
     T create();
 
     /**
@@ -18,6 +17,7 @@ public interface RecoverableFactory<T extends Recoverable>{
     /**
      * The owner key of the edge mapping or the vertext filter string
      * */
+
     String distributionKey();
 
 }

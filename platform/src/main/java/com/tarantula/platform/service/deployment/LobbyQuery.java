@@ -4,6 +4,7 @@ import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
+
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 
@@ -29,6 +30,5 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
     public String label(){
         return LobbyDescriptor.LABEL;
     }
-
 
 }
