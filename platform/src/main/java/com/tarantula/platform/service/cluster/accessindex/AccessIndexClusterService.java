@@ -183,6 +183,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public void syncEnd(String syncKey){
         tarantulaContext._syncLatch.get(syncKey).countDown();
         log.warn("Total records received ["+_total.get()+"] from master node"+">>"+syncKey);
-        _total.set(0);
+        //_total.set(0);
     }
 }
