@@ -118,7 +118,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             _t.publish(message);
             metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
         }else{
-            log.warn("No destination message ->"+message.toString());
+            log.warn("No destination message ->"+message);
         }
     }
     public boolean onEvent(Event event) {

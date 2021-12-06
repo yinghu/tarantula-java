@@ -19,6 +19,7 @@
     {"type":"launch.module","moduleResourceFile":"sudo/launch.module.view.html"},
     {"type":"shutdown.module","moduleResourceFile":"sudo/shutdown.module.view.html"},
     {"type":"reset.module","moduleResourceFile":"sudo/reset.module.view.html"},
-    {"type":"export.module","moduleResourceFile":"sudo/export.module.view.html"}
+    {"type":"export.module","moduleResourceFile":"sudo/export.module.view.html"},
+    {"type":"metrics.list","moduleResourceFile":"sudo/metrics.list.view.html"}
   ]
 }
