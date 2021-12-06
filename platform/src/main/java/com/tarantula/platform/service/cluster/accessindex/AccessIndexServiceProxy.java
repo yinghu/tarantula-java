@@ -5,11 +5,16 @@ import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.recover.DataStoreSyncBatchOperation;
+import com.tarantula.platform.service.cluster.recover.DataStoreSyncEndOperation;
+import com.tarantula.platform.service.cluster.recover.DataStoreSyncStartOperation;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -161,6 +166,41 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             }
         }
         return ret;
+    }
+
+    public int syncStart(int partition,String syncKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexSyncStartOperation operation = new AccessIndexSyncStartOperation(nodeEngine.getLocalMember().getUuid(),partition,syncKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<Integer> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+            //return 0;
+        }
+    }
+    public void sync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexSyncBatchOperation operation = new AccessIndexSyncBatchOperation(size,keys,values,partition);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
+    public void syncEnd(String memberId,String syncKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexSyncEndOperation operation = new AccessIndexSyncEndOperation(syncKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
+        try {
+            final Future<Void> future = builder.invoke();
+            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
     }
     @Override
     public void start() throws Exception {

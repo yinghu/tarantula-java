@@ -10,7 +10,8 @@ public class ReplicationData {
         this.key = key;
         this.value = value;
     }
-    public ReplicationData(byte[] key, byte[] value){
+    public ReplicationData(int partition,byte[] key, byte[] value){
+        this.partition = partition;
         this.key = key;
         this.value = value;
     }

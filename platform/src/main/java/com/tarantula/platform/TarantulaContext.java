@@ -510,6 +510,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public void _registerNode() throws Exception{
  	    this.accessIndexService().disable();
  	    _access_index_syc_finished.await();
+ 	    for(int i=0;i<accessIndexRoutingNumber;i++){
+ 	        CountDownLatch countDownLatch = new CountDownLatch(1);
+ 	        String _pk = "p"+i;
+ 	        _syncLatch.put(_pk,countDownLatch);
+ 	        this.accessIndexService().syncStart(i,_pk);
+ 	        countDownLatch.await();
+ 	        _syncLatch.remove(_pk);
+        }
         CountDownLatch _tarantula_sync = new CountDownLatch(1);
         _syncLatch.put("t100",_tarantula_sync);
         this.integrationCluster.recoverService().syncStart(dataStoreMaster,"t100");

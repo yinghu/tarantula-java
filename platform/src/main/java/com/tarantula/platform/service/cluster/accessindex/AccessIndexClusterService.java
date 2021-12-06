@@ -11,15 +11,18 @@ import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.EventService;
+import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.AccessIndexSyncEvent;
+import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AccessIndexClusterService implements ManagedService, RemoteService {
 
@@ -34,6 +37,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     private ConcurrentHashMap<String,AccessIndex> accessCache;
     private String bucket;
     private EventService publisher;
+
+    private AtomicInteger _total = new AtomicInteger(0);
+
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
@@ -139,5 +145,44 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     public byte[] recover(int partition,byte[] key){
         return this.dataStoreOnPartitions[partition].dataStore.backup().get(key);
+    }
+    public int syncStart(String memberId,int partition,String syncKey){
+        AccessIndexService recoverService = tarantulaContext.integrationCluster().accessIndexService();
+        new Thread(()->{
+            int[] total={0};
+            long st = System.currentTimeMillis();
+            if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
+                int[] batch={0};
+                byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
+                byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
+                this.dataStoreOnPartitions[partition].dataStore.backup().list((k,v)->{
+                    if(batch[0] == tarantulaContext.recoverBatchSize){
+                        recoverService.sync(batch[0],keys,values,memberId,partition);
+                        batch[0] = 0;
+                    }
+                    keys[batch[0]]=k;
+                    values[batch[0]]=v;
+                    batch[0]++;
+                    total[0]++;
+                    return true;
+                });
+                //last batch
+                recoverService.sync(batch[0],keys,values,memberId,partition);
+            }
+            recoverService.syncEnd(memberId,syncKey);
+            log.warn("Total records ["+total[0]+"] from ["+partition+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
+        }).start();
+        return this.tarantulaContext.partitionNumber();
+    }
+    public void replicateAsBatch(ReplicationData[] batch){
+        for(ReplicationData d : batch){
+            replicate(d.partition,d.key,d.value);
+        }
+        _total.addAndGet(batch.length);
+    }
+    public void syncEnd(String syncKey){
+        tarantulaContext._syncLatch.get(syncKey).countDown();
+        log.warn("Total records received ["+_total.get()+"] from master node"+">>"+syncKey);
+        _total.set(0);
     }
 }

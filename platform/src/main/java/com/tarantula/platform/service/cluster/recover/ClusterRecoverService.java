@@ -28,7 +28,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private TarantulaContext tarantulaContext;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int scope;
-    private AtomicInteger total = new AtomicInteger(0);
+    private AtomicInteger _total = new AtomicInteger(0);
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
@@ -109,11 +109,12 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         for(ReplicationData d : batch){
             replicate(d.source,d.key,d.value);
         }
-        total.addAndGet(batch.length);
+        _total.addAndGet(batch.length);
     }
     public void syncEnd(String syncKey){
         tarantulaContext._syncLatch.get(syncKey).countDown();
-        log.warn("Total records received ["+total.get()+"] from master node"+">>"+syncKey);
+        log.warn("Total records received ["+_total.get()+"] from master node"+">>"+syncKey);
+        _total.set(0);
     }
 
     public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){

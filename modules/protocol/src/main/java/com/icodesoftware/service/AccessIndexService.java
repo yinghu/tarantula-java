@@ -12,7 +12,9 @@ public interface AccessIndexService extends ServiceProvider {
 
     AccessIndex get(String accessKey);
 
-
+    int syncStart(int partition,String syncKey);
+    void sync(int size,byte[][] keys,byte[][] values,String memberId,int partition);
+    void syncEnd(String memberId,String syncKey);
 
     boolean enable();
     boolean disable();
