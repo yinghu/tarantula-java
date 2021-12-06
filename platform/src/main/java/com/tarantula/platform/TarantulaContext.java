@@ -539,7 +539,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         nodeMetrics.distributionKey(node.nodeId);
         nodeMetrics.dataStore(masterDataStore());
         masterDataStore().createIfAbsent(nodeMetrics,true);
-        //this.tarantulaCluster.registerMetricsListener(this);
         this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
