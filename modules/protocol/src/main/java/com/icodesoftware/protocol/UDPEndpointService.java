@@ -59,6 +59,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         log.warn("Ping handler number ["+1+"]");
         log.warn("Outbound message handler number ["+1+"]");
         log.warn("Session Timeout ["+sessionTimeout+"]");
+        log.warn("Receiver Timeout ["+receiverTimeout+"]");
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();

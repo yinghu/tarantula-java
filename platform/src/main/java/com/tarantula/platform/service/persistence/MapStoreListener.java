@@ -7,9 +7,8 @@ import com.icodesoftware.service.Metadata;
 public interface MapStoreListener {
 
     //dispatch backup operations
-    <T extends Recoverable> byte[] onCreating(Metadata metadata, String key, T t);
-    <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t);
-    <T extends Recoverable> T onLoading(Metadata metadata,String key);
+    <T extends Recoverable> void onCreating(Metadata metadata, String key, T t);
+    <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t);
 
     //dispatch cluster operations
     void onDistributing(Metadata metadata,byte[] key, byte[] value);

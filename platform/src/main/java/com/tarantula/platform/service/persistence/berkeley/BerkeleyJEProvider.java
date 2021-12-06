@@ -256,48 +256,22 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     // map store listener methods
     @Override
-    public <T extends Recoverable> byte[] onCreating(Metadata metadata,String key,T t){
+    public <T extends Recoverable> void onCreating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            if(t.backup()){
-                replicationPendingQueue.offer(()->{
-                    dShardingProvider.create(metadata,key,t);
-                });
-                return null;
-            }else{
-                return dShardingProvider.create(metadata,key,t);
-            }
+            replicationPendingQueue.offer(()-> dShardingProvider.create(metadata,key,t));
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.create(metadata,key,t);
+            replicationPendingQueue.offer(()-> iShardingProvider.create(metadata,key,t));
         }
-        return null;
     }
     @Override
-    public <T extends Recoverable> byte[] onUpdating(Metadata metadata,String key,T t){
+    public <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            if(t.backup()){
-                replicationPendingQueue.offer(()->{
-                    dShardingProvider.update(metadata,key,t);
-                });
-                return null;
-            }else{
-                return dShardingProvider.update(metadata,key,t);
-            }
+            replicationPendingQueue.offer(()-> dShardingProvider.update(metadata,key,t));
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.update(metadata,key,t);
+        else if(t.scope()==Distributable.INTEGRATION_SCOPE){
+            replicationPendingQueue.offer(()-> iShardingProvider.update(metadata,key,t));
         }
-        return null;
-    }
-    @Override
-    public <T extends Recoverable> T onLoading(Metadata metadata,String key){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return iShardingProvider.load(metadata,key);
-        }
-        else if(metadata.scope()==Distributable.DATA_SCOPE){
-            return dShardingProvider.load(metadata,key);
-        }
-        return null;
     }
 
     @Override
@@ -516,8 +490,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
         @Override
         public <T extends Recoverable> boolean update(T t) {
-
-
             throw new UnsupportedOperationException();
         }
 
@@ -542,6 +514,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 v = t.toBinary();
                 if(_set(k,v)){
                     mapStoreListener.onDistributing(metadata1,k,v);//set cluster
+                    if(t.backup()) mapStoreListener.onCreating(metadata1,akey,t);
                     return true;
                 }
                 return false;
@@ -573,13 +546,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     _set(key,value);
                     return true;
                 }
-                T c = mapStoreListener.onLoading(metadata1,akey);//from database
-                if(c==null){
-                    return false;
-                }
-                _set(key,t.toBinary());
-                t.fromBinary(t.toBinary());
-                return true;
+                return false;
             }catch (Exception ex){
                 log.error("error on load",ex);
                 return false;

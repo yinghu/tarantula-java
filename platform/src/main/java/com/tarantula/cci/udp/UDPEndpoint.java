@@ -51,14 +51,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
-        //udpEndpointServiceProvider.receiverTimeout(1000);
+        udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.registerPingListener(this);
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
         }
-        logger.warn("UDP Endpoint running as a daemon with pool size ->"+sessionPoolSize);
+        logger.warn("UDP Endpoint running as a daemon with session pool size ->"+sessionPoolSize);
     }
 
     @Override
