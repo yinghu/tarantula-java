@@ -100,6 +100,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			if((boolean)gameCluster.property(GameCluster.DISABLED)){
 				return;
 			}
+			this.context.setGameServiceProvider(gameCluster);
 			this.context.setGameClusterOnLobby(memberId,gameCluster,this);
 		}catch (Exception ex){
 			throw new RuntimeException(ex);

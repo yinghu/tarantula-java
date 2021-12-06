@@ -267,15 +267,24 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public TokenValidatorProvider tokenValidatorProvider(){
  	    return this.tokenValidatorProvider;
     }
-    public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
- 	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
- 	    try{
- 	        GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+    public synchronized void setGameServiceProvider(GameCluster gameCluster){
+        try{
+            GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.start();
         }catch (Exception ex){
- 	        throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
+            throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
         }
+    }
+    public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
+ 	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
+ 	    //try{
+ 	        //GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+            //this.deployServiceProvider(gameServiceProvider);
+            //gameServiceProvider.start();
+        //}catch (Exception ex){
+ 	        //throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
+        //}
  	    List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));

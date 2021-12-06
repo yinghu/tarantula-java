@@ -397,6 +397,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
     }
+    public <T extends OnAccess> void addGameService(T gameCluster){
+        byte[] key = gameCluster.distributionKey().getBytes();
+        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
+        if(memberId==null){
+            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
+            return;
+        }
+        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
+        gameCluster.fromBinary(ret);
+        this.tarantulaContext.setGameServiceProvider((GameCluster)gameCluster);
+    }
     public <T extends OnAccess> void addGameCluster(T gameCluster){
         byte[] key = gameCluster.distributionKey().getBytes();
         String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
@@ -637,7 +648,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(deployService.enableGameCluster(gameCluster.distributionKey())){
+        if(deployService.enableGameCluster(gameCluster.distributionKey())&&deployService.startGameService(gameCluster.distributionKey())){
             return tarantulaContext.integrationCluster().deployService().launchGameCluster(gameCluster.distributionKey());
         }
         else{
