@@ -101,7 +101,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 recoverService.sync(batch[0],keys,values,memberId,source);
             }
             recoverService.syncEnd(memberId,syncKey);
-            log.warn("Total records ["+total[0]+"] from ["+source+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
+            //log.warn("Total records ["+total[0]+"] from ["+source+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
         return this.tarantulaContext.partitionNumber();
     }
