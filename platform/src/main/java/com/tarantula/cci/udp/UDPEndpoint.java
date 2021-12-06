@@ -51,6 +51,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.host((String)cfg.property("IP"));
         udpEndpointServiceProvider.daemon(true);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
+        //udpEndpointServiceProvider.receiverTimeout(1000);
         udpEndpointServiceProvider.registerPingListener(this);
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();

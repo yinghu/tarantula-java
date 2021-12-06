@@ -533,18 +533,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 byte[] v = _get(k);//get local
                 if(v==null){
                     v = mapStoreListener.onRecovering(metadata1,k);//get cluster
-                    if(v!=null){
-                        _set(k,v);//local set
-                    }
+                    if(v!=null) _set(k,v);//local set
                 }
-                if(v==null){//if no record on cluster, create record on database
-                    v = mapStoreListener.onCreating(metadata1,akey,t);
-                    if(v==null){
-                        return false;
-                    }
-                    if(_set(k,v)){
-                        mapStoreListener.onDistributing(metadata1,k,v);//set cluster
-                    }
+                if(v!=null){
+                    if(loading) t.fromBinary(v);
+                    return false;
+                }
+                v = t.toBinary();
+                if(_set(k,v)){
+                    mapStoreListener.onDistributing(metadata1,k,v);//set cluster
                     return true;
                 }
                 return false;

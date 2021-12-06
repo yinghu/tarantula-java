@@ -55,7 +55,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public AtomicBoolean node_started;
 
-    public static CountDownLatch _syc_finished;
+    public static CountDownLatch _access_index_syc_finished;
 
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
 
@@ -126,6 +126,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public static boolean lobbySubscriptionEnabled = false;
     public String authContext = "localhost";
 
+    public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
 
  	private TarantulaContext(){
  	    this.endpointService = new EndpointService(this);
@@ -146,7 +147,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         _storageStarted = new CountDownLatch(1);
         _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
-        _syc_finished = new CountDownLatch(2);
+        _access_index_syc_finished = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
 
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -497,12 +498,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             v.waitForData();//block for global data sync
         });
     }
-    public void _registerNode(){
+    public void _registerNode() throws Exception{
  	    this.accessIndexService().disable();
- 	    this.integrationCluster.recoverService().syncStart(dataStoreMaster);
-        try{_syc_finished.await();}catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+ 	    _access_index_syc_finished.await();
+        CountDownLatch _tarantula_sync = new CountDownLatch(1);
+        _syncLatch.put("t100",_tarantula_sync);
+        this.integrationCluster.recoverService().syncStart(dataStoreMaster,"t100");
+        _tarantula_sync.await();
+        _syncLatch.remove("t100");
         for(String s : this.integrationCluster.recoverService().listModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);

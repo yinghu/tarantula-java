@@ -124,7 +124,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                 return true;
             });
         }
-        TarantulaContext._syc_finished.countDown();
+        TarantulaContext._access_index_syc_finished.countDown();
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"] with total access index loaded ["+totalLoaded[0]+"]");
     }
 

@@ -22,9 +22,9 @@ public interface RecoverService extends ServiceProvider{
     int replicate(String source,int partition,byte[] key,byte[] value,int nodeNumber);
 
     //operates on master node
-    int syncStart(String source);
+    int syncStart(String source,String syncKey);
     void sync(int size,byte[][] keys,byte[][] values,String memberId,String source);
-    void syncEnd(String memberId);
+    void syncEnd(String memberId,String syncKey);
 
     String[] listModules();
     byte[] loadModuleJarFile(String name);

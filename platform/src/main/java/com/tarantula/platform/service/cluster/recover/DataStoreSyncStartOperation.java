@@ -11,19 +11,21 @@ public class DataStoreSyncStartOperation extends Operation {
 
     private String memberId;
     private String source;
+    private String syncKey;
     private int totalPartitions;
     public DataStoreSyncStartOperation() {
     }
 
 
-    public DataStoreSyncStartOperation(String memberId,String source) {
+    public DataStoreSyncStartOperation(String memberId,String source,String syncKey) {
         this.memberId = memberId;
         this.source = source;
+        this.syncKey = syncKey;
     }
     @Override
     public void run() throws Exception {
         ClusterRecoverService cds = this.getService();
-        totalPartitions = cds.syncStart(memberId,source);
+        totalPartitions = cds.syncStart(memberId,source,syncKey);
     }
 
     @Override
@@ -36,6 +38,7 @@ public class DataStoreSyncStartOperation extends Operation {
         super.writeInternal(out);
         out.writeUTF(memberId);
         out.writeUTF(source);
+        out.writeUTF(syncKey);
     }
 
     @Override
@@ -43,5 +46,6 @@ public class DataStoreSyncStartOperation extends Operation {
         super.readInternal(in);
         this.memberId = in.readUTF();
         this.source = in.readUTF();
+        this.syncKey = in.readUTF();
     }
 }

@@ -88,6 +88,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployGameCluster(String gameClusterId){
 		try {
+			System.out.println(">>>>GAME CLUSTER->"+gameClusterId);
 			RecoverService recoverService = this.context.integrationCluster().recoverService();
 			String memberId = recoverService.findDataNode(context.dataStoreMaster,gameClusterId.getBytes());
 			if(memberId==null){
@@ -97,6 +98,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
 			gameCluster.fromBinary(ret);
+			System.out.println(">>>>GAME CLUSTER->"+gameCluster.property(GameCluster.GAME_SERVICE));
 			if((boolean)gameCluster.property(GameCluster.DISABLED)){
 				return;
 			}

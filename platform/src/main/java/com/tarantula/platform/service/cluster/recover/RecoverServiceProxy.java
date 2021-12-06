@@ -191,9 +191,9 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
-    public int syncStart(String source){
+    public int syncStart(String source,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
-        DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source);
+        DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source,syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
         try {
             final Future<Integer> future = builder.invoke();
@@ -214,9 +214,9 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public void syncEnd(String memberId){
+    public void syncEnd(String memberId,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
-        DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation();
+        DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation(syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
         try {
             final Future<Void> future = builder.invoke();

@@ -143,7 +143,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                log.error("unexpected error",ex);
+                //log.error("unexpected error",ex);
                 try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
             }
         }

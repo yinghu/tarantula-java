@@ -200,6 +200,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] v = _get(dso,key);//from local
             if(v==null){
                 v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
+                if(v!=null) _put(dso,key,v);
             }
             if(v==null){
                 byte[] vx = t.toBinary();//SystemUtil.toJson(t.toMap());
@@ -222,9 +223,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 return false;
             }
             else{
-                if(loading){
-                    t.fromBinary(v);//fromMap(SystemUtil.toMap(v));
-                }
+                if(loading) t.fromBinary(v);
                 return false;
             }
         }catch (Exception ex){
