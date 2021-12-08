@@ -31,17 +31,31 @@ public class GameLobbyAdminModule implements Module {
             session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameDataList")){
-            GameDataStoreContext gsc = new GameDataStoreContext();
+            GameClusterDataStoreContext gsc = new GameClusterDataStoreContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
             Lobby lobby = gc.dataLobby;
             DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
             gsc.name = lobby.descriptor().typeId();
             gsc.tag = lobby.entryList().get(0).tag();
+            //_data
             gsc.dataStore = ds.name();//lobby.descriptor().typeId();
             gsc.dataStoreCount = ds.count();
-            DataStore ss = this.context.dataStore(lobby.descriptor().typeId().replace("-data","_service"));
+            String serviceDataStoreName = ((String)gc.property(GameCluster.GAME_SERVICE)).replace("-","_");
+            //_service
+            DataStore ss = this.context.dataStore(serviceDataStoreName);
             gsc.serviceStore = ss.name();
             gsc.serviceStoreCount = ss.count();
+            //_service_room
+            DataStore ssr = this.context.dataStore(serviceDataStoreName+"_room");
+            gsc.serviceRoomStore = ssr.name();
+            gsc.serviceRoomStoreCount = ssr.count();
+            //_service_tournament
+            if((Boolean)gc.property(GameCluster.TOURNAMENT_ENABLED)){
+                DataStore sst = this.context.dataStore(serviceDataStoreName+"_tournament");
+                gsc.serviceTournamentStore = sst.name();
+                gsc.serviceTournamentStoreCount = sst.count();
+            }
+
             session.write(gsc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameLobby")){

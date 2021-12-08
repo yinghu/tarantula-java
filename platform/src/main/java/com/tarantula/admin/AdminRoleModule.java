@@ -75,32 +75,38 @@ public class AdminRoleModule implements Module{
             session.write(JsonUtil.toSimpleResponse(key!=null,key!=null?"key passed":"key failed").getBytes());
         }
         else if(session.action().equals("onCreateGameCluster")){
-            User ua = _user(session.systemId());
-            Account acc = new UserAccount();
-            acc.distributionKey(ua.primary()?session.systemId():ua.owner());
-            if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
-                OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-                //context.log("MODE->"+onAccess.property("playMode").toString(),OnLog.WARN);
-                GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),(String)onAccess.property("name"),(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
-                if(gc.successful()){
-                    IndexSet idx = new IndexSet();
-                    idx.distributionKey(acc.distributionKey());
-                    idx.label(Account.GameClusterLabel);
-                    idx.addKey(gc.distributionKey());
-                    if(!account.createIfAbsent(idx,true)){
-                        idx.addKey(gc.distributionKey());//update on existing
-                        account.update(idx);
-                    }
-                    acc.gameClusterCount(1);
-                    acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                    account.update(acc);
-                    gc.message("Game cluster created successfully");
-                }
-                session.write(gc.toJson().toString().getBytes());
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            String pendingName = (String)onAccess.property("name");
+            if(!checkGameClusterName(pendingName)){
+                session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 5 chars at least").getBytes());
             }
             else{
-                //reach max count
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes());
+                User ua = _user(session.systemId());
+                Account acc = new UserAccount();
+                acc.distributionKey(ua.primary()?session.systemId():ua.owner());
+                if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
+                    //context.log("MODE->"+onAccess.property("playMode").toString(),OnLog.WARN);
+                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
+                    if(gc.successful()){
+                        IndexSet idx = new IndexSet();
+                        idx.distributionKey(acc.distributionKey());
+                        idx.label(Account.GameClusterLabel);
+                        idx.addKey(gc.distributionKey());
+                        if(!account.createIfAbsent(idx,true)){
+                            idx.addKey(gc.distributionKey());//update on existing
+                            account.update(idx);
+                        }
+                        acc.gameClusterCount(1);
+                        acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                        account.update(acc);
+                        gc.message("Game cluster created successfully");
+                    }
+                    session.write(gc.toJson().toString().getBytes());
+                }
+                else{
+                    //reach max count
+                    session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes());
+                }
             }
         }
         else if(session.action().equals("availableGameServiceList")){
@@ -209,5 +215,8 @@ public class AdminRoleModule implements Module{
         });
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();
+    }
+    private boolean checkGameClusterName(String name){
+        return name!=null&&name.length()>5&&name.chars().allMatch(Character::isLetterOrDigit);
     }
 }

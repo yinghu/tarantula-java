@@ -6,8 +6,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.tarantula.platform.DeploymentDescriptor;
-import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.Metrics;
@@ -104,15 +102,6 @@ public class DataStoreRoleModule implements Module {
         this.context.log("Admin Datastore module started", OnLog.INFO);
     }
 
-    private JsonElement _parse(JsonParser parser, byte[] k,byte[] payload){
-        try{
-            return parser.parse(new String(payload));
-        }catch (Exception ex){
-            this.context.log("KEY->"+new String(k),OnLog.WARN);
-            this.context.log("LOAD->"+new String(payload),OnLog.WARN);
-            return new JsonObject();
-        }
-    }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
         jms.addProperty("successful",suc);

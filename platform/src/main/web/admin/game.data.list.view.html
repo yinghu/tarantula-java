@@ -51,12 +51,34 @@
         <div class="w3-display-topright tx-margin-right-24">
             <span class='w3-left tx-text-14 tx-margin-top-8'>Record Count:</span>
             <span id='tx-data-store-5' class='w3-right tx-text-14 tx-margin-top-8 tx-margin-left-12'>0</span>
+        </div> 
+    </div> 
+    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-80">
+        <div class="w3-display-topleft tx-margin-left-24 tx-margin-top-8">
+            <span><i class="fa fa-database w3-left" style="font-size:24px;color: green;"></i></span>
         </div>
-        <!--
-        <div class="w3-display-bottomright tx-margin-right-24">
-            <span id="tx-data-store-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">View</span>      
-        </div>-->    
-    </div>  
+        <div class="w3-display-bottomleft tx-margin-left-24">
+            <span class='w3-left tx-text-14 tx-margin-bottom-8'>Service Store Name:</span>
+            <span id='tx-data-store-6' class='w3-right tx-text-14 tx-margin-bottom-8 tx-margin-left-12'>0</span>
+        </div>
+        <div class="w3-display-topright tx-margin-right-24">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Record Count:</span>
+            <span id='tx-data-store-7' class='w3-right tx-text-14 tx-margin-top-8 tx-margin-left-12'>0</span>
+        </div> 
+    </div>
+    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-80">
+        <div class="w3-display-topleft tx-margin-left-24 tx-margin-top-8">
+            <span><i class="fa fa-database w3-left" style="font-size:24px;color: green;"></i></span>
+        </div>
+        <div class="w3-display-bottomleft tx-margin-left-24">
+            <span class='w3-left tx-text-14 tx-margin-bottom-8'>Service Store Name:</span>
+            <span id='tx-data-store-8' class='w3-right tx-text-14 tx-margin-bottom-8 tx-margin-left-12'>0</span>
+        </div>
+        <div class="w3-display-topright tx-margin-right-24">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Record Count:</span>
+            <span id='tx-data-store-9' class='w3-right tx-text-14 tx-margin-top-8 tx-margin-left-12'>0</span>
+        </div> 
+    </div>   
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -69,6 +91,7 @@
 <script>
     document.querySelector("#tx-game-data-list-message").innerHTML = TARA_API.query().gameClusterId;
     TARA_API.onGet('role/lobby','onGameDataList',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
         if(resp.successful){
             TARA_API.query().serviceTag = resp.tag;
             document.querySelector('#tx-data-store-0').innerHTML = resp.name;
@@ -76,7 +99,11 @@
             document.querySelector('#tx-data-store-2').innerHTML = resp.dataStore;
             document.querySelector('#tx-data-store-3').innerHTML = resp.dataStoreCount;
             document.querySelector('#tx-data-store-4').innerHTML = resp.serviceStore;
-            document.querySelector('#tx-data-store-5').innerHTML = resp.serviceStoreCount;               
+            document.querySelector('#tx-data-store-5').innerHTML = resp.serviceStoreCount;   
+            document.querySelector('#tx-data-store-6').innerHTML = resp.serviceRoomStore;
+            document.querySelector('#tx-data-store-7').innerHTML = resp.serviceRoomStoreCount;
+            document.querySelector('#tx-data-store-8').innerHTML = resp.serviceTournamentStore;
+            document.querySelector('#tx-data-store-9').innerHTML = resp.serviceTournamentStoreCount;               
         }
         else{
             document.querySelector('#tx-game-data-list-message').innerHTML=resp.message;
@@ -86,10 +113,6 @@
         TARA_API.query().popup='#tx-popup-api'; 
         tx_view({viewId:'api.service.data',containerId:'#tx-popup-api'});
     };
-    //document.querySelector('#tx-data-store-api-1').onclick = ()=>{
-        //TARA_API.query().popup='#tx-popup-api'; 
-        //tx_view({viewId:'api.service.data1',containerId:'#tx-popup-api'});
-    //};
     document.querySelector('#tx-game-data-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

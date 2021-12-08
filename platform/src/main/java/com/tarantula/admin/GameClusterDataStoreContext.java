@@ -1,9 +1,9 @@
-package com.tarantula.game;
+package com.tarantula.admin;
 
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
 
-public class GameDataStoreContext extends ResponseHeader {
+public class GameClusterDataStoreContext extends ResponseHeader {
 
     public String name;
     public String tag;
@@ -11,9 +11,13 @@ public class GameDataStoreContext extends ResponseHeader {
     public long dataStoreCount;
     public String serviceStore;
     public long serviceStoreCount;
+    public String serviceRoomStore;
+    public long serviceRoomStoreCount;
+    public String serviceTournamentStore="n/a";
+    public long serviceTournamentStoreCount;
 
     
-    public GameDataStoreContext(){
+    public GameClusterDataStoreContext(){
         this.successful = true;
     }
 
@@ -26,6 +30,11 @@ public class GameDataStoreContext extends ResponseHeader {
         jsonObject.addProperty("dataStoreCount",dataStoreCount);
         jsonObject.addProperty("serviceStore",serviceStore);
         jsonObject.addProperty("serviceStoreCount",serviceStoreCount);
+        jsonObject.addProperty("serviceRoomStore",serviceRoomStore);
+        jsonObject.addProperty("serviceRoomStoreCount",serviceRoomStoreCount);
+        jsonObject.addProperty("serviceTournamentStore",serviceTournamentStore);
+        jsonObject.addProperty("serviceTournamentStoreCount",serviceTournamentStoreCount);
+
         return jsonObject;
     }
 }
