@@ -34,6 +34,7 @@ public interface ClusterProvider extends Serviceable {
     <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream);
     void set(Metadata metadata, byte[] key, byte[] value);
     byte[] get(byte[] key);
+    byte[] createIfAbsent(byte[] key,byte[] pending);
     <T extends Recoverable> boolean load(T t);
     //long sequence();
 

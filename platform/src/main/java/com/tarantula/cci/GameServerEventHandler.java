@@ -46,7 +46,7 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
-            byte[] serverKey = this.deploymentServiceProvider.serverKey();
+            byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
             connection.configurationTypeId(typeId);
             connection.serverKey = serverKey;
@@ -80,7 +80,7 @@ public class GameServerEventHandler implements RequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            byte[] serverKey = this.deploymentServiceProvider.serverKey();
+            byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
             Cipher cipher = CipherUtil.encrypt(serverKey);
             resp.addProperty("token", Base64.getEncoder().encodeToString(cipher.doFinal("hello".getBytes())));

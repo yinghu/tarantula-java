@@ -175,6 +175,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             return false;
         }
     }
+    public byte[] createIfAbsent(byte[] key,byte[] value){
+        byte[] ret = vMap.putIfAbsent(key,value);
+        return ret!=null?ret:value;
+    }
     public void set(byte[] key,byte[] value){
         this.vMap.put(key,value);
     }

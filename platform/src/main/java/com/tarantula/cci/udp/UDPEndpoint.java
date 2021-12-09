@@ -44,7 +44,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         Configuration cfg = serviceContext.configuration(CONFIG);
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
-        this.key = serviceContext.deploymentServiceProvider().serverKey();
+        this.key = serviceContext.deploymentServiceProvider().serverKey("pushChannel");
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
         connection.secured(true);

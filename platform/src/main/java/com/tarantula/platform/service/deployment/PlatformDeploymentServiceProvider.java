@@ -729,10 +729,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (ret!=null?new String(ret):"");
     }
 
-    public byte[] serverKey(){
+    public byte[] serverKey(String typeId){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        return key;
+        return this.integrationCluster.createIfAbsent(typeId.getBytes(),key);
     }
     public boolean registerChannel(String typeId,Channel channel){
         ChannelStub channelStub = (ChannelStub)channel;
