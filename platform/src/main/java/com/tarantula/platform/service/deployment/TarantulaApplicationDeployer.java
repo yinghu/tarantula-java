@@ -2,18 +2,15 @@ package com.tarantula.platform.service.deployment;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
-import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationProvider;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener<OnLobby> {
 
@@ -21,14 +18,15 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
 		this.context = context;
 	}
+
 	public void shutdown() throws Exception {
 
 	}
 	public void start() throws Exception {
 		this.context._registerNode();
-		RecoverService recoverService = this.context.integrationCluster().recoverService();
+		DataStore datastore = this.context.masterDataStore();
 		String bucketId = this.context.bucketId();
-		List<LobbyDescriptor> bList = query(recoverService,PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
+		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));//query(recoverService,PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
@@ -43,32 +41,22 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
-			c.applications = query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.applications = datastore.list(new ApplicationQuery(c.descriptor.distributionKey()));//query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
-		byte[] gameClusterIndexData = this.context.integrationCluster().recoverService().loadGameClusterIndex();
 		IndexSet indexSet = new IndexSet();
 		indexSet.distributionKey(this.context.bucketId());
 		indexSet.label(Account.GameClusterLabel);
-		if(gameClusterIndexData!=null&&gameClusterIndexData.length>0){
-			indexSet.fromBinary(gameClusterIndexData);
-			this.context.masterDataStore().update(indexSet);
-		}
-		if(this.context.masterDataStore().load(indexSet)){
+		if(datastore.load(indexSet)){
 			indexSet.keySet().forEach((gc)->{
 				deployGameCluster(gc);
 			});
 		}
-		byte[] moduleIndexData = this.context.integrationCluster().recoverService().loadModuleIndex();
 		IndexSet moduleIndex = new IndexSet();
 		moduleIndex.distributionKey(this.context.bucketId());
 		moduleIndex.label(Account.ModuleLabel);
-		if(moduleIndexData!=null&&moduleIndexData.length>0){
-			moduleIndex.fromBinary(moduleIndexData);
-			this.context.masterDataStore().update(moduleIndex);
-		}
-		if(this.context.masterDataStore().load(moduleIndex)){
+		if(datastore.load(moduleIndex)){
 			moduleIndex.keySet().forEach((pc)->{
 				deployModule(pc);
 			});
@@ -76,11 +64,9 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployModule(String publishingId){
 		try {
-			RecoverService recoverService = this.context.integrationCluster().recoverService();
-			String memberId = recoverService.findDataNode(this.context.dataStoreMaster,publishingId.getBytes());
-			List<LobbyDescriptor> blist = this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId},false);
+			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));//this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId},false);
 			blist.forEach((lb)->{
-				this.context.setOnLobby(memberId,lb,this);
+				this.context.setOnLobby(lb,this);
 			});
 		}catch (Exception ex){
 			ex.printStackTrace();
@@ -88,40 +74,19 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployGameCluster(String gameClusterId){
 		try {
-			RecoverService recoverService = this.context.integrationCluster().recoverService();
-			String memberId = recoverService.findDataNode(context.dataStoreMaster,gameClusterId.getBytes());
-			if(memberId==null){
-				return;
-			}
-			byte[] ret = recoverService.load(memberId,context.dataStoreMaster,gameClusterId.getBytes());
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
-			gameCluster.fromBinary(ret);
+			if(!this.context.masterDataStore().load(gameCluster)) return;
 			if((boolean)gameCluster.property(GameCluster.DISABLED)){
 				return;
 			}
 			this.context.setGameServiceProvider(gameCluster);
-			this.context.setGameClusterOnLobby(memberId,gameCluster,this);
+			this.context.setGameClusterOnLobby(gameCluster,this);
 		}catch (Exception ex){
 			throw new RuntimeException(ex);
 		}
 	}
-	private <T extends Recoverable> List<T> query(RecoverService recoverService,int factoryId,RecoverableFactory<T> factory,String[] params) throws Exception{
-		List<T> tlist = new ArrayList<>();
-		CountDownLatch _lock = new CountDownLatch(1);
-		String cid = this.context.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
-			T t = factory.create();
-			t.fromBinary(v);
-			t.distributionKey(new String(k));
-			if(!t.disabled()){
-				tlist.add(t);
-			}
-		},()-> _lock.countDown());
-		recoverService.queryStart(null,cid,context.dataStoreMaster,factoryId,factory.registryId(),params);
-		_lock.await();
-		this.context.deploymentService().distributionCallback().removeQueryCallback(cid);
-		return tlist;
-	}
+
 	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
 		RecoverableFactory query = new LobbyQuery(bucketId);
 		DataStore dataStore = this.context.masterDataStore();

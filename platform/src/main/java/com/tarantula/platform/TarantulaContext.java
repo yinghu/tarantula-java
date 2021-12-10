@@ -215,19 +215,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{
 		DefaultLobby lb = this.setLobby(conf.descriptor);
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.bucketId(),lb.descriptor().typeId());
-        if(!masterDataStore().load(lobbyTypeIdIndex)){
-            //load from cluster
-            byte[] data = this.integrationCluster.recoverService().findTypeIdIndex(conf.descriptor.typeId);
-            lobbyTypeIdIndex.fromBinary(data);
-        }
+        if(!masterDataStore().load(lobbyTypeIdIndex)) throw new RuntimeException("no lobby config data");
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode==DeployCode.USER_GAME_CLUSTER){
             gameCluster.distributionKey(lobbyTypeIdIndex.owner());
-            if(!masterDataStore().load(gameCluster)){
-                //load from cluster
-                byte[] data = this.integrationCluster.recoverService().recover(dataStoreMaster,gameCluster.key().asString().getBytes());
-                gameCluster.fromBinary(data);
-            }
+            if(!masterDataStore().load(gameCluster)) throw new RuntimeException("no game cluster config data");
         }
         OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
@@ -276,20 +268,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
         }
     }
-    public synchronized void setGameClusterOnLobby(String memberId,GameCluster gameCluster,Configurable.Listener listener){
+    public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
- 	    //try{
- 	        //GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
-            //this.deployServiceProvider(gameServiceProvider);
-            //gameServiceProvider.start();
-        //}catch (Exception ex){
- 	        //throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
-        //}
- 	    List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+ 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
-        configurations.forEach((c)->_setOnLobby(memberId,c,listener));
+        configurations.forEach((c)->_setOnLobby(c,listener));
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(this.bucketId());
         indexSet.label(Account.GameClusterLabel);
@@ -299,28 +284,28 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             this.masterDataStore().update(indexSet);
         }
     }
-    private void _setOnLobby(String memberId,LobbyConfiguration lc,OnLobby.Listener listener){
+    private void _setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
             return;
         }
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
-        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
-        lc.views = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+        lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+        lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
         this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
             listener.onUpdated(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
-    public synchronized void setOnLobby(String memberId,LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
+    public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
  	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){
  	        return;
         }
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()},false);
+        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()},false);
         //lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
         //this.configureViews(lc);
         try{
@@ -332,13 +317,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
-        List<LobbyDescriptor> bList = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+        //String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
+        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
             //lc.views = this.queryFromIntegrationNode(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
             //this.configureViews(lc);
             try{
@@ -393,11 +378,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         try{
             //LobbyTypeIdIndex pk = new LobbyTypeIdIndex()
-            String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,applicationId.getBytes());
-            byte[] data = this.integrationCluster.recoverService().load(memberId,dataStoreMaster,applicationId.getBytes());
+            //String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,applicationId.getBytes());
+            //byte[] data = this.integrationCluster.recoverService().load(memberId,dataStoreMaster,applicationId.getBytes());
             DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
             deploymentDescriptor.distributionKey(applicationId);
-            deploymentDescriptor.fromBinary(data);
+            //deploymentDescriptor.fromBinary(data);
+            if(!masterDataStore().load(deploymentDescriptor)) throw new RuntimeException("no application config data");
             try{setApplicationManager(deploymentDescriptor,lb);}catch (Exception exx){
                 throw new RuntimeException(exx);
             }
@@ -669,45 +655,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
     }
 
-    public <T extends Recoverable> List<T> queryFromDataMaster(int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
-        RecoverService recoverService = integrationCluster.recoverService();
- 	    List<T> tlist = new ArrayList<>();
-        CountDownLatch _lock = new CountDownLatch(1);
-        String cid = this.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
-            T t = factory.create();
-            t.fromBinary(v);
-            t.distributionKey(new String(k));
-            if(includeDisabled||!t.disabled()){
-                tlist.add(t);
-            }
-        },()-> _lock.countDown());
-        recoverService.queryStart(null,cid,dataStoreMaster,factoryId,factory.registryId(),params);
-        try {
-            _lock.await();
-        }catch (Exception ex){
-        }
-        this.deploymentService().distributionCallback().removeQueryCallback(cid);
-        return tlist;
-    }
-    public <T extends Recoverable> List<T> queryFromIntegrationNode(String memberId,int factoryId,RecoverableFactory<T> factory,String[] params,boolean includeDisabled){
-        RecoverService recoverService = integrationCluster.recoverService();
-        List<T> tlist = new ArrayList<>();
-        CountDownLatch _lock = new CountDownLatch(1);
-        String cid = this.deploymentService().distributionCallback().registerQueryCallback((k,v)->{
-            T t = factory.create();
-            t.fromBinary(v);
-            t.distributionKey(new String(k));
-            if(includeDisabled||!t.disabled()){
-                tlist.add(t);
-            }
-        },()-> _lock.countDown());
-        recoverService.queryStart(memberId,cid,dataStoreMaster,factoryId,factory.registryId(),params);
-        try {
-            _lock.await();
-        }catch (Exception ex){}
-        this.deploymentService().distributionCallback().removeQueryCallback(cid);
-        return tlist;
-    }
     public Response checkResource(OnView pending,String targetFolder){
  	    Response response = new ResponseHeader();
  	    try{

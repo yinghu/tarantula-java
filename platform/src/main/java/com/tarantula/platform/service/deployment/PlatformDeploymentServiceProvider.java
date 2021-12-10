@@ -409,15 +409,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.setGameServiceProvider((GameCluster)gameCluster);
     }
     public <T extends OnAccess> void addGameCluster(T gameCluster){
-        byte[] key = gameCluster.distributionKey().getBytes();
-        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
-        if(memberId==null){
-            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
-            return;
-        }
-        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
-        gameCluster.fromBinary(ret);
-        this.tarantulaContext.setGameClusterOnLobby(memberId,(GameCluster)gameCluster,new OnLobbyListener());
+        if(!this.tarantulaContext.masterDataStore().load(gameCluster)) return;
+        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new OnLobbyListener());
     }
     public <T extends OnAccess> void closeGameCluster(T gameCluster){
         byte[] key = gameCluster.distributionKey().getBytes();
@@ -696,22 +689,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return null;
     }
     public Lobby lobby(String typeId){
-        //DataStore mds = this.tarantulaContext.masterDataStore();
+        DataStore mds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
-        byte[] v = this.tarantulaContext.integrationCluster().recoverService().load(null,tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.key().asString().getBytes());
-        if(v==null){
-            return null;
-        }
-        lobbyTypeIdIndex.fromBinary(v);
-        v = this.tarantulaContext.integrationCluster().recoverService().load(null,this.tarantulaContext.dataStoreMaster,lobbyTypeIdIndex.index().getBytes());
-        if(v==null){
-            return null;
-        }
+        if(!mds.load(lobbyTypeIdIndex)) return null;
         LobbyDescriptor lb = new LobbyDescriptor();
-        lb.fromBinary(v);
         lb.distributionKey(lobbyTypeIdIndex.index());
+        if(!mds.load(lb)) return null;
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
+        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.distributionKey()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
         apps.forEach((a)->{
             lobby.addEntry(a);
         });
