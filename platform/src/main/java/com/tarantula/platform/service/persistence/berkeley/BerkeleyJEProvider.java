@@ -498,9 +498,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             try{
                 pass.acquire();
                 String akey = t.key().asString();
-                if(akey==null){//must be not null
-                    return false;
-                }
+                if(akey==null) return false;
                 byte[] k = akey.getBytes();
                 byte[] v = _get(k);//get local
                 if(v==null){
@@ -512,12 +510,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     return false;
                 }
                 v = t.toBinary();
-                if(_set(k,v)){
-                    mapStoreListener.onDistributing(metadata1,k,v);//set cluster
-                    if(t.backup()) mapStoreListener.onCreating(metadata1,akey,t);
-                    return true;
-                }
-                return false;
+                if(!_set(k,v)) return false;
+                mapStoreListener.onDistributing(metadata1,k,v);//set cluster
+                if(t.backup()) mapStoreListener.onCreating(metadata1,akey,t);
+                return true;
             }catch (Exception ex){
                 log.error("error on createIfAbsent",ex);
                 return false;
@@ -532,21 +528,17 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             try{
                 pass.acquire();
                 String akey = t.key().asString();
-                if(akey==null){
-                    return false;
-                }
+                if(akey==null) return false;
                 byte[] key = akey.getBytes();
                 byte[] value;
                 if((value=_get(key))!=null){//from local
                     t.fromBinary(value);
                     return true;
                 }
-                if((value=mapStoreListener.onRecovering(metadata1,key))!=null){//from cluster
-                    t.fromBinary(value);
-                    _set(key,value);
-                    return true;
-                }
-                return false;
+                if((value=mapStoreListener.onRecovering(metadata1,key))==null) return false;
+                t.fromBinary(value);
+                _set(key,value);
+                return true;
             }catch (Exception ex){
                 log.error("error on load",ex);
                 return false;
@@ -598,7 +590,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             }
         }
         public void list(RecoverableFactory<Recoverable> query,Binary binary){
-
+            throw new UnsupportedOperationException();
         }
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {

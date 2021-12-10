@@ -95,24 +95,15 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             byte[] value = t.toBinary();//SystemUtil.toJson(t.toMap());
-            boolean suc = _put(dso,key,value);
-            if(suc){
-                //do backup and replication
-                if(t.backup()){//backing up onto database
-                    this.mapStoreListener.onCreating(dso.metadata,okey,t);
-                }
-                if(t.distributable()){//distributing onto cluster
-                    this.mapStoreListener.onDistributing(dso.metadata,key,value);
-                }
-                Listener listener = rMap.get(t.getFactoryId());
-                if(listener!=null){
-                    listener.onCreated(t,okey,key,value);
-                }
-                if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
-                    suc = onEdge(t,okey);
-                }
-            }
-            return suc;
+            if(!_put(dso,key,value)) return false;
+            //do backup and replication
+            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+            Listener listener = rMap.get(t.getFactoryId());
+            if(listener!=null) listener.onCreated(t,okey,key,value);
+            //set edge index
+            if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t,okey);
+            return true;
         }catch (Exception ex){
             log.error("Error on create",ex);
             return false;
@@ -130,56 +121,45 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
         else{
             ix = mapStoreListener.onRecovering(dos.metadata,_kn);//from cluster
-            if(ix!=null){
-                indexSet.fromBinary(ix);
-            }
+            if(ix!=null) indexSet.fromBinary(ix);
         }
         indexSet.addKey(okey);
         byte[] _vn = indexSet.toBinary();
-        boolean suc = _put(dos,_kn,_vn);
-        if(suc){
-            //do backup and replication
-            if(t.backup()){
-                if(ix!=null){
-                    this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),indexSet);
-                }
-                else{
-                    this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet);
-                }
+        if(!_put(dos,_kn,_vn)) return false;
+        //do backup and replication
+        if(t.backup()){
+            if(ix!=null){
+                this.mapStoreListener.onUpdating(dos.metadata,indexSet.key().asString(),indexSet);
             }
-            if(t.distributable()){
-                this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
+            else{
+                this.mapStoreListener.onCreating(dos.metadata,indexSet.key().asString(),indexSet);
             }
         }
-        return suc;
+        if(t.distributable()) this.mapStoreListener.onDistributing(dos.metadata,_kn,_vn);
+        return true;
     }
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null){
-                return false;
-            }
+            if(akey==null) return false;
+
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             byte[] value = t.toBinary();
-            if(_put(dso,key,value)){
-                if(t.backup()){
-                    this.mapStoreListener.onUpdating(dso.metadata,akey,t);
-                }
-                if(t.distributable()){
-                    this.mapStoreListener.onDistributing(dso.metadata,key,value);
-                }
-                Listener listener = rMap.get(t.getFactoryId());
-                if(listener!=null){
-                    listener.onUpdated(t,akey,key,value);
-                }
-                return true;
-            }
-            else{
-                return false;
-            }
+            if(!_put(dso,key,value)) return false;
+
+            if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata,akey,t);
+
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+
+            Listener listener = rMap.get(t.getFactoryId());
+
+            if(listener!=null) listener.onUpdated(t,akey,key,value);
+
+            return true;
+
         }catch (Exception ex){
             log.error("Error on update",ex);
             return false;
@@ -202,30 +182,21 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
                 if(v!=null) _put(dso,key,v);
             }
-            if(v==null){
-                byte[] vx = t.toBinary();//SystemUtil.toJson(t.toMap());
-                if(_put(dso,key,vx)) {
-                    if(t.backup()){
-                        this.mapStoreListener.onCreating(dso.metadata,akey,t);
-                    }
-                    if(t.distributable()){
-                        this.mapStoreListener.onDistributing(dso.metadata, key,vx);
-                    }
-                    Listener listener = rMap.get(t.getFactoryId());
-                    if(listener!=null){
-                        listener.onCreated(t,akey,key,vx);
-                    }
-                    if(t.onEdge()&&t.owner()!=null&&t.label()!=null){
-                        onEdge(t, akey);
-                    }
-                    return true;
-                }
-                return false;
-            }
-            else{
+            if(v!=null){//existed no creation
                 if(loading) t.fromBinary(v);
                 return false;
             }
+            byte[] vx = t.toBinary();
+            if(!_put(dso,key,vx)) return false;
+            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,akey,t);
+
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, key,vx);
+
+            Listener listener = rMap.get(t.getFactoryId());
+            if(listener!=null) listener.onCreated(t,akey,key,vx);
+            if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t, akey);
+            return true;
+
         }catch (Exception ex){
             log.error("Error on createIfAbsent",ex);
             return false;
@@ -236,16 +207,13 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean load(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null){
-                return false;
-            }
+            if(akey==null) return false;
+
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             if((value=_get(dso,key))==null){//get local
-                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null){//get cluster
-                    return false;
-                }
+                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null) return false;
                 _put(dso,key,value);
             }
             t.fromBinary(value);
@@ -277,9 +245,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             DatabaseEntry _value = new DatabaseEntry();
             try{
                 while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-                    if(!binary.on(_key.getData(),_value.getData())){
-                        break;
-                    }
+                    if(!binary.on(_key.getData(),_value.getData())) break;
                 }
             } catch (Exception ex) {
                 log.error("",ex);
@@ -306,14 +272,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 byte[] ka = b.getBytes();
                 DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
                 if((v=_get(dwso,ka))==null){//from local
-                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null){//from cluster
-                        _put(dwso,ka,v);//set local
-                    }
+                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null) _put(dwso,ka,v);//set local
                 }
                 if(v!=null){
-                    if(!binary.on(ka,v)){
-                        break;
-                    }
+                    if(!binary.on(ka,v)) break;
                 }
             }
         }catch (Exception ex){
@@ -350,9 +312,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 byte[] ka = b.getBytes();
                 DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
                 if((v=_get(dwso,ka))==null){//from local
-                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null){//from cluster
-                        _put(dwso,ka,v);//set local
-                    }
+                    if((v = mapStoreListener.onRecovering(dwso.metadata,ka))!=null) _put(dwso,ka,v);//set local
                 }
                 if(v!=null){
                     t.fromBinary(v);//fromMap(SystemUtil.toMap(v));
