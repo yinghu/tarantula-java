@@ -39,7 +39,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         DataStore dataStore = context.dataStore(serviceDataStore(application));
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
-        dataStore.load(gameLobby);
+        if(!dataStore.load(gameLobby)) throw new RuntimeException("no lobby data for key->"+application.distributionKey());
         gameLobby.dataStore(dataStore);
         gameLobby.keySet().forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
@@ -53,7 +53,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         DataStore dataStore = context.dataStore(serviceDataStore(application),context.partitionNumber());
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
-        dataStore.load(gameLobby);
+        if(!dataStore.load(gameLobby)) throw new RuntimeException("no lobby data for key->"+application.distributionKey());
         gameLobby.dataStore(dataStore);
         gameLobby.keySet().forEach((k)->{
             GameZone zone = loadGameZone(dataStore,k);
@@ -82,7 +82,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
     public GameZone loadGameZone(DataStore dataStore,String distributionKey){
         GameZone zone = new DynamicZone();
         zone.distributionKey(distributionKey);
-        dataStore.load(zone);
+        if(!dataStore.load(zone)) throw new RuntimeException("no zone data for key->"+distributionKey);
         dataStore.list(new ArenaQuery(zone.distributionKey()),(a)->{
             zone.addArena(a);
             return true;

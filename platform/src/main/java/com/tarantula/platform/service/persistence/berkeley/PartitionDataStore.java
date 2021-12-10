@@ -296,9 +296,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] edgeList;
             if((edgeList=_get(dso,owner))==null){//from local
                 edgeList = mapStoreListener.onRecovering(dso.metadata,owner);//from cluster
-                if(edgeList==null){
-                    return;
-                }
+                if(edgeList==null) return;
+                _put(dso,owner,edgeList);
             }
             IndexSet indexSet = new IndexSet();
             indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
@@ -340,9 +339,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] edgeList;
             if((edgeList=_get(dso,owner))==null){//from local
                 edgeList = mapStoreListener.onRecovering(dso.metadata,owner);//from cluster
-                if(edgeList==null){
-                    return;
-                }
+                if(edgeList==null) return;
+                _put(dso,owner,edgeList);
             }
             IndexSet indexSet = new IndexSet();
             indexSet.fromBinary(edgeList);//fromMap(SystemUtil.toMap(edgeList));
