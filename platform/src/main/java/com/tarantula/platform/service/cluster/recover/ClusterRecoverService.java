@@ -81,7 +81,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         RecoverService recoverService = tarantulaContext.integrationCluster().recoverService();
         new Thread(()->{
             int[] total={0};
-            long st = System.currentTimeMillis();
+            //long st = System.currentTimeMillis();
             if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
