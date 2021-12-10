@@ -203,7 +203,6 @@ public class DynamicZone extends RecoverableObject implements GameZone {
         return this.dataStore;
     }
     private void listArena(){
-        System.out.println("Arena list->>>>>>>>>>>>>>>>>>>>>>"+arenaList.size());
         Collections.sort(arenaList,new ArenaComparator());
         int start = 1;
         for(Arena a : arenaList){
