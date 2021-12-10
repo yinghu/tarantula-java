@@ -117,44 +117,12 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         _total.set(0);
     }
 
-    public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){
-        RecoverableFactory fac = this.tarantulaContext.recoverableRegistry(factoryId).query(classId,params);
-        RecoverService recoverService = tarantulaContext.integrationCluster().recoverService();
-        new Thread(()->{
-            this.tarantulaContext.dataStore(dataStore,tarantulaContext.partitionNumber()).backup().list(fac,(k,v)->{
-                recoverService.query(memberId,source,k,v);
-                return true;
-            });
-            recoverService.queryEnd(memberId,source);
-        }).start();
-        return fac!=null;
-    }
-    public void query(String source,byte[] key,byte[] value){
-        this.deploymentServiceProvider.distributionCallback().queryCallback(source).on(key,value);
-    }
-    public void queryEnd(String source){
-        this.deploymentServiceProvider.distributionCallback().queryEndCallback(source).on();
-    }
+
     public String[] listModules(){
         return this.tarantulaContext._listModuleContent();
     }
     public byte[] loadModuleJarFile(String fileName){
         return this.tarantulaContext._readContent(fileName);
     }
-    public byte[] loadModuleIndex(){
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(this.tarantulaContext.bucketId());
-        indexSet.label(Account.ModuleLabel);
-        return this.tarantulaContext.masterDataStore().backup().get(indexSet.key().asString().getBytes());
-    }
-    public byte[] loadGameClusterIndex(){
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(this.tarantulaContext.bucketId());
-        indexSet.label(Account.GameClusterLabel);
-        return this.tarantulaContext.masterDataStore().backup().get(indexSet.key().asString().getBytes());
-    }
-    public byte[] loadTypeIdIndex(String typeId){
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
-        return this.tarantulaContext.masterDataStore().backup().get(lobbyTypeIdIndex.key().asString().getBytes());
-    }
+
 }

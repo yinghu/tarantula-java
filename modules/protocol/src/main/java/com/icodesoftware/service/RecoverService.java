@@ -13,9 +13,6 @@ public interface RecoverService extends ServiceProvider{
     boolean checkAccessControl(String systemId, Access.Role role);
     String findDataNode(String source,byte[] key);
     byte[] load(String memberId,String dataSource,byte[] key);
-    boolean queryStart(String memberId,String source,String dataStore,int factorId,int classId,String[] params);
-    void query(String memberId,String source,byte[] key,byte[] value);
-    void queryEnd(String memberId,String source);
 
     //operates on other nodes
     byte[] recover(String source,byte[] key);
@@ -28,14 +25,5 @@ public interface RecoverService extends ServiceProvider{
 
     String[] listModules();
     byte[] loadModuleJarFile(String name);
-    byte[] loadModuleIndex();
-    byte[] loadGameClusterIndex();
-    byte[] findTypeIdIndex(String typeId);
 
-    interface QueryCallback{
-        void on(byte[] key,byte[] value);
-    }
-    interface QueryEndCallback{
-        void on();
-    }
 }

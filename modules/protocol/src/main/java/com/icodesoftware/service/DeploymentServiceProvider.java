@@ -117,10 +117,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void syncKey(String key);
 
-        String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback);
-        RecoverService.QueryCallback queryCallback(String source);
-        RecoverService.QueryEndCallback queryEndCallback(String source);
-        void removeQueryCallback(String callId);
     }
 
 }

@@ -11,7 +11,6 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -61,11 +60,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private ConcurrentHashMap<String,QueryCallbacks> qCallbacks = new ConcurrentHashMap<>();
-
     private long metricsFreshRate;
     private static long TIMER = 10000;
-
 
     @Override
     public void start() throws Exception {
@@ -855,20 +851,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             configurable.updated(new ServiceContextProxy(this.tarantulaContext));
         }
     }
-    public String registerQueryCallback(RecoverService.QueryCallback queryCallback, RecoverService.QueryEndCallback queryEndCallback){
-        String callId = UUID.randomUUID().toString();
-        qCallbacks.put(callId,new QueryCallbacks(queryCallback,queryEndCallback));
-        return callId;
-    }
-    public RecoverService.QueryCallback queryCallback(String source){
-        return qCallbacks.get(source).queryCallback;
-    }
-    public RecoverService.QueryEndCallback queryEndCallback(String source){
-        return qCallbacks.get(source).queryEndCallback;
-    }
-    public void removeQueryCallback(String callId){
-        qCallbacks.remove(callId);
-    }
+
     private class OnLobbyListener implements Configurable.Listener<OnLobby>{
         @Override
         public void onUpdated(OnLobby onLobby){

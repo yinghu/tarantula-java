@@ -100,40 +100,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return ret;
     }
-    public boolean queryStart(String memberId,String source,String dataStore,int factoryId,int classId,String[] params){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreQueryStartOperation operation = new DataStoreQueryStartOperation(nodeEngine.getLocalMember().getUuid(),source,dataStore,factoryId,classId,params);
-        Address targetNode = memberId!=null?nodeEngine.getClusterService().getMember(memberId).getAddress():nodeEngine.getMasterAddress();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public void query(String memberId,String source,byte[] key,byte[] value){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreQueryStreamOperation operation = new DataStoreQueryStreamOperation(source,key,value);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public void queryEnd(String memberId,String source){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreQueryEndOperation operation = new DataStoreQueryEndOperation(source);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public byte[] load(String memberId,String dataSource,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         LoadOperation operation = new LoadOperation(dataSource,key);
@@ -248,49 +215,5 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public byte[] loadModuleIndex(){
-        NodeEngine nodeEngine = getNodeEngine();
-        LoadModuleIndexOperation operation = new LoadModuleIndexOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public byte[] loadGameClusterIndex(){
-        NodeEngine nodeEngine = getNodeEngine();
-        LoadGameClusterIndexOperation operation = new LoadGameClusterIndexOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    @Override
-    public byte[] findTypeIdIndex(String typeId) {
-        NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        byte[] ret = null;
-        for(Member m : mlist){
-            if(!m.localMember()){
-                FindTypeIdIndexOperation operation = new FindTypeIdIndexOperation(typeId);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-                final Future<byte[]> future = builder.invoke();
-                try {
-                    ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    if(ret!=null){
-                        break;
-                    }
-                } catch (Exception e) {
-                    future.cancel(true);
-                    //goes to next node if failed
-                }
-            }
-        }
-        return ret;
-    }
+
 }
