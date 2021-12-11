@@ -36,6 +36,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private DataStore pDatastore;
     private DataStore aDatastore;
     private DataStore sDatastore;
+    private DataStore accountIndex;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -60,6 +61,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         pDatastore = this.context.dataStore(Presence.DataStore);
         aDatastore = this.context.dataStore(Account.DataStore);
         sDatastore = this.context.dataStore(OnSession.DataStore);
+        accountIndex = this.context.dataStore(Account.IndexDataStore);
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
         accessIndexService.set("serverPush",0);
         AccessIndex accessIndex = accessIndexService.set(root,0);
@@ -94,9 +96,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     idx.distributionKey(account.distributionKey());
                     idx.label(Account.UserLabel);
                     idx.addKey(user.distributionKey());
-                    if(!aDatastore.createIfAbsent(idx,true)){
+                    if(!accountIndex.createIfAbsent(idx,true)){
                         idx.addKey(user.distributionKey());//update on existing
-                        aDatastore.update(idx);
+                        accountIndex.update(idx);
                     }
                 }
             }

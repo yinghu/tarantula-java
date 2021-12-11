@@ -22,6 +22,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     private AccessIndexService accessIndexService;
     private DataStore user;
     private DataStore account;
+    private DataStore accountIndex;
     private int maxUserCount;
     private TokenValidatorProvider tokenValidatorProvider;
     private AtomicBoolean accessIndexEnabled;
@@ -35,7 +36,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             indexSet.label(Account.UserLabel);
             AccessContext atc = new AccessContext();
             atc.userList = new ArrayList<>();
-            if(account.load(indexSet)){
+            if(accountIndex.load(indexSet)){
                 //atc.userList.add()
                 indexSet.keySet().forEach((k)->{
                     User u = new User();
@@ -114,6 +115,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
+        this.accountIndex = this.context.dataStore(Account.IndexDataStore);
         this.maxUserCount = ((Number)this.context.configuration("user").property("maxUserCount")).intValue();
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerAccessIndexListener(this);

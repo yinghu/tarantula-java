@@ -515,25 +515,36 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.integrationCluster.recoverService().syncStart(Account.DataStore,"t200");
         _account_sync.await();
         _syncLatch.remove("t200");
+
+        CountDownLatch _account_index_sync = new CountDownLatch(1);
+        _syncLatch.put("t300",_account_index_sync);
+        this.integrationCluster.recoverService().syncStart(Account.IndexDataStore,"t300");
+        _account_index_sync.await();
+        _syncLatch.remove("t300");
+
         DataStore accountDataStore = this.dataStore(Account.DataStore,partitionNumber());
         RecoverService recoverService = integrationCluster.recoverService();
-        accountDataStore.backup().list((k,v)->{
-            log.warn(new String(k)+">>"+new String(v));
+        DataStore userDataStore = this.dataStore(User.DataStore,partitionNumber());
+        DataStore presenceDataStore = this.dataStore(Presence.DataStore,partitionNumber());
+        DataStore sessionDataStore = this.dataStore(OnSession.DataStore,partitionNumber());
+        DataStore subscriptionDataStore = this.dataStore(Subscription.DataStore,partitionNumber());
+
+        accountDataStore.backup().list((k,v)->{//pull account and associated data set
             byte[] ret = recoverService.load(null, User.DataStore,k);
             if(ret!=null){
-                log.warn(new String(k)+">USER>"+new String(ret));
+                userDataStore.backup().set(k,ret);
             }
             ret = recoverService.load(null,Presence.DataStore,k);
             if(ret!=null){
-                log.warn(new String(k)+">PRESENCE>"+new String(ret));
+                presenceDataStore.backup().set(k,ret);
             }
             ret = recoverService.load(null,Subscription.DataStore,k);
             if(ret!=null){
-                log.warn(new String(k)+">SUBSCRIPTION>"+new String(ret));
+                subscriptionDataStore.backup().set(k,ret);
             }
             ret = recoverService.load(null,OnSession.DataStore,k);
             if(ret!=null){
-                log.warn(new String(k)+">OnSession>"+new String(ret));
+                sessionDataStore.backup().set(k,ret);
             }
             return true;
         });

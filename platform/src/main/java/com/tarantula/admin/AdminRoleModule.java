@@ -25,6 +25,7 @@ public class AdminRoleModule implements Module{
     private ApplicationContext context;
     private GsonBuilder builder;
     private DataStore account;
+    private DataStore accountIndex;
     private DataStore user;
 
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -51,7 +52,7 @@ public class AdminRoleModule implements Module{
             IndexSet idx = new IndexSet();
             idx.distributionKey(user.primary()?session.systemId():user.owner());
             idx.label(Account.GameClusterLabel);
-            if(account.load(idx)){
+            if(accountIndex.load(idx)){
                 idx.keySet().forEach((k)->{
                     GameCluster g = this.deploymentServiceProvider.gameCluster(k);
                     if(g!=null){
@@ -92,9 +93,9 @@ public class AdminRoleModule implements Module{
                         idx.distributionKey(acc.distributionKey());
                         idx.label(Account.GameClusterLabel);
                         idx.addKey(gc.distributionKey());
-                        if(!account.createIfAbsent(idx,true)){
+                        if(!accountIndex.createIfAbsent(idx,true)){
                             idx.addKey(gc.distributionKey());//update on existing
-                            account.update(idx);
+                            accountIndex.update(idx);
                         }
                         acc.gameClusterCount(1);
                         acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
@@ -189,6 +190,7 @@ public class AdminRoleModule implements Module{
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.account = this.context.dataStore(Account.DataStore);
+        this.accountIndex = this.context.dataStore(Account.IndexDataStore);
         this.user = this.context.dataStore(Access.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
