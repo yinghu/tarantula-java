@@ -47,11 +47,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){
-            //if(session.accessMode()==Session.GAME_CENTER_PLAY_MODE){
-                //this.deploymentServiceProvider.onRemoteConnection(session,desc);
-            //}else{
-                fastJoin(session,desc,session.payload());
-            //}
+            fastJoin(session,desc,session.payload());
         }
         else{
             resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
@@ -120,8 +116,8 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public String toString(){
         return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
     }
-    @Override
-    public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
-    }
+    //@Override
+    //public Key key(){
+        //return new AssociateKey(this.bucket,this.oid,this.label);
+    //}
 }

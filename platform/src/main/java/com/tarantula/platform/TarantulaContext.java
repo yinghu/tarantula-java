@@ -19,6 +19,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -495,8 +496,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public void _registerNode() throws Exception{
  	    this.accessIndexService().disable();
- 	    _access_index_syc_finished.await();
- 	    for(int i=0;i<accessIndexRoutingNumber;i++){
+ 	    _access_index_syc_finished.await();for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
  	        String _pk = "p"+i;
  	        _syncLatch.put(_pk,countDownLatch);
@@ -509,6 +509,34 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.integrationCluster.recoverService().syncStart(dataStoreMaster,"t100");
         _tarantula_sync.await();
         _syncLatch.remove("t100");
+
+        CountDownLatch _account_sync = new CountDownLatch(1);
+        _syncLatch.put("t200",_account_sync);
+        this.integrationCluster.recoverService().syncStart(Account.DataStore,"t200");
+        _account_sync.await();
+        _syncLatch.remove("t200");
+        DataStore accountDataStore = this.dataStore(Account.DataStore,partitionNumber());
+        RecoverService recoverService = integrationCluster.recoverService();
+        accountDataStore.backup().list((k,v)->{
+            log.warn(new String(k)+">>"+new String(v));
+            byte[] ret = recoverService.load(null, User.DataStore,k);
+            if(ret!=null){
+                log.warn(new String(k)+">USER>"+new String(ret));
+            }
+            ret = recoverService.load(null,Presence.DataStore,k);
+            if(ret!=null){
+                log.warn(new String(k)+">PRESENCE>"+new String(ret));
+            }
+            ret = recoverService.load(null,Subscription.DataStore,k);
+            if(ret!=null){
+                log.warn(new String(k)+">SUBSCRIPTION>"+new String(ret));
+            }
+            ret = recoverService.load(null,OnSession.DataStore,k);
+            if(ret!=null){
+                log.warn(new String(k)+">OnSession>"+new String(ret));
+            }
+            return true;
+        });
         for(String s : this.integrationCluster.recoverService().listModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);
