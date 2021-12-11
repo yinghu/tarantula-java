@@ -12,10 +12,6 @@ public interface ClusterProvider extends Serviceable {
     String name();
     int scope();
     String bucket();
-    //String subscription();
-
-    //String addEventListener(String registerId, EventListener eventListener);
-    //void removeEventListener(String registerId);
 
     //EventListener Register
     EventService publisher();
@@ -36,7 +32,6 @@ public interface ClusterProvider extends Serviceable {
     byte[] get(byte[] key);
     byte[] createIfAbsent(byte[] key,byte[] pending);
     <T extends Recoverable> boolean load(T t);
-    //long sequence();
 
     void set(byte[] key,byte[] value);
     void index(String index,byte[] key);
