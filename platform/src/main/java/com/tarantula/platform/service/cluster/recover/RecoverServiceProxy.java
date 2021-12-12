@@ -64,62 +64,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void shutdown() throws Exception {
 
     }
-    public boolean checkAccessControl(String systemId, Access.Role role){
-        NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        boolean ret = false;
-        CheckAccessControlOperation operation = new CheckAccessControlOperation(systemId,role);
-        for(Member m : mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-            final Future<Integer> future = builder.invoke();
-            try {
-                int flag = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                if(flag!=RecoverService.CHECK_SKIPPED){
-                    ret = flag == RecoverService.ROLE_MATCHED;
-                    break;
-                }
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("checkAccessControl error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
-        }
-        return ret;
-    }
-    public String findDataNode(String source,byte[] key){
-        NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        String ret = null;
-        FindDataNodeOperation operation = new FindDataNodeOperation(source,key);
-        for(Member m : mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-            final Future<String> future = builder.invoke();
-            try {
-                ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                if(ret!=null){
-                    break;
-                }
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("findDataNode error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
-        }
-        return ret;
-    }
 
-    public byte[] load(String memberId,String dataSource,byte[] key){
-        NodeEngine nodeEngine = getNodeEngine();
-        LoadOperation operation = new LoadOperation(dataSource,key);
-        Address targetNode = memberId!=null?nodeEngine.getClusterService().getMember(memberId).getAddress():nodeEngine.getMasterAddress();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,targetNode);
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
     @Override
     public byte[] recover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();

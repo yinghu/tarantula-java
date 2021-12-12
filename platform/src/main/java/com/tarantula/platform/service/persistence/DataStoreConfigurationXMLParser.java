@@ -1,6 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.Serviceable;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
@@ -14,12 +14,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DataStoreConfigurationXMLParser extends DefaultHandler implements Serviceable {
 
-
-    public final ConcurrentHashMap<String, ServiceProvider> _loaded;
 
     String currentLoad;
     HashMap<String,String> properties = new HashMap();
@@ -31,7 +28,6 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
 
     private String dataStoreProviderConfiguration;
     private String dataDir;
-    //private String dataRecoveryDir;
 
     private int partitionNumber;
     private int accessIndexPartitionNumber;
@@ -40,16 +36,14 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private ShardingProvider shardingProvider;
     private Shard shard;
     private TarantulaContext tarantulaContext;
-    public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx, ConcurrentHashMap<String,ServiceProvider> _providers){
+    public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
         this.partitionNumber = tx.partitionNumber();
         this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
-        //this.dataRecoveryDir = tx.dataStoreRecoveryDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
-        this._loaded = _providers;
         this.tarantulaContext = tx;
     }
     private void parse(InputStream xml) throws Exception{
@@ -61,15 +55,12 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     @Override
     public void endElement(String uri, String lname, String qname) throws SAXException {
         if(qname.equals("data-source")){
-            DataStoreProvider ds = (DataStoreProvider)_loaded.get(currentLoad);
-            ds.configure(properties);
-            //_start(ds);
+            this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
             properties.clear();
         }
         else if(qname.equals("sharding-provider")){
-            DataStoreProvider dsp = (DataStoreProvider) _loaded.get("tarantula");
             _start(this.shardingProvider);
-            dsp.addShardingProvider(this.shardingProvider);
+            this.tarantulaContext.deploymentDataStoreProvider.addShardingProvider(this.shardingProvider);
             properties.clear();
         }
         else if(qname.equals("shard")){
@@ -81,8 +72,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put(currentProperty, value);
         }
         else if(qname.equals("data-store-service")){
-            DataStoreProvider ds = (DataStoreProvider)_loaded.get(currentLoad);
-            _start(ds);
+            _start(this.tarantulaContext.deploymentDataStoreProvider);
         }
 
     }
@@ -90,9 +80,10 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     public void startElement(String uri, String lname, String qname, Attributes attributes) throws SAXException {
         if(qname.equals("data-source")){
             String name = (attributes.getValue("name"));
+            if(!name.equals(DeploymentServiceProvider.DEPLOY_DATA_STORE)) throw new RuntimeException("master data store name must be->"+DeploymentServiceProvider.DEPLOY_DATA_STORE);
             String provider = (attributes.getValue("provider"));
             String trimming = (attributes.getValue("truncated"));
-            this._loaded.put(name.trim(),this.dataStoreProvider(provider.trim()));
+            this.tarantulaContext.deploymentDataStoreProvider = this.dataStoreProvider(provider.trim());
             properties.put("name",name.trim());
             properties.put("truncated",trimming);
             properties.put("bucket",this.dataBucketGroup);
@@ -144,6 +135,7 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         try{
             ds.start();
             ds.setup(this.tarantulaContext);
+            if(ds.name().equals(DeploymentServiceProvider.NAME)) this.tarantulaContext.deploymentDataStoreProvider = ds;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

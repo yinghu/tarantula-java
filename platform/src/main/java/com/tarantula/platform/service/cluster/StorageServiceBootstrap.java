@@ -12,10 +12,7 @@ public class StorageServiceBootstrap implements Serviceable {
 
     @Override
     public void start() throws Exception {
-        this.tarantulaContext._dataStoreProviderMap().forEach((k,v)->{ //synchronize data and setup
-            //v.setup(this.tarantulaContext);
-            v.waitForData();//block for global data sync
-        });
+       this.tarantulaContext.deploymentDataStoreProvider.waitForData();
     }
 
     @Override

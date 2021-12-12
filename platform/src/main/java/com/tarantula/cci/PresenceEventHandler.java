@@ -22,7 +22,6 @@ public class PresenceEventHandler implements RequestHandler {
 
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private RecoverService recoverService;
     private GsonBuilder builder;
     private OnView invalidView;
     public PresenceEventHandler(){
@@ -34,7 +33,7 @@ public class PresenceEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.player)){
+        if(tokenValidator.role(onSession.systemId()).accessControl()<AccessControl.player.accessControl()){
             throw new RuntimeException("no access permission");
         }
         Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
@@ -59,8 +58,7 @@ public class PresenceEventHandler implements RequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
-        tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        this.tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){

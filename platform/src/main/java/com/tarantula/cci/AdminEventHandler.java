@@ -18,9 +18,9 @@ public class AdminEventHandler implements RequestHandler{
 
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private RecoverService recoverService;
     private GsonBuilder builder;
     private OnView invalidView;
+
     public AdminEventHandler(){
 
     }
@@ -32,7 +32,7 @@ public class AdminEventHandler implements RequestHandler{
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.admin)){
+        if(tokenValidator.role(onSession.systemId()).accessControl()<AccessControl.admin.accessControl()){
             throw new RuntimeException("no access permission");
         }
         Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
@@ -57,7 +57,6 @@ public class AdminEventHandler implements RequestHandler{
 
     }
     public void setup(ServiceContext tcx){
-        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
         tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }

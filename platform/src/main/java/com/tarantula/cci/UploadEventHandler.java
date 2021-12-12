@@ -16,8 +16,7 @@ public class UploadEventHandler implements RequestHandler {
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
 
     private DeployService deployService;
-    private RecoverService recoverService;
-    private TokenValidator tokenValidator;
+    private TokenValidatorProvider tokenValidator;
     private GsonBuilder builder;
 
     public UploadEventHandler(){
@@ -27,8 +26,8 @@ public class UploadEventHandler implements RequestHandler {
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);
-        OnSession onSession = tokenValidator.validateToken(token);
-        if(!recoverService.checkAccessControl(onSession.systemId(),AccessControl.root)){
+        OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
+        if(tokenValidator.role(onSession.systemId()).accessControl()<AccessControl.root.accessControl()){
             throw new RuntimeException("no access permission");
         }
         InputStream in = exchange.onStream();
@@ -50,10 +49,8 @@ public class UploadEventHandler implements RequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.tokenValidator = tokenValidatorProvider.tokenValidator();
+        this.tokenValidator = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deployService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService();
-        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
     }
     public boolean onEvent(Event event){
        return true;

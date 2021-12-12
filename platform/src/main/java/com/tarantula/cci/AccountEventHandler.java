@@ -33,7 +33,7 @@ public class AccountEventHandler implements RequestHandler {
     public void onRequest(OnExchange exchange) throws Exception{
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        if(!recoverService.checkAccessControl(onSession.systemId(), AccessControl.account)){
+        if(tokenValidator.role(onSession.systemId()).accessControl()<AccessControl.account.accessControl()){
             throw new RuntimeException("no access permission");
         }
         Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));

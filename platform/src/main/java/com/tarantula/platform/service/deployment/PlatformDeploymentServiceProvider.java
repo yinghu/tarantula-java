@@ -394,14 +394,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public <T extends OnAccess> void addGameService(T gameCluster){
-        byte[] key = gameCluster.distributionKey().getBytes();
-        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
-        if(memberId==null){
+        if(!this.tarantulaContext.masterDataStore().load(gameCluster)){
             log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
             return;
         }
-        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
-        gameCluster.fromBinary(ret);
         this.tarantulaContext.setGameServiceProvider((GameCluster)gameCluster);
     }
     public <T extends OnAccess> void addGameCluster(T gameCluster){
@@ -409,14 +405,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new OnLobbyListener());
     }
     public <T extends OnAccess> void closeGameCluster(T gameCluster){
-        byte[] key = gameCluster.distributionKey().getBytes();
-        String memberId = this.tarantulaContext.integrationCluster().recoverService().findDataNode(this.tarantulaContext.dataStoreMaster,key);
-        if(memberId==null){
+        if(!tarantulaContext.masterDataStore().load(gameCluster)){
             log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
             return;
         }
-        byte[] ret = this.tarantulaContext.integrationCluster().recoverService().load(memberId,this.tarantulaContext.dataStoreMaster,key);
-        gameCluster.fromBinary(ret);
         this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
         removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
         removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));

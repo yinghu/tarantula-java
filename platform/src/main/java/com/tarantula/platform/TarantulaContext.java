@@ -96,7 +96,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
 
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
-    private final ConcurrentHashMap<String,ServiceProvider> dataStoreProviders = new ConcurrentHashMap();
+
+    public DataStoreProvider deploymentDataStoreProvider;
 
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
@@ -107,8 +108,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
-
-    public String dataStoreMaster;
 
     public boolean dataStoreDailyBackup;
 
@@ -157,7 +156,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             fMap.put(r.registryId(),r);
         });
         new ServiceBootstrap(new CountDownLatch(0),null,spc,"service-provider",true).start();
-        DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this,this.dataStoreProviders);
+        DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);
@@ -179,13 +178,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 	    this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
-        //this.tarantulaCluster.shutdown();
         for(ServiceProvider ds : serviceProviders.values()){
             ds.shutdown();
         }
-        for(ServiceProvider ds : dataStoreProviders.values()){
-            ds.shutdown();
-        }
+        this.deploymentDataStoreProvider.shutdown();
     }
 
 	public ScheduledFuture<?> schedule(SchedulingTask task){
@@ -419,18 +415,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
     }
     public DataStore dataStore(String name){
-        DataStoreProvider dataStoreProvider = (DataStoreProvider)dataStoreProviders.get(name);
-        if(dataStoreProvider==null){
-            dataStoreProvider = (DataStoreProvider)this.dataStoreProviders.get(this.dataStoreMaster);
-        }
-        return dataStoreProvider.create(name);
+        return this.deploymentDataStoreProvider.create(name);
     }
     public DataStore dataStore(String name,int partition){
-        DataStoreProvider dataStoreProvider = (DataStoreProvider)dataStoreProviders.get(name);
-        if(dataStoreProvider==null){
-            dataStoreProvider = (DataStoreProvider)this.dataStoreProviders.get(this.dataStoreMaster);
-        }
-        return dataStoreProvider.create(name,partition);
+        return this.deploymentDataStoreProvider.create(name,partition);
     }
     public int partitionNumber(){
  	    return this.platformRoutingNumber;
@@ -438,7 +426,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
- 	    return (DataStoreProvider) this.dataStoreProviders.get(this.dataStoreMaster);
+ 	    return this.deploymentDataStoreProvider;
     }
     @Override
     public ClusterProvider clusterProvider(int scope){
@@ -456,11 +444,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public DeploymentServiceProvider deploymentServiceProvider(){
  	    return this.deploymentServiceProvider;
     }
-    public ConcurrentHashMap<String,ServiceProvider> _dataStoreProviderMap(){
- 	    return this.dataStoreProviders;
-    }
+
     public DataStore masterDataStore(){
-        return ((DataStoreProvider)this.dataStoreProviders.get(this.dataStoreMaster)).create(this.dataStoreMaster,this.partitionNumber());
+        return this.deploymentDataStoreProvider.create(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.partitionNumber());
     }
     public RecoverableRegistry recoverableRegistry(int registryId){
  	    return fMap.get(registryId);
@@ -499,7 +485,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         }
         CountDownLatch _tarantula_sync = new CountDownLatch(1);
         _syncLatch.put("t100",_tarantula_sync);
-        this.integrationCluster.recoverService().syncStart(dataStoreMaster,"t100");
+        this.integrationCluster.recoverService().syncStart(DeploymentServiceProvider.DEPLOY_DATA_STORE,"t100");
         _tarantula_sync.await();
         _syncLatch.remove("t100");
 
@@ -523,19 +509,19 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         DataStore subscriptionDataStore = this.dataStore(Subscription.DataStore,partitionNumber());
 
         accountDataStore.backup().list((k,v)->{//pull account and associated data set
-            byte[] ret = recoverService.load(null, User.DataStore,k);
+            byte[] ret = recoverService.recover(User.DataStore,k);
             if(ret!=null){
                 userDataStore.backup().set(k,ret);
             }
-            ret = recoverService.load(null,Presence.DataStore,k);
+            ret = recoverService.recover(Presence.DataStore,k);
             if(ret!=null){
                 presenceDataStore.backup().set(k,ret);
             }
-            ret = recoverService.load(null,Subscription.DataStore,k);
+            ret = recoverService.recover(Subscription.DataStore,k);
             if(ret!=null){
                 subscriptionDataStore.backup().set(k,ret);
             }
-            ret = recoverService.load(null,OnSession.DataStore,k);
+            ret = recoverService.recover(OnSession.DataStore,k);
             if(ret!=null){
                 sessionDataStore.backup().set(k,ret);
             }
@@ -610,9 +596,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             serviceProviders.forEach((k,v)->{
                 v.atMidnight();
             });
-            dataStoreProviders.forEach((k,v)->{
-                v.atMidnight();
-            });
+            this.deploymentDataStoreProvider.atMidnight();
             availableApplicationManagers.forEach((k,v)->{
                 v.atMidnight();
             });

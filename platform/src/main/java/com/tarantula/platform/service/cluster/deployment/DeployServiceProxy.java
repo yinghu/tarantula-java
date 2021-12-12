@@ -7,12 +7,9 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.accessindex.AccessIndexSetOperation;
-import com.tarantula.platform.service.cluster.recover.LoadOperation;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -204,17 +201,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public byte[] load(String dataSource,byte[] key){
-        NodeEngine nodeEngine = getNodeEngine();
-        LoadOperation operation = new LoadOperation(dataSource,key);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean startGameService(String gameClusterKey){
         NodeEngine nodeEngine = getNodeEngine();
         StartGameServiceOperation operation = new StartGameServiceOperation(gameClusterKey);

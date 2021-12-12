@@ -4,15 +4,9 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
-import com.icodesoftware.Access;
-import com.icodesoftware.Account;
-import com.icodesoftware.RecoverableFactory;
+
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -26,7 +20,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     private NodeEngine nodeEngine;
     private TarantulaContext tarantulaContext;
-    private DeploymentServiceProvider deploymentServiceProvider;
     private int scope;
     private AtomicInteger _total = new AtomicInteger(0);
     @Override
@@ -34,7 +27,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         this.nodeEngine = nodeEngine;
         this.scope = Integer.parseInt(properties.getProperty("tarantula-scope"));
         tarantulaContext = TarantulaContext.getInstance();
-        deploymentServiceProvider = tarantulaContext.deploymentService();
         log.warn("Cluster Recover Service Started on scope ["+scope+"]");
     }
 
@@ -56,19 +48,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     @Override
     public void destroyDistributedObject(String s) {
 
-    }
-    public int checkAccessControl(String systemId, Access.Role role){
-        TokenValidatorProvider tcp = (TokenValidatorProvider) this.tarantulaContext.serviceProvider(TokenValidatorProvider.NAME);
-        if(!systemId.startsWith(this.tarantulaContext.bucket())){
-            return RecoverService.CHECK_SKIPPED;
-        }
-        return tcp.role(systemId).accessControl()>=role.accessControl()?RecoverService.ROLE_MATCHED:RecoverService.ROLE_NOT_MATCHED;
-    }
-    public String onDataNode(String source,byte[] key){
-        if(load(source,key)!=null){
-            return nodeEngine.getLocalMember().getUuid();
-        }
-        return null;
     }
 
     public byte[] load(String source,byte[] key){
