@@ -264,7 +264,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public void onConnection(Connection connection) {
-        logger.warn("connection->"+connection.serverId());
         ConnectionStub connectionStub = (ConnectionStub)connection;
         connectionStub.maxCapacity = roomCapacity;
         pendingConnections.offer(connectionStub);
@@ -277,13 +276,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         String serverId = channelStub.serverId;
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         connectionStub.addChannel(channelStub);
-        logger.warn("channel->"+channelStub.channelId()+"/"+serverId);
     }
     public void onDisConnection(Connection connection){
         onDisConnection(connection.serverId());
     }
     public void onPing(String serverId){
-        logger.warn("ping->"+serverId);
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         connectionStub.ping();
     }

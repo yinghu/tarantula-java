@@ -471,12 +471,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Boolean> future = builder.invoke();
             try {
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             } catch (Exception e) {
                 future.cancel(true);
                 //goes to next node if failed
                 e.printStackTrace();
-                return true;
             }
         }
         return true;
