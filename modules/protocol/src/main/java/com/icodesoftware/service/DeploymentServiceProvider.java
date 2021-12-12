@@ -19,7 +19,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     byte[] serverKey(String typeId);
     boolean registerChannel(String typeId,Channel channel);
-    boolean ping(String typeId,String serverId);
+    void ping(String typeId,String serverId);
 
 
     String registerGameChannelListener(GameChannelListener gameChannelListener);
@@ -106,7 +106,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         boolean addChannel(String typeId,Channel channel);
         void addConnection(String typeId,Connection connection);
-        boolean pingConnection(String typeId,String serverId);
+        void pingConnection(String typeId,String serverId);
         void removeConnection(String typeId,Connection connection);
 
         void stopAccessIndex();

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService {
 
     private final String objectName;
-    private TarantulaLogger logger = JDKLogger.getLogger(DeployServiceProxy.class);
+    private static TarantulaLogger logger = JDKLogger.getLogger(DeployServiceProxy.class);
 
     public DeployServiceProxy(String objectName, NodeEngine nodeEngine, ClusterDeployService deployServiceService){
         super(nodeEngine,deployServiceService);
@@ -228,6 +228,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("startGameService error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -246,6 +247,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("launchGameCluster error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -264,6 +266,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("launchApplication error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -282,6 +285,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("launchUpdateResource error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -300,6 +304,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("deployModule error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -318,6 +323,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("shutdownApplication error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -354,6 +360,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("shutdownGameCluster error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -372,6 +379,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("shutdownModule error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -390,6 +398,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("updateModule error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -409,6 +418,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("upload error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -428,6 +438,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected--;
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("sync error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -443,9 +454,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         try {
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.error("error on registerChannel",e);
-            future.cancel(true);
-            return false;
+            throw ExceptionUtil.rethrow(e);
         }
     }
     public void registerConnection(Connection connection){
@@ -459,26 +468,26 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("registerConnection error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
     }
-    public boolean ping(String typeId,String serverId){
+    public void ping(String typeId,String serverId){
         NodeEngine nodeEngine = getNodeEngine();
         PingConnectionOperation operation = new PingConnectionOperation(typeId,serverId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Boolean> future = builder.invoke();
+            final Future<Void> future = builder.invoke();
             try {
                 future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("ping error on node->"+m.getAddress(),e);
                 //goes to next node if failed
-                e.printStackTrace();
             }
         }
-        return true;
     }
     public void releaseConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
@@ -491,6 +500,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("releaseConnection error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }

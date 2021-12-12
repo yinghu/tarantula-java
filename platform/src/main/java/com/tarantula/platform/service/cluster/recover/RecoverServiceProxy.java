@@ -8,6 +8,8 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.Access;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
@@ -19,6 +21,9 @@ import java.util.concurrent.TimeUnit;
 public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
 
     private String objectName;
+
+    private static TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
+
     public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService clusterRecoverService){
         super(nodeEngine,clusterRecoverService);
         this.objectName = objectName;
@@ -75,6 +80,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 }
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("checkAccessControl error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -95,6 +101,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 }
             } catch (Exception e) {
                 future.cancel(true);
+                logger.error("findDataNode error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
         }
@@ -130,6 +137,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     }
                 } catch (Exception e) {
                     future.cancel(true);
+                    logger.error("recover error on node->"+m.getAddress(),e);
                     //goes to next node if failed
                 }
             }
@@ -152,6 +160,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     if(expected==0) break;
                 } catch (Exception e) {
                     future.cancel(true);
+                    logger.error("replicate error on node->"+m.getAddress(),e);
                     //goes to next node if failed
                 }
             }

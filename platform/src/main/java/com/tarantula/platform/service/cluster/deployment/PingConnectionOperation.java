@@ -3,7 +3,6 @@ package com.tarantula.platform.service.cluster.deployment;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.hazelcast.spi.PartitionAwareOperation;
 
 
 import java.io.IOException;
@@ -13,7 +12,6 @@ public class PingConnectionOperation extends Operation {
 
     private String  typeId;
     private String serverId;
-    private boolean suc;
 
     public PingConnectionOperation() {
     }
@@ -26,12 +24,12 @@ public class PingConnectionOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        suc = cds.pingConnection(typeId,serverId);
+        cds.pingConnection(typeId,serverId);
     }
 
     @Override
     public Object getResponse() {
-        return suc;
+        return null;
     }
 
     @Override
