@@ -467,7 +467,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         NodeEngine nodeEngine = getNodeEngine();
         PingConnectionOperation operation = new PingConnectionOperation(typeId,serverId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
+        for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Boolean> future = builder.invoke();
             try {
@@ -475,6 +475,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             } catch (Exception e) {
                 future.cancel(true);
                 //goes to next node if failed
+                e.printStackTrace();
                 return true;
             }
         }

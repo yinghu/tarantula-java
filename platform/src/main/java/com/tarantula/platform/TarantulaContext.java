@@ -318,15 +318,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        //String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,publishingId.getBytes());
         List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
             lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
-            //lc.views = this.queryFromIntegrationNode(PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()});
-            //this.configureViews(lc);
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onUpdated(ob);
@@ -378,12 +375,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return;
         }
         try{
-            //LobbyTypeIdIndex pk = new LobbyTypeIdIndex()
-            //String memberId = this.integrationCluster.recoverService().findDataNode(dataStoreMaster,applicationId.getBytes());
-            //byte[] data = this.integrationCluster.recoverService().load(memberId,dataStoreMaster,applicationId.getBytes());
             DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
             deploymentDescriptor.distributionKey(applicationId);
-            //deploymentDescriptor.fromBinary(data);
             if(!masterDataStore().load(deploymentDescriptor)) throw new RuntimeException("no application config data");
             try{setApplicationManager(deploymentDescriptor,lb);}catch (Exception exx){
                 throw new RuntimeException(exx);

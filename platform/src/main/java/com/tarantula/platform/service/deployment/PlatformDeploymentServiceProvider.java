@@ -752,6 +752,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
     public boolean pingConnection(String typeId,String serverId){
+        log.warn("Ping->"+typeId+"//"+serverId);
         try{
             cListeners.forEach((k,v)->{
                 if(v.typeId().equals(typeId)) v.onPing(serverId);
