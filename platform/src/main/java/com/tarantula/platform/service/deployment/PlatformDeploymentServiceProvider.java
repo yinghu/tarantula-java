@@ -477,13 +477,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
-    public void memberRemoved(String memberId){
-        //removed push event from the dead node
 
-    }
-    public void memberAdded(String memberId){
-        log.warn("Member added->"+memberId);
-    }
     @Override
     public void register(ServiceProvider serviceProvider) {
         this.tarantulaContext.deployServiceProvider(serviceProvider);
@@ -780,6 +774,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public boolean validDataStore(String dataStore){
         return this.tarantulaContext.dataStoreProvider().existed(dataStore);
+    }
+    public List<String> listClusterMember(){
+        ArrayList<String> mlist = new ArrayList<>();
+        return mlist;
     }
     public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
         tMap.put(topic,recoverableListener);

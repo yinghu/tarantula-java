@@ -81,6 +81,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //data store backup operation API
     void issueDataStoreBackup();
     List<String> listDataStore();
+    List<String> listClusterMember();
     boolean validDataStore(String dataStore);
 
     RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
@@ -95,6 +96,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         <T extends OnAccess> void addGameService(T gameCluster);
         <T extends OnAccess> void addGameCluster(T gameCluster);
         <T extends OnAccess> void closeGameCluster(T gameCluster);
+
         void addLobby(String typeId);
         void removeLobby(String typeId);
         void addApplication(String typeId,String applicationId);
@@ -111,9 +113,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void stopAccessIndex();
         void startAccessIndex();
-
-        void memberRemoved(String memberId);
-        void memberAdded(String memberId);
 
         void syncKey(String key);
 
