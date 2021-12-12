@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
+import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
 
-public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask {
+public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask, ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -44,6 +45,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     private String type;
     private String registerKey;
+    private String reloadKey;
     private String typeLobby;
     private ScheduledFuture scheduledFuture;
     ArrayList<String> kickoff = new ArrayList<>();
@@ -78,6 +80,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
+        this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
         this.logger = serviceContext.logger(RoomServiceProvider.class);
     }
@@ -89,6 +92,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public void shutdown() throws Exception {
         this.serviceContext.deploymentServiceProvider().unregisterGameChannelListener(registerKey);
+        this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).unregisterReloadListener(reloadKey);
         scheduledFuture.cancel(true);
     }
 
@@ -319,5 +323,10 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             gameRoom = roomCapacity>0?new PVPGameRoom(roomCapacity):new PVPGameRoom();
         }
         return gameRoom;
+    }
+
+    @Override
+    public void reload() {
+        logger.warn("reloading room service");
     }
 }
