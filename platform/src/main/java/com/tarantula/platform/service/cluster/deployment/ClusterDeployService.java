@@ -33,6 +33,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
+        this.nodeEngine.getPartitionService().addMigrationListener(this);
         this.scope = Integer.parseInt(properties.getProperty("tarantula-scope"));
         tarantulaContext = TarantulaContext.getInstance();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentService();
