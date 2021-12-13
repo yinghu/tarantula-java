@@ -221,7 +221,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         int pt = 0;
         for(Member m : nodeEngine.getClusterService().getMembers()){
             if(lm.getUuid().equals(m.getUuid())){
-                continue;
+                break;
             }
             pt++;
         }
@@ -239,7 +239,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         int pt = 0;
         for(Member m : nodeEngine.getClusterService().getMembers()){
             if(lm.getUuid().equals(m.getUuid())){
-                continue;
+                break;
             }
             pt++;
         }
