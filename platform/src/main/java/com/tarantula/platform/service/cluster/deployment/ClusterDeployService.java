@@ -232,7 +232,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
             this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
         }
-        //this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -250,7 +249,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
             this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
         }
-        //this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -425,7 +423,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
-        //log.warn("migration started->"+migrationEvent);
 
     }
 
@@ -436,6 +433,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void migrationFailed(MigrationEvent migrationEvent) {
-        //log.warn("migration completed->"+migrationEvent);
+
     }
 }
