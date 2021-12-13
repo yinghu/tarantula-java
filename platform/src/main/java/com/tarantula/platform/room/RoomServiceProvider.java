@@ -225,12 +225,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
-        gameZoneIndex.put(gameZone.distributionKey(),new GameZoneIndex(gameZone,false));
-        if(type.equals(GameZone.PLAY_MODE_PVE)){
-            return;
-        }
-        if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
-        gameZoneIndex.get(t.distributionKey()).localManaged = true;
+        String zkey = t.distributionKey();
+        gameZoneIndex.put(zkey,new GameZoneIndex(gameZone,false));
+        if(type.equals(GameZone.PLAY_MODE_PVE)) return;
+        if(!this.distributionRoomService.localManaged(zkey)) return;
+        gameZoneIndex.get(zkey).localManaged = true;
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
@@ -330,11 +329,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
-            if(!this.distributionRoomService.localManaged(k)&&v.localManaged){//release local managed game zone
+            if((!this.distributionRoomService.localManaged(k)) && v.localManaged){//release local managed game zone
                 logger.warn("release zone->"+k+">>"+v.gameZone.name());
                 v.localManaged = false;
             }
-            if(this.distributionRoomService.localManaged(k)&&!v.localManaged){//take over game zone from remote released
+            else if(this.distributionRoomService.localManaged(k) && (!v.localManaged)){//take over game zone from remote released
                 logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
                 v.localManaged = true;
             }
