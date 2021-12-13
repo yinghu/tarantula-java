@@ -11,7 +11,7 @@ import com.tarantula.platform.item.ItemServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PresenceServiceProvider;
-import com.tarantula.platform.room.RoomServiceProvider;
+import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.store.StoreServiceProvider;
@@ -26,7 +26,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     private ServiceContext serviceContext;
 
-    private RoomServiceProvider roomServiceProvider;
+    private PlatformRoomServiceProvider roomServiceProvider;
 
     private LeaderBoardProvider leaderBoardProvider;
     private InventoryServiceProvider inventoryServiceProvider;
@@ -87,7 +87,7 @@ public class GameServiceProvider implements ServiceProvider{
         this.tournamentServiceProvider = new PlatformTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.tournamentServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider.waitForData();
-        this.roomServiceProvider = new RoomServiceProvider(gameCluster);
+        this.roomServiceProvider = new PlatformRoomServiceProvider(gameCluster);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
@@ -124,7 +124,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
 
     //room service provider hool calls
-    public RoomServiceProvider roomServiceProvider(){
+    public PlatformRoomServiceProvider roomServiceProvider(){
         return roomServiceProvider;
     }
 

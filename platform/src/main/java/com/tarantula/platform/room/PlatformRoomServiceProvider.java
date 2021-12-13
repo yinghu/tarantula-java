@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
 
-public class RoomServiceProvider  implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask, ReloadListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask, ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -49,7 +49,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     private ScheduledFuture scheduledFuture;
     ArrayList<String> kickoff = new ArrayList<>();
 
-    public RoomServiceProvider(GameCluster gameCluster){
+    public PlatformRoomServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
@@ -81,7 +81,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
-        this.logger = serviceContext.logger(RoomServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
     @Override
     public void start() throws Exception {
