@@ -146,6 +146,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
+        logger.warn("sync room->"+roomId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoomRegistry roomRegistry = gameZone.roomRegistry().get(roomId);
         if(joined.length>0) logger.warn("Sync->"+roomRegistry);
@@ -231,7 +232,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         gameZoneIndex.put(zkey,clusterIndex);
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         if(!clusterIndex.localManaged) return;
-        logger.warn("game zone register->"+gameZoneIndex.get(zkey).toString());
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
@@ -334,15 +334,22 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             if(v.partitionId==partition){
                 if(v.localManaged && !localMember){
                     logger.warn("release zone ->"+k+">>"+v.gameZone.name());
+                    v.gameZone.roomRegistryQueue().clear();
+                    v.gameZone.roomRegistry().clear();
                     v.localManaged = false;
                 }
                 else if(!v.localManaged && localMember){
                     logger.warn("take over zone->"+k+">>"+v.gameZone.name());
                     v.localManaged = true;
+                    this.dataStore.list(new GameRoomRegistryQuery(k),r->{
+                        v.gameZone.roomRegistry().put(r.instanceId(),r);
+                        distributionRoomService.load(name,r.instanceId());
+                        return true;
+                    });
                 }
             }
         });
         //reload connections
-
     }
+
 }
