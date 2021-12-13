@@ -293,6 +293,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRegister(String category, String itemId) {
+        logger.warn("tournament register->"+itemId+">>>>"+category);
         TournamentHeader tournament = new TournamentHeader();
         tournament.distributionKey(itemId);
         if(!this.dataStore.load(tournament)){
