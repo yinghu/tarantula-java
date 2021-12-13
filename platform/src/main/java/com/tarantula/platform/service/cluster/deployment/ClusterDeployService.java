@@ -425,16 +425,17 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
-        log.warn("migration started->"+migrationEvent);
+        //log.warn("migration started->"+migrationEvent);
+
     }
 
     @Override
     public void migrationCompleted(MigrationEvent migrationEvent) {
-        log.warn("migration completed->"+migrationEvent);
+        log.warn("migration completed->"+migrationEvent.getPartitionId());
     }
 
     @Override
     public void migrationFailed(MigrationEvent migrationEvent) {
-        log.warn("migration completed->"+migrationEvent);
+        //log.warn("migration completed->"+migrationEvent);
     }
 }

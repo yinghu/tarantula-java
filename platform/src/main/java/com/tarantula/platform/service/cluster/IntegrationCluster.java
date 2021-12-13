@@ -307,7 +307,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     @Override
     public void stateChanged(LifecycleEvent state) {
-     LifecycleEvent.LifecycleState cs = state.getState();
+        LifecycleEvent.LifecycleState cs = state.getState();
         log.warn("Integration cluster state changed->"+state);
         switch(cs){
             case STARTED:
