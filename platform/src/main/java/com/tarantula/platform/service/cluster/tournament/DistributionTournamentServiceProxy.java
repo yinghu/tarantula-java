@@ -7,6 +7,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.tournament.DistributionTournamentService;
+import com.tarantula.platform.tournament.TournamentHeaderIndex;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -134,9 +135,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public boolean localManaged(String key){
+    public TournamentHeaderIndex localManaged(String key){
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
-        return getNodeEngine().getPartitionService().getPartition(pid).isLocal();
+        return new TournamentHeaderIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
     }
 
     public boolean trySchedule(String serviceName,String scheduleId){

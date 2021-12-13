@@ -32,7 +32,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private DataStore dataStore;
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
-    private ConcurrentHashMap<String,TournamentHeader> tournamentIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,TournamentHeaderIndex> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex = new ConcurrentHashMap<>();
 
     private IndexSet lookupTournamentKey;
@@ -43,6 +43,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
+
     public PlatformTournamentServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
@@ -96,7 +97,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public List<Tournament> list(){
         ArrayList<Tournament> _tms = new ArrayList<>();
-        tournamentIndex.forEach((k,v)->_tms.add(v));
+        tournamentIndex.forEach((k,v)->_tms.add(v.tournamentHeader));
         return _tms;
     }
     public String name(){
@@ -147,11 +148,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     public Tournament tournament(String tournamentId){//schedule node
-        TournamentHeader tournament = tournamentIndex.get(tournamentId);
+        TournamentHeader tournament = tournamentIndex.get(tournamentId).tournamentHeader;
         return tournament;
     }
     public Tournament.Instance instance(String tournamentId,String instanceId){//instance node
-        TournamentHeader tournament = this.tournamentIndex.get(tournamentId);
+        TournamentHeader tournament = this.tournamentIndex.get(tournamentId).tournamentHeader;
         return tournament.lookup(instanceId);
     }
     public Tournament.Instance instance(String instanceId){//instance node
@@ -191,9 +192,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             return false;
         }
         tournamentHeader.dataStore(this.dataStore);
-        tournamentIndex.put(tournamentId,tournamentHeader);
+        TournamentHeaderIndex index = distributionTournamentService.localManaged(tournamentId);
+        tournamentIndex.put(tournamentId,index);
         this.serviceContext.schedule(new TournamentCloseMonitor(tournamentHeader,this));
-        if(distributionTournamentService.localManaged(tournamentHeader.distributionKey())) tournamentHeader.setup(instanceIndex,this);
+        if(index.localManaged) tournamentHeader.setup(instanceIndex,this);
         return true;
     }
     private void createSchedule(TournamentSchedule schedule){
@@ -203,6 +205,18 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     @Override
     public void reload(int partition,boolean localMember) {
+        tournamentIndex.forEach((k,v)->{
+            if(v.partitionId == partition){
+                if(v.localManaged && !localMember){
+                    logger.warn("release tournament->"+v);
+                    v.localManaged = false;
+                }
+                else if(!v.localManaged && localMember){
+                    logger.warn("take over tournament->"+v);
+                    v.localManaged = true;
+                }
+            }
+        });
         //logger.warn("reloading tournament->"+name);
         //reload local tournament and instances
     }
@@ -304,9 +318,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return tournament;
     }
     private void launch(TournamentHeader tournament){
-        this.tournamentIndex.put(tournament.distributionKey(),tournament);
+        String tkey = tournament.distributionKey();
+        TournamentHeaderIndex index = this.distributionTournamentService.localManaged(tkey);
+        index.tournamentHeader = tournament;
+        this.tournamentIndex.put(tkey,index);
         this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
-        if(this.distributionTournamentService.localManaged(tournament.distributionKey())) tournament.setup(instanceIndex,this);
+        if(!index.localManaged) return;
+        tournament.setup(instanceIndex,this);
     }
     public boolean trySchedule(String scheduleId){
         logger.warn("tournament schedule ready to launch ->"+scheduleId);
