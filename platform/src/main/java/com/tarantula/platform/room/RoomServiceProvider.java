@@ -10,7 +10,6 @@ import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
-import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.GameCluster;
@@ -38,7 +37,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     private Configuration configuration;
     private int roomCapacity;
     private int roomPoolSizePerZone;
-    private ConcurrentHashMap<String,GameZone> gameZoneIndex;
+    private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
     private ConcurrentLinkedDeque<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
@@ -119,8 +118,8 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         this.distributionRoomService.leave(name,roomId,systemId);
     }
     public RoomJoinStub onRegister(String gameZoneId,Rating rating){
-        GameZone gameZone = gameZoneIndex.get(gameZoneId);
-        Arena arena = gameZoneIndex.get(gameZoneId).arena(rating.arenaLevel);
+        GameZone gameZone = gameZoneIndex.get(gameZoneId).gameZone;
+        Arena arena = gameZone.arena(rating.arenaLevel);
         GameRoomRegistry pending = gameZone.roomRegistryQueue().poll();
         if(pending==null) return new RoomJoinStub();
         int ret = pending.addPlayer(rating.systemId(),room->{
@@ -133,13 +132,13 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
     }
     public void onRelease(String zoneId,String roomId,String systemId){
-        GameZone gameZone = gameZoneIndex.get(zoneId);
-        if(gameZone!=null){
-            GameRoomRegistry released = gameZone.roomRegistry().get(roomId);
+        GameZoneIndex indexGameZone = gameZoneIndex.get(zoneId);
+        if(indexGameZone!=null){
+            GameRoomRegistry released = indexGameZone.gameZone.roomRegistry().get(roomId);
             released.removePlayer(systemId,room->{
                 if(room.empty()) {
                     room.reset();
-                    gameZone.roomRegistryQueue().offer(released);
+                    indexGameZone.gameZone.roomRegistryQueue().offer(released);
                 }
                 return true;
             });
@@ -147,7 +146,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
-        GameZone gameZone = gameZoneIndex.get(zoneId);
+        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoomRegistry roomRegistry = gameZone.roomRegistry().get(roomId);
         if(joined.length>0) logger.warn("Sync->"+roomRegistry);
         roomRegistry.sync(joined,room->{
@@ -226,12 +225,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
-        gameZoneIndex.put(gameZone.distributionKey(),gameZone);
+        gameZoneIndex.put(gameZone.distributionKey(),new GameZoneIndex(gameZone,false));
         if(type.equals(GameZone.PLAY_MODE_PVE)){
             return;
         }
         if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
-        logger.warn("local zone->"+gameZone.name());
+        gameZoneIndex.get(t.distributionKey()).localManaged = true;
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
@@ -329,11 +328,13 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     @Override
     public void reload() {
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
-        logger.warn("reloading room service->"+typeLobby);
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
-            if(!this.distributionRoomService.localManaged(k)){
-                logger.warn("release zone->"+v.name());
+            if(!this.distributionRoomService.localManaged(k)&&v.localManaged){//release local managed game zone
+                logger.warn("release zone->"+k+">>"+v.gameZone.name());
+            }
+            if(this.distributionRoomService.localManaged(k)&&!v.localManaged){//take over game zone from remote released
+                logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
             }
         });
         //reload connections
