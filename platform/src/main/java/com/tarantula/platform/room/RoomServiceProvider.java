@@ -146,7 +146,6 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
-        logger.warn("sync room->"+roomId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoomRegistry roomRegistry = gameZone.roomRegistry().get(roomId);
         if(joined.length>0) logger.warn("Sync->"+roomRegistry);
