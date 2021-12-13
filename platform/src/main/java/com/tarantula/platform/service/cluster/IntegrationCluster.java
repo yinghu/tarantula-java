@@ -272,7 +272,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }).start();
     }
     public void onPartition(int pt,boolean opening){
-        log.warn("Partition ["+pt+"] with opening ["+opening+"]");
+        //log.warn("Partition ["+pt+"] with opening ["+opening+"]");
         this.partitionStates[pt].opening = opening;
         bMap.forEach((k,v)->{
             if(v.partition()==pt&&opening){//open if closed
@@ -314,10 +314,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 _integrationInstanceStarted.countDown();
                 break;
             case MERGING:
+                log.warn("Integration cluster state merging->"+state);
                 break;
             case MERGED:
+                log.warn("Integration cluster state merged->"+state);
                 break;
             case MERGE_FAILED:
+                log.warn("Integration cluster state merged faied->"+state);
                 break;
             default:
         }

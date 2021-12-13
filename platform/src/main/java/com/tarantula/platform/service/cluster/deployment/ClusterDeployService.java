@@ -3,6 +3,8 @@ package com.tarantula.platform.service.cluster.deployment;
 import com.google.gson.GsonBuilder;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.Member;
+import com.hazelcast.core.MigrationEvent;
+import com.hazelcast.core.MigrationListener;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeployCode;
@@ -19,7 +21,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.*;
 
 
-public class ClusterDeployService implements ManagedService, RemoteService, MembershipAwareService {
+public class ClusterDeployService implements ManagedService, RemoteService, MembershipAwareService, MigrationListener {
 
     private static TarantulaLogger log = JDKLogger.getLogger(ClusterDeployService.class);
 
@@ -418,5 +420,20 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
     public void pingConnection(String typeId,String serverId){
         this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
+    }
+
+    @Override
+    public void migrationStarted(MigrationEvent migrationEvent) {
+        log.warn("migration started->"+migrationEvent);
+    }
+
+    @Override
+    public void migrationCompleted(MigrationEvent migrationEvent) {
+        log.warn("migration completed->"+migrationEvent);
+    }
+
+    @Override
+    public void migrationFailed(MigrationEvent migrationEvent) {
+        log.warn("migration completed->"+migrationEvent);
     }
 }
