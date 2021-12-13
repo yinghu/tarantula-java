@@ -228,8 +228,12 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         String zkey = t.distributionKey();
         gameZoneIndex.put(zkey,new GameZoneIndex(gameZone,false));
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
-        if(!this.distributionRoomService.localManaged(zkey)) return;
+        if(!this.distributionRoomService.localManaged(zkey)) {
+            logger.warn("game zone register->"+gameZoneIndex.get(zkey).toString());
+            return;
+        }
         gameZoneIndex.get(zkey).localManaged = true;
+        logger.warn("game zone register->"+gameZoneIndex.get(zkey).toString());
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
@@ -329,14 +333,23 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
-            logger.warn("reloading game zone->"+v.toString());
-            if((!this.distributionRoomService.localManaged(k)) && v.localManaged){//release local managed game zone
-                logger.warn("release zone->"+k+">>"+v.gameZone.name());
-                v.localManaged = false;
+            if(this.distributionRoomService.localManaged(k)){
+                if(!v.localManaged){
+                    logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
+                    v.localManaged = true;
+                }
+                else{
+                    logger.warn("keep local game zone->"+v);
+                }
             }
-            else if(this.distributionRoomService.localManaged(k) && (!v.localManaged)){//take over game zone from remote released
-                logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
-                v.localManaged = true;
+            else{
+                if(v.localManaged){
+                    logger.warn("release zone->"+k+">>"+v.gameZone.name());
+                    v.localManaged = false;
+                }
+                else{
+                    logger.warn("keep remote game zone->"+v);
+                }
             }
         });
         //reload connections
