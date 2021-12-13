@@ -13,7 +13,7 @@ public interface DistributionRoomService extends ServiceProvider {
     GameRoom view(String serviceName, String roomId);
     GameRoom join(String serviceName, String ticket, String roomId, String systemId);
     void leave(String serviceName,String roomId,String systemId);
-    boolean localManaged(String key);
+    GameZoneIndex localManaged(String key);
     void create(String serviceName,String zoneId,String roomId);
     void load(String serviceName,String roomId);
 }

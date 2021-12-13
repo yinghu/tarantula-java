@@ -202,8 +202,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupScheduleKey.update();
     }
     @Override
-    public void reload() {
-        logger.warn("reloading tournament->"+name);
+    public void reload(int partition,boolean localMember) {
+        //logger.warn("reloading tournament->"+name);
         //reload local tournament and instances
     }
     public void atMidnight(){

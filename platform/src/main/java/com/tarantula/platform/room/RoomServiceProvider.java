@@ -226,13 +226,11 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
         String zkey = t.distributionKey();
-        gameZoneIndex.put(zkey,new GameZoneIndex(gameZone,false));
+        GameZoneIndex clusterIndex = this.distributionRoomService.localManaged(zkey);
+        clusterIndex.gameZone = gameZone;
+        gameZoneIndex.put(zkey,clusterIndex);
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
-        if(!this.distributionRoomService.localManaged(zkey)) {
-            logger.warn("game zone register->"+gameZoneIndex.get(zkey).toString());
-            return;
-        }
-        gameZoneIndex.get(zkey).localManaged = true;
+        if(!clusterIndex.localManaged) return;
         logger.warn("game zone register->"+gameZoneIndex.get(zkey).toString());
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
@@ -329,26 +327,18 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
     }
 
     @Override
-    public void reload() {
+    public void reload(int partition,boolean localMember) {
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
-            if(this.distributionRoomService.localManaged(k)){
-                if(!v.localManaged){
-                    logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
-                    v.localManaged = true;
-                }
-                else{
-                    logger.warn("keep local game zone->"+v);
-                }
-            }
-            else{
-                if(v.localManaged){
-                    logger.warn("release zone->"+k+">>"+v.gameZone.name());
+            if(v.partitionId==partition){
+                if(v.localManaged && !localMember){
+                    logger.warn("release zone ->"+k+">>"+v.gameZone.name());
                     v.localManaged = false;
                 }
-                else{
-                    logger.warn("keep remote game zone->"+v);
+                else if(!v.localManaged && localMember){
+                    logger.warn("take over zone->"+k+">>"+v.gameZone.name());
+                    v.localManaged = true;
                 }
             }
         });

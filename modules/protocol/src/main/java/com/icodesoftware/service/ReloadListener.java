@@ -1,5 +1,5 @@
 package com.icodesoftware.service;
 
 public interface ReloadListener {
-    void reload();
+    void reload(int partition,boolean localMember);
 }

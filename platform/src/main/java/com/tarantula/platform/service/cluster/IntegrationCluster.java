@@ -334,8 +334,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void unregisterReloadListener(String regKey){
         rMap.remove(regKey);
     }
-    public void onReload(){
-        rMap.forEach((k,v)->v.reload());
+    public void onReload(int partition,boolean localMember){
+        rMap.forEach((k,v)->v.reload(partition,localMember));
     }
 
 }

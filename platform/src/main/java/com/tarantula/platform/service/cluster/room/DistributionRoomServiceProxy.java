@@ -7,6 +7,7 @@ import com.tarantula.platform.room.GameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.room.GameZoneIndex;
 import com.tarantula.platform.room.RoomJoinStub;
 
 import java.util.concurrent.Future;
@@ -132,9 +133,9 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public boolean localManaged(String key){
+    public GameZoneIndex localManaged(String key){
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
-        return getNodeEngine().getPartitionService().getPartition(pid).isLocal();
+        return new GameZoneIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
     }
     @Override
     public String name() {
