@@ -332,6 +332,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         gameZoneIndex.forEach((k,v)->{
             if(!this.distributionRoomService.localManaged(k)&&v.localManaged){//release local managed game zone
                 logger.warn("release zone->"+k+">>"+v.gameZone.name());
+                v.localManaged = false;
             }
             if(this.distributionRoomService.localManaged(k)&&!v.localManaged){//take over game zone from remote released
                 logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
