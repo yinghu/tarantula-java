@@ -231,6 +231,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             return;
         }
         if(!this.distributionRoomService.localManaged(t.distributionKey())) return;
+        logger.warn("local zone->"+gameZone.name());
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
@@ -327,6 +328,15 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
 
     @Override
     public void reload() {
-        logger.warn("reloading room service");
+        if(type.equals(GameZone.PLAY_MODE_PVE)) return;
+        logger.warn("reloading room service->"+typeLobby);
+        //reload local zone rooms
+        gameZoneIndex.forEach((k,v)->{
+            if(!this.distributionRoomService.localManaged(k)){
+                logger.warn("release zone->"+v.name());
+            }
+        });
+        //reload connections
+
     }
 }

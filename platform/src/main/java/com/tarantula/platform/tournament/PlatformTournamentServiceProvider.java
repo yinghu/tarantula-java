@@ -203,7 +203,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     @Override
     public void reload() {
-        logger.warn("reloading tournament");
+        logger.warn("reloading tournament->"+name);
+        //reload local tournament and instances
     }
     public void atMidnight(){
         serviceContext.schedule(new TournamentMidnightTask(this));
