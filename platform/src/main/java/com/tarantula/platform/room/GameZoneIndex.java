@@ -11,4 +11,9 @@ public class GameZoneIndex {
         this.gameZone = gameZone;
         this.localManaged = localManaged;
     }
+
+    @Override
+    public String toString(){
+        return "Zone->"+gameZone.distributionKey()+">>"+localManaged;
+    }
 }

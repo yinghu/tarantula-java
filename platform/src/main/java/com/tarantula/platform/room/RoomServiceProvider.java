@@ -329,6 +329,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
         if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
+            logger.warn("reloading game zone->"+v.toString());
             if((!this.distributionRoomService.localManaged(k)) && v.localManaged){//release local managed game zone
                 logger.warn("release zone->"+k+">>"+v.gameZone.name());
                 v.localManaged = false;
