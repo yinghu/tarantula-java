@@ -336,6 +336,7 @@ public class RoomServiceProvider  implements ConfigurationServiceProvider, GameC
             }
             if(this.distributionRoomService.localManaged(k)&&!v.localManaged){//take over game zone from remote released
                 logger.warn("take over zone ->"+k+">>"+v.gameZone.name());
+                v.localManaged = true;
             }
         });
         //reload connections
