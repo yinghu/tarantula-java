@@ -196,7 +196,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         index.tournamentHeader = tournamentHeader;
         tournamentIndex.put(tournamentId,index);
         this.serviceContext.schedule(new TournamentCloseMonitor(tournamentHeader,this));
-        if(index.localManaged) tournamentHeader.setup(instanceIndex,this);
+        if(index.localManaged) return true;
+        tournamentHeader.setup(instanceIndex,this);
+        this.logger.warn("tournament started->"+index);
         return true;
     }
     private void createSchedule(TournamentSchedule schedule){
