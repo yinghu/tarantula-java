@@ -193,6 +193,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
         tournamentHeader.dataStore(this.dataStore);
         TournamentHeaderIndex index = distributionTournamentService.localManaged(tournamentId);
+        index.tournamentHeader = tournamentHeader;
         tournamentIndex.put(tournamentId,index);
         this.serviceContext.schedule(new TournamentCloseMonitor(tournamentHeader,this));
         if(index.localManaged) tournamentHeader.setup(instanceIndex,this);
