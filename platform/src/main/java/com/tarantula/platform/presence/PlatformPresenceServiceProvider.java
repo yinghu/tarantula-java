@@ -4,9 +4,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Rating;
-import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.leaderboard.LeaderBoardProvider;
+import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
@@ -34,10 +34,10 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
 
     private PlayList recentlyPlayList;
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
-    private InventoryServiceProvider inventoryServiceProvider;
+    private PlatformInventoryServiceProvider inventoryServiceProvider;
     private DistributionItemService distributionItemService;
 
-    public PresenceServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
+    public PlatformPresenceServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
@@ -77,7 +77,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
-        this.logger = serviceContext.logger(PresenceServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
     }
     public void onFriendList(String systemId,String friendSystemId){
         PlayList playList = new PlayList(friendListSize);
@@ -116,7 +116,7 @@ public class PresenceServiceProvider implements ConfigurationServiceProvider, Cl
         rating.dataStore(this.dataStore);
         return rating;
     }
-    public Statistics statistics(String systemId, LeaderBoardProvider leaderBoardProvider){
+    public Statistics statistics(String systemId, PlatformLeaderBoardProvider leaderBoardProvider){
         StatisticsIndex deltaStatistics = new StatisticsIndex();
         deltaStatistics.distributionKey(systemId);
         deltaStatistics.dataStore(this.dataStore);

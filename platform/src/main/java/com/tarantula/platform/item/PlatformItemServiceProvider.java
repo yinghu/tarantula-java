@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ItemServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
@@ -24,7 +24,7 @@ public class ItemServiceProvider implements ConfigurationServiceProvider, Cluste
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
-    public ItemServiceProvider(GameCluster gameCluster){
+    public PlatformItemServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
@@ -58,7 +58,7 @@ public class ItemServiceProvider implements ConfigurationServiceProvider, Cluste
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(ItemServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
     @Override

@@ -7,9 +7,9 @@ import com.tarantula.platform.item.ConfigurableObject;
 public class ApplicationRedeemer extends ConfigurableObject{
 
     protected String systemId;
-    protected InventoryServiceProvider inventoryServiceProvider;
+    protected PlatformInventoryServiceProvider inventoryServiceProvider;
 
-    public ApplicationRedeemer(String systemId, InventoryServiceProvider inventoryServiceProvider){
+    public ApplicationRedeemer(String systemId, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.systemId = systemId;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }

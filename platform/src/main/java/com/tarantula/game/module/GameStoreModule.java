@@ -6,11 +6,11 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.ShoppingItemContext;
-import com.tarantula.platform.store.StoreServiceProvider;
+import com.tarantula.platform.store.PlatformStoreServiceProvider;
 
 public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
     private ApplicationContext context;
-    private StoreServiceProvider storeServiceProvider;
+    private PlatformStoreServiceProvider storeServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {

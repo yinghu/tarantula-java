@@ -5,14 +5,14 @@ import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.presence.PresenceServiceProvider;
+import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.presence.Profile;
 
 public class ProfileModule implements Module  {
 
     private ApplicationContext context;
 
-    private PresenceServiceProvider presenceServiceProvider;
+    private PlatformPresenceServiceProvider presenceServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {

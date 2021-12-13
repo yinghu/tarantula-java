@@ -4,17 +4,17 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.AchievementServiceProvider;
-import com.tarantula.platform.inbox.InboxServiceProvider;
-import com.tarantula.platform.inventory.InventoryServiceProvider;
-import com.tarantula.platform.item.ItemServiceProvider;
-import com.tarantula.platform.leaderboard.LeaderBoardProvider;
+import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
+import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
-import com.tarantula.platform.presence.PresenceServiceProvider;
+import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.store.StoreServiceProvider;
+import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -28,14 +28,14 @@ public class GameServiceProvider implements ServiceProvider{
 
     private PlatformRoomServiceProvider roomServiceProvider;
 
-    private LeaderBoardProvider leaderBoardProvider;
-    private InventoryServiceProvider inventoryServiceProvider;
-    private ItemServiceProvider itemServiceProvider;
-    private StoreServiceProvider storeServiceProvider;
-    private AchievementServiceProvider achievementServiceProvider;
+    private PlatformLeaderBoardProvider leaderBoardProvider;
+    private PlatformInventoryServiceProvider inventoryServiceProvider;
+    private PlatformItemServiceProvider itemServiceProvider;
+    private PlatformStoreServiceProvider storeServiceProvider;
+    private PlatformAchievementServiceProvider achievementServiceProvider;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
-    private PresenceServiceProvider presenceServiceProvider;
-    private InboxServiceProvider inboxServiceProvider;
+    private PlatformPresenceServiceProvider presenceServiceProvider;
+    private PlatformInboxServiceProvider inboxServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -63,25 +63,25 @@ public class GameServiceProvider implements ServiceProvider{
         serviceContext.setup(gameCluster);
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.inventoryServiceProvider = new InventoryServiceProvider(gameCluster);
+        this.inventoryServiceProvider = new PlatformInventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();
-        this.storeServiceProvider = new StoreServiceProvider(gameCluster,inventoryServiceProvider);
+        this.storeServiceProvider = new PlatformStoreServiceProvider(gameCluster,inventoryServiceProvider);
         this.storeServiceProvider.setup(serviceContext);
         this.storeServiceProvider.waitForData();
-        this.leaderBoardProvider = new LeaderBoardProvider(NAME);
+        this.leaderBoardProvider = new PlatformLeaderBoardProvider(NAME);
         this.leaderBoardProvider.setup(serviceContext);
         this.leaderBoardProvider.waitForData();
-        this.presenceServiceProvider = new PresenceServiceProvider(gameCluster,this.inventoryServiceProvider);
+        this.presenceServiceProvider = new PlatformPresenceServiceProvider(gameCluster,this.inventoryServiceProvider);
         this.presenceServiceProvider.setup(serviceContext);
         this.presenceServiceProvider.waitForData();
-        this.itemServiceProvider = new ItemServiceProvider(gameCluster);
+        this.itemServiceProvider = new PlatformItemServiceProvider(gameCluster);
         this.itemServiceProvider.setup(serviceContext);
         this.itemServiceProvider.waitForData();
-        this.inboxServiceProvider = new InboxServiceProvider(gameCluster,inventoryServiceProvider);
+        this.inboxServiceProvider = new PlatformInboxServiceProvider(gameCluster,inventoryServiceProvider);
         this.inboxServiceProvider.setup(serviceContext);
         this.inboxServiceProvider.waitForData();
-        this.achievementServiceProvider = new AchievementServiceProvider(gameCluster,inventoryServiceProvider);
+        this.achievementServiceProvider = new PlatformAchievementServiceProvider(gameCluster,inventoryServiceProvider);
         this.achievementServiceProvider.waitForData();
         this.achievementServiceProvider.setup(serviceContext);
         this.tournamentServiceProvider = new PlatformTournamentServiceProvider(gameCluster,this.inventoryServiceProvider);
@@ -138,26 +138,26 @@ public class GameServiceProvider implements ServiceProvider{
     public DailyLoginTrack dailyLogin(String systemId){
         return presenceServiceProvider.checkDailyLogin(systemId);
     }
-    public PresenceServiceProvider presenceServiceProvider(){
+    public PlatformPresenceServiceProvider presenceServiceProvider(){
         return this.presenceServiceProvider;
     }
-    public InventoryServiceProvider inventoryServiceProvider(){
+    public PlatformInventoryServiceProvider inventoryServiceProvider(){
         return this.inventoryServiceProvider;
     }
-    public StoreServiceProvider storeServiceProvider(){ return this.storeServiceProvider; }
-    public InboxServiceProvider inboxServiceProvider() { return this.inboxServiceProvider; }
+    public PlatformStoreServiceProvider storeServiceProvider(){ return this.storeServiceProvider; }
+    public PlatformInboxServiceProvider inboxServiceProvider() { return this.inboxServiceProvider; }
     //leader service provider hook calls
     public LeaderBoard leaderBoard(String category){
         return leaderBoardProvider.leaderBoard(category);
     }
 
     //configuration service provider hood calls
-    public ItemServiceProvider itemServiceProvider(){
+    public PlatformItemServiceProvider itemServiceProvider(){
         return this.itemServiceProvider;
     }
 
     //Achievement service provider
-    public AchievementServiceProvider achievementServiceProvider(){
+    public PlatformAchievementServiceProvider achievementServiceProvider(){
         return achievementServiceProvider;
     }
     //tournament service provider hook calls

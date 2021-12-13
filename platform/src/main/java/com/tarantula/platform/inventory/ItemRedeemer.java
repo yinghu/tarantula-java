@@ -5,7 +5,7 @@ import com.icodesoftware.Configurable;
 
 public class ItemRedeemer extends ApplicationRedeemer {
 
-    public ItemRedeemer(String systemId, InventoryServiceProvider inventoryServiceProvider){
+    public ItemRedeemer(String systemId, PlatformInventoryServiceProvider inventoryServiceProvider){
         super(systemId,inventoryServiceProvider);
     }
 

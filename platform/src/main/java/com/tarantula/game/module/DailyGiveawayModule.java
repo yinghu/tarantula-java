@@ -5,11 +5,11 @@ import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.presence.ItemDailyGiveawayContext;
-import com.tarantula.platform.presence.PresenceServiceProvider;
+import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 
 public class DailyGiveawayModule implements Module, Configurable.Listener {
     private ApplicationContext context;
-    private PresenceServiceProvider presenceServiceProvider;
+    private PlatformPresenceServiceProvider presenceServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {

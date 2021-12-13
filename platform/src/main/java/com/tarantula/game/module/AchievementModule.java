@@ -4,12 +4,12 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
-import com.tarantula.platform.achievement.AchievementServiceProvider;
+import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.achievement.ItemAchievementContext;
 
 public class AchievementModule implements Module,Configurable.Listener<Achievement> {
     private ApplicationContext context;
-    private AchievementServiceProvider achievementServiceProvider;
+    private PlatformAchievementServiceProvider achievementServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {

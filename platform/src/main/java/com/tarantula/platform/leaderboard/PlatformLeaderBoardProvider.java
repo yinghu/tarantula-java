@@ -12,7 +12,7 @@ import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LeaderBoardProvider implements ServiceProvider, LeaderBoard.Listener {
+public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard.Listener {
 
     private TarantulaLogger logger;
     private final String name;
@@ -25,7 +25,7 @@ public class LeaderBoardProvider implements ServiceProvider, LeaderBoard.Listene
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
-    public LeaderBoardProvider(String name){
+    public PlatformLeaderBoardProvider(String name){
         this.name = name;
     }
     public LeaderBoardSync leaderBoard(String category){
@@ -40,7 +40,7 @@ public class LeaderBoardProvider implements ServiceProvider, LeaderBoard.Listene
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.logger = serviceContext.logger(LeaderBoardProvider.class);
+        this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
         integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);

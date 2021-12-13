@@ -8,7 +8,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
@@ -42,8 +42,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
-    private InventoryServiceProvider inventoryServiceProvider;
-    public PlatformTournamentServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
+    private PlatformInventoryServiceProvider inventoryServiceProvider;
+    public PlatformTournamentServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;

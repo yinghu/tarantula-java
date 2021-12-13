@@ -1,10 +1,10 @@
-package com.tarantula.platform.store;
+package com.tarantula.platform.achievement;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.inventory.InventoryServiceProvider;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
@@ -14,31 +14,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class StoreServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformAchievementServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
-    private final InventoryServiceProvider inventoryServiceProvider;
+    private final PlatformInventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
     private DistributionItemService distributionItemService;
+    private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
+    private ConcurrentHashMap<String,Achievement> achievements;
 
-    private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
-
-    public StoreServiceProvider(GameCluster gameCluster, InventoryServiceProvider inventoryServiceProvider){
+    public PlatformAchievementServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
+        this.achievements = new ConcurrentHashMap<>();
     }
     @Override
     public String name() {
-        return "StoreService";
+        return "AchievementService";
     }
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Store service provider started");
+
     }
 
     @Override
@@ -47,24 +48,30 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.shoppingItems = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(StoreServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
+        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
 
-    public List<ShoppingItem> list(){
-        ArrayList<ShoppingItem> _items = new ArrayList<>();
-        shoppingItems.forEach((k,v)->_items.add(v));
-        return _items;
-    }
-    public boolean buy(String systemId,String itemId){
-        ShoppingItem shoppingItem = shoppingItems.get(itemId);
-        if(shoppingItem==null){
-            return false;
+    public AchievementProgress onProgress(String systemId,String goal,double delta){
+        Achievement achievement = achievements.get(goal);
+        AchievementProgress achievementProgress = new AchievementProgress(achievement);
+        achievementProgress.distributionKey(systemId);
+        this.dataStore.createIfAbsent(achievementProgress,true);
+        if(achievementProgress.onProgress(delta)){
+            //achievement looting
+            achievementProgress.disabled(true);
+            inventoryServiceProvider.redeem(systemId,achievement);
         }
-        return this.inventoryServiceProvider.redeem(systemId,shoppingItem);
+        this.dataStore.update(achievementProgress);
+        return achievementProgress;
+    }
+    public List<Achievement> list(){
+        ArrayList<Achievement> _item = new ArrayList<>();
+        achievements.forEach((k,v)->_item.add(v));
+        return _item;
     }
     @Override
     public <T extends Configurable> void register(T t) {
@@ -72,30 +79,35 @@ public class StoreServiceProvider implements ConfigurationServiceProvider, Clust
         distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
     }
     @Override
-    public <T extends Configurable> void release(T t){
+    public <T extends Configurable> void release(T t) {
         t.released();
-        this.distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+        distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
-        ShoppingItem configurableObject = new ShoppingItem();
+        Achievement configurableObject = new Achievement();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
             return false;
         }
-        shoppingItems.put(configurableObject.distributionKey(),configurableObject);
+        achievements.put(configurableObject.name(),configurableObject);
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        shoppingItems.remove(itemId);
+        String[] released = {null};
+        achievements.forEach((k,v)->{
+            if(v.distributionKey().equals(itemId)) released[0] = k;
+        });
+        if(released[0]!=null) achievements.remove(released[0]);
         return true;
     }
+
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/"+descriptor.category()));
+        List<Achievement> items = applicationPreSetup.list(serviceContext,descriptor,new AchievementObjectQuery("category/"+descriptor.category()));
         items.forEach((a)-> {
-            if (!a.disabled()) shoppingItems.put(a.distributionKey(), a);
+            if(!a.disabled()) achievements.put(a.name(),a);
         });
         return null;
     }

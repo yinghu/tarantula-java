@@ -15,14 +15,14 @@ import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.util.SystemUtil;
 
 
-public class InventoryServiceProvider implements ServiceProvider {
+public class PlatformInventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
 
     private final String name;
     private GameCluster gameCluster;
     private ServiceContext serviceContext;
     private ApplicationPreSetup applicationPreSetup;
-    public InventoryServiceProvider(GameCluster gameCluster){
+    public PlatformInventoryServiceProvider(GameCluster gameCluster){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
@@ -45,7 +45,7 @@ public class InventoryServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(ItemServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }
     public Category category(){
         GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
