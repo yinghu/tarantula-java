@@ -77,7 +77,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
         this.roomCapacity = jsonObject.get("roomCapacity").getAsInt();
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
-        typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
@@ -85,7 +85,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public void start() throws Exception {
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+type+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+type+"]["+typeLobby+"]");
     }
 
     @Override
@@ -349,6 +349,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         //reload connections
+
     }
 
 }

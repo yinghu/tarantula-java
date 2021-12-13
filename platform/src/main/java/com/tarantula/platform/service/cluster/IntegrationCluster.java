@@ -133,48 +133,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this;
     }
 
-    public <T extends Recoverable> List<T> list(RecoverableFactory<T> query){
-        ArrayList<T> alist = new ArrayList<>();
-        list(query,(t)->{
-            alist.add(t);
-            return true;
-        });
-        return alist;
-    }
-    public  <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream){
-        Collection<byte[]> c = this.mIndex.get(query.distributionKey()+Recoverable.PATH_SEPARATOR+query.label());
-        for(byte[] k : c){
-            T t = query.create();
-            byte[] v = vMap.get(k);
-            if(v!=null){
-                t.fromMap(JsonUtil.toMap(v));
-                t.distributionKey(new String(k));
-                if(!stream.on(t)){
-                    break;
-                }
-            }
-        }
-    }
-    public void set(Metadata metadata, byte[] key, byte[] value){
-        this.vMap.put(key,value);
-        if(metadata.index()!=null){
-            mIndex.put(metadata.index(),key);
-        }
-    }
+    //key value pair
     public byte[] get(byte[] key){
         return this.vMap.get(key);
     }
-    public <T extends Recoverable> boolean load(T t){
-        byte[] k = t.key().asString().getBytes();
-        byte[] v = get(k);
-        if(v!=null){
-            t.fromMap(JsonUtil.toMap(v));
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
+
     public byte[] createIfAbsent(byte[] key,byte[] value){
         byte[] ret = vMap.putIfAbsent(key,value);
         return ret!=null?ret:value;
@@ -182,29 +145,19 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void set(byte[] key,byte[] value){
         this.vMap.put(key,value);
     }
-    public void index(String index,byte[] key){
-        mIndex.lock(index);
-        mIndex.put(index,key);
-        mIndex.unlock(index);
-    }
-    public byte[] firstIndex(String index){
-        byte[] ret = null;
-        mIndex.lock(index);
-        Iterator<byte[]> it = mIndex.get(index).iterator();
-        if(it.hasNext()){
-            ret = it.next();
-            mIndex.remove(index,ret);
-        }
-        mIndex.unlock(index);
-        return ret;
-    }
-    public void removeIndex(String index){
-        mIndex.lock(index);
-        mIndex.remove(index);
-        mIndex.unlock(index);
-    }
     public byte[] remove(byte[] key){
         return vMap.remove(key);
+    }
+
+    //key value index list pair
+    public void index(String index,byte[] key){
+        mIndex.put(index,key);
+    }
+    public Collection<byte[]> index(String index){
+        return mIndex.get(index);
+    }
+    public void removeIndex(String index){
+        mIndex.remove(index);
     }
 
     public EventService subscribe(String topic, EventListener callback){

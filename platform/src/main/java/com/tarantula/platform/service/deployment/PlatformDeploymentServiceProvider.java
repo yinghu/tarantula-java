@@ -608,6 +608,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
+            this.integrationCluster.index(connection.configurationTypeId(),connection.serverId().getBytes());
             this.integrationCluster.deployService().registerConnection(connection);
             return;
         }
