@@ -14,7 +14,7 @@ public interface DistributionRoomService extends ServiceProvider {
     GameRoom join(String serviceName, String ticket, String roomId, String systemId);
     void leave(String serviceName,String roomId,String systemId);
     GameZoneIndex localManaged(String key);
-    GameChannelIndex localManaged(int sessionId);
+    GameChannelIndex localManaged(int channelId);
     void create(String serviceName,String zoneId,String roomId);
     void load(String serviceName,String roomId);
 }

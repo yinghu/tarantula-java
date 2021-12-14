@@ -39,15 +39,13 @@ public class ChannelStub extends GameChannel implements Portable {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",channelId);
-        this.properties.put("2",sessionId);
-        this.properties.put("3",timeout);
+        this.properties.put("2",timeout);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.channelId = ((Number)properties.get("1")).intValue();
-        this.sessionId = ((Number)properties.get("2")).intValue();
-        this.timeout = ((Number)properties.get("3")).intValue();
+        this.timeout = ((Number)properties.get("2")).intValue();
     }
 
     @Override
@@ -66,6 +64,15 @@ public class ChannelStub extends GameChannel implements Portable {
 
     @Override
     public String toString(){
-        return "cc->"+channelId+">>>"+sessionId+">>>"+timeout;
+        return "cc->"+channelId+">>>"+timeout;
+    }
+    @Override
+    public int hashCode(){
+        return Integer.hashCode(channelId);
+    }
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof ChannelStub)) return false;
+        return channelId == ((ChannelStub)obj).sessionId;
     }
 }

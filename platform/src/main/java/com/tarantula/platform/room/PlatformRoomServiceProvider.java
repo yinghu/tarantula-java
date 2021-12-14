@@ -20,6 +20,8 @@ import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
@@ -87,17 +89,24 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
-        Collection<byte[]> cb = clusterProvider.index(typeLobby);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
+    }
+    @Override
+    public void start() throws Exception {
+        Collection<byte[]> cb = clusterProvider.index(typeLobby);
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
             onConnection(c);
+            Collection<byte[]> cc = clusterProvider.index(c.serverId());
+            cc.forEach(bb->{
+                ChannelStub cs = new ChannelStub();
+                cs.fromBinary(bb);
+                cs.serverId = c.serverId();
+                tryOnChannel(cs);
+            });
         });
-    }
-    @Override
-    public void start() throws Exception {
         logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+type+"]["+typeLobby+"]");
     }
 
@@ -300,6 +309,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         connectionIndex.put(connection.serverId(),connectionStub);
     }
 
+    private void tryOnChannel(ChannelStub channelStub){
+        GameChannelIndex index = distributionRoomService.localManaged(channelStub.channelId());
+        if(!index.localManaged) {
+            index.channelStub = channelStub;
+            gameChannelIndex.put(index.toString(),index);
+            return;
+        }
+        onChannel(channelStub);
+    }
+
     @Override
     public void onChannel(Channel channel) {
         ChannelStub channelStub = (ChannelStub)channel;
@@ -310,6 +329,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.channelStub = channelStub;
         index.serverId = serverId;
         gameChannelIndex.put(index.toString(),index);
+        logger.warn("on channel->"+index);
     }
     public void onDisConnection(Connection connection){
         onDisConnection(connection.serverId());
@@ -355,6 +375,24 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         return gameRoom;
     }
+    private Map<String,GameChannelIndex> reload(){
+        HashMap<String,GameChannelIndex> tem = new HashMap<>();
+        Collection<byte[]> cb = clusterProvider.index(typeLobby);
+        cb.forEach(b->{
+            ConnectionStub c = new ConnectionStub();
+            c.fromBinary(b);
+            c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
+            Collection<byte[]> cc = clusterProvider.index(c.serverId());
+            cc.forEach(bb->{
+                ChannelStub cs = new ChannelStub();
+                cs.fromBinary(bb);
+                cs.serverId = c.serverId();
+                GameChannelIndex index = this.distributionRoomService.localManaged(cs.channelId());
+                if(!gameChannelIndex.containsKey(index.toString())) tem.put(index.toString(),index);
+            });
+        });
+        return tem;
+    }
 
     @Override
     public void reload(int partition,boolean localMember) {
@@ -380,18 +418,25 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         //reload connections
+        reload().forEach((k,v)->{
+            if(v.localManaged) onChannel(v.channelStub);
+        });
         gameChannelIndex.forEach((k,v)->{
             if(v.partitionId==partition){
+                ConnectionStub cb = connectionIndex.get(v.serverId);
                 if(v.localManaged && !localMember){
                     logger.warn("release game channel->"+k);
                     v.localManaged = false;
+                    cb.removeChannel(v.channelStub);
                 }
                 else if(!v.localManaged && localMember){
                     logger.warn("take over game channel->"+k);
                     v.localManaged = true;
+                    cb.addChannel(v.channelStub);
                 }
             }
         });
+
 
     }
 

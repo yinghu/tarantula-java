@@ -8,7 +8,6 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +44,8 @@ public class ConnectionStub extends ClientConnection {
         this.properties.put("1",host);
         this.properties.put("2",port);
         this.properties.put("3",serverId);
+        this.properties.put("4",type);
+        this.properties.put("5",secured);
         return this.properties;
     }
     @Override
@@ -52,6 +53,8 @@ public class ConnectionStub extends ClientConnection {
         this.host = (String) properties.get("1");
         this.port = ((Number)properties.get("2")).intValue();
         this.serverId = (String) properties.get("3");
+        this.type = (String) properties.get("4");
+        this.secured = (boolean) properties.get("5");
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
@@ -72,6 +75,9 @@ public class ConnectionStub extends ClientConnection {
             lastPing = 0;
         }
         channelStubs.offer(channelStub);
+    }
+    public void removeChannel(ChannelStub channelStub){
+
     }
     public GameChannel gameChannel(){
         ChannelStub channelStub = channelStubs.poll();
@@ -95,10 +101,7 @@ public class ConnectionStub extends ClientConnection {
         clientConnection.host(host);
         clientConnection.port(port);
         clientConnection.type(type);
-        clientConnection.protocol(protocol);
-        clientConnection.subProtocol(subProtocol);
         clientConnection.secured(secured);
-        clientConnection.path(path);
         return clientConnection;
     }
     public void ping(){

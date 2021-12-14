@@ -134,8 +134,8 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
         return new GameZoneIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
     }
-    public GameChannelIndex localManaged(int sessionId){
-        int pid = getNodeEngine().getPartitionService().getPartitionId(sessionId);
+    public GameChannelIndex localManaged(int channelId){
+        int pid = getNodeEngine().getPartitionService().getPartitionId(channelId);
         return new GameChannelIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
     }
     @Override

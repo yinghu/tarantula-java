@@ -18,11 +18,8 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     protected String serverId;
 
     protected boolean secured;
-    protected String protocol;
-    protected String subProtocol;
     protected String host;
     protected int port;
-    protected String path;
 
     public String configurationTypeId() {
         return this.configurationTypeId;
@@ -62,25 +59,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.secured = secured;
     }
 
-    @Override
-    public String protocol() {
-        return this.protocol;
-    }
 
-    @Override
-    public void protocol(String protocol) {
-        this.protocol = protocol;
-    }
-
-    @Override
-    public String subProtocol() {
-        return this.subProtocol;
-    }
-
-    @Override
-    public void subProtocol(String subProtocol) {
-        this.subProtocol = subProtocol;
-    }
 
     @Override
     public String host() {
@@ -102,15 +81,6 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.port = port;
     }
 
-    @Override
-    public String path() {
-        return path;
-    }
-
-    @Override
-    public void path(String path) {
-        this.path = path;
-    }
 
 
     public int getFactoryId() {
@@ -146,11 +116,8 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         jsonObject.addProperty("type",type);
         jsonObject.addProperty("serverId",serverId);
         jsonObject.addProperty("secured",secured);
-        jsonObject.addProperty("protocol",protocol);
-        jsonObject.addProperty("subProtocol",subProtocol);
         jsonObject.addProperty("host",host);
         jsonObject.addProperty("port",port);
-        jsonObject.addProperty("path",path);
         return jsonObject;
     }
 }

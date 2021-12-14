@@ -22,15 +22,8 @@ public class ConnectionDeserializer implements JsonDeserializer<ConnectionStub> 
         if(jo.has("serverId")){
             desc.serverId(jo.get("serverId").getAsString());
         }
-
         if(jo.has("secured")){
             desc.secured(jo.get("secured").getAsBoolean());
-        }
-        if(jo.has("protocol")){
-            desc.protocol(jo.get("protocol").getAsString());
-        }
-        if(jo.has("path")){
-            desc.path(jo.get("path").getAsString());
         }
         if(jo.has("host")){
             desc.host(jo.get("host").getAsString());
