@@ -68,13 +68,13 @@ public class ConnectionStub extends ClientConnection {
         serverKey = portableReader.readByteArray("sk");
     }
     public void addChannel(ChannelStub channelStub){
-        if(channelStubs==null) {
-            channelStubs = new ConcurrentLinkedDeque<>();
-            sessionId = new AtomicInteger(1);
-            pingSequence = new AtomicLong(0);
-            lastPing = 0;
-        }
         channelStubs.offer(channelStub);
+    }
+    public void init(){
+        channelStubs = new ConcurrentLinkedDeque<>();
+        sessionId = new AtomicInteger(1);
+        pingSequence = new AtomicLong(0);
+        lastPing = 0;
     }
     public boolean removeChannel(ChannelStub channelStub){
         return channelStubs.remove(channelStub);

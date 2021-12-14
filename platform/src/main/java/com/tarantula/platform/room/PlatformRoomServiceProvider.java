@@ -285,7 +285,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         clusterProvider.removeIndex(serverId);
         Collection<byte[]> _cb = clusterProvider.index(typeLobby);
         Collection<byte[]> _cc = clusterProvider.index(serverId);
-        //logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
+        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
         ArrayList<String> removed = new ArrayList<>();
         gameChannelIndex.forEach((k,v)->{
             if(v.serverId.equals(serverId)){
@@ -293,7 +293,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         removed.forEach(k->gameChannelIndex.remove(k));
-        //logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>vv->"+gameChannelIndex.size());
+        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>vv->"+gameChannelIndex.size());
     }
 
     @Override
@@ -305,6 +305,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onConnection(Connection connection) {
         ConnectionStub connectionStub = (ConnectionStub)connection;
         connectionStub.maxCapacity = roomCapacity;
+        connectionStub.init();
         pendingConnections.offer(connectionStub);
         connectionIndex.put(connection.serverId(),connectionStub);
     }
