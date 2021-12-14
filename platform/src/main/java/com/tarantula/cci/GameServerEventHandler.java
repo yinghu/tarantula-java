@@ -56,9 +56,10 @@ public class GameServerEventHandler implements RequestHandler {
         else if(action.equals("onChannel")){
             ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
             channel.serverId = serverId;
-            boolean suc = deploymentServiceProvider.registerChannel(typeId,channel);
+            channel.configurationTypeId(typeId);
+            deploymentServiceProvider.register(channel);
             JsonObject resp = new JsonObject();
-            resp.addProperty("successful",suc);
+            resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
         }
         else if(action.equals("onPing")){

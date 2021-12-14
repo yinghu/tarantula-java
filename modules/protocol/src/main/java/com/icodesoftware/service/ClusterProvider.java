@@ -29,6 +29,7 @@ public interface ClusterProvider extends Serviceable {
 
     //CLUSTER INDEX
     void index(String index,byte[] key);
+    void removeIndex(String index,byte[] key);
     Collection<byte[]> index(String index);
     void removeIndex(String index);
 

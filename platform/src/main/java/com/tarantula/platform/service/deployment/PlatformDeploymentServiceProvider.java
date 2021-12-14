@@ -608,8 +608,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            this.integrationCluster.index(connection.configurationTypeId(),connection.serverId().getBytes());
+            this.integrationCluster.index(connection.configurationTypeId(),connection.toBinary());
             this.integrationCluster.deployService().registerConnection(connection);
+            return;
+        }
+        if(configurable instanceof Channel){
+            ChannelStub channelStub = (ChannelStub)configurable;
+            this.integrationCluster.index(channelStub.serverId,channelStub.toBinary());
+            this.integrationCluster.deployService().registerChannel(channelStub.configurationTypeId(),channelStub);
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -702,10 +708,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         secureRandom.nextBytes(key);
         return this.integrationCluster.createIfAbsent(typeId.getBytes(),key);
     }
-    public boolean registerChannel(String typeId,Channel channel){
-        ChannelStub channelStub = (ChannelStub)channel;
-        return this.integrationCluster.deployService().registerChannel(typeId,channelStub);
-    }
+
     public void ping(String typeId,String serverId){
         this.integrationCluster.deployService().ping(typeId,serverId);
     }

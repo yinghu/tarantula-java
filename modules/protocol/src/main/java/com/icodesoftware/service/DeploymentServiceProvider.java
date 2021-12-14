@@ -18,7 +18,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //GAME SERVER APIs
 
     byte[] serverKey(String typeId);
-    boolean registerChannel(String typeId,Channel channel);
+    //boolean registerChannel(String typeId,Channel channel);
     void ping(String typeId,String serverId);
 
 

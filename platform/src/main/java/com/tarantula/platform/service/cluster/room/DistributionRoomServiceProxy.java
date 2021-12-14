@@ -3,12 +3,9 @@ package com.tarantula.platform.service.cluster.room;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.*;
 import com.tarantula.game.Rating;
-import com.tarantula.platform.room.DistributionRoomService;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.room.GameZoneIndex;
-import com.tarantula.platform.room.RoomJoinStub;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -136,6 +133,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     public GameZoneIndex localManaged(String key){
         int pid = getNodeEngine().getPartitionService().getPartitionId(key);
         return new GameZoneIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
+    }
+    public GameChannelIndex localManaged(int sessionId){
+        int pid = getNodeEngine().getPartitionService().getPartitionId(sessionId);
+        return new GameChannelIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
     }
     @Override
     public String name() {

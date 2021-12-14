@@ -1,6 +1,5 @@
 package com.tarantula.platform.room;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
@@ -9,11 +8,13 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ConnectionStub extends ClientConnection implements Portable {
+public class ConnectionStub extends ClientConnection {
 
     public byte[] serverKey;
 
@@ -39,6 +40,19 @@ public class ConnectionStub extends ClientConnection implements Portable {
         return PortableEventRegistry.CONNECTION_STUB_CID;
     }
 
+    @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",host);
+        this.properties.put("2",port);
+        this.properties.put("3",serverId);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.host = (String) properties.get("1");
+        this.port = ((Number)properties.get("2")).intValue();
+        this.serverId = (String) properties.get("3");
+    }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         super.writePortable(portableWriter);
@@ -99,6 +113,11 @@ public class ConnectionStub extends ClientConnection implements Portable {
         }
         tries++;
         return tries< UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES;
+    }
+
+    @Override
+    public String toString(){
+        return "cb->"+serverId+"//"+host+":"+port;
     }
 
 }

@@ -8,6 +8,7 @@ import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class ChannelStub extends GameChannel implements Portable {
 
@@ -36,6 +37,20 @@ public class ChannelStub extends GameChannel implements Portable {
     }
 
     @Override
+    public Map<String,Object> toMap(){
+        this.properties.put("1",channelId);
+        this.properties.put("2",sessionId);
+        this.properties.put("3",timeout);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.channelId = ((Number)properties.get("1")).intValue();
+        this.sessionId = ((Number)properties.get("2")).intValue();
+        this.timeout = ((Number)properties.get("3")).intValue();
+    }
+
+    @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",channelId);
         portableWriter.writeUTF("2",serverId);
@@ -47,5 +62,10 @@ public class ChannelStub extends GameChannel implements Portable {
         channelId = portableReader.readInt("1");
         serverId = portableReader.readUTF("2");
         timeout = portableReader.readInt("3");
+    }
+
+    @Override
+    public String toString(){
+        return "cc->"+channelId+">>>"+sessionId+">>>"+timeout;
     }
 }

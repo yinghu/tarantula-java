@@ -14,11 +14,14 @@ import java.io.IOException;
 
 public class GameChannel extends RecoverableObject implements Channel, Portable {
 
+    protected String configurationTypeId;
+
     protected int channelId;
     protected int sessionId;
     protected int timeout;
     protected byte[] serverKey;
     protected Connection connection;
+
 
     public GameChannel(){
 
@@ -29,6 +32,13 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
         this.connection = connection;
         this.serverKey = serverKey;
         this.timeout = timeout;
+    }
+    public String configurationTypeId() {
+        return this.configurationTypeId;
+    }
+
+    public void configurationTypeId(String configurationTypeId) {
+        this.configurationTypeId = configurationTypeId;
     }
 
     @Override

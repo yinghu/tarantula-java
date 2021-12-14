@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
@@ -18,6 +19,7 @@ import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
@@ -31,6 +33,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private final String name;
     private final GameCluster gameCluster;
     private ServiceContext serviceContext;
+    private ClusterProvider clusterProvider;
     private DistributionRoomService distributionRoomService;
     private SystemValidatorProvider systemValidatorProvider;
     private DataStore dataStore;
@@ -41,6 +44,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
     private ConcurrentLinkedDeque<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
+    private ConcurrentHashMap<String,GameChannelIndex> gameChannelIndex;
 
     private String type;
     private String registerKey;
@@ -65,11 +69,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.clusterProvider = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
         this.systemValidatorProvider  = (SystemValidatorProvider)serviceContext.serviceProvider(SystemValidatorProvider.NAME);
         this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
+        this.gameChannelIndex = new ConcurrentHashMap<>();
         this.pendingConnections = new ConcurrentLinkedDeque<>();
         this.connectionIndex = new ConcurrentHashMap<>();
         this.configuration = serviceContext.configuration(CONFIG);
@@ -81,7 +87,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
         this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
+        Collection<byte[]> cb = clusterProvider.index(typeLobby);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
+        cb.forEach(b->{
+            ConnectionStub c = new ConnectionStub();
+            c.fromBinary(b);
+            logger.warn(c.toString());
+        });
     }
     @Override
     public void start() throws Exception {
@@ -259,6 +271,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(connectionStub==null) return;
         pendingConnections.remove(connectionStub);
         connectionStub.close();
+        clusterProvider.removeIndex(typeLobby,connectionStub.toBinary());
+        clusterProvider.removeIndex(serverId);
+        Collection<byte[]> _cb = clusterProvider.index(typeLobby);
+        Collection<byte[]> _cc = clusterProvider.index(serverId);
+        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
+        ArrayList<String> removed = new ArrayList<>();
+        gameChannelIndex.forEach((k,v)->{
+            if(v.serverId.equals(serverId)){
+                removed.add(k);
+            }
+        });
+        removed.forEach(k->gameChannelIndex.remove(k));
+        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>vv->"+gameChannelIndex.size());
     }
 
     @Override
@@ -280,6 +305,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         String serverId = channelStub.serverId;
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         connectionStub.addChannel(channelStub);
+        GameChannelIndex index = distributionRoomService.localManaged(channelStub.channelId());
+        index.channelStub = channelStub;
+        index.serverId = serverId;
+        gameChannelIndex.put(index.toString(),index);
     }
     public void onDisConnection(Connection connection){
         onDisConnection(connection.serverId());
@@ -349,6 +378,18 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         //reload connections
+        gameChannelIndex.forEach((k,v)->{
+            if(v.partitionId==partition){
+                if(v.localManaged && !localMember){
+                    logger.warn("release game channel->"+k);
+                    v.localManaged = false;
+                }
+                else if(!v.localManaged && localMember){
+                    logger.warn("take over game channel->"+k);
+                    v.localManaged = true;
+                }
+            }
+        });
 
     }
 

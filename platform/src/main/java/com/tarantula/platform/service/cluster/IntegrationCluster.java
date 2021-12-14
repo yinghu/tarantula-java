@@ -153,6 +153,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void index(String index,byte[] key){
         mIndex.put(index,key);
     }
+    public void removeIndex(String index,byte[] key){
+        mIndex.remove(index,key);
+    }
     public Collection<byte[]> index(String index){
         return mIndex.get(index);
     }
