@@ -313,6 +313,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameChannelIndex index = distributionRoomService.localManaged(channelStub.channelId());
         if(!index.localManaged) {
             index.channelStub = channelStub;
+            index.serverId = channelStub.serverId;
             gameChannelIndex.put(index.toString(),index);
             return;
         }
