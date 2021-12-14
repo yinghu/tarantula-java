@@ -73,6 +73,6 @@ public class ChannelStub extends GameChannel implements Portable {
     @Override
     public boolean equals(Object obj){
         if(!(obj instanceof ChannelStub)) return false;
-        return channelId == ((ChannelStub)obj).sessionId;
+        return channelId == ((ChannelStub)obj).channelId;
     }
 }
