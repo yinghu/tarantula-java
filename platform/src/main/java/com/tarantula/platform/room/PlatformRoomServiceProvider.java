@@ -92,7 +92,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
-            logger.warn(c.toString());
+            c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
+            onConnection(c);
         });
     }
     @Override
@@ -315,6 +316,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     public void onPing(String serverId){
         ConnectionStub connectionStub = connectionIndex.get(serverId);
+        if(connectionStub==null) return;
         connectionStub.ping();
     }
     @Override
