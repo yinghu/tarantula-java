@@ -388,6 +388,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 cs.fromBinary(bb);
                 cs.serverId = c.serverId();
                 GameChannelIndex index = this.distributionRoomService.localManaged(cs.channelId());
+                index.serverId = c.serverId();
+                index.channelStub = cs;
                 if(!gameChannelIndex.containsKey(index.toString())) tem.put(index.toString(),index);
             });
         });
