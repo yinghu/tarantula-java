@@ -15,19 +15,10 @@ public interface Connection extends Configurable {
     boolean secured();
     void secured(boolean secured);
 
-    //String protocol();
-    //void protocol(String protocol);
-
-    //String subProtocol();
-    //void subProtocol(String subProtocol);
-
     String host();
     void host(String host);
 
     int port();
     void port(int port);
-
-    //String path();
-    //void path(String path);
 
 }
