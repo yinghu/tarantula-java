@@ -76,8 +76,8 @@ public class ConnectionStub extends ClientConnection {
         }
         channelStubs.offer(channelStub);
     }
-    public void removeChannel(ChannelStub channelStub){
-
+    public boolean removeChannel(ChannelStub channelStub){
+        return channelStubs.remove(channelStub);
     }
     public GameChannel gameChannel(){
         ChannelStub channelStub = channelStubs.poll();

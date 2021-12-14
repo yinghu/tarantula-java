@@ -428,9 +428,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(v.partitionId==partition){
                 ConnectionStub cb = connectionIndex.get(v.serverId);
                 if(v.localManaged && !localMember){
-                    logger.warn("release game channel->"+k);
+                    logger.warn("release game channel->"+k+">>"+cb.removeChannel(v.channelStub));
                     v.localManaged = false;
-                    cb.removeChannel(v.channelStub);
                 }
                 else if(!v.localManaged && localMember){
                     logger.warn("take over game channel->"+k);
