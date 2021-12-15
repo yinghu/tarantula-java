@@ -94,7 +94,11 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
         short cmd = messageBuffer.readShort();
+        GameLobby.ServiceMessageListener messageListener = this.gameLobby.ServiceMessageListener(cmd);
+        return messageListener.update(stub,messageHeader,messageBuffer);
+        /**
         byte[] ret;
+
         switch (cmd){
             case ServiceCommand.REQUEST_STATISTICS:
                 ret = query(stub);
@@ -112,7 +116,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
                 ret = error();
                 break;
         }
-        return ret;
+        return ret;**/
     }
     private byte[] error(){
         return JsonUtil.toSimpleResponse(false,"wrong command").getBytes();

@@ -1,0 +1,9 @@
+{
+  "listeners":
+  [
+    {"command" : 1,"class": "com.tarantula.game.service.RequestStatisticsCommand"},
+    {"command" : 2,"class": "com.tarantula.game.service.CommitStatisticsCommand"},
+    {"command" : 3,"class": "com.tarantula.game.service.RequestTournamentLeaderBoardCommand"},
+    {"command" : 4,"class": "com.tarantula.game.service.CommitTournamentScoreCommand"}
+  ]
+}

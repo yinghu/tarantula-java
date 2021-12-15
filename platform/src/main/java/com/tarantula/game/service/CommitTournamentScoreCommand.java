@@ -1,0 +1,21 @@
+package com.tarantula.game.service;
+
+import com.icodesoftware.protocol.MessageBuffer;
+import com.tarantula.game.GameLobby;
+import com.tarantula.game.Stub;
+
+public class CommitTournamentScoreCommand extends ServiceCommandHeader implements GameLobby.ServiceMessageListener {
+
+
+    @Override
+    public short command() {
+        return ServiceCommand.REQUEST_STATISTICS;
+    }
+
+    @Override
+    public byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        //if(!application.tournamentEnabled() || stub.tournament==null) return null;
+        this.gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),stub.systemId(),messageBuffer.readDouble());
+        return null;
+    }
+}

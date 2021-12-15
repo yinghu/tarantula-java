@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.ErrorCommand;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.room.GameRoom;
@@ -12,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class DynamicGameLobby extends IndexSet implements GameLobby, Configurable.Listener<GameZone> {
+public class DynamicGameLobby extends IndexSet implements GameLobby {
 
     private int levelMatchOffset;
     private JsonObject payload;
@@ -23,13 +24,15 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-
+    private HashMap<Short,ServiceMessageListener> messageListenerIndex;
+    private ErrorCommand errorCommand;
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
         stubIndex = new ConcurrentHashMap<>();
+        messageListenerIndex = new HashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -130,6 +133,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         this.application = context.descriptor();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = this.context.serviceProvider(application.typeId().replace("lobby","service"));
+        this.errorCommand = new ErrorCommand();
+        Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
+        this.context.log(cfg.property("listeners").toString(),OnLog.WARN);
     }
 
     @Override
@@ -140,7 +146,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         this.context.log("game start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
         for(GameZone gameZone : zoneList){
             if(gameZone.disabled()) continue;
-            gameZone.registerListener(this);
+            //gameZone.registerListener(this);
             gameZone.setup(this.context,this);
             deploymentServiceProvider.register(gameZone);
             gameServiceProvider.roomServiceProvider().register(gameZone);
@@ -169,22 +175,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
             this.gameServiceProvider.roomServiceProvider().release(gameZone);
         }
     }
-    public  void onLoaded(GameZone loaded){
-        //context.log("zone loaded in room service provider->"+loaded.distributionKey(),OnLog.WARN);
-        //gameRoomRegistryManagers.put(loaded.distributionKey(),new GameRoomRegistryManager(dataStore,loaded));
-        //gameRoomManagers.put(loaded.distributionKey(),new GameRoomManager(dataStore,loaded));
-    }
-    public void onUpdated(GameZone updated){
-        //logger.warn("zone updated in room service provider->"+updated.distributionKey());
-        //context.log("zone updated in room service provider->"+updated.distributionKey(),OnLog.WARN);
 
-    }
-    public void onRemoved(GameZone remoted){
-        //context.log("zone removed in room service provider->"+remoted.distributionKey(),OnLog.WARN);
-        //logger.warn("zone removed in room service provider->"+remoted.distributionKey());
-        //gameRoomRegistryManagers.remove(remoted.distributionKey());
-        //gameRoomManagers.remove(remoted.distributionKey());
-    }
     public boolean configureGameZone(byte[] payload){
         GameZone gameZone = new DynamicZone();
         Map<String,Object> data = JsonUtil.toMap(payload);
@@ -204,7 +195,11 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
         return arena.configureAndValidate(data);
     }
     public void reload(){
-        this.context.log(this.toString(),OnLog.WARN);
+        //this.context.log(this.toString(),OnLog.WARN);
+    }
+
+    public ServiceMessageListener ServiceMessageListener(short serviceCommand){
+        return messageListenerIndex.getOrDefault(serviceCommand,this.errorCommand);
     }
 
 }

@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Initializer;
 import com.icodesoftware.Session;
+import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.service.Serviceable;
 
 import java.util.List;
@@ -20,5 +21,12 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     void reload();
 
     boolean timeout(String systemId);
+
+    ServiceMessageListener ServiceMessageListener(short serviceCommand);
+
+    interface ServiceMessageListener{
+        short command();
+        byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
+    }
 
 }
