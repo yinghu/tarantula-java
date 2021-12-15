@@ -1,5 +1,7 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -135,7 +137,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         this.gameServiceProvider = this.context.serviceProvider(application.typeId().replace("lobby","service"));
         this.errorCommand = new ErrorCommand();
         Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
-        this.context.log(cfg.property("listeners").toString(),OnLog.WARN);
+        JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
+        listeners.forEach((e)->{
+            this.context.log(e.toString(),OnLog.WARN);
+        });
     }
 
     @Override
