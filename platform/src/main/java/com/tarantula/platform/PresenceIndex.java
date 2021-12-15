@@ -1,7 +1,6 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
@@ -11,8 +10,9 @@ import com.icodesoftware.util.RecoverableObject;
 public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
     private int counter;
+    private int sessionId;
     private EventService eventService;
-    private DeploymentServiceProvider deploymentServiceProvider;
+
     public PresenceIndex(double initialBalance){
         this();
         this.balance = initialBalance;
@@ -41,9 +41,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
-    public void registerDeploymentServiceProvider(DeploymentServiceProvider deploymentServiceProvider){
-        this.deploymentServiceProvider = deploymentServiceProvider;
-    }
+
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
         if(this.transact(desc.entryCost()*(-1))){
@@ -86,6 +84,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.properties.put("2",counter);
         this.properties.put("3",disabled);
         this.properties.put("4",this.timestamp);
+        this.properties.put("5",this.sessionId);
         return this.properties;
     }
     @Override
@@ -94,7 +93,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-
+        this.sessionId = ((Number)properties.getOrDefault("5",0)).intValue();
     }
 
     public int count(int delta){
@@ -116,8 +115,11 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public String toString(){
         return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
     }
-    //@Override
-    //public Key key(){
-        //return new AssociateKey(this.bucket,this.oid,this.label);
-    //}
+    public int sessionId(){
+        return sessionId;
+    }
+    public void sessionId(int sessionId){
+        this.sessionId = sessionId;
+        this.update();
+    }
 }

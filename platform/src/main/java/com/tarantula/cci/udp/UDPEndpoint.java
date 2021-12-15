@@ -99,6 +99,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         channels.put(uch.sessionId(),uch);
         return uch;
     }
+    public Channel channel(int sessionId){
+        return channels.get(sessionId);
+    }
 
     @Override
     public void onTimeout(int channelId, int sessionId) {

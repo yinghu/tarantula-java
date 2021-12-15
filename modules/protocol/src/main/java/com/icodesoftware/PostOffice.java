@@ -3,7 +3,7 @@ package com.icodesoftware;
 public interface PostOffice {
 
     //app to client
-    OnConnection onConnection(Connection connection);
+    OnChannel onChannel(String systemId);
     OnEmail onEmail();
     OnSMS onSMS();
 
@@ -17,7 +17,7 @@ public interface PostOffice {
     }
 
     //send data to client on the connection
-    interface OnConnection{
+    interface OnChannel{
         void send(String label,byte[] data);
     }
 

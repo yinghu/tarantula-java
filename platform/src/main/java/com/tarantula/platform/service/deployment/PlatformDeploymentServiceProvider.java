@@ -852,9 +852,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private class PostOfficeSession implements PostOffice{
 
-        public OnConnection onConnection(Connection connection){
+        public OnChannel onChannel(String systemId){
+            PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
             return (label,data)->{
-                //lookup push event via serverId
+                log.warn("sending message from->>>"+presenceIndex.sessionId());
             };
         }
 
@@ -898,14 +899,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public boolean onRequest(Session session, byte[] payload) throws Exception {
             return this.module.onRequest(session,payload);
         }
-        @Override
-        public void onTimeout(Session session){
-            this.module.onTimeout(session);
-        }
-        @Override
-        public void onIdle(Session session){
-            this.module.onIdle(session);
-        }
+
         @Override
         public void setup(ApplicationContext context) throws Exception {
             this.applicationContext = context;
@@ -927,10 +921,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.moduleId());
             this.module = moduleClassLoader.newModule(descriptor.moduleName());
         }
-        @Override
-        public void onConnection(Connection connection){
-            module.onConnection(connection);
-        }
+
         public void reset(){
             try{
                 DynamicModuleClassLoader moduleClassLoader = cMap.get(descriptor.moduleId());

@@ -82,6 +82,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby, Configurabl
     }
 
     public boolean timeout(String systemId){
+
         return stubIndex.remove(systemId)!=null;
     }
 

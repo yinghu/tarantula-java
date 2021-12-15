@@ -162,6 +162,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         EndPoint udp = (UDPEndpoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        return udp.register(systemId,requestListener,timeoutListener);
+        Channel channel = udp.register(systemId,requestListener,timeoutListener);
+        PresenceIndex presence = (PresenceIndex) this.tarantulaContext.tokenValidatorProvider().presence(systemId);
+        presence.sessionId(channel.sessionId());
+        return channel;
     }
 }

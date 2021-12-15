@@ -61,7 +61,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pdataStore.load(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
-            px.registerDeploymentServiceProvider(this.deploymentServiceProvider);
             return px;
         });
     }
