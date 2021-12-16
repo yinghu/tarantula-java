@@ -9,14 +9,14 @@
       "header": {"type": "loadouts","name": "LoadOuts","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "loadouts-item-settings"
+        "name": "items/loadouts-item-settings"
       }
     },
     {
       "header": {"type": "prize","name": "Prize","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "prize-item-settings"
+        "name": "items/prize-item-settings"
       }
     }
   ]

@@ -79,7 +79,7 @@ public class AdminRoleModule implements Module{
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String pendingName = (String)onAccess.property("name");
             if(!checkGameClusterName(pendingName)){
-                session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 5 chars at least").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 4 chars at least").getBytes());
             }
             else{
                 User ua = _user(session.systemId());

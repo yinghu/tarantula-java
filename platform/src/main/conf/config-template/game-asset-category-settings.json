@@ -9,14 +9,14 @@
       "header": {"type": "card","name": "Item Card","icon":"icon","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "card-asset-settings"
+        "name": "assets/card-asset-settings"
       }
     },
     {
       "header": {"type": "arena","name": "Arena","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "arena-asset-settings"
+        "name": "assets/arena-asset-settings"
       }
     }
   ]

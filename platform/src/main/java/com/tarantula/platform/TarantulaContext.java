@@ -779,23 +779,50 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             GameCluster gameCluster = (GameCluster)configuration;
             Path _config_game = Paths.get(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME));
             if(!Files.exists(_config_game)){
-                Files.createDirectories(_config_game);
-                URL url = Thread.currentThread().getContextClassLoader().getResource("item");
-                String[] fs = new File(url.getFile()).list((m,n)->true);
-                String _path = url.getFile();
-                int wp = _path.indexOf(":");
-                if(wp>0){
-                    _path = _path.substring(wp+1);
-                }
-                for(String f : fs){
-                    Path _item = Paths.get(_path+"/"+f);
-                    Path _game = Paths.get(_config_game+"/"+f);
-                    Files.copy(_item,_game,StandardCopyOption.COPY_ATTRIBUTES);
-                }
+                Path _config_assets = Paths.get(_config_game.toString(),"assets");
+                Path _config_components = Paths.get(_config_game.toString(),"components");
+                Path _config_commodities = Paths.get(_config_game.toString(),"commodities");
+                Path _config_items = Paths.get(_config_game.toString(),"items");
+                Path _config_applications = Paths.get(_config_game.toString(),"applications");
+                Files.createDirectories(_config_assets);
+                Files.createDirectories(_config_components);
+                Files.createDirectories(_config_commodities);
+                Files.createDirectories(_config_items);
+                Files.createDirectories(_config_applications);
+                URL url = Thread.currentThread().getContextClassLoader().getResource("config-template");
+                copyTemplateFile(url,_config_game);
+
+                URL srcAssets = Thread.currentThread().getContextClassLoader().getResource("config-template/assets");
+                copyTemplateFile(srcAssets,_config_assets);
+
+                URL srcComponents = Thread.currentThread().getContextClassLoader().getResource("config-template/components");
+                copyTemplateFile(srcComponents,_config_components);
+
+                URL srcCommodities = Thread.currentThread().getContextClassLoader().getResource("config-template/commodities");
+                copyTemplateFile(srcCommodities,_config_commodities);
+
+                URL srcItems = Thread.currentThread().getContextClassLoader().getResource("config-template/items");
+                copyTemplateFile(srcItems,_config_items);
+
+                URL srcApplications = Thread.currentThread().getContextClassLoader().getResource("config-template/applications");
+                copyTemplateFile(srcApplications,_config_applications);
             }
         }catch (Exception ex){
             log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
             throw new RuntimeException(ex);
+        }
+    }
+    private void copyTemplateFile(URL src,Path dest) throws Exception{
+        String[] fs = new File(src.getFile()).list((m,n)-> n.endsWith(".json"));
+        String _path = src.getFile();
+        int wp = _path.indexOf(":");
+        if(wp>0){
+            _path = _path.substring(wp+1);
+        }
+ 	    for(String f : fs){
+            Path _item = Paths.get(_path+"/"+f);
+            Path _game = Paths.get(dest+"/"+f);
+            Files.copy(_item,_game,StandardCopyOption.COPY_ATTRIBUTES);
         }
     }
 

@@ -9,14 +9,14 @@
       "header": {"type": "abilitiesLevels","name": "Abilities Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "abilities-levels-component-settings"
+        "name": "components/abilities-levels-component-settings"
       }
     },
     {
       "header": {"type": "robotLevels","name": "Robot Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "robot-levels-component-settings"
+        "name": "components/robot-levels-component-settings"
       }
     }
   ]
