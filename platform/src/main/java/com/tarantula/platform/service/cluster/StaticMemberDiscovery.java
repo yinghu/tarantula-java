@@ -22,12 +22,12 @@ public class StaticMemberDiscovery implements ScopedMemberDiscovery {
         ArrayList<InetAddress> alist = new ArrayList<>();
         try{
             BufferedReader reader;
-            File f = new File("/etc/tarantula/host.list."+scope);
+            File f = new File("/etc/tarantula/host.list");
             if(f.exists()){
                 reader = new BufferedReader(new FileReader(f));
             }
             else{
-                reader = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("host.list."+scope)));
+                reader = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("host.list")));
             }
             String line;
             do{
