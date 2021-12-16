@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Initializer;
 import com.icodesoftware.Session;
@@ -25,8 +26,9 @@ public interface GameLobby extends Configurable, Initializer, Serviceable {
     ServiceMessageListener ServiceMessageListener(short serviceCommand);
 
     interface ServiceMessageListener{
-        short command();
+
         byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
+        void setup(ApplicationContext applicationContext);
     }
 
 }

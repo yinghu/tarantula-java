@@ -139,10 +139,19 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
         JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
         listeners.forEach((e)->{
-            this.context.log(e.toString(),OnLog.WARN);
+            JsonObject jo = e.getAsJsonObject();
+            createInstance(jo.get("command").getAsShort(),jo.get("className").getAsString());
         });
     }
-
+    private void createInstance(short cmd,String className){
+        try{
+           ServiceMessageListener serviceMessageListener = (ServiceMessageListener) Class.forName(className).getConstructor().newInstance();
+           serviceMessageListener.setup(this.context);
+           messageListenerIndex.put(cmd,serviceMessageListener);
+        }catch (Exception ex){
+            context.log("no command listener for ["+cmd+"]",OnLog.WARN);
+        }
+    }
     @Override
     public void start() throws Exception{
         Collections.sort(zoneList,new GameZoneComparator());

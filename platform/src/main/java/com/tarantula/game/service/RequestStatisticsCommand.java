@@ -10,11 +10,6 @@ public class RequestStatisticsCommand extends ServiceCommandHeader implements Ga
 
 
     @Override
-    public short command() {
-        return ServiceCommand.REQUEST_STATISTICS;
-    }
-
-    @Override
     public byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         Statistics statistics = gameServiceProvider.statistics(stub.systemId());
         StatisticsSerializer serializer = new StatisticsSerializer();

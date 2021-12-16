@@ -4,15 +4,9 @@ import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.Stub;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 
 public class CommitStatisticsCommand extends ServiceCommandHeader implements GameLobby.ServiceMessageListener {
 
-
-    @Override
-    public short command() {
-        return ServiceCommand.REQUEST_STATISTICS;
-    }
 
     @Override
     public byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {

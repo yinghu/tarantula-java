@@ -96,49 +96,5 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         short cmd = messageBuffer.readShort();
         GameLobby.ServiceMessageListener messageListener = this.gameLobby.ServiceMessageListener(cmd);
         return messageListener.update(stub,messageHeader,messageBuffer);
-        /**
-        byte[] ret;
-
-        switch (cmd){
-            case ServiceCommand.REQUEST_STATISTICS:
-                ret = query(stub);
-                break;
-            case ServiceCommand.COMMIT_STATISTICS:
-                ret = commit(stub,messageBuffer.readUTF8(),messageBuffer.readInt());
-                break;
-            case ServiceCommand.REQUEST_TOURNAMENT_LEADERBOARD:
-                ret = queryTournament(stub);
-                break;
-            case ServiceCommand.COMMIT_TOURNAMENT_SCORE:
-                ret = commitScore(stub,messageBuffer.readDouble());
-                break;
-            default:
-                ret = error();
-                break;
-        }
-        return ret;**/
-    }
-    private byte[] error(){
-        return JsonUtil.toSimpleResponse(false,"wrong command").getBytes();
-    }
-    private byte[] queryTournament(Stub stub){
-        if(!application.tournamentEnabled() || stub.tournament==null) return null;
-        Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournament.distributionKey());
-        return board.toJson().toString().getBytes();
-    }
-    private byte[] commitScore(Stub stub,double delta){
-        if(!application.tournamentEnabled() || stub.tournament==null) return null;
-        this.gameServiceProvider.tournamentServiceProvider().score(stub.tournament.distributionKey(),stub.systemId(),delta);
-        return null;
-    }
-    private byte[] query(Stub stub){
-        Statistics statistics = gameServiceProvider.statistics(stub.systemId());
-        StatisticsSerializer serializer = new StatisticsSerializer();
-        return serializer.serialize(statistics,Statistics.class,null).toString().getBytes();
-    }
-    private byte[] commit(Stub stub,String name,double delta){
-        Statistics statistics = gameServiceProvider.statistics(stub.systemId());
-        statistics.entry(name).update(delta).update();
-        return null;
     }
 }

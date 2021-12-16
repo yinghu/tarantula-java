@@ -10,13 +10,8 @@ public class RequestTournamentLeaderBoardCommand extends ServiceCommandHeader im
 
 
     @Override
-    public short command() {
-        return ServiceCommand.REQUEST_STATISTICS;
-    }
-
-    @Override
     public byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //if(!application.tournamentEnabled() || stub.tournament==null) return null;
+        if(!application.tournamentEnabled() || stub.tournament==null) return null;
         Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournament.distributionKey());
         return board.toJson().toString().getBytes();
     }
