@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 abstract public class GameObjectSetup implements ApplicationPreSetup {
+
     protected DataStore _dataStore;
+
     public <T extends Configurable> boolean save(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
         t.dataStore(dataStore);
