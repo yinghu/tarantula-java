@@ -39,12 +39,6 @@
                 <span class="tx-text-12">Powered By ICodeSoftware</span>
             </div>    
         </div>
-        <div class="w3-panel w3-padding w3-border-bottom w3-border-red">
-            <span id='tx-play-game-message' class="tx-text-16"></span>
-            <div class='w3-bar w3-white'>
-                <span tx-game='tossup' class="w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-live-game-play-bar">Play Tossup</span>
-            </div>
-        </div>
         <div class="w3-display-container w3-white tx-content-16"></div> 
         <div class="w3-row w3-border-bottom w3-border-red">
             <div class="w3-half w3-container">
@@ -259,14 +253,6 @@
             document.querySelector('#tx-sign-up').onclick = ()=>{    
                 tx_view({viewId:'sign.up',containerId:'#tx-popup'});  
             }
-            document.querySelectorAll('.tx-live-game-play-bar').forEach((a)=>{
-                a.onclick=()=>{
-                    //console.log(a.getAttribute('tx-game'));
-                    TARA_API.query().game = a.getAttribute('tx-game');
-                    tx_guest_play_try();
-                    //tx_view({viewId:'play.game',containerId:'#tx-popup'});
-                }
-            });
         }
         function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
             TARA_API.onView(setup.viewId,function(v){
