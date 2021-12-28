@@ -1,9 +1,13 @@
 package com.icodesoftware.protocol;
 
+import com.icodesoftware.util.TimeUtil;
+
 import java.net.SocketAddress;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
@@ -143,6 +147,7 @@ public class UserChannel {
         messageHeader.sequence = sequence.incrementAndGet();
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(messageHeader.sessionId);
+        messageBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{

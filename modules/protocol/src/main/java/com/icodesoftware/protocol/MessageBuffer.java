@@ -32,7 +32,6 @@ public class MessageBuffer {
         int bits = header.ack?1:0;
         bits = header.broadcasting?bits|2:bits|0;
         bits = header.encrypted?bits|4:bits|0;
-        //byteBuffer.put(header.ack?(byte) 1:0);
         byteBuffer.put((byte)bits);
         byteBuffer.putInt(header.channelId);
         byteBuffer.putInt(header.sessionId);
@@ -41,8 +40,6 @@ public class MessageBuffer {
         byteBuffer.putShort(header.commandId);
         byteBuffer.putShort(header.batchSize);
         byteBuffer.putShort(header.batch);
-        //byteBuffer.put(header.broadcasting?(byte) 1:0);
-        //byteBuffer.put(header.encrypted?(byte) 1:0);
         return this;
     }
     public MessageHeader readHeader(){
@@ -58,8 +55,6 @@ public class MessageBuffer {
         header.commandId = byteBuffer.getShort();
         header.batchSize = byteBuffer.getShort();
         header.batch = byteBuffer.getShort();
-        //header.broadcasting = byteBuffer.get()==1;
-        //header.encrypted = byteBuffer.get()==1;
         return header;
     }
     public int readInt(){
@@ -67,6 +62,13 @@ public class MessageBuffer {
     }
     public MessageBuffer writeInt(int data){
         byteBuffer.putInt(data);
+        return this;
+    }
+    public long readLong(){
+        return byteBuffer.getLong();
+    }
+    public MessageBuffer writeLong(long data){
+        byteBuffer.putLong(data);
         return this;
     }
     public short readShort(){
