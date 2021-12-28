@@ -1,6 +1,9 @@
 package com.tarantula.cci.udp;
 
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.util.TimeUtil;
+
+import java.time.LocalDateTime;
 
 public class PushUserChannel extends UserChannel {
 
@@ -22,6 +25,7 @@ public class PushUserChannel extends UserChannel {
         messageHeader.sequence = sequence.incrementAndGet();
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(messageHeader.sessionId);
+        messageBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
