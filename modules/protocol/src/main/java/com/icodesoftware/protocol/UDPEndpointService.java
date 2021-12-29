@@ -42,6 +42,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
     private int sessionTimeout = SESSION_CHECK_INTERVAL;
+
     private int retryInterval = RETRY_TIMEOUT;
     private int receiverTimeout = 0;
     private PingListener pingListener  = ()->{};
@@ -87,12 +88,14 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         executorService.execute(()->{
             long kickoffTimer = sessionTimeout;
             long pingTimer = SESSION_CHECK_INTERVAL;
+            long serverPingTimer  = SERVER_PING_INTERVAL;
             while (true){
                 try{
                     Thread.sleep(retryInterval);
                     userChannelIndex.forEach((k,v)->v.onRetry());
                     kickoffTimer -= retryInterval;
                     pingTimer -= retryInterval;
+                    serverPingTimer -= retryInterval;
                     if(kickoffTimer<=0){
                         userChannelIndex.forEach((k,v)->v.onKickoff());
                         kickoffTimer = sessionTimeout;
@@ -100,6 +103,10 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                     if(pingTimer<=0){
                         pingListener.onPing();
                         pingTimer = SESSION_CHECK_INTERVAL;
+                    }
+                    if(serverPingTimer<=0){
+                        userChannelIndex.forEach((k,v)->v.onPing());
+                        serverPingTimer = SERVER_PING_INTERVAL;
                     }
                 }catch (Exception ex){
                     log.error("unexpected error",ex);

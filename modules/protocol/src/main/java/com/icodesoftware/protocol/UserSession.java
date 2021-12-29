@@ -26,7 +26,7 @@ public class UserSession {
     public boolean onJoin(){
         return onJoined.getAndSet(false);
     }
-    public void ping(){
+    public void onPing(){
         sequence.incrementAndGet();
     }
     public boolean online(){

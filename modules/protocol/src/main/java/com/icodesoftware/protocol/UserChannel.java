@@ -62,7 +62,7 @@ public class UserChannel {
                 return;
             }
             userSession.source = source;
-            userSession.ping();
+            userSession.onPing();
             onJoin(messageHeader,messageBuffer);
             return;
         }
@@ -80,7 +80,7 @@ public class UserChannel {
         }
         if(messageHeader.commandId == Messenger.PING){
             //update user session
-            userSession.ping();
+            userSession.onPing();
             return;
         }
         if(messageHeader.commandId == Messenger.REQUEST){
@@ -119,6 +119,19 @@ public class UserChannel {
            }
         });
         _retried.forEach(k->pendingAckMessageIndex.remove(k));
+    }
+    protected void onPing(){
+        userSessionIndex.forEach((k,v)->{
+            MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+            messageHeader.commandId = Messenger.PING;
+            messageHeader.channelId = channelId;
+            messageHeader.sessionId = k;
+            MessageBuffer buffer = new MessageBuffer();
+            buffer.writeHeader(messageHeader);
+            buffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            buffer.flip();
+            messenger.queue(buffer.toArray(),v.source);
+        });
     }
     public void queue(int sessionId,byte[] data){
         messenger.queue(data,userSessionIndex.get(sessionId).source);

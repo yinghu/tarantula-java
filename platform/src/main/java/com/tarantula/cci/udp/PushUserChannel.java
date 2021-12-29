@@ -17,6 +17,11 @@ public class PushUserChannel extends UserChannel {
     }
 
     @Override
+    protected void onPing(){
+
+    }
+
+    @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         messageBuffer.reset();
         messageHeader.ack = true;
@@ -38,4 +43,5 @@ public class PushUserChannel extends UserChannel {
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         super.onLeave(messageHeader, messageBuffer);
     }
+
 }
