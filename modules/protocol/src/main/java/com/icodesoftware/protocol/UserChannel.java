@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
@@ -121,12 +120,13 @@ public class UserChannel {
         _retried.forEach(k->pendingAckMessageIndex.remove(k));
     }
     protected void onPing(){
+        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.commandId = Messenger.PING;
+        messageHeader.channelId = channelId;
+        MessageBuffer buffer = new MessageBuffer();
         userSessionIndex.forEach((k,v)->{
-            MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
-            messageHeader.commandId = Messenger.PING;
-            messageHeader.channelId = channelId;
+            buffer.reset();
             messageHeader.sessionId = k;
-            MessageBuffer buffer = new MessageBuffer();
             buffer.writeHeader(messageHeader);
             buffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             buffer.flip();

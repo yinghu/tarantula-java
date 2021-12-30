@@ -5,7 +5,7 @@ import com.icodesoftware.service.EndPoint;
 public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
     int SESSION_CHECK_INTERVAL = 5000;
-    int SERVER_PING_INTERVAL = 6000;
+    int SERVER_PING_INTERVAL = 3000;
 
     int CONNECTION_HEALTHY_CHECK_RETRIES = 3;
 
