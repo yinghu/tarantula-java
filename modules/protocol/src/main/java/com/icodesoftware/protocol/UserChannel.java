@@ -98,7 +98,14 @@ public class UserChannel {
         onRelay(messageHeader,payload);
         int pendingTime = messageHeader.batchSize*Short.MAX_VALUE+messageHeader.batch;
         if(pendingTime>0){
-            pendingActionMessageQueue.offer(new PendingActionMessage(messageHeader.copy(),payload,pendingTime));
+            MessageBuffer.MessageHeader pendingHeader = messageHeader.copy();
+            pendingHeader.commandId += Messenger.ON_PENDING_ACTION;
+            byte[] data = messageBuffer.readPayload();
+            messageBuffer.reset();
+            messageBuffer.writeHeader(pendingHeader);
+            messageBuffer.writePayload(data);
+            messageBuffer.rewind();
+            pendingActionMessageQueue.offer(new PendingActionMessage(messageBuffer.toArray(),pendingTime));
         }
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
@@ -158,10 +165,9 @@ public class UserChannel {
                     requeueList.add(p);
                 }
                 else{
-                    final PendingActionMessage _p = p;
-                    _p.messageHeader.commandId += Messenger.ON_PENDING_ACTION;
+                    byte[] data = p.data;
                     userSessionIndex.forEach((k,v)->{
-                        messenger.queue(_p.data,v.source);
+                        messenger.queue(data,v.source);
                     });
                 }
             }
@@ -178,7 +184,7 @@ public class UserChannel {
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
         messageBuffer.flip();
         byte[] payload = messageBuffer.toArray();
-        messenger.send(payload,source);
+        messenger.queue(payload,source);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
@@ -236,11 +242,9 @@ public class UserChannel {
         }
     }
     protected class PendingActionMessage{
-        public MessageBuffer.MessageHeader messageHeader;
         public byte[] data;
         public int pendingTime;
-        public PendingActionMessage(MessageBuffer.MessageHeader messageHeader,byte[] data,int pendingTime){
-            this.messageHeader = messageHeader;
+        public PendingActionMessage(byte[] data,int pendingTime){
             this.data = data;
             this.pendingTime = pendingTime;
         }
