@@ -45,6 +45,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private int retryInterval = RETRY_TIMEOUT;
     private int receiverTimeout = 0;
+    private int frameRate = PENDING_ACTION_INTERVAL;
+
     private PingListener pingListener  = ()->{};
 
     public void start() throws Exception{
@@ -89,23 +91,29 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             long kickoffTimer = sessionTimeout;
             long pingTimer = SESSION_CHECK_INTERVAL;
             long serverPingTimer  = SERVER_PING_INTERVAL;
+            long retryTimer = retryInterval;
             while (true){
                 try{
-                    Thread.sleep(retryInterval);
-                    userChannelIndex.forEach((k,v)->v.onRetry());
-                    kickoffTimer -= retryInterval;
-                    pingTimer -= retryInterval;
-                    serverPingTimer -= retryInterval;
+                    Thread.sleep(frameRate);
+                    userChannelIndex.forEach((k,v)->v.onPendingAction(frameRate));//enqueue pending action data
+                    retryTimer -= frameRate;
+                    kickoffTimer -= frameRate;
+                    pingTimer -= frameRate;
+                    serverPingTimer -= frameRate;
+                    if(retryTimer<=0){
+                        userChannelIndex.forEach((k,v)->v.onRetry());//enqueue retry data
+                        retryTimer = retryInterval;
+                    }
                     if(kickoffTimer<=0){
-                        userChannelIndex.forEach((k,v)->v.onKickoff());
+                        userChannelIndex.forEach((k,v)->v.onKickoff());//remove session
                         kickoffTimer = sessionTimeout;
                     }
                     if(pingTimer<=0){
-                        pingListener.onPing();
+                        pingListener.onPing(); //ping game cluster server
                         pingTimer = SESSION_CHECK_INTERVAL;
                     }
                     if(serverPingTimer<=0){
-                        userChannelIndex.forEach((k,v)->v.onPing());
+                        userChannelIndex.forEach((k,v)->v.onPing());//ping clients
                         serverPingTimer = SERVER_PING_INTERVAL;
                     }
                 }catch (Exception ex){

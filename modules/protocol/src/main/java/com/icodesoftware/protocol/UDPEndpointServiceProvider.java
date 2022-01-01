@@ -6,6 +6,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
     int SESSION_CHECK_INTERVAL = 5000;
     int SERVER_PING_INTERVAL = 3000;
+    int PENDING_ACTION_INTERVAL = 50;
 
     int CONNECTION_HEALTHY_CHECK_RETRIES = 3;
 
@@ -30,9 +31,8 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
         byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
+    //ping game cluster server
     interface PingListener{
         void onPing();
     }
-
-
 }

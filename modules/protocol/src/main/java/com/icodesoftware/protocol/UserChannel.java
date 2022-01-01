@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
@@ -20,6 +21,7 @@ public class UserChannel {
     protected ArrayList<Integer> _offline;
     protected ArrayList<String> _retried;
     protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
+    protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
     protected UDPEndpointServiceProvider.SessionListener sessionListener;
 
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
@@ -29,6 +31,7 @@ public class UserChannel {
         this.requestListener = requestListener!=null?requestListener:(h,m)->null;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
+        this.pendingActionMessageQueue = new ConcurrentLinkedDeque<>();
         this.sequence = new AtomicInteger(0);
         this._offline = new ArrayList<>();
         this._retried = new ArrayList<>();
@@ -93,6 +96,10 @@ public class UserChannel {
         messageBuffer.rewind();
         byte[] payload = messageBuffer.toArray();
         onRelay(messageHeader,payload);
+        int pendingTime = messageHeader.batchSize*Short.MAX_VALUE+messageHeader.batch;
+        if(pendingTime>0){
+            pendingActionMessageQueue.offer(new PendingActionMessage(messageHeader.copy(),payload,pendingTime));
+        }
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
     }
@@ -110,7 +117,7 @@ public class UserChannel {
         _retried.clear();
         pendingAckMessageIndex.forEach((k,v)-> {
            userSessionIndex.forEach((uk, uu) -> {
-               messenger.send(v.data, uu.source);
+               messenger.queue(v.data, uu.source);
            });
            v.retries--;
            if(v.retries<=0){
@@ -139,6 +146,27 @@ public class UserChannel {
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
         sessionListener.onTimeout(channelId,sessionId);
+    }
+    public void onPendingAction(int frameRate){
+        ArrayList<PendingActionMessage> requeueList = new ArrayList<>();
+        PendingActionMessage p;
+        do{
+            p = pendingActionMessageQueue.poll();
+            if(p!=null ){
+                p.pendingTime -= frameRate;
+                if(p.pendingTime>0) {
+                    requeueList.add(p);
+                }
+                else{
+                    final PendingActionMessage _p = p;
+                    _p.messageHeader.commandId += Messenger.ON_PENDING_ACTION;
+                    userSessionIndex.forEach((k,v)->{
+                        messenger.queue(_p.data,v.source);
+                    });
+                }
+            }
+        }while (p != null);
+        requeueList.forEach(pr->pendingActionMessageQueue.offer(pr));
     }
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
         userSession.pendingAck(messageHeader);
@@ -205,6 +233,16 @@ public class UserChannel {
         public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] data){
             this.messageHeader = messageHeader;
             this.data = data;
+        }
+    }
+    protected class PendingActionMessage{
+        public MessageBuffer.MessageHeader messageHeader;
+        public byte[] data;
+        public int pendingTime;
+        public PendingActionMessage(MessageBuffer.MessageHeader messageHeader,byte[] data,int pendingTime){
+            this.messageHeader = messageHeader;
+            this.data = data;
+            this.pendingTime = pendingTime;
         }
     }
 
