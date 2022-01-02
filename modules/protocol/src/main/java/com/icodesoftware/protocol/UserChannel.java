@@ -100,6 +100,8 @@ public class UserChannel {
         if(pendingTime>0){
             MessageBuffer.MessageHeader pendingHeader = messageHeader.copy();
             pendingHeader.commandId += Messenger.ON_PENDING_ACTION;
+            messageBuffer.rewind();
+            messageBuffer.readHeader();
             byte[] data = messageBuffer.readPayload();
             messageBuffer.reset();
             messageBuffer.writeHeader(pendingHeader);
