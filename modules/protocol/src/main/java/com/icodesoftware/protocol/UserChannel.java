@@ -168,9 +168,7 @@ public class UserChannel {
                 }
                 else{
                     byte[] data = p.data;
-                    userSessionIndex.forEach((k,v)->{
-                        messenger.queue(data,v.source);
-                    });
+                    userSessionIndex.forEach((k,v)->messenger.queue(data,v.source));
                 }
             }
         }while (p != null);
@@ -186,7 +184,7 @@ public class UserChannel {
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
         messageBuffer.flip();
         byte[] payload = messageBuffer.toArray();
-        messenger.queue(payload,source);
+        messenger.send(payload,source);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
