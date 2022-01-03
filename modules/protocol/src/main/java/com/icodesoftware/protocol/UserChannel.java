@@ -107,7 +107,7 @@ public class UserChannel {
             messageBuffer.writeHeader(pendingHeader);
             messageBuffer.writePayload(data);
             messageBuffer.rewind();
-            pendingActionMessageQueue.offer(new PendingActionMessage(messageBuffer.toArray(),pendingTime));
+            pendingActionMessageQueue.offer(new PendingActionMessage(messageBuffer.toArray(),pendingTime,messageHeader));
         }
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
@@ -168,7 +168,16 @@ public class UserChannel {
                 }
                 else{
                     byte[] data = p.data;
-                    userSessionIndex.forEach((k,v)->messenger.queue(data,v.source));
+                    int[] pendingAck ={0};
+                    userSessionIndex.forEach((k,v)->{
+                        messenger.queue(data,v.source);
+                        pendingAck[0]++;
+                    });
+                    if(p.messageHeader.ack&&pendingAck[0]>0){
+                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader,data);
+                        pendingAckMessage.pendingAck = pendingAck[0];
+                        pendingAckMessageIndex.put(p.messageHeader.toString(),pendingAckMessage);
+                    }
                 }
             }
         }while (p != null);
@@ -222,14 +231,23 @@ public class UserChannel {
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,byte[] payload){
+        int[] pendingAck ={0};
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
-                if(messageHeader.sessionId!=sid) messenger.send(payload,session.source);
+                if(messageHeader.sessionId!=sid){
+                    messenger.send(payload,session.source);
+                    pendingAck[0]++;
+                }
             }
             else{
                 messenger.send(payload,session.source);
+                pendingAck[0]++;
             }
         });
+        if(!messageHeader.ack||pendingAck[0]==0) return;
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,payload);
+        pendingAckMessage.pendingAck = pendingAck[0];
+        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
@@ -244,9 +262,11 @@ public class UserChannel {
     protected class PendingActionMessage{
         public byte[] data;
         public int pendingTime;
-        public PendingActionMessage(byte[] data,int pendingTime){
+        public MessageBuffer.MessageHeader messageHeader;
+        public PendingActionMessage(byte[] data, int pendingTime, MessageBuffer.MessageHeader messageHeader){
             this.data = data;
             this.pendingTime = pendingTime;
+            this.messageHeader = messageHeader;
         }
     }
 
