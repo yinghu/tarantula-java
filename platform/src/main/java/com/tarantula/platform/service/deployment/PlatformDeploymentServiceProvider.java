@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
@@ -849,6 +850,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         public OnChannel onChannel(String systemId){
             PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
             return (label,data)->{
+                UDPEndpoint udp = (UDPEndpoint) tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+                Channel c = udp.channel(presenceIndex.sessionId());
+                //c.write();
                 log.warn("sending message from->>>"+presenceIndex.sessionId());
             };
         }

@@ -93,6 +93,9 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         else if(k.equals("timestamp")){
             access.timestamp(((Number)v).longValue());
         }
+        else{
+            access.property(k,v);
+        }
     }
     private String toLowercaseAtFirst(String str){
         char[] chars = str.toCharArray();
