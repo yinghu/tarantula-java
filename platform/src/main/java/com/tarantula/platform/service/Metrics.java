@@ -19,6 +19,7 @@ public class Metrics extends OnApplicationHeader {
     public final static String STRIPE_COUNT = "5";
     public final static String PASSWORD_COUNT = "6";
     public final static String DEVICE_COUNT = "7";
+    public final static String FACEBOOK_COUNT = "8";
 
     public static String toName(String k){
         int t = Integer.parseInt(k);
@@ -44,6 +45,9 @@ public class Metrics extends OnApplicationHeader {
                 break;
             case 7:
                 n = "DeviceValidationCount";
+                break;
+            case 8:
+                n = "FacebookValidationCount";
                 break;
         }
         return n;

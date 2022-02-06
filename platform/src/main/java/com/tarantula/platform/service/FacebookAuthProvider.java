@@ -35,24 +35,43 @@ public class FacebookAuthProvider extends AuthObject{
     @Override
     public boolean validate(Map<String,Object> params){
         try{
-            //String loginToken = (String)params.get("token");
-            String uid = params.get("login").toString().split("_")[1];
-            String query = new StringBuffer(uid).append("?access_token=")
-                    .append(clientId()).append("%7C").append(secureKey()).toString();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(tokenUri()+query))
-                    .timeout(Duration.ofSeconds(TIMEOUT))
-                    .header(ACCEPT, ACCEPT_JSON)
-                    .GET()
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonParser p = new JsonParser();
-            JsonObject j = p.parse(response.body()).getAsJsonObject();
-            return !j.has("error");
+            validateToken(params);
+            metricsListener.onUpdated(Metrics.FACEBOOK_COUNT,1);
+            return validateUser(params);
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
+    }
+    private boolean validateToken(Map<String,Object> params) throws Exception{
+        String token = params.get("token").toString();
+        String query = new StringBuffer("?input_token=").append(token).append("&access_token")
+                .append(clientId()).append("%7C").append(secureKey()).toString();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(tokenUri()+query))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonParser p = new JsonParser();
+        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        return !j.has("error");
+    }
+    private boolean validateUser(Map<String,Object> params) throws Exception{
+        String uid = params.get("login").toString().split("_")[1];
+        String query = new StringBuffer(uid).append("?access_token=")
+                .append(clientId()).append("%7C").append(secureKey()).toString();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(authUri()+query))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonParser p = new JsonParser();
+        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        return !j.has("error");
     }
 
     private class _X509TrustManager implements X509TrustManager {

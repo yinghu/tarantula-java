@@ -1,7 +1,7 @@
 {
   "appName":"RogueBotQuest",
   "appId":"261381142790450",
-  "accessToken":"5a52db83ee764bf499fb308835845785",
-  "authUrl":"https://graph.facebook.com/oauth/access_token",
-  "tokenUrl": "https://graph.facebook.com/"
+  "secureKey":"5a52db83ee764bf499fb308835845785",
+  "authUrl":"https://graph.facebook.com/",
+  "tokenUrl": "https://graph.facebook.com/debug_token"
 }

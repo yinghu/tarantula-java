@@ -623,7 +623,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     private AuthObject loadFacebookCredentials(){
         try{
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-facebook-auth.json");
+            String config = this.authContext+"-facebook-auth.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
             byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
@@ -636,7 +638,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     private AuthObject loadGoogleCredentials(){
  	    try{
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.authContext+"-google-auth.json");
+            String config = this.authContext+"-google-auth.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
             byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
@@ -649,7 +653,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     private AuthObject loadStripeCredentials(){
         try{
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("stripe-credentials.json");
+            String config = this.authContext+"-stripe-credentials.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
             byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
