@@ -21,6 +21,7 @@ public class FacebookAuthProvider extends AuthObject{
     private static String ACCEPT_JSON = "application/json";
     private static int TIMEOUT = 10;
     private HttpClient client;
+    private String accessToken;
 
     public FacebookAuthProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
         super("facebook", clientId, secureKey, authUri, tokenUri, certUri, origins);
@@ -28,6 +29,7 @@ public class FacebookAuthProvider extends AuthObject{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
             client = HttpClient.newBuilder().sslContext(sct).build();
+            if(!serverToken()) throw new RuntimeException("invalid token");
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -43,10 +45,28 @@ public class FacebookAuthProvider extends AuthObject{
             return false;
         }
     }
+    private boolean serverToken() throws Exception{
+        String query = new StringBuffer("?client_id=").append(clientId()).append("&client_secret=")
+                .append(secureKey()).append("&grant_type=client_credentials").toString();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(certUri()+query))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonParser p = new JsonParser();
+        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        if(!j.has("access_token")) return false;
+        String acc = j.get("access_token").getAsString();
+        int ix = acc.lastIndexOf('|');
+        accessToken = acc.substring(ix+1);
+        return true;
+    }
     private boolean validateToken(Map<String,Object> params) throws Exception{
         String token = params.get("token").toString();
-        String query = new StringBuffer("?input_token=").append(token).append("&access_token")
-                .append(clientId()).append("%7C").append(secureKey()).toString();
+        String query = new StringBuffer("?input_token=").append(token).append("&access_token=")
+                .append(clientId()).append("%7C").append(accessToken).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(tokenUri()+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))
@@ -61,7 +81,7 @@ public class FacebookAuthProvider extends AuthObject{
     private boolean validateUser(Map<String,Object> params) throws Exception{
         String uid = params.get("login").toString().split("_")[1];
         String query = new StringBuffer(uid).append("?access_token=")
-                .append(clientId()).append("%7C").append(secureKey()).toString();
+                .append(clientId()).append("%7C").append(accessToken).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(authUri()+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))
