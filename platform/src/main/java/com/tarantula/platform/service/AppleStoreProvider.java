@@ -14,7 +14,7 @@ public class AppleStoreProvider extends AuthObject{
     private HttpClient client;
 
     public AppleStoreProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
-        super("applestore", clientId, secureKey, authUri, tokenUri, certUri, origins);
+        super("appleStore", clientId, secureKey, authUri, tokenUri, certUri, origins);
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);

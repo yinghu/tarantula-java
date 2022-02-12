@@ -12,7 +12,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String GOOGLE = "google";
     String STRIPE = "stripe";
     String FACEBOOK = "facebook";
-    String APPLE = "apple";
+    String APPLE_STORE = "appleStore";
 
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
