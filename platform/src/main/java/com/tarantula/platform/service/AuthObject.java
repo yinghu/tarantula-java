@@ -7,6 +7,10 @@ import java.util.Map;
 
 public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
+    protected static String ACCEPT = "Accept";
+    protected static String ACCEPT_JSON = "application/json";
+    protected static int TIMEOUT = 10;
+
     private  String name;
     private  String clientId;
     private  String secureKey;

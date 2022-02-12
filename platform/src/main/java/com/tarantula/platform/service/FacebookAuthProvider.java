@@ -17,9 +17,7 @@ import java.util.Map;
 
 public class FacebookAuthProvider extends AuthObject{
 
-    private static String ACCEPT = "Accept";
-    private static String ACCEPT_JSON = "application/json";
-    private static int TIMEOUT = 10;
+
     private HttpClient client;
     private String accessToken;
 

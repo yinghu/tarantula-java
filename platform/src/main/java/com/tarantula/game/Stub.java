@@ -5,7 +5,9 @@ import com.icodesoftware.*;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.store.ShoppingItem;
 
+import java.util.List;
 import java.util.Map;
 
 //per stub/game by playerId + lobby tag
@@ -15,6 +17,8 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public String roomId;
     public String ticket;
+    public List<ShoppingItem> shoppingItems;
+
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
@@ -39,6 +43,7 @@ public class Stub extends PlayerGameObject {
         jo.add("arena", room.arena().toJson());
         jo.add("room",room.toJson());
         jo.add("rating",rating.toJson());
+
         if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(tournament!=null){
             jo.add("tournament",tournament.toJson());
