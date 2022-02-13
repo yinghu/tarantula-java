@@ -1,11 +1,17 @@
 package com.tarantula.platform.service;
 
+import com.google.gson.JsonObject;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Map;
 
 public class AppleStoreProvider extends AuthObject{
@@ -24,16 +30,33 @@ public class AppleStoreProvider extends AuthObject{
             throw new RuntimeException(ex);
         }
     }
+
     @Override
     public boolean validate(Map<String,Object> params){
         try{
-
+            String receipt = (String)params.get("receipt");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(certUri()))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).getAsString().getBytes()))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response);
             metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
             return true;
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
+    }
+
+    private JsonObject toRequestPayload(String receipt){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("receipt-data",receipt);
+        jsonObject.addProperty("password",secureKey());
+        jsonObject.addProperty("exclude-old-transactions",true);
+        return jsonObject;
     }
     private class _X509TrustManager implements X509TrustManager {
         private X509Certificate[] certificate;
@@ -55,6 +78,5 @@ public class AppleStoreProvider extends AuthObject{
         public X509Certificate[] getAcceptedIssuers() {
             return this.certificate;
         }
-
     }
 }

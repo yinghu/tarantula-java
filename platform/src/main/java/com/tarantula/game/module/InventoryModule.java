@@ -7,6 +7,8 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
 
+import java.util.Map;
+
 
 public class InventoryModule implements Module {
 
@@ -36,6 +38,15 @@ public class InventoryModule implements Module {
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());
+            }
+        }
+        else if(session.action().equals("onValidate")){
+            Map<String,Object> params = JsonUtil.toMap(session.payload());
+            if(this.context.validator().validateToken(params)){
+                session.write(JsonUtil.toSimpleResponse(true,"receipt validated").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"receipt not validated").getBytes());
             }
         }
         return false;
