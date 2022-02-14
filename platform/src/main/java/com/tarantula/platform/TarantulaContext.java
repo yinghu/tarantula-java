@@ -683,6 +683,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             gb.registerTypeAdapter(AuthObject.class,new AppleStoreCredentialsDeserializer());
             return gb.create().fromJson(new String(data),AuthObject.class);
         }catch (Exception ex){
+            ex.printStackTrace();
             return null;
         }
     }

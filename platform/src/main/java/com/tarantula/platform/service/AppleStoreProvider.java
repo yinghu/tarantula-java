@@ -37,12 +37,15 @@ public class AppleStoreProvider extends AuthObject{
             String receipt = (String)params.get("receipt");
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(certUri()))
+                    .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).getAsString().getBytes()))
+                    .header(CONTENT_TYPE,ACCEPT_JSON)
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).toString().getBytes()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
+            System.out.println(response.statusCode());
+            System.out.println(response.body());
             metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
             return true;
         }catch (Exception ex){

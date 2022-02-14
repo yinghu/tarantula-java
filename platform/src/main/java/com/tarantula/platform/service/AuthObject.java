@@ -10,6 +10,8 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static String ACCEPT = "Accept";
     protected static String ACCEPT_JSON = "application/json";
     protected static int TIMEOUT = 10;
+    protected static String CONTENT_TYPE = "Content-type";
+    protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
 
     private  String name;
     private  String clientId;

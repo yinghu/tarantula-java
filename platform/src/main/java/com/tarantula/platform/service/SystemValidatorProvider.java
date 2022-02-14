@@ -246,6 +246,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             facebook.registerMetricsLister(this.deploymentServiceProvider);
             aMap.put(OnAccess.FACEBOOK,facebook);
         }
+        AuthVendor appleStore = this.serviceContext.authVendor(OnAccess.APPLE_STORE);
+        if(appleStore!=null){
+            appleStore.registerMetricsLister(this.deploymentServiceProvider);
+            aMap.put(OnAccess.APPLE_STORE,appleStore);
+        }
         AuthVendor stripe = this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){
             stripe.registerMetricsLister(this.deploymentServiceProvider);

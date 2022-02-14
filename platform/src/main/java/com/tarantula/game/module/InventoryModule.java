@@ -1,11 +1,18 @@
 package com.tarantula.game.module;
 
+import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.OnAccessTrack;
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
+import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.OnAccessSerializer;
+import com.tarantula.platform.util.ResponseSerializer;
+
 
 import java.util.Map;
 
@@ -14,6 +21,8 @@ public class InventoryModule implements Module {
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
+    protected GsonBuilder builder;
+
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -41,8 +50,8 @@ public class InventoryModule implements Module {
             }
         }
         else if(session.action().equals("onValidate")){
-            Map<String,Object> params = JsonUtil.toMap(session.payload());
-            if(this.context.validator().validateToken(params)){
+            OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
+            if(this.context.validator().validateToken(acc.toMap())){
                 session.write(JsonUtil.toSimpleResponse(true,"receipt validated").getBytes());
             }
             else{
@@ -55,6 +64,8 @@ public class InventoryModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.context.log("Inventory module started", OnLog.WARN);
     }
