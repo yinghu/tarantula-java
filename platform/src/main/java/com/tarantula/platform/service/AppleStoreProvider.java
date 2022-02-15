@@ -1,6 +1,10 @@
 package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.store.Transaction;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -18,7 +22,8 @@ public class AppleStoreProvider extends AuthObject{
 
 
     private HttpClient client;
-
+    private DataStore dataStore;
+    private JsonParser jsonParser;
     public AppleStoreProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
         super("appleStore", clientId, secureKey, authUri, tokenUri, certUri, origins);
         try{
@@ -30,7 +35,12 @@ public class AppleStoreProvider extends AuthObject{
             throw new RuntimeException(ex);
         }
     }
-
+    @Override
+    public void setup(ServiceContext serviceContext){
+        super.setup(serviceContext);
+        jsonParser = new JsonParser();
+        this.dataStore = serviceContext.dataStore("apple_store_transaction",serviceContext.partitionNumber());
+    }
     @Override
     public boolean validate(Map<String,Object> params){
         try{
@@ -44,16 +54,21 @@ public class AppleStoreProvider extends AuthObject{
                     .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).toString().getBytes()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.statusCode());
-            System.out.println(response.body());
-            metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
-            return true;
+            return checkResponsePayload(response.body());
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
     }
-
+    private boolean checkResponsePayload(String resp){
+        JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
+        //in_app array
+        int status = receipt.get("status").getAsInt();
+        Transaction transaction = new Transaction();
+        transaction.originalPayload = resp;
+        this.dataStore.create(transaction);
+        return status==0;
+    }
     private JsonObject toRequestPayload(String receipt){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("receipt-data",receipt);

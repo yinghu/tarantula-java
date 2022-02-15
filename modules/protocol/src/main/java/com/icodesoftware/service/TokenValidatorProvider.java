@@ -51,6 +51,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
         String certUri();
         String[] origins();
         void registerMetricsLister(MetricsListener metricsListener);
+        void setup(ServiceContext serviceContext);
         boolean validate(Map<String,Object> params);
     }
 }

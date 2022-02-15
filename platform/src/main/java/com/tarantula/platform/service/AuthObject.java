@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.service.MetricsListener;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.Map;
@@ -20,6 +21,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     private  String tokenUri;
     private  String certUri;
     private  String[] origins;
+    protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
     public AuthObject(String name,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
         this.name = name;
@@ -64,6 +66,10 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     @Override
     public String[] origins() {
         return this.origins;
+    }
+    @Override
+    public void setup(ServiceContext serviceContext){
+        this.serviceContext = serviceContext;
     }
     public void registerMetricsLister(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
