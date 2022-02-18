@@ -51,8 +51,10 @@ public class InventoryModule implements Module {
         }
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
-            if(this.context.validator().validateToken(acc.toMap())){
-                session.write(JsonUtil.toSimpleResponse(true,"receipt validated").getBytes());
+            Map<String,Object> params = acc.toMap();
+            if(this.context.validator().validateToken(params)){
+                String tid = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
+                session.write(JsonUtil.toSimpleResponse(true,tid).getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"receipt not validated").getBytes());

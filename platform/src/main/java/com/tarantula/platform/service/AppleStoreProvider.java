@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.store.Transaction;
 
@@ -54,16 +55,25 @@ public class AppleStoreProvider extends AuthObject{
                     .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).toString().getBytes()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return checkResponsePayload(response.body());
+            return checkResponsePayload(response.body(),params);
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
     }
-    private boolean checkResponsePayload(String resp){
+    private boolean checkResponsePayload(String resp,Map<String,Object> params){
         JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
-        //in_app array
         int status = receipt.get("status").getAsInt();
+        //in_app array
+        JsonObject inApp = receipt.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray().get(0).getAsJsonObject();
+        if(status==0){
+            String transactionId = inApp.get("transaction_id").getAsString();
+            String sku = inApp.get("product_id").getAsString();
+            int quantity  = inApp.get("quantity").getAsInt();
+            params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
+            params.put(OnAccess.STORE_PRODUCT_ID,sku);
+            params.put(OnAccess.STORE_QUANTITY,quantity);
+        }
         Transaction transaction = new Transaction();
         transaction.originalPayload = resp;
         this.dataStore.create(transaction);
