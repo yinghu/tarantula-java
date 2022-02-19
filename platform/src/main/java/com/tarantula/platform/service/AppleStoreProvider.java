@@ -1,5 +1,7 @@
 package com.tarantula.platform.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
@@ -65,19 +67,28 @@ public class AppleStoreProvider extends AuthObject{
         JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array
-        JsonObject inApp = receipt.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray().get(0).getAsJsonObject();
+        boolean validated = false;
         if(status==0){
-            String transactionId = inApp.get("transaction_id").getAsString();
-            String sku = inApp.get("product_id").getAsString();
-            int quantity  = inApp.get("quantity").getAsInt();
-            params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
-            params.put(OnAccess.STORE_PRODUCT_ID,sku);
-            params.put(OnAccess.STORE_QUANTITY,quantity);
+            JsonArray inApps = receipt.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
+            String pendingTransactionId = (String)params.get("transactionId");
+            for(JsonElement inApp : inApps){
+                JsonObject transaction = inApp.getAsJsonObject();
+                String transactionId = transaction.get("transaction_id").getAsString();
+                if(transactionId.equals(pendingTransactionId)){
+                    String sku = transaction.get("product_id").getAsString();
+                    int quantity  = transaction.get("quantity").getAsInt();
+                    params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
+                    params.put(OnAccess.STORE_PRODUCT_ID,sku);
+                    params.put(OnAccess.STORE_QUANTITY,quantity);
+                    validated = true;
+                    break;
+                }
+            }
         }
         Transaction transaction = new Transaction();
         transaction.originalPayload = resp;
         this.dataStore.create(transaction);
-        return status==0;
+        return validated;
     }
     private JsonObject toRequestPayload(String receipt){
         JsonObject jsonObject = new JsonObject();
