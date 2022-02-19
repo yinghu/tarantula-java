@@ -88,6 +88,7 @@ public class AppleStoreProvider extends AuthObject{
         Transaction transaction = new Transaction();
         transaction.originalPayload = resp;
         this.dataStore.create(transaction);
+        this.metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
         return validated;
     }
     private JsonObject toRequestPayload(String receipt){
