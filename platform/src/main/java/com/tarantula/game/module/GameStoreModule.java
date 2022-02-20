@@ -11,6 +11,7 @@ import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.StorePurchase;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
+import java.util.List;
 import java.util.Map;
 
 public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
@@ -22,23 +23,24 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         if(session.action().equals("onList")){
             session.write(new ShoppingItemContext(true,"shop list",this.storeServiceProvider.list()).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onBuy")){
-            if(this.storeServiceProvider.buy(session.systemId(),session.name())){
-                session.write(JsonUtil.toSimpleResponse(true,"item purchased successfully").getBytes());
-            }else{
-                session.write(JsonUtil.toSimpleResponse(false,"item not existed->"+session.name()).getBytes());
-            }
-        }
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
             Map<String,Object> params = acc.toMap();
+            params.put("systemId",session.systemId());
             if(this.context.validator().validateToken(params)){
+                List<ShoppingItem> shoppingItemList = this.storeServiceProvider.list();
+                String[] itemId ={""};
+                String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
+                shoppingItemList.forEach((si)->{
+                    if(si.configurationName().equals(sku)) itemId[0] = si.distributionKey();
+                });
+                this.storeServiceProvider.grant(session.systemId(),itemId[0]);
                 StorePurchase storePurchase = new StorePurchase();
                 storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
                 session.write(storePurchase.toJson().toString().getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"receipt not validated").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,(String)params.get(OnAccess.STORE_MESSAGE)).getBytes());
             }
         }
         return false;

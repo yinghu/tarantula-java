@@ -1,27 +1,16 @@
 package com.tarantula.game.module;
 
-import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
-import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.OnAccessSerializer;
-import com.tarantula.platform.util.ResponseSerializer;
-
-
-import java.util.Map;
-
 
 public class InventoryModule implements Module {
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    protected GsonBuilder builder;
 
 
     @Override
@@ -49,25 +38,12 @@ public class InventoryModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());
             }
         }
-        else if(session.action().equals("onValidate")){
-            OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
-            Map<String,Object> params = acc.toMap();
-            if(this.context.validator().validateToken(params)){
-                String tid = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
-                session.write(JsonUtil.toSimpleResponse(true,tid).getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"receipt not validated").getBytes());
-            }
-        }
         return false;
     }
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.context.log("Inventory module started", OnLog.WARN);
     }

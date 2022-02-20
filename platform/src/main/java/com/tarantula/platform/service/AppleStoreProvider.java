@@ -33,7 +33,6 @@ public class AppleStoreProvider extends AuthObject{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
             client = HttpClient.newBuilder().sslContext(sct).build();
-            //if(!serverToken()) throw new RuntimeException("invalid token");
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -47,6 +46,7 @@ public class AppleStoreProvider extends AuthObject{
     @Override
     public boolean validate(Map<String,Object> params){
         try{
+            if(checkTransactionExisted(params)) return false;
             String receipt = (String)params.get("receipt");
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(certUri()))
@@ -63,14 +63,27 @@ public class AppleStoreProvider extends AuthObject{
             return false;
         }
     }
+    private boolean checkTransactionExisted(Map<String,Object> params){
+        String systemId = (String) params.get("systemId");
+        String transactionId = (String) params.get("transactionId");
+        Transaction transaction = new Transaction();
+        transaction.distributionKey(systemId);
+        transaction.label(transactionId);
+        if(dataStore.load(transaction)){
+            params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
+            return true;
+        }
+        return false;
+    }
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
+        String systemId = (String) params.get("systemId");
+        String pendingTransactionId = (String)params.get("transactionId");
         JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array
         boolean validated = false;
         if(status==0){
             JsonArray inApps = receipt.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
-            String pendingTransactionId = (String)params.get("transactionId");
             for(JsonElement inApp : inApps){
                 JsonObject transaction = inApp.getAsJsonObject();
                 String transactionId = transaction.get("transaction_id").getAsString();
@@ -85,7 +98,12 @@ public class AppleStoreProvider extends AuthObject{
                 }
             }
         }
+        if(!validated){
+            params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
+        }
         Transaction transaction = new Transaction();
+        transaction.distributionKey(systemId);
+        transaction.label(pendingTransactionId);
         transaction.originalPayload = resp;
         this.dataStore.create(transaction);
         this.metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
