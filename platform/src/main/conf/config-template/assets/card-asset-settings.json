@@ -2,7 +2,7 @@
   "type": "asset",
   "category": "card",
   "version": "1.0",
-  "description": "card asset template list",
+  "description": "UI display card asset",
   "itemList":
   [
       {
@@ -12,7 +12,9 @@
           "Name": "Magnet",
           "Description": "Magnet",
           "Icon": "MagnetIcon.png"
-        }
+        },
+        "application": {},
+        "reference": []
       }
   ]
 }

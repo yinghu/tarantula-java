@@ -84,9 +84,9 @@
         a.onclick=()=>{
             let itemId = a.getAttribute('tx-item-id');
             console.log(itemId);
-            TARA_API.onGet(TARA_API.query().serviceTag,'onBuy',itemId,(resp)=>{
-                editor.set(resp);        
-            });
+            //TARA_API.onGet(TARA_API.query().serviceTag,'onBuy',itemId,(resp)=>{
+                //editor.set(resp);        
+            //});
         };
     });
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{

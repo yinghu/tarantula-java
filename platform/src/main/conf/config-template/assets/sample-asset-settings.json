@@ -1,0 +1,16 @@
+{
+  "type": "asset",
+  "category": "sample",
+  "version": "1.0",
+  "description": "sample asset template",
+  "itemList":
+  [
+      {
+        "configurationTypeId": "Sample",
+        "configurationName": "sample1",
+        "header": {},
+        "application": {},
+        "reference": []
+      }
+  ]
+}

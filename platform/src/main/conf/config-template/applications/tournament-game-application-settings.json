@@ -16,7 +16,6 @@
           "durationHours": 2,
           "durationMinutesPerInstance": 10
         },
-        "payload": {},
         "reference": []
       },
       {
@@ -30,7 +29,6 @@
           "startDate": "2021-10-12",
           "durationMinutesPerInstance": 30
         },
-        "payload": {},
         "reference": []
       },
       {
@@ -44,7 +42,6 @@
           "startDate": "2021-10-12",
           "durationMinutesPerInstance": 30
         },
-        "payload": {},
         "reference": []
       },
       {
@@ -58,7 +55,6 @@
           "startDate": "2021-10-12",
           "durationMinutesPerInstance": 30
         },
-        "payload": {},
         "reference": []
       }
   ]

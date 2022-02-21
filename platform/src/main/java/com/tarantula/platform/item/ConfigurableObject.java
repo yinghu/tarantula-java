@@ -21,7 +21,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected static String HEADER_KEY = "7";
     protected static String APPLICATION_KEY = "8";
-    protected static String PAYLOAD_KEY = "9";
+    //protected static String PAYLOAD_KEY = "9";
     protected static String REFERENCE_KEY = "10";
 
 
@@ -32,7 +32,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected String configurationVersion;
 
     protected JsonObject header = new JsonObject();
-    protected JsonObject payload = new JsonObject();
+    //protected JsonObject payload = new JsonObject();
     protected JsonObject application = new JsonObject();
     protected JsonArray reference = new JsonArray();
 
@@ -46,7 +46,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.disabled = configurableObject.disabled;
         this.header = configurableObject.header;
         this.application = configurableObject.application;
-        this.payload = configurableObject.payload;
+        //this.payload = configurableObject.payload;
         this.reference = configurableObject.reference;
         this.distributionKey(configurableObject.distributionKey());
     }
@@ -112,7 +112,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put(VERSION_KEY, this.configurationVersion);
         this.properties.put(DISABLED_KEY,this.disabled);
         this.properties.put(HEADER_KEY,header.toString());
-        this.properties.put(PAYLOAD_KEY,payload.toString());
+        //this.properties.put(PAYLOAD_KEY,payload.toString());
         this.properties.put(APPLICATION_KEY,application.toString());
         this.properties.put(REFERENCE_KEY,reference.toString());
         return this.properties;
@@ -128,7 +128,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.disabled = (boolean)properties.getOrDefault(DISABLED_KEY,false);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
-        this.payload = JsonUtil.parse((String) properties.getOrDefault(PAYLOAD_KEY, "{}"));
+        //this.payload = JsonUtil.parse((String) properties.getOrDefault(PAYLOAD_KEY, "{}"));
         this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
     }
     public int getFactoryId() {
@@ -149,9 +149,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         application.entrySet().forEach((e)->{
             jsonObject.add(e.getKey(),e.getValue());
         });
-        payload.entrySet().forEach((e)->{
-            jsonObject.add(e.getKey(),e.getValue());
-        });
+        //payload.entrySet().forEach((e)->{
+            //jsonObject.add(e.getKey(),e.getValue());
+        //});
         return jsonObject;
     }
 
@@ -173,7 +173,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             return false;
         }
         this.header = config.getAsJsonObject("header");
-        this.payload = config.getAsJsonObject("payload");
+        //this.payload = config.getAsJsonObject("payload");
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
         return true;

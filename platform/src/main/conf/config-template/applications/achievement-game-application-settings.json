@@ -12,7 +12,6 @@
         "name": "Achievement1","goal": 30
       },
       "application": {},
-      "payload": {},
       "reference": []
     },
     {
@@ -22,7 +21,6 @@
         "name": "Achievement2","goal": 20
       },
       "application": {},
-      "payload": {},
       "reference": []
     }
   ]

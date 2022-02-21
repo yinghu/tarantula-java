@@ -13,10 +13,10 @@
       }
     },
     {
-      "header": {"type": "arena","name": "Arena","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "sample","name": "Sample","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "assets/arena-asset-settings"
+        "name": "assets/sample-asset-settings"
       }
     }
   ]

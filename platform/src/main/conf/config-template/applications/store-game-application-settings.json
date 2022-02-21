@@ -12,7 +12,6 @@
         "Name": "Bot Pack"
       },
       "application": {},
-      "payload": {},
       "reference": []
     },
     {
@@ -22,7 +21,6 @@
         "Name": "Abilities Pack"
       },
       "application": {},
-      "payload": {},
       "reference": []
     }
   ]

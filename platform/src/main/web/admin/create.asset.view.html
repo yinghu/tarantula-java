@@ -5,21 +5,27 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Create Game Asset</span>
+            <span id="tx-configuration-asset-header" class="tx-margin-left-8 tx-text-24">Create Game Asset</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
-            <span id='tx-configuration-asset-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
-        </div>            
+        <p id="tx-configuration-asset-description" class='w3-left tx-text-18 tx-margin-top-8 tx-margin-left-8'></p>
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <span id="tx-configuration-asset-type" class='w3-left tx-text-18 tx-margin-top-8 tx-margin-left-8'>Asset</span>
+        <span id='tx-configuration-asset-save' class='w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-20 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span>             
     </div>
     <div class="w3-panel">   
         <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
         <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
         <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
-        <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">        
+        <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+        <label class="tx-text-12 tx-margin-left-4">Configuration Category:</label>
+        <input id='tx-configuration-asset-category' class="w3-input w3-round w3-border tx-text-12" type="text">
+        <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
+        <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -41,18 +47,17 @@
     </div>
 </div>
 <script>
-    let itemTemplate = {header:{},application:{},payload:{},reference:[]};
-    itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
-    itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
-    itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
+    let itemTemplate = {header:{},application:{},reference:[]};
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
-    itemTemplate.configurationName = selectedItem.configurationName;
-    itemTemplate.configurationTypeId = selectedItem.configurationTypeId;
     itemTemplate.header = selectedItem.header;
     itemTemplate.application = selectedItem.application;
-    itemTemplate.payload = selectedItem.payload;
-    document.querySelector('#tx-configuration-asset-type-id').value = itemTemplate.configurationTypeId;
-    document.querySelector('#tx-configuration-asset-name').value = itemTemplate.configurationName;   
+    document.querySelector('#tx-configuration-asset-description').innerHTML = TARA_API.query().itemTemplate.description;
+    document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().itemTemplate.type;
+    document.querySelector('#tx-configuration-asset-type-id').value = selectedItem.configurationTypeId;
+    document.querySelector('#tx-configuration-asset-name').value = selectedItem.configurationName;
+    document.querySelector('#tx-configuration-asset-category').value = TARA_API.query().itemTemplate.category; 
+    document.querySelector('#tx-configuration-asset-version').value = TARA_API.query().itemTemplate.version;
+      
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';

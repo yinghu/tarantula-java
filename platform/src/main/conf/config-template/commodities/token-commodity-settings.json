@@ -14,7 +14,6 @@
         "application": {
            "amount": 100
         },
-        "payload": {},
         "reference": []
       },
       {
@@ -26,7 +25,6 @@
         "application": {
           "amount": 1000
         },
-        "payload": {},
         "reference": []
       },
       {
@@ -38,7 +36,6 @@
         "application": {
           "amount": 10000
         },
-        "payload": {},
         "reference": []
       }
   ]

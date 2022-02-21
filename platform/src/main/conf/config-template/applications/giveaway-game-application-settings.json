@@ -12,7 +12,6 @@
         "rewardKey": "reward_tier_1_day_1"
       },
       "application": {},
-      "payload": {},
       "reference": []
     },
     {
@@ -22,7 +21,6 @@
         "rewardKey": "reward_tier_1_day_2"
       },
       "application": {},
-      "payload": {},
       "reference": []
     },
     {
@@ -32,7 +30,6 @@
         "rewardKey": "reward_tier_1_day_3"
       },
       "application": {},
-      "payload": {},
       "reference": []
     }
   ]

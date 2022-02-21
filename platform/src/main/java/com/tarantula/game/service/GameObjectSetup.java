@@ -34,6 +34,10 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         typeIdIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIdIndex,true);
 
+        IndexSet nameIndex = new IndexSet(query("name",t.configurationName()));//name/{asset|commodity|item|application}
+        nameIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(nameIndex,true);
+
         if(!dataStore.update(t)){
             dataStore.create(t);
             indexSet.addKey(t.distributionKey());
@@ -42,6 +46,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.update(typeIndex);
             typeIdIndex.addKey(t.distributionKey());
             dataStore.update(typeIdIndex);
+            nameIndex.addKey(t.distributionKey());
+            dataStore.update(nameIndex);
         }
         return true;
     }

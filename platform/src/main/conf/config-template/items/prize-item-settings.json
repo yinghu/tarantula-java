@@ -12,7 +12,6 @@
           "name": "Prize1","rank": 1
         },
         "application":{},
-        "payload": {},
         "reference": []
       },
       {
@@ -22,7 +21,6 @@
           "name": "Prize2","rank": 2
         },
         "application":{},
-        "payload": {},
         "reference": []
       },
       {
@@ -32,7 +30,6 @@
           "name": "Prize3","rank": 3
         },
         "application":{},
-        "payload": {},
         "reference": []
       },
     {
@@ -42,7 +39,6 @@
         "name": "Prize4","rank": 4
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -52,7 +48,6 @@
         "name": "Prize5","rank": 5
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -62,7 +57,6 @@
         "name": "Prize6","rank": 6
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -72,7 +66,6 @@
         "name": "Prize7","rank": 7
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -82,7 +75,6 @@
         "name": "Prize8","rank": 8
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -92,7 +84,6 @@
         "name": "Prize9","rank": 9
       },
       "application":{},
-      "payload": {},
       "reference": []
     },
     {
@@ -102,7 +93,6 @@
         "name": "Prize10","rank": 10
       },
       "application":{},
-      "payload": {},
       "reference": []
     }
   ]
