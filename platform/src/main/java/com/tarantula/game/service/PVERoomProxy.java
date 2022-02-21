@@ -2,6 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
+import com.tarantula.platform.store.Shop;
 
 public class PVERoomProxy extends RoomProxyHeader {
 
@@ -30,7 +31,8 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         stub.rating = rating;
-        stub.shoppingItems = this.gameServiceProvider.storeServiceProvider().list();
+        stub.category = this.gameServiceProvider.inventoryServiceProvider().category();
+        stub.shop = new Shop(this.gameServiceProvider.storeServiceProvider().list());
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());
         return stub;

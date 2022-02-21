@@ -3,8 +3,10 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.item.Category;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
 
 import java.util.List;
@@ -17,7 +19,7 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public String roomId;
     public String ticket;
-    public List<ShoppingItem> shoppingItems;
+    public Shop shop;
 
     public GameRoom room;
     public Tournament.Instance tournament;
@@ -26,6 +28,7 @@ public class Stub extends PlayerGameObject {
     public Rating rating;
     public DailyLoginTrack dailyLogin;
     public Statistics statistics;
+    public Category category;
 
     public Channel pushChannel;
 
@@ -45,12 +48,11 @@ public class Stub extends PlayerGameObject {
         jo.add("rating",rating.toJson());
 
         if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
-        if(tournament!=null){
-            jo.add("tournament",tournament.toJson());
-        }
-        if(pushChannel!=null){
-            jo.add("pushChannel",pushChannel.toJson());
-        }
+        if(category!=null) jo.add("category",category.toJson());
+        if(shop!=null) jo.add("shop",shop.toJson());
+        if(tournament!=null) jo.add("tournament",tournament.toJson());
+        if(pushChannel!=null)jo.add("pushChannel",pushChannel.toJson());
+
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);
         jo.addProperty("offline",offline);
