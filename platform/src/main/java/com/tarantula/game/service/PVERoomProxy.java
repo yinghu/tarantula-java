@@ -31,7 +31,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         stub.rating = rating;
-        stub.category = this.gameServiceProvider.inventoryServiceProvider().category();
+        stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(session.systemId());
         stub.shop = new Shop(this.gameServiceProvider.storeServiceProvider().list());
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());

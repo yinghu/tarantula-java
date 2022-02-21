@@ -14,6 +14,9 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PlatformInventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
@@ -56,6 +59,10 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         preSetup.load(serviceContext,app,category);
         category.list((ci)-> ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
         return category;
+    }
+    public List<Inventory> inventoryList(String systemId){
+        List<Inventory> inventoryList = new ArrayList<>();
+        return inventoryList;
     }
     public Inventory inventory(String systemId,String category){
         Inventory inventory = new Inventory(category);
@@ -112,7 +119,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         return true;
     }
 
-    public Inventory inventory(String category){
+    public Inventory newInventory(String category){
         ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
         ConfigurableSetting conf = template.settings.get(category);
         //logger.warn("Inventory=>"+conf.type+"//"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);

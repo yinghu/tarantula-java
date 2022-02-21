@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.inbox.Inbox;
 import com.tarantula.platform.item.Category;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
@@ -28,8 +29,7 @@ public class Stub extends PlayerGameObject {
     public Rating rating;
     public DailyLoginTrack dailyLogin;
     public Statistics statistics;
-    public Category category;
-
+    public Inbox inbox;
     public Channel pushChannel;
 
     public Stub(){
@@ -48,11 +48,10 @@ public class Stub extends PlayerGameObject {
         jo.add("rating",rating.toJson());
 
         if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
-        if(category!=null) jo.add("category",category.toJson());
         if(shop!=null) jo.add("shop",shop.toJson());
         if(tournament!=null) jo.add("tournament",tournament.toJson());
-        if(pushChannel!=null)jo.add("pushChannel",pushChannel.toJson());
-
+        if(pushChannel!=null) jo.add("pushChannel",pushChannel.toJson());
+        if(inbox!=null) jo.add("inbox",inbox.toJson());
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);
         jo.addProperty("offline",offline);

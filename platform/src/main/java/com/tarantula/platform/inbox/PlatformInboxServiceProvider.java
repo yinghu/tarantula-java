@@ -38,7 +38,11 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     public void start() throws Exception {
         logger.warn("Inbox service provider started");
     }
-
+    public Inbox inbox(String systemId){
+        Inbox inbox = new Inbox();
+        inbox.inventoryList = this.inventoryServiceProvider.inventoryList(systemId);
+        return inbox;
+    }
     @Override
     public void shutdown() throws Exception {
 
