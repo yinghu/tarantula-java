@@ -84,6 +84,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
             return false;
         }
+        configurableObject._setup();
         shoppingItems.put(configurableObject.distributionKey(),configurableObject);
         return true;
     }
@@ -95,7 +96,10 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/"+descriptor.category()));
         items.forEach((a)-> {
-            if (!a.disabled()) shoppingItems.put(a.distributionKey(), a);
+            if (!a.disabled()) {
+                a._setup();
+                shoppingItems.put(a.distributionKey(), a);
+            }
         });
         return null;
     }

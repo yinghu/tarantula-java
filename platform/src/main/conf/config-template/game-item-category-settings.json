@@ -6,10 +6,10 @@
   "itemList":
   [
     {
-      "header": {"type": "loadouts","name": "LoadOuts","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "chest","name": "Chest","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "items/loadouts-item-settings"
+        "name": "items/chest-item-settings"
       }
     },
     {

@@ -26,7 +26,6 @@ public class ConfigurableHeader extends ConfigurableObject {
         jsonObject.addProperty("disabled",disabled);
         jsonObject.add("header",header);
         jsonObject.add("application",application);
-        //jsonObject.add("payload",payload);
         jsonObject.add("reference",reference);
         return jsonObject;
     }

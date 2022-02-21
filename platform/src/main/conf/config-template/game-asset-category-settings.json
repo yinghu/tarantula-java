@@ -11,13 +11,6 @@
       {
         "name": "assets/card-asset-settings"
       }
-    },
-    {
-      "header": {"type": "sample","name": "Sample","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "assets/sample-asset-settings"
-      }
     }
   ]
 }
