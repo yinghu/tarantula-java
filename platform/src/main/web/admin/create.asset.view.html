@@ -61,11 +61,16 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';
-        let _tid = document.querySelector('#tx-configuration-asset-type-id').value;
-        let _k = document.querySelector('#tx-configuration-asset-name').value;
+        let _typeId = document.querySelector('#tx-configuration-asset-type-id').value;
+        let _name= document.querySelector('#tx-configuration-asset-name').value;
+        let _category = document.querySelector('#tx-configuration-asset-category').value; 
+        let _version = document.querySelector('#tx-configuration-asset-version').value;
         let item = editor.get();
-        item.configurationTypeId = _tid;
-        item.configurationName = _k;
+        item.configurationType = TARA_API.query().itemTemplate.type;
+        item.configurationTypeId = _typeId;
+        item.configurationName = _name;
+        item.configurationCategory = _category;
+        item.configurationVersion = _version;
         TARA_API.onSet('role/item','onCreateAsset',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });

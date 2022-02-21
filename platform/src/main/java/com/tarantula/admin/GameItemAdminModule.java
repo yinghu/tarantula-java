@@ -93,13 +93,14 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
-                    //Index index = app.index(desc,app.configurationName());
-                    //index.index(app.distributionKey());
+                    session.write(app.toJson().toString().getBytes());
                 }
-                session.write(app.toJson().toString().getBytes());
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
+                }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
         else if (session.action().equals("onCreateComponent")){
@@ -113,13 +114,14 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
-                    //Index index = app.index(desc,app.configurationName());
-                    //index.index(app.distributionKey());
+                    session.write(app.toJson().toString().getBytes());
                 }
-                session.write(app.toJson().toString().getBytes());
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"failed to save component").getBytes());
+                }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save component").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
         else if (session.action().equals("onCreateCommodity")){
@@ -133,11 +135,14 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
+                    session.write(app.toJson().toString().getBytes());
                 }
-                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
+                }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
         else if (session.action().equals("onCreateItem")){
@@ -151,14 +156,14 @@ public class GameItemAdminModule implements Module {
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
-                    session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+                    session.write(app.toJson().toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
                 }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
         else if (session.action().equals("onCreateApplication")){
@@ -166,11 +171,15 @@ public class GameItemAdminModule implements Module {
             Application app = new Application();
             if(app.configureAndValidate(payload)){
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
-                SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app);
-                session.write(JsonUtil.toSimpleResponse(true,app.distributionKey()).getBytes());
+                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    session.write(app.toJson().toString().getBytes());
+                }
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"failed to save application").getBytes());
+                }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save application").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
         else if(session.action().equals("onCategory")){

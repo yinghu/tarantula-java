@@ -34,8 +34,9 @@ public class Application extends ConfigurableObject{
     @Override
     public JsonObject toJson(){
         JsonObject json = super.toJson();
+        setup();
         _reference.forEach((cob)->{
-            json.add(cob.configurationName,cob.toJson());
+            json.add(cob.distributionKey(),cob.toJson());
         });
         return json;
     }

@@ -50,12 +50,7 @@
 </div>
 <script>
     let itemTemplate = {header:{},application:{},reference:[]};
-    //itemTemplate.configurationType = TARA_API.query().itemTemplate.type;
-    //itemTemplate.configurationCategory = TARA_API.query().itemTemplate.category;
-    //itemTemplate.configurationVersion = TARA_API.query().itemTemplate.version;
     let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
-    //itemTemplate.configurationName = selectedItem.configurationName;
-    //itemTemplate.configurationTypeId = selectedItem.configurationTypeId;
     itemTemplate.application = selectedItem.application;
     itemTemplate.header = selectedItem.header;
     itemTemplate.reference = selectedItem.reference;
@@ -69,11 +64,16 @@
    
     document.querySelector('#tx-configuration-component-save').onclick=()=>{
         document.querySelector('#tx-configuration-component-save').style.display = 'none';
-        let _tid = document.querySelector('#tx-configuration-component-type-id').value;
-        let _k = document.querySelector('#tx-configuration-component-name').value;
+        let _typeId = document.querySelector('#tx-configuration-component-type-id').value;
+        let _name= document.querySelector('#tx-configuration-component-name').value;
+        let _category = document.querySelector('#tx-configuration-component-category').value; 
+        let _version = document.querySelector('#tx-configuration-component-version').value;
         let item = editor.get();
-        item.configurationTypeId = _tid;
-        item.configurationName = _k;
+        item.configurationType = TARA_API.query().itemTemplate.type;
+        item.configurationTypeId = _typeId;
+        item.configurationName = _name;
+        item.configurationCategory = _category;
+        item.configurationVersion = _version;
         TARA_API.onSet('role/item','onCreateComponent',TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });

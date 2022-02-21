@@ -8,21 +8,20 @@
       {
         "configurationTypeId": "RobotLevels",
         "configurationName": "RobotLevels",
-        "header": {
-        },
+        "header": {},
         "application": {
           "Levels":
-          [ {"Stats":
-              [
-                {"Type":"Health","Value": 1000},
-                {"Type":"MeleeDamage","Value": 100},
-                {"Type":"RangedDamage","Value": 100},
-                {"Type":"CriticalDamagePercent","Value": 0.3},
-                {"Type":"Recovery","Value": 100},
-                {"Type":"Speed","Value": 0}
-              ]
-            }
-          ]
+            [ {"Stats":
+                [
+                  {"Type":"Health","Value": 1000},
+                  {"Type":"MeleeDamage","Value": 100},
+                  {"Type":"RangedDamage","Value": 100},
+                  {"Type":"CriticalDamagePercent","Value": 0.3},
+                  {"Type":"Recovery","Value": 100},
+                  {"Type":"Speed","Value": 0}
+                ]
+              }
+            ]
         },
         "reference": []
       }
