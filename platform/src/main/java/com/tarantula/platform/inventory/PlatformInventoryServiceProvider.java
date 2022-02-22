@@ -51,17 +51,18 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }
     public Category category(){
-        GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gameCluster.serviceWithCategory("item");
-        ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        Category category = new Category();
-        category.distributionKey(app.distributionKey());
-        preSetup.load(serviceContext,app,category);
-        category.list((ci)-> ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
-        return category;
+        return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }
     public List<Inventory> inventoryList(String systemId){
         List<Inventory> inventoryList = new ArrayList<>();
+        category((ci)->{
+            if(ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)){
+                Inventory inventory = inventory(systemId,ci.configurationCategory());
+                if(inventory!=null) inventoryList.add(inventory);
+                return true;
+            }
+            return false;
+        });
         return inventoryList;
     }
     public Inventory inventory(String systemId,String category){
@@ -124,5 +125,16 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ConfigurableSetting conf = template.settings.get(category);
         //logger.warn("Inventory=>"+conf.type+"//"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);
         return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
+    }
+
+    private Category category(Category.Filter filter){
+        GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gameCluster.serviceWithCategory("item");
+        ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        Category category = new Category();
+        category.distributionKey(app.distributionKey());
+        preSetup.load(serviceContext,app,category);
+        category.list((ci)-> filter.onFilter(ci));
+        return category;
     }
 }

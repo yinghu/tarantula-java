@@ -34,9 +34,7 @@ public class ShoppingItem extends ConfigurableObject {
     public JsonObject toJson() {
         JsonObject json = super.toJson();
         //_setup();
-        _reference.forEach((cob)->{
-            json.add(cob.distributionKey(),cob.toJson());
-        });
+        _reference.forEach((cob)-> json.add(cob.distributionKey(),cob.toJson()));
         return json;
     }
 

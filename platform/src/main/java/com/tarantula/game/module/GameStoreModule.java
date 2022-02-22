@@ -5,6 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.ShoppingItemContext;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
     private ApplicationContext context;
     private PlatformStoreServiceProvider storeServiceProvider;
+    private PlatformInventoryServiceProvider inventoryServiceProvider;
     private GsonBuilder builder;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -37,6 +39,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
                 this.storeServiceProvider.grant(session.systemId(),itemId[0]);
                 StorePurchase storePurchase = new StorePurchase();
                 storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
+                storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
                 session.write(storePurchase.toJson().toString().getBytes());
             }
             else{
@@ -54,6 +57,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         GameServiceProvider gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
+        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.context.log("Game store module started", OnLog.WARN);
     }
 }

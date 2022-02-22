@@ -3,16 +3,14 @@ package com.tarantula.platform.store;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.item.Commodity;
-
-import java.util.ArrayList;
+import com.tarantula.platform.inventory.Inventory;
 import java.util.List;
 import java.util.Map;
 
 public class StorePurchase extends ResponseHeader {
 
     public String transactionId;
-    public List<Commodity> commodities = new ArrayList<>();
+    public List<Inventory> inventoryList;
 
 
     @Override
@@ -30,12 +28,9 @@ public class StorePurchase extends ResponseHeader {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
         jsonObject.addProperty("transactionId",transactionId);
-        JsonArray commodities = new JsonArray();
-        JsonObject comm = new JsonObject();
-        comm.addProperty("type","currency");
-        comm.addProperty("amount",100);
-        commodities.add(comm);
-        jsonObject.add("commodities",commodities);
+        JsonArray inventories = new JsonArray();
+        inventoryList.forEach((inventory -> inventories.add(inventory.toJson())));
+        jsonObject.add("inventoryList",inventories);
         return jsonObject;
     }
 }
