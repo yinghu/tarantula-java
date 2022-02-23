@@ -59,6 +59,9 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         shoppingItems.forEach((k,v)->_items.add(v));
         return _items;
     }
+    public ShoppingItem shoppingItem(String itemId){
+        return shoppingItems.get(itemId);
+    }
     public boolean grant(String systemId,String itemId){
         ShoppingItem shoppingItem = shoppingItems.get(itemId);
         if(shoppingItem==null){

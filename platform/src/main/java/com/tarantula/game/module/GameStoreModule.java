@@ -32,17 +32,19 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             params.put("systemId",session.systemId());
             params.put("serviceTypeId",serviceTypeId);
             if(this.context.validator().validateToken(params)){
-                List<ShoppingItem> shoppingItemList = this.storeServiceProvider.list();
-                String[] itemId ={""};
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-                shoppingItemList.forEach((si)->{
-                    if(si.configurationName().equals(sku)) itemId[0] = si.distributionKey();
-                });
-                this.storeServiceProvider.grant(session.systemId(),itemId[0]);
-                StorePurchase storePurchase = new StorePurchase();
-                storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
-                storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
-                session.write(storePurchase.toJson().toString().getBytes());
+                String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
+                ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(bundleId);
+                if(shoppingItem.configurationName().equals(sku)){
+                    this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
+                    StorePurchase storePurchase = new StorePurchase();
+                    storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
+                    storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
+                    session.write(storePurchase.toJson().toString().getBytes());
+                }
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"Bundle store name not matched").getBytes());
+                }
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,(String)params.get(OnAccess.STORE_MESSAGE)).getBytes());
