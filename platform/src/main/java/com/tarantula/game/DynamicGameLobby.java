@@ -50,6 +50,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         Stub stub = stubIndex.get(session.systemId());
         if(stub!=null&&stub.joined) {
             stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
             return stub;
         }
         GameZone _zone = zoneIndex.get(rating.level);

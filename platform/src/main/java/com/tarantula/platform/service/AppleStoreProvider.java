@@ -19,16 +19,21 @@ import java.net.http.HttpResponse;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AppleStoreProvider extends AuthObject{
 
 
     private HttpClient client;
-    private DataStore dataStore;
     private JsonParser jsonParser;
-    public AppleStoreProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
-        super("appleStore", clientId, secureKey, authUri, tokenUri, certUri, origins);
+    private Map<String,KeyDataStore> serviceKeys;
+    public AppleStoreProvider(String validationUrl,Map<String,String> bundleKeys){
+        super("appleStore","","","","",validationUrl,new String[0]);
+        serviceKeys = new HashMap<>();
+        bundleKeys.forEach((k,v)->{
+            serviceKeys.put(k,new KeyDataStore(v));
+        });
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
@@ -41,20 +46,24 @@ public class AppleStoreProvider extends AuthObject{
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         jsonParser = new JsonParser();
-        this.dataStore = serviceContext.dataStore("apple_store_transaction",serviceContext.partitionNumber());
+        serviceKeys.forEach((k,v)->{
+            String ds = k.replaceAll("-","_")+"_apple_store_transaction";
+            v.dataStore = serviceContext.dataStore(ds,serviceContext.partitionNumber());
+        });
     }
     @Override
     public boolean validate(Map<String,Object> params){
         try{
             if(checkTransactionExisted(params)) return false;
             String receipt = (String)params.get("receipt");
+            String serviceTypeId = (String)params.get("serviceTypeId");
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(certUri()))
                     .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)
                     .header(CONTENT_TYPE,ACCEPT_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(receipt).toString().getBytes()))
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(serviceTypeId,receipt).toString().getBytes()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return checkResponsePayload(response.body(),params);
@@ -66,10 +75,11 @@ public class AppleStoreProvider extends AuthObject{
     private boolean checkTransactionExisted(Map<String,Object> params){
         String systemId = (String) params.get("systemId");
         String transactionId = (String) params.get("transactionId");
+        String serviceTypeId = (String)params.get("serviceTypeId");
         Transaction transaction = new Transaction();
-        transaction.distributionKey(systemId);
-        transaction.label(transactionId);
-        if(dataStore.load(transaction)){
+        transaction.index(transactionId);
+        transaction.owner(systemId);
+        if(serviceKeys.get(serviceTypeId).dataStore.load(transaction)){
             params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
             return true;
         }
@@ -78,6 +88,7 @@ public class AppleStoreProvider extends AuthObject{
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
         String systemId = (String) params.get("systemId");
         String pendingTransactionId = (String)params.get("transactionId");
+        String serviceTypeId = (String)params.get("serviceTypeId");
         JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array
@@ -102,17 +113,17 @@ public class AppleStoreProvider extends AuthObject{
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
         Transaction transaction = new Transaction();
-        transaction.distributionKey(systemId);
-        transaction.label(pendingTransactionId);
+        transaction.index(pendingTransactionId);
+        transaction.owner(systemId);
         transaction.originalPayload = resp;
-        this.dataStore.create(transaction);
+        this.serviceKeys.get(serviceTypeId).dataStore.create(transaction);
         this.metricsListener.onUpdated(Metrics.APPLE_STORE_COUNT,1);
         return validated;
     }
-    private JsonObject toRequestPayload(String receipt){
+    private JsonObject toRequestPayload(String serviceTypeId,String receipt){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("receipt-data",receipt);
-        jsonObject.addProperty("password",secureKey());
+        jsonObject.addProperty("password",serviceKeys.get(serviceTypeId).key);
         jsonObject.addProperty("exclude-old-transactions",true);
         return jsonObject;
     }
@@ -135,6 +146,14 @@ public class AppleStoreProvider extends AuthObject{
         @Override
         public X509Certificate[] getAcceptedIssuers() {
             return this.certificate;
+        }
+    }
+
+    private class KeyDataStore{
+        public String key;
+        public DataStore dataStore;
+        public KeyDataStore(String key){
+            this.key = key;
         }
     }
 }

@@ -5,6 +5,8 @@ import com.tarantula.platform.service.AppleStoreProvider;
 import com.tarantula.platform.service.AuthObject;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthObject> {
@@ -12,8 +14,12 @@ public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthO
     @Override
     public AuthObject deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        String secureKey = jo.getAsJsonPrimitive("secureKey").getAsString();
         String certUri = jo.getAsJsonPrimitive("verifyUrl").getAsString();
-        return new AppleStoreProvider("",secureKey,"","",certUri,new String[0]);
+        Map<String,String> serviceKeys = new HashMap<>();
+        jo.get("serviceKeys").getAsJsonArray().forEach((a)->{
+            JsonObject sk = a.getAsJsonObject();
+            serviceKeys.put(sk.get("name").getAsString(),sk.get("key").getAsString());
+        });
+        return new AppleStoreProvider(certUri,serviceKeys);
     }
 }

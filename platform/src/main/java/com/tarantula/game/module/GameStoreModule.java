@@ -20,6 +20,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     private PlatformStoreServiceProvider storeServiceProvider;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
     private GsonBuilder builder;
+    private String serviceTypeId;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
@@ -29,6 +30,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
             Map<String,Object> params = acc.toMap();
             params.put("systemId",session.systemId());
+            params.put("serviceTypeId",serviceTypeId);
             if(this.context.validator().validateToken(params)){
                 List<ShoppingItem> shoppingItemList = this.storeServiceProvider.list();
                 String[] itemId ={""};
@@ -58,6 +60,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
-        this.context.log("Game store module started", OnLog.WARN);
+        this.serviceTypeId = this.context.descriptor().typeId();
+        this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
     }
 }
