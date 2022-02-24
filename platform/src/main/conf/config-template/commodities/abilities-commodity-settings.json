@@ -6,7 +6,7 @@
   "itemList":
   [
       {
-        "configurationTypeId": "Abilities",
+        "configurationTypeId": "abilities",
         "configurationName": "MagnetToss",
         "header":
         {

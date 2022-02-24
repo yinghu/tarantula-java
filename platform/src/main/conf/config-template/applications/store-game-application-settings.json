@@ -6,19 +6,28 @@
   "itemList":
   [
     {
-      "configurationTypeId": "S10",
-      "configurationName": "Bot Pack",
+      "configurationTypeId": "E100",
+      "configurationName": "sale_01",
       "header": {
-        "Name": "Bot Pack"
+        "Name": "Entry Pack"
       },
       "application": {},
       "reference": []
     },
     {
-      "configurationTypeId": "S20",
-      "configurationName": "Gun Pack",
+      "configurationTypeId": "S200",
+      "configurationName": "sale_02",
       "header": {
-        "Name": "Abilities Pack"
+        "Name": "Super Pack"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationTypeId": "B200",
+      "configurationName": "sale_05",
+      "header": {
+        "Name": "Boss Pack"
       },
       "application": {},
       "reference": []

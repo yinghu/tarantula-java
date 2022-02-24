@@ -6,10 +6,10 @@
   "itemList":
   [
       {
-        "configurationTypeId": "Token",
+        "configurationTypeId": "token",
         "configurationName": "EntryPack",
         "header": {
-          "Name": "EntryPack","Type": "Token"
+          "Name": "EntryPack"
         },
         "application": {
            "amount": 100
@@ -17,10 +17,10 @@
         "reference": []
       },
       {
-        "configurationTypeId": "Token",
+        "configurationTypeId": "token",
         "configurationName": "SuperPack",
         "header": {
-          "Name": "SuperPack","Type": "Token"
+          "Name": "SuperPack"
         },
         "application": {
           "amount": 1000
@@ -28,10 +28,10 @@
         "reference": []
       },
       {
-        "configurationTypeId": "Token",
+        "configurationTypeId": "token",
         "configurationName": "BossPack",
         "header": {
-          "Name": "BossPack","Type": "Token"
+          "Name": "BossPack"
         },
         "application": {
           "amount": 10000
