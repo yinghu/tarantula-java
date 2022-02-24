@@ -52,7 +52,7 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.application = selectedItem.application;
     document.querySelector('#tx-configuration-asset-description').innerHTML = TARA_API.query().itemTemplate.description;
-    document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().itemTemplate.type;
+    document.querySelector('#tx-configuration-asset-type').innerHTML = 'TYPE : '+TARA_API.query().itemTemplate.type;
     document.querySelector('#tx-configuration-asset-type-id').value = selectedItem.configurationTypeId;
     document.querySelector('#tx-configuration-asset-name').value = selectedItem.configurationName;
     document.querySelector('#tx-configuration-asset-category').value = TARA_API.query().itemTemplate.category; 

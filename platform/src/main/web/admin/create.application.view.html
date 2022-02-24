@@ -157,7 +157,7 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.reference = selectedItem.reference;
     document.querySelector('#tx-configuration-application-description').innerHTML = TARA_API.query().itemTemplate.description;
-    document.querySelector('#tx-configuration-application-type').innerHTML = TARA_API.query().itemTemplate.type+'/'+TARA_API.query().itemTemplate.category;
+    document.querySelector('#tx-configuration-application-type').innerHTML = 'TYPE/CATEGORY : '+TARA_API.query().itemTemplate.type+'/'+TARA_API.query().itemTemplate.category;
     document.querySelector('#tx-configuration-application-type-id').value = selectedItem.configurationTypeId;
     document.querySelector('#tx-configuration-application-name').value = selectedItem.configurationName;  
     //document.querySelector('#tx-configuration-application-category').value = TARA_API.query().itemTemplate.category; 

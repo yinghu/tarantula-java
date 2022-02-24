@@ -55,7 +55,7 @@
     itemTemplate.header = selectedItem.header;
     itemTemplate.reference = selectedItem.reference;
     document.querySelector('#tx-configuration-component-description').innerHTML = TARA_API.query().itemTemplate.description;
-    document.querySelector('#tx-configuration-component-type').innerHTML = TARA_API.query().itemTemplate.type;
+    document.querySelector('#tx-configuration-component-type').innerHTML = 'TYPE : '+TARA_API.query().itemTemplate.type;
     document.querySelector('#tx-configuration-component-type-id').value = selectedItem.configurationTypeId;
     document.querySelector('#tx-configuration-component-name').value = selectedItem.configurationName;  
     document.querySelector('#tx-configuration-component-category').value = TARA_API.query().itemTemplate.category; 
