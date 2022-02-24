@@ -56,7 +56,7 @@ public class AppleStoreProvider extends AuthObject{
         try{
             if(checkTransactionExisted(params)) return false;
             String receipt = (String)params.get("receipt");
-            String serviceTypeId = (String)params.get("serviceTypeId");
+            String serviceTypeId = (String)params.get(OnAccess.SERVICE_TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(certUri()))
                     .version(HttpClient.Version.HTTP_2)
@@ -73,9 +73,9 @@ public class AppleStoreProvider extends AuthObject{
         }
     }
     private boolean checkTransactionExisted(Map<String,Object> params){
-        String systemId = (String) params.get("systemId");
+        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
         String transactionId = (String) params.get("transactionId");
-        String serviceTypeId = (String)params.get("serviceTypeId");
+        String serviceTypeId = (String)params.get(OnAccess.SERVICE_TYPE_ID);
         Transaction transaction = new Transaction();
         transaction.index(transactionId);
         transaction.owner(systemId);
@@ -86,9 +86,9 @@ public class AppleStoreProvider extends AuthObject{
         return false;
     }
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
-        String systemId = (String) params.get("systemId");
+        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
         String pendingTransactionId = (String)params.get("transactionId");
-        String serviceTypeId = (String)params.get("serviceTypeId");
+        String serviceTypeId = (String)params.get(OnAccess.SERVICE_TYPE_ID);
         JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array

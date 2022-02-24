@@ -12,7 +12,6 @@ import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.StorePurchase;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-import java.util.List;
 import java.util.Map;
 
 public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
@@ -29,8 +28,8 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
             Map<String,Object> params = acc.toMap();
-            params.put("systemId",session.systemId());
-            params.put("serviceTypeId",serviceTypeId);
+            params.put(OnAccess.SYSTEM_ID,session.systemId());
+            params.put(OnAccess.SERVICE_TYPE_ID,serviceTypeId);
             if(this.context.validator().validateToken(params)){
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
                 String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
