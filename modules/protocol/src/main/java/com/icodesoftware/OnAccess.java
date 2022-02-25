@@ -14,6 +14,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String FACEBOOK = "facebook";
     String APPLE_STORE = "appleStore";
 
+    String MOCK_STORE = "mockStore";
+
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
 
@@ -33,6 +35,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String STORE_QUANTITY = "storeQuantity";
     String STORE_MESSAGE = "storeMessage";
     String STORE_BUNDLE_ID = "bundleId";
+    String STORE_RECEIPT = "receipt";
 
     String SYSTEM_ID = "systemId";
     String SERVICE_TYPE_ID = "serviceTypeId";

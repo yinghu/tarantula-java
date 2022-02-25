@@ -27,10 +27,7 @@ import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.util.AppleStoreCredentialsDeserializer;
-import com.tarantula.platform.util.FacebookAuthCredentialsDeserializer;
-import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
-import com.tarantula.platform.util.StripePaymentCredentialsDeserializer;
+import com.tarantula.platform.util.*;
 
 
 public class TarantulaContext implements Serviceable, ServiceContext, MetricsListener {
@@ -621,6 +618,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    else if(name.equals(OnAccess.STRIPE)){
  	        return loadStripeCredentials();
         }
+        else if(name.equals(OnAccess.MOCK_STORE)){
+            return loadStripeCredentials();
+        }
         else{
             return null;
         }
@@ -681,6 +681,23 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.close();
             GsonBuilder gb = new GsonBuilder();
             gb.registerTypeAdapter(AuthObject.class,new AppleStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthObject.class);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private AuthObject loadMockStoreCredentials(){
+        try{
+            String config = this.authContext+"-mock-store-credentials.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            in.close();
+            GsonBuilder gb = new GsonBuilder();
+            gb.registerTypeAdapter(AuthObject.class,new MockStoreCredentialsDeserializer());
             return gb.create().fromJson(new String(data),AuthObject.class);
         }catch (Exception ex){
             ex.printStackTrace();
