@@ -619,7 +619,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	        return loadStripeCredentials();
         }
         else if(name.equals(OnAccess.MOCK_STORE)){
-            return loadStripeCredentials();
+            return loadMockStoreCredentials();
         }
         else{
             return null;
