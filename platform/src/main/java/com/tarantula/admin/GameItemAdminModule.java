@@ -89,7 +89,7 @@ public class GameItemAdminModule implements Module {
                 ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
                 ConfigurableSetting conf = template.settings.get(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                if(conf!=null&&SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
@@ -110,7 +110,7 @@ public class GameItemAdminModule implements Module {
                 ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
                 ConfigurableSetting conf = template.settings.get(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
@@ -131,7 +131,7 @@ public class GameItemAdminModule implements Module {
                 ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
                 ConfigurableSetting conf = template.settings.get(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
@@ -152,7 +152,7 @@ public class GameItemAdminModule implements Module {
                 ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
                 ConfigurableSetting conf = template.settings.get(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
-                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
@@ -170,8 +170,13 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Application app = new Application();
             if(app.configureAndValidate(payload)){
+                ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
+                ConfigurableSetting conf = template.settings.get(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
-                if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(Configurable.APPLICATION_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
