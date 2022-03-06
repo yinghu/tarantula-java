@@ -21,6 +21,7 @@ public class CategoryItem extends ConfigurableObject{
         this.properties.put(CATEGORY_KEY, this.configurationCategory);
         this.properties.put(NAME_KEY, this.configurationName);
         this.properties.put(HEADER_KEY,header.toString());
+        this.properties.put(APPLICATION_KEY,application.toString());
         return this.properties;
     }
     @Override
@@ -29,6 +30,7 @@ public class CategoryItem extends ConfigurableObject{
         this.configurationCategory = (String) properties.get(CATEGORY_KEY);
         this.configurationName = (String) properties.get(NAME_KEY);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
+        this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
     }
 
     @Override
