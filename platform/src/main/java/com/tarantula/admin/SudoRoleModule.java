@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.User;
@@ -14,9 +15,10 @@ import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class SudoRoleModule implements Module {
+public class SudoRoleModule implements Module,AccessIndexService.Listener {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -24,6 +26,7 @@ public class SudoRoleModule implements Module {
     private AccessIndexService accessIndexService;
     private GsonBuilder builder;
     private DataStore uDatastore;
+    private AtomicBoolean accessIndexEnabled;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -61,6 +64,27 @@ public class SudoRoleModule implements Module {
                 session.write(toMessage(accessIndex.distributionKey(),true).toString().getBytes());
             }else{
                 session.write(toMessage("["+login+"] not found",false).toString().getBytes());
+            }
+        }
+        else if(session.action().equals("onCreateUser")){
+            if(this.accessIndexEnabled.get()){
+                OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
+                String login = (String)acc.property(OnAccess.LOGIN);
+                //String password = (String)acc.property(OnAccess.PASSWORD);
+                //String role = (String)acc.property(OnAccess.ACCESS_CONTROL);
+                AccessIndex query = accessIndexService.set(login,0);
+                if(query==null){
+                    acc.owner(acc.distributionKey());//make sure acc id as the owner
+                    acc.distributionKey(query.distributionKey());
+                    this.context.postOffice().onTag("index/user").send(acc.distributionKey(),acc);
+                    session.write(JsonUtil.toSimpleResponse(true,"user created").getBytes());
+                }
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,"login ["+login+"] already existed").getBytes());
+                }
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"access service disabled").getBytes());
             }
         }
         else if(session.action().equals("onExportModule")){
@@ -182,12 +206,14 @@ public class SudoRoleModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        this.accessIndexEnabled = new AtomicBoolean(false);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.uDatastore = this.context.dataStore(Access.DataStore);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.deploymentServiceProvider.registerAccessIndexListener(this);
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
@@ -215,5 +241,15 @@ public class SudoRoleModule implements Module {
         });
         jsonObject.add("list",clist);
         return jsonObject;
+    }
+
+    @Override
+    public void onStop() {
+        this.accessIndexEnabled.set(false);
+    }
+
+    @Override
+    public void onStart() {
+        this.accessIndexEnabled.set(true);
     }
 }

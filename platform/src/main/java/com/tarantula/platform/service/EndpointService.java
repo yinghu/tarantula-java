@@ -13,12 +13,10 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
     private TarantulaContext tarantulaContext;
     private HashMap<String, RequestHandler> rMap = new HashMap<>();
     private final ArrayList<EndPoint> endPointList;
-    //private final PushEventHandler pushEventHandler;
 
     public EndpointService(TarantulaContext tarantulaContext){
         this.tarantulaContext = tarantulaContext;
         this.endPointList = new ArrayList<>();
-        //this.pushEventHandler = new PushEventHandler();
     }
 
     public void start() throws Exception {
@@ -46,11 +44,6 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         serviceEventHandler.setup(this.tarantulaContext);
         serviceEventHandler.start();
         rMap.put(serviceEventHandler.name(),serviceEventHandler);
-
-
-        //pushEventHandler.setup(this.tarantulaContext);
-        //pushEventHandler.start();
-        //rMap.put(pushEventHandler.name(),pushEventHandler);
 
         AdminEventHandler adminEventHandler = new AdminEventHandler();
         adminEventHandler.setup(this.tarantulaContext);

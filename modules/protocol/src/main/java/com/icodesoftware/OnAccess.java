@@ -8,6 +8,11 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String SERVICE_TAG = "serviceTag";
     String PAYLOAD = "payload";
     String PASSWORD = "password";
+    String VALIDATOR = "validator";
+    String PRIMARY_USER = "primary";
+    String VALIDATED = "validated";
+    String ACTIVATED = "activated";
+    String BALANCE = "balance";
 
     String GOOGLE = "google";
     String STRIPE = "stripe";

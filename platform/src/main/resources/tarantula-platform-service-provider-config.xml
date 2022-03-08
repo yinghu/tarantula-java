@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tarantula-service-provider-configuration>
-
+    <service-provider name="com.tarantula.platform.service.user.PlatformUserService"/>
 </tarantula-service-provider-configuration>

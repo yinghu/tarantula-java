@@ -1,10 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.OnLobby;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
@@ -26,6 +23,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private String role = AccessControl.player.name();
     private double initialBalance;
     private AccessIndexService accessIndexService;
+    private UserService userService;
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private List<Access.Role> roleList;
@@ -49,6 +47,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
         this.gameList = new CopyOnWriteArrayList<>();
@@ -264,6 +263,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         return _onSession;
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
+        payload.property(OnAccess.SYSTEM_ID,systemId);
+        payload.property(OnAccess.ACCESS_CONTROL,roleName);
+        payload.property(OnAccess.VALIDATOR,validator);
+        payload.property(OnAccess.VALIDATED,validated);
+        payload.property(OnAccess.PRIMARY_USER,primary);
+        payload.property(OnAccess.BALANCE,initialBalance);
+        payload.property(OnAccess.ACTIVATED,activated);
+        return userService.createUser(payload);
+        /**
         Access acc = new User((String) payload.property("login"),validated,validator);
         acc.distributionKey(systemId);
         String pwd = (String)payload.property(OnAccess.PASSWORD);
@@ -279,7 +287,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             px.distributionKey(acc.distributionKey());
             pDatastore.create(px);
         }
-        return acc;
+        return acc;**/
     }
 
     @Override
