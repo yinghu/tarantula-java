@@ -35,7 +35,24 @@ public class PlatformUserService implements UserService {
         }
         return acc;
     }
-
+    public boolean updateEmail(OnAccess access){
+        String email = (String)access.property(OnAccess.EMAIL_ADDRESS);
+        if(!email.contains("@")) return false;
+        User user = new User();
+        user.distributionKey((String) access.property(OnAccess.SYSTEM_ID));
+        if(!userDataStore.load(user)) return false;
+        user.emailAddress(email);
+        return userDataStore.update(user);
+    }
+    public boolean changePassword(OnAccess access){
+        User user = new User();
+        user.distributionKey((String) access.property(OnAccess.SYSTEM_ID));
+        if(!userDataStore.load(user)) return false;
+        String pwd = (String)access.property(OnAccess.PASSWORD);
+        String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
+        user.password(hash);
+        return userDataStore.update(user);
+    }
     @Override
     public Account createOrUpdateAccount(Access access,Subscription subscription){
 

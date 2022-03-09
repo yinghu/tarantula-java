@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
@@ -19,6 +20,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     private DataStore accountDs;
     private DataStore memberDs;
     private LiveGameContext liveGameContext;
+    private UserService userService;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -27,6 +29,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
+        this.userService = this.context.serviceProvider(UserService.NAME);
         liveGameContext = new LiveGameContext();
         userDs = this.context.dataStore(Access.DataStore);
         accountDs = this.context.dataStore(Account.DataStore);
@@ -76,11 +79,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else if(session.action().equals("onAddEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            User auser = user(session.systemId());
-            String email = (String)onAccess.property("emailAddress");
-            if(email.contains("@")){
-                auser.emailAddress(email);
-                userDs.update(auser);
+            onAccess.property(OnAccess.SYSTEM_ID,session.systemId());
+            String email = (String) onAccess.property(OnAccess.EMAIL_ADDRESS);
+            if(userService.updateEmail(onAccess)){
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
                 if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(email,code)){
                     session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
@@ -159,9 +160,8 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else if(session.action().equals("onChangePassword")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            User user = this.user(session.systemId());
-            user.password(this.context.validator().hashPassword((String)onAccess.property("password")));
-            boolean suc = userDs.update(user);
+            onAccess.property(OnAccess.SYSTEM_ID,session.systemId());
+            boolean suc = this.userService.changePassword(onAccess);
             ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have changed password":"Failed to change password",suc);
             session.write(this.builder.create().toJson(responseHeader).getBytes());
         }
