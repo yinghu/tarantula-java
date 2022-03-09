@@ -6,11 +6,13 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.User;
+import com.tarantula.platform.presence.UserAccount;
 
 public class PlatformUserService implements UserService {
 
     private DataStore userDataStore;
     private DataStore presenceDataStore;
+    private DataStore accountDataStore;
     private TokenValidatorProvider tokenValidatorProvider;
     private TarantulaLogger logger;
     @Override
@@ -35,8 +37,16 @@ public class PlatformUserService implements UserService {
     }
 
     @Override
-    public boolean createAccount(Account account) {
-        return false;
+    public Account createOrUpdateAccount(Access access,Subscription subscription){
+
+        UserAccount account = new UserAccount();
+        account.distributionKey(access.distributionKey());
+        account.trial(subscription.trial());
+        if(!accountDataStore.createIfAbsent(account,true)){
+            account.trial(subscription.trial());
+            accountDataStore.update(account);
+        }
+        return account;
     }
 
     @Override
@@ -50,6 +60,7 @@ public class PlatformUserService implements UserService {
         tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
         presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.partitionNumber());
+        accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.partitionNumber());
         logger.warn("User service started");
     }
 

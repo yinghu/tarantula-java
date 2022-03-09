@@ -33,6 +33,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore pdataStore;//presence
     private DataStore udataStore;//user
     private DataStore adataStore;//account
+    private DataStore idataStore;//account index
     private DataStore mdatastore;//membership
 
     private DataStore deployDataStore;
@@ -233,6 +234,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
         this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
+        this.idataStore = this.serviceContext.dataStore(Account.IndexDataStore,this.serviceContext.partitionNumber());
         this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
         this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.partitionNumber());
         oMap = new ConcurrentHashMap<>();
@@ -337,25 +339,20 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return true;
     }
     public boolean grantAccess(Access access,Access owner){
-        if(access.primary()||!owner.primary()){
-            return false;
-        }
+        if(access.primary()||!owner.primary()) return false;
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(owner.distributionKey());
         indexSet.label(Account.UserLabel);
-        if(adataStore.load(indexSet)){
-            boolean updated= false;
-            for(String k : indexSet.keySet()){
-                if(k.equals(access.distributionKey())){
-                    access.role(owner.role());
-                    updated = udataStore.update(access);
-                    break;
-                }
+        if(!idataStore.load(indexSet)) return false;
+        boolean updated= false;
+        for(String k : indexSet.keySet()){
+            if(k.equals(access.distributionKey())){
+                access.role(owner.role());
+                updated = udataStore.update(access);
+                break;
             }
-            return updated;
-        }else{
-            return false;
         }
+        return updated;
     }
     public boolean revokeAccess(Access access){
         if(access.primary()){

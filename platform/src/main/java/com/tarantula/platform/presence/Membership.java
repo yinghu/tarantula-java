@@ -11,6 +11,7 @@ public class Membership extends RecoverableObject implements Subscription {
     private long startTimestamp;
     private long endTimestamp;
     private int count;
+    private boolean trial;
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }
@@ -27,6 +28,7 @@ public class Membership extends RecoverableObject implements Subscription {
         properties.put("2",endTimestamp);
         properties.put("3",timestamp);
         properties.put("4",count);
+        properties.put("5",trial);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -34,6 +36,13 @@ public class Membership extends RecoverableObject implements Subscription {
         this.endTimestamp = ((Number) properties.get("2")).longValue();
         this.timestamp = ((Number) properties.get("3")).longValue();
         this.count = ((Number) properties.getOrDefault("4",0)).intValue();
+        this.trial = (boolean) properties.getOrDefault("5",false);
+    }
+    public boolean trial(){
+        return trial;
+    }
+    public void trial(boolean trial){
+        this.trial = trial;
     }
     public long startTimestamp(){
         return this.startTimestamp;

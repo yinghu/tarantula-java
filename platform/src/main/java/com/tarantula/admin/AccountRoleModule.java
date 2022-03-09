@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
@@ -58,12 +59,13 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 u.distributionKey(uid);
                 if(user.load(u)){
                     if(!u.role().equals(owner.role())){
-                        this.tokenValidatorProvider.grantAccess(u,owner);
+                        session.write(JsonUtil.toSimpleResponse(this.tokenValidatorProvider.grantAccess(u,owner),"upgraded").getBytes());
                     }else{
-                        this.tokenValidatorProvider.revokeAccess(u);
+                        session.write(JsonUtil.toSimpleResponse(this.tokenValidatorProvider.revokeAccess(u),"revoked").getBytes());
                     }
+                }else{
+                    session.write(toMessage("user not existed ["+uid+"]",false).toString().getBytes());
                 }
-                session.write(toMessage("role granted ["+u.role()+"]",false).toString().getBytes());
             }else{
                 session.write(toMessage("only primary can update role",false).toString().getBytes());
             }
