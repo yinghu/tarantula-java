@@ -19,6 +19,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String STRIPE = "stripe";
     String FACEBOOK = "facebook";
     String APPLE_STORE = "appleStore";
+    String GAME_CENTER = "gameCenter";
 
     String MOCK_STORE = "mockStore";
 

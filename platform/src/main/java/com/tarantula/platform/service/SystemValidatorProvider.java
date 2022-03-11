@@ -256,6 +256,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             appleStore.setup(serviceContext);
             aMap.put(OnAccess.APPLE_STORE,appleStore);
         }
+        AuthVendor gameCenter = this.serviceContext.authVendor(OnAccess.GAME_CENTER);
+        if(gameCenter!=null){
+            gameCenter.registerMetricsLister(this.deploymentServiceProvider);
+            gameCenter.setup(serviceContext);
+            aMap.put(OnAccess.GAME_CENTER,gameCenter);
+        }
         AuthVendor mockStore = this.serviceContext.authVendor(OnAccess.MOCK_STORE);
         if(mockStore!=null){
             mockStore.registerMetricsLister(this.deploymentServiceProvider);

@@ -621,6 +621,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         else if(name.equals(OnAccess.MOCK_STORE)){
             return loadMockStoreCredentials();
         }
+        else if(name.equals(OnAccess.GAME_CENTER)){
+            return new GameCenterAuthProvider();
+        }
         else{
             return null;
         }
