@@ -58,3 +58,5 @@ tarantula.data.store.dir=/tarantula/data
 tarantula.service.deployment.dir=/tarantula/deploy
 ```
 2. Simply run `docker-compose up -d` and navigate to `localhost:8090`
+
+If you make a code change, the image will need to get rebuilt, and can be done by running `docker-compose up --build -d`
