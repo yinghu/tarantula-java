@@ -48,3 +48,15 @@
 5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase, remote deployment use http:// ). 
 6. Input codebase, artifact name, and version for the module, then click add module.
 7. Launch the module on the main setup-tool under the module.
+
+## DOCKER
+To run with docker rather than directly on your machine, make sure you have [Docker](https://www.docker.com/products/docker-desktop/) and docker-compose (included with docker-desktop) installed.
+
+1. Ensure `platform/src/main/conf/tarantula.properties` has these properties set
+```
+tarantula.data.store.dir=/tarantula/data
+tarantula.service.deployment.dir=/tarantula/deploy
+```
+2. Simply run `docker-compose up -d` and navigate to `localhost:8090`
+
+If you make a code change, the image will need to get rebuilt, and can be done by running `docker-compose up --build -d`
