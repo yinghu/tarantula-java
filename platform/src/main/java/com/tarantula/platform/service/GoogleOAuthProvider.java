@@ -1,47 +1,33 @@
 package com.tarantula.platform.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.icodesoftware.service.ServiceContext;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class GoogleOAuthProvider extends AuthObject {
 
-    private final GoogleIdTokenVerifier googleIdTokenVerifier;
-
-    public GoogleOAuthProvider(String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
-        super("google", clientId, secureKey, authUri, tokenUri, certUri, origins);
-        final NetHttpTransport transport = new NetHttpTransport();
-        final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport,jsonFactory).setAudience(Collections.singletonList(this.clientId())).build();
+    private Map<String,GoogleOAuthTokenValidator> googleIdTokenVerifiers;
+    public GoogleOAuthProvider(Map<String,GoogleOAuthTokenValidator> validatorMappings){
+        super("google","","","","","",new String[0]);
+        this.googleIdTokenVerifiers = validatorMappings;
+    }
+    @Override
+    public void setup(ServiceContext serviceContext){
+        googleIdTokenVerifiers.forEach((k,v)->{
+            v.registerMetricsLister(this.metricsListener);
+            v.setup(serviceContext);
+        });
     }
 
     @Override
     public boolean validate(Map<String,Object> params){
         try{
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(params.get("token").toString());
-            if(googleIdToken==null){
-                return false;
-            }
-            GoogleIdToken.Payload payload = googleIdToken.getPayload();
-            String email = payload.getEmail();
-            //boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
-            String name = (String) payload.get("name");
-            String pictureUrl = (String) payload.get("picture");
-            String familyName = (String) payload.get("family_name");
-            String givenName = (String) payload.get("given_name");
-            params.put("email",email);
-            params.put("name",name);
-            params.put("pictureUrl",pictureUrl);
-            params.put("fullName",givenName+" "+familyName);
-            metricsListener.onUpdated(Metrics.GOOGLE_COUNT,1);
-            return email!=null;
+            GoogleOAuthTokenValidator googleIdTokenVerifier = googleIdTokenVerifiers.get(params.get("typeId"));
+            return googleIdTokenVerifier.validate(params);
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
     }
+
 }

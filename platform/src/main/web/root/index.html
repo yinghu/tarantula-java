@@ -366,13 +366,13 @@
             }); 
         }
         function tx_oauth_sign_out() {
-            if(!window.gapi) return;
-            let auth2 = gapi.auth2.getAuthInstance();
-            if(auth2.isSignedIn.get() == true){
-                auth2.signOut().then(function () {
-                    console.log('Google user signed out.');
-                });
-            }
+            //if(!window.gapi) return;
+            //let auth2 = gapi.auth2.getAuthInstance();
+            //if(auth2.isSignedIn.get() == true){
+                //auth2.signOut().then(function () {
+                    //console.log('Google user signed out.');
+                //});
+            //}
         }
         function tx_create_uuid(){
             let dt = new Date().getTime();
