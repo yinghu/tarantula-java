@@ -13,6 +13,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static int TIMEOUT = 10;
     protected static String CONTENT_TYPE = "Content-type";
     protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
+    protected static String AUTHORIZATION = "Authorization";
 
     private  String name;
     private  String clientId;

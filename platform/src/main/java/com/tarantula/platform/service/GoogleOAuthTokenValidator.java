@@ -6,21 +6,46 @@ import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gson.JsonObject;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 
-import java.util.Collections;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Map;
+
 
 public class GoogleOAuthTokenValidator extends AuthObject {
 
-    private final GoogleIdTokenVerifier googleIdTokenVerifier;
-    public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey, String authUri, String tokenUri, String certUri) {
+    private HttpClient client;
+    private NetHttpTransport transport;
+    private JacksonFactory jsonFactory;
+    private String accessKey;
+    private String applicationId;
+    private String verifyUri;
+    public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey, String authUri, String tokenUri, String certUri,String verifyUri,String applicationId,String accessKey) {
         super(typeId, clientId, secureKey, authUri, tokenUri, certUri, new String[0]);
-        final NetHttpTransport transport = new NetHttpTransport();
-        final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport,jsonFactory)
-                .setAudience(Collections.singletonList(this.clientId()))
-                .setIssuer("https://accounts.google.com").build();
+        this.verifyUri = verifyUri;
+        this.applicationId = applicationId;
+        this.accessKey = accessKey;
+        transport = new NetHttpTransport();
+        jsonFactory = JacksonFactory.getDefaultInstance();
+        try{
+            SSLContext sct = SSLContext.getInstance("TLS");
+            sct.init(null,new TrustManager[]{new GoogleOAuthTokenValidator._X509TrustManager()},null);
+            client = HttpClient.newBuilder().sslContext(sct).build();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -30,52 +55,59 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public boolean validate(Map<String,Object> params) {
         try{
-            final NetHttpTransport transport = new NetHttpTransport();
-            final JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             String token = (String) params.get("token");
             GoogleAuthorizationCodeTokenRequest request =
                     new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,tokenUri(),clientId(),secureKey(),token,"");
             GoogleTokenResponse response = request.execute();
-            Credential credential = new Credential
-                    .Builder(BearerToken.authorizationHeaderAccessMethod())
-                    .setJsonFactory(jsonFactory)
-                    .setTransport(transport)
-                    .setTokenServerEncodedUrl("https://www.googleapis.com/oauth2/v4/token")
-                    .setClientAuthentication((req)->{})
-                    .build()
-                    .setFromTokenResponse(response);
-            return credential.getAccessToken()!=null;
+            return verifyPlayer(response.getAccessToken(),params);
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
         }
     }
 
-    public boolean _validate(Map<String,Object> params){
+    private boolean verifyPlayer(String accessToken,Map<String,Object> params){
         try{
-            //new GoogleIdTokenVerifier.Builder()
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(params.get("token").toString());
-            if(googleIdToken==null){
-                return false;
-            }
-            GoogleIdToken.Payload payload = googleIdToken.getPayload();
-            String email = payload.getEmail();
-            //boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
-            String name = (String) payload.get("name");
-            String pictureUrl = (String) payload.get("picture");
-            String familyName = (String) payload.get("family_name");
-            String givenName = (String) payload.get("given_name");
-            params.put("email",email);
-            params.put("name",name);
-            params.put("pictureUrl",pictureUrl);
-            params.put("fullName",givenName+" "+familyName);
-            metricsListener.onUpdated(Metrics.GOOGLE_COUNT,1);
-            System.out.println(payload.getEmail());
-            return email!=null;
+            String query = new StringBuffer(verifyUri).append(applicationId).append("/verify").append("?key=").append(accessKey).toString();
+            HttpRequest _request = HttpRequest.newBuilder()
+                    .uri(URI.create(query))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
+                    .header(AUTHORIZATION,"Bearer "+ accessToken)
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .GET()
+                    .build();
+            HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+            JsonObject payload = JsonUtil.parse(_response.body());
+            if(!payload.has("player_id")) return false;
+            String pendingPlayerId = (String) params.get(OnAccess.LOGIN);
+            return pendingPlayerId.endsWith(payload.get("player_id").getAsString());
         }catch (Exception ex){
             ex.printStackTrace();
-            return true;
+            return false;
         }
+    }
+
+    private class _X509TrustManager implements X509TrustManager {
+        private X509Certificate[] certificate;
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            //run on server
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            //run on client to check if certificate is valid
+            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
+            //throw new CertificateException("Invalid certificate");
+            //}
+            certificate = chain;
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return this.certificate;
+        }
+
     }
 
 }
