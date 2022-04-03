@@ -56,8 +56,9 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     public boolean validate(Map<String,Object> params) {
         try{
             String token = (String) params.get("token");
+            String typeId = (String) params.get("typeId");
             GoogleAuthorizationCodeTokenRequest request =
-                    new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,tokenUri(),clientId(),secureKey(),token,"");
+                    new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,tokenUri(),clientId(typeId),secureKey(),token,"");
             GoogleTokenResponse response = request.execute();
             return verifyPlayer(response.getAccessToken(),params);
         }catch (Exception ex){

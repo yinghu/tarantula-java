@@ -45,6 +45,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     interface AuthVendor{
         String name();
         String clientId();
+        String clientId(String typeId);
         String secureKey();
         String authUri();
         String tokenUri();

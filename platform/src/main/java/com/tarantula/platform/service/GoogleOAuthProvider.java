@@ -30,4 +30,10 @@ public class GoogleOAuthProvider extends AuthObject {
         }
     }
 
+    @Override
+    public String clientId(String typeId){
+        GoogleOAuthTokenValidator googleOAuthTokenValidator = googleIdTokenVerifiers.get(typeId);
+        return googleOAuthTokenValidator!=null?googleOAuthTokenValidator.clientId():"";
+    }
+
 }

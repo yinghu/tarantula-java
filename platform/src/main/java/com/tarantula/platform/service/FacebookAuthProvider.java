@@ -44,7 +44,8 @@ public class FacebookAuthProvider extends AuthObject{
         }
     }
     private boolean serverToken() throws Exception{
-        String query = new StringBuffer("?client_id=").append(clientId()).append("&client_secret=")
+
+        String query = new StringBuffer("?client_id=").append(clientId("typeId")).append("&client_secret=")
                 .append(secureKey()).append("&grant_type=client_credentials").toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(certUri()+query))
@@ -64,7 +65,7 @@ public class FacebookAuthProvider extends AuthObject{
     private boolean validateToken(Map<String,Object> params) throws Exception{
         String token = params.get("token").toString();
         String query = new StringBuffer("?input_token=").append(token).append("&access_token=")
-                .append(clientId()).append("%7C").append(accessToken).toString();
+                .append(clientId("")).append("%7C").append(accessToken).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(tokenUri()+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))
@@ -79,7 +80,7 @@ public class FacebookAuthProvider extends AuthObject{
     private boolean validateUser(Map<String,Object> params) throws Exception{
         String uid = params.get("login").toString().split("_")[1];
         String query = new StringBuffer(uid).append("?access_token=")
-                .append(clientId()).append("%7C").append(accessToken).toString();
+                .append(clientId("")).append("%7C").append(accessToken).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(authUri()+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))

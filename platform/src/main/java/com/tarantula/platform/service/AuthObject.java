@@ -39,8 +39,14 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     public String name(){
         return this.name;
     }
+
     @Override
     public String clientId() {
+        return this.clientId;
+    }
+
+    @Override
+    public String clientId(String typeId) {
         return this.clientId;
     }
 
