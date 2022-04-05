@@ -19,11 +19,14 @@
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
         <div id="tx-Account" class="w3-container tx-pane">
-            <div class='w3-bar w3-white'>
-                <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                <span view-id='upgrade.role.account' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Account</span>
-                <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
-                <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Account Management</span></div>
+                <div class='w3-bar w3-white'>
+                    <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
+                    <span view-id='upgrade.role.account' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Account</span>
+                    <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
+                    <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
+                </div>            
             </div>
             <div class='w3-panel w3-border-bottom w3-border-red'>
                 <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-user" style="font-size:16px"></i></span>
@@ -156,55 +159,30 @@
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
                 </div>
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Lobby</span>
-                    <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span id='game-lobby-0' class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>game-lobby</span>
-                </div>
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Service</span>
-                    <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>
-                    <span id='game-service-0' class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>game-service</span>  
-                </div>
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Data</span>
-                    <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>
-                    <span id='game-data-0' class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>game-data</span>   
-                </div>
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Asset</span>
-                    <span id='game-asset-id-0' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Asset Configuration</span> 
-                </div> 
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Component</span>
-                    <span id='game-component-id-0' tx-game-cluster-id='' view-id='game.component.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Component Configuration</span> 
-                </div> 
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Commodity</span>
-                    <span id='game-commodity-id-0' tx-game-cluster-id='' view-id='game.commodity.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Commodity Configuration</span> 
-                </div>  
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Item</span>
-                    <span id='game-configuration-id-0' tx-game-cluster-id='' view-id='game.item.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Item Configuration</span> 
-                </div> 
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Item Application</span>
-                    <span id='game-application-id-0' tx-game-cluster-id='' view-id='game.application.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Application Configuration</span> 
-                </div> 
-                <div class="w3-container w3-padding w3-border-bottom w3-border-red" style="display: none;">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Item Template</span>
-                    <span id='game-item-template-id-0' tx-game-cluster-id='' view-id='edit.item.template' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Edit</span>   
-                    <span class='w3-right tx-text-14 tx-margin-right-8 tx-margin-top-8'>Item Template</span> 
-                </div> 
                 <div class="w3-container w3-padding">
-                    <span class='w3-left tx-text-14 tx-margin-top-8'>Game Server Access Key</span>
-                    <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Create</span>   
-                </div> 
+                
+                    <!-- Service bar-->
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Service Management</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
+                        <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Service</span>
+                        <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Data</span>   
+                    </div>  
+                    <!-- Item bar-->    
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Inventory Management</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span id='game-asset-id-0' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Asset</span>   
+                        <span id='game-component-id-0' tx-game-cluster-id='' view-id='game.component.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Component</span>   
+                        <span id='game-commodity-id-0' tx-game-cluster-id='' view-id='game.commodity.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Commodity</span>   
+                        <span id='game-configuration-id-0' tx-game-cluster-id='' view-id='game.item.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Item</span>   
+                        <span id='game-application-id-0' tx-game-cluster-id='' view-id='game.application.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Application</span>   
+                    </div>  
+                    <!-- Game Server bar-->    
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Game Server Management</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>AccessKey</span>   
+                    </div>  
+                </div>    
                  
             </div>
              
@@ -527,9 +505,9 @@
                         lnc.style.display='none';
                         shd.style.display='block';
                     }
-                    document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
-                    document.querySelector('#game-service-'+i).innerHTML = g.gameService;
-                    document.querySelector('#game-data-'+i).innerHTML = g.gameData;
+                    //document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
+                    //document.querySelector('#game-service-'+i).innerHTML = g.gameService;
+                    //document.querySelector('#game-data-'+i).innerHTML = g.gameData;
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
@@ -539,7 +517,7 @@
                     document.querySelector('#game-commodity-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-application-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
-                    document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
+                    //document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
                     document.querySelector('#tx-game-cluster-next').style.display='block';
                 });
