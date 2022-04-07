@@ -100,11 +100,6 @@
     document.querySelector('#tx-asset-property-add-ok').onclick =()=>{
         let _pk = document.querySelector('#tx-asset-property-key').value;
         let _pv = document.querySelector('#tx-asset-property-value').value;
-        let _ty = typeof _pv;
-        console.log("type>"+_ty);
-        if(_ty == "number") {
-            _pv = _pv/1;
-        }
         itemTemplate.header[_pk]= _pv;
         editor.set(itemTemplate);
     }
