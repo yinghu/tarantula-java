@@ -130,6 +130,7 @@
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
+                    <span id='tx-game-cluster-next-list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Game</span>
                 </div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-cubes" style="font-size:16px"></i></span>
@@ -146,11 +147,6 @@
                     <span class='w3-left tx-text-14'>Game Cluster</span>
                     <span id='tx-game-cluster-create' view-id='create.game.cluster' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create</span>
                 </div>  
-            </div>
-            <div id='tx-game-cluster-next' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
-                <div  class='w3-container w3-padding'>
-                    <span id='tx-game-cluster-next-list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Next Game</span>    
-                </div>
             </div>
             <div id='game-cluster-0' class='w3-panel w3-border-bottom w3-border-red' style="display: none;">
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
@@ -519,7 +515,7 @@
                     document.querySelector('#game-application-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     //document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
-                    document.querySelector('#tx-game-cluster-next').style.display='block';
+                    //document.querySelector('#tx-game-cluster-next').style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
             }
