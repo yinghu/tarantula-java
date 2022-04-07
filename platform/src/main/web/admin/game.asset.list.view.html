@@ -12,6 +12,11 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
+            <span id='tx-asset-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Asset Category</span>          
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
             <span id='tx-asset-template-0' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-asset-template' style="display: none;"></span>          
             <span id='tx-asset-template-1' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-asset-template' style="display: none;"></span>          
             <span id='tx-asset-template-2' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-asset-template' style="display: none;"></span>          
@@ -137,6 +142,9 @@
             document.querySelector('#tx-asset-template-'+i).setAttribute('tx-category',a.header.type);
         });
     });
+    document.querySelector('#tx-asset-category-create').onclick = ()=>{
+        
+    };
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{
             hide_game_item_list();
