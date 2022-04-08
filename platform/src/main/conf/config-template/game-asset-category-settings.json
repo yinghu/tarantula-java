@@ -9,7 +9,11 @@
       "header": {"type": "card","name": "Item Card","icon":"icon","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "assets/card-asset-settings"
+        "name": "assets/card-asset-settings",
+        "properties":
+        [
+          {"name": "","type": "","description": ""}
+        ]
       }
     }
   ]

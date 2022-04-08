@@ -1,35 +1,32 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-edit-item-template-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-create-category-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Game Item Template</span>
+            <span id='tx-create-category-title' class="tx-margin-left-8 tx-text-24">Item Category</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel">   
+        <label class="tx-text-12 tx-margin-left-4">Category Type:</label>
+        <input id='tx-create-category-type' class="w3-input w3-round w3-border tx-text-12" type="text">  
+        <label class="tx-text-12 tx-margin-left-4">Category Name:</label>
+        <input id='tx-create-category-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+        <label class="tx-text-12 tx-margin-left-4">Category Icon:</label>
+        <input id='tx-create-category-icon' class="w3-input w3-round w3-border tx-text-12" type="text">
+        <label class="tx-text-12 tx-margin-left-4">Category Version:</label>
+        <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
+    </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-load-item-template' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Load</span>
-            <span id='tx-save-item-template' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
+            <span id='tx-create-cateory-cancel' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Cancel</span>
+            <span id='tx-create-cateory-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span> 
         </div>            
     </div>
-    <div class="w3-panel">
-        <label class="tx-text-12 tx-margin-left-4">Configuration Template Category:</label>
-        <input id='tx-configuration-item-template-category' class="w3-input w3-round w3-border tx-text-12" type="text">    
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
-            <span id='tx-edit-item-template-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
-            <span id='tx-edit-item-template-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
-            <span id='tx-edit-item-template-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
-        </div>            
-    </div>
-    <div class="w3-panel w3-center tx-text-14">
-        <div id="jsoneditor-edit-item-template" style="width: 100%;"></div>
-    </div> 
+  
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -40,39 +37,26 @@
     </div>
 </div>
 <script>
-    let itemTemplate = {description:"input item category to load",gameClusterId:TARA_API.query().gameClusterId};
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-edit-item-template"),{mode:'code'},itemTemplate);
     //TARA_API.onGet('role/item','onCategory',TARA_API.query().gameClusterId,(resp)=>{
         //console.log(resp);
         //editor.set(resp);   
     //});
-    document.querySelector('#tx-load-item-template').onclick=()=>{
+    document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
+    document.querySelector('#tx-create-cateory-cancel').onclick=()=>{
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';
+    };
+    document.querySelector('#tx-create-cateory-save').onclick=()=>{
         //let item = editor.get();
         ///let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
         //TARA_API.onSet(TARA_API.query().serviceTag,'onedit',query,item,(resp)=>{
             ///editor.set(resp);   
         //});
     };
-    document.querySelector('#tx-save-item-template').onclick=()=>{
-        //let item = editor.get();
-        ///let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
-        //TARA_API.onSet(TARA_API.query().serviceTag,'onedit',query,item,(resp)=>{
-            ///editor.set(resp);   
-        //});
-    };
-    document.querySelector('#tx-edit-item-template-close').onclick=()=>{
-        editor.destroy();
+    document.querySelector('#tx-create-category-close').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";
         m3.style.display = 'none';       
-    };
-    document.querySelector('#tx-edit-item-template-json-mode-tree').onclick=()=>{
-        editor.setMode('tree');
-    };
-    document.querySelector('#tx-edit-item-template-json-mode-code').onclick=()=>{
-        editor.setMode('code');
-    };
-    document.querySelector('#tx-edit-item-template-json-mode-preview').onclick=()=>{
-        editor.setMode('preview');
     };
 </script>

@@ -143,7 +143,9 @@
         });
     });
     document.querySelector('#tx-asset-category-create').onclick = ()=>{
-        
+        TARA_API.query().popup='#tx-popup-api';
+        TARA_API.query().category = 'asset';
+        tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
     };
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{

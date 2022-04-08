@@ -12,6 +12,11 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
+            <span id='tx-component-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Component Category</span>          
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
             <span id='tx-component-template-0' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-component-template' style="display: none;"></span>          
             <span id='tx-component-template-1' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-component-template' style="display: none;"></span>          
             <span id='tx-component-template-2' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-component-template' style="display: none;"></span>          
@@ -137,6 +142,11 @@
             document.querySelector('#tx-component-template-'+i).setAttribute('tx-category',a.header.type);
         });
     });
+    document.querySelector('#tx-component-category-create').onclick = ()=>{
+        TARA_API.query().popup='#tx-popup-api';
+        TARA_API.query().category = 'component';
+        tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
+    };
     document.querySelectorAll('.tx-game-component-template').forEach(a=>{
         a.onclick=()=>{
             hide_game_item_list();
