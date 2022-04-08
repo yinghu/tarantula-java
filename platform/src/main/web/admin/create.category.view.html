@@ -18,7 +18,11 @@
         <label class="tx-text-12 tx-margin-left-4">Category Icon:</label>
         <input id='tx-create-category-icon' class="w3-input w3-round w3-border tx-text-12" type="text">
         <label class="tx-text-12 tx-margin-left-4">Category Version:</label>
-        <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
+        <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text"> 
+        <div class="w3-panel" id="tx-create-category-rechargeable-display" style="display: none;">  
+            <label class="tx-text-12 tx-margin-right-4">Rechargeable</label>
+            <input id='tx-create-category-rechargeable' class="w3-check tx-text-12" type="checkbox">      
+        </div>    
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -41,6 +45,8 @@
         //console.log(resp);
         //editor.set(resp);   
     //});
+    if(TARA_API.query().category == 'commodity')
+        document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-cateory-cancel').onclick=()=>{
         let m3 = document.querySelector(TARA_API.query().popup);

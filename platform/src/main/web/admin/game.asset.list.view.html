@@ -136,10 +136,11 @@
 <script>
     TARA_API.onGet('role/item','onTemplateAssetCategory',TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
+        TARA_API.query().itemList = resp.itemList;
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-asset-template-'+i).style.display = 'block';
             document.querySelector('#tx-asset-template-'+i).innerHTML = a.header.name;
-            document.querySelector('#tx-asset-template-'+i).setAttribute('tx-category',a.header.type);
+            document.querySelector('#tx-asset-template-'+i).setAttribute('tx-index',''+i);
         });
     });
     document.querySelector('#tx-asset-category-create').onclick = ()=>{
@@ -150,7 +151,8 @@
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{
             hide_game_item_list();
-            let category = a.getAttribute('tx-category');
+            let ix = a.getAttribute('tx-index');
+            let category = TARA_API.query().itemList[ix/1].header.type;////a.getAttribute('tx-category');
             let query = TARA_API.query().gameClusterId+'#'+category;
             TARA_API.onGet('role/item','onTemplateAssetList',query,(resp)=>{
                 console.log(resp);
