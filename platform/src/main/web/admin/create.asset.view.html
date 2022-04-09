@@ -14,21 +14,22 @@
         <span id="tx-configuration-asset-description" class='w3-left tx-text-18 tx-margin-top-8 tx-margin-left-8'></span>
         <span id="tx-configuration-asset-type" class='w3-right tx-text-18 tx-margin-top-8 tx-margin-left-8'>Asset</span>
     </div>
-    
-    <div class="w3-panel">   
-        <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
-        <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
-        <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
-        <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
-        <label class="tx-text-12 tx-margin-left-4">Configuration Category:</label>
-        <input id='tx-configuration-asset-category' class="w3-input w3-round w3-border tx-text-12" type="text">
-        <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
-        <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
-    </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
-           <span id='tx-configuration-asset-add-property' class='w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-20 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Add Property</span>             
-        </div> 
+    <div class="w3-container" id="tx-asset-create-section">
+        <div class="w3-panel">  
+            <fieldset> 
+                <legend class="tx-text-12">Configuration</legend>
+                <label class="tx-text-12 tx-margin-left-4">Configuration TypeId:</label>
+                <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
+                <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
+                <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+                <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
+                <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
+            </fieldset>
+        </div>
+        <div class="w3-panel"> 
+            <fieldset id="tx-asset-create-form"> 
+            </fieldset>
+        </div>
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -36,36 +37,11 @@
             <span id='tx-asset-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-asset-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
             <span id='tx-configuration-asset-save' class='w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-20 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span>             
-    
         </div>            
     </div>
-    <div class="w3-panel w3-center tx-text-14">
-        <div id="jsoneditor-configuration-asset" style="width: 100%;"></div>
-    </div> 
-    <div class="w3-card-4 w3-border w3-round w3-white tx-lobby-add-checkout" id="tx-asset-property-add-form">
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
-                <span class="tx-margin-left-8 tx-text-18">Add Header</span>
-            </div>
-        </div>
-        <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-left-4">Key :</label>
-            <input id='tx-asset-property-key' class="w3-input w3-round w3-border tx-text-12" type="text">
-            <label class="tx-text-12 tx-margin-left-4">Value :</label>
-            <input id='tx-asset-property-value' class="w3-input w3-round w3-border tx-text-12" type="text">    
-        </div>
-        <div class="w3-panel w3-border-bottom w3-border-red">
-            <span id="tx-asset-property-add-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>     
-            <span id="tx-asset-property-add-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Save</span>     
-        </div>
-        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-                <span class="tx-text-12">Powered By ICodeSoftware</span>
-            </div>
+    <div class="w3-container" id="tx-asset-create-json" style="display: none;">
+        <div class="w3-panel w3-center tx-text-14">
+            <div id="jsoneditor-configuration-asset" style="width: 100%;"></div>
         </div> 
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -79,46 +55,56 @@
 </div>
 <script>
     let itemTemplate = {header:{},application:{},reference:[]};
-    let selectedItem = TARA_API.query().itemTemplate.itemList[TARA_API.query().gameItemIndex];
+    let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     itemTemplate.header = selectedItem.header;
     itemTemplate.application = selectedItem.application;
-    document.querySelector('#tx-configuration-asset-description').innerHTML = TARA_API.query().itemTemplate.description;
-    document.querySelector('#tx-configuration-asset-type').innerHTML = 'TYPE/CATEGORY : '+TARA_API.query().itemTemplate.type+'/'+TARA_API.query().itemTemplate.category;
-    document.querySelector('#tx-configuration-asset-type-id').value = selectedItem.configurationTypeId;
-    document.querySelector('#tx-configuration-asset-name').value = selectedItem.configurationName;
-    document.querySelector('#tx-configuration-asset-category').value = TARA_API.query().itemTemplate.category; 
-    document.querySelector('#tx-configuration-asset-version').value = TARA_API.query().itemTemplate.version;
-      
+    document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.name;
+    document.querySelector('#tx-configuration-asset-type').innerHTML = 'ASSET/CATEGORY : '+selectedItem.header.type;
+    document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
+    let assetForm = document.querySelector('#tx-asset-create-form');
+    let props = [];
+    props.push('<legend class=\'tx-text-12\'>');
+    props.push(itemTemplate.header.name);
+    props.push('</legend>');
+    selectedItem.application.properties.forEach(p=> {
+        console.log(p);
+        props.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
+        props.push(p.name);    
+        props.push('</label>');
+        props.push('<input id=\'');
+        props.push('tx-asset-property-');
+        props.push(p.name);
+        props.push('\'');
+        props.push(' class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
+        props.push('text');
+        props.push('\'>');
+    });
+    assetForm.innerHTML = props.join('');  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
     
-    document.querySelector('#tx-configuration-asset-add-property').onclick =()=>{
-        document.querySelector('#tx-asset-property-add-form').style.display = 'block';
-    }
-    document.querySelector('#tx-asset-property-add-cancel').onclick =()=>{
-        document.querySelector('#tx-asset-property-add-form').style.display = 'none';
-    }
-    document.querySelector('#tx-asset-property-add-ok').onclick =()=>{
-        let _pk = document.querySelector('#tx-asset-property-key').value;
-        let _pv = document.querySelector('#tx-asset-property-value').value;
-        itemTemplate.header[_pk]= _pv;
-        editor.set(itemTemplate);
-    }
     
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';
         let _typeId = document.querySelector('#tx-configuration-asset-type-id').value;
         let _name= document.querySelector('#tx-configuration-asset-name').value;
-        let _category = document.querySelector('#tx-configuration-asset-category').value; 
         let _version = document.querySelector('#tx-configuration-asset-version').value;
         let item = editor.get();
-        item.configurationType = TARA_API.query().itemTemplate.type;
+        item.configurationType = 'asset';
         item.configurationTypeId = _typeId;
         item.configurationName = _name;
-        item.configurationCategory = _category;
+        item.configurationCategory = selectedItem.header.type;
         item.configurationVersion = _version;
-        TARA_API.onSet('role/item','onCreateAsset',TARA_API.query().gameClusterId,item,(resp)=>{
-            editor.set(resp);   
+        selectedItem.application.properties.forEach(p=> {
+            let pv = document.querySelector('#tx-asset-property-'+p.name).value;
+            item.header[p.name] = pv;
         });
+        editor.set(item);
+        document.querySelector('#tx-asset-create-section').style.display ='none';
+        document.querySelector('#tx-asset-create-json').style.display ='block';
+        
+        //TARA_API.onSet('role/item','onCreateAsset',TARA_API.query().gameClusterId,item,(resp)=>{
+            //editor.set(resp);   
+        //});
     };
     document.querySelector('#tx-configuration-asset-api-close').onclick=()=>{
         editor.destroy();
