@@ -27,7 +27,10 @@
         [
           {"name": "Name","type": "String","description": "name of asset"},
           {"name": "Icon","type": "String","description": "icon of asset"},
-          {"name": "Description","type": "String","description": "description of asset"}
+          {"name": "Description","type": "String","description": "description of asset"},
+          {"name": "Level","type": "number","description": "level of asset"},
+          {"name": "Limited","type": "boolean","description": "limited of asset"},
+          {"name": "ReleaseDate","type": "dateTime","description": "level of asset"}
         ]
       }
     }
