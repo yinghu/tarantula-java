@@ -23,14 +23,7 @@
                 <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
                 <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
                 <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
-                <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
-                <label class="tx-text-12 tx-margin-left-4">Configuration Choice:</label>
-                <select name="cars" id="cars" class="tx-text-12 w3-select w3-border">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                </select>
+                <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">
             </fieldset>
         </div>
         <div class="w3-panel"> 
@@ -88,18 +81,17 @@
     props.push('</legend>');
     selectedItem.application.properties.forEach(p=> {
         console.log(p);
-        props.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
-        props.push(p.name);    
-        props.push('</label>');
-        props.push('<input id=\'');
-        props.push('tx-asset-property-');
-        props.push(p.name);
-        props.push('\' ');
-        props.push(toHtmlInputType(p.type));
+        props.push(toHtmlInputType(p));
     });
     assetForm.innerHTML = props.join('');  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
     
+    document.querySelectorAll('.tx-list-item-add').forEach(a=>{
+        a.onclick = ()=>{
+            let list = document.querySelector('#tx-asset-property-Items');
+            list.innerHTML += '<li>A</li>';
+        };
+    });
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{
         document.querySelector('#tx-asset-create-section').style.display ='block';
         document.querySelector('#tx-asset-create-json').style.display ='none';    
@@ -111,7 +103,8 @@
         m3.style.display = 'none';    
     };
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
-        console.log("save");    
+        let v = document.querySelector('#tx-asset-property-Name');
+        console.log(v.value);   
     };
     document.querySelector('#tx-configuration-asset-preview').onclick=()=>{
         //document.querySelector('#tx-configuration-asset-save').style.display = 'none';
@@ -151,10 +144,58 @@
     document.querySelector('#tx-asset-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    function toHtmlInputType(type){
-        if(type=='boolean') return 'class=\'w3-round w3-border tx-text-12 w3-check tx-margin-left-4 tx-margin-bottom-4\' type=\'checkbox\'></br>';
-        if(type=='number') return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'number\'>';
-        if(type=='dateTime') return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'datetime-local\'>';
-        return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'text\'>'; 
+    function toHtmlInputType(prop){
+        let tem = [];
+        if(prop.type == 'list') tem.push('<div>');
+        tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
+        tem.push(prop.name);    
+        tem.push('</label>');
+        if(prop.type == 'list'){
+            tem.push('<span class=\'w3-right tx-margin-right-4 tx-list-item-add\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+        }
+        if(prop.type=='boolean') tem.push('</br>');
+        if(prop.type == 'enum' || prop.type == 'reference'){
+            tem.push('<select ');
+        }
+        else if(prop.type == 'list'){
+            tem.push('<ul ');
+        }
+        else{
+            tem.push('<input ');
+        }
+        tem.push('id=\'');
+        tem.push('tx-asset-property-');
+        tem.push(prop.name);
+        tem.push('\' ');
+        if(prop.type=='boolean'){
+            tem.push('class=\'w3-round w3-border tx-text-12 w3-check tx-margin-left-4 tx-margin-bottom-4\' type=\'checkbox\'></br>');
+            return tem.join('');
+        }
+        if(prop.type=='number'){
+            tem.push('class=\'w3-input w3-round w3-border tx-text-12\' type=\'number\'>');
+            return tem.join('');
+        }
+        if(prop.type=='dateTime'){
+            tem.push('class=\'w3-input w3-round w3-border tx-text-12\' type=\'datetime-local\'>');
+            return tem.join('');
+        }
+        if(prop.type == 'enum' || prop.type == 'reference'){
+            tem.push('name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4\'>');
+            tem.push('<option value=\'a\'>A</option>');
+            tem.push('<option value=\'b\'>B</option>');
+            tem.push('<option value=\'c\'>C</option>');
+            tem.push('</select>');
+            return tem.join('');
+        }
+        if(prop.type == 'list'){
+            tem.push('class=\'w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4\'>');
+            //tem.push('<li>A</li>');
+            //tem.push('<li>B</li>');
+            //tem.push('<li>C</li>');
+            tem.push('</ul>');
+            return tem.join('');
+        }
+        tem.push('class=\'w3-input w3-round w3-border tx-text-12\' type=\'text\'>');
+        return tem.join(''); 
     }
 </script>
