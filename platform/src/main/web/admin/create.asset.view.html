@@ -24,6 +24,13 @@
                 <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
                 <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
                 <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">        
+                <label class="tx-text-12 tx-margin-left-4">Configuration Choice:</label>
+                <select name="cars" id="cars" class="tx-text-12 w3-select w3-border">
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="audi">Audi</option>
+                </select>
             </fieldset>
         </div>
         <div class="w3-panel"> 
@@ -87,10 +94,8 @@
         props.push('<input id=\'');
         props.push('tx-asset-property-');
         props.push(p.name);
-        props.push('\'');
-        props.push(' class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
-        props.push('text');
-        props.push('\'>');
+        props.push('\' ');
+        props.push(toHtmlInputType(p.type));
     });
     assetForm.innerHTML = props.join('');  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
@@ -146,4 +151,10 @@
     document.querySelector('#tx-asset-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    function toHtmlInputType(type){
+        if(type=='boolean') return 'class=\'w3-round w3-border tx-text-12 w3-check tx-margin-left-4 tx-margin-bottom-4\' type=\'checkbox\'></br>';
+        if(type=='number') return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'number\'>';
+        if(type=='dateTime') return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'datetime-local\'>';
+        return 'class=\'w3-input w3-round w3-border tx-text-12\' type=\'text\'>'; 
+    }
 </script>
