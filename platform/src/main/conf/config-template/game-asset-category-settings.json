@@ -3,23 +3,24 @@
   "category": "system",
   "version": "1.0",
   "description": "category asset template list",
+
   "itemList":
   [
     {
-      "header": {"type": "card","name": "Item Card","icon":"icon","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "card","name": "Item Card","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "assets/card-asset-settings",
         "properties":
         [
-          {"name": "Name","type": "String","description": "name of asset"},
-          {"name": "Icon","type": "String","description": "icon of asset"},
-          {"name": "Description","type": "String","description": "description of asset"}
+          {"name": "Name","type": "string"},
+          {"name": "Icon","type": "string"},
+          {"name": "Description","type": "string"}
         ]
       }
     },
     {
-      "header": {"type": "zone","name": "Game Zone","icon":"icon","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "zone","name": "Game Zone","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "name": "assets/card-asset-settings",
