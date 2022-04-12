@@ -3,14 +3,13 @@
   "category": "system",
   "version": "1.0",
   "description": "category asset template list",
-
+  "name": "assets/card-asset-settings",
   "itemList":
   [
     {
       "header": {"type": "card","name": "Item Card","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "assets/card-asset-settings",
         "properties":
         [
           {"name": "Name","type": "string"},
@@ -23,7 +22,6 @@
       "header": {"type": "zone","name": "Game Zone","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "assets/card-asset-settings",
         "properties":
         [
           {"name": "Name","type": "string"},

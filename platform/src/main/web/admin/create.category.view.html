@@ -36,10 +36,7 @@
                 <label class="tx-text-12 tx-margin-left-4">Name:</label>
                 <input id='tx-create-category-property-name' class="w3-input w3-round w3-border tx-text-12" type="text">
                 <label class="tx-text-12 tx-margin-left-4">Type:</label>
-                <select id='tx-create-category-property-type' class="w3-select tx-text-12" >
-                    <option value="string">string</option>
-                    <option value="number">number</option>
-                    <option value="dateTime">dateTime</option>        
+                <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
                 </select>
                 <div class="w3-panel">
                     <span id="tx-create-category-add" class="w3-right"><i class="fa fa-plus" style="font-size:16px"></i></span>             
@@ -88,10 +85,16 @@
     </div>
 </div>
 <script>
-    //TARA_API.onGet('role/item','onCategory',TARA_API.query().gameClusterId,(resp)=>{
-        //console.log(resp);
-        //editor.set(resp);   
-    //});
+    let types = [];
+    TARA_API.onGet('role/item','onTemplateAssetList',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
+        types = resp.itemList[0].application.types;
+        //editor.set(resp);
+        let tp = document.querySelector('#tx-create-category-property-type');
+        types.forEach(t => {
+            tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
+        });   
+    });
     let categoryTemplate = {header:{},application:{properties:[]}};
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
     if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';

@@ -13,6 +13,7 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
     public String category;
     public String version;
     public String description;
+    public String name;
     public HashMap<String,ConfigurableSetting> settings = new HashMap<>();
 
     @Override
@@ -22,6 +23,7 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
         jsonObject.addProperty("category",category);
         jsonObject.addProperty("version",version);
         jsonObject.addProperty("description",description);
+        jsonObject.addProperty("name",name);
         jsonObject.add("itemList",(JsonArray)property("itemList"));
         return jsonObject;
     }

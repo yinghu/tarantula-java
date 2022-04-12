@@ -43,43 +43,33 @@ public class GameItemAdminModule implements Module {
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateAssetList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
-            ConfigurableSetting conf = template.settings.get(query[1]);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf.settingName);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateComponentList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
-            ConfigurableSetting conf = template.settings.get(query[1]);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf.settingName);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateCommodityList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-            String conf = template.settings.get(query[1]).settingName;
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateItemList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
-            String conf = template.settings.get(query[1]).settingName;
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateApplicationList")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
-            String conf = template.settings.get(query[1]).settingName;
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,conf);
+            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if (session.action().equals("onCreateAsset")){

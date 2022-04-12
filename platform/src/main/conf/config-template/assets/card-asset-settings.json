@@ -1,19 +1,20 @@
 {
   "type": "asset",
-  "category": "card",
+  "category": "type",
   "version": "1.0",
-  "description": "UI display card asset",
+  "description": "basic types of asset category",
   "itemList":
   [
       {
-        "configurationTypeId": "DisplayCard",
-        "configurationName": "MagnetAbilityCard",
-        "header": {
-          "Name": "Magnet",
-          "Description": "Magnet",
-          "Icon": "MagnetIcon.png"
+        "header": {},
+        "application": {
+          "types": [
+            {"type": "string","name": "String","value": "string"},
+            {"type": "number","name": "Number","value": "number"},
+            {"type": "dateTime","name": "DateTime","value": "dateTime"},
+            {"type": "enum","name":"Selection","value":[{"name": "A","value": 0},{"name": "B","value": 1},{"name": "C","value": 2}] }
+          ]
         },
-        "application": {},
         "reference": []
       }
   ]

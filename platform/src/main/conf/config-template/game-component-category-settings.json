@@ -3,6 +3,7 @@
   "category": "system",
   "version": "1.0",
   "description": "category component template list",
+  "name": "components/abilities-levels-component-settings",
   "itemList":
   [
     {

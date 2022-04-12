@@ -3,6 +3,7 @@
   "category": "system",
   "version": "1.0",
   "description": "category item template list",
+  "name": "items/chest-item-settings",
   "itemList":
   [
     {

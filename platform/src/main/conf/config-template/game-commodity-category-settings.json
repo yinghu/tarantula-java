@@ -3,6 +3,7 @@
   "category": "system",
   "version": "1.0",
   "description": "category commodity template list",
+  "name": "commodities/robot-commodity-settings",
   "itemList":
   [
     {
