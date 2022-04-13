@@ -95,16 +95,20 @@
             tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
         });   
     });
+    let ixc = 0;
     let categoryTemplate = {header:{},application:{properties:[]}};
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
     if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
+        if(categoryTemplate.application[pname] !=null ) return;
         let ptype = document.querySelector('#tx-create-category-property-type').value;
-        console.log(pname+"<<<>"+ptype);
+        categoryTemplate.application[pname] = ptype;
         let props = document.querySelector('#tx-create-category-properties');
-        props.innerHTML += '<li><div class=\'w3-container\'><span>'+pname+' : '+ptype+'</span><span onclick=\'removecategoryproperty()\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red\'>Remove</span></div></li>';
+        ixc++;
+        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'</span><span tx-property-name=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+        removecategoryproperty();
     };
     document.querySelector('#tx-create-cateory-cancel').onclick=()=>{
         close_create_category_view();
@@ -137,7 +141,11 @@
         editor.setMode('preview');
     };
     function removecategoryproperty(){
-        console.log("remove property");
+        document.querySelectorAll('.tx-remove-property').forEach(a=>{
+            a.onclick = ()=>{
+                document.querySelector('#txc-property-'+a.getAttribute('tx-property-name')).style.display = 'none';
+            };
+        });
     }
     function close_create_category_view(){
         editor.destroy();
