@@ -618,7 +618,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
         if(name.equals(OnAccess.GAME_CENTER)) return new GameCenterAuthProvider();
 
-        if(name.equals(OnAccess.GOOGLE_STORE)) return new GooglePlayStoreProvider();
+        if(name.equals(OnAccess.GOOGLE_STORE)) return loadGoogleStoreCredentials();
 
         return null;
 
@@ -651,6 +651,21 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             return gb.create().fromJson(new String(data),AuthObject.class);
  	    }catch (Exception ex){
  	        return null;
+        }
+    }
+    private AuthObject loadGoogleStoreCredentials(){
+        try{
+            String config = this.authContext+"-google-store.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            in.close();
+            GsonBuilder gb = new GsonBuilder();
+            gb.registerTypeAdapter(AuthObject.class,new GoogleStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthObject.class);
+        }catch (Exception ex){
+            return null;
         }
     }
     private AuthObject loadStripeCredentials(){
