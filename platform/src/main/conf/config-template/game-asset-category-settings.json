@@ -25,14 +25,12 @@
         "properties":
         [
           {"name": "Name","type": "string"},
-          {"name": "Icon","type": "string"},
-          {"name": "Description","type": "string"},
           {"name": "Level","type": "number"},
           {"name": "Limited","type": "boolean"},
           {"name": "ReleaseDate","type": "dateTime"},
-          {"name": "Choice","type": "enum","enum": ["A","B","C"]},
-          {"name": "Card","type": "reference","reference": ["A","B","C"]},
-          {"name": "Items","type": "list","reference": ["A","B","C"]}
+          {"name": "Choice","type": "enum","reference": ["A","B","C"]},
+          {"name": "Card","type": "reference","reference":"card"},
+          {"name": "Items","type": "list","reference": "string","primitive": "string"}
         ]
       }
     }
