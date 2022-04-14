@@ -83,12 +83,37 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
+
+    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-create-category-warning-message-board">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Warning</span>
+            </div>
+        </div>
+        <div id="tx-create-category-warning-message" class="w3-panel w3-center tx-text-14"></div>
+        <div class="w3-panel w3-center">
+            <span id="tx-create-category-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
+    </div>
+
 </div>
 <script>
     let types = [];
     TARA_API.onGet('role/item','onTemplateAssetList',TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
-        types = resp.itemList[0].application.types;
+        types = resp.itemList;
         //editor.set(resp);
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {
@@ -102,13 +127,25 @@
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
-        if(categoryTemplate.application[pname] !=null ) return;
+        if(pname==null||pname==''){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Property name cannot be null";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(categoryTemplate.application[pname] !=null ){ 
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Property name already existed";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return;
+        }
         let ptype = document.querySelector('#tx-create-category-property-type').value;
         categoryTemplate.application[pname] = ptype;
         let props = document.querySelector('#tx-create-category-properties');
         ixc++;
-        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'</span><span tx-property-name=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
         removecategoryproperty();
+    };
+    document.querySelector('#tx-create-category-warning-message-ok').onclick=()=>{
+        document.querySelector('#tx-create-category-warning-message-board').style.display = 'none';
     };
     document.querySelector('#tx-create-cateory-cancel').onclick=()=>{
         close_create_category_view();
@@ -143,7 +180,9 @@
     function removecategoryproperty(){
         document.querySelectorAll('.tx-remove-property').forEach(a=>{
             a.onclick = ()=>{
-                document.querySelector('#txc-property-'+a.getAttribute('tx-property-name')).style.display = 'none';
+                let pname = a.getAttribute("tx-property-name");
+                delete categoryTemplate.application[pname];
+                document.querySelector('#txc-property-'+a.getAttribute('tx-property-index')).style.display = 'none';
             };
         });
     }
