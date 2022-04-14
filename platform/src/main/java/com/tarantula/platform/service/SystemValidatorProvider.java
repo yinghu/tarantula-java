@@ -274,6 +274,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             stripe.setup(serviceContext);
             aMap.put(OnAccess.STRIPE,(stripe));
         }
+        AuthVendor googleStore = this.serviceContext.authVendor(OnAccess.GOOGLE_STORE);
+        if(googleStore!=null){
+            googleStore.registerMetricsLister(this.deploymentServiceProvider);
+            googleStore.setup(serviceContext);
+            aMap.put(OnAccess.GOOGLE_STORE,googleStore);
+        }
     }
 
     @Override

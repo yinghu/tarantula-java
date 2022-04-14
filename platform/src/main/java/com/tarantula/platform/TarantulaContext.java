@@ -606,27 +606,22 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.schedule(new MidnightCheck(this));
     }
     public TokenValidatorProvider.AuthVendor authVendor(String name){
- 	    if(name.equals(OnAccess.GOOGLE)){
- 	        return loadGoogleCredentials();
- 	    }
- 	    else if(name.equals(OnAccess.FACEBOOK)){
- 	        return loadFacebookCredentials();
-        }
-        else if(name.equals(OnAccess.APPLE_STORE)){
-            return loadAppleStoreCredentials();
-        }
- 	    else if(name.equals(OnAccess.STRIPE)){
- 	        return loadStripeCredentials();
-        }
-        else if(name.equals(OnAccess.MOCK_STORE)){
-            return loadMockStoreCredentials();
-        }
-        else if(name.equals(OnAccess.GAME_CENTER)){
-            return new GameCenterAuthProvider();
-        }
-        else{
-            return null;
-        }
+ 	    if(name.equals(OnAccess.GOOGLE)) return loadGoogleCredentials();
+
+ 	    if(name.equals(OnAccess.FACEBOOK)) return loadFacebookCredentials();
+
+        if(name.equals(OnAccess.APPLE_STORE)) return loadAppleStoreCredentials();
+
+ 	    if(name.equals(OnAccess.STRIPE)) return loadStripeCredentials();
+
+        if(name.equals(OnAccess.MOCK_STORE)) return loadMockStoreCredentials();
+
+        if(name.equals(OnAccess.GAME_CENTER)) return new GameCenterAuthProvider();
+
+        if(name.equals(OnAccess.GOOGLE_STORE)) return new GooglePlayStoreProvider();
+
+        return null;
+
     }
     private AuthObject loadFacebookCredentials(){
         try{
