@@ -28,12 +28,14 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
             Map<String,Object> params = acc.toMap();
+            String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
+            ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(bundleId);
+            if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             params.put(OnAccess.SERVICE_TYPE_ID,serviceTypeId);
+            params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.configurationName());
             if(this.context.validator().validateToken(params)){
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-                String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
-                ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(bundleId);
                 if(shoppingItem.configurationName().equals(sku)){
                     this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
                     StorePurchase storePurchase = new StorePurchase();
