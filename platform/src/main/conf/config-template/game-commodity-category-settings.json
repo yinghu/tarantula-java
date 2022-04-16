@@ -3,9 +3,19 @@
   "category": "system",
   "version": "1.0",
   "description": "category commodity template list",
-  "name": "assets/asset-type-settings",
+  "name": "commodities/commodity-type-settings",
   "itemList":
   [
-
+    {
+      "header": {"type": "gold","name": "Gold","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "application":
+      {
+        "properties":
+        [
+          {"name": "Name","type": "string"},
+          {"name": "amount","type": "number"}
+        ]
+      }
+    }
   ]
 }

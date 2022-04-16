@@ -21,30 +21,19 @@ public class GameItemAdminModule implements Module {
         if(session.action().equals("onCategorySettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            //ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,query[1]);
-            //applicationPreSetup.save(this.context,gameCluster,configuration);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateComponentCategory")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateCommodityCategory")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateItemCategory")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateApplicationCategory")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
-            session.write(configuration.toJson().toString().getBytes());
+            ConfigurableCategories categories = new ConfigurableCategories();
+            categories.name(query[1]);
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            if(!applicationPreSetup.load(context,gameCluster,categories)){
+                ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,query[1]);
+                JsonArray cclasses = (JsonArray)configuration.property("itemList");
+                cclasses.forEach((c)->{
+                    this.context.log(c.toString(),OnLog.WARN);
+                    categories.addType(c.getAsJsonObject());
+                });
+                applicationPreSetup.save(context,gameCluster,categories);
+            }
+            session.write(categories.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTypesSettings")){
             String[] query = session.name().split("#");
@@ -70,30 +59,7 @@ public class GameItemAdminModule implements Module {
             }
             session.write(configurableTypes.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onTemplateComponentList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateCommodityList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateItemList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-            session.write(configuration.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTemplateApplicationList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-            session.write(configuration.toJson().toString().getBytes());
-        }
+
         else if (session.action().equals("onCreateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Asset app = new Asset();

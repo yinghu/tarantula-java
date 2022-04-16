@@ -3,7 +3,7 @@
   "category": "system",
   "version": "1.0",
   "description": "category component template list",
-  "name": "assets/asset-type-settings",
+  "name": "components/component-type-settings",
   "itemList":
   [
     {
