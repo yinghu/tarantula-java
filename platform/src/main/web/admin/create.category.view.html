@@ -111,7 +111,7 @@
 </div>
 <script>
     let types = [];
-    TARA_API.onGet('role/item','onTemplateAssetList',TARA_API.query().gameClusterId,(resp)=>{
+    TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         types = resp.itemList;
         //editor.set(resp);

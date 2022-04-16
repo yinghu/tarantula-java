@@ -5,14 +5,14 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Game Asset List</span>
+            <span id="tx-game-asset-title" class="tx-margin-left-8 tx-text-24">Game Asset List</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-asset-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Asset Category</span>          
+            <span id='tx-asset-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Category</span>          
         </div>            
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
@@ -41,7 +41,8 @@
     </div>
 </div>
 <script>
-    TARA_API.onGet('role/item','onTemplateAssetCategory',TARA_API.query().gameClusterId,(resp)=>{
+    document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().category+" list";
+    TARA_API.onGet('role/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         TARA_API.query().itemList = resp.itemList;
         resp.itemList.forEach((a,i)=>{
@@ -52,21 +53,12 @@
     });
     document.querySelector('#tx-asset-category-create').onclick = ()=>{
         TARA_API.query().popup='#tx-popup-api';
-        TARA_API.query().category = 'asset';
         tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
     };
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{
             let ix = a.getAttribute('tx-index')/1;
             TARA_API.query().itemIndex = ix;
-            TARA_API.query().popup='#tx-popup-api';
-            tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
-        };
-    });
-    document.querySelectorAll('.tx-game-asset-register').forEach(a=>{
-        a.onclick=()=>{
-            let ix = a.getAttribute('tx-index')/1;
-            TARA_API.query().gameItemIndex= ix;
             TARA_API.query().popup='#tx-popup-api';
             tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
         };

@@ -3,36 +3,9 @@
   "category": "system",
   "version": "1.0",
   "description": "category item template list",
-  "name": "applications/tournament-game-application-settings",
+  "name": "assets/asset-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "tournament","name": "Tournament","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "applications/tournament-game-application-settings"
-      }
-    },
-    {
-      "header": {"type": "store","name": "Store","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "applications/store-game-application-settings"
-      }
-    },
-    {
-      "header": {"type": "achievement","name": "Achievement","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "applications/achievement-game-application-settings"
-      }
-    },
-    {
-      "header": {"type": "giveaway","name": "Giveaway","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "applications/giveaway-game-application-settings"
-      }
-    }
+
   ]
 }

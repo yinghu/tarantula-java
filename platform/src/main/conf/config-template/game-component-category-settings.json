@@ -3,21 +3,36 @@
   "category": "system",
   "version": "1.0",
   "description": "category component template list",
-  "name": "components/abilities-levels-component-settings",
+  "name": "assets/asset-type-settings",
   "itemList":
   [
     {
-      "header": {"type": "abilitiesLevels","name": "Abilities Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "abilityStats","name": "Ability Stats","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "components/abilities-levels-component-settings"
+        "properties":
+        [
+          {"name":"EnergyCost","type":"number","value": 4},
+          {"name":"ChargeTime","type":"number","value": 0.4},
+          {"name":"Duration","type":"number","value": 3},
+          {"name":"TargetingRange","type":"number","value": 5.5},
+          {"name":"DamageRange","type":"number", "value": 2.75}
+        ]
       }
     },
     {
-      "header": {"type": "robotLevels","name": "Robot Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "robotStats","name": "Robot Stats","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
-        "name": "components/robot-levels-component-settings"
+        "properties":
+        [
+          {"name":"Health", "type":"number","value": 1000},
+          {"name":"MeleeDamage","type":"number","value": 100},
+          {"name":"RangedDamage","type":"number","value": 100},
+          {"name":"CriticalDamagePercent","type":"number","value": 0.3},
+          {"name":"Recovery","type":"number","value": 100},
+          {"name":"Speed","type":"number","value": 0}
+        ]
       }
     }
   ]

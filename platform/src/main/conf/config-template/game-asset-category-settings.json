@@ -3,7 +3,7 @@
   "category": "system",
   "version": "1.0",
   "description": "category asset template list",
-  "name": "assets/card-asset-settings",
+  "name": "assets/asset-type-settings",
   "itemList":
   [
     {
