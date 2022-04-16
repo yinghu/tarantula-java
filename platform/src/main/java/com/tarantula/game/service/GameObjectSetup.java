@@ -87,11 +87,6 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         return application.typeId().replace(replaced,"_service");
     }
 
-    protected String serviceDataStore(GameCluster application){
-        String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
-        return serviceTypeId.replaceAll("-","_");
-    }
-
     protected GameZone.RoomProxy joinProxy(String playMode){
         GameZone.RoomProxy roomProxy = new PVERoomProxy();
         if(playMode.equals(GameZone.PLAY_MODE_PVP)){
@@ -126,5 +121,24 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
     protected String query(String type,String category){
         return new StringBuffer().append(type).append(Recoverable.PATH_SEPARATOR).append(category).toString();
+    }
+
+
+    public <T extends Configurable> boolean save(ApplicationContext context, GameCluster gameCluster, T t){
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        return dataStore.update(t);
+    }
+    public <T extends Configurable> boolean load(ApplicationContext context, GameCluster gameCluster, T t){
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        return dataStore.load(t);
+    }
+    public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        return dataStore.list(recoverableFactory);
+    }
+
+    private String configurationDataStore(GameCluster application){
+        String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
+        return serviceTypeId.replaceAll("-","_")+"_configuration";
     }
 }

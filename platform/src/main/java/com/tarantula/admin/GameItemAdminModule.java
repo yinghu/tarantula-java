@@ -1,10 +1,12 @@
 package com.tarantula.admin;
 
+import com.google.gson.JsonArray;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.OnLobbyTrack;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
@@ -19,7 +21,9 @@ public class GameItemAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onTemplateAssetCategory")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             ConfigurableTemplate configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
+            applicationPreSetup.save(this.context,gameCluster,configuration);
             session.write(configuration.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateComponentCategory")){
@@ -44,9 +48,20 @@ public class GameItemAdminModule implements Module {
         }
         else if(session.action().equals("onTemplateAssetList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
-            Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-            session.write(configuration.toJson().toString().getBytes());
+            ConfigurableTypes configurableTypes = new ConfigurableTypes();
+            configurableTypes.name("common");
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            if(!applicationPreSetup.load(context,gameCluster,configurableTypes)){
+                ConfigurableTemplate template = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
+                Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
+                JsonArray items = (JsonArray) configuration.property("itemList");
+                items.forEach((f)->{
+                    this.context.log(f.toString(),OnLog.WARN);
+                    configurableTypes.addType(f.getAsJsonObject());
+                });
+                applicationPreSetup.save(context,gameCluster,configurableTypes);
+            }
+            session.write(configurableTypes.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTemplateComponentList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
