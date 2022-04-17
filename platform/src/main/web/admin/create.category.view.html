@@ -39,8 +39,9 @@
                 <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
                 </select>
                 <div id="tx-create-category-property-value-drop" style="display: none;">
-                    <label class="tx-text-12 tx-margin-left-4">Value:</label>
-                    <input id='tx-create-category-property-value' class="w3-input w3-round w3-border tx-text-12" type="text">
+                    <label class="tx-text-12 tx-margin-left-4">Reference:</label>
+                    <select id='tx-create-category-property-value' class="w3-select tx-text-12">
+                    <select>
                 </div>
                 <div class="w3-panel">
                     <span id="tx-create-category-add" class="w3-right"><i class="fa fa-plus" style="font-size:16px"></i></span>             
@@ -121,7 +122,8 @@
         types = resp.itemList;
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {
-            tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
+            tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';
+            types[t.name] = t.value;    
         });   
     });
     let ixc = 0;
@@ -129,6 +131,9 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
     if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
     let typeSelect = document.querySelector('#tx-create-category-property-type');
+    let typeDrop = document.querySelector('#tx-create-category-property-value-drop');
+    let typeValue = document.querySelector('#tx-create-category-property-value');
+    
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
@@ -167,8 +172,33 @@
             editor.set(resp);   
         });
     };
+    typeValue.onchange =()=>{   
+        console.log(typeValue.value);
+    };
     typeSelect.onchange = ()=>{
-        console.log("change->"+typeSelect.value);
+        let selected = typeSelect.value;
+        let nameSelected = typeSelect.options[typeSelect.selectedIndex].text;
+        switch(selected){
+            case 'enum':
+                typeValue.innerHTML='';
+                types[nameSelected].forEach(e=>{
+                    typeValue.innerHTML += '<option value=\''+e.value+'\'>'+e.name+'</option>';        
+                });
+                typeDrop.style.display = 'block';
+                break;
+            case 'category':
+                typeDrop.style.display = 'block';
+                break;
+            case 'list':
+                typeDrop.style.display = 'block';
+                break;
+            case 'set':
+                typeDrop.style.display = 'block';
+                break;
+            default:
+                typeDrop.style.display = 'none';     
+                break;
+        }
     };
     document.querySelector('#tx-create-cateory-preview').onclick=()=>{
         let ctype = document.querySelector('#tx-create-category-type').value;
@@ -183,6 +213,7 @@
         categoryTemplate.header.version = cversion;
         categoryTemplate.header.enabled = cenabled;
         categoryTemplate.header.rechargeable = crechargeable; 
+        categoryTemplate.application.properties = [];
         pendingProps.forEach((v,k,m)=>{
             console.log(k);
             console.log(v);

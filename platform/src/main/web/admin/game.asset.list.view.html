@@ -12,7 +12,8 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
-            <span id='tx-asset-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Category</span>          
+            <span id='tx-asset-category-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Type(category)</span>          
+            <span id='tx-asset-enum-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Type(enum)</span> 
         </div>            
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
@@ -54,6 +55,11 @@
     document.querySelector('#tx-asset-category-create').onclick = ()=>{
         TARA_API.query().popup='#tx-popup-api';
         tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
+    };
+    document.querySelector('#tx-asset-enum-create').onclick = ()=>{
+        console.log("create enum type");
+        //TARA_API.query().popup='#tx-popup-api';
+        //tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
     };
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{

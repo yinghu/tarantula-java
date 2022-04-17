@@ -8,7 +8,8 @@
     {"type": "string","name":"String","value": "string"},
     {"type": "number","name": "Number","value": "number"},
     {"type": "dateTime","name": "DateTime","value": "dateTime"},
-    {"type": "reference","name": "Reference"},
-    {"type": "list","name": "List"}
+    {"type": "category","name": "Category"},
+    {"type": "list","name": "List"},
+    {"type": "set","name": "Set"}
   ]
 }
