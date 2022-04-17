@@ -32,6 +32,7 @@
           {"name": "Card","type": "reference","reference":"card"},
           {"name": "Items","type": "list","reference": "string","primitive": "string"}
         ]
+
       }
     }
   ]

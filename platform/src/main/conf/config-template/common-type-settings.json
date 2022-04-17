@@ -5,8 +5,10 @@
   "description": "basic common types of category",
   "itemList":
   [
-      {"type": "string","name":"String","value": "string"},
-      {"type": "number","name": "Number","value": "number"},
-      {"type": "dateTime","name": "DateTime","value": "dateTime"}
+    {"type": "string","name":"String","value": "string"},
+    {"type": "number","name": "Number","value": "number"},
+    {"type": "dateTime","name": "DateTime","value": "dateTime"},
+    {"type": "reference","name": "Reference"},
+    {"type": "list","name": "List"}
   ]
 }

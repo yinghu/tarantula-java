@@ -70,10 +70,8 @@
     document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
     let itemTemplate = {header:{},application:{},reference:[]};
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    //itemTemplate.header = selectedItem.header;
-    //itemTemplate.application = selectedItem.application;
     document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.name;
-    document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/CATEGORY : '+selectedItem.header.type;
+    document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
     document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];

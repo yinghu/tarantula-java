@@ -38,9 +38,10 @@
                 <label class="tx-text-12 tx-margin-left-4">Type:</label>
                 <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
                 </select>
-                <label class="tx-text-12 tx-margin-left-4">Value:</label>
-                <input id='tx-create-category-property-value' class="w3-input w3-round w3-border tx-text-12" type="text">
-                
+                <div id="tx-create-category-property-value-drop" style="display: none;">
+                    <label class="tx-text-12 tx-margin-left-4">Value:</label>
+                    <input id='tx-create-category-property-value' class="w3-input w3-round w3-border tx-text-12" type="text">
+                </div>
                 <div class="w3-panel">
                     <span id="tx-create-category-add" class="w3-right"><i class="fa fa-plus" style="font-size:16px"></i></span>             
                 </div>
@@ -127,6 +128,7 @@
     let categoryTemplate = {header:{},application:{properties:[]}};
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
     if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
+    let typeSelect = document.querySelector('#tx-create-category-property-type');
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
@@ -164,6 +166,9 @@
         TARA_API.onSet('role/item','onUpdateCategorySettings',query,item,(resp)=>{
             editor.set(resp);   
         });
+    };
+    typeSelect.onchange = ()=>{
+        console.log("change->"+typeSelect.value);
     };
     document.querySelector('#tx-create-cateory-preview').onclick=()=>{
         let ctype = document.querySelector('#tx-create-category-type').value;
