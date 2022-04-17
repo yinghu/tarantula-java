@@ -1,6 +1,7 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
@@ -8,12 +9,12 @@ import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigurableCategories extends RecoverableObject implements Configuration {
 
     private static String ITEM_LIST = "itemList";
     private JsonObject application = new JsonObject();
-
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -50,6 +51,25 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         }
         JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
         items.add(type);
+    }
+    public ConfigurableSetting configurableSetting(String category){
+        if(!application.has(ITEM_LIST)) return null;
+        JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        ConfigurableSetting configurableSetting = null;
+        for(JsonElement je : items) {
+            JsonObject item = je.getAsJsonObject();
+            JsonObject header = item.getAsJsonObject().get("header").getAsJsonObject();
+            if(header.get("type").getAsString().equals(category)){
+                configurableSetting = new ConfigurableSetting();
+                configurableSetting.type = category;
+                configurableSetting.name = header.get("name").getAsString();
+                configurableSetting.icon = header.get("icon").getAsString();
+                configurableSetting.properties = item.get("application").getAsJsonObject().get("properties").getAsJsonArray();
+                break;
+            }
+        }
+        return configurableSetting;
+
     }
     public Key key(){
         return new NaturalKey("category/classes/"+name);

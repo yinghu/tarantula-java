@@ -70,15 +70,15 @@
     document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
     let itemTemplate = {header:{},application:{},reference:[]};
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    itemTemplate.header = selectedItem.header;
-    itemTemplate.application = selectedItem.application;
+    //itemTemplate.header = selectedItem.header;
+    //itemTemplate.application = selectedItem.application;
     document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.name;
     document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/CATEGORY : '+selectedItem.header.type;
     document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];
     props.push('<legend class=\'tx-text-14 w3-text-blue\'>');
-    props.push(itemTemplate.header.name);
+    props.push(selectedItem.header.name);
     props.push('</legend>');
     selectedItem.application.properties.forEach(p=> {
         console.log(p);
@@ -104,16 +104,18 @@
         m3.style.display = 'none';    
     };
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
-        let v = document.querySelector('#tx-asset-property-Name');
-        console.log(v.value);   
+        let item = editor.get();   
+        let cmd = toCmd(TARA_API.query().category);
+        TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
+            editor.set(resp);   
+        });
     };
     document.querySelector('#tx-configuration-asset-preview').onclick=()=>{
-        //document.querySelector('#tx-configuration-asset-save').style.display = 'none';
         let _typeId = document.querySelector('#tx-configuration-asset-type-id').value;
         let _name= document.querySelector('#tx-configuration-asset-name').value;
         let _version = document.querySelector('#tx-configuration-asset-version').value;
         let item = editor.get();
-        item.configurationType = 'asset';
+        item.configurationType = TARA_API.query().category;
         item.configurationTypeId = _typeId;
         item.configurationName = _name;
         item.configurationCategory = selectedItem.header.type;
@@ -125,10 +127,6 @@
         editor.set(item);
         document.querySelector('#tx-asset-create-section').style.display ='none';
         document.querySelector('#tx-asset-create-json').style.display ='block';
-        
-        //TARA_API.onSet('role/item','onCreateAsset',TARA_API.query().gameClusterId,item,(resp)=>{
-            //editor.set(resp);   
-        //});
     };
     document.querySelector('#tx-configuration-asset-api-close').onclick=()=>{
         editor.destroy();
@@ -198,5 +196,8 @@
         }
         tem.push('class=\'w3-input w3-round w3-border tx-text-12\' type=\'text\'>');
         return tem.join(''); 
+    }
+    function toCmd(category){
+        return "onCreate"+category[0].toUpperCase() + category.slice(1).toLowerCase();
     }
 </script>

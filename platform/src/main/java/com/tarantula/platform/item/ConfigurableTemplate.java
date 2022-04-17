@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.RecoverableObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurableTemplate extends RecoverableObject implements Configuration {
@@ -15,7 +14,6 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
     public String version;
     public String description;
     public String name;
-    public HashMap<String,ConfigurableSetting> settings = new HashMap<>();
 
 
     @Override

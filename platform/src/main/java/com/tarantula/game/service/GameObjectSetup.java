@@ -128,8 +128,16 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
         return dataStore.update(t);
     }
+    public <T extends Configurable> boolean save(ServiceContext context,GameCluster gameCluster,T t){
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster),context.partitionNumber());
+        return dataStore.update(t);
+    }
     public <T extends Configurable> boolean load(ApplicationContext context, GameCluster gameCluster, T t){
         DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        return dataStore.load(t);
+    }
+    public <T extends Configurable> boolean load(ServiceContext context,GameCluster gameCluster,T t){
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster),context.partitionNumber());
         return dataStore.load(t);
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){

@@ -38,6 +38,9 @@
                 <label class="tx-text-12 tx-margin-left-4">Type:</label>
                 <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
                 </select>
+                <label class="tx-text-12 tx-margin-left-4">Value:</label>
+                <input id='tx-create-category-property-value' class="w3-input w3-round w3-border tx-text-12" type="text">
+                
                 <div class="w3-panel">
                     <span id="tx-create-category-add" class="w3-right"><i class="fa fa-plus" style="font-size:16px"></i></span>             
                 </div>
@@ -111,10 +114,10 @@
 </div>
 <script>
     let types = [];
+    let pendingProps = new Map();
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         types = resp.itemList;
-        //editor.set(resp);
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {
             tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
@@ -132,16 +135,17 @@
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return; 
         }
-        if(categoryTemplate.application[pname] !=null ){ 
+        if(pendingProps.has(pname)){ 
             document.querySelector("#tx-create-category-warning-message").innerHTML = "Property name already existed";
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return;
         }
         let ptype = document.querySelector('#tx-create-category-property-type').value;
-        categoryTemplate.application[pname] = ptype;
+        let pvalue = document.querySelector('#tx-create-category-property-value').value;
+        pendingProps.set(pname,{name:pname,type:ptype,value:pvalue});
         let props = document.querySelector('#tx-create-category-properties');
         ixc++;
-        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'['+pvalue+']</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
         removecategoryproperty();
     };
     document.querySelector('#tx-create-category-warning-message-ok').onclick=()=>{
@@ -154,12 +158,31 @@
         document.querySelector('#tx-create-category-form-section').style.display ='block';
         document.querySelector('#tx-create-category-json-section').style.display ='none';
     };
+    document.querySelector('#tx-create-category-save').onclick=()=>{    
+        let item = editor.get();
+        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
+        TARA_API.onSet('role/item','onUpdateCategorySettings',query,item,(resp)=>{
+            editor.set(resp);   
+        });
+    };
     document.querySelector('#tx-create-cateory-preview').onclick=()=>{
-        //let item = editor.get();
-        ///let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().itemId
-        //TARA_API.onSet(TARA_API.query().serviceTag,'onedit',query,item,(resp)=>{
-            ///editor.set(resp);   
-        //});
+        let ctype = document.querySelector('#tx-create-category-type').value;
+        let cname = document.querySelector('#tx-create-category-name').value;
+        let cicon = document.querySelector('#tx-create-category-icon').value;
+        let cversion = document.querySelector('#tx-create-category-version').value;
+        let cenabled = document.querySelector('#tx-create-category-enabled').value;
+        let crechargeable = document.querySelector('#tx-create-category-rechargeable').value;
+        categoryTemplate.header.type = ctype;
+        categoryTemplate.header.name = cname;
+        categoryTemplate.header.icon = cicon;
+        categoryTemplate.header.version = cversion;
+        categoryTemplate.header.enabled = cenabled;
+        categoryTemplate.header.rechargeable = crechargeable; 
+        pendingProps.forEach((v,k,m)=>{
+            console.log(k);
+            console.log(v);
+            categoryTemplate.application.properties.push(v);
+        });
         editor.set(categoryTemplate);
         document.querySelector('#tx-create-category-form-section').style.display ='none';
         document.querySelector('#tx-create-category-json-section').style.display ='block';
@@ -181,7 +204,7 @@
         document.querySelectorAll('.tx-remove-property').forEach(a=>{
             a.onclick = ()=>{
                 let pname = a.getAttribute("tx-property-name");
-                delete categoryTemplate.application[pname];
+                pendingProps.delete(pname);
                 document.querySelector('#txc-property-'+a.getAttribute('tx-property-index')).style.display = 'none';
             };
         });

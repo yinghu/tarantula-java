@@ -23,7 +23,9 @@ public interface ApplicationPreSetup {
 
 
     <T extends Configurable> boolean save(ApplicationContext context, GameCluster gameCluster, T t);
+    <T extends Configurable> boolean save(ServiceContext context,GameCluster gameCluster,T t);
     <T extends Configurable> boolean load(ApplicationContext context, GameCluster gameCluster, T t);
+    <T extends Configurable> boolean load(ServiceContext context,GameCluster gameCluster,T t);
     <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
 
 }
