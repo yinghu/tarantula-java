@@ -57,9 +57,8 @@
         tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
     };
     document.querySelector('#tx-asset-enum-create').onclick = ()=>{
-        console.log("create enum type");
-        //TARA_API.query().popup='#tx-popup-api';
-        //tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
+        TARA_API.query().popup='#tx-popup-api';
+        tx_view({viewId:'create.enum',containerId:'#tx-popup-api'});
     };
     document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
         a.onclick=()=>{

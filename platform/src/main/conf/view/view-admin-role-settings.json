@@ -16,6 +16,7 @@
     {"type":"create.application","moduleResourceFile":"admin/create.application.view.html"},
     {"type":"register.application","moduleResourceFile":"admin/register.application.view.html"},
     {"type":"create.category","moduleResourceFile":"admin/create.category.view.html"},
+    {"type":"create.enum","moduleResourceFile":"admin/create.enum.view.html"},
     {"type":"game.lobby.list","moduleResourceFile":"admin/game.lobby.list.view.html"},
     {"type":"game.service.list","moduleResourceFile":"admin/game.service.list.view.html"},
     {"type":"game.data.list","moduleResourceFile":"admin/game.data.list.view.html"},
