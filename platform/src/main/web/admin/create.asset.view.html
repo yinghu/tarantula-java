@@ -79,7 +79,7 @@
     props.push(selectedItem.header.name);
     props.push('</legend>');
     selectedItem.application.properties.forEach(p=> {
-        console.log(p);
+        //console.log(p);
         props.push(toHtmlInputType(p));
     });
     assetForm.innerHTML = props.join('');  
@@ -151,7 +151,7 @@
             tem.push('<span class=\'w3-right tx-margin-right-4 tx-list-item-add\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
         }
         if(prop.type=='boolean') tem.push('</br>');
-        if(prop.type == 'enum' || prop.type == 'reference'){
+        if(prop.type == 'enum' || prop.type == 'category'){
             tem.push('<select ');
         }
         else if(prop.type == 'list'){
@@ -176,19 +176,26 @@
             tem.push('class=\'w3-input w3-round w3-border tx-text-12\' type=\'datetime-local\'>');
             return tem.join('');
         }
-        if(prop.type == 'enum' || prop.type == 'reference'){
+        if(prop.type == 'enum'){
             tem.push('name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4\'>');
-            tem.push('<option value=\'a\'>A</option>');
-            tem.push('<option value=\'b\'>B</option>');
-            tem.push('<option value=\'c\'>C</option>');
+            TARA_API.query().types[prop.reference].value.forEach(e=>{
+                tem.push('<option value=\'a\'>'+e.name+'</option>');
+            });
+            tem.push('</select>');
+            return tem.join('');
+        }
+        if(prop.type == 'category'){
+            tem.push('name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4\'>');
+            tem.push('<option value=\'a\'>Card1</option>');
+            tem.push('<option value=\'a\'>Card2</option>');
             tem.push('</select>');
             return tem.join('');
         }
         if(prop.type == 'list'){
             tem.push('class=\'w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4\'>');
-            //tem.push('<li>A</li>');
-            //tem.push('<li>B</li>');
-            //tem.push('<li>C</li>');
+            tem.push('<li>A</li>');
+            tem.push('<li>B</li>');
+            tem.push('<li>C</li>');
             tem.push('</ul>');
             return tem.join('');
         }

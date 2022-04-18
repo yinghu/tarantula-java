@@ -46,6 +46,10 @@
     TARA_API.onGet('role/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         TARA_API.query().itemList = resp.itemList;
+        TARA_API.query().types ={};
+        resp.types.itemList.forEach(t=>{
+            TARA_API.query().types[t.name]=t;            
+        });
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-asset-template-'+i).style.display = 'block';
             document.querySelector('#tx-asset-template-'+i).innerHTML = a.header.name;

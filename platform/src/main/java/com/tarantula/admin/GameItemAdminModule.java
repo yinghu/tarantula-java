@@ -25,6 +25,7 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             ConfigurableCategories categories = this.configurableCategories(query[1],gameCluster,applicationPreSetup);
+            categories.configurableTypes(this.configurableTypes(query[1],gameCluster,applicationPreSetup));
             session.write(categories.toJson().toString().getBytes());
         }
         else if(session.action().equals("onTypesSettings")){

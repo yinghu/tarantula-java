@@ -9,12 +9,12 @@ import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigurableCategories extends RecoverableObject implements Configuration {
 
     private static String ITEM_LIST = "itemList";
     private JsonObject application = new JsonObject();
+    private ConfigurableTypes configurableTypes;
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -43,6 +43,7 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         jsonObject.addProperty("name",name);
         if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
         jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
+        if(configurableTypes!=null) jsonObject.add("types",configurableTypes.toJson());
         return jsonObject;
     }
     public void addType(JsonObject type){
@@ -51,6 +52,9 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         }
         JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
         items.add(type);
+    }
+    public void configurableTypes(ConfigurableTypes configurableTypes){
+        this.configurableTypes = configurableTypes;
     }
     public ConfigurableSetting configurableSetting(String category){
         if(!application.has(ITEM_LIST)) return null;
