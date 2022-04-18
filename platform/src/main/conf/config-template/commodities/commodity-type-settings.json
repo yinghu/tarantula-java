@@ -5,6 +5,6 @@
   "description": "basic types of asset category",
   "itemList":
   [
-      {"type": "enum","name":"Selection","value":[{"name": "A","value": 0},{"name": "B","value": 1},{"name": "C","value": 2}] }
+      {"type": "enum","name":"Sample","value":[{"name": "A","value": 0},{"name": "B","value": 1},{"name": "C","value": 2}] }
   ]
 }

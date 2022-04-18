@@ -7,7 +7,7 @@
   "itemList":
   [
     {
-      "header": {"type": "card","name": "Item Card","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
+      "header": {"type": "Card","name": "Item Card","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
       "application":
       {
         "properties":
@@ -16,23 +16,6 @@
           {"name": "Icon","type": "string"},
           {"name": "Description","type": "string"}
         ]
-      }
-    },
-    {
-      "header": {"type": "zone","name": "Game Zone","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "properties":
-        [
-          {"name": "Name","type": "string"},
-          {"name": "Level","type": "number"},
-          {"name": "Limited","type": "boolean"},
-          {"name": "ReleaseDate","type": "dateTime"},
-          {"name": "Choice","type": "enum","reference": ["A","B","C"]},
-          {"name": "Card","type": "reference","reference":"card"},
-          {"name": "Items","type": "list","reference": "string","primitive": "string"}
-        ]
-
       }
     }
   ]

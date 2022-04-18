@@ -1,6 +1,7 @@
 package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -10,6 +11,7 @@ import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameItemAdminModule implements Module {
@@ -31,6 +33,26 @@ public class GameItemAdminModule implements Module {
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             ConfigurableTypes configurableTypes = this.configurableTypes(query[1],gameCluster,applicationPreSetup);
             session.write(configurableTypes.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onUpdateTypesSettings")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            JsonObject jo = JsonUtil.parse(session.payload());
+            ArrayList<String> updates = new ArrayList<>();
+            if(jo.get(Configurable.ASSET_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.ASSET_CONFIG_TYPE);
+            if(jo.get(Configurable.COMPONENT_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.COMPONENT_CONFIG_TYPE);
+            if(jo.get(Configurable.COMMODITY_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.COMMODITY_CONFIG_TYPE);
+            if(jo.get(Configurable.ITEM_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.ITEM_CONFIG_TYPE);
+            if(jo.get(Configurable.APPLICATION_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.APPLICATION_CONFIG_TYPE);
+            updates.forEach((update)-> {
+                ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
+                jo.get("itemList").getAsJsonArray().forEach((e) -> {
+                    configurableTypes.addType(e.getAsJsonObject());
+                });
+                applicationPreSetup.save(context, gameCluster, configurableTypes);
+                if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
+            });
         }
         else if(session.action().equals("onUpdateCategorySettings")){
             String[] query = session.name().split("#");
@@ -232,10 +254,7 @@ public class GameItemAdminModule implements Module {
         if(!applicationPreSetup.load(context,gameCluster,categories)){
             ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
             JsonArray cclasses = (JsonArray)configuration.property("itemList");
-            cclasses.forEach((c)->{
-                this.context.log(c.toString(),OnLog.WARN);
-                categories.addType(c.getAsJsonObject());
-            });
+            cclasses.forEach((c)->categories.addType(c.getAsJsonObject()));
             applicationPreSetup.save(context,gameCluster,categories);
         }
         return categories;
@@ -246,17 +265,19 @@ public class GameItemAdminModule implements Module {
         if(!applicationPreSetup.load(context,gameCluster,configurableTypes)){
             Configuration commonTypes = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMON_TYPE_TEMPLATE);
             JsonArray ctypes = (JsonArray)commonTypes.property("itemList");
-            ctypes.forEach((c)->{
-                this.context.log(c.toString(),OnLog.WARN);
-                configurableTypes.addType(c.getAsJsonObject());
-            });
+            ctypes.forEach((c)-> configurableTypes.addType(c.getAsJsonObject()));
             ConfigurableTemplate template = this.categoryTemplateSetting(gameCluster,name);
+            JsonArray cct = (JsonArray)template.property("itemList");
+            cct.forEach((t)->{
+                String type = t.getAsJsonObject().get("header").getAsJsonObject().get("type").getAsString();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("type","category");
+                jsonObject.addProperty("name",type);
+                configurableTypes.addType(jsonObject);
+            });
             Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
             JsonArray items = (JsonArray) configuration.property("itemList");
-            items.forEach((f)->{
-                this.context.log(f.toString(),OnLog.WARN);
-                configurableTypes.addType(f.getAsJsonObject());
-            });
+            items.forEach((f)-> configurableTypes.addType(f.getAsJsonObject()));
             applicationPreSetup.save(context,gameCluster,configurableTypes);
         }
         return configurableTypes;
