@@ -5,9 +5,17 @@
   "description": "basic common types of category",
   "itemList":
   [
-    {"type": "string","name":"String","value": "string"},
-    {"type": "number","name": "Number","value": "number"},
-    {"type": "dateTime","name": "DateTime","value": "dateTime"},
+    {"type": "string","name": "Icon","value": "text"},
+    {"type": "string","name": "Name","value": "text"},
+    {"type": "string","name": "Description","value": "text"},
+    {"type": "string","name": "EmailAddress","value": "email"},
+    {"type": "string","name": "Password","value": "password"},
+    {"type": "number","name": "Short","value": "number"},
+    {"type": "number","name": "Integer","value": "number"},
+    {"type": "number","name": "Long","value": "number"},
+    {"type": "number","name": "Double","value": "number"},
+    {"type": "number","name": "Float","value": "number"},
+    {"type": "dateTime","name": "DateTime","value": "dateTime-local"},
     {"type": "list","name": "List"},
     {"type": "set","name": "Set"}
   ]

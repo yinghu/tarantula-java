@@ -12,11 +12,11 @@
       {
         "properties":
         [
-          {"name":"EnergyCost","type":"number","value": 4},
-          {"name":"ChargeTime","type":"number","value": 0.4},
-          {"name":"Duration","type":"number","value": 3},
-          {"name":"TargetingRange","type":"number","value": 5.5},
-          {"name":"DamageRange","type":"number", "value": 2.75}
+          {"name":"EnergyCost","type":"number","reference":"Float","value": 4},
+          {"name":"ChargeTime","type":"number","reference":"Float","value": 0.4},
+          {"name":"Duration","type":"number","reference":"Float","value": 3},
+          {"name":"TargetingRange","type":"number","reference":"Float","value": 5.5},
+          {"name":"DamageRange","type":"number","reference":"Float","value": 2.75}
         ]
       }
     },
@@ -26,12 +26,12 @@
       {
         "properties":
         [
-          {"name":"Health", "type":"number","value": 1000},
-          {"name":"MeleeDamage","type":"number","value": 100},
-          {"name":"RangedDamage","type":"number","value": 100},
-          {"name":"CriticalDamagePercent","type":"number","value": 0.3},
-          {"name":"Recovery","type":"number","value": 100},
-          {"name":"Speed","type":"number","value": 0}
+          {"name":"Health", "type":"number","reference":"Float","value": 1000},
+          {"name":"MeleeDamage","type":"number","reference":"Float","value": 100},
+          {"name":"RangedDamage","type":"number","reference":"Float","value": 100},
+          {"name":"CriticalDamagePercent","type":"number","reference":"Float","value": 0.3},
+          {"name":"Recovery","type":"number","reference":"Float","value": 100},
+          {"name":"Speed","type":"number","reference":"Float","value": 0}
         ]
       }
     }

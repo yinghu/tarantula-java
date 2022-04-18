@@ -12,8 +12,10 @@
       {
         "properties":
         [
-          {"name": "Name","type": "string"},
-          {"name": "amount","type": "number"}
+          {"name": "Name","type": "string","reference":"Name"},
+          {"name": "Amount","type": "number","reference":"Double"},
+          {"name": "Card","type": "category","reference":"Card"},
+          {"name": "Sample","type": "enum","reference":"Sample"}
         ]
       }
     }

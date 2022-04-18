@@ -53,6 +53,8 @@
                 <label class="tx-text-12 tx-margin-left-4">Type:</label>
                 <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
                 </select>
+                <label class="tx-text-12 tx-margin-left-4">Nullable</label>
+                <input id='tx-create-category-property-nullable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">
                 <div id="tx-create-category-property-value-drop" style="display: none;">
                     <label class="tx-text-12 tx-margin-left-4">Reference:</label>
                     <select id='tx-create-category-property-value' class="w3-select tx-text-12">
@@ -132,6 +134,9 @@
 <script>
     let types = [];
     let pendingProps = new Map();
+    let cked = document.querySelector('#tx-create-category-scope-'+TARA_API.query().category);
+    cked.checked = true;
+    cked.disabled = true;
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         types = resp.itemList;
@@ -146,9 +151,12 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
     if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
     let typeSelect = document.querySelector('#tx-create-category-property-type');
+    let typeSelectIndex = 0;
     let typeDrop = document.querySelector('#tx-create-category-property-value-drop');
     let typeValue = document.querySelector('#tx-create-category-property-value');
-    
+    let typeValueSelected = 0;
+    let props = document.querySelector('#tx-create-category-properties');
+    let nullableChecked = document.querySelector('#tx-create-category-property-nullable');
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
@@ -162,12 +170,27 @@
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return;
         }
-        let ptype = document.querySelector('#tx-create-category-property-type').value;
-        let pvalue = document.querySelector('#tx-create-category-property-value').value;
-        pendingProps.set(pname,{name:pname,type:ptype,value:pvalue});
-        let props = document.querySelector('#tx-create-category-properties');
+        let ptype = typeSelect.value;
+        let tname = typeSelect.options[typeSelectIndex].text;
+        let nullabled = nullableChecked.checked;
         ixc++;
-        props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'['+pvalue+']</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+        switch(ptype){
+            case 'category':
+            case 'enum':
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+            case 'list':
+            case 'set':
+                let pvalue = typeValue.value+':'+typeValue.options[typeValueSelected].text;
+                pendingProps.set(pname,{name:pname,type:ptype,reference:pvalue,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+pvalue+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+            default:
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+        }
         removecategoryproperty();
     };
     document.querySelector('#tx-create-category-warning-message-ok').onclick=()=>{
@@ -188,11 +211,12 @@
         });
     };
     typeValue.onchange =()=>{   
-        console.log(typeValue.value);
+        typeValueSelected = typeValue.selectedIndex;
     };
     typeSelect.onchange = ()=>{
         let selected = typeSelect.value;
-        let nameSelected = typeSelect.options[typeSelect.selectedIndex].text;
+        typeSelectIndex = typeSelect.selectedIndex;
+        let nameSelected = typeSelect.options[typeSelectIndex].text;
         switch(selected){
             case 'enum':
                 typeValue.innerHTML='';
@@ -201,13 +225,20 @@
                 });
                 typeDrop.style.display = 'block';
                 break;
-            case 'category':
-                typeDrop.style.display = 'block';
-                break;
             case 'list':
+                typeValue.innerHTML = '';
+                types.forEach(t => {
+                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set')
+                        typeValue.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
+                });  
                 typeDrop.style.display = 'block';
                 break;
             case 'set':
+                typeValue.innerHTML = '';
+                types.forEach(t => {
+                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set')
+                        typeValue.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
+                });  
                 typeDrop.style.display = 'block';
                 break;
             default:
@@ -216,6 +247,13 @@
         }
     };
     document.querySelector('#tx-create-cateory-preview').onclick=()=>{
+        let payload ={};
+        payload.asset = document.querySelector('#tx-create-category-scope-asset').checked;
+        payload.component = document.querySelector('#tx-create-category-scope-component').checked;
+        payload.commodity = document.querySelector('#tx-create-category-scope-commodity').checked;
+        payload.item = document.querySelector('#tx-create-category-scope-item').checked;
+        payload.application = document.querySelector('#tx-create-category-scope-application').checked;
+
         let ctype = document.querySelector('#tx-create-category-type').value;
         let cname = document.querySelector('#tx-create-category-name').value;
         let cicon = document.querySelector('#tx-create-category-icon').value;
@@ -230,11 +268,10 @@
         categoryTemplate.header.rechargeable = crechargeable; 
         categoryTemplate.application.properties = [];
         pendingProps.forEach((v,k,m)=>{
-            console.log(k);
-            console.log(v);
             categoryTemplate.application.properties.push(v);
         });
-        editor.set(categoryTemplate);
+        payload.category = categoryTemplate;
+        editor.set(payload);
         document.querySelector('#tx-create-category-form-section').style.display ='none';
         document.querySelector('#tx-create-category-json-section').style.display ='block';
     };

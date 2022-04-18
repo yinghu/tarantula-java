@@ -12,9 +12,9 @@
       {
         "properties":
         [
-          {"name": "Name","type": "string"},
-          {"name": "Icon","type": "string"},
-          {"name": "Description","type": "string"}
+          {"name": "Name","type": "string","reference": "Name","nullable": false},
+          {"name": "Icon","type": "string","reference": "Icon","nullable": false},
+          {"name": "Description","type": "string","reference": "Description","nullable": true}
         ]
       }
     }
