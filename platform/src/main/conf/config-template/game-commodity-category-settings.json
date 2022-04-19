@@ -16,6 +16,7 @@
           {"name": "Amount","type": "number","reference":"Double"},
           {"name": "Card","type": "category","reference":"Card"},
           {"name": "Active","type": "boolean","reference":"Boolean"},
+          {"name": "StartTime","type": "dateTime","reference":"DateTime"},
           {"name": "Sample","type": "enum","reference":"Sample"},
           {"name": "EmailList","type": "set","reference":"string:EmailAddress"},
           {"name": "CardList","type": "list","reference":"category:Card"}
