@@ -1,6 +1,7 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
@@ -43,12 +44,21 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
         return jsonObject;
     }
-    public void addType(JsonObject type){
+    public boolean addType(JsonObject type){
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());
         }
         JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        boolean exiting = false;
+        for(JsonElement je : items) {
+            if (je.getAsJsonObject().get("name").getAsString().equals(type.get("name").getAsString())){
+                exiting = true;
+                break;
+            }
+        }
+        if(exiting) return false;
         items.add(type);
+        return true;
     }
     public Key key(){
         return new NaturalKey("category/types/"+name);

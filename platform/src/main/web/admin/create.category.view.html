@@ -157,6 +157,7 @@
     let typeValueSelected = 0;
     let props = document.querySelector('#tx-create-category-properties');
     let nullableChecked = document.querySelector('#tx-create-category-property-nullable');
+    document.querySelector('#tx-create-category-version').value = '1.0';
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
@@ -251,8 +252,23 @@
         let cname = document.querySelector('#tx-create-category-name').value;
         let cicon = document.querySelector('#tx-create-category-icon').value;
         let cversion = document.querySelector('#tx-create-category-version').value;
-        let cenabled = document.querySelector('#tx-create-category-enabled').value;
-        let crechargeable = document.querySelector('#tx-create-category-rechargeable').value;
+        let cenabled = document.querySelector('#tx-create-category-enabled').checked;
+        let crechargeable = document.querySelector('#tx-create-category-rechargeable').checked;
+        if(ctype==null||ctype==''){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type cannot be null";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(TARA_API.query().types.hasOwnProperty(ctype)){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type alread existed";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(cname==null||cname==''){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category name cannot be null";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
         categoryTemplate.header.type = ctype;
         categoryTemplate.header.name = cname;
         categoryTemplate.header.icon = cicon;
@@ -263,6 +279,11 @@
         pendingProps.forEach((v,k,m)=>{
             categoryTemplate.application.properties.push(v);
         });
+        if(categoryTemplate.application.properties.length<=0){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category at least has one or more proprties";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return;
+        }
         payload.category = categoryTemplate;
         editor.set(payload);
         document.querySelector('#tx-create-category-form-section').style.display ='none';

@@ -154,7 +154,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
             ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
             JsonArray cclasses = (JsonArray)configuration.property("itemList");
             cclasses.forEach((c)->{
-                categories.addType(c.getAsJsonObject());
+                categories.addCategory(c.getAsJsonObject());
             });
             applicationPreSetup.save(serviceContext,gameCluster,categories);
         }
