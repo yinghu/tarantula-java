@@ -15,6 +15,7 @@
     {"type": "number","name": "Long","value": "number"},
     {"type": "number","name": "Double","value": "number"},
     {"type": "number","name": "Float","value": "number"},
+    {"type": "boolean","name": "Boolean","value": "boolean"},
     {"type": "dateTime","name": "DateTime","value": "dateTime-local"},
     {"type": "list","name": "List"},
     {"type": "set","name": "Set"}

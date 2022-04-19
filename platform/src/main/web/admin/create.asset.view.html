@@ -75,20 +75,33 @@
     document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];
+    let payload = {};
     props.push('<legend class=\'tx-text-14 w3-text-blue\'>');
     props.push(selectedItem.header.name);
     props.push('</legend>');
     selectedItem.application.properties.forEach(p=> {
         //console.log(p);
+        payload[p.name]=p;
         props.push(toHtmlInputType(p));
     });
     assetForm.innerHTML = props.join('');  
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},itemTemplate);
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},payload);
     
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{
-            let list = document.querySelector('#tx-asset-property-Items');
-            list.innerHTML += '<li>A</li>';
+            let pname = a.getAttribute('tx-property-name');
+            let list = document.querySelector('#tx-asset-property-'+pname);
+            let pv = payload[pname].reference.split(':');
+            if(pv[0] != 'category'){
+                let v = TARA_API.query().types[pv[1]];
+                let added = [];
+                added.push('<li><div>');
+                added.push('<input class=\'w3-input w3-round w3-border tx-text-12\' style=\'width:80%\' type=\'');
+                added.push(v.value);
+                added.push('\'><span class=\'w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button\'>Remove</span></div></li>');        
+                list.innerHTML += added.join('');
+            }
+            //list.innerHTML += '<li>'+v.value+'</li>';
         };
     });
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{
@@ -143,18 +156,23 @@
     };
     function toHtmlInputType(prop){
         let tem = [];
-        if(prop.type == 'list') tem.push('<div>');
+        if(prop.type == 'list' || prop.type == 'set'){
+            console.log(prop.reference);
+            tem.push('<div>');
+        }
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
         tem.push(prop.name);    
         tem.push('</label>');
-        if(prop.type == 'list'){
-            tem.push('<span class=\'w3-right tx-margin-right-4 tx-list-item-add\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+        if(prop.type == 'list' || prop.type == 'set'){
+            tem.push('<span tx-property-name=\'');
+            tem.push(prop.name);
+            tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-add\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
         }
         if(prop.type=='boolean') tem.push('</br>');
         if(prop.type == 'enum' || prop.type == 'category'){
             tem.push('<select ');
         }
-        else if(prop.type == 'list'){
+        else if(prop.type == 'list' || prop.type == 'set'){
             tem.push('<ul ');
         }
         else{
@@ -191,11 +209,8 @@
             tem.push('</select>');
             return tem.join('');
         }
-        if(prop.type == 'list'){
+        if(prop.type == 'list' || prop.type =='set'){
             tem.push('class=\'w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4\'>');
-            tem.push('<li>A</li>');
-            tem.push('<li>B</li>');
-            tem.push('<li>C</li>');
             tem.push('</ul>');
             return tem.join('');
         }

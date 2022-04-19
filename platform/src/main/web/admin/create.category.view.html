@@ -226,17 +226,10 @@
                 typeDrop.style.display = 'block';
                 break;
             case 'list':
-                typeValue.innerHTML = '';
-                types.forEach(t => {
-                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set')
-                        typeValue.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
-                });  
-                typeDrop.style.display = 'block';
-                break;
             case 'set':
                 typeValue.innerHTML = '';
                 types.forEach(t => {
-                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set')
+                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set' && t.type !='boolean')
                         typeValue.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
                 });  
                 typeDrop.style.display = 'block';
