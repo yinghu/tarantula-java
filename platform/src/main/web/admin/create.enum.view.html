@@ -13,21 +13,6 @@
     <div class="w3-container" id="tx-create-enum-form-section">
         <div class="w3-panel"> 
             <fieldset class="w3-border-blue"> 
-                <legend class="tx-text-14 w3-text-blue">Scope</legend>
-                <label class="tx-text-12 tx-margin-right-4">Asset</label>
-                <input id='tx-create-enum-scope-asset' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Component</label>
-                <input id='tx-create-enum-scope-component' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Commodity</label>
-                <input id='tx-create-enum-scope-commodity' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Item</label>
-                <input id='tx-create-enum-scope-item' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Application</label>
-                <input id='tx-create-enum-scope-application' class="w3-check tx-text-12" type="checkbox">
-            </fieldset>
-        </div>
-        <div class="w3-panel"> 
-            <fieldset class="w3-border-blue"> 
                 <legend class="tx-text-14 w3-text-blue">Properties</legend>
                 <label class="tx-text-12 tx-margin-left-4">Name:</label>
                 <input id='tx-create-enum-property-name' class="w3-input w3-round w3-border tx-text-12" type="text">
@@ -110,9 +95,6 @@
     let payload ={};
     let types = new Map();
     let pendingProps = new Map();
-    let cked = document.querySelector('#tx-create-enum-scope-'+TARA_API.query().category);
-    cked.checked = true;
-    cked.disabled = true;
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         //payload = resp;
@@ -180,14 +162,7 @@
             value.push({name:k,value:v});
         });
         pendingEnum.value = value;
-        payload.asset = document.querySelector('#tx-create-enum-scope-asset').checked;
-        payload.component = document.querySelector('#tx-create-enum-scope-component').checked;
-        payload.commodity = document.querySelector('#tx-create-enum-scope-commodity').checked;
-        payload.item = document.querySelector('#tx-create-enum-scope-item').checked;
-        payload.application = document.querySelector('#tx-create-enum-scope-application').checked;
-        payload.itemList =[];
-        //types.forEach((v,k,m)=>{ payload.itemList.push(v)});
-        payload.itemList.push(pendingEnum);
+        payload.type=pendingEnum;
         editor.set(payload);
         document.querySelector('#tx-create-enum-form-section').style.display ='none';
         document.querySelector('#tx-create-enum-json-section').style.display ='block';

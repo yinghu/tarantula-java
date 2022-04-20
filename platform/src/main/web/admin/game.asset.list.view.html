@@ -52,7 +52,7 @@
         });
         resp.itemList.forEach((a,i)=>{
             document.querySelector('#tx-asset-template-'+i).style.display = 'block';
-            document.querySelector('#tx-asset-template-'+i).innerHTML = a.header.name+':'+a.header.type;
+            document.querySelector('#tx-asset-template-'+i).innerHTML = a.header.type;
             document.querySelector('#tx-asset-template-'+i).setAttribute('tx-index',''+i);
         });
     });

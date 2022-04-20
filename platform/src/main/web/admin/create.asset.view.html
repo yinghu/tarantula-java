@@ -14,11 +14,6 @@
         <span id="tx-configuration-asset-description" class='w3-left tx-text-18 tx-margin-top-8 tx-margin-left-8'></span>
         <span id="tx-configuration-asset-type" class='w3-right tx-text-18 tx-margin-top-8 tx-margin-left-8'>Asset</span>
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
-            <span id='tx-asset-create-enable' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Enable</span> 
-        </div>            
-    </div>
     <div class="w3-container" id="tx-asset-create-section">
         <div class="w3-panel">  
             <fieldset class="w3-border-blue"> 
@@ -75,10 +70,7 @@
     document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
     let itemTemplate = {header:{},application:{},reference:[]};
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    let enableCmd = document.querySelector('#tx-asset-create-enable');
-    enableCmd.innerHTML = selectedItem.header.enabled?'Disable':'Enable';
-    let updateCmd = selectedItem.header.enabled?'onDisableCategpry':'onEnableCategpry';
-    document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.name;
+    document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.scope;
     document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
     document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
     let assetForm = document.querySelector('#tx-asset-create-form');
@@ -124,9 +116,6 @@
             list.innerHTML += added.join('');
         };
     });
-    enableCmd.onclick=()=>{
-        console.log("enable category->"+updateCmd);       
-    };
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{
         document.querySelector('#tx-asset-create-section').style.display ='block';
         document.querySelector('#tx-asset-create-json').style.display ='none';    

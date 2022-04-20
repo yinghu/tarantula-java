@@ -39,29 +39,49 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            JsonObject jo = JsonUtil.parse(session.payload());
-            List<String> updates = availableUpdates(query[1],jo);
-            updates.forEach((update)-> {
-                ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                jo.get("itemList").getAsJsonArray().forEach((e) -> {
-                    configurableTypes.addType(e.getAsJsonObject());
+            JsonObject jo = JsonUtil.parse(session.payload()).get("type").getAsJsonObject();
+            TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo.get("type").getAsString());
+            if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
+                applicationPreSetup.save(context,gameCluster,typeIndex);
+                List<String> updates = availableUpdates(query[1]);
+                updates.forEach((update)-> {
+                    ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
+                    configurableTypes.addType(jo);
+                    applicationPreSetup.save(context, gameCluster, configurableTypes);
+                    if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
                 });
-                applicationPreSetup.save(context, gameCluster, configurableTypes);
-                if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
-            });
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
+            }
         }
         else if(session.action().equals("onUpdateCategorySettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            JsonObject jo = JsonUtil.parse(session.payload());
-            List<String> updates = this.availableUpdates(query[1],jo);
-            updates.forEach(update->{
-                ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-                categories.addCategory(jo.get("category").getAsJsonObject());
-                applicationPreSetup.save(context,gameCluster,categories);
-                if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
-            });
+            JsonObject jo = JsonUtil.parse(session.payload()).get("category").getAsJsonObject();
+            JsonObject header = jo.get("header").getAsJsonObject();
+            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),query[1],header.get("scope").getAsString());
+            if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
+                applicationPreSetup.save(context,gameCluster,typeIndex);
+                List<String> updates = this.availableUpdates(query[1]);
+                updates.forEach(update->{
+                    ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
+                    if(categories.addCategory(jo)){
+                        applicationPreSetup.save(context,gameCluster,categories);
+                        ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
+                        JsonObject type = new JsonObject();
+                        type.addProperty("type","category");
+                        type.addProperty("name",typeIndex.name());
+                        configurableTypes.addType(type);
+                        applicationPreSetup.save(context,gameCluster,configurableTypes);
+                    }
+                    if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
+                });
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
+            }
         }
         else if (session.action().equals("onCreateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
@@ -281,29 +301,29 @@ public class GameItemAdminModule implements Module {
         }
         return configurableTypes;
     }
-    private List<String> availableUpdates(String type,JsonObject jo){
+    private List<String> availableUpdates(String type){
         ArrayList<String> updates = new ArrayList<>();
         updates.add(type);
         if(type.equals(Configurable.ITEM_CONFIG_TYPE)){
-             if(jo.get(Configurable.APPLICATION_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.APPLICATION_CONFIG_TYPE);
+             updates.add(Configurable.APPLICATION_CONFIG_TYPE);
              return updates;
         }
         if(type.equals(Configurable.COMMODITY_CONFIG_TYPE)){
-            if(jo.get(Configurable.ITEM_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.ITEM_CONFIG_TYPE);
-            if(jo.get(Configurable.APPLICATION_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.APPLICATION_CONFIG_TYPE);
+            updates.add(Configurable.ITEM_CONFIG_TYPE);
+            updates.add(Configurable.APPLICATION_CONFIG_TYPE);
             return updates;
         }
         if(type.equals(Configurable.COMPONENT_CONFIG_TYPE)){
-            if(jo.get(Configurable.COMMODITY_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.COMMODITY_CONFIG_TYPE);
-            if(jo.get(Configurable.ITEM_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.ITEM_CONFIG_TYPE);
-            if(jo.get(Configurable.APPLICATION_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.APPLICATION_CONFIG_TYPE);
+            updates.add(Configurable.COMMODITY_CONFIG_TYPE);
+            updates.add(Configurable.ITEM_CONFIG_TYPE);
+            updates.add(Configurable.APPLICATION_CONFIG_TYPE);
             return updates;
         }
         if(type.equals(Configurable.ASSET_CONFIG_TYPE)){
-            if(jo.get(Configurable.COMPONENT_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.COMPONENT_CONFIG_TYPE);
-            if(jo.get(Configurable.COMMODITY_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.COMMODITY_CONFIG_TYPE);
-            if(jo.get(Configurable.ITEM_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.ITEM_CONFIG_TYPE);
-            if(jo.get(Configurable.APPLICATION_CONFIG_TYPE).getAsBoolean()) updates.add(Configurable.APPLICATION_CONFIG_TYPE);
+            updates.add(Configurable.COMPONENT_CONFIG_TYPE);
+            updates.add(Configurable.COMMODITY_CONFIG_TYPE);
+            updates.add(Configurable.ITEM_CONFIG_TYPE);
+            updates.add(Configurable.APPLICATION_CONFIG_TYPE);
             return updates;
         }
         return updates;

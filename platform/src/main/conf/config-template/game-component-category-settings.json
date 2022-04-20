@@ -6,34 +6,6 @@
   "name": "components/component-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "AbilityStats","name": "Ability Stats","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "properties":
-        [
-          {"name":"EnergyCost","type":"number","reference":"Float","value": 4},
-          {"name":"ChargeTime","type":"number","reference":"Float","value": 0.4},
-          {"name":"Duration","type":"number","reference":"Float","value": 3},
-          {"name":"TargetingRange","type":"number","reference":"Float","value": 5.5},
-          {"name":"DamageRange","type":"number","reference":"Float","value": 2.75}
-        ]
-      }
-    },
-    {
-      "header": {"type": "RobotStats","name": "Robot Stats","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "properties":
-        [
-          {"name":"Health", "type":"number","reference":"Float","value": 1000},
-          {"name":"MeleeDamage","type":"number","reference":"Float","value": 100},
-          {"name":"RangedDamage","type":"number","reference":"Float","value": 100},
-          {"name":"CriticalDamagePercent","type":"number","reference":"Float","value": 0.3},
-          {"name":"Recovery","type":"number","reference":"Float","value": 100},
-          {"name":"Speed","type":"number","reference":"Float","value": 0}
-        ]
-      }
-    }
+
   ]
 }

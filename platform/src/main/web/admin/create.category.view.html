@@ -11,38 +11,34 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-container" id="tx-create-category-form-section">
-        <div class="w3-panel"> 
-            <fieldset class="w3-border-blue"> 
+        <div class="w3-panel">   
+            <fieldset class="w3-border-blue">
                 <legend class="tx-text-14 w3-text-blue">Scope</legend>
-                <label class="tx-text-12 tx-margin-right-4">Asset:</label>
-                <input id='tx-create-category-scope-asset' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Component:</label>
-                <input id='tx-create-category-scope-component' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Commodity:</label>
-                <input id='tx-create-category-scope-commodity' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Item:</label>
-                <input id='tx-create-category-scope-item' class="w3-check tx-text-12" type="checkbox">
-                <label class="tx-text-12 tx-margin-right-4">Application:</label>
-                <input id='tx-create-category-scope-application' class="w3-check tx-text-12" type="checkbox">
-            </fieldset>
+                <label class="tx-text-12 tx-margin-right-4">Asset</label>
+                <input id='tx-category-scope-asset' value='asset' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Component</label>
+                <input id='tx-category-scope-component' value='component' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Commodity</label>
+                <input id='tx-category-scope-commodity' value='commodity' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Item</label>
+                <input id='tx-category-scope-item' value='item' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Application</label>
+                <input id='tx-category-scope-application' value='application' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+            </fieldset>    
         </div>
         <div class="w3-panel">   
             <fieldset class="w3-border-blue">
                 <legend class="tx-text-14 w3-text-blue">Header</legend>
                 <label class="tx-text-12 tx-margin-left-4">Category Type:</label>
                 <input id='tx-create-category-type' class="w3-input w3-round w3-border tx-text-12" type="text">  
-                <label class="tx-text-12 tx-margin-left-4">Category Name:</label>
+                <label class="tx-text-12 tx-margin-left-4">Category Description:</label>
                 <input id='tx-create-category-name' class="w3-input w3-round w3-border tx-text-12" type="text">
-                <label class="tx-text-12 tx-margin-left-4">Category Icon:</label>
-                <input id='tx-create-category-icon' class="w3-input w3-round w3-border tx-text-12" type="text">
                 <label class="tx-text-12 tx-margin-left-4">Category Version:</label>
                 <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text"> 
                 <div id="tx-create-category-rechargeable-display" style="display: none;">  
                     <label class="tx-text-12 tx-margin-left-4">Rechargeable</label>
                     <input id='tx-create-category-rechargeable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">      
                 </div>
-                <label class="tx-text-12 tx-margin-left-4">Enabled</label>
-                <input id='tx-create-category-enabled' class="w3-check tx-text-12 tx-margin-left-32" type="checkbox">
             </fieldset>    
         </div>
         <div class="w3-panel"> 
@@ -132,11 +128,10 @@
 
 </div>
 <script>
+    let scope = TARA_API.query().category;
+    document.querySelector('#tx-category-scope-'+scope).checked = true;
     let types = [];
     let pendingProps = new Map();
-    let cked = document.querySelector('#tx-create-category-scope-'+TARA_API.query().category);
-    cked.checked = true;
-    cked.disabled = true;
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         types = resp.itemList;
@@ -211,6 +206,11 @@
             editor.set(resp);   
         });
     };
+    document.querySelectorAll('.tx-category-scope').forEach(a=>{
+        a.onchange = ()=>{
+            scope = a.value;
+        }
+    });
     typeValue.onchange =()=>{   
         typeValueSelected = typeValue.selectedIndex;
     };
@@ -242,17 +242,10 @@
     };
     document.querySelector('#tx-create-cateory-preview').onclick=()=>{
         let payload ={};
-        payload.asset = document.querySelector('#tx-create-category-scope-asset').checked;
-        payload.component = document.querySelector('#tx-create-category-scope-component').checked;
-        payload.commodity = document.querySelector('#tx-create-category-scope-commodity').checked;
-        payload.item = document.querySelector('#tx-create-category-scope-item').checked;
-        payload.application = document.querySelector('#tx-create-category-scope-application').checked;
-
+       
         let ctype = document.querySelector('#tx-create-category-type').value;
         let cname = document.querySelector('#tx-create-category-name').value;
-        let cicon = document.querySelector('#tx-create-category-icon').value;
         let cversion = document.querySelector('#tx-create-category-version').value;
-        let cenabled = document.querySelector('#tx-create-category-enabled').checked;
         let crechargeable = document.querySelector('#tx-create-category-rechargeable').checked;
         if(ctype==null||ctype==''){
             document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type cannot be null";
@@ -264,16 +257,10 @@
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return; 
         }
-        if(cname==null||cname==''){
-            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category name cannot be null";
-            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
-            return; 
-        }
+        categoryTemplate.header.scope = scope;
         categoryTemplate.header.type = ctype;
-        categoryTemplate.header.name = cname;
-        categoryTemplate.header.icon = cicon;
+        categoryTemplate.header.description = cname;
         categoryTemplate.header.version = cversion;
-        categoryTemplate.header.enabled = cenabled;
         categoryTemplate.header.rechargeable = crechargeable; 
         categoryTemplate.application.properties = [];
         pendingProps.forEach((v,k,m)=>{

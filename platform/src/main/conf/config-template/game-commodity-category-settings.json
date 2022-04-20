@@ -6,22 +6,6 @@
   "name": "commodities/commodity-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "Gold","name": "Gold","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "properties":
-        [
-          {"name": "Name","type": "string","reference":"Name"},
-          {"name": "Amount","type": "number","reference":"Double"},
-          {"name": "Card","type": "category","reference":"Card"},
-          {"name": "Active","type": "boolean","reference":"Boolean"},
-          {"name": "StartTime","type": "dateTime","reference":"DateTime"},
-          {"name": "Sample","type": "enum","reference":"Sample"},
-          {"name": "EmailList","type": "set","reference":"string:EmailAddress"},
-          {"name": "CardList","type": "list","reference":"category:Card"}
-        ]
-      }
-    }
+
   ]
 }
