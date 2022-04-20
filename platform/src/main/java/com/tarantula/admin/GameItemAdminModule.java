@@ -39,7 +39,7 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            JsonObject jo = JsonUtil.parse(session.payload()).get("type").getAsJsonObject();
+            JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo.get("type").getAsString());
             if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
                 applicationPreSetup.save(context,gameCluster,typeIndex);
@@ -59,7 +59,7 @@ public class GameItemAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            JsonObject jo = JsonUtil.parse(session.payload()).get("category").getAsJsonObject();
+            JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),query[1],header.get("scope").getAsString());
             if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
@@ -87,14 +87,14 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Asset app = new Asset();
-            if(app.configureAndValidate(payload)){
+            if(app.configureAndValidate(JsonUtil.parse(payload))){
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null&&SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
+                    //Category category = app.category(desc);
+                    //category.list();
+                    //category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -109,14 +109,14 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Component app = new Component();
-            if(app.configureAndValidate(payload)){
+            if(app.configureAndValidate(JsonUtil.parse(payload))){
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
+                    //Category category = app.category(desc);
+                    //category.list();
+                    //category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -131,14 +131,14 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Commodity app = new Commodity();
-            if(app.configureAndValidate(payload)){
+            if(app.configureAndValidate(JsonUtil.parse(payload))){
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
+                    //Category category = app.category(desc);
+                    //category.list();
+                    //category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -153,14 +153,14 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Item app = new Item();
-            if(app.configureAndValidate(payload)){
+            if(app.configureAndValidate(JsonUtil.parse(payload))){
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
+                    //Category category = app.category(desc);
+                    ///category.list();
+                    //category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -175,14 +175,14 @@ public class GameItemAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();
-            if(app.configureAndValidate(payload)){
+            if(app.configureAndValidate(JsonUtil.parse(payload))){
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationCategory());
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.APPLICATION_CONFIG_TYPE,conf.type,conf.name));
+                    //Category category = app.category(desc);
+                    //category.list();
+                    //category.addItem(new CategoryItem(Configurable.APPLICATION_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{

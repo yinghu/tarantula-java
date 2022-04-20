@@ -22,8 +22,6 @@
                 <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
                 <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
                 <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
-                <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
-                <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">
             </fieldset>
         </div>
         <div class="w3-panel"> 
@@ -65,32 +63,54 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
+    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-create-asset-warning-message-board">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Warning</span>
+            </div>
+        </div>
+        <div id="tx-create-asset-warning-message" class="w3-panel w3-center tx-text-14"></div>
+        <div class="w3-panel w3-center">
+            <span id="tx-create-asset-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
+    </div>
 </div>
 <script>
     document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
-    let itemTemplate = {header:{},application:{},reference:[]};
+    //let itemTemplate = {header:{},application:{},reference:[]};
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.scope;
     document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
-    document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
+    //document.querySelector('#tx-configuration-asset-version').value = selectedItem.header.version;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];
-    let payload = {};
+    let payload = {category:{}};
     props.push('<legend class=\'tx-text-14 w3-text-blue\'>');
-    props.push(selectedItem.header.name);
+    props.push(selectedItem.header.type);
     props.push('</legend>');
     selectedItem.application.properties.forEach(p=> {
-        //console.log(p);
-        payload[p.name]=p;
+        payload.category[p.name]=p;
         props.push(toHtmlInputType(p));
     });
     assetForm.innerHTML = props.join('');  
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},payload);
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},'{}');
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-asset-property-'+pname);
-            let pv = payload[pname].reference.split(':');           
+            let pv = payload.category[pname].reference.split(':');           
             let v = TARA_API.query().types[pv[1]];
             let added = [];
             added.push('<li><div class=\'w3-row\'>');
@@ -116,6 +136,25 @@
             list.innerHTML += added.join('');
         };
     });
+    document.querySelectorAll('.tx-on-stock').forEach(a=>{
+        a.onchange = ()=>{
+            let pname = a.getAttribute('tx-property-name');
+            //let list = document.querySelector('#tx-asset-property-'+pname);
+            console.log("category selected->"+pname);
+            //let pv = payload[pname].reference.split(':');           
+            ///let v = TARA_API.query().types[pv[1]];
+            //let added = [];
+            //added.push('<li><div class=\'w3-row\'>');
+            //added.push('<div class=\'w3-col l11 s10\'><input class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
+            //added.push(v.value);
+            //added.push('\'></div><divclass=\'w3-col l1 s2\' ><span class=\'w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button\'>Remove</span></div></div></li>');        
+            //added.push('<li>Card1</li>');
+            //list.innerHTML += added.join('');
+        };
+        a.onclick = ()=>{
+            console.log("load stock");    
+        };
+    });
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{
         document.querySelector('#tx-asset-create-section').style.display ='block';
         document.querySelector('#tx-asset-create-json').style.display ='none';    
@@ -128,7 +167,7 @@
     };
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         let item = editor.get();   
-        let cmd = toCmd(TARA_API.query().category);
+        let cmd = toCmd(selectedItem.header.scope);
         TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
@@ -136,18 +175,37 @@
     document.querySelector('#tx-configuration-asset-preview').onclick=()=>{
         let _typeId = document.querySelector('#tx-configuration-asset-type-id').value;
         let _name= document.querySelector('#tx-configuration-asset-name').value;
-        let _version = document.querySelector('#tx-configuration-asset-version').value;
-        let item = editor.get();
-        item.configurationType = TARA_API.query().category;
-        item.configurationTypeId = _typeId;
-        item.configurationName = _name;
-        item.configurationCategory = selectedItem.header.type;
-        item.configurationVersion = _version;
+        if(_typeId==null||_typeId==''){
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = "TypeId cannot be null";
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(_name==null||_name==''){
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = "Name cannot be null";
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        let itemTemplate = {header:{},application:{},reference:[]};
+        itemTemplate.configurationType = selectedItem.header.scope;//TARA_API.query().category;
+        itemTemplate.configurationTypeId = _typeId;
+        itemTemplate.configurationName = _name;
+        itemTemplate.configurationCategory = selectedItem.header.type;
+        itemTemplate.configurationVersion = selectedItem.header.version;
+        let propertyChecked = '';
         selectedItem.application.properties.forEach(p=> {
             let pv = document.querySelector('#tx-asset-property-'+p.name).value;
-            item.header[p.name] = pv;
+            if(!payload.category[p.name].nullable && (pv==null||pv=='')){
+                propertyChecked += p.name+',';   
+            }
+            itemTemplate.header[p.name] = pv;
         });
-        editor.set(item);
+        if(propertyChecked != ''){
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = propertyChecked+" cannot be null";
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';
+            return;
+        }
+        //payload.instance = itemTemplate;
+        editor.set(itemTemplate);
         document.querySelector('#tx-asset-create-section').style.display ='none';
         document.querySelector('#tx-asset-create-json').style.display ='block';
     };
@@ -156,6 +214,9 @@
         let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";
         m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-create-asset-warning-message-ok').onclick=()=>{
+        document.querySelector('#tx-create-asset-warning-message-board').style.display = 'none';
     };
     document.querySelector('#tx-asset-json-mode-tree').onclick=()=>{
         editor.setMode('tree');
@@ -190,6 +251,10 @@
         else if(prop.type == 'list' || prop.type == 'set'){
             //insert select on list/set
             if(prop.reference.startsWith('category')){
+                let tpp = prop.reference.split(':');
+                TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+tpp[1],(resp)=>{
+                    console.log(resp);   
+                });
                 tem.push('<select tx-property-name=\'');
                 tem.push(prop.name);
                 tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-list-category-add\'>');
@@ -219,7 +284,10 @@
             return tem.join('');
         }
         if(prop.type == 'category'){
-            tem.push('name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4\'>');
+            TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+prop.reference,(resp)=>{
+                console.log(resp);   
+            });
+            tem.push('name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-on-stock\'>');
             tem.push('<option value=\'a\'>Card1</option>');
             tem.push('<option value=\'a\'>Card2</option>');
             tem.push('</select>');

@@ -129,6 +129,9 @@
 </div>
 <script>
     let scope = TARA_API.query().category;
+    //TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#typeId/RQCard',(resp)=>{
+        //console.log(resp);   
+    //});
     document.querySelector('#tx-category-scope-'+scope).checked = true;
     let types = [];
     let pendingProps = new Map();
