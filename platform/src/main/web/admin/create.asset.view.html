@@ -119,8 +119,10 @@
             let v = TARA_API.query().types[pv[1]];
             let added = [];
             let ix = payload.index++;
-            console.log("ITEM INDEX->"+ix);
-            added.push('<li id=\'tx-list-item-remove-'+pname+'-'+ix);
+            //console.log("ITEM INDEX->"+ix);
+            let removedIx = 'tx-list-item-remove-'+pname+'-'+ix;
+            payload[pname].set(removedIx,pvalue);
+            added.push('<li id=\''+removedIx);
             added.push('\'><div class=\'w3-container tx-text-12\'>');
             added.push('<span>');
             added.push(pvalue);
@@ -131,9 +133,10 @@
             document.querySelectorAll('.tx-list-item-remove-'+pname).forEach(e=>{
                 e.onclick =()=>{
                     let rid = e.getAttribute('tx-index');
-                    document.querySelector('#tx-list-item-remove-'+pname+'-'+rid).style.display = 'none';
-
-                    console.log("remove item->"+rid);
+                    let removed = 'tx-list-item-remove-'+pname+'-'+rid;
+                    document.querySelector('#'+removed).style.display = 'none';
+                    payload[pname].delete(removed);    
+                    //console.log("remove item->"+rid);
                 };
             });
         };
@@ -145,7 +148,9 @@
             let added = [];
             let item = payload[a.value];
             let ix = payload.index++;
-            added.push('<li id=\'tx-list-category-remove-'+pname+'-'+ix);
+            let removedIx = 'tx-list-category-remove-'+pname+'-'+ix;
+            payload[pname].set(removedIx,a.value);
+            added.push('<li id=\''+removedIx);
             added.push('\'><div class=\'w3-container tx-text-12\'><span>');
             added.push(item.configurationName+'&lt'+a.value);
             added.push('&gt</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
@@ -155,9 +160,10 @@
             document.querySelectorAll('.tx-list-category-remove-'+pname).forEach(e=>{
                 e.onclick =()=>{
                     let rid = e.getAttribute('tx-index');
-                    document.querySelector('#tx-list-category-remove-'+pname+'-'+rid).style.display = 'none';
-
-                    console.log("remove category->"+rid);
+                    let removed = 'tx-list-category-remove-'+pname+'-'+rid;    
+                    document.querySelector('#'+removed).style.display = 'none';
+                    payload[pname].delete(removed);    
+                    //console.log("remove category->"+rid);
                 };
             });
         };
@@ -167,6 +173,7 @@
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-asset-property-'+pname);
             let item = payload[a.value];
+            payload[pname].set(pname,a.value);
             list.innerHTML = '<li>'+item.configurationName+'&lt'+a.value+'&gt</li>';
         };
     });
@@ -241,8 +248,10 @@
         selectedItem.application.properties.forEach(p=> {
             let typeRef = payload.category[p.name]; 
             if(typeRef.type == 'list' || typeRef.type == 'set' || typeRef.type =='category'){
-                let ui = document.querySelector('#tx-asset-property-'+p.name);
-                console.log(ui);
+                itemTemplate.application[p.name] = [];
+                payload[p.name].forEach((v,k,m)=>{
+                    itemTemplate.application[p.name].push(v);
+                });
             }
             else if(typeRef.type =='boolean'){
                 itemTemplate.header[p.name] = document.querySelector('#tx-asset-property-'+p.name).checked;     
@@ -295,7 +304,7 @@
         tem.push(prop.name);    
         tem.push('</label>');
         if(prop.type == 'list' || prop.type == 'set'){
-            payload[prop.name]=[];    
+            payload[prop.name]=new Map();    
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);
             if(prop.reference.startsWith('category')){
@@ -323,6 +332,7 @@
             tem.push('<ul ');
         }
         else if(prop.type == 'category'){
+            payload[prop.name]=new Map();
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);    
             tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
