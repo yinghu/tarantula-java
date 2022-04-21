@@ -94,7 +94,7 @@
     document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];
-    let payload = {category:{}};
+    let payload = {index:0,category:{}};
     props.push('<legend class=\'tx-text-14 w3-text-blue\'>');
     props.push(selectedItem.header.type);
     props.push('</legend>');
@@ -107,15 +107,30 @@
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
+            let pix = a.getAttribute('tx-index');
+            let pvalue = document.querySelector('#tx-list-item-add-'+pname+'-'+pix).value;
             let list = document.querySelector('#tx-asset-property-'+pname);
             let pv = payload.category[pname].reference.split(':');           
             let v = TARA_API.query().types[pv[1]];
             let added = [];
-            added.push('<li><div class=\'w3-row\'>');
-            added.push('<div class=\'w3-col l11 s10\'><input class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
-            added.push(v.value);
-            added.push('\'></div><div class=\'w3-col l1 s2 tx-margin-top-8\' ><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button\'>Remove</span></div></div></li>');        
+            let ix = payload.index++;
+            console.log("ITEM INDEX->"+ix);
+            added.push('<li id=\'tx-list-item-remove-'+pname+'-'+ix);
+            added.push('\'><div class=\'w3-container tx-text-12\'>');
+            added.push('<span>');
+            added.push(pvalue);
+            added.push('</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
+            added.push('tx-list-item-remove-'+pname);
+            added.push('\' tx-index=\''+ix+'\'>Remove</span></div></li>');        
             list.innerHTML += added.join('');
+            document.querySelectorAll('.tx-list-item-remove-'+pname).forEach(e=>{
+                e.onclick =()=>{
+                    let rid = e.getAttribute('tx-index');
+                    document.querySelector('#tx-list-item-remove-'+pname+'-'+rid).style.display = 'none';
+
+                    console.log("remove item->"+rid);
+                };
+            });
         };
     });
     document.querySelectorAll('.tx-list-category-add').forEach(a=>{
@@ -124,10 +139,22 @@
             let list = document.querySelector('#tx-asset-property-'+pname);
             let added = [];
             let item = payload[a.value];
-            added.push('<li><div class=\'w3-container tx-text-12\'><span>');
+            let ix = payload.index++;
+            added.push('<li id=\'tx-list-category-remove-'+pname+'-'+ix);
+            added.push('\'><div class=\'w3-container tx-text-12\'><span>');
             added.push(item.configurationName+'&lt'+a.value);
-            added.push('&gt</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button\'>Remove</span></div>');
+            added.push('&gt</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
+            added.push('tx-list-category-remove-'+pname);
+            added.push('\' tx-index=\''+ix+'\'>Remove</span></div></li>');
             list.innerHTML += added.join('');
+            document.querySelectorAll('.tx-list-category-remove-'+pname).forEach(e=>{
+                e.onclick =()=>{
+                    let rid = e.getAttribute('tx-index');
+                    document.querySelector('#tx-list-category-remove-'+pname+'-'+rid).style.display = 'none';
+
+                    console.log("remove category->"+rid);
+                };
+            });
         };
     });
     document.querySelectorAll('.tx-property-category-add').forEach(a=>{
@@ -256,28 +283,36 @@
     function toHtmlInputType(prop){
         let tem = [];
         if(prop.type == 'list' || prop.type == 'set' || prop.type == 'category'){
-            tem.push('<div class=\'tx-margin-bottom-8\'>');
+            tem.push('<div class=\'w3-container tx-margin-bottom-8\'>');
         }
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
         tem.push(prop.name);    
         tem.push('</label>');
         if(prop.type == 'list' || prop.type == 'set'){
+            payload[prop.name]=[];    
             tem.push('<span tx-property-name=\'');
-            tem.push(prop.name);    
+            tem.push(prop.name);
             if(prop.reference.startsWith('category')){
                 tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-load\'>');
                 tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
-                tem.push('<select id=\'tx-list-select-');
+                tem.push('<div class=\'w3-container\'><select id=\'tx-list-select-');
                 tem.push(prop.name);
                 tem.push('\' tx-property-name=\'');
                 tem.push(prop.name);
                 tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-list-category-add\'>');
                 tem.push('<option value=\'\' disabled selected>Click plus to load</option>');
-                tem.push('</select>');
+                tem.push('</select></div>');
             }
             else{
-                tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-add\'>');
-                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+                let pv = payload.category[prop.name].reference.split(':');           
+                let v = TARA_API.query().types[pv[1]];
+                let ix = payload.index++;
+                tem.push('\' tx-index=\''+ix+'\'class=\'w3-right tx-margin-right-4 tx-list-item-add\'>');
+                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div><div class=\'w3-container tx-margin-bottom-8\'><input id=\'tx-list-item-add-');
+                tem.push(prop.name+'-'+ix);
+                tem.push('\' class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
+                tem.push(v.value);
+                tem.push('\'></div>');  
             }
             tem.push('<ul ');
         }
@@ -285,13 +320,13 @@
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);    
             tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
-            tem.push('<select id=\'tx-list-select-');
+            tem.push('<div class=\'w3-container\'><select id=\'tx-list-select-');
             tem.push(prop.name);
             tem.push('\' tx-property-name=\'');
             tem.push(prop.name);
             tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-property-category-add\'>');
             tem.push('<option value=\'\' disabled selected>Click plus to load</option>');
-            tem.push('</select>');
+            tem.push('</select></div>');
             tem.push('<ul ');
         }
         else if(prop.type=='boolean') {
