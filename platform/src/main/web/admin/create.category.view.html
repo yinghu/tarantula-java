@@ -203,6 +203,7 @@
         document.querySelector('#tx-create-category-json-section').style.display ='none';
     };
     document.querySelector('#tx-create-category-save').onclick=()=>{    
+        document.querySelector('#tx-create-category-save').style.display ='none';
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
         TARA_API.onSet('role/item','onUpdateCategorySettings',query,item,(resp)=>{
@@ -278,6 +279,7 @@
         editor.set(payload);
         document.querySelector('#tx-create-category-form-section').style.display ='none';
         document.querySelector('#tx-create-category-json-section').style.display ='block';
+        document.querySelector('#tx-create-category-save').style.display ='block';
     };
    
     document.querySelector('#tx-create-category-close').onclick=()=>{

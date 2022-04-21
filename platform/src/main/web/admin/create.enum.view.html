@@ -136,7 +136,7 @@
         document.querySelector('#tx-create-enum-json-section').style.display ='none';
     };
     document.querySelector('#tx-create-enum-save').onclick=()=>{    
-        document.querySelector('#tx-create-enum-save').style.display = 'none';
+        document.querySelector('#tx-create-enum-save').style.display ='none';
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
         TARA_API.onSet('role/item','onUpdateTypesSettings',query,item,(resp)=>{
@@ -166,6 +166,7 @@
         editor.set(payload);
         document.querySelector('#tx-create-enum-form-section').style.display ='none';
         document.querySelector('#tx-create-enum-json-section').style.display ='block';
+        document.querySelector('#tx-create-enum-save').style.display ='block';
     };
    
     document.querySelector('#tx-create-enum-close').onclick=()=>{
