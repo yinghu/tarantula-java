@@ -114,7 +114,7 @@
             added.push('<li><div class=\'w3-row\'>');
             added.push('<div class=\'w3-col l11 s10\'><input class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
             added.push(v.value);
-            added.push('\'></div><divclass=\'w3-col l1 s2\' ><span class=\'w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button\'>Remove</span></div></div></li>');        
+            added.push('\'></div><div class=\'w3-col l1 s2 tx-margin-top-8\' ><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button\'>Remove</span></div></div></li>');        
             list.innerHTML += added.join('');
         };
     });
@@ -122,15 +122,20 @@
         a.onchange = ()=>{
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-asset-property-'+pname);
-            console.log("category selected->"+pname);
-            console.log("category selected->"+a.value);
-            //let pv = payload[pname].reference.split(':');           
-            //let v = TARA_API.query().types[pv[1]];
             let added = [];
+            let item = payload[a.value];
             added.push('<li><div class=\'w3-container tx-text-12\'><span>');
-            added.push(a.value);
-            added.push('</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button\'>Remove</span></div>');
+            added.push(item.configurationName+'&lt'+a.value);
+            added.push('&gt</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button\'>Remove</span></div>');
             list.innerHTML += added.join('');
+        };
+    });
+    document.querySelectorAll('.tx-property-category-add').forEach(a=>{
+        a.onchange = ()=>{
+            let pname = a.getAttribute('tx-property-name');
+            let list = document.querySelector('#tx-asset-property-'+pname);
+            let item = payload[a.value];
+            list.innerHTML = '<li>'+item.configurationName+'&lt'+a.value+'&gt</li>';
         };
     });
     document.querySelectorAll('.tx-list-item-load').forEach(a=>{
@@ -138,12 +143,12 @@
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-list-select-'+pname);
             let pv = payload.category[pname].reference.split(':');           
-            //let v = TARA_API.query().types[pv[1]];
-            list.innerHTML ='';
+            list.innerHTML ='<option value="" disabled selected>Choose your option</option>';
             TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
                 console.log(resp);
                 resp.itemList.forEach(item=>{
                     list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
+                    payload[item.itemId]=item;
                 });   
             });  
         };
@@ -153,9 +158,13 @@
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-list-select-'+pname);
             let pv = payload.category[pname].reference;           
-            //let v = TARA_API.query().types[pv[1]];
+            list.innerHTML='<option value="" disabled selected>Choose your option</option>';
             TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv,(resp)=>{
-                console.log(resp);   
+                console.log(resp);
+                resp.itemList.forEach(item=>{
+                    list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
+                    payload[item.itemId]=item;
+                });
             });   
         };
     });
@@ -256,16 +265,19 @@
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);    
             if(prop.reference.startsWith('category')){
-                tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+                tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-load\'>');
+                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
                 tem.push('<select id=\'tx-list-select-');
                 tem.push(prop.name);
                 tem.push('\' tx-property-name=\'');
                 tem.push(prop.name);
                 tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-list-category-add\'>');
+                tem.push('<option value=\'\' disabled selected>Click plus to load</option>');
                 tem.push('</select>');
             }
             else{
-                tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-add\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+                tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-add\'>');
+                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
             }
             tem.push('<ul ');
         }
@@ -273,9 +285,12 @@
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);    
             tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
-            tem.push('<select tx-property-name=\'');
+            tem.push('<select id=\'tx-list-select-');
             tem.push(prop.name);
-            tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-list-category-add\'>');
+            tem.push('\' tx-property-name=\'');
+            tem.push(prop.name);
+            tem.push('\' name=\'chs\' class=\'w3-round w3-border tx-text-12 w3-select tx-margin-left-4 tx-margin-bottom-8 tx-property-category-add\'>');
+            tem.push('<option value=\'\' disabled selected>Click plus to load</option>');
             tem.push('</select>');
             tem.push('<ul ');
         }
