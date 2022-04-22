@@ -129,14 +129,11 @@
 </div>
 <script>
     let scope = TARA_API.query().category;
-    //TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#typeId/RQCard',(resp)=>{
-        //console.log(resp);   
-    //});
     document.querySelector('#tx-category-scope-'+scope).checked = true;
     let types = [];
     let pendingProps = new Map();
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-        console.log(resp);
+        //console.log(resp);
         types = resp.itemList;
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {

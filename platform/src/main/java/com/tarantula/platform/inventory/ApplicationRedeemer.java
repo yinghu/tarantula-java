@@ -55,6 +55,8 @@ public class ApplicationRedeemer extends ConfigurableObject{
     }
 
     public double amount() {
-        return application.has("amount")?application.get("amount").getAsDouble():0;
+        if(header.has("Amount")) return header.get("Amount").getAsDouble();
+        if(header.has("amount")) return header.get("amount").getAsDouble();
+        return 0;
     }
 }

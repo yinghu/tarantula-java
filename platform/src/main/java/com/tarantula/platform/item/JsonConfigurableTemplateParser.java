@@ -28,8 +28,8 @@ public class JsonConfigurableTemplateParser {
                         if(itemSet.type.equals("category")){
                             ConfigurableSetting setting = new ConfigurableSetting();
                             setting.type = header.get("type").getAsString();
-                            setting.name = header.get("name").getAsString();
-                            if(header.has("icon")) setting.icon = header.get("icon").getAsString();
+                            //setting.name = header.get("name").getAsString();
+                            //if(header.has("icon")) setting.icon = header.get("icon").getAsString();
                             setting.rechargeable = header.has("rechargeable")&&header.get("rechargeable").getAsBoolean();
                             setting.properties = template.getAsJsonObject("application").get("properties").getAsJsonArray();
                         }

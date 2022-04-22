@@ -103,7 +103,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
@@ -121,7 +121,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     public Inventory newInventory(String category){
         ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
         ConfigurableSetting conf = categories.configurableSetting(category);
-        return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
+        return new Inventory(conf.type,conf.rechargeable);
     }
 
     private Category category(Category.Filter filter){

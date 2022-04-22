@@ -69,6 +69,8 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
             if(header.get("type").getAsString().equals(category)){
                 configurableSetting = new ConfigurableSetting();
                 configurableSetting.type = category;
+                configurableSetting.description = header.has("description")?header.get("description").getAsString():"";
+                configurableSetting.rechargeable = header.has("rechargeable")?header.get("rechargeable").getAsBoolean():false;
                 configurableSetting.properties = item.get("application").getAsJsonObject().get("properties").getAsJsonArray();
                 break;
             }

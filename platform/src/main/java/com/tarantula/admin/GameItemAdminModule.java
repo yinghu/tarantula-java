@@ -136,9 +136,9 @@ public class GameItemAdminModule implements Module {
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    //Category category = app.category(desc);
-                    //category.list();
-                    //category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.name));
+                    Category category = app.category(desc);
+                    category.list();
+                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.description));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
