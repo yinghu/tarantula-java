@@ -196,9 +196,9 @@
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
             let list = document.querySelector('#tx-list-select-'+pname);
-            let pv = payload.category[pname].reference;           
+            let pv = payload.category[pname].reference.split(':');           
             list.innerHTML='<option value="" disabled selected>Choose your option</option>';
-            TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv,(resp)=>{
+            TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
                 console.log(resp);
                 resp.itemList.forEach(item=>{
                     list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
@@ -249,8 +249,12 @@
             let typeRef = payload.category[p.name]; 
             if(typeRef.type == 'list' || typeRef.type == 'set' || typeRef.type =='category'){
                 itemTemplate.application[p.name] = [];
+                console.log(typeRef);
                 payload[p.name].forEach((v,k,m)=>{
                     itemTemplate.application[p.name].push(v);
+                    if(typeRef.reference.startsWith('category')){
+                        itemTemplate.reference.push(v);
+                    }
                 });
             }
             else if(typeRef.type =='boolean'){

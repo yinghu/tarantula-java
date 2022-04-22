@@ -16,13 +16,13 @@ public class TypeIndex extends RecoverableObject implements Configurable {
     public TypeIndex(String name,String index,String label){
         this.name = name;
         this.index = index;
-        this.label = label;
+        this.label = label;//scope
     }
 
     @Override
     public Map<String,Object> toMap(){
         properties.put("index",index);
-        properties.put("type",label);
+        properties.put("label",label);
         properties.put("payload",payload.toString());
         return properties;
     }

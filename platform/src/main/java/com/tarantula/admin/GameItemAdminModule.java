@@ -64,7 +64,7 @@ public class GameItemAdminModule implements Module {
             TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),query[1],header.get("scope").getAsString());
             if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
                 applicationPreSetup.save(context,gameCluster,typeIndex);
-                List<String> updates = this.availableUpdates(query[1]);
+                List<String> updates = this.availableUpdates(typeIndex.label());
                 updates.forEach(update->{
                     ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                     if(categories.addCategory(jo)){
