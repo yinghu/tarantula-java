@@ -72,7 +72,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+        distributionItemService.register(name,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t){
