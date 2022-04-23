@@ -165,7 +165,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
 
 
     public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
-        List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("category/"+application.category()));
+        List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("typeId/"+application.category()));
         items.forEach((a)-> {
             if(!application.disabled()) dailyGiveaways.put(a.name(),a);
         });

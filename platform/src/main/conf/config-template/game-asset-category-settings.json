@@ -3,14 +3,9 @@
   "category": "system",
   "version": "1.0",
   "description": "category asset template list",
+  "name": "assets/asset-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "card","name": "Item Card","icon":"icon","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "assets/card-asset-settings"
-      }
-    }
+
   ]
 }

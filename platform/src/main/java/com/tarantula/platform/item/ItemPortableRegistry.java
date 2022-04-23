@@ -35,6 +35,11 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int TRANSACTION_CID = 14;
 
+    public static final int CONFIGURABLE_TEMPLATE = 15;
+
+    public static final int CONFIGURABLE_TYPES_CID = 16;
+
+    public static final int CONFIGURABLE_CATEGORIES_CID = 17;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -81,6 +86,16 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
             case TRANSACTION_CID:
                 pt = new Transaction();
                 break;
+            case CONFIGURABLE_TEMPLATE:
+                pt = new ConfigurableTemplate();
+                break;
+            case CONFIGURABLE_TYPES_CID:
+                pt = new ConfigurableTypes();
+                break;
+            case CONFIGURABLE_CATEGORIES_CID:
+                pt = new ConfigurableCategories();
+                break;
+
             default:
         }
         return pt;

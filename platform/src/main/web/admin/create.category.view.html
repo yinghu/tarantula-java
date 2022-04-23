@@ -1,0 +1,312 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-create-category-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span id='tx-create-category-title' class="tx-margin-left-8 tx-text-24">Item Category</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-container" id="tx-create-category-form-section">
+        <div class="w3-panel">   
+            <fieldset class="w3-border-blue">
+                <legend class="tx-text-14 w3-text-blue">Scope</legend>
+                <label class="tx-text-12 tx-margin-right-4">Asset</label>
+                <input id='tx-category-scope-asset' value='asset' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Component</label>
+                <input id='tx-category-scope-component' value='component' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Commodity</label>
+                <input id='tx-category-scope-commodity' value='commodity' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Item</label>
+                <input id='tx-category-scope-item' value='item' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+                <label class="tx-text-12 tx-margin-right-4">Application</label>
+                <input id='tx-category-scope-application' value='application' class="w3-radio tx-text-12 tx-category-scope" name='scope' type="radio">
+            </fieldset>    
+        </div>
+        <div class="w3-panel">   
+            <fieldset class="w3-border-blue">
+                <legend class="tx-text-14 w3-text-blue">Header</legend>
+                <label class="tx-text-12 tx-margin-left-4">Category Type:</label>
+                <input id='tx-create-category-type' class="w3-input w3-round w3-border tx-text-12" type="text">  
+                <label class="tx-text-12 tx-margin-left-4">Category Description:</label>
+                <input id='tx-create-category-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+                <label class="tx-text-12 tx-margin-left-4">Category Version:</label>
+                <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text"> 
+                <div id="tx-create-category-rechargeable-display" style="display: none;">  
+                    <label class="tx-text-12 tx-margin-left-4">Rechargeable</label>
+                    <input id='tx-create-category-rechargeable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">      
+                </div>
+            </fieldset>    
+        </div>
+        <div class="w3-panel"> 
+            <fieldset class="w3-border-blue"> 
+                <legend class="tx-text-14 w3-text-blue">Properties</legend>
+                <label class="tx-text-12 tx-margin-left-4">Name:</label>
+                <input id='tx-create-category-property-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+                <label class="tx-text-12 tx-margin-left-4">Type:</label>
+                <select id='tx-create-category-property-type' class="w3-select tx-text-12" >        
+                </select>
+                <label class="tx-text-12 tx-margin-left-4">Nullable</label>
+                <input id='tx-create-category-property-nullable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">
+                <div id="tx-create-category-property-value-drop" style="display: none;">
+                    <label class="tx-text-12 tx-margin-left-4">Reference:</label>
+                    <select id='tx-create-category-property-value' class="w3-select tx-text-12">
+                    <select>
+                </div>
+                <div class="w3-panel">
+                    <span id="tx-create-category-add" class="w3-right"><i class="fa fa-plus" style="font-size:16px"></i></span>             
+                </div>
+                <div class="w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4">
+                    <ul id='tx-create-category-properties' class="w3-ul">
+                        
+                    </ul>
+                </div>
+            </fieldset>
+        </div>
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <div class='w3-bar w3-white'>
+                <span id='tx-create-cateory-cancel' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Cancel</span>
+                <span id='tx-create-cateory-preview' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span> 
+            </div>            
+        </div>
+    </div>
+
+    <div class="w3-container" id="tx-create-category-json-section" style="display: none;">
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <div class='w3-bar w3-white'>
+                <span id='tx-category-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+                <span id='tx-category-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+                <span id='tx-category-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>                
+            </div>            
+        </div>        
+        <div class="w3-panel w3-center tx-text-14">
+            <div id="jsoneditor-configuration-create-category" style="width: 100%;"></div>
+        </div> 
+        <div class="w3-panel w3-border-bottom w3-border-red">
+            <div class='w3-bar w3-white'>
+                <span id='tx-create-category-back' class='w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-20 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Back</span>             
+                <span id='tx-create-category-save' class='w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-20 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span>             
+            </div>            
+        </div> 
+    </div>
+  
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+
+    <div class="w3-card-4 w3-border w3-round w3-white tx-ok-checkout" id="tx-create-category-warning-message-board">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:24px"></i></span>
+                <span class="tx-margin-left-8 tx-text-18">Warning</span>
+            </div>
+        </div>
+        <div id="tx-create-category-warning-message" class="w3-panel w3-center tx-text-14"></div>
+        <div class="w3-panel w3-center">
+            <span id="tx-create-category-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
+    </div>
+
+</div>
+<script>
+    let scope = TARA_API.query().category;
+    document.querySelector('#tx-category-scope-'+scope).checked = true;
+    let types = [];
+    let pendingProps = new Map();
+    TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
+        //console.log(resp);
+        types = resp.itemList;
+        let tp = document.querySelector('#tx-create-category-property-type');
+        types.forEach(t => {
+            tp.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';
+            types[t.name] = t.value;    
+        });   
+    });
+    let ixc = 0;
+    let categoryTemplate = {header:{},application:{properties:[]}};
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-create-category"),{mode:'tree'},categoryTemplate);
+    if(TARA_API.query().category == 'commodity') document.querySelector('#tx-create-category-rechargeable-display').style.display ='block';
+    let typeSelect = document.querySelector('#tx-create-category-property-type');
+    let typeSelectIndex = 0;
+    let typeDrop = document.querySelector('#tx-create-category-property-value-drop');
+    let typeValue = document.querySelector('#tx-create-category-property-value');
+    let typeValueSelected = 0;
+    let props = document.querySelector('#tx-create-category-properties');
+    let nullableChecked = document.querySelector('#tx-create-category-property-nullable');
+    document.querySelector('#tx-create-category-version').value = '1.0';
+    document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
+    document.querySelector('#tx-create-category-add').onclick=()=>{
+        let pname = document.querySelector('#tx-create-category-property-name').value;
+        if(pname==null||pname==''){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Property name cannot be null";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(pendingProps.has(pname)){ 
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Property name already existed";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return;
+        }
+        let ptype = typeSelect.value;
+        let tname = typeSelect.options[typeSelectIndex].text;
+        let nullabled = nullableChecked.checked;
+        ixc++;
+        switch(ptype){
+            case 'category':
+                pendingProps.set(pname,{name:pname,type:ptype,reference:ptype+':'+tname,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+            case 'enum':
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+            case 'list':
+            case 'set':
+                let pvalue = typeValue.value+':'+typeValue.options[typeValueSelected].text;
+                pendingProps.set(pname,{name:pname,type:ptype,reference:pvalue,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+pvalue+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+            default:
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
+                break;
+        }
+        removecategoryproperty();
+    };
+    document.querySelector('#tx-create-category-warning-message-ok').onclick=()=>{
+        document.querySelector('#tx-create-category-warning-message-board').style.display = 'none';
+    };
+    document.querySelector('#tx-create-cateory-cancel').onclick=()=>{
+        close_create_category_view();
+    };
+    document.querySelector('#tx-create-category-back').onclick=()=>{
+        document.querySelector('#tx-create-category-form-section').style.display ='block';
+        document.querySelector('#tx-create-category-json-section').style.display ='none';
+    };
+    document.querySelector('#tx-create-category-save').onclick=()=>{    
+        document.querySelector('#tx-create-category-save').style.display ='none';
+        let item = editor.get();
+        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
+        TARA_API.onSet('role/item','onUpdateCategorySettings',query,item,(resp)=>{
+            editor.set(resp);   
+        });
+    };
+    document.querySelectorAll('.tx-category-scope').forEach(a=>{
+        a.onchange = ()=>{
+            scope = a.value;
+        }
+    });
+    typeValue.onchange =()=>{   
+        typeValueSelected = typeValue.selectedIndex;
+    };
+    typeSelect.onchange = ()=>{
+        let selected = typeSelect.value;
+        typeSelectIndex = typeSelect.selectedIndex;
+        let nameSelected = typeSelect.options[typeSelectIndex].text;
+        switch(selected){
+            case 'enum':
+                typeValue.innerHTML='';
+                types[nameSelected].forEach(e=>{
+                    typeValue.innerHTML += '<option value=\''+e.value+'\'>'+e.name+'</option>';        
+                });
+                typeDrop.style.display = 'block';
+                break;
+            case 'list':
+            case 'set':
+                typeValue.innerHTML = '';
+                types.forEach(t => {
+                    if(t.type != 'enum' && t.type != 'list' && t.type != 'set' && t.type !='boolean')
+                        typeValue.innerHTML += '<option value=\''+t.type+'\'>'+t.name+'</option>';    
+                });  
+                typeDrop.style.display = 'block';
+                break;
+            default:
+                typeDrop.style.display = 'none';     
+                break;
+        }
+    };
+    document.querySelector('#tx-create-cateory-preview').onclick=()=>{
+        let payload ={};
+       
+        let ctype = document.querySelector('#tx-create-category-type').value;
+        let cname = document.querySelector('#tx-create-category-name').value;
+        let cversion = document.querySelector('#tx-create-category-version').value;
+        let crechargeable = document.querySelector('#tx-create-category-rechargeable').checked;
+        if(ctype==null||ctype==''){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type cannot be null";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        if(TARA_API.query().types.hasOwnProperty(ctype)){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type alread existed";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return; 
+        }
+        categoryTemplate.header.scope = scope;
+        categoryTemplate.header.type = ctype;
+        categoryTemplate.header.description = cname;
+        categoryTemplate.header.version = cversion;
+        categoryTemplate.header.rechargeable = crechargeable; 
+        categoryTemplate.application.properties = [];
+        pendingProps.forEach((v,k,m)=>{
+            categoryTemplate.application.properties.push(v);
+        });
+        if(categoryTemplate.application.properties.length<=0){
+            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category at least has one or more proprties";
+            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            return;
+        }
+        payload.category = categoryTemplate;
+        editor.set(payload);
+        document.querySelector('#tx-create-category-form-section').style.display ='none';
+        document.querySelector('#tx-create-category-json-section').style.display ='block';
+        document.querySelector('#tx-create-category-save').style.display ='block';
+    };
+   
+    document.querySelector('#tx-create-category-close').onclick=()=>{
+        close_create_category_view();       
+    };
+    document.querySelector('#tx-category-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-category-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-category-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
+    function removecategoryproperty(){
+        document.querySelectorAll('.tx-remove-property').forEach(a=>{
+            a.onclick = ()=>{
+                let pname = a.getAttribute("tx-property-name");
+                pendingProps.delete(pname);
+                document.querySelector('#txc-property-'+a.getAttribute('tx-property-index')).style.display = 'none';
+            };
+        });
+    }
+    function close_create_category_view(){
+        editor.destroy();
+        let m3 = document.querySelector(TARA_API.query().popup);
+        m3.innerHTML="";
+        m3.style.display = 'none';
+    }
+</script>

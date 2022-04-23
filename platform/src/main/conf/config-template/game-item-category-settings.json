@@ -3,21 +3,9 @@
   "category": "system",
   "version": "1.0",
   "description": "category item template list",
+  "name": "items/item-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "chest","name": "Chest","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "items/chest-item-settings"
-      }
-    },
-    {
-      "header": {"type": "prize","name": "Prize","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "items/prize-item-settings"
-      }
-    }
+
   ]
 }

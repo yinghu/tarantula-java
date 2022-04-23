@@ -1,9 +1,7 @@
 package com.tarantula.platform.inventory;
 
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.Tournament;
+import com.google.gson.JsonArray;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
@@ -105,7 +103,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
@@ -121,10 +119,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     }
 
     public Inventory newInventory(String category){
-        ConfigurableTemplate template = this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-        ConfigurableSetting conf = template.settings.get(category);
-        //logger.warn("Inventory=>"+conf.type+"//"+ conf.name+"/"+conf.rechargeable+"/"+conf.icon);
-        return new Inventory(conf.type,conf.name,conf.icon,conf.rechargeable);
+        ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = categories.configurableSetting(category);
+        return new Inventory(conf.type,conf.rechargeable);
     }
 
     private Category category(Category.Filter filter){
@@ -136,5 +133,31 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         preSetup.load(serviceContext,app,category);
         category.list((ci)-> filter.onFilter(ci));
         return category;
+    }
+    private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
+        if(name.equals(Configurable.ASSET_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.COMPONENT_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.COMMODITY_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.ITEM_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.APPLICATION_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
+        return null;
+    }
+    private ConfigurableCategories configurableCategories(String type,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name(type);
+        if(!applicationPreSetup.load(serviceContext,gameCluster,categories)){
+            ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
+            JsonArray cclasses = (JsonArray)configuration.property("itemList");
+            cclasses.forEach((c)->{
+                categories.addCategory(c.getAsJsonObject());
+            });
+            applicationPreSetup.save(serviceContext,gameCluster,categories);
+        }
+        return categories;
     }
 }

@@ -72,7 +72,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+        distributionItemService.register(name,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t){
@@ -97,7 +97,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/"+descriptor.category()));
+        List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if (!a.disabled()) {
                 a._setup();

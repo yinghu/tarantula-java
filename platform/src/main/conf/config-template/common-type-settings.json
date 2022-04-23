@@ -1,0 +1,25 @@
+{
+  "type": "common",
+  "category": "type",
+  "version": "1.0",
+  "description": "basic common types of category",
+  "itemList":
+  [
+    {"type": "string","name": "String","value": "text"},
+    {"type": "string","name": "Icon","value": "text"},
+    {"type": "string","name": "Name","value": "text"},
+    {"type": "string","name": "Description","value": "text"},
+    {"type": "string","name": "EmailAddress","value": "email"},
+    {"type": "string","name": "Password","value": "password"},
+    {"type": "number","name": "Short","value": "number"},
+    {"type": "number","name": "Integer","value": "number"},
+    {"type": "number","name": "Long","value": "number"},
+    {"type": "number","name": "Double","value": "number"},
+    {"type": "number","name": "Float","value": "number"},
+    {"type": "boolean","name": "Boolean","value": "boolean"},
+    {"type": "dateTime","name": "DateTime","value": "dateTime-local"},
+    {"type": "list","name": "List"},
+    {"type": "set","name": "Set"},
+    {"type": "enum","name": "Environment","value": [{"name":"Development","value":0},{"name":"Production","value":1}]}
+  ]
+}

@@ -164,6 +164,12 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     @Override
     public boolean configureAndValidate(JsonObject config) {
+        if(!config.has("configurationType")||!config.has("configurationTypeId")||!config.has("configurationName") ||!config.has("configurationCategory")||!config.has("configurationVersion")) return false;
+        this.configurationType = config.get("configurationType").getAsString();
+        this.configurationTypeId = config.get("configurationTypeId").getAsString();
+        this.configurationName = config.get("configurationName").getAsString();
+        this.configurationCategory = config.get("configurationCategory").getAsString();
+        this.configurationVersion = config.get("configurationVersion").getAsString();
         if (!config.has("header") || !config.has("application") || !config.has("reference")) {
             return false;
         }

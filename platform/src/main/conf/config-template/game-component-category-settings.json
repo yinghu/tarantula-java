@@ -3,21 +3,9 @@
   "category": "system",
   "version": "1.0",
   "description": "category component template list",
+  "name": "components/component-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "abilitiesLevels","name": "Abilities Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "components/abilities-levels-component-settings"
-      }
-    },
-    {
-      "header": {"type": "robotLevels","name": "Robot Levels","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "components/robot-levels-component-settings"
-      }
-    }
+
   ]
 }

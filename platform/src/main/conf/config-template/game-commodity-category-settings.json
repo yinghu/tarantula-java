@@ -3,35 +3,9 @@
   "category": "system",
   "version": "1.0",
   "description": "category commodity template list",
+  "name": "commodities/commodity-type-settings",
   "itemList":
   [
-    {
-      "header": {"type": "robot","name": "Robot","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "commodities/robot-commodity-settings"
-      }
-    },
-    {
-      "header": {"type": "abilities","name": "Abilities","enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "commodities/abilities-commodity-settings"
-      }
-    },
-    {
-      "header": {"type": "gold","name": "Gold","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "commodities/gold-commodity-settings"
-      }
-    },
-    {
-      "header": {"type": "token","name": "Token","rechargeable":true,"enabled": true,"icon":"robotQuest_icon.png","version": 1.0},
-      "application":
-      {
-        "name": "commodities/token-commodity-settings"
-      }
-    }
+
   ]
 }

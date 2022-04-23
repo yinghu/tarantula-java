@@ -16,26 +16,27 @@ public class JsonConfigurableTemplateParser {
             itemSet.category = temp.has("category")?temp.get("category").getAsString():"";
             itemSet.version = temp.has("version")?temp.get("version").getAsString():"";
             itemSet.description = temp.has("description")?temp.get("description").getAsString():"";
+            itemSet.name = temp.has("name")?temp.get("name").getAsString():"";
             JsonArray items = temp.get("itemList").getAsJsonArray();
             JsonArray exposed = new JsonArray();
             items.forEach((item)->{
                 JsonObject template = item.getAsJsonObject();
-                if(!template.has("header")) template.add("header",new JsonObject());
-                if(!template.has("application")) template.add("application",new JsonObject());
-                if(!template.has("payload")) template.add("payload",new JsonObject());
-                if(!template.has("reference")) template.add("reference",new JsonArray());
-                JsonObject header = template.getAsJsonObject("header");
-                if(!header.has("enabled")||header.get("enabled").getAsBoolean()){
-                    exposed.add(template);
-                    if(itemSet.type.equals("category")){
-                        ConfigurableSetting setting = new ConfigurableSetting();
-                        setting.type = header.get("type").getAsString();
-                        setting.name = header.get("name").getAsString();
-                        if(header.has("icon")) setting.icon = header.get("icon").getAsString();
-                        setting.rechargeable = header.has("rechargeable")&&header.get("rechargeable").getAsBoolean();
-                        setting.settingName = template.getAsJsonObject("application").get("name").getAsString();
-                        itemSet.settings.put(setting.type,setting);
+                if(template.has("header")){
+                    JsonObject header = template.getAsJsonObject("header");
+                    if(!header.has("enabled")||header.get("enabled").getAsBoolean()){
+                        exposed.add(template);
+                        if(itemSet.type.equals("category")){
+                            ConfigurableSetting setting = new ConfigurableSetting();
+                            setting.type = header.get("type").getAsString();
+                            //setting.name = header.get("name").getAsString();
+                            //if(header.has("icon")) setting.icon = header.get("icon").getAsString();
+                            setting.rechargeable = header.has("rechargeable")&&header.get("rechargeable").getAsBoolean();
+                            setting.properties = template.getAsJsonObject("application").get("properties").getAsJsonArray();
+                        }
                     }
+                }
+                else{
+                    exposed.add(template);
                 }
             });
             itemSet.property("itemList",exposed);

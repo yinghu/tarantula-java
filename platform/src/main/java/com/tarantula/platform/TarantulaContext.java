@@ -908,7 +908,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 fileInputStream.close();
                 return item;
             }catch (Exception exx){
-                log.warn("configuration not existed->"+config);
+                log.warn("configuration not existed->"+config,exx);
                 return null;
             }
         });
