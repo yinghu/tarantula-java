@@ -301,9 +301,9 @@
     };
     function toHtmlInputType(prop){
         let tem = [];
-        if(prop.type == 'list' || prop.type == 'set' || prop.type == 'category'){
+        //if(prop.type == 'list' || prop.type == 'set' || prop.type == 'category'){
             tem.push('<div class=\'tx-margin-bottom-8\'>');
-        }
+        //}
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
         tem.push(prop.name);    
         tem.push('</label>');
@@ -350,13 +350,13 @@
             tem.push('<ul ');
         }
         else if(prop.type=='boolean') {
-            tem.push('</br><input ');
+            tem.push('</br></div><input ');
         }
         else if(prop.type == 'enum'){
-            tem.push('<select ');
+            tem.push('</div><select ');
         }
         else{
-            tem.push('<input ');
+            tem.push('</div><input ');
         }
         tem.push('id=\'');
         tem.push('tx-asset-property-');

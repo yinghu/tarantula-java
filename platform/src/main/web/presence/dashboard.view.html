@@ -525,6 +525,11 @@
             }        
         });
     }
+    function _tx_service_list(gameClusterId){
+        TARA_API.onGet('role/lobby','onGameServiceList',gameClusterId,(resp)=>{
+            console.log(resp);
+        });       
+    }
     function _tx_game(){
         _tx_lobby();
     }

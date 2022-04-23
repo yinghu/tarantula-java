@@ -51,6 +51,8 @@
                 </select>
                 <label class="tx-text-12 tx-margin-left-4">Nullable</label>
                 <input id='tx-create-category-property-nullable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">
+                <label class="tx-text-12 tx-margin-left-4">Downloadable</label>
+                <input id='tx-create-category-property-downloadable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">
                 <div id="tx-create-category-property-value-drop" style="display: none;">
                     <label class="tx-text-12 tx-margin-left-4">Reference:</label>
                     <select id='tx-create-category-property-value' class="w3-select tx-text-12">
@@ -152,6 +154,7 @@
     let typeValueSelected = 0;
     let props = document.querySelector('#tx-create-category-properties');
     let nullableChecked = document.querySelector('#tx-create-category-property-nullable');
+    let downloadableChecked = document.querySelector('#tx-create-category-property-downloadable');
     document.querySelector('#tx-create-category-version').value = '1.0';
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     document.querySelector('#tx-create-category-add').onclick=()=>{
@@ -169,24 +172,25 @@
         let ptype = typeSelect.value;
         let tname = typeSelect.options[typeSelectIndex].text;
         let nullabled = nullableChecked.checked;
+        let downloadabled = downloadableChecked.checked;
         ixc++;
         switch(ptype){
             case 'category':
-                pendingProps.set(pname,{name:pname,type:ptype,reference:ptype+':'+tname,nullable:nullabled});
+                pendingProps.set(pname,{name:pname,type:ptype,reference:ptype+':'+tname,nullable:nullabled,downloadable:downloadabled});
                 props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
                 break;
             case 'enum':
-                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled,downloadable:downloadabled});
                 props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
                 break;
             case 'list':
             case 'set':
                 let pvalue = typeValue.value+':'+typeValue.options[typeValueSelected].text;
-                pendingProps.set(pname,{name:pname,type:ptype,reference:pvalue,nullable:nullabled});
+                pendingProps.set(pname,{name:pname,type:ptype,reference:pvalue,nullable:nullabled,downloadable:downloadabled});
                 props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+pvalue+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
                 break;
             default:
-                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled});
+                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled,downloadable:downloadabled});
                 props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
                 break;
         }
