@@ -131,7 +131,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-name',key);
     aj.send();
   };
-  let _upload = function(payload,fname,ctype,callback){
+  let _upload = function(payload,fname,ctype,typeId,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
     aj.onreadystatechange = function(){
@@ -147,6 +147,7 @@ var TARA_API = (function(){
     aj.setRequestHeader('Accept','application/json');
     aj.setRequestHeader("Content-type", ctype);//"application/java-archive"
     aj.setRequestHeader('Tarantula-token',presence.token);
+    aj.setRequestHeader('Tarantula-type-id',typeId);
     aj.send(payload);
   };
   let _subscribe = function(payload,callback){

@@ -75,7 +75,7 @@
             ctype = 'image/jpeg';
         }
         document.querySelector("#tx-upload-view-spin").style.display='block';
-        TARA_API.onUpload(_data,_fd.name,ctype,(resp)=>{
+        TARA_API.onUpload(_data,_fd.name,ctype,'root',(resp)=>{
             if(!resp.successful){
                 document.querySelector("#tx-upload-view-message").innerHTML = resp.message; 
             }else{   
