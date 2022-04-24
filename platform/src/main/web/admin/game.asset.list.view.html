@@ -70,6 +70,7 @@
     bars.itemBar = [document.querySelector('#tx-item-template-bar'),document.querySelector('#tx-item-template-bar-pane')];
     bars.applicationBar = [document.querySelector('#tx-application-template-bar'),document.querySelector('#tx-application-template-bar-pane')];
     TARA_API.onGet('role/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
+        console.log(resp);
         TARA_API.query().itemList = resp.itemList;
         TARA_API.query().types ={};
         resp.types.itemList.forEach(t=>{

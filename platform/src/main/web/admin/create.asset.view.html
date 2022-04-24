@@ -207,6 +207,14 @@
             });   
         };
     });
+    document.querySelectorAll('.tx-category-item-upload').forEach(a=>{
+        a.onclick = ()=>{
+            let pname = a.getAttribute('tx-property-name');
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = "Upload File";
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';  
+            console.log("upload ->"+pname);
+        };    
+    });
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{
         document.querySelector('#tx-asset-create-section').style.display ='block';
         document.querySelector('#tx-asset-create-json').style.display ='none';    
@@ -313,7 +321,7 @@
             tem.push(prop.name);
             if(prop.reference.startsWith('category')){
                 tem.push('\' class=\'w3-right tx-margin-right-4 tx-list-item-load\'>');
-                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px; color:green;\'></i></span></div>');
                 tem.push('<div class=\'\'><select id=\'tx-list-select-');
                 tem.push(prop.name);
                 tem.push('\' tx-property-name=\'');
@@ -327,7 +335,7 @@
                 let v = TARA_API.query().types[pv[1]];
                 let ix = payload.index++;
                 tem.push('\' tx-index=\''+ix+'\'class=\'w3-right tx-margin-right-4 tx-list-item-add\'>');
-                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div><div class=\'tx-margin-bottom-8\'><input id=\'tx-list-item-add-');
+                tem.push('<i class=\'fa fa-plus\' style=\'font-size:12px; color:green;\'></i></span></div><div class=\'tx-margin-bottom-8\'><input id=\'tx-list-item-add-');
                 tem.push(prop.name+'-'+ix);
                 tem.push('\' class=\'w3-input w3-round w3-border tx-text-12\' type=\'');
                 tem.push(v.value);
@@ -339,7 +347,7 @@
             payload[prop.name]=new Map();
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);    
-            tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px\'></i></span></div>');
+            tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-load\'><i class=\'fa fa-plus\' style=\'font-size:12px; color:green;\'></i></span></div>');
             tem.push('<div class=\'\'><select id=\'tx-list-select-');
             tem.push(prop.name);
             tem.push('\' tx-property-name=\'');
@@ -356,7 +364,14 @@
             tem.push('</div><select ');
         }
         else{
-            tem.push('</div><input ');
+            if(prop.downloadable){
+                tem.push('<span tx-property-name=\'');
+                tem.push(prop.name);    
+                tem.push('\' class=\'w3-right tx-margin-right-4 tx-category-item-upload\'><i class=\'fa fa-file\' style=\'font-size:12px; color:green;\'></i></span>');
+                tem.push('</div><input disabled ');
+            }else{
+                tem.push('</div><input ');
+            }
         }
         tem.push('id=\'');
         tem.push('tx-asset-property-');
