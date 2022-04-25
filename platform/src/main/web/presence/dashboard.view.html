@@ -156,13 +156,20 @@
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
                 </div>
                 <div class="w3-container w3-padding">
-                
+                    <!-- Lobby bar -->
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Lobby Management</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
+                    </div>
+                    <!-- Data Store bar -->
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">DataStore Management</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Data</span>   
+                    </div>  
                     <!-- Service bar-->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Service Management</span></div>
                     <div class='w3-bar w3-white'>
-                        <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
                         <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Service</span>
-                        <span id='game-data-list-id-0' tx-game-cluster-id='' view-id='game.data.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Data</span>   
                     </div>  
                     <!-- Item bar-->    
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Item/Inventory Management</span></div>
@@ -485,7 +492,9 @@
     }
     function _tx_game_cluster_list(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameClusterList',index:TARA_API.query().gameClusterIndex},(resp)=>{
+            console.log(resp);
             if(resp.successful){
+                let _gameClusterId;
                 resp.gameClusterList.forEach((g,i)=>{
                     let disabled = g.disabled;
                     let _name = g.tournamentEnabled?g.name+'/'+g.mode+'[tournament mode]':g.name+'/'+g.mode;
@@ -505,6 +514,7 @@
                     //document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
                     //document.querySelector('#game-service-'+i).innerHTML = g.gameService;
                     //document.querySelector('#game-data-'+i).innerHTML = g.gameData;
+                    _gameClusterId = g.gameClusterId
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
@@ -519,6 +529,9 @@
                     //document.querySelector('#tx-game-cluster-next').style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
+                TARA_API.onGet('role/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
+                    console.log(resp1);        
+                });
             }
             else{
                 console.log(resp.message);

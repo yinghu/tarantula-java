@@ -114,7 +114,7 @@
         if(resp.successful){
             let i = 0;
             resp.serviceList.forEach((a)=>{
-                //console.log(a);
+                console.log(a);
                 if(a.resetEnabled == true){
                     document.querySelector('#tx-service-list-name-'+i).innerHTML=a.name;
                     document.querySelector('#tx-service-list-tag-'+i).innerHTML='Access Tag : '+a.tag;
