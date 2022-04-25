@@ -168,8 +168,7 @@
                     </div>  
                     <!-- Service bar-->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Service Management</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span id='game-service-list-id-0' tx-game-cluster-id='' view-id='game.service.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Service</span>
+                    <div id='tx-game-cluster-service-bar' class='w3-bar w3-white'>
                     </div>  
                     <!-- Item bar-->    
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Item/Inventory Management</span></div>
@@ -178,7 +177,7 @@
                         <span id='game-component-id-0' tx-game-category='component' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Component</span>   
                         <span id='game-commodity-id-0' tx-game-category='commodity' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Commodity</span>   
                         <span id='game-configuration-id-0' tx-game-category='item' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Item</span>   
-                        <span id='game-application-id-0' tx-game-category='application' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Application</span>   
+                        <!--<span id='game-application-id-0' tx-game-category='application' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Application</span>-->   
                     </div>  
                     <!-- Game Server bar-->    
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Game Server Management</span></div>
@@ -401,6 +400,7 @@
             TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
             let vid = a.getAttribute('view-id');
             TARA_API.query().category = a.getAttribute('tx-game-category');
+            TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
             TARA_API.query().popup = '#tx-popup';
             tx_view({viewId:vid,containerId:'#tx-popup'});    
         }
@@ -414,7 +414,7 @@
     document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
         a.onclick=()=>{
             TARA_API.query().popup = '#tx-popup';
-            TARA_API.query().serviceTag = a.getAttribute('service-tag');
+            TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
             let vid = a.getAttribute('view-id');
             tx_view({viewId:vid,containerId:'#tx-popup'});    
         }
@@ -518,19 +518,35 @@
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    //document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-asset-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-component-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-commodity-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
-                    document.querySelector('#game-application-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    //document.querySelector('#game-application-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     //document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
                     //document.querySelector('#tx-game-cluster-next').style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
+                let sbar = document.querySelector('#tx-game-cluster-service-bar');
+                sbar.innerHTML = '';
                 TARA_API.onGet('role/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
-                    console.log(resp1);        
+                    console.log(resp1);
+                    resp1.serviceList.forEach((a)=>{
+                        if(a.resetEnabled == true){
+                            let tem = [];
+                            tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
+                            tem.push('game.asset.list\' tx-game-category=\'application\' tx-service-tag=\'role/');
+                            tem.push(a.category.toLowerCase()+'\' tx-service-category=\'');
+                            tem.push(a.category+'\'');
+                            tem.push(' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>');
+                            tem.push(a.name);
+                            tem.push('</span>');  
+                            sbar.innerHTML += tem.join('');           
+                        }
+                    });
+                    reset_t_action_event();       
                 });
             }
             else{
@@ -598,7 +614,7 @@
                             let serviceBar = document.querySelector('#live-game-service-'+ix); 
                             serviceBar.style.display = 'block';
                             serviceBar.innerHTML = b.name;
-                            serviceBar.setAttribute('service-tag',b.tag);
+                            serviceBar.setAttribute('tx-service-tag',b.tag);
                             serviceBar.setAttribute('view-id','live.game.service.'+b.name.toLowerCase());
                             ix++;
                         }
@@ -610,5 +626,18 @@
     }
     function reset_live_game_service_bar(){
         document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{a.style.display ='none';});
+    }
+    function reset_t_action_event(){
+        document.querySelectorAll('.tx-action').forEach((a)=>{
+            a.onclick=()=>{
+                TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
+                let vid = a.getAttribute('view-id');
+                TARA_API.query().category = a.getAttribute('tx-game-category');
+                TARA_API.query().serviceCategory = a.getAttribute('tx-service-category');
+                TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
+                TARA_API.query().popup = '#tx-popup';
+                tx_view({viewId:vid,containerId:'#tx-popup'});    
+            }
+        });    
     }
 </script>

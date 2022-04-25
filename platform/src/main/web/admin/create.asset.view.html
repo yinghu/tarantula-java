@@ -136,6 +136,10 @@
 
 </div>
 <script>
+    if(TARA_API.query().category == 'application'){
+        document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
+        document.querySelector('#tx-configuration-asset-type-id').disabled = true;
+    }
     document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.scope;

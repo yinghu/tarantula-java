@@ -16,31 +16,10 @@
             <span id='tx-asset-enum-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Type(enum)</span> 
         </div>            
     </div>
-    <div id='tx-asset-template-bar-pane' class="w3-panel" style="display: none;">
+    <div id='tx-service-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Assets</legend> 
-            <div id='tx-asset-template-bar' class='w3-bar w3-white'>
-            </div>
-        </fieldset>            
-    </div>
-    <div id='tx-component-template-bar-pane' class="w3-panel" style="display: none;">
-        <fieldset class="w3-border-blue tx-text-12">
-            <legend>Components</legend>
-            <div id='tx-component-template-bar' class='w3-bar w3-white'>
-            </div>
-        </fieldset>            
-    </div>
-    <div id='tx-commodity-template-bar-pane' class="w3-panel" style="display: none;">
-        <fieldset class="w3-border-blue tx-text-12">
-            <legend>Commodities</legend>
-            <div id='tx-commodity-template-bar' class='w3-bar w3-white'>
-            </div>
-        </fieldset>            
-    </div>
-    <div id='tx-item-template-bar-pane' class="w3-panel" style="display: none;">
-        <fieldset class="w3-border-blue tx-text-12">
-            <legend>Items</legend>
-            <div id='tx-item-template-bar' class='w3-bar w3-white'>
+            <legend id="tx-service-template-bar-pane-title">Service.Items</legend>
+            <div id='tx-service-item-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
     </div>
@@ -51,7 +30,34 @@
             </div>
         </fieldset>            
     </div>
-
+    <div id='tx-item-template-bar-pane' class="w3-panel" style="display: none;">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Items</legend>
+            <div id='tx-item-template-bar' class='w3-bar w3-white'>
+            </div>
+        </fieldset>            
+    </div>
+    <div id='tx-commodity-template-bar-pane' class="w3-panel" style="display: none;">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Commodities</legend>
+            <div id='tx-commodity-template-bar' class='w3-bar w3-white'>
+            </div>
+        </fieldset>            
+    </div>
+    <div id='tx-component-template-bar-pane' class="w3-panel" style="display: none;">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Components</legend>
+            <div id='tx-component-template-bar' class='w3-bar w3-white'>
+            </div>
+        </fieldset>            
+    </div>
+    <div id='tx-asset-template-bar-pane' class="w3-panel" style="display: none;">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Assets</legend> 
+            <div id='tx-asset-template-bar' class='w3-bar w3-white'>
+            </div>
+        </fieldset>            
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -62,7 +68,24 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().category+" list";
+    if(TARA_API.query().category == 'application'){
+        let serviceBar = document.querySelector('#tx-service-item-template-bar');
+        document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().serviceCategory+" list";
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
+            console.log(resp);
+            if(resp.successful){
+                serviceBar.innerHTML = '';
+                resp.itemList.forEach((a,i)=>{
+                    serviceBar.innerHTML += toHtmlServiceBarItem(a,i);
+                });
+            }
+            hookEvent();
+        });
+        document.querySelector('#tx-service-template-bar-pane-title').innerHTML=tx_first_upcase(TARA_API.query().serviceCategory);
+        document.querySelector('#tx-service-template-bar-pane').style.display = 'block';
+    }else{
+        document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().category+" list";
+    }
     let bars ={};
     bars.assetBar = [document.querySelector('#tx-asset-template-bar'),document.querySelector('#tx-asset-template-bar-pane')];
     bars.componentBar = [document.querySelector('#tx-component-template-bar'),document.querySelector('#tx-component-template-bar-pane')];
@@ -109,12 +132,26 @@
                 tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
             };
         });
+        document.querySelectorAll('.tx-service-item-action').forEach(e=>{
+            e.onclick = ()=>{
+                console.log('do action !');
+            }
+        });
     }
     function toHtmlBarItem(a,i){
         let tem = [];
         tem.push('<span tx-index=\''+i);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-asset-template\'>');
         tem.push(a.header.scope+'.'+a.header.type);
+        tem.push('</span>');
+        return tem.join('');    
+    }
+
+    function toHtmlServiceBarItem(a,i){
+        let tem = [];
+        tem.push('<span tx-index=\''+i);
+        tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-service-item-action\'>');
+        tem.push(a.configurationName);
         tem.push('</span>');
         return tem.join('');    
     }

@@ -24,7 +24,7 @@ public class DailyGiveAwayAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("category/"+app.category()));
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("typeId/"+app.category()));
             session.write(new ItemHeaderContext(true,items.size()>0?"Configure daily giveaway item":"no items configured",items).toJson().toString().getBytes());
         }
         else if (session.action().equals("onRegister")){
