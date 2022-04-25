@@ -283,14 +283,27 @@
         document.querySelector('#tx-create-asset-upload-board').style.display = 'none';
     };
     document.querySelector('#tx-create-asset-upload-ok').onclick=()=>{
-        console.log("uploading file...");
-
         document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'block';
         let f =  pendingUpload.file;
-        TARA_API.onUpload(pendingUpload.data,f.name,'png',TARA_API.query().gameClusterId,(resp)=>{
-            console.log(resp);
-            document.querySelector("#tx-create-asset-upload-progress").innerHTML = resp.message; 
-            //document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none';    
+        let sfx = f.name.split('.').pop();
+        let ctype = 'text/html';
+        if(sfx =='json'){
+            ctype = 'application/json';
+        }
+        else if(sfx=='png'){
+            ctype = 'image/png';
+        }
+        else if(sfx=='jpg'||sfx=='jpeg'){
+            ctype = 'image/jpeg';
+        }
+        TARA_API.onUpload(pendingUpload.data,f.name,ctype,TARA_API.query().gameClusterId,(resp)=>{
+            if(resp.successful){
+                document.querySelector('#tx-asset-property-'+pendingUpload.property).value = resp.message;
+                document.querySelector('#tx-create-asset-upload-board').style.display = 'none';     
+            }else{
+                document.querySelector("#tx-create-asset-upload-progress").innerHTML = 'try again'; 
+                document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none';
+            }   
         });
     };
     document.querySelector('#tx-configuration-asset-back').onclick=()=>{

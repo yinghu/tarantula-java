@@ -717,7 +717,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             return null;
         }
     }
-
+    //file name web/[game cluster name]/file.png etc
     public void _writeContent(String fileName,byte[] content){
         try{
             //write to local deploy dir to be ready for deployment
@@ -881,6 +881,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
                 URL srcApplications = Thread.currentThread().getContextClassLoader().getResource("config-template/applications");
                 copyTemplateFile(srcApplications,_config_applications);
             }
+            Path _web_game = Paths.get(this.deployDir+"/web/"+gameCluster.property(GameCluster.NAME));
+            if(!Files.exists(_web_game)){
+                Files.createDirectories(_web_game);
+            }
+
         }catch (Exception ex){
             log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
             throw new RuntimeException(ex);
