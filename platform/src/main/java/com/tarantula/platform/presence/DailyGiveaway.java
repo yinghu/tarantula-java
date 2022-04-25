@@ -20,7 +20,7 @@ public class DailyGiveaway extends ConfigurableObject {
     }
 
     public String name(){
-        return header.get("rewardKey").getAsString();
+        return configurationName;//header.get("rewardKey").getAsString();
     }
 
     @Override

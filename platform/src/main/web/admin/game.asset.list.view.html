@@ -68,6 +68,7 @@
     </div>
 </div>
 <script>
+    let applications ={};
     if(TARA_API.query().category == 'application'){
         let serviceBar = document.querySelector('#tx-service-item-template-bar');
         document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().serviceCategory+" list";
@@ -134,7 +135,18 @@
         });
         document.querySelectorAll('.tx-service-item-action').forEach(e=>{
             e.onclick = ()=>{
-                console.log('do action !');
+                let app = applications[e.getAttribute('tx-application-id')];
+                //let cat = TARA_API.query().types[app.configurationCategory];
+                TARA_API.query().itemList.forEach((a,i)=>{
+                    if(app.configurationCategory == a.header.type){
+                        console.log(a);
+                        console.log(i);
+                        TARA_API.query().itemIndex = i;
+                    }
+                });
+                TARA_API.query().pendingUpdate = app;
+                TARA_API.query().popup='#tx-popup-api';
+                tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
             }
         });
     }
@@ -148,8 +160,9 @@
     }
 
     function toHtmlServiceBarItem(a,i){
+        applications[a.itemId] = a;
         let tem = [];
-        tem.push('<span tx-index=\''+i);
+        tem.push('<span tx-application-id=\''+a.itemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-service-item-action\'>');
         tem.push(a.configurationName);
         tem.push('</span>');
