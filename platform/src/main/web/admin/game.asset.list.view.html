@@ -128,6 +128,7 @@
         document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
             a.onclick=()=>{
                 let ix = a.getAttribute('tx-index')/1;
+                TARA_API.query().operation = 'Create';
                 TARA_API.query().itemIndex = ix;
                 TARA_API.query().popup='#tx-popup-api';
                 tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
@@ -144,6 +145,7 @@
                         TARA_API.query().itemIndex = i;
                     }
                 });
+                TARA_API.query().operation = 'Update';
                 TARA_API.query().pendingUpdate = app;
                 TARA_API.query().popup='#tx-popup-api';
                 tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
@@ -164,7 +166,7 @@
         let tem = [];
         tem.push('<span tx-application-id=\''+a.itemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-service-item-action\'>');
-        tem.push(a.configurationName);
+        tem.push(a.configurationCategory+':'+a.configurationName);
         tem.push('</span>');
         return tem.join('');    
     }

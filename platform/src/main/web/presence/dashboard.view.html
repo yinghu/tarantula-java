@@ -511,42 +511,37 @@
                         lnc.style.display='none';
                         shd.style.display='block';
                     }
-                    //document.querySelector('#game-lobby-'+i).innerHTML = g.gameLobby;
-                    //document.querySelector('#game-service-'+i).innerHTML = g.gameService;
-                    //document.querySelector('#game-data-'+i).innerHTML = g.gameData;
                     _gameClusterId = g.gameClusterId
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-data-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    //document.querySelector('#game-service-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-asset-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-component-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-commodity-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
-                    //document.querySelector('#game-application-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
-                    //document.querySelector('#game-item-template-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);                    
                     document.querySelector('#game-cluster-'+i).style.display='block';
-                    //document.querySelector('#tx-game-cluster-next').style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
                 let sbar = document.querySelector('#tx-game-cluster-service-bar');
                 sbar.innerHTML = '';
                 TARA_API.onGet('role/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
                     console.log(resp1);
-                    resp1.serviceList.forEach((a)=>{
-                        if(a.resetEnabled == true){
-                            let tem = [];
-                            tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                            tem.push('game.asset.list\' tx-game-category=\'application\' tx-service-tag=\'role/');
-                            tem.push(a.category.toLowerCase()+'\' tx-service-category=\'');
-                            tem.push(a.category+'\'');
-                            tem.push(' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>');
-                            tem.push(a.name);
-                            tem.push('</span>');  
-                            sbar.innerHTML += tem.join('');           
-                        }
-                    });
-                    reset_t_action_event();       
+                    if(resp1.successful){
+                        resp1.serviceList.forEach((a)=>{
+                            if(a.resetEnabled == true){
+                                let tem = [];
+                                tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
+                                tem.push('game.asset.list\' tx-game-category=\'application\' tx-service-tag=\'role/');
+                                tem.push(a.category.toLowerCase()+'\' tx-service-category=\'');
+                                tem.push(a.category+'\'');
+                                tem.push(' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>');
+                                tem.push(a.name);
+                                tem.push('</span>');  
+                                sbar.innerHTML += tem.join('');           
+                            }
+                        });
+                        reset_t_action_event();
+                    }       
                 });
             }
             else{

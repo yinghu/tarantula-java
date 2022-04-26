@@ -83,7 +83,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
             }
         }
-        else if (session.action().equals("onCreateAsset")){
+        else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Asset app = new Asset();
@@ -105,7 +105,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().equals("onCreateComponent")){
+        else if (session.action().equals("onCreateComponent") || session.action().equals("onUpdateComponent")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Component app = new Component();
@@ -127,7 +127,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().equals("onCreateCommodity")){
+        else if (session.action().equals("onCreateCommodity")||session.action().equals("onUpdateCommodity")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Commodity app = new Commodity();
@@ -149,7 +149,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().equals("onCreateItem")){
+        else if (session.action().equals("onCreateItem")||session.action().equals("onUpdateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Item app = new Item();
@@ -171,7 +171,7 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().equals("onCreateApplication")){
+        else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();
@@ -193,7 +193,6 @@ public class GameItemAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);

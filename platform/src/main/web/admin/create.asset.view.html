@@ -140,8 +140,7 @@
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
         document.querySelector('#tx-configuration-asset-type-id').disabled = true;
     }
-    console.log(TARA_API.query().pendingUpdate);
-    document.querySelector('#tx-configuration-asset-header').innerHTML = "Create Game ["+TARA_API.query().category+"]";
+    document.querySelector('#tx-configuration-asset-header').innerHTML = TARA_API.query().operation+' ['+TARA_API.query().category+']';
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.scope;
     document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
@@ -158,6 +157,9 @@
     assetForm.innerHTML = props.join('');  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},'{}');
     let pendingUpload ={};
+    if(TARA_API.query().operation == 'Update'){
+        populate(TARA_API.query().pendingUpdate);
+    }
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
@@ -225,10 +227,7 @@
     document.querySelectorAll('.tx-property-category-add').forEach(a=>{
         a.onchange = ()=>{
             let pname = a.getAttribute('tx-property-name');
-            let list = document.querySelector('#tx-asset-property-'+pname);
-            let item = payload[a.value];
-            payload[pname].set(pname,a.value);
-            list.innerHTML = '<li>'+item.configurationName+'&lt'+a.value+'&gt</li>';
+            txCategoryItemAdd(pname,a.value);
         };
     });
     document.querySelectorAll('.tx-list-item-load').forEach(a=>{
@@ -249,16 +248,7 @@
     document.querySelectorAll('.tx-category-item-load').forEach(a=>{
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
-            let list = document.querySelector('#tx-list-select-'+pname);
-            let pv = payload.category[pname].reference.split(':');           
-            list.innerHTML='<option value="" disabled selected>Choose your option</option>';
-            TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
-                console.log(resp);
-                resp.itemList.forEach(item=>{
-                    list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
-                    payload[item.itemId]=item;
-                });
-            });   
+            txCategoryItemLoad(pname,()=>{});  
         };
     });
     document.querySelectorAll('.tx-category-item-upload').forEach(a=>{
@@ -343,6 +333,9 @@
             return; 
         }
         let itemTemplate = {header:{},application:{},reference:[]};
+        if(TARA_API.query().operation == 'Update'){
+            itemTemplate.itemId = TARA_API.query().pendingUpdate.itemId;
+        }
         itemTemplate.configurationType = selectedItem.header.scope;//TARA_API.query().category;
         itemTemplate.configurationTypeId = _typeId;
         itemTemplate.configurationName = _name;
@@ -403,11 +396,31 @@
     document.querySelector('#tx-asset-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    function txCategoryItemLoad(propertyName,callback){
+        let list = document.querySelector('#tx-list-select-'+propertyName);
+        let pv = payload.category[propertyName].reference.split(':');           
+        list.innerHTML='<option value="" disabled selected>Choose your option</option>';
+        TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
+            console.log(resp);
+            resp.itemList.forEach(item=>{
+                list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
+                payload[item.itemId]=item;
+            });
+            callback();
+        });  
+    }
+    function txCategoryItemAdd(propertyName,propertyValue){
+        let list = document.querySelector('#tx-asset-property-'+propertyName);
+        let item = payload[propertyValue];
+        payload[propertyName].set(propertyName,propertyValue);
+        list.innerHTML = '<li>'+item.configurationName+'&lt'+propertyValue+'&gt</li>';
+    }
+    function txListItemLoad(){
+
+    }
     function toHtmlInputType(prop){
         let tem = [];
-        //if(prop.type == 'list' || prop.type == 'set' || prop.type == 'category'){
-            tem.push('<div class=\'tx-margin-bottom-8\'>');
-        //}
+        tem.push('<div class=\'tx-margin-bottom-8\'>');
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
         tem.push(prop.name);    
         tem.push('</label>');
@@ -496,6 +509,46 @@
         return tem.join(''); 
     }
     function toCmd(category){
-        return "onCreate"+category[0].toUpperCase() + category.slice(1).toLowerCase();
+        return "on"+TARA_API.query().operation+category[0].toUpperCase() + category.slice(1).toLowerCase();
+    }
+    function populate(data){
+        console.log(data);
+        document.querySelector('#tx-configuration-asset-name').value = data.configurationName;
+        console.log(selectedItem);
+        selectedItem.application.properties.forEach(prop=>{
+            let pv = document.querySelector('#tx-asset-property-'+prop.name);
+            switch(prop.type){
+                case 'list':
+                    break;
+                case 'set':
+                    break;
+                case 'category':
+                    if(data.application[prop.name].length==1){
+                        console.log(data.application[prop.name][0]);
+                        txCategoryItemLoad(prop.name,()=>{
+                            Array.from(document.querySelector('#tx-list-select-'+prop.name).options).forEach(opt=>{
+                            if(data.application[prop.name][0]==opt.value){
+                                opt.selected = true;
+                                txCategoryItemAdd(prop.name,opt.value);
+                            }
+                        });
+                    });    
+                    }
+                    break;
+                case 'enum':
+                    Array.from(pv.options).forEach(opt=>{
+                        if(data.header[prop.name]-opt.value==0){
+                            opt.selected = true;
+                        }
+                    });
+                    break;
+                case 'boolean':
+                    pv.checked = data.header[prop.name];    
+                    break;
+                default:
+                    pv.value = data.header[prop.name];    
+                    break;
+            }
+        });
     }
 </script>

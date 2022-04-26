@@ -176,6 +176,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.header = config.getAsJsonObject("header");
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
+        if(config.has("itemId")){
+            this.distributionKey(config.get("itemId").getAsString());
+        }
         return true;
     }
 
