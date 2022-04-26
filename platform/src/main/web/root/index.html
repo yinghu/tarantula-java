@@ -324,23 +324,23 @@
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_on_google_auth(){
-            let m = document.getElementsByTagName('head')[0];
-            let m1 = document.createElement('meta');
-            m1.name = 'google-signin-scope';
-            m1.content = 'profile email';
-            m.parentNode.insertBefore(m1,m);
-            let m2 = document.createElement('meta');
-            m2.name = 'google-signin-client_id';
-            m2.content = TARA_API.query().googleClientId;
-            m.parentNode.insertBefore(m2,m);    
-            let glib = document.createElement('script');
-            glib.type = 'text/javascript';
-            glib.async = true;
-            glib.defer = true;
-            glib.src = 'https://apis.google.com/js/platform.js';
-            glib.onload = render_button;
-            let t = document.getElementsByTagName("script")[0];
-            t.parentNode.insertBefore(glib,t); 
+            //let m = document.getElementsByTagName('head')[0];
+            //let m1 = document.createElement('meta');
+            //m1.name = 'google-signin-scope';
+            //m1.content = 'profile email';
+            //m.parentNode.insertBefore(m1,m);
+            //let m2 = document.createElement('meta');
+            //m2.name = 'google-signin-client_id';
+            //m2.content = TARA_API.query().googleClientId;
+            //m.parentNode.insertBefore(m2,m);    
+            //let glib = document.createElement('script');
+            //glib.type = 'text/javascript';
+            //glib.async = true;
+            //glib.defer = true;
+            //glib.src = 'https://apis.google.com/js/platform.js';
+            //glib.onload = render_button;
+            //let t = document.getElementsByTagName("script")[0];
+            //t.parentNode.insertBefore(glib,t); 
         }
         function render_button() {
             gapi.signin2.render('tx-google-button', {

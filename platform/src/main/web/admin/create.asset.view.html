@@ -136,14 +136,14 @@
 
 </div>
 <script>
+    let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
         document.querySelector('#tx-configuration-asset-type-id').disabled = true;
     }
-    document.querySelector('#tx-configuration-asset-header').innerHTML = TARA_API.query().operation+' ['+TARA_API.query().category+']';
-    let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    document.querySelector('#tx-configuration-asset-description').innerHTML = selectedItem.header.scope;
-    document.querySelector('#tx-configuration-asset-type').innerHTML = TARA_API.query().category+'/category : '+selectedItem.header.type;
+    document.querySelector('#tx-configuration-asset-header').innerHTML = TARA_API.query().operation+' ['+selectedItem.header.type+']';
+    document.querySelector('#tx-configuration-asset-description').innerHTML = tx_first_upcase(selectedItem.header.scope);
+    document.querySelector('#tx-configuration-asset-type').innerHTML = 'Category : '+selectedItem.header.type;
     let assetForm = document.querySelector('#tx-asset-create-form');
     let props = [];
     let payload = {index:0,category:{}};
@@ -537,6 +537,7 @@
     }
     function populate(data){
         console.log(data);
+        document.querySelector('#tx-configuration-asset-type-id').value = data.configurationTypeId;
         document.querySelector('#tx-configuration-asset-name').value = data.configurationName;
         console.log(selectedItem);
         selectedItem.application.properties.forEach(prop=>{
