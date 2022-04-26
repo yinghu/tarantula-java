@@ -19,6 +19,12 @@
     <div id='tx-service-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
             <legend id="tx-service-template-bar-pane-title">Service.Items</legend>
+            <select class="w3-select w3-border tx-margin-bottom-8" name="option">
+                <option value="type">ByType</option>
+                <option value="category">ByCategory</option>
+                <option value="typeId" selected>ByTypeId</option>
+                <option value="name">ByName</option>
+            </select>
             <div id='tx-service-item-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
@@ -66,9 +72,43 @@
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
     </div>
+    <!-- application operation selection form -->
+    <div class="w3-card-4 w3-border w3-round w3-white tx-popup-w300-h200" id="tx-application-operation-selection-board">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topright w3-padding">
+                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:16px"></i></span>
+                <span class="tx-margin-left-8 tx-text-14">Operation</span>
+            </div>
+        </div>
+        <div class="w3-display-container" style="height: 128px;">
+            <div id="tx-application-operation-selection-message" class="w3-display-topmiddle w3-center tx-margin-top-8 tx-text-14">Edit/Publish</div>
+            <div class="w3-display-left tx-margin-left-16 tx-margin-bottom-8">
+                <span id='tx-application-operation-selection-edit' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Edit</span>
+            </div>
+            <div class="w3-display-right tx-margin-right-16 tx-margin-bottom-8">
+                <span id='tx-application-operation-selection-publish' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Publish</span>
+            </div>
+            <div class="w3-display-bottommiddle w3-center">
+                <span id="tx-application-operation-selection-cancel" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
+            </div>
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
+    </div>
 </div>
 <script>
     let applications ={};
+    let operationBoard = document.querySelector('#tx-application-operation-selection-board');
+    let operationMessage = document.querySelector('#tx-application-operation-selection-message');
     if(TARA_API.query().category == 'application'){
         let serviceBar = document.querySelector('#tx-service-item-template-bar');
         document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().serviceCategory+" list";
@@ -124,6 +164,17 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    document.querySelector('#tx-application-operation-selection-cancel').onclick =()=>{
+        operationBoard.style.display = 'none';
+    }
+    document.querySelector('#tx-application-operation-selection-edit').onclick =()=>{
+        operationBoard.style.display = 'none';
+        tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
+    }
+    document.querySelector('#tx-application-operation-selection-publish').onclick =()=>{
+        operationBoard.style.display = 'none';
+        tx_view({viewId:'register.application',containerId:'#tx-popup-api'});
+    }
     function hookEvent(){
         document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
             a.onclick=()=>{
@@ -148,7 +199,9 @@
                 TARA_API.query().operation = 'Update';
                 TARA_API.query().pendingUpdate = app;
                 TARA_API.query().popup='#tx-popup-api';
-                tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
+                operationBoard.style.display = 'block';
+                operationMessage.innerHTML = app.configurationCategory+':'+app.configurationName;
+                //tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
             }
         });
     }

@@ -35,7 +35,7 @@
     </div>
 </div>
 <script>
-    let itemTemplate = TARA_API.query().item;
+    let itemTemplate = TARA_API.query().itemList[TARA_API.query().itemIndex];
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'tree'},itemTemplate);
     if(!itemTemplate.disabled){
         document.querySelector('#tx-register-item-register').innerHTML = "Release";    
@@ -49,7 +49,7 @@
     };
     document.querySelector('#tx-register-item-api-close').onclick=()=>{
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().gamePopup);
+        let m3 = document.querySelector(TARA_API.query().popup);
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
