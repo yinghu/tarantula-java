@@ -170,12 +170,28 @@
                 document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block'; 
                 return;
             }
+            if(payload.category[pname].type == 'set'){
+                if(payload[pname+'_set'].has(pvalue)){
+                    document.querySelector("#tx-create-asset-warning-message").innerHTML = "value is duplicated in set";
+                    document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block'; 
+                    return;
+                }
+                payload[pname+'_set'].set(pvalue,pvalue);
+            }
             txListItemAdd(pname,pvalue);
         };
     });
     document.querySelectorAll('.tx-list-category-add').forEach(a=>{
         a.onchange = ()=>{
             let pname = a.getAttribute('tx-property-name');
+            if(payload.category[pname].type == 'set'){
+                if(payload[pname+'_set'].has(a.value)){
+                    document.querySelector("#tx-create-asset-warning-message").innerHTML = "value is duplicated in set";
+                    document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block'; 
+                    return;
+                }
+                payload[pname+'_set'].set(a.value,a.value);
+            }
             txCategoryListAdd(pname,a.value);
         };
     });
@@ -383,6 +399,10 @@
                 let rid = e.getAttribute('tx-index');
                 let removed = 'tx-list-category-remove-'+propertyName+'-'+rid;    
                 document.querySelector('#'+removed).style.display = 'none';
+                if(payload.category[propertyName].type == 'set'){
+                    let removedKey = payload[propertyName].get(removed);
+                    payload[propertyName+'_set'].delete(removedKey);
+                }
                 payload[propertyName].delete(removed);    
                 //console.log("remove category->"+rid);
             };
@@ -410,7 +430,11 @@
                 let rid = e.getAttribute('tx-index');
                 let removed = 'tx-list-item-remove-'+propertyName+'-'+rid;
                 document.querySelector('#'+removed).style.display = 'none';
-                payload[propertyName].delete(removed);    
+                if(payload.category[propertyName].type == 'set'){
+                    let removedKey = payload[propertyName].get(removed);
+                    payload[propertyName+'_set'].delete(removedKey);
+                }
+                payload[propertyName].delete(removed);  
                 //console.log("remove item->"+rid);
             };
         });
@@ -422,7 +446,10 @@
         tem.push(prop.name);    
         tem.push('</label>');
         if(prop.type == 'list' || prop.type == 'set'){
-            payload[prop.name]=new Map();    
+            payload[prop.name]=new Map();  
+            if(prop.type == 'set'){
+                payload[prop.name+'_set'] = new Map();
+            }  
             tem.push('<span tx-property-name=\'');
             tem.push(prop.name);
             if(prop.reference.startsWith('category')){
