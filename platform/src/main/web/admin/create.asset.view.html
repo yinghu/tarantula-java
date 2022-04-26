@@ -170,31 +170,7 @@
                 document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block'; 
                 return;
             }
-            let list = document.querySelector('#tx-asset-property-'+pname);
-            let pv = payload.category[pname].reference.split(':');           
-            let v = TARA_API.query().types[pv[1]];
-            let added = [];
-            let ix = payload.index++;
-            //console.log("ITEM INDEX->"+ix);
-            let removedIx = 'tx-list-item-remove-'+pname+'-'+ix;
-            payload[pname].set(removedIx,pvalue);
-            added.push('<li id=\''+removedIx);
-            added.push('\'><div class=\'w3-container tx-text-12\'>');
-            added.push('<span>');
-            added.push(pvalue);
-            added.push('</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
-            added.push('tx-list-item-remove-'+pname);
-            added.push('\' tx-index=\''+ix+'\'>Remove</span></div></li>');        
-            list.innerHTML += added.join('');
-            document.querySelectorAll('.tx-list-item-remove-'+pname).forEach(e=>{
-                e.onclick =()=>{
-                    let rid = e.getAttribute('tx-index');
-                    let removed = 'tx-list-item-remove-'+pname+'-'+rid;
-                    document.querySelector('#'+removed).style.display = 'none';
-                    payload[pname].delete(removed);    
-                    //console.log("remove item->"+rid);
-                };
-            });
+            txListItemAdd(pname,pvalue);
         };
     });
     document.querySelectorAll('.tx-list-category-add').forEach(a=>{
@@ -412,7 +388,33 @@
             };
         });
     }
-
+    function txListItemAdd(propertyName,propertyValue){
+        let list = document.querySelector('#tx-asset-property-'+propertyName);
+        let pv = payload.category[propertyName].reference.split(':');           
+        let v = TARA_API.query().types[pv[1]];
+        let added = [];
+        let ix = payload.index++;
+        //console.log("ITEM INDEX->"+ix);
+        let removedIx = 'tx-list-item-remove-'+propertyName+'-'+ix;
+        payload[propertyName].set(removedIx,propertyValue);
+        added.push('<li id=\''+removedIx);
+        added.push('\'><div class=\'w3-container tx-text-12\'>');
+        added.push('<span>');
+        added.push(propertyValue);
+        added.push('</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
+        added.push('tx-list-item-remove-'+propertyName);
+        added.push('\' tx-index=\''+ix+'\'>Remove</span></div></li>');        
+        list.innerHTML += added.join('');
+        document.querySelectorAll('.tx-list-item-remove-'+propertyName).forEach(e=>{
+            e.onclick =()=>{
+                let rid = e.getAttribute('tx-index');
+                let removed = 'tx-list-item-remove-'+propertyName+'-'+rid;
+                document.querySelector('#'+removed).style.display = 'none';
+                payload[propertyName].delete(removed);    
+                //console.log("remove item->"+rid);
+            };
+        });
+    }
     function toHtmlInputType(prop){
         let tem = [];
         tem.push('<div class=\'tx-margin-bottom-8\'>');
@@ -527,6 +529,9 @@
                     else{
                        if(data.application[prop.name].length>0){
                            console.log(data.application[prop.name]);
+                           data.application[prop.name].forEach(k=>{
+                               txListItemAdd(prop.name,k);
+                           });
                        }     
                     }
                     break;
