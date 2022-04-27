@@ -6,6 +6,33 @@
   "name": "commodities/commodity-type-settings",
   "itemList":
   [
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "RechargeableCommodity",
+        "description": "general commodity",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Amount",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
 
   ]
 }

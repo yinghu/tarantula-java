@@ -20,10 +20,10 @@ public class Achievement extends ConfigurableObject {
         return PresencePortableRegistry.ACHIEVEMENT_CID;
     }
     public String name(){
-        return header.get("name").getAsString();
+        return header.get("Name").getAsString();
     }
     public double goal(){
-        return header.get("goal").getAsDouble();
+        return header.get("Goal").getAsDouble();
     }
 
     @Override

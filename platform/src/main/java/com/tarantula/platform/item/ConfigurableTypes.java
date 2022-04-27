@@ -44,6 +44,11 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
         return jsonObject;
     }
+
+    public JsonArray toTypes(){
+        if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
+        return application.get(ITEM_LIST).getAsJsonArray();
+    }
     public boolean addType(JsonObject type){
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());

@@ -4,13 +4,16 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
-public class GameCluster extends OnApplicationHeader implements Portable {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable {
+
+    public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
     public final static String NAME="1";
     public final static String MODE="2";//pve | pvp |tvp|tvt

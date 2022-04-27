@@ -27,8 +27,12 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            gsc.lobby= gc.serviceLobby;
-            session.write(gsc.toJson().toString().getBytes());
+            if(gc!=null){
+                gsc.lobby= gc.serviceLobby;
+                session.write(gsc.toJson().toString().getBytes());
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"no game cluser for key ["+session.name()+"]").getBytes());
+            }
         }
         else if(session.action().equals("onGameDataList")){
             GameClusterDataStoreContext gsc = new GameClusterDataStoreContext();

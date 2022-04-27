@@ -48,11 +48,25 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         if(configurableTypes!=null) jsonObject.add("types",configurableTypes.toJson());
         return jsonObject;
     }
+    public JsonArray toCategories(){
+        if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
+        return application.get(ITEM_LIST).getAsJsonArray();
+    }
     public boolean addCategory(JsonObject type){
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());
         }
         JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        boolean exiting = false;
+        for(JsonElement je : items) {
+            String ex = je.getAsJsonObject().get("header").getAsJsonObject().get("type").getAsString();
+            String ax = type.getAsJsonObject().get("header").getAsJsonObject().get("type").getAsString();
+            if (ex.equals(ax)){
+                exiting = true;
+                break;
+            }
+        }
+        if(exiting) return false;
         items.add(type);
         return true;
     }
@@ -69,8 +83,10 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
             if(header.get("type").getAsString().equals(category)){
                 configurableSetting = new ConfigurableSetting();
                 configurableSetting.type = category;
-                configurableSetting.description = header.has("description")?header.get("description").getAsString():"";
-                configurableSetting.rechargeable = header.has("rechargeable")?header.get("rechargeable").getAsBoolean():false;
+                configurableSetting.scope = header.get("scope").getAsString();
+                configurableSetting.version = header.get("version").getAsString();
+                configurableSetting.description = header.get("description").getAsString();
+                configurableSetting.rechargeable = header.get("rechargeable").getAsBoolean();
                 configurableSetting.properties = item.get("application").getAsJsonObject().get("properties").getAsJsonArray();
                 break;
             }

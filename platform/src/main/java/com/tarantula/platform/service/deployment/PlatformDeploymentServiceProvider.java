@@ -655,7 +655,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        return this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
+        GameCluster gameCluster = this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
+        if(gameCluster.successful()){
+            this.tarantulaContext.setup(gameCluster);
+            oListeners.forEach((k,o)->
+                    {
+                        if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                            o.listener.onCreated(gameCluster);
+                        }
+                    }
+            );
+        }
+        return (T)gameCluster;
     }
     public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){
         return (T)this.tarantulaContext.configuration((GameCluster)gameCluster,config);

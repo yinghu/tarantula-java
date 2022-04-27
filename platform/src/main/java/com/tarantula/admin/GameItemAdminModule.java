@@ -14,7 +14,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameItemAdminModule implements Module {
+public class GameItemAdminModule implements Module,Configurable.Listener<GameCluster> {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
 
@@ -211,6 +211,7 @@ public class GameItemAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.deploymentServiceProvider.registerConfigurableListener(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE,this);
         this.context.log("game item admin module started", OnLog.WARN);
     }
     private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
@@ -286,5 +287,70 @@ public class GameItemAdminModule implements Module {
             return updates;
         }
         return updates;
+    }
+    @Override
+    public void onCreated(GameCluster gameCluster){
+        ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+
+        ConfigurableCategories assets = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableCategories items = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        assets.toCategories().forEach((c->{
+            components.addCategory(c.getAsJsonObject());
+            commodities.addCategory(c.getAsJsonObject());
+            items.addCategory(c.getAsJsonObject());
+            applications.addCategory(c.getAsJsonObject());
+        }));
+        components.toCategories().forEach((c->{
+            commodities.addCategory(c.getAsJsonObject());
+            items.addCategory(c.getAsJsonObject());
+            applications.addCategory(c.getAsJsonObject());
+        }));
+        commodities.toCategories().forEach((c->{
+            this.context.log(c.toString(),OnLog.WARN);
+            items.addCategory(c.getAsJsonObject());
+            applications.addCategory(c.getAsJsonObject());
+        }));
+        items.toCategories().forEach((c->{
+            applications.addCategory(c.getAsJsonObject());
+        }));
+        applicationPreSetup.save(context,gameCluster,assets);
+        applicationPreSetup.save(context,gameCluster,components);
+        applicationPreSetup.save(context,gameCluster,commodities);
+        applicationPreSetup.save(context,gameCluster,items);
+        applicationPreSetup.save(context,gameCluster,applications);
+
+        ConfigurableTypes assetTypes = this.configurableTypes(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableTypes componentTypes = this.configurableTypes(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableTypes commodityTypes = this.configurableTypes(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableTypes itemTypes = this.configurableTypes(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableTypes applicationTypes = this.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        assetTypes.toTypes().forEach((t)->{
+            componentTypes.addType(t.getAsJsonObject());
+            commodityTypes.addType(t.getAsJsonObject());
+            itemTypes.addType(t.getAsJsonObject());
+            applicationTypes.addType(t.getAsJsonObject());
+        });
+        componentTypes.toTypes().forEach((t)->{
+            commodityTypes.addType(t.getAsJsonObject());
+            itemTypes.addType(t.getAsJsonObject());
+            applicationTypes.addType(t.getAsJsonObject());
+        });
+        commodityTypes.toTypes().forEach((t)->{
+            itemTypes.addType(t.getAsJsonObject());
+            applicationTypes.addType(t.getAsJsonObject());
+        });
+        itemTypes.toTypes().forEach((t)->{
+            applicationTypes.addType(t.getAsJsonObject());
+        });
+
+        applicationPreSetup.save(context,gameCluster,assetTypes);
+        applicationPreSetup.save(context,gameCluster,componentTypes);
+        applicationPreSetup.save(context,gameCluster,commodityTypes);
+        applicationPreSetup.save(context,gameCluster,itemTypes);
+        applicationPreSetup.save(context,gameCluster,applicationTypes);
+
     }
 }
