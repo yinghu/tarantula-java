@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ShoppingItem extends ConfigurableObject {
 
     private ArrayList<ConfigurableObject> _reference;
-
+    private boolean validated;
     public ShoppingItem(){}
 
     public ShoppingItem(ConfigurableObject configurableObject){
@@ -33,21 +33,28 @@ public class ShoppingItem extends ConfigurableObject {
     @Override
     public JsonObject toJson() {
         JsonObject json = super.toJson();
-        //_setup();
+        _setup();
         _reference.forEach((cob)-> json.add(cob.distributionKey(),cob.toJson()));
         return json;
     }
-
+    @Override
+    public boolean configureAndValidate() {
+        _setup();
+        return validated;
+    }
     public  <T extends Configurable> T _setup(){
         _reference = new ArrayList<>();
+        int commodities = 0;
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
+                if(cob.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)) commodities++;
                 _reference.add(cob.setup());
             }
         }
+        validated = commodities>0;
         return (T)this;
     }
     @Override

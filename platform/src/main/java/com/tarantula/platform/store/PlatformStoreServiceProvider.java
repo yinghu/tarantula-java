@@ -84,10 +84,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
-            return false;
-        }
-        configurableObject._setup();
+        if(!applicationPreSetup.load(serviceContext,app,configurableObject)) return false;
         shoppingItems.put(configurableObject.distributionKey(),configurableObject);
         return true;
     }

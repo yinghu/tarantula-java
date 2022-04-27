@@ -25,19 +25,33 @@ public class GameStoreAdminModule implements Module {
             List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("typeId/"+app.category()));
             session.write(new ItemHeaderContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
+        else if(session.action().equals("onLoad")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Application app = new Application();
+            app.distributionKey(query[1]);
+            if(preSetup.load(context,desc,app)){
+                session.write(app.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,query[1]+" not existed").getBytes());
+            }
+        }
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(ks[0]);
             ShoppingItem app = new ShoppingItem();
             app.distributionKey(ks[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app) && app.configureAndValidate()){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
                 gameServiceProvider.storeServiceProvider().register(app.setup());
             }
             else{
-               session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+               session.write(JsonUtil.toSimpleResponse(false,"invalid shopping item").getBytes());
             }
         }
         else if (session.action().equals("onRelease")){

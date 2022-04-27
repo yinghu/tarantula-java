@@ -6,6 +6,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableHeader;
 import com.tarantula.platform.item.ConfigurableHeaderQuery;
 import com.tarantula.platform.item.ItemHeaderContext;
@@ -26,6 +27,20 @@ public class DailyGiveAwayAdminModule implements Module {
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("typeId/"+app.category()));
             session.write(new ItemHeaderContext(true,items.size()>0?"Configure daily giveaway item":"no items configured",items).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onLoad")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Application app = new Application();
+            app.distributionKey(query[1]);
+            if(preSetup.load(context,desc,app)){
+                session.write(app.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,query[1]+" not existed").getBytes());
+            }
         }
         else if (session.action().equals("onRegister")){
             String[] ks = session.name().split("#");

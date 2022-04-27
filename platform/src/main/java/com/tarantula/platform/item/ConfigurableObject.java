@@ -144,6 +144,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         jsonObject.addProperty("configurationCategory",configurationCategory);
         jsonObject.addProperty("configurationVersion",configurationVersion);
         jsonObject.addProperty("itemId", distributionKey());
+        jsonObject.addProperty("disabled",disabled);
         jsonObject.add("header",header);
         jsonObject.add("application",application);
         jsonObject.add("reference",reference);
