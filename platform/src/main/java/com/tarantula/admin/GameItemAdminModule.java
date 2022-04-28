@@ -55,7 +55,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
             }
         }
-        else if(session.action().equals("onUpdateCategorySettings")){
+        else if(session.action().equals("onCreateCategorySettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
@@ -75,6 +75,34 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                         type.addProperty("name",typeIndex.name());
                         configurableTypes.addType(type);
                         applicationPreSetup.save(context,gameCluster,configurableTypes);
+                    }
+                    if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
+                });
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
+            }
+        }
+        else if(session.action().equals("onUpdateCategorySettings")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
+            JsonObject header = jo.get("header").getAsJsonObject();
+            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),query[1],header.get("scope").getAsString());
+            if(applicationPreSetup.load(context,gameCluster,typeIndex)){
+                //applicationPreSetup.save(context,gameCluster,typeIndex);
+                List<String> updates = this.availableUpdates(typeIndex.label());
+                updates.forEach(update->{
+                    ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
+                    if(categories.updateCategory(jo)){
+                        applicationPreSetup.save(context,gameCluster,categories);
+                        //ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
+                        //JsonObject type = new JsonObject();
+                        //type.addProperty("type","category");
+                        //type.addProperty("name",typeIndex.name());
+                        //configurableTypes.addType(type);
+                        //applicationPreSetup.save(context,gameCluster,configurableTypes);
                     }
                     if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
                 });
@@ -309,7 +337,6 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             applications.addCategory(c.getAsJsonObject());
         }));
         commodities.toCategories().forEach((c->{
-            this.context.log(c.toString(),OnLog.WARN);
             items.addCategory(c.getAsJsonObject());
             applications.addCategory(c.getAsJsonObject());
         }));

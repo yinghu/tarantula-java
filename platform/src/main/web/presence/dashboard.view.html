@@ -494,7 +494,7 @@
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameClusterList',index:TARA_API.query().gameClusterIndex},(resp)=>{
             console.log(resp);
             if(resp.successful){
-                let _gameClusterId;
+                let _gameClusterId='';
                 resp.gameClusterList.forEach((g,i)=>{
                     let disabled = g.disabled;
                     let _name = g.tournamentEnabled?g.name+'/'+g.mode+'[tournament mode]':g.name+'/'+g.mode;
@@ -522,6 +522,7 @@
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
+                if(_gameClusterId=='') return;
                 let sbar = document.querySelector('#tx-game-cluster-service-bar');
                 sbar.innerHTML = '';
                 TARA_API.onGet('role/lobby','onGameServiceList',_gameClusterId,(resp1)=>{

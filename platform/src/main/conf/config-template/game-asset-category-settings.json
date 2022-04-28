@@ -6,6 +6,39 @@
   "name": "assets/asset-type-settings",
   "itemList":
   [
-
+    {
+      "header": {
+        "scope": "asset",
+        "type": "DisplayCard",
+        "description": "general icon view",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SmallIcon",
+            "type": "string",
+            "reference": "Icon",
+            "nullable": false,
+            "downloadable": true
+          },
+          {
+            "name": "LargeIcon",
+            "type": "string",
+            "reference": "Icon",
+            "nullable": false,
+            "downloadable": true
+          }
+        ]
+      }
+    }
   ]
 }

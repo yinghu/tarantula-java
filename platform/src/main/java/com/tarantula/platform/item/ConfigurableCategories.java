@@ -7,9 +7,8 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class ConfigurableCategories extends RecoverableObject implements Configuration {
@@ -67,6 +66,25 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
             }
         }
         if(exiting) return false;
+        items.add(type);
+        return true;
+    }
+    public boolean updateCategory(JsonObject type){
+        if(!application.has(ITEM_LIST)){
+            application.add(ITEM_LIST,new JsonArray());
+        }
+        JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        boolean removed = false;
+        for(Iterator<JsonElement> it = items.iterator(); it.hasNext();){
+            JsonObject jo = it.next().getAsJsonObject();
+            String ex = jo.get("header").getAsJsonObject().get("type").getAsString();
+            String ax = type.get("header").getAsJsonObject().get("type").getAsString();
+            if(ex.equals(ax)){
+                it.remove();
+                removed = true;
+            }
+        }
+        if(!removed) return false;
         items.add(type);
         return true;
     }

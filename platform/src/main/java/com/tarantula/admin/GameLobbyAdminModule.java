@@ -31,7 +31,7 @@ public class GameLobbyAdminModule implements Module {
                 gsc.lobby= gc.serviceLobby;
                 session.write(gsc.toJson().toString().getBytes());
             }else{
-                session.write(JsonUtil.toSimpleResponse(false,"no game cluser for key ["+session.name()+"]").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"no game cluster for key ["+session.name()+"]").getBytes());
             }
         }
         else if(session.action().equals("onGameDataList")){

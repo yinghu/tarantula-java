@@ -17,6 +17,12 @@ public class GameServiceContext extends ResponseHeader {
 
     public JsonObject toJson(){
         DescriptorSerializer serializer = new DescriptorSerializer();
+        if(lobby==null){
+            JsonObject noLobby = new JsonObject();
+            noLobby.addProperty("successful",false);
+            noLobby.addProperty("message","lobby no active");
+            return noLobby;
+        }
         JsonObject jsonObject = (JsonObject) serializer.serialize(lobby.descriptor(), Descriptor.class,null);
         jsonObject.addProperty("successful",successful);
         JsonArray ja = new JsonArray();

@@ -5,6 +5,6 @@
   "description": "sample types of asset category",
   "itemList":
   [
-
+    {"type": "category","name": "DisplayCard"}
   ]
 }
