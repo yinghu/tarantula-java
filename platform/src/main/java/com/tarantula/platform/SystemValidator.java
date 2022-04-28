@@ -1,9 +1,6 @@
 package com.tarantula.platform;
 
-import com.icodesoftware.Access;
-import com.icodesoftware.OnSession;
-import com.icodesoftware.Presence;
-import com.icodesoftware.TokenValidator;
+import com.icodesoftware.*;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
@@ -91,6 +88,9 @@ public class SystemValidator{
         }
         public boolean upgradeRole(Access access,String role){
             return systemValidatorProvider.upgradeRole(access,role);
+        }
+        public Access.Role role(String systemId){
+            return systemValidatorProvider.role(systemId);
         }
     }
 }

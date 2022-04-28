@@ -15,18 +15,15 @@ public class Inventory extends IndexSet implements Configurable, Balance {
     private HashMap<String,InventoryItem> itemList = new HashMap<>();
     private boolean rechargeable;
     private double balance;
-    //private String icon;
 
     public Inventory(){}
 
-    public Inventory(String category){
-        super("Inventory/"+category);
+    public Inventory(String category,String typeId){
+        super("Inventory/"+category+"/"+typeId);
     }
 
-    public Inventory(String category,boolean rechargeable){
-        super("Inventory/"+category);
-        //this.name = name;
-        //this.icon = icon;
+    public Inventory(String category,String typeId,boolean rechargeable){
+        super("Inventory/"+category+"/"+typeId);
         this.rechargeable = rechargeable;
     }
 
@@ -63,16 +60,12 @@ public class Inventory extends IndexSet implements Configurable, Balance {
 
     @Override
     public Map<String,Object> toMap(){
-        //properties.put("name",name);
-        //properties.put("icon",icon);
         properties.put("rechargeable",rechargeable);
         properties.put("balance",balance);
         return  super.toMap();
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        //name = (String) properties.remove("name");
-        //icon = (String) properties.remove("icon");
         rechargeable = (boolean)properties.remove("rechargeable");
         balance = ((Number)properties.remove("balance")).doubleValue();
         super.fromMap(properties);
@@ -87,9 +80,9 @@ public class Inventory extends IndexSet implements Configurable, Balance {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
-        //jsonObject.addProperty("name",name);
-        //jsonObject.addProperty("icon",icon);
-        jsonObject.addProperty("type",label.split("/")[1]);
+        String[] ttp = label.split("/");
+        jsonObject.addProperty("type",ttp[1]);
+        jsonObject.addProperty("typeId",ttp[2]);
         jsonObject.addProperty("balance",balance);
         jsonObject.addProperty("rechargeable",rechargeable);
         JsonArray items = new JsonArray();

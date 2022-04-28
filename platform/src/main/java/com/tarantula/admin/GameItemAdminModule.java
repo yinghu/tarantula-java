@@ -166,7 +166,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     Category category = app.category(desc);
                     category.list();
-                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,conf.description));
+                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{

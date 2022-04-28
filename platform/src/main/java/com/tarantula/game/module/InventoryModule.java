@@ -20,7 +20,8 @@ public class InventoryModule implements Module {
             session.write(category.toJson().toString().getBytes());
         }
         else if(session.action().equals("onInventory")){
-            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),session.name());
+            String[] query = session.name().split("#");
+            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0],query[1]);
             if(inventory!=null){
                 session.write(inventory.toJson().toString().getBytes());
             }else{
@@ -29,7 +30,7 @@ public class InventoryModule implements Module {
         }
         else if(session.action().equals("onCommodity")){
             String[] query = session.name().split("#");
-            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0]);
+            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0],query[1]);
             Configurable commodity;
             if(inventory!=null&&(commodity=inventory.load(query[1]))!=null){
                 session.write(commodity.toJson().toString().getBytes());

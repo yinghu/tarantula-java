@@ -89,12 +89,14 @@
     reset_live_game_inventory_bar();
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inventory"),{mode:'tree'},{});
     TARA_API.onGet(TARA_API.query().serviceTag,'onCategory','',(resp)=>{
+        console.log(resp);
         editor.set(resp);
         if(!resp.successful) return;        
         resp.itemList.forEach((gi,i)=>{
             let cbar = document.querySelector('#live-game-inventory-category-'+i);
-            cbar.innerHTML = gi.name;
+            cbar.innerHTML = gi.typeId;
             cbar.setAttribute('tx-inventory-category',gi.category);
+            cbar.setAttribute('tx-inventory-type-id',gi.typeId);
             cbar.style.display = 'block';
         });
     });
@@ -102,7 +104,8 @@
         a.onclick=()=>{
             reset_live_game_inventory_list();
             let cat = a.getAttribute('tx-inventory-category');
-            TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',cat,(resp)=>{
+            let tid = a.getAttribute('tx-inventory-type-id');
+            TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',cat+'#'+tid,(resp)=>{
             editor.set(resp);
             if(!resp.successful) return;        
                 resp.itemList.forEach((gi,i)=>{

@@ -26,4 +26,6 @@ public interface TokenValidator {
 
     boolean upgradeRole(Access access,String role);
 
+    Access.Role role(String systemId);
+
 }

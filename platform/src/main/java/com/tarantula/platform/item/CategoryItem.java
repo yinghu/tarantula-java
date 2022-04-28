@@ -9,17 +9,17 @@ public class CategoryItem extends ConfigurableObject{
 
 
     public CategoryItem(){}
-    public CategoryItem(String type,String category,String name){
+    public CategoryItem(String type,String category,String typeId){
         this.configurationType = type;
         this.configurationCategory = category;
-        this.configurationName = name;
+        this.configurationTypeId = typeId;
     }
 
     @Override
     public Map<String,Object> toMap(){
         this.properties.put(TYPE_KEY,this.configurationType);
         this.properties.put(CATEGORY_KEY, this.configurationCategory);
-        this.properties.put(NAME_KEY, this.configurationName);
+        this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
         this.properties.put(HEADER_KEY,header.toString());
         this.properties.put(APPLICATION_KEY,application.toString());
         return this.properties;
@@ -28,7 +28,7 @@ public class CategoryItem extends ConfigurableObject{
     public void fromMap(Map<String,Object> properties){
         this.configurationType  = (String) properties.get(TYPE_KEY);
         this.configurationCategory = (String) properties.get(CATEGORY_KEY);
-        this.configurationName = (String) properties.get(NAME_KEY);
+        this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
     }
@@ -43,7 +43,7 @@ public class CategoryItem extends ConfigurableObject{
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type",configurationType);
         jsonObject.addProperty("category",configurationCategory);
-        jsonObject.addProperty("name",configurationName);
+        jsonObject.addProperty("typeId",configurationTypeId);
         header.entrySet().forEach((je)->jsonObject.add(je.getKey(),je.getValue()));
         return jsonObject;
     }
@@ -51,11 +51,11 @@ public class CategoryItem extends ConfigurableObject{
     @Override
     public boolean equals(Object obj){
         CategoryItem categoryItem =(CategoryItem)obj;
-        return categoryItem.configurationCategory.equals(configurationCategory);
+        return categoryItem.configurationType().equals(configurationType)&&categoryItem.configurationTypeId().equals(configurationTypeId);
     }
     @Override
     public int hashCode(){
-        return configurationCategory.hashCode();
+        return (configurationType+configurationTypeId).hashCode();
     }
 
 }

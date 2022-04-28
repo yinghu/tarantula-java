@@ -5,6 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.ShoppingItemContext;
@@ -50,6 +51,18 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             else{
                 session.write(JsonUtil.toSimpleResponse(false,(String)params.get(OnAccess.STORE_MESSAGE)).getBytes());
             }
+        }
+        else if(session.action().equals("onTestWithAdmin")){
+            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(session.name());
+            if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
+            this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
+            StorePurchase storePurchase = new StorePurchase();
+            storePurchase.transactionId = session.name();
+            storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
+            session.write(storePurchase.toJson().toString().getBytes());
         }
         return false;
     }

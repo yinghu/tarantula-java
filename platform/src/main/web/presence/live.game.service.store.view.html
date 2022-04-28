@@ -10,45 +10,8 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div id='tx-live-store-game-item-list-0' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
-        <div class="w3-container">
-            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
-            <span id='tx-live-store-game-item-list-type-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
-            <span id='tx-live-store-game-item-list-name-0' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
-            <span id="tx-live-store-game-item-list-api-0" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy">Buy</span>
-        </div>    
-    </div>
-    <div id='tx-live-store-game-item-list-1' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
-        <div class="w3-container">
-            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
-            <span id='tx-live-store-game-item-list-type-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
-            <span id='tx-live-store-game-item-list-name-1' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
-            <span id="tx-live-store-game-item-list-api-1" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy">Buy</span>
-        </div>    
-    </div>
-    <div id='tx-live-store-game-item-list-2' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
-        <div class="w3-container">
-            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
-            <span id='tx-live-store-game-item-list-type-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
-            <span id='tx-live-store-game-item-list-name-2' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
-            <span id="tx-live-store-game-item-list-api-2" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy">Buy</span>
-        </div>    
-    </div>
-    <div id='tx-live-store-game-item-list-3' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
-        <div class="w3-container">
-            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
-            <span id='tx-live-store-game-item-list-type-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
-            <span id='tx-live-store-game-item-list-name-3' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
-            <span id="tx-live-store-game-item-list-api-3" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy">Buy</span>
-        </div>    
-    </div>
-    <div id='tx-live-store-game-item-list-4' class="w3-panel  w3-border-bottom w3-border-red" style="display: none;">
-        <div class="w3-container">
-            <span class='w3-left tx-text-14 tx-margin-top-8'><i class="fa fa-hourglass-1" style="font-size:24px;color:blue"></i></span>
-            <span id='tx-live-store-game-item-list-type-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16'>Type</span>
-            <span id='tx-live-store-game-item-list-name-4' class='w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12'>Name</span>
-            <span id="tx-live-store-game-item-list-api-4" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy">Buy</span>
-        </div>    
+    <div id='tx-live-store-game-item-list' class="w3-panel  w3-border-bottom w3-border-red">
+            
     </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
@@ -71,23 +34,32 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-gamestore"),{mode:'tree'},{});
+    let shoppingList = document.querySelector('#tx-live-store-game-item-list');
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         editor.set(resp);
+        shoppingList.innerHTML ='';
         resp.itemList.forEach((gi,i)=>{
-            document.querySelector('#tx-live-store-game-item-list-type-'+i).innerHTML = gi.configurationType;
-            document.querySelector('#tx-live-store-game-item-list-name-'+i).innerHTML = gi.configurationName;
-            document.querySelector('#tx-live-store-game-item-list-api-'+i).setAttribute('tx-item-id',gi.itemId);
-            document.querySelector('#tx-live-store-game-item-list-'+i).style.display = 'block';    
+            let tem = [];
+            tem.push('<div class=\'w3-container\'>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+            tem.push(gi.configurationCategory);
+            tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+            tem.push(gi.configurationName);
+            tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
+            tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
+            tem.push('</div>'); 
+            shoppingList.innerHTML += tem.join('');  
         });
-    });
-    document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
-        a.onclick=()=>{
-            let itemId = a.getAttribute('tx-item-id');
-            console.log(itemId);
-            //TARA_API.onGet(TARA_API.query().serviceTag,'onBuy',itemId,(resp)=>{
-                //editor.set(resp);        
-            //});
-        };
+        document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
+            a.onclick=()=>{
+                let itemId = a.getAttribute('tx-item-id');
+                console.log(itemId);
+                TARA_API.onGet(TARA_API.query().serviceTag,'onTestWithAdmin',itemId,(resp)=>{
+                    editor.set(resp);        
+                });
+            };
+        });
     });
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
         editor.destroy();

@@ -209,29 +209,6 @@
         else{
             addCategoryProperty(pname,ptype,tname,nullabled,downloadabled,'');
         }
-        /**
-        ixc++;
-        switch(ptype){
-            case 'category':
-                pendingProps.set(pname,{name:pname,type:ptype,reference:ptype+':'+tname,nullable:nullabled,downloadable:downloadabled});
-                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
-                break;
-            case 'enum':
-                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled,downloadable:downloadabled});
-                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
-                break;
-            case 'list':
-            case 'set':
-                let pvalue = typeValue.value+':'+typeValue.options[typeValueSelected].text;
-                pendingProps.set(pname,{name:pname,type:ptype,reference:pvalue,nullable:nullabled,downloadable:downloadabled});
-                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+pvalue+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
-                break;
-            default:
-                pendingProps.set(pname,{name:pname,type:ptype,reference:tname,nullable:nullabled,downloadable:downloadabled});
-                props.innerHTML += '<li id=\'txc-property-'+ixc+'\'><div class=\'w3-container\'><span>'+pname+' : '+ptype+'&lt'+tname+'&gt</span><span tx-property-name=\''+pname+'\' tx-property-index=\''+ixc+'\' class=\'w3-right tx-padding-button w3-tag w3-round w3-red tx-remove-property\'>Remove</span></div></li>';
-                break;
-        }
-        removecategoryproperty();**/
     };
     document.querySelector('#tx-create-category-warning-message-ok').onclick=()=>{
         document.querySelector('#tx-create-category-warning-message-board').style.display = 'none';

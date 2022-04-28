@@ -55,7 +55,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         List<Inventory> inventoryList = new ArrayList<>();
         category((ci)->{
             if(ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)){
-                Inventory inventory = inventory(systemId,ci.configurationCategory());
+                Inventory inventory = inventory(systemId,ci.configurationCategory(),ci.configurationTypeId());
                 if(inventory!=null) inventoryList.add(inventory);
                 return true;
             }
@@ -63,8 +63,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         });
         return inventoryList;
     }
-    public Inventory inventory(String systemId,String category){
-        Inventory inventory = new Inventory(category);
+
+    public Inventory inventory(String systemId,String category,String typeId){
+        Inventory inventory = new Inventory(category,typeId);
         inventory.distributionKey(systemId);
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory("store");
@@ -118,10 +119,10 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         return true;
     }
 
-    public Inventory newInventory(String category){
+    public Inventory newInventory(String category,String typeId){
         ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
         ConfigurableSetting conf = categories.configurableSetting(category);
-        return new Inventory(conf.type,conf.rechargeable);
+        return new Inventory(conf.type,typeId,conf.rechargeable);
     }
 
     private Category category(Category.Filter filter){

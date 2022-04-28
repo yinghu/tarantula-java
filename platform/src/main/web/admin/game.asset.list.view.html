@@ -157,35 +157,6 @@
     let serviceBar = document.querySelector('#tx-service-item-template-bar');
     let serviceBarTitle = document.querySelector('#tx-service-template-bar-pane-title');
     populateStock();
-    /**
-    if(TARA_API.query().category == 'application'){
-        document.querySelector('#tx-game-asset-title').innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+" List";
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
-            console.log(resp);
-            if(resp.successful){
-                serviceBar.innerHTML = '';
-                resp.itemList.forEach((a,i)=>{
-                    serviceBar.innerHTML += toHtmlServiceBarItem(a,i);
-                });
-            }
-            hookEvent();
-        });
-        serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
-        //document.querySelector('#tx-service-template-bar-pane').style.display = 'block';
-    }else{
-        TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
-            console.log(resp);
-            if(resp.successful){
-                serviceBar.innerHTML = '';
-                resp.itemList.forEach((a,i)=>{
-                    serviceBar.innerHTML += toHtmlBarStockItem(a,i);
-                });
-            }
-            hookEvent();
-        });  
-        serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().category)+".Instances";
-        document.querySelector('#tx-game-asset-title').innerHTML = tx_first_upcase(TARA_API.query().category)+" List";
-    }**/
     let bars = {};
     bars.assetBar = [document.querySelector('#tx-asset-template-bar'),document.querySelector('#tx-asset-template-bar-pane'),assetView];
     bars.componentBar = [document.querySelector('#tx-component-template-bar'),document.querySelector('#tx-component-template-bar-pane'),componentView];
@@ -193,31 +164,7 @@
     bars.itemBar = [document.querySelector('#tx-item-template-bar'),document.querySelector('#tx-item-template-bar-pane'),itemView];
     bars.applicationBar = [document.querySelector('#tx-application-template-bar'),document.querySelector('#tx-application-template-bar-pane'),applicationView];
     populateCategories();
-    /**
-    TARA_API.onGet('role/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-        console.log(resp);
-        TARA_API.query().itemList = resp.itemList;
-        TARA_API.query().types = {};
-        resp.types.itemList.forEach(t=>{
-            TARA_API.query().types[t.name]=t;            
-        });
-        bars.assetBar[0].innerHTML ='';
-        bars.componentBar[0].innerHTML = '';
-        bars.commodityBar[0].innerHTML = '';
-        bars.itemBar[0].innerHTML = '';
-        bars.applicationBar[0].innerHTML = '';
-        resp.itemList.forEach((a,i)=>{
-            bars[a.header.scope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
-            //bars[a.header.scope+'Bar'][1].style.display = 'block';
-        });
-        bars[TARA_API.query().category+'Bar'][2].checked = true;
-        bars[TARA_API.query().category+'Bar'][1].style.display = 'block';
-        hookEvent();
-    });**/
     document.querySelector('#tx-asset-category-refresh').onclick = ()=>{
-        //TARA_API.query().popup='#tx-popup-api';
-        //TARA_API.query().operation = 'Create';
-        //tx_view({viewId:'create.category',containerId:'#tx-popup-api'});
         populateStock();
         populateCategories();
     };
@@ -274,13 +221,11 @@
                 let cat = TARA_API.query().itemList[ix];
                 itemOperationBoard.style.display = 'block';
                 itemOperationMessage.innerHTML = cat.header.type;                
-                //tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
             };
         });
         document.querySelectorAll('.tx-service-item-action').forEach(e=>{
             e.onclick = ()=>{
                 let app = applications[e.getAttribute('tx-application-id')];
-                //let cat = TARA_API.query().types[app.configurationCategory];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
                         console.log(a);
@@ -293,13 +238,11 @@
                 TARA_API.query().popup='#tx-popup-api';
                 operationBoard.style.display = 'block';
                 operationMessage.innerHTML = app.configurationCategory+':'+app.configurationName;
-                //tx_view({viewId:'create.asset',containerId:'#tx-popup-api'});
             }
         });
         document.querySelectorAll('.tx-stock-item-action').forEach(e=>{
             e.onclick = ()=>{
                 let app = applications[e.getAttribute('tx-item-id')];
-                //let cat = TARA_API.query().types[app.configurationCategory];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
                         console.log(a);
@@ -377,8 +320,7 @@
                 hookEvent();
             });
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
-            //document.querySelector('#tx-service-template-bar-pane').style.display = 'block';
-        }else{
+         }else{
             TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
