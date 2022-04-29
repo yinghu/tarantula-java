@@ -144,6 +144,7 @@
     </div>
 </div>
 <script>
+    console.log(TARA_API.query().gameCluster);
     let applications ={};
     let assetView = document.querySelector('#tx-category-list-scope-asset');
     let componentView = document.querySelector('#tx-category-list-scope-component');
@@ -308,7 +309,7 @@
     }
     function populateStock(){
         if(TARA_API.query().category == 'application'){
-            document.querySelector('#tx-game-asset-title').innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+" List";
+            document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
             TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
@@ -332,7 +333,7 @@
                 hookEvent();
             });  
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().category)+".Instances";
-            document.querySelector('#tx-game-asset-title').innerHTML = tx_first_upcase(TARA_API.query().category)+" List";
+            document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().category)+" List";
         }        
     }
    
