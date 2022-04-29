@@ -13,6 +13,8 @@ public class GameClusterDataStoreContext extends ResponseHeader {
     public long serviceStoreCount;
     public String serviceRoomStore;
     public long serviceRoomStoreCount;
+    public String serviceConfigurationStore;
+    public long serviceConfigurationStoreCount;
     public String serviceTournamentStore="n/a";
     public long serviceTournamentStoreCount;
 
@@ -32,6 +34,8 @@ public class GameClusterDataStoreContext extends ResponseHeader {
         jsonObject.addProperty("serviceStoreCount",serviceStoreCount);
         jsonObject.addProperty("serviceRoomStore",serviceRoomStore);
         jsonObject.addProperty("serviceRoomStoreCount",serviceRoomStoreCount);
+        jsonObject.addProperty("serviceConfigurationStore",serviceConfigurationStore);
+        jsonObject.addProperty("serviceConfigurationStoreCount",serviceConfigurationStoreCount);
         jsonObject.addProperty("serviceTournamentStore",serviceTournamentStore);
         jsonObject.addProperty("serviceTournamentStoreCount",serviceTournamentStoreCount);
 

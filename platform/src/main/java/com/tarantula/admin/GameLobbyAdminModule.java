@@ -53,6 +53,12 @@ public class GameLobbyAdminModule implements Module {
             DataStore ssr = this.context.dataStore(serviceDataStoreName+"_room");
             gsc.serviceRoomStore = ssr.name();
             gsc.serviceRoomStoreCount = ssr.count();
+
+            //_service_configuration
+            DataStore cfr = this.context.dataStore(serviceDataStoreName+"_configuration");
+            gsc.serviceConfigurationStore = cfr.name();
+            gsc.serviceConfigurationStoreCount = cfr.count();
+
             //_service_tournament
             if((Boolean)gc.property(GameCluster.TOURNAMENT_ENABLED)){
                 DataStore sst = this.context.dataStore(serviceDataStoreName+"_tournament");

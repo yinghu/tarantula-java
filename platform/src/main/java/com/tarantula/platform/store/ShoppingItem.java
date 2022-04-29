@@ -8,7 +8,7 @@ import com.tarantula.platform.item.*;
 import java.util.ArrayList;
 
 
-public class ShoppingItem extends ConfigurableObject {
+public class ShoppingItem extends ConfigurableObject implements Configurable.Listener<Commodity>{
 
     private ArrayList<ConfigurableObject> _reference;
     private boolean validated;
@@ -51,6 +51,7 @@ public class ShoppingItem extends ConfigurableObject {
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
                 if(cob.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)) commodities++;
+                cob.registerListener(this);
                 _reference.add(cob.setup());
             }
         }
@@ -72,6 +73,7 @@ public class ShoppingItem extends ConfigurableObject {
         if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
             Commodity commodity = new Commodity(this);
             commodity.dataStore(dataStore);
+            commodity.registerListener(this);
             return commodity.setup();
         }
         if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
@@ -83,5 +85,10 @@ public class ShoppingItem extends ConfigurableObject {
             return (T)this;
         }
         return null;
+    }
+
+    @Override
+    public void onLoaded(Commodity commodity){
+        System.out.println(commodity.configurationType()+">>"+commodity.configurationCategory());
     }
 }

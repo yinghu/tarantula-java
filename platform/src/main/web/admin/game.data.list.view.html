@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-database" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Data Store Service</span>
+            <span id='tx-game-cluster-data-store-title' class="tx-margin-left-8 tx-text-24">Data Store Service</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -78,6 +78,19 @@
             <span class='w3-left tx-text-14 tx-margin-top-8'>Record Count:</span>
             <span id='tx-data-store-9' class='w3-right tx-text-14 tx-margin-top-8 tx-margin-left-12'>0</span>
         </div> 
+    </div>
+    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-80">
+        <div class="w3-display-topleft tx-margin-left-24 tx-margin-top-8">
+            <span><i class="fa fa-database w3-left" style="font-size:24px;color: green;"></i></span>
+        </div>
+        <div class="w3-display-bottomleft tx-margin-left-24">
+            <span class='w3-left tx-text-14 tx-margin-bottom-8'>Service Store Name:</span>
+            <span id='tx-data-store-10' class='w3-right tx-text-14 tx-margin-bottom-8 tx-margin-left-12'>0</span>
+        </div>
+        <div class="w3-display-topright tx-margin-right-24">
+            <span class='w3-left tx-text-14 tx-margin-top-8'>Record Count:</span>
+            <span id='tx-data-store-11' class='w3-right tx-text-14 tx-margin-top-8 tx-margin-left-12'>0</span>
+        </div> 
     </div>   
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -89,6 +102,7 @@
     </div>
 </div>
 <script>
+    document.querySelector('#tx-game-cluster-data-store-title').innerHTML=TARA_API.query().gameCluster.name + ' Data Service';
     document.querySelector("#tx-game-data-list-message").innerHTML = TARA_API.query().gameClusterId;
     TARA_API.onGet('role/lobby','onGameDataList',TARA_API.query().gameClusterId,(resp)=>{
         console.log(resp);
@@ -103,7 +117,9 @@
             document.querySelector('#tx-data-store-6').innerHTML = resp.serviceRoomStore;
             document.querySelector('#tx-data-store-7').innerHTML = resp.serviceRoomStoreCount;
             document.querySelector('#tx-data-store-8').innerHTML = resp.serviceTournamentStore;
-            document.querySelector('#tx-data-store-9').innerHTML = resp.serviceTournamentStoreCount;               
+            document.querySelector('#tx-data-store-9').innerHTML = resp.serviceTournamentStoreCount;
+            document.querySelector('#tx-data-store-10').innerHTML = resp.serviceConfigurationStore;
+            document.querySelector('#tx-data-store-11').innerHTML = resp.serviceConfigurationStoreCount;               
         }
         else{
             document.querySelector('#tx-game-data-list-message').innerHTML=resp.message;

@@ -59,12 +59,15 @@ public class Commodity extends ConfigurableObject{
     }
     @Override
     public  <T extends Configurable> T setup(){
+        System.out.println(this.configurationCategory+"/"+this.configurationTypeId);
+        if(listener!=null) listener.onLoaded(this);
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
+                cob.registerListener(this.listener);
                 _reference.add(cob.setup());
             }
         }

@@ -225,6 +225,7 @@
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
         let cmd = 'on'+TARA_API.query().operation+'CategorySettings';
+        console.log(cmd+'>>>'+query);
         TARA_API.onSet('role/item',cmd,query,item,(resp)=>{
             editor.set(resp);   
         });

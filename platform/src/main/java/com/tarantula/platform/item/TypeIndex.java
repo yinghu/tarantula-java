@@ -13,23 +13,24 @@ public class TypeIndex extends RecoverableObject implements Configurable {
 
     public JsonObject payload = new JsonObject();
 
-    public TypeIndex(String name,String index,String label){
+    public TypeIndex(String name){
         this.name = name;
-        this.index = index;
-        this.label = label;//scope
+    }
+    public TypeIndex(String name,String scope,JsonObject payload){
+        this(name);
+        this.index = scope;
+        this.payload = payload;
     }
 
     @Override
     public Map<String,Object> toMap(){
-        properties.put("index",index);
-        properties.put("label",label);
+        properties.put("scope",index);
         properties.put("payload",payload.toString());
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.index = (String) properties.get("index");
-        this.label = (String) properties.get("label");
+        this.index = (String)properties.get("scope");
         this.payload = JsonUtil.parse((String) properties.getOrDefault("payload","{}"));
     }
 

@@ -35,6 +35,8 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected JsonObject application = new JsonObject();
     protected JsonArray reference = new JsonArray();
 
+    protected Configurable.Listener listener;
+
     public ConfigurableObject(){}
     public ConfigurableObject(ConfigurableObject configurableObject){
         this.configurationType = configurableObject.configurationType;
@@ -49,6 +51,10 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.distributionKey(configurableObject.distributionKey());
     }
 
+    public <T extends Configurable> void registerListener(Listener<T> listener){
+        System.out.println("reg->"+this.configurationType);
+        this.listener = listener;
+    }
 
     public String configurationType() {
         return this.configurationType;

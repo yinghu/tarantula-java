@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Live Game Store</span>
+            <span id='tx-live-store-game-item-list-title' class="tx-margin-left-8 tx-text-24">Live Game Store</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
@@ -34,32 +34,35 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-gamestore"),{mode:'tree'},{});
+    document.querySelector('#tx-live-store-game-item-list-title').innerHTML = TARA_API.query().serviceTag;
     let shoppingList = document.querySelector('#tx-live-store-game-item-list');
     TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
         editor.set(resp);
-        shoppingList.innerHTML ='';
-        resp.itemList.forEach((gi,i)=>{
-            let tem = [];
-            tem.push('<div class=\'w3-container\'>');
-            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
-            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
-            tem.push(gi.configurationCategory);
-            tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-            tem.push(gi.configurationName);
-            tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
-            tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
-            tem.push('</div>'); 
-            shoppingList.innerHTML += tem.join('');  
-        });
-        document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
-            a.onclick=()=>{
-                let itemId = a.getAttribute('tx-item-id');
-                console.log(itemId);
-                TARA_API.onGet(TARA_API.query().serviceTag,'onTestWithAdmin',itemId,(resp)=>{
-                    editor.set(resp);        
-                });
-            };
-        });
+        if(resp.successful){
+            shoppingList.innerHTML ='';
+            resp.itemList.forEach((gi,i)=>{
+                let tem = [];
+                tem.push('<div class=\'w3-container\'>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                tem.push(gi.configurationCategory);
+                tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                tem.push(gi.configurationName);
+                tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
+                tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
+                tem.push('</div>'); 
+                shoppingList.innerHTML += tem.join('');  
+            });
+            document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
+                a.onclick=()=>{
+                    let itemId = a.getAttribute('tx-item-id');
+                    console.log(itemId);
+                    TARA_API.onGet(TARA_API.query().serviceTag,'onTestWithAdmin',itemId,(resp)=>{
+                        editor.set(resp);        
+                    });
+                };
+            });
+        }
     });
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
         editor.destroy();
