@@ -48,11 +48,11 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.header = configurableObject.header;
         this.application = configurableObject.application;
         this.reference = configurableObject.reference;
+        this.listener = configurableObject.listener;
         this.distributionKey(configurableObject.distributionKey());
     }
 
     public <T extends Configurable> void registerListener(Listener<T> listener){
-        System.out.println("reg->"+this.configurationType);
         this.listener = listener;
     }
 

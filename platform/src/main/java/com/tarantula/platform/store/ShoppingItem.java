@@ -12,7 +12,9 @@ public class ShoppingItem extends ConfigurableObject implements Configurable.Lis
 
     private ArrayList<ConfigurableObject> _reference;
     private boolean validated;
-    public ShoppingItem(){}
+    public ShoppingItem(){
+
+    }
 
     public ShoppingItem(ConfigurableObject configurableObject){
         super(configurableObject);
@@ -39,23 +41,22 @@ public class ShoppingItem extends ConfigurableObject implements Configurable.Lis
     }
     @Override
     public boolean configureAndValidate() {
-        _setup();
+        Application app = new Application(this);
+        app.dataStore(this.dataStore);
+        app.registerListener(this);
+        app.setup();
         return validated;
     }
     public  <T extends Configurable> T _setup(){
         _reference = new ArrayList<>();
-        int commodities = 0;
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
-                if(cob.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)) commodities++;
-                cob.registerListener(this);
                 _reference.add(cob.setup());
             }
         }
-        validated = commodities>0;
         return (T)this;
     }
     @Override
@@ -73,7 +74,6 @@ public class ShoppingItem extends ConfigurableObject implements Configurable.Lis
         if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)){
             Commodity commodity = new Commodity(this);
             commodity.dataStore(dataStore);
-            commodity.registerListener(this);
             return commodity.setup();
         }
         if(this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)){
@@ -82,6 +82,7 @@ public class ShoppingItem extends ConfigurableObject implements Configurable.Lis
             return item.setup();
         }
         if(this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)){
+            this.registerListener(this.listener);
             return (T)this;
         }
         return null;
@@ -89,6 +90,6 @@ public class ShoppingItem extends ConfigurableObject implements Configurable.Lis
 
     @Override
     public void onLoaded(Commodity commodity){
-        System.out.println(commodity.configurationType()+">>"+commodity.configurationCategory());
+        this.validated = true;
     }
 }

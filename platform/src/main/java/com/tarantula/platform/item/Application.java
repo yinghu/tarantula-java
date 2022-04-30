@@ -68,6 +68,7 @@ public class Application extends ConfigurableObject{
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
+                cob.registerListener(this.listener);
                 _reference.add(cob.setup());
             }
         }

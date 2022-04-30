@@ -48,7 +48,7 @@ public class GameStoreAdminModule implements Module {
             if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app) && app.configureAndValidate()){
                 session.write(JsonUtil.toSimpleResponse(true,ks[1]).getBytes());
                 GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-                gameServiceProvider.storeServiceProvider().register(app.setup());
+                gameServiceProvider.storeServiceProvider().register(app);
             }
             else{
                session.write(JsonUtil.toSimpleResponse(false,"invalid shopping item").getBytes());
