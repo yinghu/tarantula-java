@@ -19,12 +19,12 @@ import java.util.List;
 public class PlatformInventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
 
-    private final String name;
+    private final String name ="inventory";
     private GameCluster gameCluster;
     private ServiceContext serviceContext;
     private ApplicationPreSetup applicationPreSetup;
+    private DataStore inventoryDataStore;
     public PlatformInventoryServiceProvider(GameCluster gameCluster){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
 
@@ -35,7 +35,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
-        logger.warn("Inventory service provider started");
+        logger.warn("Inventory service provider started->"+name);
     }
 
     @Override
@@ -46,7 +46,11 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.inventoryDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name);
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
+    }
+    public DataStore inventoryDataStore(){
+        return this.inventoryDataStore;
     }
     public Category category(){
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
@@ -67,9 +71,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     public Inventory inventory(String systemId,String category,String typeId){
         Inventory inventory = new Inventory(category,typeId);
         inventory.distributionKey(systemId);
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory("store");
-        if(!this.applicationPreSetup.load(serviceContext,app,inventory)) return null;
+        if(!inventoryDataStore.load(inventory)) return null;
+        inventory.dataStore(inventoryDataStore);
         inventory.list();
         return inventory;
     }

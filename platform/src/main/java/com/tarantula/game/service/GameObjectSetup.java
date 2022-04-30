@@ -15,6 +15,7 @@ import java.util.Set;
 abstract public class GameObjectSetup implements ApplicationPreSetup {
 
     protected DataStore _dataStore;
+    protected String DS_CONFIG = "configuration";
 
     public <T extends Configurable> boolean save(ApplicationContext context,Descriptor application,T t){
         DataStore dataStore = _dataStore!=null?_dataStore:context.dataStore(serviceDataStore(application));
@@ -125,28 +126,30 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
 
     public <T extends Configurable> boolean save(ApplicationContext context, GameCluster gameCluster, T t){
-        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG));
         return dataStore.update(t);
     }
     public <T extends Configurable> boolean save(ServiceContext context,GameCluster gameCluster,T t){
-        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster),context.partitionNumber());
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG),context.partitionNumber());
         return dataStore.update(t);
     }
     public <T extends Configurable> boolean load(ApplicationContext context, GameCluster gameCluster, T t){
-        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG));
         return dataStore.load(t);
     }
     public <T extends Configurable> boolean load(ServiceContext context,GameCluster gameCluster,T t){
-        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster),context.partitionNumber());
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG),context.partitionNumber());
         return dataStore.load(t);
     }
     public <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){
-        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster));
+        DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG));
         return dataStore.list(recoverableFactory);
     }
-
-    private String configurationDataStore(GameCluster application){
+    public DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster,String service){
+        return serviceContext.dataStore(configurationDataStore(gameCluster,service),serviceContext.partitionNumber());
+    }
+    private String configurationDataStore(GameCluster application,String suffix){
         String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
-        return serviceTypeId.replaceAll("-","_")+"_configuration";
+        return serviceTypeId.replaceAll("-","_")+"_"+suffix;
     }
 }

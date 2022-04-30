@@ -8,6 +8,8 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.presence.saves.SavedGame;
+import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.statistics.StatisticsIndex;
@@ -19,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
-    private final String name;
+    private final String name ="presence";
     private final GameCluster gameCluster;
     private ServiceContext serviceContext;
-    private DataStore dataStore;
+    private DataStore presenceDataStore;
     private ApplicationPreSetup applicationPreSetup;
 
 
@@ -38,7 +40,6 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private DistributionItemService distributionItemService;
 
     public PlatformPresenceServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
@@ -53,9 +54,9 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.dailyGiveaways = new ConcurrentHashMap<>();
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
-        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
-        this.recentlyPlayList.dataStore(this.dataStore);
-        logger.warn("Presence service provider started");
+        this.presenceDataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.presenceDataStore);
+        logger.warn("Presence service provider started->"+name);
     }
 
     @Override
@@ -75,16 +76,16 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.presenceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name);
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
     }
     public void onFriendList(String systemId,String friendSystemId){
         PlayList playList = new PlayList(friendListSize);
         playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
+        this.presenceDataStore.createIfAbsent(playList,true);
         playList.playListIndex.push(friendSystemId);
-        this.dataStore.update(playList);
+        this.presenceDataStore.update(playList);
     }
     public void onPlay(String systemId){
         this.recentlyPlayList.playListIndex.push(systemId);
@@ -93,7 +94,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     public List<String> friendList(String systemId){
         PlayList playList = new PlayList(friendListSize);
         playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
+        this.presenceDataStore.createIfAbsent(playList,true);
         return playList.playListIndex.list(new ArrayList<>());
     }
     public List<String> recentlyPlayList(){
@@ -105,22 +106,22 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         profile.displayName ="player";
         profile.iconUrl = "resource/portrait.png";
         profile.distributionKey(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
+        this.presenceDataStore.createIfAbsent(profile,true);
+        profile.dataStore(this.presenceDataStore);
         return profile;
     }
     public Rating rating(String systemId){
         Rating rating = new Rating();
         rating.distributionKey(systemId);
-        this.dataStore.createIfAbsent(rating,true);
-        rating.dataStore(this.dataStore);
+        this.presenceDataStore.createIfAbsent(rating,true);
+        rating.dataStore(this.presenceDataStore);
         return rating;
     }
     public Statistics statistics(String systemId, PlatformLeaderBoardProvider leaderBoardProvider){
         StatisticsIndex deltaStatistics = new StatisticsIndex();
         deltaStatistics.distributionKey(systemId);
-        deltaStatistics.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(deltaStatistics,true);
+        deltaStatistics.dataStore(this.presenceDataStore);
+        this.presenceDataStore.createIfAbsent(deltaStatistics,true);
         deltaStatistics.registerListener((entry -> {
             LeaderBoard leaderBoard = leaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);
@@ -130,8 +131,8 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     public DailyLoginTrack checkDailyLogin(String systemId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
         dailyLoginTrack.distributionKey(systemId);
-        dailyLoginTrack.dataStore(dataStore);
-        this.dataStore.createIfAbsent(dailyLoginTrack,true);
+        dailyLoginTrack.dataStore(presenceDataStore);
+        this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         return rewarded?dailyLoginTrack:null;
     }
@@ -140,11 +141,17 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyGiveaways.forEach((k,v)-> _items.add(v));
         return _items;
     }
+    public List<SavedGame> listSaves(String systemId){
+        SavedGameIndex savedGameIndex = new SavedGameIndex();
+        savedGameIndex.distributionKey(systemId);
+        savedGameIndex.dataStore(this.presenceDataStore);
+        return savedGameIndex.list();
+    }
     public boolean redeem(String systemId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
         dailyLoginTrack.distributionKey(systemId);
-        dailyLoginTrack.dataStore(dataStore);
-        this.dataStore.createIfAbsent(dailyLoginTrack,true);
+        dailyLoginTrack.dataStore(presenceDataStore);
+        this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
         if(!dailyLoginTrack.rewardPending) return false;
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
