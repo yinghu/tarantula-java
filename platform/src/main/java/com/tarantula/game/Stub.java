@@ -6,6 +6,8 @@ import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.inbox.Inbox;
 import com.tarantula.platform.item.Category;
 import com.tarantula.platform.presence.DailyLoginTrack;
+import com.tarantula.platform.presence.saves.PlayerSavedGames;
+import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.room.GameRoom;
 import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
@@ -31,6 +33,7 @@ public class Stub extends PlayerGameObject {
     public Statistics statistics;
     public Inbox inbox;
     public Channel pushChannel;
+    public PlayerSavedGames playerSavedGames;
 
     public Stub(){
     }
@@ -47,11 +50,12 @@ public class Stub extends PlayerGameObject {
         jo.add("room",room.toJson());
         jo.add("rating",rating.toJson());
 
-        if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
+        //if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(shop!=null) jo.add("shop",shop.toJson());
-        if(tournament!=null) jo.add("tournament",tournament.toJson());
+        //if(tournament!=null) jo.add("tournament",tournament.toJson());
         if(pushChannel!=null) jo.add("pushChannel",pushChannel.toJson());
         if(inbox!=null) jo.add("inbox",inbox.toJson());
+        if(playerSavedGames!=null) jo.add("savedGames", playerSavedGames.toJson());
         jo.addProperty("tag",tag);
         jo.addProperty("tournamentEnabled",tournament!=null);
         jo.addProperty("offline",offline);

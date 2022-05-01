@@ -43,8 +43,8 @@ public class GameLobbyAdminModule implements Module {
             gsc.name = lobby.descriptor().typeId();
             gsc.tag = lobby.entryList().get(0).tag();
             //_data
-            DataStore ds = applicationPreSetup.dataStore(context,gc,"data");
-            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("data",ds.name(),ds.count()));
+            DataStore ds = applicationPreSetup.dataStore(context,gc,"player");
+            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("player",ds.name(),ds.count()));
 
             //_service
             DataStore ss = applicationPreSetup.dataStore(context,gc);

@@ -63,7 +63,7 @@ public class GameServiceProvider implements ServiceProvider{
         serviceContext.setup(gameCluster);
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.serviceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,"data");
+        this.serviceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,"player");
         this.inventoryServiceProvider = new PlatformInventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();

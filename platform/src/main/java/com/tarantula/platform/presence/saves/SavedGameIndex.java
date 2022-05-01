@@ -1,5 +1,7 @@
 package com.tarantula.platform.presence.saves;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -45,10 +47,25 @@ public class SavedGameIndex extends IndexSet {
         dataStore.update(this);
         return true;
     }
-    public List<SavedGame> list(){
+    public List<SavedGame> list(String deviceId){
         ArrayList<SavedGame> _tem = new ArrayList<>();
-        _tem.addAll(savedGames);
+        int[] created = {0};
+        savedGames.forEach(save->{
+            if(save.index().equals(deviceId)) created[0]++;
+            _tem.add(save);
+        });
+        if(created[0]==0){//
+            SavedGame savedGame = new SavedGame(deviceId);
+            this.dataStore.create(savedGame);
+            addSavedGame(savedGame);
+            _tem.add(savedGame);
+            DeviceIndex deviceIndex = new DeviceIndex(deviceId);
+            this.dataStore.createIfAbsent(deviceIndex,true);
+            deviceIndex.addKey(this.distributionKey());
+            this.dataStore.update(deviceIndex);
+        }
         return _tem;
     }
+
 
 }

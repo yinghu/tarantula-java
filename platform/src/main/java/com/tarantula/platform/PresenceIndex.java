@@ -62,6 +62,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.accessMode(session.accessMode());
         fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
+        fe.name(session.name());
         fe.payload(payload);
         RoutingKey rk = this.eventService.routingKey(session.systemId(),desc.tag());//route to player node
         fe.destination(rk.route());//node/tag/partition

@@ -141,11 +141,11 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyGiveaways.forEach((k,v)-> _items.add(v));
         return _items;
     }
-    public List<SavedGame> listSaves(String systemId){
+    public List<SavedGame> listSaves(String systemId,String deviceId){
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
         savedGameIndex.dataStore(this.presenceDataStore);
-        return savedGameIndex.list();
+        return savedGameIndex.list(deviceId);
     }
     public boolean redeem(String systemId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();

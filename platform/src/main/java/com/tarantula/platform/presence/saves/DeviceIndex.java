@@ -1,22 +1,18 @@
 package com.tarantula.platform.presence.saves;
 
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-import java.util.Map;
 
 //device id => systemId index set
 public class DeviceIndex extends IndexSet {
 
+    public DeviceIndex(){
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("3",timestamp);
-        return this.properties;
     }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.timestamp = ((Number) properties.get("3")).longValue();
+    public DeviceIndex(String deviceId){
+        this.index = deviceId;
     }
 
     @Override
@@ -27,5 +23,8 @@ public class DeviceIndex extends IndexSet {
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
+    }
+    public Key key(){
+        return new NaturalKey(this.index);
     }
 }
