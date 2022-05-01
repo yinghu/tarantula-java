@@ -145,8 +145,19 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = context.dataStore(configurationDataStore(gameCluster,DS_CONFIG));
         return dataStore.list(recoverableFactory);
     }
+    public DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster){
+        String serviceDataStoreName = ((String)gameCluster.property(GameCluster.GAME_SERVICE)).replace("-","_");
+        return serviceContext.dataStore(serviceDataStoreName,serviceContext.partitionNumber());
+    }
+    public DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster){
+        String serviceDataStoreName = ((String)gameCluster.property(GameCluster.GAME_SERVICE)).replace("-","_");
+        return applicationContext.dataStore(serviceDataStoreName);
+    }
     public DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster,String service){
         return serviceContext.dataStore(configurationDataStore(gameCluster,service),serviceContext.partitionNumber());
+    }
+    public DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster,String service){
+        return applicationContext.dataStore(configurationDataStore(gameCluster,service));
     }
     private String configurationDataStore(GameCluster application,String suffix){
         String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);

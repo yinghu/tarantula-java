@@ -39,7 +39,7 @@ public class GameServiceProvider implements ServiceProvider{
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
-
+    private DataStore serviceDataStore;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -63,6 +63,7 @@ public class GameServiceProvider implements ServiceProvider{
         serviceContext.setup(gameCluster);
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.serviceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,"data");
         this.inventoryServiceProvider = new PlatformInventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();
@@ -122,7 +123,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.roomServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
-
+    public DataStore serviceDataStore(){
+        return this.serviceDataStore;
+    }
     //room service provider hool calls
     public PlatformRoomServiceProvider roomServiceProvider(){
         return roomServiceProvider;

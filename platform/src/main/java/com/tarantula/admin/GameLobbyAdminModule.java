@@ -8,6 +8,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -37,33 +38,30 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onGameDataList")){
             GameClusterDataStoreContext gsc = new GameClusterDataStoreContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Lobby lobby = gc.dataLobby;
-            DataStore ds = this.context.dataStore(lobby.descriptor().typeId().replace("-","_"));
             gsc.name = lobby.descriptor().typeId();
             gsc.tag = lobby.entryList().get(0).tag();
             //_data
-            gsc.dataStore = ds.name();//lobby.descriptor().typeId();
-            gsc.dataStoreCount = ds.count();
-            String serviceDataStoreName = ((String)gc.property(GameCluster.GAME_SERVICE)).replace("-","_");
+            DataStore ds = applicationPreSetup.dataStore(context,gc,"data");
+            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("data",ds.name(),ds.count()));
+
             //_service
-            DataStore ss = this.context.dataStore(serviceDataStoreName);
-            gsc.serviceStore = ss.name();
-            gsc.serviceStoreCount = ss.count();
+            DataStore ss = applicationPreSetup.dataStore(context,gc);
+            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("service",ss.name(),ss.count()));
+
             //_service_room
-            DataStore ssr = this.context.dataStore(serviceDataStoreName+"_room");
-            gsc.serviceRoomStore = ssr.name();
-            gsc.serviceRoomStoreCount = ssr.count();
+            DataStore ssr = applicationPreSetup.dataStore(context,gc,"room");
+            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("room",ssr.name(),ssr.count()));
 
             //_service_configuration
-            DataStore cfr = this.context.dataStore(serviceDataStoreName+"_configuration");
-            gsc.serviceConfigurationStore = cfr.name();
-            gsc.serviceConfigurationStoreCount = cfr.count();
+            DataStore cfr = applicationPreSetup.dataStore(context,gc,"configuration");
+            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("configuration",cfr.name(),cfr.count()));
 
             //_service_tournament
             if((Boolean)gc.property(GameCluster.TOURNAMENT_ENABLED)){
-                DataStore sst = this.context.dataStore(serviceDataStoreName+"_tournament");
-                gsc.serviceTournamentStore = sst.name();
-                gsc.serviceTournamentStoreCount = sst.count();
+                DataStore sst = applicationPreSetup.dataStore(context,gc,"tournament");
+                gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("tournament",sst.name(),sst.count()));
             }
 
             session.write(gsc.toJson().toString().getBytes());

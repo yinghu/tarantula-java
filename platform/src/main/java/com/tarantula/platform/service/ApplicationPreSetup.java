@@ -30,5 +30,8 @@ public interface ApplicationPreSetup {
     <T extends Configurable> boolean load(ServiceContext context,GameCluster gameCluster,T t);
     <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
 
+    DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster);
+    DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster);
     DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster,String service);
+    DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster,String service);
 }
