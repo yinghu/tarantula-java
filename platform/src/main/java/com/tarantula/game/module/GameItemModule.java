@@ -20,9 +20,10 @@ public class GameItemModule implements Module,Configurable.Listener<Configurable
             List<ConfigurableObject> _item = this.gameServiceProvider.itemServiceProvider().list(this.context.descriptor(),session.name());
             session.write(new ItemContext(true,session.name(),_item).toString().getBytes());
         }
-        else if(session.action().equals("onLoad")){
-
+        else{
+            throw new UnsupportedOperationException(session.action()+" not support");
         }
+
         return false;
     }
 
@@ -32,7 +33,7 @@ public class GameItemModule implements Module,Configurable.Listener<Configurable
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.gameServiceProvider.itemServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
-        this.context.log("game item module started", OnLog.WARN);
+        this.context.log("Game item module started", OnLog.WARN);
     }
     public void onCreated(ConfigurableObject item){
         itemList.put(item.distributionKey(),item);

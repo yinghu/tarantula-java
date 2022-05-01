@@ -22,7 +22,7 @@ public class RecentlyPlayListModule implements Module  {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.context.log("recently play list module started", OnLog.WARN);
+        this.context.log("Recently play list module started", OnLog.WARN);
     }
     @Override
     public void clear(){

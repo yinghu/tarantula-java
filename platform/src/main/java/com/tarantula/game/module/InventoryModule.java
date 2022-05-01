@@ -39,6 +39,9 @@ public class InventoryModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());
             }
         }
+        else{
+            throw new UnsupportedOperationException(session.action()+" not support");
+        }
         return false;
     }
 

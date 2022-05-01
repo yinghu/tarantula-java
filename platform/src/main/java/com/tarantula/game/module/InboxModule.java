@@ -10,7 +10,9 @@ public class InboxModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
-        return false;
+
+        throw new UnsupportedOperationException(session.action()+" not support");
+        //return false;
     }
 
     @Override

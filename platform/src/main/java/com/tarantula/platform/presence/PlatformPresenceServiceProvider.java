@@ -145,6 +145,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
         savedGameIndex.dataStore(this.presenceDataStore);
+        this.presenceDataStore.createIfAbsent(savedGameIndex,true);
         return savedGameIndex.list(deviceId);
     }
     public boolean redeem(String systemId){

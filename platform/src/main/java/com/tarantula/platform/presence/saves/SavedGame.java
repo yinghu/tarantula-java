@@ -13,19 +13,22 @@ public class SavedGame extends RecoverableObject {
     public SavedGame(){
 
     }
-    public SavedGame(String deviceId){
+    public SavedGame(String owner,String deviceId){
+        this.owner = owner;
         this.index = deviceId;
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",index);
-        this.properties.put("2",version);
+        this.properties.put("2",owner);
+        this.properties.put("3",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.index = ((String) properties.get("1"));
-        this.version = ((Number)properties.getOrDefault("2",0)).intValue();
+        this.owner = ((String) properties.get("2"));
+        this.version = ((Number)properties.getOrDefault("3",0)).intValue();
     }
 
     @Override
@@ -43,6 +46,7 @@ public class SavedGame extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("gameId",this.distributionKey());
         jsonObject.addProperty("deviceId",index);
+        jsonObject.addProperty("owner",owner);
         jsonObject.addProperty("version",version);
         return jsonObject;
     }

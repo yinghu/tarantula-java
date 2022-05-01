@@ -64,6 +64,9 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
             session.write(storePurchase.toJson().toString().getBytes());
         }
+        else{
+            throw new UnsupportedOperationException(session.action()+" not support");
+        }
         return false;
     }
 
