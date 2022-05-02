@@ -24,14 +24,7 @@
             "downloadable": false
           },
           {
-            "name": "SmallIcon",
-            "type": "string",
-            "reference": "Icon",
-            "nullable": false,
-            "downloadable": true
-          },
-          {
-            "name": "LargeIcon",
+            "name": "Icon",
             "type": "string",
             "reference": "Icon",
             "nullable": false,

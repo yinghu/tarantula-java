@@ -6,6 +6,39 @@
   "name": "items/item-type-settings",
   "itemList":
   [
-
+    {
+      "header": {
+        "scope": "item",
+        "type": "Chest",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Description",
+            "type": "string",
+            "reference": "Description",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Rank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
   ]
 }

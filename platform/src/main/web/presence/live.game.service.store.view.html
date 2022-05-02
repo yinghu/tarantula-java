@@ -46,6 +46,9 @@
         case 'savedgame':
             tx_live_savedgame_setup();
             break;
+        case 'achievement':
+            tx_live_achievement_setup();
+            break;
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -148,5 +151,11 @@
                 });   
             };
         });             
+    }
+    function tx_live_achievement_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+            editor.set(resp);
+        });   
     }
 </script>

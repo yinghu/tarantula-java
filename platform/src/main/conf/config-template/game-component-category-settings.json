@@ -6,6 +6,108 @@
   "name": "components/component-type-settings",
   "itemList":
   [
-
+    {
+      "header": {
+        "scope": "component",
+        "type": "RobotStatistics",
+        "description": "general component",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Health",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "MeleeDamage",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "RangedDamage",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "CriticalDamagePercent",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Recovery",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Speed",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "component",
+        "type": "AbilitiesStatistics",
+        "description": "general component",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "EnergyCost",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ChargeTime",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Duration",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "TargetingRange",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "DamageRange",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
   ]
 }

@@ -12,6 +12,7 @@ import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
+import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
@@ -214,11 +215,13 @@ public class GameServiceProvider implements ServiceProvider{
     public <T extends ConfigurableObject> T createApplication(String category){
         if(category.equals("store")) return (T)new ShoppingItem();
         if(category.equals("achievement")) return (T)new Achievement();
+        if(category.equals("giveaway")) return (T)new DailyGiveaway();
         return (T)new ConfigurableObject();
     }
     public ConfigurationServiceProvider configurationServiceProvider(String name){
         if(name.equals("store")) return storeServiceProvider;
         if(name.equals("achievement")) return achievementServiceProvider;
+        if(name.equals("giveaway")) return presenceServiceProvider;
         return null;
     }
 }
