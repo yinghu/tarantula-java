@@ -34,36 +34,20 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-gamestore"),{mode:'tree'},{});
-    document.querySelector('#tx-live-store-game-item-list-title').innerHTML = TARA_API.query().serviceTag;
+    document.querySelector('#tx-live-store-game-item-list-title').innerHTML = TARA_API.query().category;
     let shoppingList = document.querySelector('#tx-live-store-game-item-list');
-    TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
-        editor.set(resp);
-        if(resp.successful){
-            shoppingList.innerHTML ='';
-            resp.itemList.forEach((gi,i)=>{
-                let tem = [];
-                tem.push('<div class=\'w3-container\'>');
-                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
-                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
-                tem.push(gi.configurationCategory);
-                tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-                tem.push(gi.configurationName);
-                tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
-                tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
-                tem.push('</div>'); 
-                shoppingList.innerHTML += tem.join('');  
-            });
-            document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
-                a.onclick=()=>{
-                    let itemId = a.getAttribute('tx-item-id');
-                    console.log(itemId);
-                    TARA_API.onGet(TARA_API.query().serviceTag,'onTestWithAdmin',itemId,(resp)=>{
-                        editor.set(resp);        
-                    });
-                };
-            });
-        }
-    });
+    switch(TARA_API.query().category){
+        case 'store':
+            tx_live_store_setup();
+            break;
+        case 'inventory':
+            tx_live_inventory_setup();
+            break;
+        case 'savedgame':
+            tx_live_savedgame_setup();
+            break;
+    }
+   
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
         editor.destroy();
         let m3 = document.querySelector(TARA_API.query().popup);
@@ -79,4 +63,90 @@
     document.querySelector('#tx-gamestore-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    function tx_live_store_setup(){
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList','',(resp)=>{
+            editor.set(resp);
+            if(resp.successful){
+                shoppingList.innerHTML ='';
+                resp.itemList.forEach((gi,i)=>{
+                    let tem = [];
+                    tem.push('<div class=\'w3-container\'>');
+                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                    tem.push(gi.configurationCategory);
+                    tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                    tem.push(gi.configurationName);
+                    tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
+                    tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
+                    tem.push('</div>'); 
+                    shoppingList.innerHTML += tem.join('');  
+                });
+                document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
+                    a.onclick=()=>{
+                        let itemId = a.getAttribute('tx-item-id');
+                        console.log(itemId);
+                        TARA_API.onGet(TARA_API.query().serviceTag,'onTestWithAdmin',itemId,(resp)=>{
+                            editor.set(resp);        
+                        });
+                    };
+                });           
+            }
+        });
+    }
+    function tx_live_inventory_setup(){
+        TARA_API.onGet(TARA_API.query().serviceTag,'onCategory','',(resp)=>{
+            editor.set(resp);
+            if(resp.successful){
+                shoppingList.innerHTML ='';
+                resp.itemList.forEach((gi,i)=>{
+                    let tem = [];
+                    tem.push('<div class=\'w3-container\'>');
+                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                    tem.push(gi.typeId);
+                    tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                    tem.push(gi.name);
+                    tem.push('</span><span tx-type-id=\''+gi.typeId+'\' tx-category=\''+gi.category);
+                    tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>View</span>');
+                    tem.push('</div>'); 
+                    shoppingList.innerHTML += tem.join('');  
+                });
+                document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
+                    a.onclick=()=>{
+                        let tid = a.getAttribute('tx-type-id');
+                        let cat = a.getAttribute('tx-category');
+                        console.log(cat+'#'+tid);
+                        TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',cat+'#'+tid,(resp)=>{
+                            editor.set(resp);
+                        });   
+                    };
+                });             
+            }
+        });
+    }
+    function tx_live_savedgame_setup(){
+        shoppingList.innerHTML ='';
+        let itemList = [{name:'Device1',deviceId:'device1'},{name:'Device2',deviceId:'device2'},{name:'Device3',deviceId:'device3'},{name:'Device4',deviceId:'device4'}];
+        itemList.forEach((gi,i)=>{
+            let tem = [];
+            tem.push('<div class=\'w3-container\'>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+            tem.push(gi.name);
+            tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+            tem.push('');
+            tem.push('</span><span tx-type-id=\''+gi.deviceId+'\' tx-category=\''+gi.name);
+            tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>View</span>');
+            tem.push('</div>'); 
+            shoppingList.innerHTML += tem.join('');  
+        });
+        document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
+            a.onclick=()=>{
+                let deviceId = a.getAttribute('tx-type-id');
+                TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{
+                    editor.set(resp);
+                });   
+            };
+        });             
+    }
 </script>

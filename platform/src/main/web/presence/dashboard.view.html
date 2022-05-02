@@ -324,33 +324,17 @@
             document.querySelector('#tx-'+_pane).style.display='block'; 
         }; 
     });
-    document.querySelectorAll('.tx-action').forEach((a)=>{
-        a.onclick=()=>{
-            TARA_API.query().gameClusterId=a.getAttribute('tx-game-cluster-id');
-            let vid = a.getAttribute('view-id');
-            TARA_API.query().category = a.getAttribute('tx-game-category');
-            TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
-            TARA_API.query().popup = '#tx-popup';
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
-        }
-    });
+   
     document.querySelector('#tx-game-cluster-next-list').onclick=()=>{
         _tx_game_cluster_list();
     };
     document.querySelector('#tx-live-game-next-list').onclick=()=>{
         _tx_lobby();
     };
-    document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{
-        a.onclick=()=>{
-            TARA_API.query().popup = '#tx-popup';
-            TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
-            let vid = a.getAttribute('view-id');
-            tx_view({viewId:vid,containerId:'#tx-popup'});    
-        }
-    });
    
     _tx_account();
     document.querySelector('#tx-Account-down').style.display ='block';
+    reset_t_action_event();
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
             if(resp.successful){
@@ -491,7 +475,7 @@
     }
     
     function _tx_lobby(){   
-        reset_live_game_service_bar();
+        //reset_live_game_service_bar();
         let lgn = document.querySelector('#tx-live-game-next-list');
         let _pg = lgn.getAttribute('live-game-page')/1;
         TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onLobbyList',page:_pg},(resp)=>{
@@ -532,6 +516,7 @@
                             tem.push(b.tag);
                             tem.push('\' view-id=\'');
                             tem.push('live.game.service.'+b.name.toLowerCase());
+                            tem.push('\' tx-service-category=\''+b.category);
                             tem.push('\' class=\'w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar\'>');
                             tem.push(b.name);
                             tem.push('</span>');
@@ -563,6 +548,7 @@
             a.onclick=()=>{
                 TARA_API.query().popup = '#tx-popup';
                 TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
+                TARA_API.query().category = a.getAttribute('tx-service-category');
                 let vid = a.getAttribute('view-id');
                 tx_view({viewId:vid,containerId:'#tx-popup'});    
             }
