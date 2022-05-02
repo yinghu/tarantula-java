@@ -114,7 +114,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not existed").getBytes());
             }
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
@@ -364,6 +364,13 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
             applicationPreSetup.save(context,gameCluster,typeIndex);
             applications.addCategory(jo);
+        }));
+        applications.toCategories().forEach((c->{
+            JsonObject jo = c.getAsJsonObject();
+            JsonObject ho = jo.get("header").getAsJsonObject();
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
+            applicationPreSetup.save(context,gameCluster,typeIndex);
+            //applications.addCategory(jo);
         }));
         applicationPreSetup.save(context,gameCluster,assets);
         applicationPreSetup.save(context,gameCluster,components);

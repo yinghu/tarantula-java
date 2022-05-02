@@ -1,7 +1,5 @@
 package com.tarantula.admin;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -53,7 +51,7 @@ public class GameApplicationAdminModule implements Module {
                 gameServiceProvider.configurationServiceProvider(query[2]).register(app);
             }
             else{
-               session.write(JsonUtil.toSimpleResponse(false,"invalid shopping item").getBytes());
+               session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
             }
         }
         else if (session.action().equals("onRelease")){
@@ -81,9 +79,7 @@ public class GameApplicationAdminModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        Configuration configuration = this.context.configuration("application");
-        JsonArray apps = ((JsonElement)configuration.property("admin-application-list")).getAsJsonArray();
-        this.context.log("Game application admin module started->"+apps.toString(), OnLog.WARN);
+       this.context.log("Game application admin module started", OnLog.WARN);
     }
 
 }

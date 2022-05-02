@@ -546,7 +546,7 @@
                 case 'list':
                 case 'set':
                     if(prop.reference.startsWith('category')){
-                        if(data.application[prop.name].length>0){
+                        if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length>0){
                                 txCategoryItemLoad(prop.name,()=>{
                                     data.application[prop.name].forEach(k=>{
                                         txCategoryListAdd(prop.name,k);
@@ -555,7 +555,7 @@
                         }
                     }
                     else{
-                       if(data.application[prop.name].length>0){
+                       if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length>0){
                            console.log(data.application[prop.name]);
                            data.application[prop.name].forEach(k=>{
                                txListItemAdd(prop.name,k);
@@ -564,7 +564,7 @@
                     }
                     break;
                 case 'category':
-                    if(data.application[prop.name].length==1){
+                    if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length==1){
                             txCategoryItemLoad(prop.name,()=>{
                                 Array.from(document.querySelector('#tx-list-select-'+prop.name).options).forEach(opt=>{
                                 if(data.application[prop.name][0]==opt.value){

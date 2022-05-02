@@ -21,7 +21,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected static String HEADER_KEY = "7";
     protected static String APPLICATION_KEY = "8";
-    //protected static String PAYLOAD_KEY = "9";
+
     protected static String REFERENCE_KEY = "10";
 
 
