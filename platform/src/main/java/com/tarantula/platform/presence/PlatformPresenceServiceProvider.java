@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
     private TarantulaLogger logger;
-    private final String name ="presence";
+    private final String gameServiceName;
     private final GameCluster gameCluster;
     private ServiceContext serviceContext;
     private DataStore presenceDataStore;
@@ -40,13 +40,14 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private DistributionItemService distributionItemService;
 
     public PlatformPresenceServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
 
     @Override
     public String name() {
-        return "PresenceService";
+        return "presence";
     }
 
     @Override
@@ -56,7 +57,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
         this.presenceDataStore.createIfAbsent(this.recentlyPlayList,true);
         this.recentlyPlayList.dataStore(this.presenceDataStore);
-        logger.warn("Presence service provider started->"+name);
+        logger.warn("Presence service provider started->"+gameServiceName);
     }
 
     @Override
@@ -76,9 +77,10 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.presenceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name);
+        this.presenceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
+        this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
     public void onFriendList(String systemId,String friendSystemId){
         PlayList playList = new PlayList(friendListSize);
@@ -162,13 +164,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        this.distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+        this.distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        this.distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
 

@@ -1,0 +1,89 @@
+package com.tarantula.admin;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.icodesoftware.Module;
+import com.icodesoftware.*;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.*;
+import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.util.SystemUtil;
+
+import java.util.List;
+
+public class GameApplicationAdminModule implements Module {
+    private ApplicationContext context;
+    private DeploymentServiceProvider deploymentServiceProvider;
+    @Override
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
+        if(session.action().equals("onList")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor app = gameCluster.serviceWithCategory(query[1]);
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("typeId/"+app.category()));
+            session.write(new ItemHeaderContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onLoad")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor desc = gameCluster.serviceWithCategory(query[2]);
+            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Application app = new Application();
+            app.distributionKey(query[1]);
+            if(preSetup.load(context,desc,app)){
+                session.write(app.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,query[1]+" not existed").getBytes());
+            }
+        }
+        else if (session.action().equals("onRegister")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            ConfigurableObject app = gameServiceProvider.createApplication(query[2]);
+            app.distributionKey(query[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(query[2]);
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app) && app.configureAndValidate()){
+                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
+                gameServiceProvider.configurationServiceProvider(query[2]).register(app);
+            }
+            else{
+               session.write(JsonUtil.toSimpleResponse(false,"invalid shopping item").getBytes());
+            }
+        }
+        else if (session.action().equals("onRelease")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            ConfigurableObject app = gameServiceProvider.createApplication(query[2]);
+            app.distributionKey(query[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(query[2]);
+            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
+                gameServiceProvider.configurationServiceProvider(query[2]).release(app.setup());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+            }
+        }
+        else {
+            throw new UnsupportedOperationException(session.action()+" not supported");
+        }
+        return false;
+    }
+
+    @Override
+    public void setup(ApplicationContext applicationContext) throws Exception {
+        this.context = applicationContext;
+        this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
+        Configuration configuration = this.context.configuration("application");
+        JsonArray apps = ((JsonElement)configuration.property("admin-application-list")).getAsJsonArray();
+        this.context.log("Game application admin module started->"+apps.toString(), OnLog.WARN);
+    }
+
+}

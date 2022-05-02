@@ -20,12 +20,12 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     private ServiceContext serviceContext;
     private DistributionItemService distributionItemService;
 
-    private final String name;
+    private final String gameServiceName;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
     public PlatformItemServiceProvider(GameCluster gameCluster){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
 
@@ -35,7 +35,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T config) {
-        distributionItemService.register(name,name(),config.configurationCategory(),config.distributionKey());
+        distributionItemService.register(gameServiceName,name(),config.configurationCategory(),config.distributionKey());
     }
 
 
@@ -63,12 +63,12 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public String name() {
-        return "ItemService";
+        return "item";
     }
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Item service provider started");
+        this.logger.warn("Item service provider started on ->"+gameServiceName);
     }
 
     @Override

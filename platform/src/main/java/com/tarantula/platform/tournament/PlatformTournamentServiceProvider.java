@@ -28,7 +28,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ServiceContext serviceContext;
     private DistributionTournamentService distributionTournamentService;
     private DistributionItemService distributionItemService;
-    private final String name;
+    private final String gameServiceName;
     private DataStore dataStore;
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -45,7 +45,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private PlatformInventoryServiceProvider inventoryServiceProvider;
 
     public PlatformTournamentServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
@@ -70,20 +70,20 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public Tournament.Instance join(String tournamentId, String systemId) {
-        String tid = this.distributionTournamentService.register(name,tournamentId,systemId);
-        Tournament.Instance instance = this.distributionTournamentService.join(name,tournamentId,tid,systemId);
+        String tid = this.distributionTournamentService.register(gameServiceName,tournamentId,systemId);
+        Tournament.Instance instance = this.distributionTournamentService.join(gameServiceName,tournamentId,tid,systemId);
         instance.distributionKey(tid);
         return instance;
     }
 
     @Override
     public Tournament.Entry score(String instanceId, String systemId, double delta) {
-        Tournament.Entry _e = this.distributionTournamentService.score(name,instanceId,systemId,delta);
+        Tournament.Entry _e = this.distributionTournamentService.score(gameServiceName,instanceId,systemId,delta);
         return _e;
     }
     @Override
     public Tournament.Entry configure(String instanceId, String systemId, byte[] payload) {
-        Tournament.Entry _e = this.distributionTournamentService.configure(name,instanceId,systemId,payload);
+        Tournament.Entry _e = this.distributionTournamentService.configure(gameServiceName,instanceId,systemId,payload);
         return _e;
     }
     public void leave(String instanceId, String systemId){
@@ -91,7 +91,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     @Override
     public Tournament.RaceBoard list(String instanceId) {
-        Tournament.RaceBoard ins = this.distributionTournamentService.list(name,instanceId);
+        Tournament.RaceBoard ins = this.distributionTournamentService.list(gameServiceName,instanceId);
         Collections.sort(ins.list(),new TournamentEntryComparator());
         return ins;
     }
@@ -101,7 +101,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return _tms;
     }
     public String name(){
-        return "TournamentService";
+        return "tournament";
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -112,7 +112,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
         this.lookupScheduleKey.distributionKey(gameCluster.distributionKey());
-        this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
+        this.dataStore = applicationPreSetup.dataStore(serviceContext,gameCluster,name());//serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
@@ -138,7 +138,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         this.serviceContext.schedule(new TournamentMidnightTask(this));
-        this.logger.warn("distributed tournament started pending pool size->"+configuration.property("pendingTournamentPoolSize"));
+        this.logger.warn("Tournament service provider started with pending pool size->"+configuration.property("pendingTournamentPoolSize")+" on ->"+gameServiceName);
     }
 
     @Override
@@ -232,10 +232,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 TournamentSchedule schedule = new TournamentSchedule();
                 schedule.distributionKey(k);
                 if(dataStore.load(schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
-                    if(distributionTournamentService.trySchedule(name,k)){
+                    if(distributionTournamentService.trySchedule(gameServiceName,k)){
                         Tournament tournament = createTournament(schedule);
-                        this.distributionItemService.register(name,name(),"tournament",tournament.distributionKey());
-                        distributionTournamentService.scheduleFinished(name,k);
+                        this.distributionItemService.register(gameServiceName,name(),"tournament",tournament.distributionKey());
+                        distributionTournamentService.scheduleFinished(gameServiceName,k);
                     }
                 }
 
@@ -278,7 +278,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentSchedule schedule = parser.schedule();
         if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)){
             Tournament tournament = createTournament(schedule);
-            distributionItemService.register(name,name(),t.configurationCategory(),tournament.distributionKey());
+            distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
         }
         else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
             this.createSchedule(schedule);

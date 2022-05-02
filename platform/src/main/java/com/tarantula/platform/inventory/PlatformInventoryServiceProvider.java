@@ -19,23 +19,24 @@ import java.util.List;
 public class PlatformInventoryServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
 
-    private final String name ="inventory";
+    private final String gameServiceName;
     private GameCluster gameCluster;
     private ServiceContext serviceContext;
     private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
     public PlatformInventoryServiceProvider(GameCluster gameCluster){
         this.gameCluster = gameCluster;
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
     }
 
     @Override
     public String name() {
-        return name;
+        return "inventory";
     }
 
     @Override
     public void start() throws Exception {
-        logger.warn("Inventory service provider started->"+name);
+        logger.warn("Inventory service provider started->"+gameServiceName);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.inventoryDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name);
+        this.inventoryDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }
     public DataStore inventoryDataStore(){

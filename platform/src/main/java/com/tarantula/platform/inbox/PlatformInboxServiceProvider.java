@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlatformInboxServiceProvider implements ServiceProvider {
 
     private TarantulaLogger logger;
-    private final String name;
+    private final String gameServiceName;
     private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
@@ -25,18 +25,18 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
     public PlatformInboxServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
     @Override
     public String name() {
-        return "InboxService";
+        return "inbox";
     }
 
     @Override
     public void start() throws Exception {
-        logger.warn("Inbox service provider started");
+        logger.warn("Inbox service provider started on ->"+gameServiceName);
     }
     public Inbox inbox(String systemId){
         Inbox inbox = new Inbox();
@@ -52,7 +52,7 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformInboxServiceProvider.class);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.dataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
 }

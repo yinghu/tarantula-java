@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private TarantulaLogger logger;
-    private final String name;
+    private final String gameServiceName;
     private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
@@ -27,18 +27,18 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
     }
     @Override
     public String name() {
-        return "StoreService";
+        return "store";
     }
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Store service provider started");
+        this.logger.warn("Store service provider started on->"+gameServiceName);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(name,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t){
         t.released();
-        this.distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
         ShoppingItem configurableObject = new ShoppingItem();

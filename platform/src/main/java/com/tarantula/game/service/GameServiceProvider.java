@@ -4,9 +4,12 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
@@ -15,6 +18,7 @@ import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -205,6 +209,16 @@ public class GameServiceProvider implements ServiceProvider{
         if(serviceName.equals(tournamentServiceProvider.name())){
             return tournamentServiceProvider;
         }
+        return null;
+    }
+    public <T extends ConfigurableObject> T createApplication(String category){
+        if(category.equals("store")) return (T)new ShoppingItem();
+        if(category.equals("achievement")) return (T)new Achievement();
+        return (T)new ConfigurableObject();
+    }
+    public ConfigurationServiceProvider configurationServiceProvider(String name){
+        if(name.equals("store")) return storeServiceProvider;
+        if(name.equals("achievement")) return achievementServiceProvider;
         return null;
     }
 }

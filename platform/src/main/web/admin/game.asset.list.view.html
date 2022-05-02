@@ -310,7 +310,8 @@
     function populateStock(){
         if(TARA_API.query().category == 'application'){
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
-            TARA_API.onGet(TARA_API.query().serviceTag,'onList',TARA_API.query().gameClusterId,(resp)=>{
+            let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
+            TARA_API.onGet('role/application','onList',query,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
                     serviceBar.innerHTML = '';

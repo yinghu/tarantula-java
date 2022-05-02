@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlatformAchievementServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private TarantulaLogger logger;
-    private final String name;
+    private final String gameServiceName;
     private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
@@ -27,14 +27,14 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     private ConcurrentHashMap<String,Achievement> achievements;
 
     public PlatformAchievementServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         this.inventoryServiceProvider = inventoryServiceProvider;
         this.achievements = new ConcurrentHashMap<>();
     }
     @Override
     public String name() {
-        return "AchievementService";
+        return "achievement";
     }
 
     @Override
@@ -51,8 +51,9 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(gameServiceName.replace("-","_"),serviceContext.partitionNumber());
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
+        this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 
     public AchievementProgress onProgress(String systemId,String goal,double delta){
@@ -76,12 +77,12 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(name,name(),t.configurationCategory(),t.distributionKey());
+        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        distributionItemService.release(name,name(),t.configurationCategory(),t.distributionKey());
+        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
         Achievement configurableObject = new Achievement();

@@ -52,35 +52,15 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
+
+
             <application>
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
                 <type>application</type>
-                <category>store</category>
-                <tag>role/store</tag>
-                <module-name>com.tarantula.admin.GameStoreAdminModule</module-name>
-                <deploy-priority>10</deploy-priority>
-                <deploy-version>1</deploy-version>
-                <access-control>30</access-control>
-            </application>
-            <application>
-                <type-id>admin-role</type-id>
-                <name>Admin Role</name>
-                <type>application</type>
-                <category>achievement</category>
-                <tag>role/achievement</tag>
-                <module-name>com.tarantula.admin.AchievementAdminModule</module-name>
-                <deploy-priority>10</deploy-priority>
-                <deploy-version>1</deploy-version>
-                <access-control>30</access-control>
-            </application>
-            <application>
-                <type-id>admin-role</type-id>
-                <name>Admin Role</name>
-                <type>application</type>
-                <category>giveaway</category>
-                <tag>role/giveaway</tag>
-                <module-name>com.tarantula.admin.DailyGiveAwayAdminModule</module-name>
+                <category>application</category>
+                <tag>role/application</tag>
+                <module-name>com.tarantula.admin.GameApplicationAdminModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
