@@ -13,7 +13,7 @@ public class SavedGameModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.name(),this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else{
@@ -27,7 +27,6 @@ public class SavedGameModule implements Module {
         this.context = applicationContext;
         GameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
-        //this.achievementServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Saved game module started", OnLog.WARN);
     }
 }

@@ -7,15 +7,22 @@ import java.util.List;
 
 public class PlayerSavedGames{
 
+    public String systemId;
+    public String deviceId;
     public List<SavedGame> savedGames;
 
-    public PlayerSavedGames(List<SavedGame> savedGames){
+    public PlayerSavedGames(String systemId,String deviceId,List<SavedGame> savedGames){
+        this.systemId = systemId;
+        this.deviceId = deviceId;
         this.savedGames = savedGames;
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         JsonArray saves = new JsonArray();
-        savedGames.forEach(save->saves.add(save.toJson()));
+        savedGames.forEach(save->{
+            if(save.owner().equals(systemId)&&save.index().equals(deviceId)) jsonObject.add("currentSavedGame",save.toJson());
+            saves.add(save.toJson());
+        });
         jsonObject.add("savedGames",saves);
         return jsonObject;
     }

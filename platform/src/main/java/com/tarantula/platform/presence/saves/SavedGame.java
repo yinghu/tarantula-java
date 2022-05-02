@@ -1,12 +1,13 @@
 package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configurable;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
 
-public class SavedGame extends RecoverableObject {
+public class SavedGame extends RecoverableObject implements Configurable {
 
     //index -- device id
     //version -- game latest update mark

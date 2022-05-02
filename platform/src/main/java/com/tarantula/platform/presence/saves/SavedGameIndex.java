@@ -66,15 +66,15 @@ public class SavedGameIndex extends IndexSet {
         }
         DeviceIndex deviceIndex = new DeviceIndex(deviceId);
         this.dataStore.createIfAbsent(deviceIndex,true);
-        System.out.println("INDEX 1"+deviceIndex.toJson());
+        //System.out.println("INDEX 1"+deviceIndex.toJson());
         deviceIndex.dataStore(this.dataStore);
         deviceIndex.list().forEach(save->{
-            System.out.println("Save->"+save.toJson());
+            //System.out.println("Save->"+save.toJson());
             if(addSavedGame(save)) _tem.add(save);
         });
         deviceIndex.addKey(this.distributionKey());
         this.dataStore.update(deviceIndex);
-        System.out.println("INDEX 2"+deviceIndex.toJson());
+        //System.out.println("INDEX 2"+deviceIndex.toJson());
         return _tem;
     }
 
