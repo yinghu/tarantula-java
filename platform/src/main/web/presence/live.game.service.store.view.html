@@ -49,6 +49,9 @@
         case 'achievement':
             tx_live_achievement_setup();
             break;
+        case 'giveaway':
+            tx_live_giveaway_setup();
+            break;
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -153,6 +156,12 @@
         });             
     }
     function tx_live_achievement_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+            editor.set(resp);
+        });   
+    }
+    function tx_live_giveaway_setup(){
         console.log(TARA_API.query()); 
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
             editor.set(resp);
