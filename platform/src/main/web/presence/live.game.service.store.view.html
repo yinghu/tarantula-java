@@ -13,6 +13,9 @@
     <div id='tx-live-store-game-item-list' class="w3-panel  w3-border-bottom w3-border-red">
             
     </div>
+    <div id='tx-live-game-service-action-bar' class="w3-panel  w3-border-bottom w3-border-red">
+            
+    </div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
             <span id='tx-gamestore-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
@@ -36,6 +39,7 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-gamestore"),{mode:'tree'},{});
     document.querySelector('#tx-live-store-game-item-list-title').innerHTML = TARA_API.query().category;
     let shoppingList = document.querySelector('#tx-live-store-game-item-list');
+    let actionList = document.querySelector('#tx-live-game-service-action-bar');
     switch(TARA_API.query().category){
         case 'store':
             tx_live_store_setup();
@@ -148,9 +152,33 @@
         });
         document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
             a.onclick=()=>{
+                actionList.innerHTML = '';
                 let deviceId = a.getAttribute('tx-type-id');
                 TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{
                     editor.set(resp);
+                    if(resp.currentSavedGame.hasOwnProperty('dailyLogin')){
+                        console.log(resp.currentSavedGame.gameId);
+                        let dailyLogin = resp.currentSavedGame.dailyLogin;
+                        let tem = [];
+                        tem.push('<div class=\'w3-container\'>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                        tem.push('DailyLogin');
+                        tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                        tem.push('');
+                        tem.push('</span><span tx-game-id=\''+resp.currentSavedGame.gameId+'\' tx-reward-id=\''+dailyLogin.rewardKey);
+                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-daily-reward-claim\'>Claim</span>');
+                        tem.push('</div>'); 
+                        actionList.innerHTML += tem.join('');
+                        document.querySelectorAll('.tx-live-service-daily-reward-claim').forEach(a=>{
+                            a.onclick =()=>{
+                                let gameId = a.getAttribute('tx-game-id'); 
+                                TARA_API.onGet(TARA_API.query().serviceTag,'onDailyRewardClaim',gameId,(resp1)=>{
+                                    editor.set(resp1);        
+                                });
+                            }
+                        }); 
+                    }
                 });   
             };
         });             

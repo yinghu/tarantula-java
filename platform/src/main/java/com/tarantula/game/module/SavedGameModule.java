@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
@@ -16,6 +17,10 @@ public class SavedGameModule implements Module {
             PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.name(),this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
             playerSavedGames.presenceServiceProvider = presenceServiceProvider;
             session.write(playerSavedGames.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onDailyRewardClaim")){
+            boolean rewarded = this.presenceServiceProvider.redeem(session.systemId(),session.name());
+            session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

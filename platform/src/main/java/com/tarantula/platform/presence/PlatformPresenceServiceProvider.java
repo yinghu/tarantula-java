@@ -130,9 +130,9 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         }));
         return deltaStatistics;
     }
-    public DailyLoginTrack checkDailyLogin(String systemId){
+    public DailyLoginTrack checkDailyLogin(String gameId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(systemId);
+        dailyLoginTrack.distributionKey(gameId);
         dailyLoginTrack.dataStore(presenceDataStore);
         this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
@@ -150,11 +150,11 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.presenceDataStore.createIfAbsent(savedGameIndex,true);
         return savedGameIndex.list(deviceId);
     }
-    public boolean redeem(String systemId){
+    public boolean redeem(String systemId,String gameId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(systemId);
+        dailyLoginTrack.distributionKey(gameId);
         dailyLoginTrack.dataStore(presenceDataStore);
-        this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
+        if(!this.presenceDataStore.load(dailyLoginTrack)) return false;
         if(!dailyLoginTrack.rewardPending) return false;
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();

@@ -25,6 +25,6 @@ public class DailyGiveaway extends GrantableObject {
         return header.get("Day").getAsInt();
     }
     public String name(){
-        return "w_"+week()+"d_"+day();
+        return "w_"+week()+"_d_"+day();
     }
 }

@@ -81,7 +81,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
@@ -90,7 +90,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
@@ -99,7 +99,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;
@@ -117,7 +117,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         ItemRedeemer redeemer = new ItemRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationCategory());
+        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
         redeemer.redeem();
         return true;

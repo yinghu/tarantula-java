@@ -12,7 +12,7 @@ import java.util.Map;
 public class DailyLoginTrack extends RecoverableObject {
 
     public int lastLoginDay;
-    public int rewardTier;
+    public int week;
     public int nextRewardTimeSeconds;
     public boolean rewardPending;
 
@@ -23,7 +23,7 @@ public class DailyLoginTrack extends RecoverableObject {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",lastLoginDay);
-        this.properties.put("2",rewardTier);
+        this.properties.put("2",week);
         this.properties.put("3",timestamp);
         this.properties.put("4",rewardPending);
         return this.properties;
@@ -31,7 +31,7 @@ public class DailyLoginTrack extends RecoverableObject {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.lastLoginDay = ((Number) properties.get("1")).intValue();
-        this.rewardTier = ((Number) properties.get("2")).intValue();
+        this.week = ((Number) properties.get("2")).intValue();
         this.timestamp = ((Number) properties.get("3")).longValue();
         this.rewardPending = (boolean) properties.getOrDefault("4",false);
     }
@@ -51,9 +51,9 @@ public class DailyLoginTrack extends RecoverableObject {
     }
 
     public boolean checkDailyLogin(int pendingHours,int maxDays,int maxTier){
-        if(lastLoginDay==0&&rewardTier==0){
+        if(lastLoginDay==0&&week==0){
             lastLoginDay = 1;
-            rewardTier = 1;
+            week = 1;
             LocalDateTime cur = LocalDateTime.now();
             timestamp = TimeUtil.toUTCMilliseconds(cur);
             rewardPending = true;
@@ -70,7 +70,7 @@ public class DailyLoginTrack extends RecoverableObject {
                 if(TimeUtil.durationUTCInSeconds(lastLogin,current)>pendingHours*3600){
                     lastLoginDay = lastLoginDay<maxDays?(lastLoginDay+1):1;
                     if(lastLoginDay==1){
-                        rewardTier = rewardTier<maxTier?(rewardTier+1):1;
+                        week = week<maxTier?(week+1):1;
                     }
                     timestamp = TimeUtil.toUTCMilliseconds(current);
                     rewardPending = true;
@@ -83,7 +83,7 @@ public class DailyLoginTrack extends RecoverableObject {
                 }
             }
             lastLoginDay = 1;
-            rewardTier = rewardTier<maxTier?(rewardTier+1):1;
+            week = week<maxTier?(week+1):1;
             timestamp = TimeUtil.toUTCMilliseconds(current);
             rewardPending = true;
             this.dataStore.update(this);
@@ -95,12 +95,12 @@ public class DailyLoginTrack extends RecoverableObject {
             if(lastLoginDay==lastDayOfYear&&current.getDayOfYear()==1){
                 lastLoginDay = lastLoginDay<maxDays?(lastLoginDay+1):1;
                 if(lastLoginDay==1){
-                    rewardTier = rewardTier<maxTier?(rewardTier+1):1;
+                    week = week<maxTier?(week+1):1;
                 }
             }
             else{
                 lastLoginDay = 1;
-                rewardTier = rewardTier<maxTier?(rewardTier+1):1;
+                week = week<maxTier?(week+1):1;
             }
             rewardPending = true;
             timestamp = TimeUtil.toUTCMilliseconds(current);
@@ -111,14 +111,16 @@ public class DailyLoginTrack extends RecoverableObject {
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        //jsonObject.addProperty("gameId",distributionKey());
         jsonObject.addProperty("lastLoginDay",lastLoginDay);
-        jsonObject.addProperty("rewardTier",rewardTier);
+        jsonObject.addProperty("rewardWeek",week);
         jsonObject.addProperty("rewardKey",rewardKey());
         jsonObject.addProperty("nextLoginInSeconds",nextRewardTimeSeconds);
+        jsonObject.addProperty("rewardPending",rewardPending);
         return jsonObject;
     }
     public String rewardKey(){
-        return "reward_tier_"+rewardTier+"_day_"+lastLoginDay;
+        return "w_"+week+"_d_"+lastLoginDay;
     }
     private void nextRewardTime(LocalDateTime current,int pendingHours){
         int remainingSeconds = 24*60*60-current.getSecond();
