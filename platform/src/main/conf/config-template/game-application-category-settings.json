@@ -9,6 +9,26 @@
     {
       "header": {
         "scope": "application",
+        "type": "Shop",
+        "description": "store category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application",
         "type": "ShoppingItem",
         "description": "store category",
         "version": "1.0",
@@ -44,7 +64,7 @@
       "application": {
         "properties": [
           {
-            "name": "Level",
+            "name": "Tier",
             "type": "number",
             "reference": "Integer",
             "nullable": false,
@@ -58,7 +78,7 @@
             "downloadable": false
           },
           {
-            "name": "Goal",
+            "name": "Objective",
             "type": "number",
             "reference": "Double",
             "nullable": false,
@@ -85,7 +105,7 @@
             "downloadable": false
           },
           {
-            "name": "Week",
+            "name": "Tier",
             "type": "number",
             "reference": "Integer",
             "nullable": false,

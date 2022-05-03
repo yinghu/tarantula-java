@@ -5,6 +5,7 @@
   "description": "sample types of commodity category",
   "itemList":
   [
-    {"type": "category","name": "RechargeableCommodity"}
+    {"type": "category","name": "GameCurrency"},
+    {"type": "category","name": "GameAward"}
   ]
 }

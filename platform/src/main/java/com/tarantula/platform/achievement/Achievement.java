@@ -21,8 +21,8 @@ public class Achievement extends GrantableObject{
     public String name(){
         return header.get("Name").getAsString();
     }
-    public double goal(){
-        return header.get("Goal").getAsDouble();
+    public double objective(){
+        return header.get("Objective").getAsDouble();
     }
 
 }

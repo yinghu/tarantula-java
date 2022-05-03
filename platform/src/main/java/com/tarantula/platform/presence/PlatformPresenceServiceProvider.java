@@ -1,5 +1,7 @@
 package com.tarantula.platform.presence;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -67,9 +69,10 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     @Override
     public void waitForData(){
         Configuration configuration = serviceContext.configuration("game-presence-settings");
-        this.dailyLoginPendingHours =((Number)configuration.property("waitingTimeHours")).intValue();
-        this.maxConsecutiveDays = ((Number)configuration.property("maxConsecutiveDays")).intValue();
-        this.maxRewardTier = ((Number)configuration.property("maxRewardTiers")).intValue();
+        JsonObject dailyReward = ((JsonElement)configuration.property("dailyReward")).getAsJsonObject();
+        this.dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
+        this.maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
+        this.maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
         this.recentlyPlayListSize = ((Number)configuration.property("recentlyPlayListSize")).intValue();
         this.friendListSize = ((Number)configuration.property("friendListSize")).intValue();
     }

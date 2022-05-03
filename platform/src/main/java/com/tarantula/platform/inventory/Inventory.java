@@ -4,17 +4,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Balance;
 import com.icodesoftware.Configurable;
+import com.icodesoftware.Countable;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Inventory extends IndexSet implements Configurable, Balance {
+public class Inventory extends IndexSet implements Configurable, Balance, Countable {
 
     private HashMap<String,InventoryItem> itemList = new HashMap<>();
     private boolean rechargeable;
     private double balance;
+    private int count;
 
     public Inventory(){}
 
@@ -62,12 +64,14 @@ public class Inventory extends IndexSet implements Configurable, Balance {
     public Map<String,Object> toMap(){
         properties.put("rechargeable",rechargeable);
         properties.put("balance",balance);
+        properties.put("count",count);
         return  super.toMap();
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         rechargeable = (boolean)properties.remove("rechargeable");
         balance = ((Number)properties.remove("balance")).doubleValue();
+        count = ((Number)properties.remove("count")).intValue();
         super.fromMap(properties);
     }
 
@@ -99,5 +103,9 @@ public class Inventory extends IndexSet implements Configurable, Balance {
     @Override
     public boolean transact(double amount) {
         return false;
+    }
+    public int count(int delta){
+        count += delta;
+        return count;
     }
 }

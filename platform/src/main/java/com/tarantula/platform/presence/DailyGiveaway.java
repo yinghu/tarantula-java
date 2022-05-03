@@ -18,13 +18,13 @@ public class DailyGiveaway extends GrantableObject {
         return PresencePortableRegistry.DAILY_GIVEAWAY_CID;
     }
 
-    public int week(){
-        return header.get("Week").getAsInt();
+    public int tier(){
+        return header.get("Tier").getAsInt();
     }
     public int day(){
         return header.get("Day").getAsInt();
     }
     public String name(){
-        return "w_"+week()+"_d_"+day();
+        return "t_"+tier()+"_d_"+day();
     }
 }

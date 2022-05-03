@@ -1,7 +1,9 @@
 {
-  "waitingTimeHours": 5,
-  "maxConsecutiveDays": 7,
-  "maxRewardTiers": 7,
+  "dailyReward":
+    {"waitingTimeHours": 5,
+      "maxConsecutiveDays": 7,
+      "maxRewardTiers": 7
+    },
   "recentlyPlayListSize": 10,
   "friendListSize": 10
 }
