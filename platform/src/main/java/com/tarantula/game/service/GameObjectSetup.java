@@ -23,9 +23,16 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         if(!t.configureAndValidate()){
             return false;
         }
-        IndexSet indexSet = new IndexSet(query("category",t.configurationCategory()));//category/{category}
-        indexSet.distributionKey(application.distributionKey());
-        dataStore.createIfAbsent(indexSet,true);
+        IndexSet superCategoryIndex = null;
+        int superIndex;
+        if((superIndex = t.configurationCategory().indexOf(".")) > 0){
+            superCategoryIndex = new IndexSet(query("category",t.configurationCategory().substring(0,superIndex)));
+            superCategoryIndex.distributionKey(application.distributionKey());
+            dataStore.createIfAbsent(superCategoryIndex,true);
+        }
+        IndexSet categoryIndex = new IndexSet(query("category",t.configurationCategory()));//category/{category}
+        categoryIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(categoryIndex,true);
 
         IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item|application}
         typeIndex.distributionKey(application.distributionKey());
@@ -41,14 +48,18 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
         if(!dataStore.update(t)){
             dataStore.create(t);
-            indexSet.addKey(t.distributionKey());
-            dataStore.update(indexSet);
+            categoryIndex.addKey(t.distributionKey());
+            dataStore.update(categoryIndex);
             typeIndex.addKey(t.distributionKey());
             dataStore.update(typeIndex);
             typeIdIndex.addKey(t.distributionKey());
             dataStore.update(typeIdIndex);
             nameIndex.addKey(t.distributionKey());
             dataStore.update(nameIndex);
+            if(superCategoryIndex!=null){
+                superCategoryIndex.addKey(t.distributionKey());
+                dataStore.update(superCategoryIndex);
+            }
         }
         return true;
     }

@@ -6,10 +6,6 @@
   "itemList":
   [
     {"type": "category","name": "Pack"},
-    {"type": "category","name": "Chest"},
-    {"type": "category","name": "Loot"},
-    {"type": "category","name": "Collection"},
-    {"type": "category","name": "Sku"},
-    {"type": "category","name": "Unit"}
+    {"type": "category","name": "Sku"}
   ]
 }
