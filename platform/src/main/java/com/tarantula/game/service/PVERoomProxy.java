@@ -36,7 +36,9 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.shop = new Shop(this.gameServiceProvider.storeServiceProvider().list());
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());
-        stub.playerSavedGames = new PlayerSavedGames(session.systemId(),session.name(),gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.name()));
+        PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
+        playerSavedGames.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
+        stub.playerSavedGames = playerSavedGames;
         return stub;
     }
     public void leave(Stub stub){

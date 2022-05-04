@@ -146,23 +146,22 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyGiveaways.forEach((k,v)-> _items.add(v));
         return _items;
     }
-    public List<SavedGame> listSaves(String systemId,String deviceId){
+    public List<SavedGame> listSaves(String systemId,String deviceId,String deviceName){
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
         savedGameIndex.dataStore(this.presenceDataStore);
         this.presenceDataStore.createIfAbsent(savedGameIndex,true);
-        return savedGameIndex.list(deviceId);
+        return savedGameIndex.list(deviceId,deviceName);
     }
     public boolean redeem(String systemId,String gameId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
         dailyLoginTrack.distributionKey(gameId);
         dailyLoginTrack.dataStore(presenceDataStore);
         if(!this.presenceDataStore.load(dailyLoginTrack)) return false;
-        if(!dailyLoginTrack.rewardPending) return false;
-        dailyLoginTrack.rewardPending = false;
+        if(!dailyLoginTrack.rewardPending || !dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
+        dailyLoginTrack.rewardPending = !this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
         dailyLoginTrack.update();
-        if(!dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
-        return this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
+        return !dailyLoginTrack.rewardPending;
     }
 
     @Override

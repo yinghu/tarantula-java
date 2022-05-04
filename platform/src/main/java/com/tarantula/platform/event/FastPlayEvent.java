@@ -41,7 +41,9 @@ public class FastPlayEvent extends Data implements Event {
         out.writeUTF("11",this.ticket);
         out.writePortable("14",this.forward);
         out.writeInt("15",routingNumber);
-        out.writeByteArray("16",payload!=null?payload:new byte[0]);
+        out.writeUTF("16",name);
+        out.writeUTF("17",clientId);
+        out.writeByteArray("18",payload!=null?payload:new byte[0]);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
@@ -55,7 +57,9 @@ public class FastPlayEvent extends Data implements Event {
         this.ticket = in.readUTF("11");
         this.forward = in.readPortable("14");
         this.routingNumber = in.readInt("15");
-        this.payload = in.readByteArray("16");
+        this.name = in.readUTF("16");
+        this.clientId = in.readUTF("17");
+        this.payload = in.readByteArray("18");
     }
     @Override
     public void write(byte[] payload){

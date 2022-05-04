@@ -51,7 +51,7 @@ public class SavedGameIndex extends IndexSet {
         savedGames.forEach(save-> _tem.add(save));
         return _tem;
     }
-    public List<SavedGame> list(String deviceId){
+    public List<SavedGame> list(String deviceId,String deviceName){
         ArrayList<SavedGame> _tem = new ArrayList<>();
         int[] created = {0};
         savedGames.forEach(save->{
@@ -59,7 +59,7 @@ public class SavedGameIndex extends IndexSet {
             _tem.add(save);
         });
         if(created[0]==0){//
-            SavedGame savedGame = new SavedGame(this.distributionKey(),deviceId);
+            SavedGame savedGame = new SavedGame(this.distributionKey(),deviceId,deviceName);
             this.dataStore.create(savedGame);
             addSavedGame(savedGame);
             _tem.add(savedGame);

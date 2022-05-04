@@ -14,7 +14,8 @@ public class SavedGameModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.name(),this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
+            String[] query = session.name().split("#");
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.presenceServiceProvider.listSaves(session.systemId(),query[0],query[1]));
             playerSavedGames.presenceServiceProvider = presenceServiceProvider;
             session.write(playerSavedGames.toJson().toString().getBytes());
         }

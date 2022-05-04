@@ -34,6 +34,7 @@ public class ServiceEventHandler implements RequestHandler {
         String tag = exchange.header(Session.TARANTULA_TAG);
         String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
         String name = exchange.header(Session.TARANTULA_NAME);//key name
+        String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String pmd = exchange.header(Session.TARANTULA_ACCESS_MODE);
         int playMode = pmd!=null?Integer.parseInt(pmd):Session.FAST_PLAY_MODE;
         byte[]  _payload = exchange.payload();
@@ -57,6 +58,7 @@ public class ServiceEventHandler implements RequestHandler {
             actionEvent.streaming(exchange.streaming());
             if(tournamentId!=null&&tournamentId.length()>5) actionEvent.tournamentId(tournamentId);
             actionEvent.name(name);
+            actionEvent.clientId(clientId);
             actionEvent.accessMode(playMode);
             this.eventService.publish(actionEvent);
         }

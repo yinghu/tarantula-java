@@ -136,7 +136,7 @@
     }
     function tx_live_savedgame_setup(){
         shoppingList.innerHTML ='';
-        let itemList = [{name:'Device1',deviceId:'device1'},{name:'Device2',deviceId:'device2'},{name:'Device3',deviceId:'device3'},{name:'Device4',deviceId:'device4'}];
+        let itemList = [{name:'Handset1',deviceId:'handset1'},{name:'Handset2',deviceId:'handset2'},{name:'Handset3',deviceId:'handset3'}];
         itemList.forEach((gi,i)=>{
             let tem = [];
             tem.push('<div class=\'w3-container\'>');
@@ -154,7 +154,8 @@
             a.onclick=()=>{
                 actionList.innerHTML = '';
                 let deviceId = a.getAttribute('tx-type-id');
-                TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{
+                let deviceName = a.getAttribute('tx-category');
+                TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId+'#'+deviceName,(resp)=>{
                     editor.set(resp);
                     if(resp.currentSavedGame.hasOwnProperty('dailyLogin')){
                         console.log(resp.currentSavedGame.gameId);

@@ -2,7 +2,6 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 
 import java.util.List;

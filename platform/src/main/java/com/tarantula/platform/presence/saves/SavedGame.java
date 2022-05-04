@@ -16,22 +16,25 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public SavedGame(){
 
     }
-    public SavedGame(String owner,String deviceId){
+    public SavedGame(String owner,String deviceId,String deviceName){
         this.owner = owner;
         this.index = deviceId;
+        this.name = deviceName;
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",index);
-        this.properties.put("2",owner);
-        this.properties.put("3",version);
+        this.properties.put("2",name);
+        this.properties.put("3",owner);
+        this.properties.put("4",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.index = ((String) properties.get("1"));
-        this.owner = ((String) properties.get("2"));
-        this.version = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.name = ((String) properties.get("2"));
+        this.owner = ((String) properties.get("3"));
+        this.version = ((Number)properties.getOrDefault("4",0)).intValue();
     }
 
     @Override
@@ -49,6 +52,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("gameId",this.distributionKey());
         jsonObject.addProperty("deviceId",index);
+        jsonObject.addProperty("deviceName",name);
         jsonObject.addProperty("owner",owner);
         jsonObject.addProperty("version",version);
         if(dailyLoginTrack!=null) jsonObject.add("dailyLogin", dailyLoginTrack.toJson());
