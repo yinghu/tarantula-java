@@ -161,6 +161,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         if(!dailyLoginTrack.rewardPending) return false;
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
+        if(!dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
         return this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
     }
 
