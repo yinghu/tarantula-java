@@ -66,6 +66,8 @@ public class GameRoomTest {
             Assert.assertEquals(true,r.resetIfEmpty());
             return false;
         });
+        String p = "player's mac";
+        System.out.println(p.replace('\'', ' '));
     }
 
 }
