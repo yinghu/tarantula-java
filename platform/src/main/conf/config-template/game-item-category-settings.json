@@ -27,7 +27,7 @@
             "name": "Description",
             "type": "string",
             "reference": "Description",
-            "nullable": false,
+            "nullable": true,
             "downloadable": false
           },
           {
@@ -50,20 +50,6 @@
       },
       "application": {
         "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Description",
-            "type": "string",
-            "reference": "Description",
-            "nullable": false,
-            "downloadable": false
-          }
         ]
       }
     }

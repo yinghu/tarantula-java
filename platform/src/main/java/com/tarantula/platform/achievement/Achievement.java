@@ -18,8 +18,16 @@ public class Achievement extends GrantableObject{
     public int getClassId() {
         return PresencePortableRegistry.ACHIEVEMENT_CID;
     }
+
+    public int tier(){
+        return header.get("Tier").getAsInt();
+    }
+    public int target(){
+        return header.get("Target").getAsInt();
+    }
+
     public String name(){
-        return header.get("Name").getAsString();
+        return "tier_"+header.get("Tier").getAsInt()+"_target_"+header.get("Target").getAsInt();
     }
     public double objective(){
         return header.get("Objective").getAsDouble();

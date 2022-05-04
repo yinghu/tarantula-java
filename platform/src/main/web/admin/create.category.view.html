@@ -290,11 +290,11 @@
         pendingProps.forEach((v,k,m)=>{
             categoryTemplate.application.properties.push(v);
         });
-        if(categoryTemplate.application.properties.length<=0){
-            document.querySelector("#tx-create-category-warning-message").innerHTML = "Category at least has one or more proprties";
-            document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
-            return;
-        }
+        //if(categoryTemplate.application.properties.length<=0){
+            //document.querySelector("#tx-create-category-warning-message").innerHTML = "Category at least has one or more proprties";
+            //document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
+            //return;
+        //}
         payload.category = categoryTemplate;
         editor.set(payload);
         document.querySelector('#tx-create-category-form-section').style.display ='none';

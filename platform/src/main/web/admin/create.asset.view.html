@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="w3-display-container" style="height: 78px;">
-            <div id="tx-create-asset-warning-message" class="w3-display-topmiddle w3-center tx-margin-top-8 tx-text-14"></div>
+            <div id="tx-create-asset-warning-message" class="w3-display-topmiddle w3-center tx-margin-top-8 tx-text-12"></div>
             <div class="w3-display-bottommiddle w3-center">
                 <span id="tx-create-asset-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
             </div>
@@ -303,6 +303,11 @@
         itemTemplate.configurationName = _name;
         itemTemplate.configurationCategory = selectedItem.header.type;
         itemTemplate.configurationVersion = selectedItem.header.version;
+        if(selectedItem.application.properties.length==0){
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = "Do not create asset for type->"+ selectedItem.header.type;
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';
+            return;
+        }
         let propertyChecked = '';
         selectedItem.application.properties.forEach(p=> {
             let typeRef = payload.category[p.name]; 
