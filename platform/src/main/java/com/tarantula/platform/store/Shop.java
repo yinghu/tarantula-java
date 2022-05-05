@@ -2,11 +2,12 @@ package com.tarantula.platform.store;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.item.GrantableObject;
 
 import java.util.List;
 
-public class Shop extends RecoverableObject {
+public class Shop extends GrantableObject {
+
     private List<ShoppingItem> itemList;
 
     public Shop(List<ShoppingItem> itemList){
