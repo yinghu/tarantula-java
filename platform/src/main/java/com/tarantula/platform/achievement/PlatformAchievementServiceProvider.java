@@ -56,17 +56,17 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 
-    public AchievementProgress onProgress(String systemId,String goal,double delta){
-        Achievement achievement = achievements.get(goal);
-        AchievementProgress achievementProgress = new AchievementProgress(achievement);
-        achievementProgress.distributionKey(systemId);
+    public AchievementProgress onProgress(String gameId,double delta){
+        AchievementProgress achievementProgress = new AchievementProgress();
+        achievementProgress.distributionKey(gameId);
         this.dataStore.createIfAbsent(achievementProgress,true);
+        achievementProgress.dataStore(this.dataStore);
+
         if(achievementProgress.onProgress(delta)){
             //achievement looting
             achievementProgress.disabled(true);
-            inventoryServiceProvider.redeem(systemId,achievement);
+            //inventoryServiceProvider.redeem(systemId,achievement);
         }
-        this.dataStore.update(achievementProgress);
         return achievementProgress;
     }
     public List<Achievement> list(){

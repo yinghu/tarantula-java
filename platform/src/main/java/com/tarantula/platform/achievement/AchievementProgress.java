@@ -10,14 +10,14 @@ import java.util.Map;
 
 public class AchievementProgress extends RecoverableObject {
 
+    private int tier;
+    private int target;
     private double progress;
     private double objective;
-    public AchievementProgress(){
 
-    }
-    public AchievementProgress(Achievement achievement){
-        this.label = achievement.name();
-        this.objective = achievement.objective();
+
+    public AchievementProgress(){
+        this.label = "achievementProgress";
     }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -29,16 +29,24 @@ public class AchievementProgress extends RecoverableObject {
 
     @Override
     public Map<String,Object> toMap(){
-        properties.put("1",progress);
-        properties.put("2",objective);
-        properties.put("3",disabled);
+        properties.put("1",tier);
+        properties.put("2",target);
+        properties.put("3",objective);
+        properties.put("4",progress);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.progress = ((Number)properties.get("1")).doubleValue();
-        this.objective = ((Number)properties.get("2")).doubleValue();
-        this.disabled = (boolean)properties.getOrDefault("3",false);
+        this.tier = ((Number)properties.get("1")).intValue();
+        this.target = ((Number)properties.get("2")).intValue();
+        this.objective = ((Number)properties.get("3")).doubleValue();
+        this.progress = ((Number)properties.get("4")).doubleValue();
+    }
+    public int tier(){
+        return tier;
+    }
+    public int target(){
+        return target;
     }
     public double progress(){
         return progress;
@@ -48,16 +56,16 @@ public class AchievementProgress extends RecoverableObject {
     }
     public boolean onProgress(double delta){
         progress +=delta;
-        if(progress>=objective&&!disabled) return true;
+        //if(progress>=objective&&!disabled) return true;
         return false;
     }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",label);
+        jsonObject.addProperty("tier",tier);
+        jsonObject.addProperty("target",target);
         jsonObject.addProperty("progress",progress);
         jsonObject.addProperty("objective",objective);
-        jsonObject.addProperty("passed",disabled);
         return jsonObject;
     }
     @Override
