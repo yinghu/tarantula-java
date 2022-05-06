@@ -25,7 +25,7 @@ public class Achievement extends GrantableObject{
     public int target(){
         return header.get("Target").getAsInt();
     }
-
+    @Override
     public String name(){
         return "tier_"+header.get("Tier").getAsInt()+"_target_"+header.get("Target").getAsInt();
     }

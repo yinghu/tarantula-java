@@ -4,6 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.inventory.InventoryItem;
+import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.Transaction;
 
@@ -40,6 +41,8 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int CONFIGURABLE_TYPES_CID = 16;
 
     public static final int CONFIGURABLE_CATEGORIES_CID = 17;
+
+    public static final int SHOP_CID = 18;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -94,6 +97,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case CONFIGURABLE_CATEGORIES_CID:
                 pt = new ConfigurableCategories();
+                break;
+            case SHOP_CID:
+                pt = new Shop();
                 break;
 
             default:

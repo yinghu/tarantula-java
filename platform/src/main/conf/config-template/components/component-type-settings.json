@@ -2,7 +2,7 @@
   "type": "component",
   "category": "type",
   "version": "1.0",
-  "description": "sample types of component category",
+  "description": "types of component category",
   "itemList":
   [
     {"type": "category","name": "GameStatistics"}

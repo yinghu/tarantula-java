@@ -47,7 +47,7 @@ public class Item extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(){
-        int passed = 0;
+        int passed = 0;//have to have at least one reference
         for(JsonElement je : this.reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Application extends ConfigurableObject{
 
-    private ArrayList<ConfigurableObject> _reference;
+    protected ArrayList<ConfigurableObject> _reference;
 
     public Application(){}
 
@@ -48,17 +48,19 @@ public class Application extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(){
-        boolean passed = true;
+        int passed = 0;//have to have at least one reference
         for(JsonElement je : this.reference){
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
-            if(!dataStore.load(cob)){
-                passed = false;
+            if(dataStore.load(cob)){
+                passed++;
+            }
+            else{
+                passed=0;//invalid reference
                 break;
             }
         }
-        this.disabled = true;
-        return passed;
+        return passed>0;
     }
     @Override
     public  <T extends Configurable> T setup(){

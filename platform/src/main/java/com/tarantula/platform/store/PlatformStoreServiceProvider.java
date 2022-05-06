@@ -54,6 +54,9 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
     }
 
+    public Shop shop(String name){
+        return new Shop(list());
+    }
     public List<ShoppingItem> list(){
         ArrayList<ShoppingItem> _items = new ArrayList<>();
         shoppingItems.forEach((k,v)->_items.add(v));
@@ -97,7 +100,6 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if (!a.disabled()) {
-                a._setup();
                 shoppingItems.put(a.distributionKey(), a);
             }
         });

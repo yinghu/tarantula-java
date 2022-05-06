@@ -2,7 +2,7 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.Configurable;
 
-public class GrantableObject extends ConfigurableObject implements Configurable.Listener<Commodity> {
+public class GrantableObject extends Application implements Configurable.Listener<Commodity> {
 
     protected boolean validated;
 
@@ -37,21 +37,23 @@ public class GrantableObject extends ConfigurableObject implements Configurable.
         }
         if(this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)){
             this.registerListener(this.listener);
+            super.setup();
             return (T)this;
         }
         return null;
     }
     @Override
     public boolean configureAndValidate() {
-        Application app = new Application(this);
-        app.dataStore(this.dataStore);
-        app.registerListener(this);
-        app.setup();
+        //Application app = new Application(this);
+        //app.dataStore(this.dataStore);
+        //app.registerListener(this);
+        setup();
         return validated;
     }
     @Override
     public void onLoaded(Commodity commodity){
         this.validated = true;
     }
+
 
 }

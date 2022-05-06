@@ -24,6 +24,8 @@ public class DailyGiveaway extends GrantableObject {
     public int day(){
         return header.get("Day").getAsInt();
     }
+
+    @Override
     public String name(){
         return "t_"+tier()+"_d_"+day();
     }

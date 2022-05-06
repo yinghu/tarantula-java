@@ -2,7 +2,7 @@
   "type": "item",
   "category": "type",
   "version": "1.0",
-  "description": "sample types of item category",
+  "description": "types of item category",
   "itemList":
   [
     {"type": "category","name": "Pack"},

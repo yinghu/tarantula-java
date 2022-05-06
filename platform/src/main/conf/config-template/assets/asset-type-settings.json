@@ -2,7 +2,7 @@
   "type": "asset",
   "category": "type",
   "version": "1.0",
-  "description": "sample types of asset category",
+  "description": "types of asset category",
   "itemList":
   [
     {"type": "category","name": "DisplayCard"}
