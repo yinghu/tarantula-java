@@ -2,9 +2,11 @@ package com.tarantula.platform.presence;
 
 import com.tarantula.platform.item.*;
 
-public class DailyGiveaway extends GrantableObject {
+public class DailyGiveaway extends Application {
 
-    public DailyGiveaway(){}
+    public DailyGiveaway(){
+
+    }
 
     public DailyGiveaway(ConfigurableObject configurableObject){
         super(configurableObject);
@@ -28,5 +30,14 @@ public class DailyGiveaway extends GrantableObject {
     @Override
     public String name(){
         return "t_"+tier()+"_d_"+day();
+    }
+
+    @Override
+    public boolean configureAndValidate() {
+        //Application app = new Application(this);
+        //app.dataStore(this.dataStore);
+        //app.registerListener(this);
+        setup();
+        return validated;
     }
 }

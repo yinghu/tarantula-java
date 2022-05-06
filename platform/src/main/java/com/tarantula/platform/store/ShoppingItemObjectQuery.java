@@ -3,7 +3,7 @@ package com.tarantula.platform.store;
 import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
-public class ShoppingItemObjectQuery implements RecoverableFactory<ShoppingItem> {
+public class ShoppingItemObjectQuery implements RecoverableFactory<Shop> {
 
     public String label;
 
@@ -13,13 +13,13 @@ public class ShoppingItemObjectQuery implements RecoverableFactory<ShoppingItem>
     }
 
     @Override
-    public ShoppingItem create() {
-        return new ShoppingItem();
+    public Shop create() {
+        return new Shop();
     }
 
     @Override
     public int registryId() {
-        return ItemPortableRegistry.SHOPPING_ITEM_CID;
+        return ItemPortableRegistry.SHOP_CID;
     }
 
     @Override

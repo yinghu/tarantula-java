@@ -126,7 +126,7 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
             t.distributionKey(k);
             if(dataStore.load(t)){
                 t.dataStore(dataStore);
-                arrayList.add(t.setup());//convert one of asset, commodity, item
+                arrayList.add(t);//convert one of asset, commodity, item
             }
         });
         return arrayList;

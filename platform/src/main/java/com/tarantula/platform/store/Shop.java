@@ -2,31 +2,37 @@ package com.tarantula.platform.store;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.GrantableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
+
 
 import java.util.List;
 
-public class Shop extends GrantableObject {
+public class Shop extends Application {
 
-    private List<ShoppingItem> itemList;
+
 
     public Shop(){
-
     }
     public Shop(ConfigurableObject configurableObject){
         super(configurableObject);
     }
-    public Shop(List<ShoppingItem> itemList){
-        this.itemList = itemList;
+    public Shop(String name){
+        this();
+        configurationName = name;
+    }
+
+    public String name(){
+        return configurationName;
     }
 
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",configurationName);
         JsonArray alist = new JsonArray();
-        itemList.forEach((v)->{
+        _reference.forEach((v)->{
             alist.add(v.toJson());
         });
         jsonObject.add("itemList",alist);
@@ -40,5 +46,10 @@ public class Shop extends GrantableObject {
     public int getClassId() {
         return ItemPortableRegistry.SHOP_CID;
     }
+
+    public List<ConfigurableObject> list(){
+        return _reference;
+    }
+
 
 }

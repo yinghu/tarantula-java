@@ -7,9 +7,10 @@ import com.icodesoftware.Configurable;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Application extends ConfigurableObject{
+public class Application extends ConfigurableObject implements Configurable.Listener<Commodity>{
 
     protected ArrayList<ConfigurableObject> _reference;
+    protected boolean validated;
 
     public Application(){}
 
@@ -34,7 +35,6 @@ public class Application extends ConfigurableObject{
     @Override
     public JsonObject toJson(){
         JsonObject json = super.toJson();
-        setup();
         _reference.forEach((cob)->{
             json.add(cob.distributionKey(),cob.toJson());
         });
@@ -48,19 +48,21 @@ public class Application extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(){
-        int passed = 0;//have to have at least one reference
-        for(JsonElement je : this.reference){
-            ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
-            if(dataStore.load(cob)){
-                passed++;
-            }
-            else{
-                passed=0;//invalid reference
-                break;
-            }
-        }
-        return passed>0;
+        setup();
+        return validated;
+        //int passed = 0;//have to have at least one of references item, commodity, component or asset
+        //for(JsonElement je : this.reference){
+            //ConfigurableObject cob = new ConfigurableObject();
+            //cob.distributionKey(je.getAsString());
+            //if(dataStore.load(cob) && !cob.configurationType().equals(Configurable.APPLICATION_CONFIG_TYPE)){
+                //passed++;
+            //}
+            //else{
+                //passed=0;//invalid reference
+                //break;
+            //}
+        //}
+        //return passed>0;
     }
     @Override
     public  <T extends Configurable> T setup(){
@@ -69,11 +71,19 @@ public class Application extends ConfigurableObject{
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
-            if(this.dataStore.load(cob)){
-                cob.registerListener(this.listener);
+            if(this.dataStore.load(cob) && !cob.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)){
+                cob.registerListener(this);
                 _reference.add(cob.setup());
+            }
+            else{
+                validated = false;
+                break;
             }
         }
         return (T)this;
+    }
+    @Override
+    public void onLoaded(Commodity commodity){
+        this.validated = true;
     }
 }

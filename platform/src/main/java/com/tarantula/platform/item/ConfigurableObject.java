@@ -181,9 +181,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             return false;
         }
         this.header = config.getAsJsonObject("header");
-        if(header.entrySet().isEmpty()){
-            return false;
-        }
+        //if(header.entrySet().isEmpty()){
+            //return false;
+        //}
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
         if(config.has("itemId")){

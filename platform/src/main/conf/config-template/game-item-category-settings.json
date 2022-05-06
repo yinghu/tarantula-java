@@ -9,6 +9,40 @@
     {
       "header": {
         "scope": "item",
+        "type": "ShoppingItem",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SkuName",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Item",
+            "type": "category",
+            "reference": "category:Pack",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
         "type": "Pack",
         "description": "item category",
         "version": "1.0",

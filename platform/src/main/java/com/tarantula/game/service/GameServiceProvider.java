@@ -19,6 +19,7 @@ import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
+import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
@@ -212,12 +213,7 @@ public class GameServiceProvider implements ServiceProvider{
         }
         return null;
     }
-    public <T extends ConfigurableObject> T createApplication(String category){
-        if(category.equals("store")) return (T)new ShoppingItem();
-        if(category.equals("achievement")) return (T)new Achievement();
-        if(category.equals("giveaway")) return (T)new DailyGiveaway();
-        return (T)new ConfigurableObject();
-    }
+
     public ConfigurationServiceProvider configurationServiceProvider(String name){
         if(name.equals("store")) return storeServiceProvider;
         if(name.equals("achievement")) return achievementServiceProvider;

@@ -5,6 +5,7 @@
   "description": "types of item category",
   "itemList":
   [
+    {"type": "category","name": "ShoppingItem"},
     {"type": "category","name": "Pack"},
     {"type": "category","name": "Sku"}
   ]

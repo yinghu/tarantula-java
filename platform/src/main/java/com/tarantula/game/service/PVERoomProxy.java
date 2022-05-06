@@ -33,7 +33,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         stub.rating = rating;
         stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(session.systemId());
-        stub.shop = this.gameServiceProvider.storeServiceProvider().shop("");
+        stub.shop = this.gameServiceProvider.storeServiceProvider().shop("Tami");
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());
         PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));

@@ -33,7 +33,7 @@ public class Item extends ConfigurableObject{
     @Override
     public JsonObject toJson(){
         JsonObject json = super.toJson();
-        setup();
+        ///setup();
         _reference.forEach((cob)->{
             json.add(cob.distributionKey(),cob.toJson());
         });

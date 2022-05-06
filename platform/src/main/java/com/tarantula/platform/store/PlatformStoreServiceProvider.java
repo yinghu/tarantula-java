@@ -24,6 +24,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private DistributionItemService distributionItemService;
     private ApplicationPreSetup applicationPreSetup;
 
+    private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
@@ -48,6 +49,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public void setup(ServiceContext serviceContext) {
         this.shoppingItems = new ConcurrentHashMap<>();
+        this.shopIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformStoreServiceProvider.class);
@@ -55,7 +57,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
 
     public Shop shop(String name){
-        return new Shop(list());
+        return shopIndex.containsKey(name)?shopIndex.get(name):new Shop(name);
     }
     public List<ShoppingItem> list(){
         ArrayList<ShoppingItem> _items = new ArrayList<>();
@@ -97,10 +99,11 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<ShoppingItem> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
+        List<Shop> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if (!a.disabled()) {
-                shoppingItems.put(a.distributionKey(), a);
+                shopIndex.put(a.distributionKey(), a.setup());
+                a.list().forEach(item->shoppingItems.put(item.distributionKey(),new ShoppingItem(item)));
             }
         });
         return null;

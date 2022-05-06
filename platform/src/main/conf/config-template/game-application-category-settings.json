@@ -36,40 +36,6 @@
     {
       "header": {
         "scope": "application",
-        "type": "ShoppingItem",
-        "description": "store category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SkuName",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Item",
-            "type": "category",
-            "reference": "category:Pack",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "application",
         "type": "Achievement",
         "description": "achievement category",
         "version": "1.0",

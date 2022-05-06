@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.tarantula.platform.item.*;
 
 
-public class ShoppingItem extends GrantableObject{
+public class ShoppingItem extends Item{
 
     public ShoppingItem(){
 
@@ -29,7 +29,7 @@ public class ShoppingItem extends GrantableObject{
     @Override
     public JsonObject toJson() {
         JsonObject json = super.toJson();
-        _reference.forEach((cob)-> json.add(cob.distributionKey(),cob.toJson()));
+        //_reference.forEach((cob)-> json.add(cob.distributionKey(),cob.toJson()));
         return json;
     }
 

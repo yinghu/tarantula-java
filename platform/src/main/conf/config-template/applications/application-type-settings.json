@@ -6,7 +6,6 @@
   "itemList":
   [
     {"type": "category","name": "Shop"},
-    {"type": "category","name": "ShoppingItem"},
     {"type": "category","name": "Achievement"},
     {"type": "category","name": "DailyGiveaway"}
   ]
