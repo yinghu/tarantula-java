@@ -8,6 +8,7 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
@@ -36,6 +37,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected JsonArray reference = new JsonArray();
 
     protected Configurable.Listener listener;
+    protected ArrayList<ConfigurableObject> _reference;
 
     public ConfigurableObject(){}
     public ConfigurableObject(ConfigurableObject configurableObject){
@@ -49,6 +51,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.application = configurableObject.application;
         this.reference = configurableObject.reference;
         this.listener = configurableObject.listener;
+        this._reference = configurableObject._reference;
         this.distributionKey(configurableObject.distributionKey());
     }
 
@@ -245,4 +248,5 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         configurableHeader.distributionKey(this.distributionKey());
         return (T)configurableHeader;
     }
+
 }

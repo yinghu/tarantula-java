@@ -9,7 +9,6 @@ import java.util.Map;
 
 public class Commodity extends ConfigurableObject{
 
-    private ArrayList<ConfigurableObject> _reference;
     public Commodity(){}
 
     public Commodity(ConfigurableObject configurableObject){

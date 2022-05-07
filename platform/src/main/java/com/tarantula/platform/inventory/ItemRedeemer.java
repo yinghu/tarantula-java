@@ -14,7 +14,7 @@ public class ItemRedeemer extends ApplicationRedeemer {
     }
 
     public void redeem() {
-        if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
+        //if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
         reference.forEach((ref)->{
             ItemRedeemer inventoryRedeemer = new ItemRedeemer(systemId,this.inventoryServiceProvider);
             inventoryRedeemer.distributionKey(ref.getAsString());

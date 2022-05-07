@@ -30,7 +30,7 @@ public class ApplicationRedeemer extends ConfigurableObject{
 
 
     public  void redeem(){
-        if(!this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)) return;
+        //if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
         reference.forEach((ref)->{
             ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.inventoryServiceProvider);
             inventoryRedeemer.distributionKey(ref.getAsString());

@@ -31,9 +31,9 @@
             "downloadable": false
           },
           {
-            "name": "Item",
+            "name": "ItemPack",
             "type": "category",
-            "reference": "category:Pack",
+            "reference": "category:ItemPack",
             "nullable": false,
             "downloadable": false
           }
@@ -43,7 +43,7 @@
     {
       "header": {
         "scope": "item",
-        "type": "Pack",
+        "type": "DailyRewardItem",
         "description": "item category",
         "version": "1.0",
         "rechargeable": false
@@ -58,12 +58,52 @@
             "downloadable": false
           },
           {
-            "name": "Description",
+            "name": "ItemPack",
+            "type": "category",
+            "reference": "category:ItemPack",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "AchievementAwardItem",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
             "type": "string",
-            "reference": "Description",
-            "nullable": true,
+            "reference": "Name",
+            "nullable": false,
             "downloadable": false
           },
+          {
+            "name": "ItemPack",
+            "type": "category",
+            "reference": "category:ItemPack",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "ItemPack",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
           {
             "name": "SkuList",
             "type": "list",
@@ -84,6 +124,7 @@
       },
       "application": {
         "properties": [
+
         ]
       }
     }

@@ -170,6 +170,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
+                    app.setup();
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
@@ -195,6 +196,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                     //Category category = app.category(desc);
                     ///category.list();
                     //category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
+                    app.setup();
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -213,10 +215,12 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
+                app.disabled(true);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     //Category category = app.category(desc);
                     //category.list();
                     //category.addItem(new CategoryItem(Configurable.APPLICATION_CONFIG_TYPE,conf.type,conf.name));
+                    app.setup();
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{

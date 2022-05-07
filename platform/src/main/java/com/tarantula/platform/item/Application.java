@@ -9,7 +9,6 @@ import java.util.Map;
 
 public class Application extends ConfigurableObject implements Configurable.Listener<Commodity>{
 
-    protected ArrayList<ConfigurableObject> _reference;
     protected boolean validated;
 
     public Application(){}

@@ -85,16 +85,19 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     public boolean onRegister(String category,String itemId){
-        ShoppingItem configurableObject = new ShoppingItem();
+        Shop configurableObject = new Shop();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)) return false;
-        shoppingItems.put(configurableObject.distributionKey(),configurableObject);
+        registerShop(configurableObject);
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        shoppingItems.remove(itemId);
+        Shop shop = shopIndex.remove(itemId);
+        if(shop==null) return false;
+        shopIndex.remove(shop.name());
+        shop.list().forEach(item->shoppingItems.remove(item.distributionKey()));
         return true;
     }
     @Override
@@ -102,10 +105,20 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         List<Shop> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if (!a.disabled()) {
-                shopIndex.put(a.distributionKey(), a.setup());
-                a.list().forEach(item->shoppingItems.put(item.distributionKey(),new ShoppingItem(item)));
+                registerShop(a);
             }
         });
         return null;
     }
+
+    private void registerShop(Shop shop){
+        Shop s = shop.setup();
+        shopIndex.put(shop.configurationName(),s);
+        shopIndex.put(shop.distributionKey(),s);
+        shop.list().forEach(item->{
+            //item.setup();
+            shoppingItems.put(item.distributionKey(),new ShoppingItem(item));
+        });
+    }
+
 }

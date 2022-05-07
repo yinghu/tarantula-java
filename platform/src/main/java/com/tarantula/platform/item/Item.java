@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Item extends ConfigurableObject{
 
-    private ArrayList<ConfigurableObject> _reference;
+
     public Item(){}
 
     public Item(ConfigurableObject configurableObject){

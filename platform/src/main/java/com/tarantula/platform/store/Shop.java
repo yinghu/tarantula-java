@@ -31,6 +31,11 @@ public class Shop extends Application {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",configurationName);
+        if(_reference==null) {
+            jsonObject.addProperty("successful",false);
+            return jsonObject;
+        }
+        jsonObject.addProperty("successful",true);
         JsonArray alist = new JsonArray();
         _reference.forEach((v)->{
             alist.add(v.toJson());

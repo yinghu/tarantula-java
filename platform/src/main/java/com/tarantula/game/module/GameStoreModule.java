@@ -8,7 +8,6 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
-import com.tarantula.platform.store.ShoppingItemContext;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.StorePurchase;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -24,7 +23,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new ShoppingItemContext(true,"shop list",this.storeServiceProvider.list()).toJson().toString().getBytes());
+            session.write(this.storeServiceProvider.shop("Tami").toJson().toString().getBytes());
         }
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);

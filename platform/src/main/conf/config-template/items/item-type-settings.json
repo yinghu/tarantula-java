@@ -6,7 +6,9 @@
   "itemList":
   [
     {"type": "category","name": "ShoppingItem"},
-    {"type": "category","name": "Pack"},
+    {"type": "category","name": "DailyRewardItem"},
+    {"type": "category","name": "AchievementAwardItem"},
+    {"type": "category","name": "ItemPack"},
     {"type": "category","name": "Sku"}
   ]
 }
