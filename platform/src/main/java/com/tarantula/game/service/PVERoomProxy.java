@@ -3,7 +3,6 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.presence.saves.PlayerSavedGames;
-import com.tarantula.platform.store.Shop;
 
 public class PVERoomProxy extends RoomProxyHeader {
 

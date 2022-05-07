@@ -3,7 +3,7 @@ package com.tarantula.platform.achievement;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class Achievement extends GrantableObject{
+public class Achievement extends Application{
 
     public Achievement(){}
 
@@ -31,6 +31,15 @@ public class Achievement extends GrantableObject{
     }
     public double objective(){
         return header.get("Objective").getAsDouble();
+    }
+
+    @Override
+    public boolean configureAndValidate() {
+        //Application app = new Application(this);
+        //app.dataStore(this.dataStore);
+        //app.registerListener(this);
+        setup();
+        return validated;
     }
 
 }
