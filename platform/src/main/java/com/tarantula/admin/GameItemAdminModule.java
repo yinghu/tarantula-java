@@ -207,7 +207,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
+        else if (session.action().startsWith("onCreateApplication")||session.action().startsWith("onUpdateApplication")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();

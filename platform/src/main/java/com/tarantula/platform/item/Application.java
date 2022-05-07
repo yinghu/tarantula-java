@@ -42,7 +42,7 @@ public class Application extends ConfigurableObject implements Configurable.List
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE);
+        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.APPLICATION_CONFIG_TYPE);
     }
 
     @Override

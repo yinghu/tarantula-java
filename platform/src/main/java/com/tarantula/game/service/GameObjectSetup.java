@@ -34,7 +34,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         categoryIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(categoryIndex,true);
 
-        IndexSet typeIndex = new IndexSet(query("type",t.configurationType()));//type/{asset|commodity|item|application}
+        superIndex = t.configurationType().indexOf(".");
+        IndexSet typeIndex = new IndexSet(query("type",superIndex>0?t.configurationType().substring(0,superIndex):t.configurationType()));//type/{asset|commodity|item|application}
         typeIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIndex,true);
 

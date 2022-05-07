@@ -299,7 +299,13 @@
             bars.itemBar[0].innerHTML = '';
             bars.applicationBar[0].innerHTML = '';
             resp.itemList.forEach((a,i)=>{
-                bars[a.header.scope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
+                if(a.header.scope.startsWith('application')){
+                    if(a.header.scope == 'application.'+TARA_API.query().serviceCategory){
+                        bars['applicationBar'][0].innerHTML += toHtmlBarItem(a,i);        
+                    }
+                }else{
+                    bars[a.header.scope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
+                }
                 //bars[a.header.scope+'Bar'][1].style.display = 'block';
             });
             bars[TARA_API.query().category+'Bar'][2].checked = true;

@@ -8,7 +8,7 @@
   [
     {
       "header": {
-        "scope": "application",
+        "scope": "application.store",
         "type": "Shop",
         "description": "store category",
         "version": "1.0",
@@ -35,7 +35,7 @@
     },
     {
       "header": {
-        "scope": "application",
+        "scope": "application.achievement",
         "type": "Achievement",
         "description": "achievement category",
         "version": "1.0",
@@ -83,7 +83,7 @@
     },
     {
       "header": {
-        "scope": "application",
+        "scope": "application.giveaway",
         "type": "DailyGiveaway",
         "description": "giveaway category",
         "version": "1.0",
