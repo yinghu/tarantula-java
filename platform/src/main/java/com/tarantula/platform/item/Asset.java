@@ -37,6 +37,12 @@ public class Asset extends ConfigurableObject{
     public boolean configureAndValidate(JsonObject config){
         return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.ASSET_CONFIG_TYPE);
     }
+
+    @Override
+    public boolean configureAndValidate(){
+        
+        return true;
+    }
     @Override
     public  <T extends Configurable> T setup(){
         return (T)this;

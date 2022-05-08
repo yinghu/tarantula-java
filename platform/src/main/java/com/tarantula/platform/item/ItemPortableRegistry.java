@@ -80,9 +80,6 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
             case INDEX_CID:
                 pt = new Index();
                 break;
-            case CONFIGURABLE_HEADER_CID:
-                pt = new ConfigurableHeader();
-                break;
             case SHOPPING_ITEM_CID:
                 pt = new ShoppingItem();
                 break;

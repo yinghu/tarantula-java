@@ -24,7 +24,7 @@ public class ItemDailyGiveawayContext extends ResponseHeader {
         jsonObject.addProperty("message",message);
         JsonArray alist = new JsonArray();
         itemList.forEach((v)->{
-            alist.add(v.configurableHeader().toJson());
+            alist.add(v.toJson());
         });
         jsonObject.add("itemList",alist);
         return jsonObject;

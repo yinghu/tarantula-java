@@ -99,12 +99,6 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                         ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                         if(categories.updateCategory(jo)){
                             applicationPreSetup.save(context,gameCluster,categories);
-                            //ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
-                            //JsonObject type = new JsonObject();
-                            //type.addProperty("type","category");
-                            //type.addProperty("name",typeIndex.name());
-                            //configurableTypes.addType(type);
-                            //applicationPreSetup.save(context,gameCluster,configurableTypes);
                         }
                         if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
                     });
@@ -125,10 +119,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
+                app.configurableSetting(conf);
                 if(conf!=null&&SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    //Category category = app.category(desc);
-                    //category.list();
-                    //category.addItem(new CategoryItem(Configurable.ASSET_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -147,10 +139,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
+                app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    //Category category = app.category(desc);
-                    //category.list();
-                    //category.addItem(new CategoryItem(Configurable.COMPONENT_CONFIG_TYPE,conf.type,conf.name));
                     session.write(app.toJson().toString().getBytes());
                 }
                 else{
@@ -169,6 +159,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
+                app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     app.setup();
                     Category category = app.category(desc);
@@ -192,10 +183,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory("item");
+                app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    //Category category = app.category(desc);
-                    ///category.list();
-                    //category.addItem(new CategoryItem(Configurable.ITEM_CONFIG_TYPE,conf.type,conf.name));
                     app.setup();
                     session.write(app.toJson().toString().getBytes());
                 }
@@ -216,10 +205,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
                 Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
                 app.disabled(true);
+                app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    //Category category = app.category(desc);
-                    //category.list();
-                    //category.addItem(new CategoryItem(Configurable.APPLICATION_CONFIG_TYPE,conf.type,conf.name));
                     app.setup();
                     session.write(app.toJson().toString().getBytes());
                 }
@@ -236,8 +223,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery(query[1]));
-            session.write(new ItemHeaderContext(true,query[1],items).toJson().toString().getBytes());
+            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
+            session.write(new ItemContext(true,query[1],items).toJson().toString().getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
@@ -250,7 +237,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerConfigurableListener(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE,this);
-        this.context.log("game item admin module started", OnLog.WARN);
+        this.context.log("Game item admin module started", OnLog.WARN);
     }
     private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
         if(name.equals(Configurable.ASSET_CONFIG_TYPE))

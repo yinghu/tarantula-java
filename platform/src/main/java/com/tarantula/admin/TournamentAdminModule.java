@@ -25,8 +25,8 @@ public class TournamentAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableHeader> items = preSetup.list(this.context,app,new ConfigurableHeaderQuery("typeId/"+app.category()));
-            session.write(new ItemHeaderContext(true,items.size()>0?"Configure tournament item":"no items configured",items).toJson().toString().getBytes());
+            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("typeId/"+app.category()));
+            session.write(new ItemContext(true,items.size()>0?"Configure tournament item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
             String[] query = session.name().split("#");

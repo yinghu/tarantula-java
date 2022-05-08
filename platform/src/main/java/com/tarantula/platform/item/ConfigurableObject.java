@@ -23,7 +23,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     protected static String HEADER_KEY = "7";
     protected static String APPLICATION_KEY = "8";
 
-    protected static String REFERENCE_KEY = "10";
+    protected static String REFERENCE_KEY = "9";
+
+    protected static String SETTINGS_KEY = "10";
 
 
     protected String configurationType;
@@ -38,6 +40,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected Configurable.Listener listener;
     protected ArrayList<ConfigurableObject> _reference;
+    protected JsonArray _configurableSetting = new JsonArray();
 
     public ConfigurableObject(){}
     public ConfigurableObject(ConfigurableObject configurableObject){
@@ -121,6 +124,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put(HEADER_KEY,header.toString());
         this.properties.put(APPLICATION_KEY,application.toString());
         this.properties.put(REFERENCE_KEY,reference.toString());
+        this.properties.put(SETTINGS_KEY,_configurableSetting.toString());
         return this.properties;
     }
 
@@ -135,6 +139,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
         this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
+        this._configurableSetting = JsonUtil.parseAsArray((String) properties.getOrDefault(SETTINGS_KEY, "[]"));
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -243,10 +248,9 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         index.dataStore(dataStore);
         return index;
     }
-    public <T extends Configurable> T configurableHeader(){
-        ConfigurableHeader configurableHeader = new ConfigurableHeader(this);
-        configurableHeader.distributionKey(this.distributionKey());
-        return (T)configurableHeader;
+
+    public void configurableSetting(ConfigurableSetting configurableSetting){
+        this._configurableSetting = configurableSetting.properties;
     }
 
 }
