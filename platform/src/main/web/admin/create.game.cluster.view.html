@@ -73,25 +73,30 @@
                 <span class="tx-margin-left-8 tx-text-12">Logo Icon</span>
             </div>
         </div>
-        <div class="w3-display-container" style="height: 128px;">
-            <div class="w3-display-show w3-border">
-                <div class="w3-green" style="height:24px;width:20%"></div>
+        <div class="w3-display-container" style="height: 16px">
+            <div class="w3-container tx-margin-top-16">
+                <div class="w3-border">
+                    <div class="w3-green" style="height:16px;width:1%"></div>
+                </div>
             </div>
-            
-            <div class="w3-display-middleleft tx-margin-left-8 tx-margin-top-8">
-                <span id='tx-logo-icon-file-name' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">Pending</span>
+        </div>
+        <div class="w3-display-container" style="height: 16px;">
+            <div class="w3-container w3-center tx-margin-top-8">
+                <span id='tx-logo-icon-file-name' class="tx-text-12">Choose Icon To Upload (PNG ONLY)</span>
             </div>
-            <div class="w3-display-middleright tx-margin-right-8 tx-margin-bottom-8">
-                <span id='tx-logo-icon-upload-ok' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Upload</span>
+        </div>
+        <div class="w3-display-container" style="height: 32px;">
+            <div class="w3-panel">
+                <span id='tx-logo-icon-upload-ok' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button" style="display: block;">Upload</span>
             </div>
-            
-            
-            <div class="w3-display-bottomleft tx-margin-left-8 tx-margin-bottom-8">
+        </div>    
+        <div class="w3-display-container" style="height: 30px;">    
+            <div class="w3-display-bottomleft tx-margin-left-16 tx-margin-bottom-8">
                 <span id="tx-logo-icon-upload-cancel" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Cancel</span>     
             </div>
-            <div class="w3-display-bottomright tx-margin-right-8 tx-margin-bottom-8">
+            <div class="w3-display-bottomright tx-margin-right-16">
                 <label for="tx-logo-icon-upload-file" class="tx-file-upload w3-round">
-                    <span class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Choose File</span>
+                    <span class="w3-tag w3-right w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Choose File</span>
                 </label>
                 <input id ="tx-logo-icon-upload-file" type="file"/>
             </div>
@@ -108,7 +113,7 @@
 </div>
 <script>
     let _mode = "pve";
-    let _pendingIcon ={};
+    let _pendingIcon ={ready:false};
     document.querySelector('#tx-launch-game-cluster-form').style.display='none';
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
@@ -130,8 +135,7 @@
         _mode = document.querySelector('#tx-play-mode').value;
     };
     document.querySelectorAll('.tx-logo-icon-upload').forEach(a=>{
-        a.onclick=()=>{
-            document.querySelector("#tx-logo-icon-upload-ok").style.display = 'none'; 
+        a.onclick=()=>{ 
             let icon = a.getAttribute('tx-logo-icon-name');
             _pendingIcon.icon = icon;
             document.querySelector('#tx-logo-icon-upload-board').style.display = 'block';
@@ -145,7 +149,7 @@
         var reader = new FileReader();
         reader.onloadend = (fe)=>{
             _pendingIcon.data = reader.result;
-            document.querySelector("#tx-logo-icon-upload-ok").style.display = 'block'; 
+            _pendingIcon.ready = true; 
         };
         reader.readAsArrayBuffer(_fd); 
     }; 
@@ -153,7 +157,18 @@
         document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
     };
     document.querySelector('#tx-logo-icon-upload-ok').onclick = ()=>{
+        if(!_pendingIcon.ready){ 
+            document.querySelector("#tx-logo-icon-file-name").innerHTML = 'Select icon file first!'; 
+            return;
+        }
+        let f = _pendingIcon.file;
+        let sfx = f.name.split('.').pop();
+        if(sfx != 'png'){
+            document.querySelector("#tx-logo-icon-file-name").innerHTML = 'Select PNG format file!'; 
+            return;
+        }    
         document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
+        _pendingIcon = {ready:false};
     };
     document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
