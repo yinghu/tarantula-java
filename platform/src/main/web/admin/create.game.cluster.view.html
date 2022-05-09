@@ -76,7 +76,7 @@
         <div class="w3-display-container" style="height: 16px">
             <div class="w3-container tx-margin-top-16">
                 <div class="w3-border">
-                    <div class="w3-green" style="height:16px;width:1%"></div>
+                    <div id="tx-upload-progress" class="w3-green" style="height:16px;width:1%"></div>
                 </div>
             </div>
         </div>
@@ -113,12 +113,32 @@
 </div>
 <script>
     let _mode = "pve";
-    let _pendingIcon ={ready:false};
+    let _pendingIcon ={ready:false,progress:1};
     document.querySelector('#tx-launch-game-cluster-form').style.display='none';
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         let _b = document.querySelector('#tx-game-cluster-enable-tournament').checked;
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onCreateGameCluster',name:_n,playMode:_mode,tournamentEnabled:_b},(resp)=>{
+        let _gicon = document.querySelector('#tx-game-cluster-logo').value;
+        let _dicon = document.querySelector('#tx-game-cluster-developer-logo').value;
+        if(_n ==null | _n == ''){
+            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster name cannot be null';
+            return;
+        }
+        if(_gicon ==null | _gicon == ''){
+            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster icon cannot be null';
+            return;
+        }
+        if(_dicon ==null | _dicon == ''){
+            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game developer icon cannot be null';
+            return;
+        }
+        let cmd = {serviceTag:'role/admin',command:'onCreateGameCluster'};
+        cmd.name = _n;
+        cmd.playMode = _mode;
+        cmd.tournamentEnabled = _b;
+        cmd.gameIcon = _gicon;
+        cmd.developerIcon = _dicon;
+        TARA_API.onService(true,cmd,(resp)=>{
             if(resp.successful){
                 //goes to do lobby configurations
                 TARA_API.query().gameClusterId = resp.gameClusterId;
@@ -154,6 +174,10 @@
         reader.readAsArrayBuffer(_fd); 
     }; 
     document.querySelector('#tx-logo-icon-upload-cancel').onclick = ()=>{
+        document.querySelector('#'+_pendingIcon.icon).value ='';
+        _pendingIcon = {ready:false,progress:1};
+        document.querySelector('#tx-upload-progress').style.width = '1%';
+        document.querySelector("#tx-logo-icon-file-name").innerHTML = "Choose Icon To Upload (PNG ONLY)";
         document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
     };
     document.querySelector('#tx-logo-icon-upload-ok').onclick = ()=>{
@@ -166,9 +190,28 @@
         if(sfx != 'png'){
             document.querySelector("#tx-logo-icon-file-name").innerHTML = 'Select PNG format file!'; 
             return;
-        }    
-        document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
-        _pendingIcon = {ready:false};
+        } 
+        TARA_API.onUpload(_pendingIcon.data,f.name,'image/png','createGameCluster',(resp)=>{
+            if(resp.successful){
+                console.log(_pendingIcon.icon);
+                document.querySelector('#'+_pendingIcon.icon).value = resp.message;
+                document.querySelector('#tx-upload-progress').style.width = '100%'; 
+                document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
+                _pendingIcon = {ready:false,progress:1};   
+                document.querySelector('#tx-upload-progress').style.width = '1%'; 
+                document.querySelector("#tx-logo-icon-file-name").innerHTML = "Choose Icon To Upload (PNG ONLY)";  
+            }
+            else{
+                console.log(resp);
+                if(resp.code == 0 || resp.code == 200){
+                    _pendingIcon.progress += 20;
+                    document.querySelector('#tx-upload-progress').style.width = _pendingIcon.progress+'%'; 
+                }else{
+                    document.querySelector("#tx-logo-icon-file-name").innerHTML = "something wrong, try again";  
+                    //_pendingIcon = {ready:false,progress:1};
+                }
+            }  
+        });   
     };
     document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');

@@ -86,7 +86,8 @@ public class AdminRoleModule implements Module{
                 Account acc = new UserAccount();
                 acc.distributionKey(ua.primary()?session.systemId():ua.owner());
                 if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
-                    //context.log("MODE->"+onAccess.property("playMode").toString(),OnLog.WARN);
+                    //context.log("ICON->"+onAccess.property("gameIcon").toString(),OnLog.WARN);
+                    //context.log("ICON->"+onAccess.property("developerIcon").toString(),OnLog.WARN);
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
                     if(gc.successful()){
                         IndexSet idx = new IndexSet();

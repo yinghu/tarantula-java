@@ -140,7 +140,7 @@ var TARA_API = (function(){
             callback(p);
         }
         else{
-            callback({successful:false,message:'Please waiting .....'});
+            callback({successful:false,code:aj.status,message:'Please waiting .....'});
         }
     };
     aj.open('POST','/upload/'+fname,true);

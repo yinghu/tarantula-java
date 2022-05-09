@@ -10,6 +10,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.io.InputStream;
 
@@ -41,6 +42,16 @@ public class UploadEventHandler implements RequestHandler {
             boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1), in.readAllBytes());
             ResponseHeader resp = new ResponseHeader("upload", suc ? "uploaded" : "failed", suc);
             exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
+        }
+        else if(typeId.equals("createGameCluster")){
+            if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.admin.accessControl()) {
+                throw new RuntimeException("no access permission");
+            }
+            InputStream in = exchange.onStream();
+            byte[] data = in.readAllBytes();
+            String fn = SystemUtil.oid()+".png";
+            boolean suc = deployService.upload("web/"+fn,data);
+            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
         }
         else{
             if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.admin.accessControl()) {
