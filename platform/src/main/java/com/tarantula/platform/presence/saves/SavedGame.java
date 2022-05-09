@@ -67,4 +67,9 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public int hashCode(){
         return (distributionKey()).hashCode();
     }
+    @Override
+    public void update(){
+        //if(this.dataStore==null) return;
+        this.dataStore.update(this);
+    }
 }

@@ -153,6 +153,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.presenceDataStore.createIfAbsent(savedGameIndex,true);
         return savedGameIndex.list(deviceId,deviceName);
     }
+    public SavedGame loadSavedGame(String systemId,String gameId){
+        SavedGame savedGame = new SavedGame();
+        savedGame.distributionKey(gameId);
+        if(!this.presenceDataStore.load(savedGame)|| !savedGame.owner().equals(systemId)) return null;
+        savedGame.dataStore(this.presenceDataStore);
+        return  savedGame;
+    }
     public boolean redeem(String systemId,String gameId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
         dailyLoginTrack.distributionKey(gameId);
@@ -180,7 +187,10 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
         List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("typeId/"+application.category()));
         items.forEach((a)-> {
-            if(!application.disabled()) dailyGiveaways.put(a.name(),a);
+            if(!application.disabled()) {
+                a.setup();
+                dailyGiveaways.put(a.name(),a);
+            }
         });
         return null;
     }
@@ -194,6 +204,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         if(!applicationPreSetup.load(serviceContext,app,dailyGiveaway)){
             return false;
         }
+        dailyGiveaway.setup();
         dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
         return true;
     }
