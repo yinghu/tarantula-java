@@ -40,7 +40,7 @@ public class Asset extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(){
-        
+
         return true;
     }
     @Override

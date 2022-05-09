@@ -11,39 +11,39 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-create-game-cluster-message"></div>
-    <div class="w3-panel w3-border-bottom w3-border-red tx-text-12">
+    <div class="w3-panel w3-border-bottom w3-border-red tx-text-14">
         <div class="w3-container">
-            <p>You are creating a service cluster to support your new game title in development and production.</p>
+            <p>You are creating a game service cluster to support your new game title</p>
         </div>
-        <ul class="w3-ul tx-text-12">
-            <li>Up to max 10 lobbies per game title</li>
-            <li>Multiple game levels per lobby (up to max 10 levels per lobby)</li>
-            <li>Game service including match-making, statistics, leader board, etc</li>
-            <li>Data service that supports arbitray json format set/get opertions</li>
-            <li>Integrated user management features such as registration, login,presence, virtual currency, etc</li>
-            <li>Serverless game development with configurable game level design</li>
-        </ul>
     </div>
     <div id='tx-create-game-cluster-form' class="w3-container w3-border-bottom w3-border-red">
         <div class="w3-panel">
-            <label class="tx-text-12">Game Title Name</label>
+            <label class="tx-text-12">Game Title Name :</label>
             <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
+        </div>
+        <div class="w3-panel">
+            <span><label class="tx-text-12">Game Logo Icon :</label></span>
+            <span class="w3-right"><i class="fa fa-file" style="font-size:24px; color: green"></i></span>
+            <input id ="tx-game-cluster-logo" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game logo icon' disabled/>
         </div> 
         <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">PVE (Single Player Versus Computer)</label>
-            <input value='pve' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio" checked>
+            <label class="tx-text-12">Developer Name :</label>
+            <input id ="tx-game-cluster-developer" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='developer name'/>
         </div>
         <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">PVP (Player Versus Player)</label>
-            <input value='pvp' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
-        </div>
+            <span><label class="tx-text-12">Developer Logo Icon :</label></span>
+            <span class="w3-right"><i class="fa fa-file" style="font-size:24px; color: green;"></i></span>
+            <input id ="tx-game-cluster-developer-logo" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game logo icon' disabled/>
+        </div> 
         <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">TVE (Team Versus Computer)</label>
-            <input value='tve' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
-        </div>
-        <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">TVT (Team Versus Team)</label>
-            <input value='tvt' class="w3-radio tx-text-12 tx-play-mode" name='mode' type="radio">
+            <label class="tx-text-12 tx-margin-right-4">Game Play Mode :</label>
+            <select id='tx-play-mode' class="w3-select w3-border w3-round tx-text-12" name='mode'>
+                <option value="" disabled selected>Choose Play Mode</option>
+                <option value="pve">PVE (Single Player Versus Computer)</option>
+                <option value="pvp">PVP (Player Versus Player)</option>
+                <option value="tve">TVE (Team Versus Computer)</option>
+                <option value="tvt">TVT (Team Versus Team)</option>   
+            </select>
         </div>
         <div class="w3-panel">
             <label class="tx-text-12 tx-margin-right-4">Enable Tournament</label>
@@ -85,11 +85,10 @@
             }
         });       
     };
-    document.querySelectorAll('.tx-play-mode').forEach(a=>{
-        a.onchange = ()=>{
-            _mode = a.value;
-        }
-    });
+    document.querySelector('#tx-play-mode').onchange = ()=>{
+        _mode = document.querySelector('#tx-play-mode').value;
+    };
+
     document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

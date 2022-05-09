@@ -49,19 +49,6 @@ public class Application extends ConfigurableObject implements Configurable.List
     public boolean configureAndValidate(){
         setup();
         return validated;
-        //int passed = 0;//have to have at least one of references item, commodity, component or asset
-        //for(JsonElement je : this.reference){
-            //ConfigurableObject cob = new ConfigurableObject();
-            //cob.distributionKey(je.getAsString());
-            //if(dataStore.load(cob) && !cob.configurationType().equals(Configurable.APPLICATION_CONFIG_TYPE)){
-                //passed++;
-            //}
-            //else{
-                //passed=0;//invalid reference
-                //break;
-            //}
-        //}
-        //return passed>0;
     }
     @Override
     public  <T extends Configurable> T setup(){

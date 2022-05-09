@@ -158,7 +158,7 @@ public class GameLobbyAdminModule implements Module {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
-        this.context.log("game lobby admin module started", OnLog.WARN);
+        this.context.log("Game lobby admin module started", OnLog.WARN);
     }
 
     private JsonObject toJson(Lobby lobby){
