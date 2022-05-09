@@ -23,7 +23,7 @@
         </div>
         <div class="w3-panel">
             <span><label class="tx-text-12">Game Logo Icon :</label></span>
-            <span class="w3-right"><i class="fa fa-file" style="font-size:24px; color: green"></i></span>
+            <span class="w3-right tx-logo-icon-upload" tx-logo-icon-name='tx-game-cluster-logo'><i class="fa fa-file" style="font-size:24px; color: green"></i></span>
             <input id ="tx-game-cluster-logo" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game logo icon' disabled/>
         </div> 
         <div class="w3-panel">
@@ -32,7 +32,7 @@
         </div>
         <div class="w3-panel">
             <span><label class="tx-text-12">Developer Logo Icon :</label></span>
-            <span class="w3-right"><i class="fa fa-file" style="font-size:24px; color: green;"></i></span>
+            <span class="w3-right tx-logo-icon-upload" tx-logo-icon-name='tx-game-cluster-developer-logo'><i class="fa fa-file" style="font-size:24px; color: green;"></i></span>
             <input id ="tx-game-cluster-developer-logo" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game logo icon' disabled/>
         </div> 
         <div class="w3-panel">
@@ -64,10 +64,51 @@
         <div class="w3-display-bottomright w3-padding">
             <span class="tx-text-12">Powered By ICodeSoftware</span>
         </div>
+    </div>
+    <!-- Upload form-->
+    <div class="w3-card-4 w3-border w3-round w3-white tx-popup-w300-h200" id="tx-logo-icon-upload-board">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-upload w3-text-yellow tx-margin-top-4" style="font-size:16px;color: green;"></i></span>
+                <span class="tx-margin-left-8 tx-text-12">Logo Icon</span>
+            </div>
+        </div>
+        <div class="w3-display-container" style="height: 128px;">
+            <div class="w3-display-show w3-border">
+                <div class="w3-green" style="height:24px;width:20%"></div>
+            </div>
+            
+            <div class="w3-display-middleleft tx-margin-left-8 tx-margin-top-8">
+                <span id='tx-logo-icon-file-name' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">Pending</span>
+            </div>
+            <div class="w3-display-middleright tx-margin-right-8 tx-margin-bottom-8">
+                <span id='tx-logo-icon-upload-ok' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Upload</span>
+            </div>
+            
+            
+            <div class="w3-display-bottomleft tx-margin-left-8 tx-margin-bottom-8">
+                <span id="tx-logo-icon-upload-cancel" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Cancel</span>     
+            </div>
+            <div class="w3-display-bottomright tx-margin-right-8 tx-margin-bottom-8">
+                <label for="tx-logo-icon-upload-file" class="tx-file-upload w3-round">
+                    <span class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Choose File</span>
+                </label>
+                <input id ="tx-logo-icon-upload-file" type="file"/>
+            </div>
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div> 
     </div>    
 </div>
 <script>
     let _mode = "pve";
+    let _pendingIcon ={};
     document.querySelector('#tx-launch-game-cluster-form').style.display='none';
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
@@ -88,7 +129,32 @@
     document.querySelector('#tx-play-mode').onchange = ()=>{
         _mode = document.querySelector('#tx-play-mode').value;
     };
-
+    document.querySelectorAll('.tx-logo-icon-upload').forEach(a=>{
+        a.onclick=()=>{
+            document.querySelector("#tx-logo-icon-upload-ok").style.display = 'none'; 
+            let icon = a.getAttribute('tx-logo-icon-name');
+            _pendingIcon.icon = icon;
+            document.querySelector('#tx-logo-icon-upload-board').style.display = 'block';
+        }
+    });
+    document.querySelector("#tx-logo-icon-upload-file").onchange = (e)=>{
+        let _fd = e.target.files[0];
+        _pendingIcon.file = _fd;
+        document.querySelector('#'+_pendingIcon.icon).value = _fd.name;
+        document.querySelector("#tx-logo-icon-file-name").innerHTML = _fd.name; 
+        var reader = new FileReader();
+        reader.onloadend = (fe)=>{
+            _pendingIcon.data = reader.result;
+            document.querySelector("#tx-logo-icon-upload-ok").style.display = 'block'; 
+        };
+        reader.readAsArrayBuffer(_fd); 
+    }; 
+    document.querySelector('#tx-logo-icon-upload-cancel').onclick = ()=>{
+        document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
+    };
+    document.querySelector('#tx-logo-icon-upload-ok').onclick = ()=>{
+        document.querySelector('#tx-logo-icon-upload-board').style.display = 'none';
+    };
     document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";

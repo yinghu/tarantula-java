@@ -225,7 +225,7 @@
         };    
     });
     document.querySelector("#tx-item-upload-file").onchange = (e)=>{
-        _fd = e.target.files[0];
+        let _fd = e.target.files[0];
         pendingUpload.file = _fd;
         document.querySelector('#tx-asset-property-'+pendingUpload.property).value = _fd.name;
         document.querySelector("#tx-create-asset-upload-file").innerHTML = _fd.name; 
