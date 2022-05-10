@@ -6,23 +6,22 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 
-import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
-import com.tarantula.platform.presence.saves.PlayerSavedGames;
+import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.platform.presence.saves.SavedGame;
 
 public class SavedGameModule implements Module {
     private ApplicationContext context;
-    private PlatformPresenceServiceProvider presenceServiceProvider;
+    private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
             String[] query = session.name().split("#");
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.presenceServiceProvider.listSaves(session.systemId(),query[0],query[1]));
-            playerSavedGames.presenceServiceProvider = presenceServiceProvider;
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),query[0],query[1]));
+            playerSavedGames.gameServiceProvider = gameServiceProvider;
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdate")){
-            SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
+            SavedGame savedGame = this.gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
                 savedGame.version(savedGame.version()+1);
                 savedGame.update();
@@ -35,7 +34,7 @@ public class SavedGameModule implements Module {
             }
         }
         else if(session.action().equals("onDailyRewardClaim")){
-            boolean rewarded = this.presenceServiceProvider.redeem(session.systemId(),session.name());
+            boolean rewarded = this.gameServiceProvider.presenceServiceProvider().redeem(session.systemId(),session.name());
             session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
         else{
@@ -47,8 +46,7 @@ public class SavedGameModule implements Module {
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        GameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
+        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 }

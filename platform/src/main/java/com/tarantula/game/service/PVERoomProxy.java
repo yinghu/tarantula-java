@@ -2,7 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
-import com.tarantula.platform.presence.saves.PlayerSavedGames;
+import com.tarantula.game.PlayerSavedGames;
 
 public class PVERoomProxy extends RoomProxyHeader {
 
@@ -36,7 +36,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.statistics = gameServiceProvider.statistics(session.systemId());
         stub.dailyLogin = gameServiceProvider.dailyLogin(session.systemId());
         PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
-        playerSavedGames.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
+        playerSavedGames.gameServiceProvider = gameServiceProvider;
         stub.playerSavedGames = playerSavedGames;
         return stub;
     }

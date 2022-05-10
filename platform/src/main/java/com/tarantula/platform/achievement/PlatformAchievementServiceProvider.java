@@ -55,18 +55,27 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
-
+    public AchievementProgress achievementProgress(String gameId){
+        AchievementProgress achievementProgress = new AchievementProgress();
+        achievementProgress.distributionKey(gameId);
+        this.dataStore.createIfAbsent(achievementProgress,true);
+        achievementProgress.dataStore(this.dataStore);
+        if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
+        return achievementProgress.disabled()?null:achievementProgress;
+    }
     public AchievementProgress onProgress(String gameId,double delta){
         AchievementProgress achievementProgress = new AchievementProgress();
         achievementProgress.distributionKey(gameId);
         this.dataStore.createIfAbsent(achievementProgress,true);
         achievementProgress.dataStore(this.dataStore);
-
         if(achievementProgress.onProgress(delta)){
-            //achievement looting
-            achievementProgress.disabled(true);
-            //inventoryServiceProvider.redeem(systemId,achievement);
+            if(!tryNextAchievement(achievementProgress)){
+                achievementProgress.disabled(true);
+                this.dataStore.update(achievementProgress);
+            }
+            return achievementProgress;
         }
+        this.dataStore.update(achievementProgress);
         return achievementProgress;
     }
     public List<Achievement> list(){
@@ -111,5 +120,22 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
             if(!a.disabled()) achievements.put(a.name(),a);
         });
         return null;
+    }
+    private boolean tryNextAchievement(AchievementProgress achievementProgress){
+        String key = "tier_"+achievementProgress.tier()+"_target_"+(achievementProgress.target()+1);//target up 1
+        Achievement achievement = achievements.get(key);
+        if(achievement!=null){
+            achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
+            this.dataStore.update(achievementProgress);
+            return true;
+        }
+        key = "tier_"+(achievementProgress.tier()+1)+"_target_1"; //tier up 1
+        achievement = achievements.get(key);
+        if(achievement!=null){
+            achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
+            this.dataStore.update(achievementProgress);
+            return true;
+        }
+        return false;
     }
 }

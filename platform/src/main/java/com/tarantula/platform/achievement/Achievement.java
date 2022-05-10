@@ -35,9 +35,6 @@ public class Achievement extends Application{
 
     @Override
     public boolean configureAndValidate() {
-        //Application app = new Application(this);
-        //app.dataStore(this.dataStore);
-        //app.registerListener(this);
         setup();
         return validated;
     }

@@ -18,6 +18,7 @@ public class AchievementProgress extends RecoverableObject {
 
     public AchievementProgress(){
         this.label = "achievementProgress";
+        this.disabled = true;
     }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -33,6 +34,7 @@ public class AchievementProgress extends RecoverableObject {
         properties.put("2",target);
         properties.put("3",objective);
         properties.put("4",progress);
+        properties.put("5",disabled);
         return properties;
     }
     @Override
@@ -41,6 +43,7 @@ public class AchievementProgress extends RecoverableObject {
         this.target = ((Number)properties.get("2")).intValue();
         this.objective = ((Number)properties.get("3")).doubleValue();
         this.progress = ((Number)properties.get("4")).doubleValue();
+        this.disabled = (boolean)properties.get("5");
     }
     public int tier(){
         return tier;
@@ -56,7 +59,9 @@ public class AchievementProgress extends RecoverableObject {
     }
     public boolean onProgress(double delta){
         progress +=delta;
-        //if(progress>=objective&&!disabled) return true;
+        if(progress>=objective){
+            return true;
+        }
         return false;
     }
     @Override
@@ -69,7 +74,18 @@ public class AchievementProgress extends RecoverableObject {
         return jsonObject;
     }
     @Override
+    public String name(){
+        return "tier_"+tier+"_target_"+target;
+    }
+    @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
+    }
+    public void reset(int tier,int target,double objective){
+        this.tier = tier;
+        this.target = target;
+        this.objective = objective;
+        this.progress = 0;
+        this.disabled = false;
     }
 }
