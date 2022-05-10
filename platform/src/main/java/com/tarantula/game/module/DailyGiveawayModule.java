@@ -16,7 +16,7 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
         if(session.action().equals("onList")){
             session.write(new ItemDailyGiveawayContext(true, "daily giveaway list", this.presenceServiceProvider.list()).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onRedeem")){
+        else if(session.action().equals("onDailyRewardClaim")){
             boolean rewarded = this.presenceServiceProvider.redeem(session.systemId(),session.name());
             session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }

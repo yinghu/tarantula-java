@@ -138,6 +138,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyLoginTrack.distributionKey(gameId);
         dailyLoginTrack.dataStore(presenceDataStore);
         this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
+        if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         return rewarded?dailyLoginTrack:null;
     }
