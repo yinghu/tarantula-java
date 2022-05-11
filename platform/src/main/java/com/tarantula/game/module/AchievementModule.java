@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
@@ -14,6 +15,9 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onProgress")){
+            session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

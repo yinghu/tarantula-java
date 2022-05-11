@@ -63,12 +63,14 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
         return achievementProgress.disabled()?null:achievementProgress;
     }
-    public AchievementProgress onProgress(String gameId,double delta){
+    public AchievementProgress onProgress(String systemId,String gameId,double delta){
         AchievementProgress achievementProgress = new AchievementProgress();
         achievementProgress.distributionKey(gameId);
         this.dataStore.createIfAbsent(achievementProgress,true);
         achievementProgress.dataStore(this.dataStore);
         if(achievementProgress.onProgress(delta)){
+            Achievement achievement = achievements.get(achievementProgress.name());
+
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);
                 this.dataStore.update(achievementProgress);
@@ -101,6 +103,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
             return false;
         }
+        configurableObject.setup();
         achievements.put(configurableObject.name(),configurableObject);
         return true;
     }
@@ -117,6 +120,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         List<Achievement> items = applicationPreSetup.list(serviceContext,descriptor,new AchievementObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
+            a.setup();
             if(!a.disabled()) achievements.put(a.name(),a);
         });
         return null;
