@@ -10,7 +10,7 @@ import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class GameLobbyModule implements Module {
+public class GameLobbyModule implements Module ,Configurable.Listener{
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
@@ -57,6 +57,7 @@ public class GameLobbyModule implements Module {
         this.gameLobby = this.gameServiceProvider.lobby(this.context.descriptor());
         this.gameLobby.setup(context);
         this.gameLobby.start();
+        this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override

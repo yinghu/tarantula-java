@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -28,7 +29,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
 
     private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
-    private List<String> gameList;
+    //private List<String> gameList;
+    private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
 
     private DataStore uDatastore;
     private DataStore pDatastore;
@@ -50,7 +52,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.roleList = this.tokenValidatorProvider.list();
-        this.gameList = new CopyOnWriteArrayList<>();
+        this.onLobbyIndex = new ConcurrentHashMap<>();
+        //this.gameList = new CopyOnWriteArrayList<>();
         String root = (String)configuration.property("root");
         String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
@@ -112,12 +115,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         if(session.action().equals("onIndex")){
             PresenceContext ic = new PresenceContext("onIndex");
             String typeId = session.trackId();
-            ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
-            ic.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId(typeId);
-            ic.lobbyList = this.context.index();
-            ic.roleList = roleList;
-            ic.gameList = gameList;
-            session.write(builder.create().toJson(ic).getBytes());
+            if(onLobbyIndex.containsKey(typeId)){
+                ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
+                session.write(builder.create().toJson(ic).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"game ["+typeId+"] not available").getBytes());
+            }
         }
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
@@ -295,12 +299,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     public void onUpdated(OnLobby onLobby) {
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
-            gameList.add(ps[0]);
+            onLobbyIndex.put(ps[0],onLobby);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
         }
         else{
             String[] ps = onLobby.typeId().split("-");
-            gameList.remove(ps[0]);
+            onLobbyIndex.remove(ps[0]);
             context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
         }
     }

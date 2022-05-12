@@ -71,7 +71,7 @@
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Lobby Management</span></div>
-                    <div class='w3-bar w3-white'>
+                    <div id='tx-game-cluster-lobby-bar' class='w3-bar w3-white'>
                         <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
                     </div>
                     <!-- Data Store bar -->
@@ -346,6 +346,15 @@
                         });
                         reset_t_action_event();
                     }       
+                });
+                let lbar = document.querySelector('#tx-game-cluster-lobby-bar');
+                TARA_API.onGet('role/lobby','onGameLobbyList',_gameClusterId,(resp3)=>{
+                    //console.log(resp3);
+                    if(resp3.successful){
+                        resp3.gameLobbyList.forEach(a=>{
+                            console.log(a)
+                        });
+                    }
                 });
             }
             else{

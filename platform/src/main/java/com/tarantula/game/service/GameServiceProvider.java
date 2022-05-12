@@ -12,6 +12,7 @@ import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
+import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
@@ -32,6 +33,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     private ServiceContext serviceContext;
 
+    private PlatformLobbyServiceProvider lobbyServiceProvider;
     private PlatformRoomServiceProvider roomServiceProvider;
 
     private PlatformLeaderBoardProvider leaderBoardProvider;
@@ -70,6 +72,9 @@ public class GameServiceProvider implements ServiceProvider{
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.serviceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,"player");
+        this.lobbyServiceProvider = new PlatformLobbyServiceProvider(gameCluster);
+        this.lobbyServiceProvider.setup(serviceContext);
+        this.lobbyServiceProvider.waitForData();
         this.inventoryServiceProvider = new PlatformInventoryServiceProvider(gameCluster);
         this.inventoryServiceProvider.setup(serviceContext);
         this.inventoryServiceProvider.waitForData();
@@ -110,6 +115,7 @@ public class GameServiceProvider implements ServiceProvider{
     }
     @Override
     public void start() throws Exception {
+        this.lobbyServiceProvider.start();
         this.inventoryServiceProvider.start();
         this.presenceServiceProvider.start();
         this.leaderBoardProvider.start();
@@ -122,6 +128,7 @@ public class GameServiceProvider implements ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
+        this.lobbyServiceProvider.shutdown();
         this.presenceServiceProvider.shutdown();
         this.leaderBoardProvider.shutdown();
         this.tournamentServiceProvider.shutdown();
@@ -147,6 +154,11 @@ public class GameServiceProvider implements ServiceProvider{
     public DailyLoginTrack dailyLogin(String systemId){
         return presenceServiceProvider.checkDailyLogin(systemId);
     }
+
+    public PlatformLobbyServiceProvider lobbyServiceProvider() {
+        return lobbyServiceProvider;
+    }
+
     public PlatformPresenceServiceProvider presenceServiceProvider(){
         return this.presenceServiceProvider;
     }
