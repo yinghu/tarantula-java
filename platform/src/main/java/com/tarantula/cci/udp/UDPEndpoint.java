@@ -93,9 +93,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(poolSetting);
     }
 
-    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+    public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         UDPChannel uch = this.pendingQueue.poll();
-        uch.register(systemId,sessionId.incrementAndGet(),requestListener,timeoutListener);
+        uch.register(session.systemId(),sessionId.incrementAndGet(),requestListener,timeoutListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }

@@ -93,7 +93,7 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.postOffice();
     }
 
-    public Channel register(String systemId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
-        return this.tarantulaApplicationContext.register(systemId,requestListener,timeoutListener);
+    public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+        return this.tarantulaApplicationContext.register(session,requestListener,timeoutListener);
     }
 }
