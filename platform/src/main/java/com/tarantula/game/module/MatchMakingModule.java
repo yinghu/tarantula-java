@@ -29,7 +29,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
-            //this.context.log("ACCESS MODE->"+session.accessMode(),OnLog.WARN);
+            //this.context.log("ACCESS MODE->"+session,OnLog.WARN);
             Response response = context.presence(session.systemId()).onPlay(session,lobby);
             if(response!=null) session.write(this.builder.create().toJson(response).getBytes());
         }

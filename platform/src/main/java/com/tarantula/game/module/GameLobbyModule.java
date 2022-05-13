@@ -19,6 +19,7 @@ public class GameLobbyModule implements Module ,Configurable.Listener{
     private Descriptor application;
     @Override
     public void onJoin(Session session) throws Exception{
+        //this.context.log("Session->"+session,OnLog.WARN);
         if(application.tournamentEnabled()&&session.tournamentId()!=null&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(toMessage("no tournament available,please try later",false).getBytes());
             return;

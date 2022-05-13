@@ -38,6 +38,8 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int PENDING_REWARD_CID = 11;
 
+    public static final int THIRD_PARTY_LOGIN_CID = 12;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public Recoverable create(int i) {
@@ -75,6 +77,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case PENDING_REWARD_CID:
                 pt = new PendingReward();
+                break;
+            case THIRD_PARTY_LOGIN_CID:
+                pt = new ThirdPartyLogin();
                 break;
             default:
         }

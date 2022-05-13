@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
@@ -32,10 +31,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     //private List<String> gameList;
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
 
-    private DataStore uDatastore;
-    private DataStore pDatastore;
-    private DataStore aDatastore;
-    private DataStore sDatastore;
+    private DataStore userDatastore;
+    private DataStore thirdPartyLoginDatastore;
+    private DataStore accountDatastore;
     private DataStore accountIndex;
 
     @Override
@@ -59,10 +57,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        uDatastore = this.context.dataStore(Access.DataStore);
-        pDatastore = this.context.dataStore(Presence.DataStore);
-        aDatastore = this.context.dataStore(Account.DataStore);
-        sDatastore = this.context.dataStore(OnSession.DataStore);
+        userDatastore = this.context.dataStore(Access.DataStore);
+        thirdPartyLoginDatastore = this.context.dataStore(ThirdPartyLogin.DataStore);
+        accountDatastore = this.context.dataStore(Account.DataStore);
+        //sDatastore = this.context.dataStore(OnSession.DataStore);
         accountIndex = this.context.dataStore(Account.IndexDataStore);
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
         accessIndexService.set("serverPush",0);
@@ -75,7 +73,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             acc.subscribed(true);
             LocalDateTime loc = LocalDateTime.now();
             acc.timestamp(TimeUtil.toUTCMilliseconds(loc));
-            aDatastore.create(acc);
+            accountDatastore.create(acc);
             Membership membership = new Membership();
             membership.distributionKey(user.distributionKey());
             membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
@@ -90,10 +88,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);
                 Account account = new UserAccount();
                 account.distributionKey(uadded.owner());
-                if(aDatastore.load(account)){
+                if(accountDatastore.load(account)){
                     account.userCount(1);
                     account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                    aDatastore.update(account);
+                    accountDatastore.update(account);
                     IndexSet idx = new IndexSet();
                     idx.distributionKey(account.distributionKey());
                     idx.label(Account.UserLabel);
@@ -137,10 +135,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onToken")){//exchange token
             boolean suc = this.context.validator().validateToken(acc.toMap());
             if(suc){
-                OnSession _ox = new OnSessionTrack();
+                ThirdPartyLogin _ox = new ThirdPartyLogin();
                 _ox.distributionKey(session.systemId());
-                sDatastore.load(_ox);
-                OnSession onSession = this.login(session.systemId(),_ox.token(),session);
+                thirdPartyLoginDatastore.load(_ox);
+                OnSession onSession = this.login(session.systemId(),_ox.password(),session);
                 onSession(onSession,session);
             }else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
@@ -161,16 +159,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             if(this.context.validator().validateToken(params)){
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
-                    OnSession _onSession = new OnSessionTrack();
-                    _onSession.distributionKey(session.systemId());
-                    _onSession.token(SystemUtil.oid());
-                    sDatastore.createIfAbsent(_onSession,false);
-                    acc.property(OnAccess.PASSWORD,_onSession.token());
+                    ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin((String)params.get("provider"),SystemUtil.oid(),"");
+                    thirdPartyLogin.distributionKey(session.systemId());
+                    thirdPartyLoginDatastore.createIfAbsent(thirdPartyLogin,false);
+                    acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
                     Access user = createLogin(acc,session.systemId(),role,true,acc.name(),true);
                     user.emailAddress((String) params.get("email"));
                     user.activated(true);
-                    uDatastore.update(user);
-                    OnSession onSession = login(session.systemId(),_onSession.token(),session);
+                    userDatastore.update(user);
+                    OnSession onSession = login(session.systemId(),thirdPartyLogin.password(),session);
                     onSession(onSession,session);
                 }
                 else{
@@ -195,18 +192,28 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onDevice")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
-            OnSession access = this.login(session.systemId(),deviceId,session);
-            onSession(access,session);
-            this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
+            ThirdPartyLogin _ox = new ThirdPartyLogin();
+            _ox.distributionKey(session.systemId());
+            if(thirdPartyLoginDatastore.load(_ox)&&_ox.deviceId().equals(deviceId)){
+                OnSession access = this.login(session.systemId(),_ox.password(),session);
+                onSession(access,session);
+                this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"Device not registered").getBytes());
+            }
         }
         else if(session.action().equals("onDeviceRegister")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
+                ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin("device",SystemUtil.oid(),deviceId);
+                thirdPartyLogin.distributionKey(session.systemId());
+                thirdPartyLoginDatastore.createIfAbsent(thirdPartyLogin,false);
                 acc.property("login",deviceId);
-                acc.property("password",deviceId);
+                acc.property("password",thirdPartyLogin.password());
                 this.createLogin(acc,session.systemId(),role,true,"device",true);
-                OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
+                OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
                 onSession(access,session);
             }
             else{
@@ -227,13 +234,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String code = (String)acc.property(OnAccess.ACCESS_KEY);
             Access user = new User();
             user.distributionKey(session.systemId());
-            if(!uDatastore.load(user)){
+            if(!userDatastore.load(user)){
                 session.write(JsonUtil.toSimpleResponse(false,"wrong user name").getBytes());
             }
             else{
                 if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
                     user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
-                    uDatastore.update(user);
+                    userDatastore.update(user);
                     OnSession onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(onSession,session);
                 }
@@ -266,7 +273,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         Access access = new User();
         access.distributionKey(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
-        if(uDatastore.load(access)){
+        if(userDatastore.load(access)){
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
@@ -282,23 +289,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.BALANCE,initialBalance);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(payload);
-        /**
-        Access acc = new User((String) payload.property("login"),validated,validator);
-        acc.distributionKey(systemId);
-        String pwd = (String)payload.property(OnAccess.PASSWORD);
-        acc.password(this.context.validator().hashPassword(pwd));
-        acc.activated(this.activated);//if false do email validation
-        acc.primary(primary);
-        if(!primary){
-            acc.owner(payload.owner());
-        }
-        acc.role(roleName);
-        if(uDatastore.create(acc)){
-            PresenceIndex px = new PresenceIndex(initialBalance);
-            px.distributionKey(acc.distributionKey());
-            pDatastore.create(px);
-        }
-        return acc;**/
     }
 
     @Override

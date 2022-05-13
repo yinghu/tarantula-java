@@ -11,12 +11,6 @@ public class FastPlayEvent extends Data implements Event {
     public FastPlayEvent(){
 
     }
-    public FastPlayEvent(String systemId,int stub, SessionForward forward){
-        this();
-        this.systemId = systemId;
-        this.stub = stub;
-        this.forward = forward;
-    }
     public FastPlayEvent(SessionForward forward){
         this();
         this.forward = forward;
@@ -69,6 +63,9 @@ public class FastPlayEvent extends Data implements Event {
     public void write(byte[] payload,boolean closed){
         this.eventService.publish(new ResponsiveEvent(this.forward.source(),this.forward.sessionId(),payload,closed));
     }
-
+    @Override
+    public String toString(){
+        return "PLAY ACTION EVENT ["+action+"]["+this.systemId+"/"+this.stub+"]";
+    }
 
 }

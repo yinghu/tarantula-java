@@ -72,7 +72,6 @@
                     <!-- Lobby bar -->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Lobby Management</span></div>
                     <div id='tx-game-cluster-lobby-bar' class='w3-bar w3-white'>
-                        <span id='game-lobby-list-id-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
                     </div>
                     <!-- Data Store bar -->
                     <div class="w3-panel w3-green tx-padding-title" style="display: none;"><span class="tx-text-14">DataStore Management</span></div>
@@ -297,7 +296,7 @@
                     }
                     _gameClusterId = g.gameClusterId
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    //document.querySelector('#game-lobby-list-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-asset-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-component-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-commodity-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
@@ -348,15 +347,26 @@
                     }       
                 });
                 let lbar = document.querySelector('#tx-game-cluster-lobby-bar');
+                lbar.innerHTML = '';
                 TARA_API.onGet('role/lobby','onGameLobbyList',_gameClusterId,(resp3)=>{
                     //console.log(resp3);
                     if(resp3.successful){
                         resp3.gameLobbyList.forEach(a=>{
                             console.log(a)
+                            let tem = [];
+                            tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
+                            tem.push('api.game.lobby\' tx-game-lobby-id=\'');
+                            tem.push(a.applicationId+'\' tx-game-cluster-id=\'');
+                            tem.push(_gameClusterId);
+                            tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
+                            tem.push(a.name);
+                            tem.push('</span>');  
+                            lbar.innerHTML += tem.join('');   
                         });
+                        reset_t_action_event();
                     }
                 });
-            }
+            } 
             else{
                 console.log(resp.message);
             }        
@@ -457,6 +467,16 @@
                 TARA_API.query().popup = '#tx-popup';
                 TARA_API.query().serviceTag = a.getAttribute('tx-service-tag');
                 TARA_API.query().category = a.getAttribute('tx-service-category');
+                let vid = a.getAttribute('view-id');
+                tx_view({viewId:vid,containerId:'#tx-popup'});    
+            }
+        });
+        document.querySelectorAll('.tx-game-lobby-action').forEach((a)=>{
+            a.onclick=()=>{
+                TARA_API.query().popup='#tx-popup';
+                TARA_API.query().gameClusterId = a.getAttribute('tx-game-cluster-id');
+                TARA_API.query().applicationId = a.getAttribute('tx-game-lobby-id');
+                TARA_API.query().gameLobbyName = a.innerHTML;
                 let vid = a.getAttribute('view-id');
                 tx_view({viewId:vid,containerId:'#tx-popup'});    
             }
