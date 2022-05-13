@@ -172,8 +172,12 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                     _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
-            else if(action.equals("onIndex")){
+            else if(action.equals("onAvailable")){
                 event.trackId(typeId);
+                this.eventService.publish(event);
+            }
+            else if(action.equals("onIndex")){
+                //event.trackId(typeId);
                 this.eventService.publish(event);
             }
             else{

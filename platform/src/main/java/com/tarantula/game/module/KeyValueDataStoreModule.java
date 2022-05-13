@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.game.MappingObject;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.game.service.GameServiceProvider;
@@ -56,7 +55,6 @@ public class KeyValueDataStoreModule implements Module {
         this.context = context;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        //this.dataStore = this.context.dataStore(this.context.descriptor().typeId().replace("-","_"));//typeId_data
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         this.dataStore = this.gameServiceProvider.serviceDataStore();
         this.maxSizeOnSet = ((Number)this.gameServiceProvider.configuration().property("maxSizeOnSet")).intValue();

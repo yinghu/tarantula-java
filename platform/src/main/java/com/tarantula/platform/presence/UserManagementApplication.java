@@ -114,6 +114,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onIndex")){
             PresenceContext ic = new PresenceContext("onIndex");
+            ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId();
+            ic.lobbyList = this.context.index();
+            session.write(builder.create().toJson(ic).getBytes());
+        }
+        else if(session.action().equals("onAvailable")){
+            PresenceContext ic = new PresenceContext("onAvailable");
             String typeId = session.trackId();
             if(onLobbyIndex.containsKey(typeId)){
                 ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
