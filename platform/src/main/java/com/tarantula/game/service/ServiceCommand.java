@@ -14,7 +14,7 @@ public class ServiceCommand {
     public final static short COMMIT_ACHIEVEMENT = 6;
 
     public static GameLobby.ServiceMessageListener messageListener(short command){
-        GameLobby.ServiceMessageListener callback = new UnsupportedCommandListener();
+        GameLobby.ServiceMessageListener callback = new ErrorCommand();
         switch (command){
             case REQUEST_ACHIEVEMENT_LIST:
                 break;

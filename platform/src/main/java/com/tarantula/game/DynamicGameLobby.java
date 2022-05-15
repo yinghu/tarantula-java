@@ -8,11 +8,14 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.ErrorCommand;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.ServiceCommand;
 import com.tarantula.platform.IndexSet;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.tarantula.game.service.ServiceCommand.*;
 
 public class DynamicGameLobby extends IndexSet implements GameLobby {
 
@@ -25,8 +28,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-    private HashMap<Short,ServiceMessageListener> messageListenerIndex;
     private ErrorCommand errorCommand;
+    private HashMap<Short,ServiceMessageListener> messageListenerIndex;
+
     public DynamicGameLobby(){
         super("gameLobby");
         payload = new JsonObject();
@@ -138,13 +142,14 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         this.application = context.descriptor();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = this.context.serviceProvider(application.typeId().replace("lobby","service"));
-        this.errorCommand = new ErrorCommand();
         Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
         JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
         listeners.forEach((e)->{
             JsonObject jo = e.getAsJsonObject();
             createInstance(jo.get("command").getAsShort(),jo.get("className").getAsString());
+
         });
+        this.errorCommand = new ErrorCommand();
     }
     private void createInstance(short cmd,String className){
         try{
@@ -216,6 +221,22 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
     }
 
     public ServiceMessageListener ServiceMessageListener(short serviceCommand){
+        GameLobby.ServiceMessageListener callback = new ErrorCommand();
+        switch (serviceCommand){
+            case ServiceCommand.REQUEST_ACHIEVEMENT_LIST:
+                break;
+            case COMMIT_STATISTICS:
+                break;
+            case REQUEST_STATISTICS:
+                break;
+            case REQUEST_TOURNAMENT_LEADERBOARD:
+                break;
+            case COMMIT_TOURNAMENT_SCORE:
+                break;
+            case COMMIT_ACHIEVEMENT:
+                break;
+        }
+        //return callback;
         return messageListenerIndex.getOrDefault(serviceCommand,this.errorCommand);
     }
 
