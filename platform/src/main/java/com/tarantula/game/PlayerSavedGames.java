@@ -26,6 +26,7 @@ public class PlayerSavedGames{
             if(save.owner().equals(systemId) && save.index().equals(deviceId)) {
                 save.dailyLoginTrack = gameServiceProvider.presenceServiceProvider().checkDailyLogin(save.distributionKey());
                 save.achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(save.distributionKey());
+                save.playerSaveIndex = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(systemId);
                 jsonObject.add("currentSavedGame",save.toJson());
             }
             saves.add(save.toJson());

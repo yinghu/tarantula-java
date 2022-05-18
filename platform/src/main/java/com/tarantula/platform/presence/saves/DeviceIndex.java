@@ -9,14 +9,14 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-
 //device id => systemId index set
 public class DeviceIndex extends IndexSet {
 
     public DeviceIndex(){
-
+        this.label = "deviceIndex";
     }
     public DeviceIndex(String deviceId){
+        this();
         this.index = deviceId;
     }
 

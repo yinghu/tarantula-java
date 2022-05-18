@@ -47,10 +47,12 @@ public class IndexSet extends RecoverableObject {
         return new AssociateKey(this.bucket,this.oid,this.label);
     }
 
-    public void addKey(String key){
+    public boolean addKey(String key){
+        boolean added;
         synchronized (keySet){
-            keySet.add(key);
+            added = keySet.add(key);
         }
+        return added;
     }
     public void removeKey(String key){
         synchronized (keySet){

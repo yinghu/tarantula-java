@@ -10,6 +10,7 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -160,6 +161,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         if(!this.presenceDataStore.load(savedGame)|| !savedGame.owner().equals(systemId)) return null;
         savedGame.dataStore(this.presenceDataStore);
         return  savedGame;
+    }
+    public PlayerSaveIndex loadPlayerSaveIndex(String systemId){
+        PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex();
+        playerSaveIndex.distributionKey(systemId);
+        presenceDataStore.createIfAbsent(playerSaveIndex,true);
+        playerSaveIndex.dataStore(presenceDataStore);
+        return playerSaveIndex;
     }
     public boolean redeem(String systemId,String gameId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();

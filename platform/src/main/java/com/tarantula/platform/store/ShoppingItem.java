@@ -31,9 +31,10 @@ public class ShoppingItem extends Item{
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
-        json.addProperty("successful",true);
         JsonArray list = new JsonArray();
-        _reference.forEach((cob)-> list.add(cob.toJson()));
+        if(_reference!=null) {
+            _reference.forEach((cob)-> list.add(cob.toJson()));
+        }
         json.add("itemList",list);
         return json;
     }

@@ -15,6 +15,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
     //version -- game latest update mark
     public DailyLoginTrack dailyLoginTrack;
     public AchievementProgress achievementProgress;
+    public PlayerSaveIndex playerSaveIndex;
 
     public SavedGame(){
 
@@ -60,6 +61,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         jsonObject.addProperty("version",version);
         if(dailyLoginTrack!=null) jsonObject.add("dailyLogin", dailyLoginTrack.toJson());
         if(achievementProgress!=null) jsonObject.add("achievement", achievementProgress.toJson());
+        if(playerSaveIndex!=null) jsonObject.add("playerSaveIndex",playerSaveIndex.toJson());
         return jsonObject;
     }
     @Override
