@@ -88,4 +88,7 @@ public class AchievementProgress extends RecoverableObject {
         this.progress = 0;
         this.disabled = false;
     }
+    public void reset(){
+        reset(0,0,0);
+    }
 }

@@ -6,7 +6,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MappingObject;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
-import com.tarantula.platform.presence.saves.SavedGame;
 
 
 public class KeyValueDataStoreModule implements Module {
@@ -43,7 +42,7 @@ public class KeyValueDataStoreModule implements Module {
             if(dataStore.load(mo)){
                 v = mo.toBinary();
             }
-            session.write(v!=null?v:"{}".getBytes());
+            session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

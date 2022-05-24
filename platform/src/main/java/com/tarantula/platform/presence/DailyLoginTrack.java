@@ -122,6 +122,11 @@ public class DailyLoginTrack extends RecoverableObject {
     public String rewardKey(){
         return "t_"+tier+"_d_"+lastLoginDay;
     }
+    public void reset(){
+        lastLoginDay = 0;
+        tier = 0;
+        this.dataStore.update(this);
+    }
     private void nextRewardTime(LocalDateTime current,int pendingHours){
         int remainingSeconds = 24*60*60-current.getSecond();
         nextRewardTimeSeconds = remainingSeconds>pendingHours*60*60?remainingSeconds:pendingHours*60*60;

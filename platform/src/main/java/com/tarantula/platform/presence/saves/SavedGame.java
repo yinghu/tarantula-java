@@ -31,6 +31,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         this.properties.put("2",name);
         this.properties.put("3",owner);
         this.properties.put("4",version);
+        this.properties.put("5",timestamp);
         return this.properties;
     }
     @Override
@@ -39,6 +40,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         this.name = ((String) properties.get("2"));
         this.owner = ((String) properties.get("3"));
         this.version = ((Number)properties.getOrDefault("4",0)).intValue();
+        this.timestamp = ((Number)properties.getOrDefault("5",0)).longValue();
     }
 
     @Override
@@ -59,6 +61,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         jsonObject.addProperty("deviceName",name);
         jsonObject.addProperty("owner",owner);
         jsonObject.addProperty("version",version);
+        jsonObject.addProperty("timestamp",timestamp);
         if(dailyLoginTrack!=null) jsonObject.add("dailyLogin", dailyLoginTrack.toJson());
         if(achievementProgress!=null) jsonObject.add("achievement", achievementProgress.toJson());
         if(playerSaveIndex!=null) jsonObject.add("playerSaveIndex",playerSaveIndex.toJson());
