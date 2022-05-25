@@ -202,6 +202,7 @@
         TARA_API.onService(true,cmd,(resp)=>{
             console.log(resp);
             list_game_lobby();
+            TARA_API.query().callback(); 
         });    
     }
     function enable_game_lobby(){
@@ -209,12 +210,14 @@
         TARA_API.onService(true,cmd,(resp)=>{
             console.log(resp);
             list_game_lobby();
+            TARA_API.query().callback(); 
         });
     }
     function create_game_lobby(){
         let cmd ={serviceTag:'role/lobby',command:'onAddLobby',lobbyIndex:TARA_API.query().lobbyIndex,gameClusterId:TARA_API.query().gameClusterId};
         TARA_API.onService(true,cmd,(resp)=>{
             list_game_lobby();
+            TARA_API.query().callback(); 
         });
     }
     function list_game_lobby(){
