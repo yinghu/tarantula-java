@@ -67,6 +67,7 @@
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
+                    <span id='game-create-lobby-0' tx-game-cluster-id='' view-id='create.game.lobby' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create Lobby</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
@@ -286,13 +287,17 @@
                     shd.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let lnc = document.querySelector('#game-launch-id-'+i);
                     lnc.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    let gcl = document.querySelector('#game-create-lobby-'+i);
+                    gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     if(disabled == true){
                         shd.style.display='none';
+                        gcl.style.display = 'none';
                         lnc.style.display='block';
                     }
                     else{
                         lnc.style.display='none';
                         shd.style.display='block';
+                        gcl.style.display = 'block';
                     }
                     _gameClusterId = g.gameClusterId
                     document.querySelector('#game-cluster-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
@@ -372,11 +377,7 @@
             }        
         });
     }
-    function _tx_service_list(gameClusterId){
-        TARA_API.onGet('role/lobby','onGameServiceList',gameClusterId,(resp)=>{
-            console.log(resp);
-        });       
-    }
+
     function _tx_game(){
         _tx_lobby();
     }
@@ -393,7 +394,7 @@
     }
     
     function _tx_lobby(){   
-        //reset_live_game_service_bar();
+        
         let lgn = document.querySelector('#tx-live-game-next-list');
         let _pg = lgn.getAttribute('live-game-page')/1;
         TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onLobbyList',page:_pg},(resp)=>{
@@ -447,9 +448,7 @@
             lgn.setAttribute('live-game-page',(resp.index+1));
         });
     }
-    function reset_live_game_service_bar(){
-        document.querySelectorAll('.tx-game-service-bar').forEach((a)=>{a.style.display ='none';});
-    }
+   
     function reset_t_action_event(){
         document.querySelectorAll('.tx-action').forEach((a)=>{
             a.onclick=()=>{

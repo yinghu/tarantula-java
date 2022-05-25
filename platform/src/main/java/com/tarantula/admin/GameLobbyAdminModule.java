@@ -36,6 +36,9 @@ public class GameLobbyAdminModule implements Module {
             }
         }
         else if(session.action().equals("onGameDataList")){
+            session.write(JsonUtil.toSimpleResponse(false,"").getBytes());
+        }
+        else if(session.action().equals("__onGameDataList")){
             GameClusterDataStoreContext gsc = new GameClusterDataStoreContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
@@ -167,9 +170,11 @@ public class GameLobbyAdminModule implements Module {
         DescriptorSerializer descriptorSerializer = new DescriptorSerializer();
         //jsonObject.add("lobby",descriptorSerializer.serialize(lobby.descriptor(),Descriptor.class,null));
         JsonArray alist = new JsonArray();
-        lobby.entryList().forEach((a)->{
-            alist.add(descriptorSerializer.serialize(a,Descriptor.class,null));
-        });
+        if(lobby!=null){
+            lobby.entryList().forEach((a)->{
+                alist.add(descriptorSerializer.serialize(a,Descriptor.class,null));
+            });
+        }
         jsonObject.add("gameLobbyList",alist);
         return jsonObject;
     }

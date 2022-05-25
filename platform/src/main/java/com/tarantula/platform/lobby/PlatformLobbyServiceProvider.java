@@ -2,16 +2,12 @@ package com.tarantula.platform.lobby;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
-
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.util.SystemUtil;
 
 
 public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
@@ -31,8 +27,8 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         //this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         //this.presenceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
         //this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
-        this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
-        this.logger.warn("Presence service provider started on ->"+gameServiceName);
+        this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
+        this.logger.warn("Lobby service provider started on ->"+gameServiceName);
     }
     @Override
     public String name() {
@@ -50,6 +46,17 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     @Override
+    public <T extends Configurable> void register(T t) {
+        t.registered();
+        //distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+    }
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        //distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+    }
+
+    @Override
     public boolean onRegister(String category, String itemId) {
         return false;
     }
@@ -58,6 +65,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     public boolean onRelease(String category, String itemId) {
         return false;
     }
+
     public String registerConfigurableListener(Descriptor application, Configurable.Listener listener) {
         logger.warn("register lobby module->"+application.tag());
         return null;

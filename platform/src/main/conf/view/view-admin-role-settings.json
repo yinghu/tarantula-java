@@ -3,6 +3,7 @@
   "context": "admin",
   "viewList":[
     {"type":"create.game.cluster","moduleResourceFile":"admin/create.game.cluster.view.html"},
+    {"type":"create.game.lobby","moduleResourceFile":"admin/create.game.lobby.view.html"},
     {"type":"create.access.key","moduleResourceFile":"admin/create.access.key.view.html"},
     {"type":"game.asset.list","moduleResourceFile":"admin/game.asset.list.view.html"},
     {"type":"create.asset","moduleResourceFile":"admin/create.asset.view.html"},

@@ -74,6 +74,9 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         }
         return this.inventoryServiceProvider.redeem(systemId,shoppingItem);
     }
+    public void deposit(){
+
+    }
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();

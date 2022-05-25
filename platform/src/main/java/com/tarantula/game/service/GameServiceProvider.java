@@ -230,6 +230,7 @@ public class GameServiceProvider implements ServiceProvider{
         if(name.equals("store")) return storeServiceProvider;
         if(name.equals("achievement")) return achievementServiceProvider;
         if(name.equals("giveaway")) return presenceServiceProvider;
+        if(name.equals("lobby")) return lobbyServiceProvider;
         return null;
     }
 }

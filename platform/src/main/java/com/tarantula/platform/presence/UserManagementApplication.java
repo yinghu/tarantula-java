@@ -249,6 +249,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 }
             }
         }
+        else if(session.action().equals("onDeveloper")){
+            session.write(JsonUtil.toSimpleResponse(true,session.trackId()).getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }

@@ -8,9 +8,10 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class GameLobbyModule implements Module ,Configurable.Listener{
+public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>{
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
@@ -70,4 +71,11 @@ public class GameLobbyModule implements Module ,Configurable.Listener{
     private String toMessage(String msg, boolean successful){
         return JsonUtil.toSimpleResponse(successful,msg);
     }
+
+    @Override
+    public void onUpdated(LobbyItem lobbyItem){
+
+    }
+
+
 }

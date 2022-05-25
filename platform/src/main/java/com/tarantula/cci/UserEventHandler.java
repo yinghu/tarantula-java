@@ -24,6 +24,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
     private GsonBuilder builder;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private DeploymentServiceProvider deploymentServiceProvider;
+    private TokenValidatorProvider tokenValidatorProvider;
 
     private AtomicBoolean onIndex;
 
@@ -42,6 +43,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
         String tag = onExchange.header(Session.TARANTULA_TAG);
         String action = onExchange.header(Session.TARANTULA_ACTION);
         String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
+        String accessKey = onExchange.header(Session.TARANTULA_ACCESS_KEY);
         String  sid = onExchange.id();
         this._hex.put(sid,onExchange);
         if(path.equals("/user/action")){
@@ -177,7 +179,12 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                 this.eventService.publish(event);
             }
             else if(action.equals("onIndex")){
-                //event.trackId(typeId);
+                this.eventService.publish(event);
+            }
+            else if(action.equals("onDeveloper")){
+                String validTypeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+                if(validTypeId==null) throw new RuntimeException("Illegal access");
+                event.trackId(validTypeId);
                 this.eventService.publish(event);
             }
             else{
@@ -214,6 +221,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.deploymentServiceProvider.registerAccessIndexListener(this);
         this.accessIndexService = tcx.accessIndexService();
+        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.bucket = tcx.bucket();
     }
     public void onCheck(){
