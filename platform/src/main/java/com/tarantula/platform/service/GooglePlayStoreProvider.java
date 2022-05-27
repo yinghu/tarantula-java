@@ -24,6 +24,7 @@ public class GooglePlayStoreProvider extends AuthObject{
     public boolean validate(Map<String,Object> params){
         try{
             GoogleStorePurchaseValidator googleStorePurchaseValidator = googleStorePurchaseValidators.get(params.get("typeId"));
+            metricsListener.onUpdated(Metrics.GOOGLE_STORE_COUNT,1);
             return googleStorePurchaseValidator.validate(params);
         }catch (Exception ex){
             ex.printStackTrace();

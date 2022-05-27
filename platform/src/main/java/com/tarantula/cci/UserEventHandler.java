@@ -184,8 +184,34 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
             else if(action.equals("onDeveloper")){
                 String validTypeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
                 if(validTypeId==null) throw new RuntimeException("Illegal access");
-                event.trackId(validTypeId);
-                this.eventService.publish(event);
+                AccessIndex acc = accessIndexService.get(magicKey);
+                if(acc!=null){
+                    event.systemId(acc.distributionKey());
+                    RoutingKey _routingKey = eventService.routingKey(acc.distributionKey(),tag);
+                    event.trackId(accessKey);
+                    event.destination(_routingKey.route());
+                    event.routingNumber(_routingKey.routingNumber());
+                    this.eventService.publish(event);
+                }else if(onIndex.get()){//device login exchange first time
+                    AccessIndex _dindex = accessIndexService.set(magicKey,0);
+                    if(_dindex!=null){
+                        event.action("onDeveloperRegister");
+                        event.trackId(accessKey);
+                        event.systemId(_dindex.distributionKey());
+                        RoutingKey _routingKey = eventService.routingKey(_dindex.distributionKey(),tag);
+                        event.destination(_routingKey.route());
+                        event.routingNumber(_routingKey.routingNumber());
+                        this.eventService.publish(event);
+                    }
+                    else{
+                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeveloperRegister","["+magicKey+"] not available",false)).getBytes();
+                        _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                    }
+                }
+                else{
+                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    _hex.remove(sid).onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
+                }
             }
             else{
                 throw new RuntimeException("["+action+"] not supported");

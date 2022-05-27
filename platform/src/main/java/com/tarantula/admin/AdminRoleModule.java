@@ -65,21 +65,30 @@ public class AdminRoleModule implements Module{
 
         else if(session.action().equals("onCreateAccessKey")){
             //generate access key from game cluster id
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
+            String key = tokenValidatorProvider.createGameClusterAccessKey(session.name());
             session.write(new PermissionContext(key).toJson().toString().getBytes());
         }
         else if(session.action().equals("onTestAccessKey")){
             //test access key
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String key = tokenValidatorProvider.validateGameClusterAccessKey((String)onAccess.property(OnAccess.ACCESS_KEY));
+            String key = tokenValidatorProvider.validateGameClusterAccessKey(session.name());
             session.write(JsonUtil.toSimpleResponse(key!=null,key!=null?"key passed":"key failed").getBytes());
+        }
+        else if(session.action().equals("onRevokeAccessKey")){
+            //revoke access key
+            String[] query = session.name().split("#");
+            tokenValidatorProvider.revokeAccessKey(query[1]);
+            List<String> keys = tokenValidatorProvider.gameClusterAccessKeyList(query[0]);
+            session.write(new PermissionContext(keys).toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateDeveloperKey")){
             //generate access key from game cluster id
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String key = tokenValidatorProvider.gameClusterAccessKey((String)onAccess.property("gameClusterId"));
+            String key = tokenValidatorProvider.createGameClusterAccessKey(session.name());
             session.write(new PermissionContext(key).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onDeveloperKeyList")){
+            //list access key from game cluster id
+            List<String> keys = tokenValidatorProvider.gameClusterAccessKeyList(session.name());
+            session.write(new PermissionContext(keys).toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -92,8 +101,6 @@ public class AdminRoleModule implements Module{
                 Account acc = new UserAccount();
                 acc.distributionKey(ua.primary()?session.systemId():ua.owner());
                 if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
-                    //context.log("ICON->"+onAccess.property("gameIcon").toString(),OnLog.WARN);
-                    //context.log("ICON->"+onAccess.property("developerIcon").toString(),OnLog.WARN);
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
                     if(gc.successful()){
                         IndexSet idx = new IndexSet();

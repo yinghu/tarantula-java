@@ -81,12 +81,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         String[] sp = accessKey.split("-");
         AccessKey ck = new AccessKey();
         ck.distributionKey(sp[0]);
-        if(!deployDataStore.load(ck)) return null;
+        if(!deployDataStore.load(ck) || ck.disabled()) return null;
         long stmp = ck.timestamp();//((Number)ck.property(AccessKey.TIMESTAMP)).longValue();
         String label = ck.typeId();//(String)ck.property(AccessKey.KEY_LABEL);
         return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp)?label:null;
     }
-    public String accessKey(String label){
+    public String createAccessKey(String label){
         AccessKey ck = new AccessKey();
         long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         ck.timestamp(stmp);//property(AccessKey.TIMESTAMP,stmp);
@@ -95,6 +95,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp);
         }
         return null;
+    }
+    public void revokeAccessKey(String accessKey){
+        String[] sp = accessKey.split("-");
+        AccessKey ck = new AccessKey();
+        ck.distributionKey(sp[0]);
+        if(!deployDataStore.load(ck)) return;
+        ck.disabled(true);
+        deployDataStore.update(ck);
     }
     public String hashJoinTicket(String roomId,String systemId){
         return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId);
@@ -107,23 +115,32 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         String[] sp = accessKey.split("-");
         AccessKey akey = new AccessKey();
         akey.distributionKey(sp[0]);
-        if(!this.deployDataStore.load(akey)) return null;
+        if(!this.deployDataStore.load(akey)|| akey.disabled()) return null;
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
         if(gameCluster==null) return null;
         String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         return SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp())?validLobby:null;
     }
-    public String gameClusterAccessKey(String gameClusterId){
+    public String createGameClusterAccessKey(String gameClusterId){
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
         long stmp =TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId((String)gc.property(GameCluster.GAME_LOBBY));
         accessKey.timestamp(stmp);
-        accessKey.index(gameClusterId);
+        accessKey.owner(gameClusterId);
         if(!this.deployDataStore.create(accessKey)) return null;
         gc.property(GameCluster.TIMESTAMP,stmp);
         gc.update();
         return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),accessKey.distributionKey(),stmp);
+    }
+    public List<String> gameClusterAccessKeyList(String gameClusterId){
+        AccessKeyQuery query = new AccessKeyQuery(gameClusterId);
+        ArrayList<String> keys = new ArrayList<>();
+        deployDataStore.list(query,accessKey -> {
+            if(!accessKey.disabled()) keys.add(accessKey.distributionKey());
+            return true;
+        });
+        return keys;
     }
 
     public String ticket(String key,int stub,int duration){

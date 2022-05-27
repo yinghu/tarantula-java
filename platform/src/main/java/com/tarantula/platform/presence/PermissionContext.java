@@ -1,7 +1,10 @@
 package com.tarantula.platform.presence;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
+
+import java.util.List;
 
 public class PermissionContext extends ResponseHeader {
     public int maxGameClusterCount;
@@ -11,6 +14,8 @@ public class PermissionContext extends ResponseHeader {
     public String role;
     public String accessKey;
     public boolean subscriptionExpired;
+    public List<String> accessKeyList;
+
     public PermissionContext(int maxGameClusterCount,int currentCount,boolean subscriptionExpired){
         this.maxGameClusterCount = maxGameClusterCount;
         this.currentCount = currentCount;
@@ -28,6 +33,10 @@ public class PermissionContext extends ResponseHeader {
             message = "try again later";
         }
     }
+    public PermissionContext(List<String> accessKeyList){
+        this.accessKeyList = accessKeyList;
+        this.successful = true;
+    }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
@@ -44,6 +53,11 @@ public class PermissionContext extends ResponseHeader {
         }
         if(accessKey!=null){
             jo.addProperty("accessKey",accessKey);
+        }
+        if(accessKeyList!=null){
+            JsonArray klist = new JsonArray();
+            accessKeyList.forEach(k->klist.add(k));
+            jo.add("accessKeyList",klist);
         }
         return jo;
     }

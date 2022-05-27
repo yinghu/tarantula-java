@@ -23,6 +23,8 @@ public class Metrics extends OnApplicationHeader {
     public final static String APPLE_STORE_COUNT = "9";
     public final static String GAME_CENTER = "10";
     public final static String GOOGLE_STORE_COUNT = "11";
+    public final static String DEVELOPER_LOGIN_COUNT = "12";
+
 
     public static String toName(String k){
         int t = Integer.parseInt(k);
@@ -60,6 +62,9 @@ public class Metrics extends OnApplicationHeader {
                 break;
             case 11:
                 n = "GoogleStoreValidationCount";
+                break;
+            case 12:
+                n = "DeveloperValidationCount";
                 break;
         }
         return n;

@@ -19,14 +19,17 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     //labeled access key
     String validateAccessKey(String accessKey);
-    String accessKey(String label);
+    String createAccessKey(String label);
+    void revokeAccessKey(String accessKey);
 
     String ticket(String key,int stub,int duration);
     boolean validateTicket(String key,int stub,String ticket);
 
     //game server register key on game cluster lobby tyeId
     String validateGameClusterAccessKey(String gameClusterId);
-    String gameClusterAccessKey(String gameClusterId);
+    String createGameClusterAccessKey(String gameClusterId);
+    List<String> gameClusterAccessKeyList(String gameClusterId);
+
 
     void timeout(int minutes,int seconds);
 

@@ -33,6 +33,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
 
     private DataStore userDatastore;
     private DataStore thirdPartyLoginDatastore;
+    private DataStore developerLoginDatastore;
     private DataStore accountDatastore;
     private DataStore accountIndex;
 
@@ -60,7 +61,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         userDatastore = this.context.dataStore(Access.DataStore);
         thirdPartyLoginDatastore = this.context.dataStore(ThirdPartyLogin.DataStore);
         accountDatastore = this.context.dataStore(Account.DataStore);
-        //sDatastore = this.context.dataStore(OnSession.DataStore);
+        developerLoginDatastore = this.context.dataStore(DeveloperLogin.DataStore);
         accountIndex = this.context.dataStore(Account.IndexDataStore);
         DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
         accessIndexService.set("serverPush",0);
@@ -250,7 +251,35 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
         }
         else if(session.action().equals("onDeveloper")){
-            session.write(JsonUtil.toSimpleResponse(true,session.trackId()).getBytes());
+            String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
+            DeveloperLogin _ox = new DeveloperLogin();
+            _ox.distributionKey(session.systemId());
+            if(developerLoginDatastore.load(_ox)&&_ox.deviceId().equals(deviceId)){
+                OnSession access = this.login(session.systemId(),_ox.password(),session);
+                onSession(access,session);
+                this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"Developer not registered").getBytes());
+            }
+        }
+        else if(session.action().equals("onDeveloperRegister")){
+            String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
+            AccessIndex accessIndex = this.accessIndexService.get(deviceId);
+            if(accessIndex!=null){
+                DeveloperLogin thirdPartyLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
+                thirdPartyLogin.distributionKey(session.systemId());
+                developerLoginDatastore.createIfAbsent(thirdPartyLogin,false);
+                acc.property("login",deviceId);
+                acc.property("password",thirdPartyLogin.password());
+                this.createLogin(acc,session.systemId(),role,true,"key",true);
+                OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
+                onSession(access,session);
+            }
+            else{
+                session.write(this.builder.create().toJson(new ResponseHeader("onDeveloper","wrong device id", false)).getBytes());
+            }
+            this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
         }
         else{
             throw new UnsupportedOperationException(session.action());
