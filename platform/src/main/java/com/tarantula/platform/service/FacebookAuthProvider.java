@@ -35,9 +35,15 @@ public class FacebookAuthProvider extends AuthObject{
     @Override
     public boolean validate(Map<String,Object> params){
         try{
-            validateToken(params);
-            metricsListener.onUpdated(Metrics.FACEBOOK_COUNT,1);
-            return validateUser(params);
+            boolean validated;
+            if(validateToken(params)){
+                validated = validateUser(params);
+            }
+            else{
+                validated = validateMe(params);
+            }
+            if(validated) metricsListener.onUpdated(Metrics.FACEBOOK_COUNT,1);
+            return validated;
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
@@ -62,6 +68,24 @@ public class FacebookAuthProvider extends AuthObject{
         accessToken = acc.substring(ix+1);
         return true;
     }
+
+    private boolean validateMe(Map<String,Object> params) throws Exception{
+        String uid = params.get("login").toString().split("_")[1];
+        String token = params.get("token").toString();
+        String query = new StringBuffer("me").append("?access_token=").append(token).toString();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(authUri()+query))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if(response.statusCode()!=200) return false;
+        JsonParser p = new JsonParser();
+        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        return j.has("id") && j.get("id").getAsString().equals(uid);
+    }
+
     private boolean validateToken(Map<String,Object> params) throws Exception{
         String token = params.get("token").toString();
         String query = new StringBuffer("?input_token=").append(token).append("&access_token=")
@@ -73,6 +97,7 @@ public class FacebookAuthProvider extends AuthObject{
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if(response.statusCode()!= 200) return false;
         JsonParser p = new JsonParser();
         JsonObject j = p.parse(response.body()).getAsJsonObject();
         return !j.has("error");
@@ -88,6 +113,7 @@ public class FacebookAuthProvider extends AuthObject{
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if(response.statusCode()!=200) return false;
         JsonParser p = new JsonParser();
         JsonObject j = p.parse(response.body()).getAsJsonObject();
         return !j.has("error");

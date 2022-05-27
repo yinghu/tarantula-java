@@ -254,7 +254,23 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-action','onResetCode');
     aj.setRequestHeader('Tarantula-name',emailAddress);
     aj.send();               
-  }; 
+  };
+  let _developer = function(developerKey,callback){
+    let aj = new XMLHttpRequest();   
+    aj.responseType = 'text';
+    aj.onreadystatechange = function(){
+        if(aj.status === 200 && aj.readyState === 4){
+            let jsb = JSON.parse(aj.responseText);
+            callback(jsb);
+        }
+    };
+    aj.open("GET","/user/action",true);
+    aj.setRequestHeader('Accept','application/json');
+    aj.setRequestHeader('Tarantula-tag','index/user');
+    aj.setRequestHeader('Tarantula-action','onDeveloper');
+    aj.setRequestHeader('Tarantula-access-key',developerKey);
+    aj.send();               
+  };  
   let _resetPassword = function(payload,callback){
     let _ps = JSON.stringify(payload);
     let aj = new XMLHttpRequest();   
@@ -390,7 +406,8 @@ var TARA_API = (function(){
       connect : _connect,
       send : _send,
       disconnect : _disconnect,
-      onPlay : _play
+      onPlay : _play,
+      onDeveloper : _developer,
   };
     
 })();
