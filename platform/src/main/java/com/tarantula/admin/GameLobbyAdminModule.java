@@ -110,14 +110,16 @@ public class GameLobbyAdminModule implements Module {
             }
         }
         else if(session.action().equals("onDisableLobby")){
-            Map<String,Object> cmd = JsonUtil.toMap(payload);
-            this.deploymentServiceProvider.disableApplication((String)cmd.get("lobbyId"));
-            session.write(payload);
+            //Map<String,Object> cmd = JsonUtil.toMap(payload);
+            String[] query = session.name().split("#");
+            this.deploymentServiceProvider.disableApplication(query[1]);
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
         }
         else if(session.action().equals("onEnableLobby")){
-            Map<String,Object> cmd = JsonUtil.toMap(payload);
-            this.deploymentServiceProvider.enableApplication((String)cmd.get("lobbyId"));
-            session.write(payload);
+            //Map<String,Object> cmd = JsonUtil.toMap(payload);
+            String[] query = session.name().split("#");
+            this.deploymentServiceProvider.enableApplication(query[1]);
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
         }
         else if(session.action().equals("onReloadLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);

@@ -67,7 +67,7 @@
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
-                    <span id='game-create-lobby-0' tx-game-cluster-id='' view-id='game.lobby.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
@@ -88,8 +88,7 @@
                         <span id='game-asset-id-0' tx-game-category='asset' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Asset</span>   
                         <span id='game-component-id-0' tx-game-category='component' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Component</span>   
                         <span id='game-commodity-id-0' tx-game-category='commodity' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Commodity</span>   
-                        <span id='game-configuration-id-0' tx-game-category='item' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Item</span>   
-                        <!--<span id='game-application-id-0' tx-game-category='application' tx-game-cluster-id='' view-id='game.asset.list' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Application</span>-->   
+                        <span id='game-configuration-id-0' tx-game-category='item' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Item</span>      
                     </div>  
                     <!-- Game Server bar-->    
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Game Access Management</span></div>
@@ -289,7 +288,7 @@
                     shd.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let lnc = document.querySelector('#game-launch-id-'+i);
                     lnc.setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    let gcl = document.querySelector('#game-create-lobby-'+i);
+                    let gcl = document.querySelector('#game-edit-lobby-'+i);
                     gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     if(disabled == true){
                         shd.style.display='none';
@@ -361,15 +360,17 @@
                     if(resp3.successful){
                         resp3.gameLobbyList.forEach(a=>{
                             console.log(a)
-                            let tem = [];
-                            tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                            tem.push('api.game.lobby\' tx-game-lobby-id=\'');
-                            tem.push(a.applicationId+'\' tx-game-cluster-id=\'');
-                            tem.push(_gameClusterId);
-                            tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
-                            tem.push(a.name);
-                            tem.push('</span>');  
-                            lbar.innerHTML += tem.join('');   
+                            if(!a.disabled){
+                                let tem = [];
+                                tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
+                                tem.push('api.game.lobby\' tx-game-lobby-id=\'');
+                                tem.push(a.applicationId+'\' tx-game-cluster-id=\'');
+                                tem.push(_gameClusterId);
+                                tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
+                                tem.push(a.name);
+                                tem.push('</span>');  
+                                lbar.innerHTML += tem.join('');
+                            }   
                         });
                         reset_t_action_event();
                     }

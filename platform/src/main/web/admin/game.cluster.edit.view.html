@@ -1,0 +1,68 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-edit-game-cluster-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-key" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Update Lobby</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class='w3-panel' id="tx-game-lobby-list">
+    </div>     
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
+    let keyBar = document.querySelector('#tx-game-lobby-list');
+    TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
+        console.log(resp);
+        if(resp.successful){
+            tx_access_key_bar_reset(resp);
+        }      
+    });
+    document.querySelector('#tx-edit-game-cluster-close').onclick=()=>{
+        let m3 = document.querySelector('#tx-popup');
+        m3.innerHTML="";
+        m3.style.display = 'none';       
+    };
+    function tx_access_key_bar_reset(resp){
+        keyBar.innerHTML ='';
+        resp.gameLobbyList.forEach((gi)=>{
+            let tem = [];
+            tem.push('<div class=\'w3-container\'>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+            tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+            tem.push(gi.name);
+            tem.push('</span><span tx-application-id=\''+gi.applicationId+'\'');
+            tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-lobby-close-action\'>');
+            tem.push(gi.disabled?'Open':'Close');
+            tem.push('</span></div>'); 
+            keyBar.innerHTML += tem.join('');  
+        });
+        document.querySelectorAll('.tx-game-lobby-close-action').forEach(a=>{
+            a.onclick=()=>{
+                let applicationId = a.getAttribute('tx-application-id');
+                console.log(applicationId);
+                let cmd = a.innerHTML == 'Open'?'onEnableLobby':'onDisableLobby';
+                console.log(cmd);
+                TARA_API.onGet('role/lobby',cmd,TARA_API.query().gameClusterId+'#'+applicationId,(resp)=>{
+                    console.log(resp);
+                    TARA_API.query().callback(); 
+                    if(resp.successful){
+                        //tx_access_key_bar_reset(resp);
+                    }        
+                });
+            };
+        });
+    }
+</script>
