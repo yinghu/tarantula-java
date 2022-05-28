@@ -130,8 +130,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
-            onSession(access,session);
-            this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
+            if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
         }
         else if(session.action().equals("onToken")){//exchange token
             boolean suc = this.context.validator().validateToken(acc.toMap());
@@ -187,8 +186,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 Access access = this.createLogin(acc,session.systemId(),role,false,"password",true);
                 session.systemId(access.distributionKey());
                 OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
-                this.onSession(_onSession,session);
-                this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
+                if(this.onSession(_onSession,session)) this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
             }
         }
         else if(session.action().equals("onDevice")){
@@ -197,8 +195,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             _ox.distributionKey(session.systemId());
             if(thirdPartyLoginDatastore.load(_ox)&&_ox.deviceId().equals(deviceId)){
                 OnSession access = this.login(session.systemId(),_ox.password(),session);
-                onSession(access,session);
-                this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
+                if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"Device not registered").getBytes());
@@ -215,12 +212,11 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.property("password",thirdPartyLogin.password());
                 this.createLogin(acc,session.systemId(),role,true,"device",true);
                 OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
-                onSession(access,session);
+                if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes());
             }
-            this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
         }
         else if(session.action().equals("onResetCode")){
             String code = this.deploymentServiceProvider.resetCode(session.trackId());
@@ -256,8 +252,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             _ox.distributionKey(session.systemId());
             if(developerLoginDatastore.load(_ox)&&_ox.deviceId().equals(deviceId)){
                 OnSession access = this.login(session.systemId(),_ox.password(),session);
-                onSession(access,session);
-                this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
+                if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"Developer not registered").getBytes());
@@ -267,25 +262,24 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
-                DeveloperLogin thirdPartyLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
-                thirdPartyLogin.distributionKey(session.systemId());
-                developerLoginDatastore.createIfAbsent(thirdPartyLogin,false);
+                DeveloperLogin developerLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
+                developerLogin.distributionKey(session.systemId());
+                developerLoginDatastore.createIfAbsent(developerLogin,false);
                 acc.property("login",deviceId);
-                acc.property("password",thirdPartyLogin.password());
-                this.createLogin(acc,session.systemId(),role,true,"key",true);
-                OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
-                onSession(access,session);
+                acc.property("password",developerLogin.password());
+                this.createLogin(acc,session.systemId(),AccessControl.admin.name(),true,"key",true);
+                OnSession access = this.login(session.systemId(),developerLogin.password(),session);
+                if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
             }
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onDeveloper","wrong device id", false)).getBytes());
             }
-            this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
         }
         else{
             throw new UnsupportedOperationException(session.action());
         }
     }
-    private void onSession(OnSession access, Session session){
+    private boolean onSession(OnSession access, Session session){
         if(access.successful()){
             PresenceContext ptx = new PresenceContext("onLogin");
             ptx.presence= access;
@@ -300,6 +294,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong user/password", false)).getBytes());
         }
+        return access.successful();
     }
     private OnSession login(String systemId, String password, Session session){
         Access access = new User();

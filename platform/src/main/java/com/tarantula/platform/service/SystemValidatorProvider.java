@@ -129,9 +129,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         accessKey.timestamp(stmp);
         accessKey.owner(gameClusterId);
         if(!this.deployDataStore.create(accessKey)) return null;
-        gc.property(GameCluster.TIMESTAMP,stmp);
-        gc.update();
-        return SystemUtil.accessKey(messageDigest(),(String)gc.property(GameCluster.GAME_LOBBY),accessKey.distributionKey(),stmp);
+        //gc.property(GameCluster.TIMESTAMP,stmp);
+        //gc.update();
+        return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp);
     }
     public List<String> gameClusterAccessKeyList(String gameClusterId){
         AccessKeyQuery query = new AccessKeyQuery(gameClusterId);
