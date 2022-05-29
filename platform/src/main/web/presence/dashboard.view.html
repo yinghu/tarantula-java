@@ -416,16 +416,18 @@
                     a.applications.forEach((b)=>{
                         lobbyIndex++;
                         let tem =[];
-                        //lp.setAttribute('tournament-enabled',b.tournamentEnabled);
-                        tem.push('<div class=\'w3-container w3-border-bottom w3-border-red w3-padding\'>');
-                        tem.push('<span class=\'w3-left tx-text-14\'>');
-                        tem.push(lobbyIndex);    
-                        tem.push('</span>');
-                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-left-8\'>');
-                        tem.push(b.tag);
-                        tem.push('</span>'); 
-                        tem.push('<span class=\'w3-right tx-text-14 w3-text-green\'><i class=\'fa fa-check\' style=\'font-size:18px\'></i></span></div>');
-                        liveGameLobbyBar.innerHTML += tem.join('');    
+                        if(!b.disabled){
+                            //lp.setAttribute('tournament-enabled',b.tournamentEnabled);
+                            tem.push('<div class=\'w3-container w3-border-bottom w3-border-red w3-padding\'>');
+                            tem.push('<span class=\'w3-left tx-text-14\'>');
+                            tem.push(lobbyIndex);    
+                            tem.push('</span>');
+                            tem.push('<span class=\'w3-left tx-text-14 tx-margin-left-8\'>');
+                            tem.push(b.tag);
+                            tem.push('</span>'); 
+                            tem.push('<span class=\'w3-right tx-text-14 w3-text-green\'><i class=\'fa fa-check\' style=\'font-size:18px\'></i></span></div>');
+                            liveGameLobbyBar.innerHTML += tem.join('');
+                        }    
                     });
                 }
                 else if(a.descriptor.typeId == resp.name+'-service'){

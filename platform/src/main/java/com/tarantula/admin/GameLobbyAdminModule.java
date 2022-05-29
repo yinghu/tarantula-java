@@ -13,6 +13,7 @@ import com.tarantula.platform.util.DescriptorSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameLobbyAdminModule implements Module {
@@ -23,7 +24,8 @@ public class GameLobbyAdminModule implements Module {
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            session.write(toJson(gameCluster.gameLobby).toString().getBytes());
+            Lobby lobby = this.deploymentServiceProvider.lobby((String) gameCluster.property(GameCluster.GAME_LOBBY));
+            session.write(toJson(lobby).toString().getBytes());
         }
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
@@ -79,9 +81,10 @@ public class GameLobbyAdminModule implements Module {
             session.write(toJson(app,lobby).toString().getBytes());
         }
         else if (session.action().equals("onAddLobby")){
-            Map<String,Object> cmd = JsonUtil.toMap(payload);
-            String gameClusterId = (String) cmd.get("gameClusterId");
-            int lobbyIndex = ((Number) cmd.get("lobbyIndex")).intValue();
+            //Map<String,Object> cmd = JsonUtil.toMap(payload);
+            String[] query = session.name().split("#");
+            String gameClusterId = query[0];//(String) cmd.get("gameClusterId");
+            int lobbyIndex = Integer.parseInt(query[1]);//(Number) cmd.get("lobbyIndex")).intValue();
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Lobby lobby = gameCluster.gameLobby;
             if(lobby.entryList().size()<maxGameLobbyCount&&lobbyIndex<=maxGameLobbyCount){
@@ -112,14 +115,14 @@ public class GameLobbyAdminModule implements Module {
         else if(session.action().equals("onDisableLobby")){
             //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
-            this.deploymentServiceProvider.disableApplication(query[1]);
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            boolean suc = this.deploymentServiceProvider.disableApplication(query[1]);
+            session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else if(session.action().equals("onEnableLobby")){
             //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
-            this.deploymentServiceProvider.enableApplication(query[1]);
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            boolean suc = this.deploymentServiceProvider.enableApplication(query[1]);
+            session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else if(session.action().equals("onReloadLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);

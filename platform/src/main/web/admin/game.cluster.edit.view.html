@@ -10,6 +10,14 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-container w3-center w3-text-red tx-text-12">
+        <p id="tx-game-lobby-edit-message">To add new lobby, click new lobby</p>
+    </div> 
+    <div class="w3-container w3-padding">
+        <div class='w3-bar w3-white'>
+            <span id='tx-add-game-lobby' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4'>New Lobby</span>   
+        </div>
+    </div>  
     <div class='w3-panel' id="tx-game-lobby-list">
     </div>     
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -24,20 +32,38 @@
 <script>
     //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
     let keyBar = document.querySelector('#tx-game-lobby-list');
-    TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
-        console.log(resp);
-        if(resp.successful){
-            tx_access_key_bar_reset(resp);
-        }      
-    });
+    let gameEditMessage = document.querySelector('#tx-game-lobby-edit-message');
+    let lobbyIndex = 0;
     document.querySelector('#tx-edit-game-cluster-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    document.querySelector('#tx-add-game-lobby').onclick=()=>{
+        TARA_API.onGet('role/lobby','onAddLobby',TARA_API.query().gameClusterId+'#'+(lobbyIndex+1),(resp)=>{
+            console.log(resp);
+            gameEditMessage.innerHTML = resp.message;
+            if(resp.successful){
+                tx_list_game_lobby_update();
+                TARA_API.query().callback(); 
+            }      
+        });       
+    };
+    tx_list_game_lobby_update();
+    function tx_list_game_lobby_update(){
+        TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
+            console.log(resp);
+            if(resp.successful){
+                tx_access_key_bar_reset(resp);
+            }      
+        });    
+    }
     function tx_access_key_bar_reset(resp){
         keyBar.innerHTML ='';
         resp.gameLobbyList.forEach((gi)=>{
+            if(gi.accessRank>lobbyIndex){
+                lobbyIndex = gi.accessRank;
+            }
             let tem = [];
             tem.push('<div class=\'w3-container\'>');
             tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
@@ -54,12 +80,12 @@
                 let applicationId = a.getAttribute('tx-application-id');
                 console.log(applicationId);
                 let cmd = a.innerHTML == 'Open'?'onEnableLobby':'onDisableLobby';
-                console.log(cmd);
                 TARA_API.onGet('role/lobby',cmd,TARA_API.query().gameClusterId+'#'+applicationId,(resp)=>{
                     console.log(resp);
+                    gameEditMessage.innerHTML = resp.message;
                     TARA_API.query().callback(); 
                     if(resp.successful){
-                        //tx_access_key_bar_reset(resp);
+                        tx_list_game_lobby_update();
                     }        
                 });
             };

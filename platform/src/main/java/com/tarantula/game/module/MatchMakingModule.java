@@ -3,6 +3,7 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
@@ -29,9 +30,13 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             Rating rating = this.gameServiceProvider.rating(session.systemId());
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
-            //this.context.log("ACCESS MODE->"+session,OnLog.WARN);
-            Response response = context.presence(session.systemId()).onPlay(session,lobby);
-            if(response!=null) session.write(this.builder.create().toJson(response).getBytes());
+            if(lobby!=null) {
+                Response response = context.presence(session.systemId()).onPlay(session, lobby);
+                if (response != null) session.write(this.builder.create().toJson(response).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -75,11 +80,14 @@ public class MatchMakingModule implements Module, Lobby.Listener {
             }
             start++;
         }
-        if(start<maxRank){
+        if(start>1&&start<maxRank){
             Descriptor lastZone = mLobby.get(start-1);
             for(int i = start;i<=maxRank;i++){
                 mLobby.put(i,lastZone);
             }
+        }
+        else{
+            this.context.log("No lobby Entries for Game->"+context.descriptor().typeId(),OnLog.WARN);
         }
         //mLobby.forEach((k,v)->{
             //context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
