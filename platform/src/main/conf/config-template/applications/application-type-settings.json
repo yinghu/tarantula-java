@@ -7,6 +7,7 @@
   [
     {"type": "category","name": "Shop"},
     {"type": "category","name": "Achievement"},
-    {"type": "category","name": "DailyGiveaway"}
+    {"type": "category","name": "DailyGiveaway"},
+    {"type": "category","name": "Map"}
   ]
 }

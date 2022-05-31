@@ -125,7 +125,7 @@
     {
       "header": {
         "scope": "application.lobby",
-        "type": "Lobby",
+        "type": "Map",
         "description": "lobby category",
         "version": "1.0",
         "rechargeable": false
@@ -140,9 +140,9 @@
             "downloadable": false
           },
           {
-            "name": "LobbyItemSet",
+            "name": "ZoneSet",
             "type": "set",
-            "reference": "category:LobbyItem",
+            "reference": "category:Zone",
             "nullable": false,
             "downloadable": false
           }

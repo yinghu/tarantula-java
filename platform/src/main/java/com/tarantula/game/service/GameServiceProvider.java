@@ -223,6 +223,9 @@ public class GameServiceProvider implements ServiceProvider{
         if(serviceName.equals(tournamentServiceProvider.name())){
             return tournamentServiceProvider;
         }
+        if(serviceName.equals(lobbyServiceProvider.name())){
+            return lobbyServiceProvider;
+        }
         return null;
     }
 

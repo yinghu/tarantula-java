@@ -145,7 +145,7 @@
     {
       "header": {
         "scope": "item",
-        "type": "LobbyItem",
+        "type": "Zone",
         "description": "item category",
         "version": "1.0",
         "rechargeable": false
