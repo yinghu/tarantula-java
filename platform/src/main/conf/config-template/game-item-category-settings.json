@@ -131,20 +131,6 @@
     {
       "header": {
         "scope": "item",
-        "type": "Arena",
-        "description": "item category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
         "type": "Zone",
         "description": "item category",
         "version": "1.0",

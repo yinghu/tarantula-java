@@ -59,6 +59,20 @@
           }
         ]
       }
+    },
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "Arena",
+        "description": "lobby category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+
+        ]
+      }
     }
   ]
 }

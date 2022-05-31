@@ -74,7 +74,7 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
 
     @Override
     public void onUpdated(LobbyItem lobbyItem){
-
+        this.context.log("lobby item->"+lobbyItem.distributionKey(),OnLog.WARN);
     }
 
 

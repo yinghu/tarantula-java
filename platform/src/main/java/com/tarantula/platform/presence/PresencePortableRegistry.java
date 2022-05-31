@@ -8,6 +8,7 @@ import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.inventory.PendingReward;
+import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.presence.saves.DeviceIndex;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
@@ -44,6 +45,8 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int PLAYER_SAVE_INDEX_CID = 13;
 
     public static final int DEVELOPER_LOGIN_CID = 14;
+
+    public static final int LOBBY_ITEM_CID = 15;
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -91,6 +94,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case DEVELOPER_LOGIN_CID:
                 pt = new DeveloperLogin();
+                break;
+            case LOBBY_ITEM_CID:
+                pt = new LobbyItem();
                 break;
             default:
         }

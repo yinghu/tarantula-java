@@ -10,7 +10,6 @@
     {"type": "category","name": "AchievementAwardItem"},
     {"type": "category","name": "ItemPack"},
     {"type": "category","name": "Sku"},
-    {"type": "category","name": "Arena"},
     {"type": "category","name": "Zone"}
   ]
 }

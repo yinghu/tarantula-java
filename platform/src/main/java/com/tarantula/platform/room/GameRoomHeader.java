@@ -18,6 +18,7 @@ import java.util.Map;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
+    protected String playMode;
     protected int channelId;
     protected int sessionId;
     protected int timeout;
@@ -32,6 +33,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected HashMap<String,GameEntry> joinIndex;
     protected GameEntry[] entries;
 
+    public String playMode(){
+        return this.playMode;
+    }
     public int channelId(){
         return channelId;
     }
@@ -121,6 +125,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("capacity",capacity);
         jsonObject.addProperty("duration",duration);
         jsonObject.addProperty("round",round);
+        jsonObject.addProperty("playMode",playMode);
         if(connection!=null){
             jsonObject.addProperty("channelId",channelId);
             jsonObject.addProperty("sessionId",sessionId);

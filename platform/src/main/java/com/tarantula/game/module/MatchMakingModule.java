@@ -8,6 +8,7 @@ import com.tarantula.game.MatchMakingComparator;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchMakingModule implements Module, Lobby.Listener {
+public class MatchMakingModule implements Module, Lobby.Listener,Configurable.Listener<LobbyItem> {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
@@ -54,6 +55,7 @@ public class MatchMakingModule implements Module, Lobby.Listener {
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.maxRank = ((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();
         listLobby().addListener(this);
+        this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 

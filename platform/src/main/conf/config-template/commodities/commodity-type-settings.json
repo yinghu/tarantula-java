@@ -6,6 +6,7 @@
   "itemList":
   [
     {"type": "category","name": "GameCurrency"},
-    {"type": "category","name": "GameAward"}
+    {"type": "category","name": "GameAward"},
+    {"type": "category","name": "Arena"}
   ]
 }

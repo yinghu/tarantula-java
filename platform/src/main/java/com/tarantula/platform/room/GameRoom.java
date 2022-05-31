@@ -7,6 +7,7 @@ import com.tarantula.game.Arena;
 
 public interface GameRoom extends Configurable {
 
+    String playMode();
     int channelId();
     int sessionId();
     int timeout();
