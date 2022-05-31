@@ -121,6 +121,33 @@
           }
         ]
       }
+    },
+    {
+      "header": {
+        "scope": "application.lobby",
+        "type": "Lobby",
+        "description": "lobby category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "LobbyItemSet",
+            "type": "set",
+            "reference": "category:LobbyItem",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
     }
   ]
 }

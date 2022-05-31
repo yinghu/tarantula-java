@@ -127,6 +127,40 @@
 
         ]
       }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Arena",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "LobbyItem",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "ArenaSet",
+            "type": "set",
+            "reference": "category:Arena",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
     }
   ]
 }
