@@ -363,9 +363,9 @@
                             if(!a.disabled){
                                 let tem = [];
                                 tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                                tem.push('api.game.lobby\' tx-game-lobby-id=\'');
-                                tem.push(a.applicationId+'\' tx-game-cluster-id=\'');
-                                tem.push(_gameClusterId);
+                                tem.push('game.asset.list\' tx-game-lobby-id=\'');
+                                tem.push(a.applicationId+'\' tx-game-category=\'application\' tx-service-category=\'');
+                                tem.push(a.category);
                                 tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
                                 tem.push(a.name);
                                 tem.push('</span>');  
@@ -481,6 +481,8 @@
                 TARA_API.query().popup='#tx-popup';
                 TARA_API.query().gameClusterId = a.getAttribute('tx-game-cluster-id');
                 TARA_API.query().applicationId = a.getAttribute('tx-game-lobby-id');
+                TARA_API.query().category = a.getAttribute('tx-game-category');
+                TARA_API.query().serviceCategory = a.getAttribute('tx-service-category');
                 TARA_API.query().gameLobbyName = a.innerHTML;
                 let vid = a.getAttribute('view-id');
                 tx_view({viewId:vid,containerId:'#tx-popup'});    
