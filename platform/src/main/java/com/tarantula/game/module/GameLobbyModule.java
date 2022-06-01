@@ -72,10 +72,19 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
         return JsonUtil.toSimpleResponse(successful,msg);
     }
 
+
+    @Override
+    public void onLoaded(LobbyItem lobbyItem){
+        this.context.log("lobby item loaded->"+lobbyItem.configurationName(),OnLog.WARN);
+    }
     @Override
     public void onUpdated(LobbyItem lobbyItem){
-        this.context.log("lobby item->"+lobbyItem.distributionKey(),OnLog.WARN);
+        this.context.log("lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
     }
 
+    @Override
+    public void onRemoved(LobbyItem lobbyItem){
+        this.context.log("lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
+    }
 
 }

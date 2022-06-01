@@ -25,7 +25,7 @@ public class PVERoomProxy extends RoomProxyHeader {
             gameLobby.timeout(s);
         });
         stub.roomId = stub.room.roomId();
-        stub.zone = gameZone;
+        //stub.zone = gameZone;
         stub.joined = true;
         stub.offline = true;
         stub.tag = application.tag();

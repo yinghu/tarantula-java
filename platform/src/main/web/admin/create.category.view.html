@@ -159,7 +159,9 @@
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
     if(TARA_API.query().operation=='Update'){
         let cat = TARA_API.query().itemList[TARA_API.query().itemIndex];
-        document.querySelector('#tx-category-scope-'+cat.header.scope).checked = true;
+        let ix = cat.header.scope.indexOf('.');
+        let _scope = ix>0?cat.header.scope.substring(0,ix):cat.header.scope;
+        document.querySelector('#tx-category-scope-'+_scope).checked = true;
         document.querySelector('#tx-create-category-type').value = cat.header.type;
         document.querySelector('#tx-create-category-name').value = cat.header.description;
         document.querySelector('#tx-create-category-version').value = cat.header.version;

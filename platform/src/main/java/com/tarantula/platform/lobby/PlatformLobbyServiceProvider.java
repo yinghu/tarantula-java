@@ -23,21 +23,25 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     private TarantulaLogger logger;
     private GameCluster gameCluster;
     private String gameServiceName;
+    private String gameName;
     private ApplicationPreSetup applicationPreSetup;
     private DistributionItemService distributionItemService;
     private ConcurrentHashMap<String,Configurable.Listener<LobbyItem>> lobbyListeners;
+    private ConcurrentHashMap<String,LobbyItem> lobbyItems;
     public PlatformLobbyServiceProvider(GameCluster gameCluster){
         this.gameCluster = gameCluster;
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameName = ((String)gameCluster.property(GameCluster.NAME)).toLowerCase();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
         this.lobbyListeners = new ConcurrentHashMap<>();
+        this.lobbyItems = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
-        this.logger.warn("Lobby service provider started on ->"+gameServiceName);
+        this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameName);
     }
     @Override
     public String name() {
@@ -62,41 +66,45 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
     }
 
     public boolean onRegister(String category,String itemId){
-        LobbyItem configurableObject = new LobbyItem();
-        configurableObject.distributionKey(itemId);
+        LobbyItem lobbyItem = new LobbyItem();
+        lobbyItem.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
+        if(!applicationPreSetup.load(serviceContext,app,lobbyItem)){
             return false;
         }
-        configurableObject.setup();
-        //achievements.put(configurableObject.name(),configurableObject);
-        lobbyListeners.forEach((k,v)->v.onUpdated(configurableObject));
+        lobbyItem.setup();
+        String lobbyTag = gameName+"/"+lobbyItem.name();
+        lobbyItems.put(lobbyTag,lobbyItem);
+        Configurable.Listener lobbyListener = lobbyListeners.get(lobbyTag);
+        if(lobbyListener!=null) lobbyListener.onUpdated(lobbyItem);
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        String[] released = {null};
-        //achievements.forEach((k,v)->{
-            //if(v.distributionKey().equals(itemId)) released[0] = k;
-        //});
-        //if(released[0]!=null) achievements.remove(released[0]);
+        String lobbyTag = gameName+"/"+itemId;
+        LobbyItem removed = lobbyItems.remove(lobbyTag);
+        if(removed!=null){
+            Configurable.Listener listener = lobbyListeners.get(lobbyTag);
+            if(listener!=null) listener.onRemoved(removed);
+        }
         return true;
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),listener);
-        logger.warn("register lobby module->"+descriptor.tag()+">>"+descriptor.category());
         List<LobbyItem> items = applicationPreSetup.list(serviceContext,descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
-            logger.warn("Lobby->"+a.configurationName());
-            lobbyListeners.forEach((k,v)->v.onUpdated(a));
-            //if (!a.disabled()) {
-                //registerShop(a);
-            //}
+            if(!a.disabled()){
+                lobbyItems.put(gameName+"/"+a.name(),a);
+            }
+        });
+        lobbyItems.forEach((k,v)->{
+            Configurable.Listener lobbyListener = lobbyListeners.get(k);
+            if(lobbyListener!=null) lobbyListener.onLoaded(v);
         });
         return null;
     }

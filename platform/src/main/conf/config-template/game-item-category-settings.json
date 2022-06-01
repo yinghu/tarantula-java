@@ -139,6 +139,27 @@
       "application": {
         "properties": [
           {
+            "name": "PlayMode",
+            "type": "enum",
+            "reference": "PlayMode",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Capacity",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "ArenaSet",
             "type": "set",
             "reference": "category:Arena",

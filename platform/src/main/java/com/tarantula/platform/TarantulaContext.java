@@ -220,6 +220,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
+            if(c.disabled()) {
+                log.warn("Application is disabled->"+c.tag);
+                continue;
+            }
             this.setApplicationManager(c, lb);
         }
         if(lb.descriptor().accessMode()==Access.PUBLIC_ACCESS_MODE){
