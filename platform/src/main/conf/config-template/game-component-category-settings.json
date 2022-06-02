@@ -9,6 +9,47 @@
     {
       "header": {
         "scope": "component",
+        "type": "Room",
+        "description": "room category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Capacity",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Duration",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Overtime",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "JoinsOnStart",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "component",
         "type": "GameStatistics",
         "description": "general component",
         "version": "1.0",

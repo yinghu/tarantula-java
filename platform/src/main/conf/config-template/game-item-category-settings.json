@@ -153,9 +153,9 @@
             "downloadable": false
           },
           {
-            "name": "Capacity",
-            "type": "number",
-            "reference": "Integer",
+            "name": "Room",
+            "type": "category",
+            "reference": "category:Room",
             "nullable": false,
             "downloadable": false
           },
