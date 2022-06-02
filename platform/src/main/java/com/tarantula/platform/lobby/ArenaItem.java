@@ -1,9 +1,9 @@
 package com.tarantula.platform.lobby;
 
-import com.tarantula.platform.item.Item;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class ArenaItem extends Item {
+public class ArenaItem extends Commodity {
 
     public ArenaItem(){
 

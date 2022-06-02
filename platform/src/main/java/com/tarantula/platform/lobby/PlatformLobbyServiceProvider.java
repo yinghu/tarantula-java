@@ -78,7 +78,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
             return false;
         }
         lobbyItem.setup();
-        String lobbyTag = gameName+"/"+lobbyItem.name();
+        String lobbyTag = gameName+"/"+lobbyItem.configurationName();
         lobbyItems.put(lobbyTag,lobbyItem);
         Configurable.Listener lobbyListener = lobbyListeners.get(lobbyTag);
         if(lobbyListener!=null) lobbyListener.onUpdated(lobbyItem);
@@ -99,7 +99,12 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         List<LobbyItem> items = applicationPreSetup.list(serviceContext,descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if(!a.disabled()){
-                lobbyItems.put(gameName+"/"+a.name(),a);
+                a.setup();
+                this.logger.warn(a.name());
+                a.zoneList().forEach((z)->{
+                    this.logger.warn(z.name()+">>"+z.playMode()+">>"+z.room().capacity()+">>>"+z.arenaList().size());
+                });
+                lobbyItems.put(gameName+"/"+a.configurationName(),a);
             }
         });
         lobbyItems.forEach((k,v)->{

@@ -3,13 +3,13 @@ package com.tarantula.platform.lobby;
 import com.google.gson.JsonElement;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyItem extends Application {
+
 
     public LobbyItem(){}
 
@@ -23,11 +23,14 @@ public class LobbyItem extends Application {
 
 
     public String name(){
-        return this.configurationName();
+        return this.header.get("Name").getAsString();
     }
 
     public List<ZoneItem> zoneList(){
         ArrayList<ZoneItem> zlist = new ArrayList<>();
+        _reference.forEach(ref->{
+            zlist.add((ZoneItem)ref);
+        });
         return zlist;
     }
 
@@ -35,7 +38,7 @@ public class LobbyItem extends Application {
     public  <T extends Configurable> T setup(){
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
-            ConfigurableObject cob = new ConfigurableObject();
+            ZoneItem cob = new ZoneItem();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob) && !cob.configurationType().equals(Configurable.APPLICATION_CONFIG_TYPE)){
