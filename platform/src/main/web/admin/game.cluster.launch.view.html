@@ -25,11 +25,14 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-game-cluster-launch-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelector("#tx-game-cluster-launch-message").innerHTML = "You are launching the game cluster!";
     document.querySelector('#tx-game-cluster-launch').onclick=()=>{
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onLaunchGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
             document.querySelector('#tx-game-cluster-launch-message').innerHTML=resp.message;  
             TARA_API.query().callback();   
+            let m3 = document.querySelector('#tx-popup');
+            m3.innerHTML="";
+            m3.style.display = 'none';    
         });
     };
     document.querySelector('#tx-game-cluster-launch-cancel').onclick=()=>{

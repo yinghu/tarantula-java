@@ -88,7 +88,7 @@
         <type-id>game-data</type-id>
         <type>lobby</type>
         <category>service</category>
-        <name>DataStore</name>
+        <name>DataService</name>
         <access-mode>12</access-mode>
         <deploy-code>4</deploy-code>
         <deploy-priority>20</deploy-priority>

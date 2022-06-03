@@ -26,11 +26,14 @@
     </div>
 </div>
 <script>
-    document.querySelector("#tx-game-cluster-shutdown-message").innerHTML = TARA_API.query().gameClusterId;
+    document.querySelector("#tx-game-cluster-shutdown-message").innerHTML = "Are you sure to shut down the game cluster?";
     document.querySelector("#tx-game-cluster-shutdown").onclick=()=>{
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onShutdownGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
             document.querySelector('#tx-game-cluster-shutdown-message').innerHTML=resp.message; 
             TARA_API.query().callback();      
+            let m3 = document.querySelector('#tx-popup');
+            m3.innerHTML="";
+            m3.style.display = 'none';
         });
     };
     document.querySelector('#tx-game-cluster-shutdown-cancel').onclick=()=>{

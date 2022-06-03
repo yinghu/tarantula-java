@@ -58,23 +58,16 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
         lobbyId = this.context.descriptor().typeId().replace("data","lobby");
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("data","service"));
         this.maxRank = ((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();
-        //listLobby().addListener(this);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
-
-
-
-    //@Override
-    //public void onLobby(Descriptor descriptor) {
-        //this.context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
-        //if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.maxRank){
-            //mLobby.clear();
-            //listLobby();
-        //}
-    //}
+    @Override
+    public void clear() {
+        this.deploymentServiceProvider.unregisterConfigurableListener(registerKey);
+        this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
+    }
     private Lobby listLobby(){
         Lobby lobby = this.context.lobby(lobbyId);
         List<Descriptor> alist = lobby.entryList();

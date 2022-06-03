@@ -28,7 +28,6 @@ public class DefaultLobby implements Lobby {
 		listeners.forEach((l)->{
 			l.onLobby(removed);
 		});
-		//if(applicationIndex.isEmpty()) listeners.clear();
     }
 	public List<Descriptor> entryList(){
 		ArrayList<Descriptor> dlist = new ArrayList<>();

@@ -23,28 +23,33 @@ public class GameLobbyAdminModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Lobby lobby = this.deploymentServiceProvider.lobby((String) gameCluster.property(GameCluster.GAME_LOBBY));
-            session.write(toJson(lobby).toString().getBytes());
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
+            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
+                Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+                session.write(toJson(lobby).toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"no lobby data ["+session.name()+"]").getBytes());
+            }
         }
         else if(session.action().equals("onGameServiceList")){
             GameServiceContext gsc = new GameServiceContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            if(gc!=null){
+            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
                 gsc.lobby= gc.serviceLobby;
                 session.write(gsc.toJson().toString().getBytes());
             }else{
-                session.write(JsonUtil.toSimpleResponse(false,"no game cluster for key ["+session.name()+"]").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"no service data ["+session.name()+"]").getBytes());
             }
         }
         else if(session.action().equals("onGameDataList")){
             GameServiceContext gsc = new GameServiceContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            if(gc!=null){
+            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
                 gsc.lobby= gc.dataLobby;
                 session.write(gsc.toJson().toString().getBytes());
             }else{
-                session.write(JsonUtil.toSimpleResponse(false,"no game cluster for key ["+session.name()+"]").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"no game data ["+session.name()+"]").getBytes());
             }
         }
 
