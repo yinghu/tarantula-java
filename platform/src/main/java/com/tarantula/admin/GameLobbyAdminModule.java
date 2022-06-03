@@ -38,39 +38,16 @@ public class GameLobbyAdminModule implements Module {
             }
         }
         else if(session.action().equals("onGameDataList")){
-            session.write(JsonUtil.toSimpleResponse(false,"").getBytes());
-        }
-        else if(session.action().equals("__onGameDataList")){
-            GameClusterDataStoreContext gsc = new GameClusterDataStoreContext();
+            GameServiceContext gsc = new GameServiceContext();
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gc.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Lobby lobby = gc.dataLobby;
-            gsc.name = lobby.descriptor().typeId();
-            gsc.tag = lobby.entryList().get(0).tag();
-            //_data
-            DataStore ds = applicationPreSetup.dataStore(context,gc,"player");
-            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("player",ds.name(),ds.count()));
-
-            //_service
-            DataStore ss = applicationPreSetup.dataStore(context,gc);
-            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("service",ss.name(),ss.count()));
-
-            //_service_room
-            DataStore ssr = applicationPreSetup.dataStore(context,gc,"room");
-            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("room",ssr.name(),ssr.count()));
-
-            //_service_configuration
-            DataStore cfr = applicationPreSetup.dataStore(context,gc,"configuration");
-            gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("configuration",cfr.name(),cfr.count()));
-
-            //_service_tournament
-            if((Boolean)gc.property(GameCluster.TOURNAMENT_ENABLED)){
-                DataStore sst = applicationPreSetup.dataStore(context,gc,"tournament");
-                gsc.gameDataStoreList.add(new GameClusterDataStoreContext.GameDataStore("tournament",sst.name(),sst.count()));
+            if(gc!=null){
+                gsc.lobby= gc.dataLobby;
+                session.write(gsc.toJson().toString().getBytes());
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"no game cluster for key ["+session.name()+"]").getBytes());
             }
-
-            session.write(gsc.toJson().toString().getBytes());
         }
+
         else if(session.action().equals("onGameLobby")){
             Map<String,Object> cmd = JsonUtil.toMap(payload);
             String gameClusterId = (String) cmd.get("gameClusterId");

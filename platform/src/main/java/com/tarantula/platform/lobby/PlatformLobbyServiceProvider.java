@@ -7,6 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
+import com.tarantula.game.GameLobby;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -58,6 +59,10 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     }
 
+    public GameLobby gameLobby(Descriptor descriptor){
+        return null;
+    }
+
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
@@ -100,10 +105,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         items.forEach((a)-> {
             if(!a.disabled()){
                 a.setup();
-                this.logger.warn(a.name());
-                a.zoneList().forEach((z)->{
-                    this.logger.warn(z.name()+">>"+z.playMode()+">>"+z.room().capacity()+">>>"+z.arenaList().size());
-                });
                 lobbyItems.put(gameName+"/"+a.configurationName(),a);
             }
         });

@@ -75,8 +75,8 @@
                     <div id='tx-game-cluster-lobby-bar' class='w3-bar w3-white'>
                     </div>
                     <!-- Data Store bar -->
-                    <div class="w3-panel w3-green tx-padding-title" style="display: none;"><span class="tx-text-14">DataStore Management</span></div>
-                    <div id='tx-game-cluster-data-bar' class='w3-bar w3-white' style="display: none;">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Data Management</span></div>
+                    <div id='tx-game-cluster-data-bar' class='w3-bar w3-white'>
                     </div>  
                     <!-- Service bar-->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Service Management</span></div>
@@ -338,17 +338,18 @@
                 TARA_API.onGet('role/lobby','onGameDataList',_gameClusterId,(resp2)=>{
                     console.log(resp2);
                     if(resp2.successful){
-                        resp2.storeList.forEach((a)=>{
-                            //if(a.resetEnabled == true){
+                        resp2.serviceList.forEach((a)=>{
+                            if(a.resetEnabled == true){
                                 let tem = [];
                                 tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                                tem.push('game.data.list\' tx-service-tag=\'');
-                                tem.push(resp2.tag+'\'');
+                                tem.push('game.asset.list\' tx-game-category=\'application\' tx-service-tag=\'role/');
+                                tem.push(a.category.toLowerCase()+'\' tx-service-category=\'');
+                                tem.push(a.category+'\'');
                                 tem.push(' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>');
-                                tem.push(tx_first_upcase(a.name)+'('+a.count+')');
+                                tem.push(a.name);
                                 tem.push('</span>');  
                                 dbar.innerHTML += tem.join('');           
-                            //}
+                            }
                         });
                         reset_t_action_event();
                     }       

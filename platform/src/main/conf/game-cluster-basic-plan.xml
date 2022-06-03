@@ -49,15 +49,6 @@
         <deploy-code>4</deploy-code>
         <deploy-priority>10</deploy-priority>
         <application-list>
-            <application><!-- Match making module-->
-                <type-id>game-service</type-id>
-                <name>Lobby</name>
-                <type>application</type>
-                <category>lobby</category>
-                <tag>game/lobby</tag>
-                <reset-enabled>true</reset-enabled>
-                <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
-            </application>
             <application><!-- Configuration module-->
                 <type-id>game-service</type-id>
                 <name>Item</name>
@@ -93,12 +84,22 @@
         <deploy-code>4</deploy-code>
         <deploy-priority>20</deploy-priority>
         <application-list>
+            <application><!-- Match making module-->
+                <type-id>game-data</type-id>
+                <name>Lobby</name>
+                <type>application</type>
+                <category>lobby</category>
+                <tag>game/lobby</tag>
+                <reset-enabled>true</reset-enabled>
+                <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
+            </application>
             <application><!-- key/value set/get app-->
                 <type-id>game-data</type-id>
                 <name>JsonDataStore</name>
                 <type>application</type>
                 <category>data</category>
                 <tag>game/data</tag>
+                <deploy-priority>20</deploy-priority>
                 <module-name>com.tarantula.game.module.KeyValueDataStoreModule</module-name>
             </application>
         </application-list>

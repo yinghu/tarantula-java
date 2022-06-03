@@ -15,4 +15,8 @@ public class ArenaItem extends Commodity {
     public int getClassId() {
         return PresencePortableRegistry.ARENA_ITEM_CID;
     }
+
+    public int level(){
+        return header.get("Level").getAsInt();
+    }
 }

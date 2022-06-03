@@ -3,6 +3,8 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
 import com.tarantula.game.service.GameServiceProvider;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchMakingModule implements Module, Lobby.Listener,Configurable.Listener<LobbyItem> {
+public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem> {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
@@ -24,6 +26,8 @@ public class MatchMakingModule implements Module, Lobby.Listener,Configurable.Li
     private GsonBuilder builder;
     private String lobbyId;
     private int maxRank;
+    private DeploymentServiceProvider deploymentServiceProvider;
+    private String registerKey;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         //check Rating to match the game zone to join 
@@ -51,24 +55,26 @@ public class MatchMakingModule implements Module, Lobby.Listener,Configurable.Li
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.mLobby = new ConcurrentHashMap<>();//max matching level
-        lobbyId = this.context.descriptor().typeId().replace("service","lobby");
-        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        lobbyId = this.context.descriptor().typeId().replace("data","lobby");
+        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("data","service"));
         this.maxRank = ((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();
-        listLobby().addListener(this);
+        //listLobby().addListener(this);
+        this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
 
 
-    @Override
-    public void onLobby(Descriptor descriptor) {
-        this.context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
-        if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.maxRank){
-            mLobby.clear();
-            listLobby();
-        }
-    }
+    //@Override
+    //public void onLobby(Descriptor descriptor) {
+        //this.context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
+        //if(descriptor.accessRank()>0&&descriptor.accessRank()<=this.maxRank){
+            //mLobby.clear();
+            //listLobby();
+        //}
+    //}
     private Lobby listLobby(){
         Lobby lobby = this.context.lobby(lobbyId);
         List<Descriptor> alist = lobby.entryList();
@@ -95,5 +101,32 @@ public class MatchMakingModule implements Module, Lobby.Listener,Configurable.Li
             //context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
         //});
         return lobby;
+    }
+    private class OnLobbyListener implements Configurable.Listener<OnLobby>,Lobby.Listener{
+
+        public OnLobbyListener(){
+        }
+        @Override
+        public void onUpdated(OnLobby onLobby) {
+            if(onLobby.typeId().equals(lobbyId)){
+                if(onLobby.closed()) {
+                    mLobby.clear();
+                    context.log("Lobby ["+onLobby.typeId()+"] is going to be offline",OnLog.WARN);
+                    deploymentServiceProvider.unregisterConfigurableListener(registerKey);
+                    return;
+                }
+                context.log("Lobby ["+onLobby.typeId()+"] is going to be online",OnLog.WARN);
+                listLobby().addListener(this);
+            }
+        }
+
+        @Override
+        public void onLobby(Descriptor descriptor) {
+            context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
+            if(descriptor.accessRank()>0&&descriptor.accessRank()<=maxRank){
+                mLobby.clear();
+                listLobby();
+            }
+        }
     }
 }

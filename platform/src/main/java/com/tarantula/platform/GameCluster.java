@@ -101,6 +101,13 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                 break;
             }
         }
+        if(loaded!=null) return loaded;
+        for(Descriptor d : dataLobby.entryList()){
+            if(d.category().equals(category)){
+                loaded = d;
+                break;
+            }
+        }
         return loaded;
     }
     public Descriptor gameWithKey(String key){
