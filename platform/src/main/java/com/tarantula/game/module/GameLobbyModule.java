@@ -64,6 +64,7 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
     }
     @Override
     public void clear() {
+        this.gameServiceProvider.lobbyServiceProvider().unregisterConfigurableListener(context.descriptor().tag());
         try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
@@ -75,6 +76,7 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
 
     @Override
     public void onLoaded(LobbyItem lobbyItem){
+
         this.context.log("lobby item loaded->"+lobbyItem.configurationName(),OnLog.WARN);
     }
     @Override

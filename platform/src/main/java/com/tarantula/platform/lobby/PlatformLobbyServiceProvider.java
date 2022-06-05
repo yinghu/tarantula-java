@@ -7,7 +7,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
-import com.tarantula.game.GameLobby;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -27,7 +26,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     private String gameName;
     private ApplicationPreSetup applicationPreSetup;
     private DistributionItemService distributionItemService;
-    private ConcurrentHashMap<String,Configurable.Listener<LobbyItem>> lobbyListeners;
+    private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
     public PlatformLobbyServiceProvider(GameCluster gameCluster){
         this.gameCluster = gameCluster;
@@ -59,10 +58,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     }
 
-    public GameLobby gameLobby(Descriptor descriptor){
-        return null;
-    }
-
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
@@ -85,22 +80,22 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         lobbyItem.setup();
         String lobbyTag = gameName+"/"+lobbyItem.configurationName();
         lobbyItems.put(lobbyTag,lobbyItem);
-        Configurable.Listener lobbyListener = lobbyListeners.get(lobbyTag);
-        if(lobbyListener!=null) lobbyListener.onUpdated(lobbyItem);
+        ListenerOnLobby lobbyListener = lobbyListeners.get(lobbyTag);
+        if(lobbyListener!=null) lobbyListener.listener.onUpdated(lobbyItem);
         return true;
     }
     public boolean onRelease(String category,String itemId){
         String lobbyTag = gameName+"/"+itemId;
         LobbyItem removed = lobbyItems.remove(lobbyTag);
         if(removed!=null){
-            Configurable.Listener listener = lobbyListeners.get(lobbyTag);
-            if(listener!=null) listener.onRemoved(removed);
+            ListenerOnLobby listener = lobbyListeners.get(lobbyTag);
+            if(listener!=null) listener.listener.onRemoved(removed);
         }
         return true;
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        lobbyListeners.put(descriptor.tag(),listener);
+        lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(serviceContext,descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if(!a.disabled()){
@@ -109,9 +104,12 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
             }
         });
         lobbyItems.forEach((k,v)->{
-            Configurable.Listener lobbyListener = lobbyListeners.get(k);
-            if(lobbyListener!=null) lobbyListener.onLoaded(v);
+            ListenerOnLobby lobbyListener = lobbyListeners.get(k);
+            if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(v);
         });
         return null;
+    }
+    public void unregisterConfigurableListener(String registryKey){
+        lobbyListeners.remove(registryKey);
     }
 }

@@ -53,15 +53,15 @@ public class GameLobbyAdminModule implements Module {
             }
         }
 
-        else if(session.action().equals("onGameLobby")){
-            Map<String,Object> cmd = JsonUtil.toMap(payload);
-            String gameClusterId = (String) cmd.get("gameClusterId");
-            String applicationId = (String) cmd.get("applicationId");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            Descriptor app = gameCluster.gameWithKey(applicationId);
-            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            session.write(toJson(app,lobby).toString().getBytes());
-        }
+       //else if(session.action().equals("onGameLobby")){
+            //Map<String,Object> cmd = JsonUtil.toMap(payload);
+            //String gameClusterId = (String) cmd.get("gameClusterId");
+            //String applicationId = (String) cmd.get("applicationId");
+            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
+            //Descriptor app = gameCluster.gameWithKey(applicationId);
+            //GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
+            //session.write(toJson(app,lobby).toString().getBytes());
+        //}
         else if (session.action().equals("onAddLobby")){
             //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
@@ -114,7 +114,7 @@ public class GameLobbyAdminModule implements Module {
             Descriptor app = gameCluster.gameWithKey(lobbyId);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
-            lobby.reload();
+            ///lobby.reload();
             //GameZone zone = lobby.list().get(0);
             //this.deploymentServiceProvider.configure(zone.distributionKey());
             session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
@@ -125,7 +125,7 @@ public class GameLobbyAdminModule implements Module {
             Descriptor app = gameCluster.gameWithKey(keys[1]);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
-            lobby.configureGameZone(payload);
+            //lobby.configureGameZone(payload);
             session.write(JsonUtil.toSimpleResponse(true,"zone updated").getBytes());
         }
         else if(session.action().equals("onSaveLobbyLevel")){
@@ -134,7 +134,7 @@ public class GameLobbyAdminModule implements Module {
             Descriptor app = gameCluster.gameWithKey(keys[1]);
             GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
             lobby.setup(context);
-            lobby.configureArena(payload);
+            //lobby.configureArena(payload);
             session.write(JsonUtil.toSimpleResponse(true,"level updated").getBytes());
         }
         else {
@@ -165,6 +165,7 @@ public class GameLobbyAdminModule implements Module {
         jsonObject.add("gameLobbyList",alist);
         return jsonObject;
     }
+    /**
     private JsonObject toJson(Descriptor lobby,GameLobby gameLobby){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
@@ -202,5 +203,5 @@ public class GameLobbyAdminModule implements Module {
         });
         jsonObject.add("list",zarray);
         return jsonObject;
-    }
+    }**/
 }

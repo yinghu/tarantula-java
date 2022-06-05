@@ -97,8 +97,16 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
     }
 
     protected String serviceDataStore(Descriptor application){
-        String replaced = application.typeId().endsWith("-lobby")?"-lobby":"-service";
-        return application.typeId().replace(replaced,"_service");
+        if(application.typeId().endsWith("-data")){
+            return application.typeId().replace("-data","_service");
+        }
+        if(application.typeId().endsWith("-lobby")){
+            return application.typeId().replace("-lobby","_service");
+        }
+        if(application.typeId().endsWith("-service")){
+            return application.typeId().replace("-service","_service");
+        }
+        return null;
     }
 
     protected GameZone.RoomProxy joinProxy(String playMode){

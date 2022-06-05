@@ -153,6 +153,13 @@
             "downloadable": false
           },
           {
+            "name": "Rank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "Room",
             "type": "category",
             "reference": "category:Room",

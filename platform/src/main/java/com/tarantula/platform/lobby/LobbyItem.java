@@ -8,7 +8,7 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LobbyItem extends Application {
+public class LobbyItem extends Application{
 
 
     public LobbyItem(){}
@@ -52,4 +52,6 @@ public class LobbyItem extends Application {
         }
         return (T)this;
     }
+
+
 }

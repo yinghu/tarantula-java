@@ -65,12 +65,12 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         return _stub;
     }
 
-    public List<GameZone> list(){
-        ArrayList<GameZone> list = new ArrayList<>();
-        zoneList.forEach((v)->list.add(v));
-        Collections.sort(zoneList,new GameZoneComparator());
-        return list;
-    }
+    //public List<GameZone> list(){
+        //ArrayList<GameZone> list = new ArrayList<>();
+        //zoneList.forEach((v)->list.add(v));
+        //Collections.sort(zoneList,new GameZoneComparator());
+        //return list;
+    //}
     public void leave(Session session){
         Stub stub = stubIndex.remove(session.systemId());
         if(stub==null) return;
@@ -128,13 +128,13 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         return true;
     }
 
-    public Descriptor descriptor(){
-        return application;
-    }
+    //public Descriptor descriptor(){
+        //return application;
+    //}
 
-    public void descriptor(Descriptor descriptor){
+    //public void descriptor(Descriptor descriptor){
 
-    }
+    //}
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
@@ -198,27 +198,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         }
     }
 
-    public boolean configureGameZone(byte[] payload){
-        GameZone gameZone = new DynamicZone();
-        Map<String,Object> data = JsonUtil.toMap(payload);
-        String zoneId = (String)data.get("zoneId");
-        gameZone.distributionKey(zoneId);
-        this.dataStore.load(gameZone);
-        this.context.log(gameZone.toString(),OnLog.WARN);
-        return gameZone.configureAndValidate(data);
-    }
-    public boolean configureArena(byte[] payload){
-        Arena arena = new Arena();
-        Map<String,Object> data = JsonUtil.toMap(payload);
-        String arenaId = (String) data.get("arenaId");
-        arena.distributionKey(arenaId);
-        this.dataStore.load(arena);
-        this.context.log(arena.toString(),OnLog.WARN);
-        return arena.configureAndValidate(data);
-    }
-    public void reload(){
-        //this.context.log(this.toString(),OnLog.WARN);
-    }
+
 
     public ServiceMessageListener ServiceMessageListener(short serviceCommand){
         GameLobby.ServiceMessageListener callback = new ErrorCommand();

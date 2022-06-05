@@ -2,25 +2,25 @@ package com.tarantula.game;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.Initializer;
+
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.service.Serviceable;
 
-import java.util.List;
 
-public interface GameLobby extends Configurable, Initializer, Serviceable {
+public interface GameLobby extends Configurable, Serviceable {
 
-    List<GameZone> list();
+    //List<GameZone> list();
+
     Stub join(Session session, Rating rating);
     void leave(Session session);
     void update(Session session, byte[] payload);
     void list(Session session);
 
-    boolean configureGameZone(byte[] payload);
-    boolean configureArena(byte[] payload);
-    void reload();
-
+    //boolean configureGameZone(byte[] payload);
+    //boolean configureArena(byte[] payload);
+    //void reload();
+    public void setup(ApplicationContext applicationContext) throws Exception;
     boolean timeout(String systemId);
 
     ServiceMessageListener ServiceMessageListener(short serviceCommand);
