@@ -859,12 +859,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private class PostOfficeSession implements PostOffice{
 
         public OnChannel onChannel(String systemId){
-            PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
+            //PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
             return (label,data)->{
-                UDPEndpoint udp = (UDPEndpoint) tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-                Channel c = udp.channel(presenceIndex.sessionId());
+                //UDPEndpoint udp = (UDPEndpoint) tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+                //Channel c = udp.channel(presenceIndex.sessionId());
                 //c.write();
-                log.warn("sending message from->>>"+presenceIndex.sessionId());
+                //log.warn("sending message from->>>"+presenceIndex.sessionId());
             };
         }
 

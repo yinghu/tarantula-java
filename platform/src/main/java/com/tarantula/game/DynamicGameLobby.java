@@ -1,21 +1,16 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.ErrorCommand;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.game.service.ServiceCommand;
 import com.tarantula.platform.IndexSet;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.tarantula.game.service.ServiceCommand.*;
 
 public class DynamicGameLobby extends IndexSet implements GameLobby {
 
@@ -28,8 +23,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
     private DeploymentServiceProvider deploymentServiceProvider;
     private GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,Stub> stubIndex;
-    private ErrorCommand errorCommand;
-    private HashMap<Short,ServiceMessageListener> messageListenerIndex;
 
     public DynamicGameLobby(){
         super("gameLobby");
@@ -37,7 +30,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         zoneList = new CopyOnWriteArrayList<>();
         zoneIndex = new ConcurrentHashMap<>();
         stubIndex = new ConcurrentHashMap<>();
-        messageListenerIndex = new HashMap<>();
     }
     public int levelMatchOffset(){
         return levelMatchOffset;
@@ -50,7 +42,8 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
     }
 
     public Stub join(Session session, Rating rating){
-        Stub stub = stubIndex.get(session.systemId());
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
             stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
             stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
@@ -61,23 +54,19 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         }
         GameZone _zone = zoneIndex.get(rating.level);
         Stub _stub = _zone.join(session,rating);
-        stubIndex.put(session.systemId(),_stub);
+        stubIndex.put(_stub.key().asString(),_stub);
         return _stub;
     }
 
-    //public List<GameZone> list(){
-        //ArrayList<GameZone> list = new ArrayList<>();
-        //zoneList.forEach((v)->list.add(v));
-        //Collections.sort(zoneList,new GameZoneComparator());
-        //return list;
-    //}
     public void leave(Session session){
-        Stub stub = stubIndex.remove(session.systemId());
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null) return;
         stub.zone.leave(stub);
     }
     public void update(Session session, byte[] payload){
-        Stub stub = stubIndex.get(session.systemId());
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return;
@@ -85,7 +74,8 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         stub.zone.update(session,stub,payload);
     }
     public void list(Session session){
-        Stub stub = stubIndex.get(session.systemId());
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return;
@@ -93,9 +83,11 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         stub.zone.list(session,stub);
     }
 
-    public boolean timeout(String systemId){
-
-        return stubIndex.remove(systemId)!=null;
+    public boolean timeout(String systemId,int stub){
+        StubKey stubKey = new StubKey(systemId,application.tag(),stub);
+        Stub removed = stubIndex.remove(stubKey.asString());
+        removed.zone.leave(removed);
+        return  removed!=null;
     }
 
     @Override
@@ -128,13 +120,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         return true;
     }
 
-    //public Descriptor descriptor(){
-        //return application;
-    //}
-
-    //public void descriptor(Descriptor descriptor){
-
-    //}
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
@@ -142,24 +127,14 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         this.application = context.descriptor();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = this.context.serviceProvider(application.typeId().replace("lobby","service"));
-        Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
-        JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
-        listeners.forEach((e)->{
-            JsonObject jo = e.getAsJsonObject();
-            createInstance(jo.get("command").getAsShort(),jo.get("className").getAsString());
+        //Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
+        //JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
+        //listeners.forEach((e)->{
+            //JsonObject jo = e.getAsJsonObject();
+            //createInstance(jo.get("command").getAsShort(),jo.get("className").getAsString());
+        //});
+    }
 
-        });
-        this.errorCommand = new ErrorCommand();
-    }
-    private void createInstance(short cmd,String className){
-        try{
-           ServiceMessageListener serviceMessageListener = (ServiceMessageListener) Class.forName(className).getConstructor().newInstance();
-           serviceMessageListener.setup(this.context);
-           messageListenerIndex.put(cmd,serviceMessageListener);
-        }catch (Exception ex){
-            context.log("no command listener for ["+cmd+"]",OnLog.WARN);
-        }
-    }
     @Override
     public void start() throws Exception{
         Collections.sort(zoneList,new GameZoneComparator());
@@ -198,26 +173,5 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         }
     }
 
-
-
-    public ServiceMessageListener ServiceMessageListener(short serviceCommand){
-        GameLobby.ServiceMessageListener callback = new ErrorCommand();
-        switch (serviceCommand){
-            case ServiceCommand.REQUEST_ACHIEVEMENT_LIST:
-                break;
-            case COMMIT_STATISTICS:
-                break;
-            case REQUEST_STATISTICS:
-                break;
-            case REQUEST_TOURNAMENT_LEADERBOARD:
-                break;
-            case COMMIT_TOURNAMENT_SCORE:
-                break;
-            case COMMIT_ACHIEVEMENT:
-                break;
-        }
-        //return callback;
-        return messageListenerIndex.getOrDefault(serviceCommand,this.errorCommand);
-    }
 
 }

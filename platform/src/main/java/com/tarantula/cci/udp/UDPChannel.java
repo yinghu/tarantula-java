@@ -26,8 +26,9 @@ public class UDPChannel extends GameChannel {
         this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
-    public void register(String systemId,int sessionId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
-        this.owner = systemId;
+    public void register(Session session,int sessionId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+        this.owner = session.systemId();
+        this.routingNumber = session.stub();
         this.sessionId = sessionId;
         this.requestListener = requestListener;
         this.timeoutListener = timeoutListener;
@@ -101,6 +102,6 @@ public class UDPChannel extends GameChannel {
         userChannel.kickoff(sessionId);
     }
     public void kickoff(){
-        this.timeoutListener.timeout(this.owner);
+        this.timeoutListener.timeout(this.owner,this.routingNumber);
     }
 }

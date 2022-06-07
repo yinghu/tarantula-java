@@ -9,6 +9,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.lobby.RoomItem;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,6 +24,12 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
 
     public JsonObject payload = new JsonObject();
 
+
+    public Arena(RoomItem roomItem){
+        this.capacity = roomItem.capacity();
+        this.joinsOnStart = roomItem.joinsOnStart();
+        this.duration = roomItem.duration();
+    }
     public Arena(){
         this.label = LABEL;
         this.onEdge = true;

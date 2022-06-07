@@ -10,20 +10,14 @@ import com.icodesoftware.service.Serviceable;
 
 public interface GameLobby extends Configurable, Serviceable {
 
-    //List<GameZone> list();
 
     Stub join(Session session, Rating rating);
     void leave(Session session);
     void update(Session session, byte[] payload);
     void list(Session session);
 
-    //boolean configureGameZone(byte[] payload);
-    //boolean configureArena(byte[] payload);
-    //void reload();
-    public void setup(ApplicationContext applicationContext) throws Exception;
-    boolean timeout(String systemId);
-
-    ServiceMessageListener ServiceMessageListener(short serviceCommand);
+    void setup(ApplicationContext applicationContext) throws Exception;
+    boolean timeout(String systemId,int stub);
 
     interface ServiceMessageListener{
 

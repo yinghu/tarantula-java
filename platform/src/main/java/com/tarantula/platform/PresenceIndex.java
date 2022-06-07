@@ -10,7 +10,7 @@ import com.icodesoftware.util.RecoverableObject;
 public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
     private int counter;
-    private int sessionId;
+    //private int sessionId;
     private EventService eventService;
 
     public PresenceIndex(double initialBalance){
@@ -86,7 +86,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.properties.put("2",counter);
         this.properties.put("3",disabled);
         this.properties.put("4",this.timestamp);
-        this.properties.put("5",this.sessionId);
+        //this.properties.put("5",this.sessionId);
         return this.properties;
     }
     @Override
@@ -95,7 +95,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-        this.sessionId = ((Number)properties.getOrDefault("5",0)).intValue();
+        //this.sessionId = ((Number)properties.getOrDefault("5",0)).intValue();
     }
 
     public int count(int delta){
@@ -117,11 +117,11 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public String toString(){
         return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
     }
-    public int sessionId(){
-        return sessionId;
-    }
-    public void sessionId(int sessionId){
-        this.sessionId = sessionId;
-        this.update();
-    }
+    //public int sessionId(){
+        //return sessionId;
+    //}
+    //public void sessionId(int sessionId){
+        //this.sessionId = sessionId;
+        //this.update();
+    //}
 }

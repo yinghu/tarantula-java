@@ -1,0 +1,184 @@
+package com.tarantula.game;
+
+import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.game.service.*;
+import com.tarantula.platform.lobby.LobbyItem;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+public class GameLobbyProxy extends RecoverableObject implements GameLobby,Configurable.Listener<LobbyItem>{
+
+    private ConcurrentHashMap<String,Stub> stubIndex;
+    private ConcurrentHashMap<Integer,GameZone> zoneIndex;
+    private GameServiceProvider gameServiceProvider;
+    private ApplicationContext context;
+    private Descriptor application;
+    private GameLobby defaultLobby;
+    private boolean usingDefault;
+
+    public GameLobbyProxy(){
+        this.stubIndex = new ConcurrentHashMap<>();
+        this.zoneIndex = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public Stub join(Session session, Rating rating) {
+        if(usingDefault) return defaultLobby.join(session,rating);
+        //using configurable lobby item
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
+        if(stub!=null&&stub.joined) {
+            stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
+            playerSavedGames.gameServiceProvider = gameServiceProvider;
+            stub.playerSavedGames = playerSavedGames;
+            return stub;
+        }
+        GameZone _zone = gameZone(rating);
+        stub = _zone.join(session,rating);
+        stubIndex.put(stub.key().asString(),stub);
+        return stub;
+    }
+
+    @Override
+    public void leave(Session session) {
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
+        if(stub==null) return;
+        stub.zone.leave(stub);
+    }
+
+    @Override
+    public void update(Session session, byte[] payload){
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
+        if(stub==null){
+            session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
+            return;
+        }
+        stub.zone.update(session,stub,payload);
+    }
+
+    @Override
+    public void list(Session session){
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = stubIndex.get(stubKey.asString());
+        if(stub==null){
+            session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
+            return;
+        }
+        stub.zone.list(session,stub);
+    }
+
+    @Override
+    public void setup(ApplicationContext applicationContext) throws Exception {
+        this.context = applicationContext;
+        this.application = applicationContext.descriptor();
+        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
+        this.defaultLobby = gameServiceProvider.lobby(this.context.descriptor());
+        this.defaultLobby.setup(applicationContext);
+        this.defaultLobby.start();
+        this.usingDefault = true;
+    }
+
+    @Override
+    public boolean timeout(String systemId,int stub) {
+        StubKey stubKey = new StubKey(systemId,application.tag(),stub);
+        Stub removed = stubIndex.remove(stubKey.asString());
+        return  removed!=null;
+    }
+
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+        defaultLobby.shutdown();
+    }
+    private GameZone gameZone(Rating rating){
+        if(rating.level>0 && rating.level<101) return zoneIndex.get(1);
+        if(rating.level>100 && rating.level<201) return zoneIndex.get(2);
+        if(rating.level>200 && rating.level<301) return zoneIndex.get(3);
+        if(rating.level>300 && rating.level<401) return zoneIndex.get(4);
+        if(rating.level>400 && rating.level<501) return zoneIndex.get(5);
+        if(rating.level>500 && rating.level<601) return zoneIndex.get(6);
+        if(rating.level>600 && rating.level<701) return zoneIndex.get(7);
+        if(rating.level>700 && rating.level<801) return zoneIndex.get(8);
+        if(rating.level>800 && rating.level<901) return zoneIndex.get(9);
+        return zoneIndex.get(10);
+    }
+
+    @Override
+    public void onLoaded(LobbyItem lobbyItem){
+        this.context.log("lobby item loaded->"+lobbyItem.configurationName(), OnLog.WARN);
+        if(configure(lobbyItem)) this.usingDefault = false;
+    }
+    @Override
+    public void onUpdated(LobbyItem lobbyItem){
+        this.context.log("lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
+        if(configure(lobbyItem)) this.usingDefault = false;
+    }
+    @Override
+    public void onRemoved(LobbyItem lobbyItem){
+        this.context.log("lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
+        this.usingDefault = true;
+        zoneIndex.clear();
+    }
+    private boolean configure(LobbyItem lobbyItem){
+        zoneIndex.clear();
+        lobbyItem.zoneList().forEach(zoneItem -> {
+            ConfigurableZone configurableZone = new ConfigurableZone(zoneItem);
+            configurableZone.dataStore(gameServiceProvider.serviceDataStore());
+            configurableZone.setup(context,this);
+            GameZone.RoomProxy roomProxy = roomProxy(zoneItem.playMode());
+            roomProxy.setup(context,this,configurableZone);
+            configurableZone.roomProxy(roomProxy);
+            zoneIndex.put(zoneItem.rank(),configurableZone);
+        });
+        if(zoneIndex.isEmpty()) return false;
+        fillLobby();
+        for(int i= 1;i<11;i++){
+            GameZone gameZone = zoneIndex.get(i);
+            this.context.log(gameZone.toString(),OnLog.WARN);
+        }
+        return true;
+    }
+    private GameZone.RoomProxy roomProxy(String playMode){
+        GameZone.RoomProxy roomProxy = new PVERoomProxy();
+        if(playMode.equals(GameZone.PLAY_MODE_PVP)){
+            roomProxy = new PVPRoomProxy();
+        }
+        else if(playMode.equals(GameZone.PLAY_MODE_TVE)){
+            roomProxy = new TVERoomProxy();
+        }
+        else if(playMode.equals(GameZone.PLAY_MODE_TVT)){
+            roomProxy = new TVTRoomProxy();
+        }
+        return roomProxy;
+    }
+    private void fillLobby(){
+        for(int i=1;i<11;i++){
+            if(!zoneIndex.containsKey(i)){
+                GameZone pre = zoneIndex.get(i-1);
+                if(pre!=null) {
+                    zoneIndex.put(i,pre);
+                }
+                else{
+                    for(int j=i+1;j<11;j++){
+                        GameZone next = zoneIndex.get(j);
+                        if(next!=null){
+                            zoneIndex.put(i,next);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

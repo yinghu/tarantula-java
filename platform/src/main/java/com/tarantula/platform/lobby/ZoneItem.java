@@ -2,6 +2,7 @@ package com.tarantula.platform.lobby;
 
 import com.google.gson.JsonArray;
 import com.icodesoftware.Configurable;
+import com.tarantula.game.GameZone;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -25,7 +26,14 @@ public class ZoneItem extends Item {
     }
 
     public String playMode(){
-        return header.get("PlayMode").getAsString();
+        int px = header.get("PlayMode").getAsInt();
+        if(px==1) return GameZone.PLAY_MODE_PVP;
+        if(px==2) return GameZone.PLAY_MODE_TVE;
+        if(px==3) return GameZone.PLAY_MODE_TVT;
+        return GameZone.PLAY_MODE_PVE;
+    }
+    public int rank(){
+        return header.get("Rank").getAsInt();
     }
     public String name(){
         return header.get("Name").getAsString();

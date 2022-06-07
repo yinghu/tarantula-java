@@ -4,18 +4,17 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.GameLobby;
+import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>{
+public class GameLobbyModule implements Module{
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
-    private GameLobby gameLobby;
+    private GameLobbyProxy gameLobby;
     private GsonBuilder builder;
     private Descriptor application;
     @Override
@@ -56,10 +55,10 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        this.gameLobby = this.gameServiceProvider.lobby(this.context.descriptor());
+        this.gameLobby = new GameLobbyProxy();//this.gameServiceProvider.lobby(this.context.descriptor());
         this.gameLobby.setup(context);
         this.gameLobby.start();
-        this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this.gameLobby);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override
@@ -73,20 +72,5 @@ public class GameLobbyModule implements Module ,Configurable.Listener<LobbyItem>
         return JsonUtil.toSimpleResponse(successful,msg);
     }
 
-
-    @Override
-    public void onLoaded(LobbyItem lobbyItem){
-
-        this.context.log("lobby item loaded->"+lobbyItem.configurationName(),OnLog.WARN);
-    }
-    @Override
-    public void onUpdated(LobbyItem lobbyItem){
-        this.context.log("lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
-    }
-
-    @Override
-    public void onRemoved(LobbyItem lobbyItem){
-        this.context.log("lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
-    }
 
 }

@@ -71,7 +71,7 @@ public interface Session extends OnApplication {
     void trackId(String trackId);
 
     interface TimeoutListener{
-        void timeout(String systemId);
+        void timeout(String systemId,int stub);
     }
 
 }

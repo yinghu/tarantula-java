@@ -14,6 +14,7 @@ public class PVERoomProxy extends RoomProxyHeader {
     public Stub join(Session session,Rating rating) {
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
+        stub.stub(session.stub());
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
         stub.room = this.gameServiceProvider.roomServiceProvider().join(gameZone,rating);
@@ -21,8 +22,8 @@ public class PVERoomProxy extends RoomProxyHeader {
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
-        stub.pushChannel = context.register(session,(h,m)->super.update(stub,h,m),(s)->{
-            gameLobby.timeout(s);
+        stub.pushChannel = context.register(session,(h,m)->super.update(stub,h,m),(s,d)->{
+            gameLobby.timeout(s,d);
         });
         stub.roomId = stub.room.roomId();
         //stub.zone = gameZone;

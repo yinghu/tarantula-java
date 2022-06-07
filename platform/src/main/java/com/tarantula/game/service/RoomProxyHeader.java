@@ -11,6 +11,8 @@ import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.statistics.StatisticsSerializer;
 
+import static com.tarantula.game.service.ServiceCommand.*;
+
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -94,7 +96,26 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
         short cmd = messageBuffer.readShort();
-        GameLobby.ServiceMessageListener messageListener = this.gameLobby.ServiceMessageListener(cmd);
+        GameLobby.ServiceMessageListener messageListener = this.serviceMessageListener(cmd);
         return messageListener.update(stub,messageHeader,messageBuffer);
+    }
+
+    private GameLobby.ServiceMessageListener serviceMessageListener(short serviceCommand){
+        GameLobby.ServiceMessageListener callback = new ErrorCommand();
+        switch (serviceCommand){
+            case ServiceCommand.REQUEST_ACHIEVEMENT_LIST:
+                break;
+            case COMMIT_STATISTICS:
+                break;
+            case REQUEST_STATISTICS:
+                break;
+            case REQUEST_TOURNAMENT_LEADERBOARD:
+                break;
+            case COMMIT_TOURNAMENT_SCORE:
+                break;
+            case COMMIT_ACHIEVEMENT:
+                break;
+        }
+        return callback;
     }
 }

@@ -37,7 +37,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         pendingQueue = new ConcurrentLinkedDeque<>();
         connection = new ClientConnection();
         udpEndpointServiceProvider = new UDPEndpointService();
-        sessionId = new AtomicInteger(0);
+        sessionId = new AtomicInteger(1);
     }
     public void setup(ServiceContext serviceContext){
         //this.serviceContext = serviceContext;
@@ -95,7 +95,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         UDPChannel uch = this.pendingQueue.poll();
-        uch.register(session.systemId(),sessionId.incrementAndGet(),requestListener,timeoutListener);
+        uch.register(session,sessionId.getAndIncrement(),requestListener,timeoutListener);
         channels.put(uch.sessionId(),uch);
         return uch;
     }

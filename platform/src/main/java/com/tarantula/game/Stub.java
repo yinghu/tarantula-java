@@ -69,7 +69,7 @@ public class Stub extends PlayerGameObject {
     }
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,label);
+        return new StubKey(this.bucket,this.oid,label,stub);
     }
     @Override
     public String distributionKey() {
@@ -85,7 +85,7 @@ public class Stub extends PlayerGameObject {
         String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
         this.bucket = klist[0];
         this.oid = klist[1];
-        if(klist.length==3) this.label = klist[2];
+        //if(klist.length==3) this.label = klist[2];
     }
     @Override
     public int getFactoryId() {
@@ -96,8 +96,9 @@ public class Stub extends PlayerGameObject {
         return GamePortableRegistry.STUB_CID;
     }
 
+
     @Override
     public String toString(){
-        return label+"=>"+super.toString();
+        return key().toString();
     }
 }

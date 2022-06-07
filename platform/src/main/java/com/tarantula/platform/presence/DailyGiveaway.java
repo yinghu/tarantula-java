@@ -8,10 +8,6 @@ public class DailyGiveaway extends Application {
 
     }
 
-    public DailyGiveaway(ConfigurableObject configurableObject){
-        super(configurableObject);
-    }
-
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }
@@ -34,9 +30,6 @@ public class DailyGiveaway extends Application {
 
     @Override
     public boolean configureAndValidate() {
-        //Application app = new Application(this);
-        //app.dataStore(this.dataStore);
-        //app.registerListener(this);
         setup();
         return validated;
     }
