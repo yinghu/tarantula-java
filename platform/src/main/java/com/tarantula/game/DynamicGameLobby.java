@@ -127,12 +127,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         this.application = context.descriptor();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.gameServiceProvider = this.context.serviceProvider(application.typeId().replace("lobby","service"));
-        //Configuration cfg = this.deploymentServiceProvider.configuration("service-listener-settings");
-        //JsonArray listeners = ((JsonElement)cfg.property("listeners")).getAsJsonArray();
-        //listeners.forEach((e)->{
-            //JsonObject jo = e.getAsJsonObject();
-            //createInstance(jo.get("command").getAsShort(),jo.get("className").getAsString());
-        //});
     }
 
     @Override

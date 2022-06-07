@@ -19,14 +19,19 @@ public class ServiceCommand {
             case REQUEST_ACHIEVEMENT_LIST:
                 break;
             case COMMIT_STATISTICS:
+                callback = new CommitStatisticsCommand();
                 break;
             case REQUEST_STATISTICS:
+                callback = new RequestStatisticsCommand();
                 break;
             case REQUEST_TOURNAMENT_LEADERBOARD:
+                callback = new RequestTournamentLeaderBoardCommand();
                 break;
             case COMMIT_TOURNAMENT_SCORE:
+                callback = new CommitTournamentScoreCommand();
                 break;
             case COMMIT_ACHIEVEMENT:
+                callback = new CommitAchievementCommand();
                 break;
         }
         return callback;
