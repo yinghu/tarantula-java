@@ -858,15 +858,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     private class PostOfficeSession implements PostOffice{
 
-        public OnChannel onChannel(String systemId){
+        //public OnChannel onChannel(Session session){
             //PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
-            return (label,data)->{
+            //return (label,data)->{
                 //UDPEndpoint udp = (UDPEndpoint) tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
                 //Channel c = udp.channel(presenceIndex.sessionId());
                 //c.write();
                 //log.warn("sending message from->>>"+presenceIndex.sessionId());
-            };
-        }
+            //};
+        //}
 
         public OnTopic onTopic(){
             return (topic,data)->{

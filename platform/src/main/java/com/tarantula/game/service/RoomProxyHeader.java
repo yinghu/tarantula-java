@@ -11,8 +11,6 @@ import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.statistics.StatisticsSerializer;
 
-import static com.tarantula.game.service.ServiceCommand.*;
-
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
