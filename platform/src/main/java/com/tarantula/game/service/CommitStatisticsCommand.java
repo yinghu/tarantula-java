@@ -11,7 +11,7 @@ public class CommitStatisticsCommand extends ServiceCommandHeader implements Gam
     @Override
     public byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         String name = messageBuffer.readUTF8();
-        double delta = messageBuffer.readInt();
+        double delta = messageBuffer.readFloat();
         Statistics statistics = gameServiceProvider.statistics(stub.systemId());
         statistics.entry(name).update(delta).update();
         return null;
