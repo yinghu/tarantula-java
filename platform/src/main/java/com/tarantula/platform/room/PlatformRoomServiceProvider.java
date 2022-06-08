@@ -17,6 +17,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,9 +120,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public GameRoom join(GameZone gameZone, Rating rating){
         if(type.equals(GameZone.PLAY_MODE_PVE)){
-            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(rating.systemId(),k-> this.createGameRoom(type,0));
+            String roomId = serviceContext.bucket()+"/"+ SystemUtil.oid();
+            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(type,0));
             gameRoom.join(rating.systemId(),room->true);
             gameRoom.setup(gameZone.arena(rating.arenaLevel));
+            gameRoom.distributionKey(roomId);
             return gameRoom;
         }
         RoomJoinStub roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
@@ -133,7 +136,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     public void leave(String roomId,String systemId){
         if(type.equals(GameZone.PLAY_MODE_PVE)) {
-            GameRoom gameRoom = gameRoomIndex.remove(systemId);
+            GameRoom gameRoom = gameRoomIndex.remove(roomId);
             gameRoom.leave(systemId,room->true);
             return;
         }

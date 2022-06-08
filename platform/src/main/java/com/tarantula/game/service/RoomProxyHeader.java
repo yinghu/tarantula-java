@@ -97,6 +97,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
         short cmd = messageBuffer.readShort();
         GameLobby.ServiceMessageListener messageListener = ServiceCommand.messageListener(cmd);
+        messageListener.setup(this.context);
         return messageListener.update(stub,messageHeader,messageBuffer);
     }
 

@@ -88,6 +88,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public boolean timeout(String systemId,int stub) {
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
         Stub removed = stubIndex.remove(stubKey.asString());
+        removed.zone.leave(removed);
         return  removed!=null;
     }
 
