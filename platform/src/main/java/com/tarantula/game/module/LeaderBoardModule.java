@@ -16,34 +16,34 @@ public class LeaderBoardModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
 
-        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier} //onLeaderBoard/total/wins
+        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier} //onLeaderBoard/wins/total
             String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
             if(query.length==3){
                 LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
                 LeaderBoardView view = new LeaderBoardView();
                 view.category = ldb.category();
-                view.classifier = query[2];
+                view.classifier = query[2];//total/daily/weekly/monthly/yearly
                 view.board = new ArrayList<>();
                 int[] size  ={0};
-                if(view.category.equals(LeaderBoard.DAILY)) {
+                if(view.classifier.equals(LeaderBoard.DAILY)) {
                     ldb.total().rank((r, e) -> {
                         view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
                         size[0]++;
                     });
                 }
-                else if(view.category.equals(LeaderBoard.WEEKLY)) {
+                else if(view.classifier.equals(LeaderBoard.WEEKLY)) {
                     ldb.total().rank((r, e) -> {
                         view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
                         size[0]++;
                     });
                 }
-                else if(view.category.equals(LeaderBoard.MONTHLY)) {
+                else if(view.classifier.equals(LeaderBoard.MONTHLY)) {
                     ldb.total().rank((r, e) -> {
                         view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
                         size[0]++;
                     });
                 }
-                else if(view.category.equals(LeaderBoard.YEARLY)) {
+                else if(view.classifier.equals(LeaderBoard.YEARLY)) {
                     ldb.total().rank((r, e) -> {
                         view.board.add(new LeaderBoardView.EntryView(r, e.owner(), e.value(), e.timestamp()));
                         size[0]++;

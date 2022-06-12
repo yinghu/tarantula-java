@@ -13,6 +13,8 @@ public class ServiceCommand {
     public final static short REQUEST_ACHIEVEMENT_LIST = 5;
     public final static short COMMIT_ACHIEVEMENT = 6;
 
+    public final static short REQUEST_LEADER_BOARD = 7;
+
     public static GameLobby.ServiceMessageListener messageListener(short command){
         GameLobby.ServiceMessageListener callback = new ErrorCommand();
         switch (command){
@@ -32,6 +34,9 @@ public class ServiceCommand {
                 break;
             case COMMIT_ACHIEVEMENT:
                 callback = new CommitAchievementCommand();
+                break;
+            case REQUEST_LEADER_BOARD:
+                callback = new RequestLeaderBoardCommand();
                 break;
         }
         return callback;
