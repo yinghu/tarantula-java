@@ -3,18 +3,9 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.Rating;
-import com.tarantula.game.RatingSerializer;
-import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardView;
 import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
-import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
-import com.tarantula.platform.statistics.StatisticsSerializer;
-import com.tarantula.platform.statistics.StatsDelta;
 
 import java.util.ArrayList;
 
@@ -24,8 +15,8 @@ public class LeaderBoardModule implements Module {
     private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        //fetch statistics from systemId
-        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier}
+
+        if(session.action().startsWith("onLeaderBoard")){ //use query OnLeaderBoard/{category}/{classifier} //onLeaderBoard/total/wins
             String[] query = session.action().split(Recoverable.PATH_SEPARATOR);
             if(query.length==3){
                 LeaderBoard ldb = this.gameServiceProvider.leaderBoard(query[1]);
@@ -81,8 +72,6 @@ public class LeaderBoardModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(StatisticsIndex.class,new StatisticsSerializer());
-        this.builder.registerTypeAdapter(Rating.class,new RatingSerializer());
         this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.context.log("Leader board module started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);

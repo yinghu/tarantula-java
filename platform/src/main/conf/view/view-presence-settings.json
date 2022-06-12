@@ -18,7 +18,7 @@
     {"type": "live.game.service.recentlyplaylist","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.friendlist","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.store.view.html"},
+    {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.leaderboard.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.inventory","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.item","moduleResourceFile": "presence/live.game.service.store.view.html"},
