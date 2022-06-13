@@ -65,20 +65,15 @@ public class SavedGameModule implements Module {
         }
         else if(session.action().equals("onMerge")){
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
-            if(updated.distributionKey().equals(session.name())) {
-                SavedGame current = gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(), session.name());
-                SavedGame remote = gameServiceProvider.presenceServiceProvider().loadSavedGame(updated.owner(), updated.distributionKey());
-                current.version(remote.version());
-                current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
-                JsonObject resp = new JsonObject();
-                resp.add("currentSavedGame", current.toJson());
-                resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
-                session.write(resp.toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"no game merged").getBytes());
-            }
+            SavedGame current = gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(), session.name());
+            SavedGame remote = gameServiceProvider.presenceServiceProvider().loadSavedGame(updated.owner(), updated.distributionKey());
+            current.version(remote.version());
+            current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
+            JsonObject resp = new JsonObject();
+            resp.add("currentSavedGame", current.toJson());
+            resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
+            session.write(resp.toString().getBytes());
         }
 
         else if(session.action().equals("onDailyRewardClaim")){
