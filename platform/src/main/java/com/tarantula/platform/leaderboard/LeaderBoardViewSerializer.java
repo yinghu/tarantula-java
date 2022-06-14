@@ -12,20 +12,20 @@ public class LeaderBoardViewSerializer implements JsonSerializer<LeaderBoardView
     public JsonElement serialize(LeaderBoardView leaderBoard, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",true);
-        jo.addProperty("category",leaderBoard.category);
-        jo.addProperty("classifier",leaderBoard.classifier);
-        jo.addProperty("size",leaderBoard.size);
+        jo.addProperty("Category",leaderBoard.category);
+        jo.addProperty("Classifier",leaderBoard.classifier);
+        jo.addProperty("Size",leaderBoard.size);
         JsonArray blist = new JsonArray();
         for(LeaderBoardView.EntryView e : leaderBoard.board){
                 JsonObject b = new JsonObject();
-                b.addProperty("rank",e.rank);
-                b.addProperty("owner",e.owner);
-                b.addProperty("value",e.value);
-                b.addProperty("lastUpdated", TimeUtil.fromUTCMilliseconds(e.timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
+                b.addProperty("Rank",e.rank);
+                b.addProperty("Owner",e.owner);
+                b.addProperty("Value",e.value);
+                b.addProperty("LastUpdated", TimeUtil.fromUTCMilliseconds(e.timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
                 blist.add(b);
 
         }
-        jo.add("board",blist);
+        jo.add("_entries",blist);
         return jo;
     }
 }
