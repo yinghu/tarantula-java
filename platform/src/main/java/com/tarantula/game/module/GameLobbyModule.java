@@ -8,7 +8,9 @@ import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.SystemUtil;
 
 public class GameLobbyModule implements Module{
 
@@ -41,6 +43,17 @@ public class GameLobbyModule implements Module{
         }
         else if(session.action().equals("onList")){
             this.gameLobby.list(session);
+        }
+        else if(session.action().equals("onTest")){
+            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            session.clientId("device_"+session.stub());
+            session.name("web_device");
+            Rating rating = gameServiceProvider.rating(session.systemId());
+            rating.level = this.context.descriptor().accessRank()*100-99;
+            Stub stub = gameLobby.join(session,rating);
+            session.write(stub.toJson().toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

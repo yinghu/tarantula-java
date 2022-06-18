@@ -7,9 +7,9 @@ var TARA_API = (function(){
   let wsWorker;
     
   let _parse = function(data){
-    data.lobbyList.forEach(function(v){
-        lobbyList.push(v);
-    });
+    //data.lobbyList.forEach(function(v){
+        //lobbyList.push(v);
+    //});
   };            
   let _toWebSocketUrl = function(connection){       
     //use server connection config for web socket
@@ -217,8 +217,13 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let p = JSON.parse(aj.responseText);
-            if(p.successful){
-                presence = p.presence;
+            console.log(p);
+            if(p.Successful){
+                presence.systemId = p.SystemId;
+                presence.token = p.Token;
+                presence.stub = p.Stub;
+                presence.login = p.Login;
+
                 qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;

@@ -35,25 +35,25 @@ public class Stub extends PlayerGameObject {
 
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
-        jo.addProperty("successful",joined);
+        jo.addProperty("Successful",joined);
         if(!joined){
-            jo.addProperty("message","failed to join");
+            jo.addProperty("Message","failed to join");
             return jo;
         }
         //jo.add("zone",zone.toJson());
         //jo.add("arena", room.arena().toJson());
-        jo.add("room",room.toJson());
+        jo.add("_room",room.toJson());
         //jo.add("rating",rating.toJson());
         //if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
-        if(shop!=null) jo.add("shop",shop.toJson());
+        if(shop!=null) jo.add("_shop",shop.toJson());
         //if(tournament!=null) jo.add("tournament",tournament.toJson());
-        if(pushChannel!=null) jo.add("pushChannel",pushChannel.toJson());
-        if(inbox!=null) jo.add("inbox",inbox.toJson());
-        if(playerSavedGames!=null) jo.add("playerSavedGames", playerSavedGames.toJson());
-        jo.addProperty("tag",tag);
-        jo.addProperty("tournamentEnabled",tournament!=null);
-        jo.addProperty("offline",offline);
-        jo.addProperty("ticket",ticket);
+        if(pushChannel!=null) jo.add("_pushChannel",pushChannel.toJson());
+        if(inbox!=null) jo.add("_inbox",inbox.toJson());
+        if(playerSavedGames!=null) jo.add("_playerSavedGames", playerSavedGames.toJson());
+        jo.addProperty("Tag",tag);
+        jo.addProperty("TournamentEnabled",tournament!=null);
+        //jo.addProperty("Offline",offline);
+        jo.addProperty("Ticket",ticket);
         return jo;
     }
     @Override

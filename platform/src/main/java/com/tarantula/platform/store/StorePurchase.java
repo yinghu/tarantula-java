@@ -26,11 +26,11 @@ public class StorePurchase extends ResponseHeader {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        jsonObject.addProperty("transactionId",transactionId);
+        jsonObject.addProperty("Successful",true);
+        jsonObject.addProperty("TransactionId",transactionId);
         JsonArray inventories = new JsonArray();
         inventoryList.forEach((inventory -> inventories.add(inventory.toJson())));
-        jsonObject.add("inventoryList",inventories);
+        jsonObject.add("_inventoryList",inventories);
         return jsonObject;
     }
 }

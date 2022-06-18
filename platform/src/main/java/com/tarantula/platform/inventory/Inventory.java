@@ -36,6 +36,7 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         if(this.rechargeable){
             balance += commodity.amount();
         }
+        count++;
         dataStore.update(this);
     }
     public Configurable load(String inventoryId){
@@ -83,15 +84,16 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
+        jsonObject.addProperty("Successful",true);
         String[] ttp = label.split("/");
-        jsonObject.addProperty("type",ttp[1]);
-        jsonObject.addProperty("typeId",ttp[2]);
-        jsonObject.addProperty("balance",balance);
-        jsonObject.addProperty("rechargeable",rechargeable);
+        jsonObject.addProperty("Type",ttp[1]);
+        jsonObject.addProperty("TypeId",ttp[2]);
+        jsonObject.addProperty("Balance",balance);
+        jsonObject.addProperty("Rechargeable",rechargeable);
+        jsonObject.addProperty("Count",count);
         JsonArray items = new JsonArray();
         itemList.forEach((k,item)->items.add(item.toJson()));
-        jsonObject.add("itemList",items);
+        jsonObject.add("_itemList",items);
         return jsonObject;
     }
 

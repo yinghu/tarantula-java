@@ -1,6 +1,5 @@
 package com.tarantula.platform.room;
 
-import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -21,16 +20,7 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
         return PortableEventRegistry.PVE_ROOM_CID;
     }
 
-    @Override
-    public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("capacity",capacity);
-        jsonObject.addProperty("duration",duration);
-        jsonObject.addProperty("round",round);
-        jsonObject.addProperty("timeout",0);
-        jsonObject.addProperty("playMode",playMode);
-        return jsonObject;
-    }
+
 
     public synchronized PVEGameRoom join(String systemId,RoomListener roomListener){
         return this;

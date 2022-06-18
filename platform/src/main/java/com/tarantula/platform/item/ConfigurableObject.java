@@ -152,16 +152,16 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("configurationType",configurationType);
-        jsonObject.addProperty("configurationTypeId",configurationTypeId);
-        jsonObject.addProperty("configurationName",configurationName);
-        jsonObject.addProperty("configurationCategory",configurationCategory);
-        jsonObject.addProperty("configurationVersion",configurationVersion);
-        jsonObject.addProperty("itemId", distributionKey());
-        jsonObject.addProperty("disabled",disabled);
-        jsonObject.add("header",header);
-        jsonObject.add("application",application);
-        jsonObject.add("reference",reference);
+        jsonObject.addProperty("ConfigurationType",configurationType);
+        jsonObject.addProperty("ConfigurationTypeId",configurationTypeId);
+        jsonObject.addProperty("ConfigurationName",configurationName);
+        jsonObject.addProperty("ConfigurationCategory",configurationCategory);
+        jsonObject.addProperty("ConfigurationVersion",configurationVersion);
+        jsonObject.addProperty("ItemId", distributionKey());
+        jsonObject.addProperty("Disabled",disabled);
+        jsonObject.add("Header",header);
+        jsonObject.add("Application",application);
+        jsonObject.add("Reference",reference);
         return jsonObject;
     }
 

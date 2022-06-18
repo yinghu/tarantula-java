@@ -27,11 +27,11 @@ public class PlayerSavedGames{
                 save.dailyLoginTrack = gameServiceProvider.presenceServiceProvider().checkDailyLogin(save.distributionKey());
                 save.achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(save.distributionKey());
                 save.playerSaveIndex = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(systemId);
-                jsonObject.add("currentSavedGame",save.toJson());
+                jsonObject.add("_currentSavedGame",save.toJson());
             }
             saves.add(save.toJson());
         });
-        jsonObject.add("savedGames",saves);
+        jsonObject.add("_savedGames",saves);
         return jsonObject;
     }
 }

@@ -76,17 +76,17 @@
     function tx_live_store_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList','',(resp)=>{
             editor.set(resp);
-            if(resp.successful){
+            if(resp.Successful){
                 shoppingList.innerHTML ='';
-                resp.itemList.forEach((gi,i)=>{
+                resp._itemList.forEach((gi,i)=>{
                     let tem = [];
                     tem.push('<div class=\'w3-container\'>');
                     tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
                     tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
-                    tem.push(gi.configurationCategory);
+                    tem.push(gi.ConfigurationCategory);
                     tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-                    tem.push(gi.configurationName);
-                    tem.push('</span><span tx-item-id=\''+gi.itemId+'\'');
+                    tem.push(gi.ConfigurationName);
+                    tem.push('</span><span tx-item-id=\''+gi.ItemId+'\'');
                     tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
                     tem.push('</div>'); 
                     shoppingList.innerHTML += tem.join('');  

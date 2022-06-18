@@ -56,15 +56,15 @@ public class SavedGame extends RecoverableObject implements Configurable {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("gameId",this.distributionKey());
-        jsonObject.addProperty("deviceId",index);
-        jsonObject.addProperty("deviceName",name);
-        jsonObject.addProperty("owner",owner);
-        jsonObject.addProperty("version",version);
-        jsonObject.addProperty("timestamp",timestamp);
-        if(dailyLoginTrack!=null) jsonObject.add("dailyLogin", dailyLoginTrack.toJson());
-        if(achievementProgress!=null) jsonObject.add("achievement", achievementProgress.toJson());
-        if(playerSaveIndex!=null) jsonObject.add("playerSaveIndex",playerSaveIndex.toJson());
+        jsonObject.addProperty("GameId",this.distributionKey());
+        jsonObject.addProperty("DeviceId",index);
+        jsonObject.addProperty("DeviceName",name);
+        jsonObject.addProperty("Owner",owner);
+        jsonObject.addProperty("Version",version);
+        jsonObject.addProperty("Timestamp",timestamp);
+        if(dailyLoginTrack!=null) jsonObject.add("_dailyLogin", dailyLoginTrack.toJson());
+        if(achievementProgress!=null) jsonObject.add("_achievement", achievementProgress.toJson());
+        if(playerSaveIndex!=null) jsonObject.add("_playerSaveIndex",playerSaveIndex.toJson());
         return jsonObject;
     }
     @Override

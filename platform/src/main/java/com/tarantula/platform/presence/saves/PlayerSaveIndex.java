@@ -26,7 +26,7 @@ public class PlayerSaveIndex extends IndexSet {
         JsonObject jsonObject = new JsonObject();
         JsonArray keys = new JsonArray();
         keySet().forEach(k->keys.add(k));
-        jsonObject.add("keys",keys);
+        jsonObject.add("_keys",keys);
         return jsonObject;
     }
 }

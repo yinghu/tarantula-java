@@ -228,7 +228,7 @@
             e.onclick = ()=>{
                 let app = applications[e.getAttribute('tx-application-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
-                    if(app.configurationCategory == a.header.type){
+                    if(app.ConfigurationCategory == a.header.type){
                         console.log(a);
                         console.log(i);
                         TARA_API.query().itemIndex = i;
@@ -238,14 +238,14 @@
                 TARA_API.query().pendingUpdate = app;
                 TARA_API.query().popup='#tx-popup-api';
                 operationBoard.style.display = 'block';
-                operationMessage.innerHTML = app.configurationCategory+':'+app.configurationName;
+                operationMessage.innerHTML = app.ConfigurationCategory+':'+app.ConfigurationName;
             }
         });
         document.querySelectorAll('.tx-stock-item-action').forEach(e=>{
             e.onclick = ()=>{
                 let app = applications[e.getAttribute('tx-item-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
-                    if(app.configurationCategory == a.header.type){
+                    if(app.ConfigurationCategory == a.header.type){
                         console.log(a);
                         console.log(i);
                         TARA_API.query().itemIndex = i;
@@ -268,20 +268,20 @@
     }
 
     function toHtmlServiceBarItem(a,i){
-        applications[a.itemId] = a;
+        applications[a.ItemId] = a;
         let tem = [];
-        tem.push('<span tx-application-id=\''+a.itemId);
+        tem.push('<span tx-application-id=\''+a.ItemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-service-item-action\'>');
-        tem.push(a.configurationCategory+':'+a.configurationName);
+        tem.push(a.ConfigurationCategory+':'+a.ConfigurationName);
         tem.push('</span>');
         return tem.join('');    
     }
     function toHtmlBarStockItem(a,i){
-        applications[a.itemId] = a;
+        applications[a.ItemId] = a;
         let tem = [];
-        tem.push('<span tx-item-id=\''+a.itemId);
+        tem.push('<span tx-item-id=\''+a.ItemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-stock-item-action\'>');
-        tem.push(a.configurationCategory+':'+a.configurationName);
+        tem.push(a.ConfigurationCategory+':'+a.ConfigurationName);
         tem.push('</span>');
         return tem.join('');    
     }

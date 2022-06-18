@@ -43,9 +43,9 @@ public class InventoryItem extends ConfigurableObject {
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("inventoryId",distributionKey());
-        jsonObject.addProperty("typeId",configurationTypeId);
-        jsonObject.addProperty("name",configurationName);
+        jsonObject.addProperty("InventoryId",distributionKey());
+        jsonObject.addProperty("TypeId",configurationTypeId);
+        jsonObject.addProperty("Name",configurationName);
         return jsonObject;
     }
 

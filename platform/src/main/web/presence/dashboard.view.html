@@ -425,8 +425,9 @@
                             tem.push('</span>');
                             tem.push('<span class=\'w3-left tx-text-14 tx-margin-left-8\'>');
                             tem.push(b.tag);
-                            tem.push('</span>'); 
-                            tem.push('<span class=\'w3-right tx-text-14 w3-text-green\'><i class=\'fa fa-check\' style=\'font-size:18px\'></i></span></div>');
+                            tem.push('</span><span view-id=\'live.game.lobby.test\' tx-service-tag=\'');
+                            tem.push(b.tag); 
+                            tem.push('\' class=\'w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>Test</span></div>');
                             liveGameLobbyBar.innerHTML += tem.join('');
                         }    
                     });

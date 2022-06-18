@@ -30,16 +30,17 @@ public class Shop extends Application {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",configurationName);
+        jsonObject.addProperty("Successful",true);
+        jsonObject.addProperty("Name",configurationName);
         if(_reference==null) {
-            jsonObject.add("itemList",new JsonArray());
+            jsonObject.add("_itemList",new JsonArray());
             return jsonObject;
         }
         JsonArray alist = new JsonArray();
         _reference.forEach((v)->{
             alist.add(v.toJson());
         });
-        jsonObject.add("itemList",alist);
+        jsonObject.add("_itemList",alist);
         return jsonObject;
     }
 

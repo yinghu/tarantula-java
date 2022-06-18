@@ -8,9 +8,10 @@ import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
 
 public class PresenceIndex extends RecoverableObject implements Presence {
+
     private double balance;
     private int counter;
-    //private int sessionId;
+
     private EventService eventService;
 
     public PresenceIndex(double initialBalance){
@@ -117,11 +118,4 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public String toString(){
         return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
     }
-    //public int sessionId(){
-        //return sessionId;
-    //}
-    //public void sessionId(int sessionId){
-        //this.sessionId = sessionId;
-        //this.update();
-    //}
 }

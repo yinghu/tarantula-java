@@ -16,7 +16,7 @@ public class Inbox extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         JsonArray inventories = new JsonArray();
         inventoryList.forEach((inventory -> inventories.add(inventory.toJson())));
-        jsonObject.add("inventoryList",inventories);
+        jsonObject.add("_inventoryList",inventories);
         return jsonObject;
     }
 }

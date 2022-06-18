@@ -37,15 +37,15 @@
 <script>
     let itemTemplate = TARA_API.query().pendingUpdate;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'tree'},itemTemplate);
-    let query = TARA_API.query().gameClusterId+'#'+itemTemplate.itemId+'#'+itemTemplate.configurationTypeId;        
+    let query = TARA_API.query().gameClusterId+'#'+itemTemplate.ItemId+'#'+itemTemplate.ConfigurationTypeId;        
     console.log(query);
     let actionBtn = document.querySelector('#tx-register-item-register');
     actionBtn.style.display = 'none';
     let cmd = 'onRelease';
     TARA_API.onGet('role/application','onLoad',query,(resp)=>{
-        if(resp.hasOwnProperty('itemId')&&resp.itemId == itemTemplate.itemId){
-            actionBtn.innerHTML = resp.disabled?'Register':'Release';
-            cmd = resp.disabled?'onRegister':'onRelease';
+        if(resp.hasOwnProperty('ItemId')&&resp.ItemId == itemTemplate.ItemId){
+            actionBtn.innerHTML = resp.Disabled?'Register':'Release';
+            cmd = resp.Disabled?'onRegister':'onRelease';
             actionBtn.style.display = 'block';
         }
         editor.set(resp);

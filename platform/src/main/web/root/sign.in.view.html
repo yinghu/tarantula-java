@@ -43,11 +43,12 @@
         let _n = document.querySelector('#tx-user-name').value;
         let _p = document.querySelector('#tx-password').value;
         TARA_API.onLogin({login:_n,password:_p},function(resp){
+            console.log(resp);
             if(resp.successful){
                 tx_on_login();              
             }
             else{
-                document.querySelector("#tx-sign-in-message").innerHTML=resp.message;
+                document.querySelector("#tx-sign-in-message").innerHTML=resp.Message;
             }
         });            
     };

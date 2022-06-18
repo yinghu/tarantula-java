@@ -10,8 +10,7 @@
 
     {"type": "upgrade.role.account","moduleResourceFile": "presence/upgrade.account.view.html"},
     {"type": "upgrade.role.admin","moduleResourceFile": "presence/upgrade.admin.view.html"},
-    {"type": "play.game.tossup","moduleResourceFile": "presence/play.game.tossup.view.html"},
-    {"type": "play.game.tossup.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
+    {"type": "live.game.lobby.test","moduleResourceFile": "presence/live.game.lobby.test.view.html"},
     {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
     {"type": "live.game.service.statistics","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.store.view.html"},

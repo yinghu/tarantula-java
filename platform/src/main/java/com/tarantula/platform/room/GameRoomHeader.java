@@ -121,11 +121,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("roomId",distributionKey());
-        jsonObject.addProperty("capacity",capacity);
-        jsonObject.addProperty("duration",duration);
-        jsonObject.addProperty("round",round);
-        jsonObject.addProperty("playMode",playMode);
+        jsonObject.addProperty("RoomId",distributionKey());
+        jsonObject.addProperty("Capacity",capacity);
+        jsonObject.addProperty("Duration",duration);
+        jsonObject.addProperty("Round",round);
+        jsonObject.addProperty("PlayMode",playMode);
         if(connection!=null){
             jsonObject.addProperty("channelId",channelId);
             jsonObject.addProperty("sessionId",sessionId);
@@ -133,6 +133,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             jsonObject.addProperty("serverKey",Base64.getEncoder().encodeToString(serverKey));
             jsonObject.add("connection",connection.toJson());
         }
+        if(entries==null) return jsonObject;
         JsonArray plist = new JsonArray();
         for(GameEntry ge : entries){
             if(ge==null) continue;

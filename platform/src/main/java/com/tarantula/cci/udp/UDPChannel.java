@@ -87,11 +87,11 @@ public class UDPChannel extends GameChannel {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("channelId",channelId);
-        jsonObject.addProperty("sessionId",sessionId);
-        jsonObject.addProperty("timeout",timeout);
-        jsonObject.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
-        jsonObject.add("connection",connection.toJson());
+        jsonObject.addProperty("ChannelId",channelId);
+        jsonObject.addProperty("SessionId",sessionId);
+        jsonObject.addProperty("Timeout",timeout);
+        jsonObject.addProperty("_serverKey", Base64.getEncoder().encodeToString(serverKey));
+        jsonObject.add("_connection",connection.toJson());
         return jsonObject;
     }
     public void sessionId(int sessionId){

@@ -6,6 +6,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Metrics;
+import com.tarantula.platform.util.OnSessionSerializer;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -121,8 +122,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             PresenceContext ic = new PresenceContext("onAvailable");
             String typeId = session.trackId();
             if(onLobbyIndex.containsKey(typeId)){
-                ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
-                session.write(builder.create().toJson(ic).getBytes());
+                //ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
+                session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"game ["+typeId+"] not available").getBytes());
@@ -283,16 +284,17 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         if(access.successful()){
             PresenceContext ptx = new PresenceContext("onLogin");
             ptx.presence= access;
-            List<Lobby> lobbyList = new ArrayList<>();
-            lobbyList.add(this.context.lobby(this.lobbyId));
-            ptx.lobbyList=(lobbyList);
-            session.write(this.builder.create().toJson(ptx).getBytes());
+            //List<Lobby> lobbyList = new ArrayList<>();
+            //lobbyList.add(this.context.lobby(this.lobbyId));
+            //ptx.lobbyList=(lobbyList);
+            //session.write(this.builder.create().toJson(ptx).getBytes());
+            session.write(new OnSessionSerializer().serialize(access,OnSession.class,null).toString().getBytes());
             session.systemId(access.systemId());
             session.stub(access.stub());
             session.ticket(access.ticket());
         }
         else{
-            session.write(this.builder.create().toJson(new ResponseHeader("reset","wrong user/password", false)).getBytes());
+            session.write(JsonUtil.toSimpleResponse(false,"wrong user/password").getBytes());
         }
         return access.successful();
     }

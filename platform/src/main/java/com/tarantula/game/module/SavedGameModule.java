@@ -71,7 +71,7 @@ public class SavedGameModule implements Module {
             current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
             JsonObject resp = new JsonObject();
-            resp.add("currentSavedGame", current.toJson());
+            resp.add("_currentSavedGame", current.toJson());
             resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
             session.write(resp.toString().getBytes());
         }

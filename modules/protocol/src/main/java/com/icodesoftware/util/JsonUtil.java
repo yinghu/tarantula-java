@@ -82,6 +82,9 @@ public class JsonUtil {
         JsonObject resp = new JsonObject();
         resp.addProperty("successful",successful);
         resp.addProperty("message",message);
+        resp.addProperty("Successful",successful);
+        resp.addProperty("Message",message);
+
         return resp.toString();
     }
     public static JsonObject parse(String json){

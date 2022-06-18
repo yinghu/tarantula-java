@@ -11,7 +11,7 @@ public class LeaderBoardViewSerializer implements JsonSerializer<LeaderBoardView
 
     public JsonElement serialize(LeaderBoardView leaderBoard, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jo = new JsonObject();
-        jo.addProperty("successful",true);
+        jo.addProperty("Successful",true);
         jo.addProperty("Category",leaderBoard.category);
         jo.addProperty("Classifier",leaderBoard.classifier);
         jo.addProperty("Size",leaderBoard.size);
