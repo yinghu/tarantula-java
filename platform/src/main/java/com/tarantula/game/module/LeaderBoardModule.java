@@ -5,7 +5,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.leaderboard.LeaderBoardView;
-import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
 
 import java.util.ArrayList;
 
@@ -56,7 +55,7 @@ public class LeaderBoardModule implements Module {
                     });
                 }
                 view.size = size[0];
-                session.write(this.builder.create().toJson(view).getBytes());
+                session.write(view.toJson().toString().getBytes());
             }
             else{
                 throw new UnsupportedOperationException(session.action());
@@ -71,8 +70,6 @@ public class LeaderBoardModule implements Module {
     @Override
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(LeaderBoardView.class,new LeaderBoardViewSerializer());
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.context.log("Leader board module started ["+this.context.descriptor().typeId()+"]", OnLog.WARN);
     }

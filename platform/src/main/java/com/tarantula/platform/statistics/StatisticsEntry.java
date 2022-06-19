@@ -1,5 +1,6 @@
 package com.tarantula.platform.statistics;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
@@ -150,5 +151,16 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         }
         loaded = true;
         return this.dataStore.createIfAbsent(this,true);
+    }
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("Daily",daily);
+        jsonObject.addProperty("Weekly",weekly);
+        jsonObject.addProperty("Monthly",monthly);
+        jsonObject.addProperty("Yearly",yearly);
+        jsonObject.addProperty("Total",total);
+        return jsonObject;
     }
 }

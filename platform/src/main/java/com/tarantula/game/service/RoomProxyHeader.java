@@ -1,6 +1,6 @@
 package com.tarantula.game.service;
 
-import com.google.gson.JsonArray;
+
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
@@ -9,7 +9,6 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
@@ -39,18 +38,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
             stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
             if(session.name().equals("rating")) {
                 session.write(stub.rating.toJson().toString().getBytes());
-                response = true;
-            }
-        }
-        if(jsonObject.has("stats")){
-            JsonArray stats = jsonObject.getAsJsonArray("stats");
-            stats.forEach((a)->{
-                JsonObject kv = a.getAsJsonObject();
-                stub.statistics.entry(kv.get("name").getAsString()).update(kv.get("value").getAsDouble()).update();
-            });
-            if(session.name().equals("stats")){
-                StatisticsSerializer serializer = new StatisticsSerializer();
-                session.write(serializer.serialize(stub.statistics,Statistics.class,null).toString().getBytes());
                 response = true;
             }
         }

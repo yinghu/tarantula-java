@@ -5,7 +5,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.leaderboard.LeaderBoardView;
-import com.tarantula.platform.leaderboard.LeaderBoardViewSerializer;
+
 
 import java.util.ArrayList;
 
@@ -53,7 +53,6 @@ public class RequestLeaderBoardCommand extends ServiceCommandHeader implements G
             });
         }
         view.size = size[0];
-        LeaderBoardViewSerializer serializer = new LeaderBoardViewSerializer();
-        return serializer.serialize(view,LeaderBoardView.class,null).toString().getBytes();
+        return view.toJson().toString().getBytes();
     }
 }

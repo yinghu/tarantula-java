@@ -2,8 +2,6 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.*;
 
 public class TarantulaApplicationHeader implements TarantulaApplication {
@@ -29,7 +27,6 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
-        this.builder.registerTypeAdapter(StatisticsIndex.class,new StatisticsSerializer());
     }
 
 

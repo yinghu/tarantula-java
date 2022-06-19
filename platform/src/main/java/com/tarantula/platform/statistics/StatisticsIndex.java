@@ -1,4 +1,6 @@
 package com.tarantula.platform.statistics;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
@@ -78,5 +80,17 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid,this.label);
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject jo  = new JsonObject();
+        JsonArray ja = new JsonArray();
+        for(Statistics.Entry entry : summary()){
+            ja.add(entry.toJson());
+        }
+        jo.addProperty("Successful",true);
+        jo.add("_categories",ja);
+        return jo;
     }
 }

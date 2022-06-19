@@ -185,6 +185,7 @@ public class RecoverableObject implements Recoverable {
         return (JsonUtil.toJsonString(this.toMap()));
     }
 
+    @Override
     public JsonObject toJson(){
         return JsonUtil.toJsonObject(this.properties);
     }
