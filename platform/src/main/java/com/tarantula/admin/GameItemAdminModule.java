@@ -41,19 +41,14 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
-            if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
-                applicationPreSetup.save(context,gameCluster,typeIndex);
-                List<String> updates = availableUpdates(query[1]);
-                updates.forEach((update)-> {
-                    ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                    configurableTypes.addType(jo);
-                    applicationPreSetup.save(context, gameCluster, configurableTypes);
-                    if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
-                });
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
-            }
+            applicationPreSetup.save(context,gameCluster,typeIndex);
+            List<String> updates = availableUpdates(query[1]);
+            updates.forEach((update)-> {
+                ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
+                configurableTypes.addType(jo);
+                applicationPreSetup.save(context, gameCluster, configurableTypes);
+                if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
+            });
         }
         else if(session.action().equals("onCreateCategorySettings")){
             String[] query = session.name().split("#");
@@ -61,10 +56,11 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),header.get("scope").getAsString(),jo);
+            String scope = header.get("scope").getAsString();
+            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),scope,jo);
             if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
                 applicationPreSetup.save(context,gameCluster,typeIndex);
-                List<String> updates = this.availableUpdates(typeIndex.index());
+                List<String> updates = this.availableUpdates(typeIndex.index().startsWith(Configurable.APPLICATION_CONFIG_TYPE+".")?Configurable.APPLICATION_CONFIG_TYPE:typeIndex.index());
                 updates.forEach(update->{
                     ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                     if(categories.addCategory(jo)){
@@ -89,12 +85,13 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
+            String scope = header.get("scope").getAsString();
             TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString());
             if(applicationPreSetup.load(context,gameCluster,typeIndex)){
-                if(typeIndex.index().equals(header.get("scope").getAsString())){
+                if(typeIndex.index().equals(scope)){
                     typeIndex.payload = jo;
                     applicationPreSetup.save(context,gameCluster,typeIndex);
-                    List<String> updates = this.availableUpdates(typeIndex.index());
+                    List<String> updates = this.availableUpdates(typeIndex.index().startsWith(Configurable.APPLICATION_CONFIG_TYPE+".")?Configurable.APPLICATION_CONFIG_TYPE:typeIndex.index());
                     updates.forEach(update->{
                         ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                         if(categories.updateCategory(jo)){

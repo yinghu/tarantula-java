@@ -188,4 +188,5 @@ public class RecoverableObject implements Recoverable {
     public JsonObject toJson(){
         return JsonUtil.toJsonObject(this.properties);
     }
+
 }

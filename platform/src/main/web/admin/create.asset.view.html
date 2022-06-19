@@ -583,7 +583,7 @@
                     break;
                 case 'enum':
                     Array.from(pv.options).forEach(opt=>{
-                        if(data.header[prop.name]-opt.value==0){
+                        if(data.Header.hasOwnProperty(prop.name) && data.Header[prop.name]-opt.value==0){
                             opt.selected = true;
                         }
                     });

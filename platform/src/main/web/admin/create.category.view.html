@@ -131,7 +131,26 @@
 </div>
 <script>
     let scope = TARA_API.query().category;
+    console.log(TARA_API.query().serviceCategory);
     document.querySelector('#tx-category-scope-'+scope).checked = true;
+    if(scope == 'item'){
+        document.querySelector('#tx-category-scope-application').disabled = true;
+    }
+    else if(scope == 'commodity'){
+        document.querySelector('#tx-category-scope-application').disabled = true;
+        document.querySelector('#tx-category-scope-item').disabled = true;
+    }
+    else if(scope == 'component'){
+        document.querySelector('#tx-category-scope-application').disabled = true;
+        document.querySelector('#tx-category-scope-item').disabled = true;
+        document.querySelector('#tx-category-scope-commodity').disabled = true;
+    }
+    else if(scope == 'asset'){
+        document.querySelector('#tx-category-scope-application').disabled = true;
+        document.querySelector('#tx-category-scope-item').disabled = true;
+        document.querySelector('#tx-category-scope-commodity').disabled = true;
+       document.querySelector('#tx-category-scope-component').disabled = true;
+    }
     let types = [];
     let pendingProps = new Map();
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
@@ -283,7 +302,11 @@
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return; 
         }
-        categoryTemplate.header.scope = scope;
+        if(scope == 'application' && TARA_API.query().serviceCategory != null){
+            categoryTemplate.header.scope = scope+'.'+TARA_API.query().serviceCategory;
+        }else{
+            categoryTemplate.header.scope = scope;
+        }
         categoryTemplate.header.type = ctype;
         categoryTemplate.header.description = cname;
         categoryTemplate.header.version = cversion;

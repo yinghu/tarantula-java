@@ -1,6 +1,8 @@
 package com.icodesoftware;
 
 
+import com.google.gson.JsonObject;
+
 import java.util.Map;
 
 public interface Recoverable extends Distributable {
