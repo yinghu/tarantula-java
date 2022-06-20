@@ -104,11 +104,11 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("rank",rank);
-        jsonObject.addProperty("level",level);
-        jsonObject.addProperty("xp",xp);
-        jsonObject.addProperty("arenaLevel",arenaLevel);
-        jsonObject.addProperty("arenaXP",arenaXp);
+        jsonObject.addProperty("Rank",rank);
+        jsonObject.addProperty("Level",level);
+        jsonObject.addProperty("Xp",xp);
+        jsonObject.addProperty("ArenaLevel",arenaLevel);
+        jsonObject.addProperty("ArenaXP",arenaXp);
         return jsonObject;
     }
 }

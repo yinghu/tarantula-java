@@ -253,4 +253,15 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this._configurableSetting = configurableSetting.properties;
     }
 
+    public JsonObject header(){
+        return header;
+    }
+    public JsonObject application(){
+        return application;
+    }
+    public JsonArray reference(){
+        return reference;
+    }
+
+
 }

@@ -297,7 +297,7 @@
         }
         let itemTemplate = {header:{},application:{},reference:[]};
         if(TARA_API.query().operation == 'Update'){
-            itemTemplate.itemId = TARA_API.query().pendingUpdate.ItemId;
+            itemTemplate.itemId = TARA_API.query().pendingUpdate.itemId;
         }
         itemTemplate.configurationType = selectedItem.header.scope;//TARA_API.query().category;
         itemTemplate.configurationTypeId = _typeId;
@@ -372,8 +372,8 @@
         TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
             console.log(resp);
             resp.itemList.forEach(item=>{
-                list.innerHTML += '<option value=\''+item.ItemId+'\'>'+item.ConfigurationName+'</option>';
-                payload[item.ItemId]=item;
+                list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
+                payload[item.itemId]=item;
             });
             callback();
         });  
@@ -383,7 +383,7 @@
         let list = document.querySelector('#tx-asset-property-'+propertyName);
         let item = payload[propertyValue];
         payload[propertyName].set(propertyName,propertyValue);
-        list.innerHTML = '<li>'+item.ConfigurationName+'&lt'+propertyValue+'&gt</li>';
+        list.innerHTML = '<li>'+item.configurationName+'&lt'+propertyValue+'&gt</li>';
     }
 
     function txCategoryListAdd(propertyName,propertyValue){
@@ -395,7 +395,7 @@
         payload[propertyName].set(removedIx,propertyValue);
         added.push('<li id=\''+removedIx);
         added.push('\'><div class=\'w3-container tx-text-12\'><span>');
-        added.push(item.ConfigurationName+'&lt'+propertyValue);
+        added.push(item.configurationName+'&lt'+propertyValue);
         added.push('&gt</span><span class=\'w3-right w3-tag w3-round w3-border w3-border-green w3-red tx-text-12 tx-padding-button ');
         added.push('tx-list-category-remove-'+propertyName);
         added.push('\' tx-index=\''+ix+'\'>Remove</span></div></li>');
@@ -543,8 +543,8 @@
     }
     function populate(data){
         console.log(data);
-        document.querySelector('#tx-configuration-asset-type-id').value = data.ConfigurationTypeId;
-        document.querySelector('#tx-configuration-asset-name').value = data.ConfigurationName;
+        document.querySelector('#tx-configuration-asset-type-id').value = data.configurationTypeId;
+        document.querySelector('#tx-configuration-asset-name').value = data.configurationName;
         console.log(selectedItem);
         selectedItem.application.properties.forEach(prop=>{
             let pv = document.querySelector('#tx-asset-property-'+prop.name);
@@ -552,28 +552,28 @@
                 case 'list':
                 case 'set':
                     if(prop.reference.startsWith('category')){
-                        if(data.Application.hasOwnProperty(prop.name) && data.Application[prop.name].length>0){
+                        if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length>0){
                                 txCategoryItemLoad(prop.name,()=>{
-                                    data.Application[prop.name].forEach(k=>{
+                                    data.application[prop.name].forEach(k=>{
                                         txCategoryListAdd(prop.name,k);
                                     });
                             });    
                         }
                     }
                     else{
-                       if(data.Application.hasOwnProperty(prop.name) && data.Application[prop.name].length>0){
+                       if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length>0){
                            console.log(data.application[prop.name]);
-                           data.Application[prop.name].forEach(k=>{
+                           data.application[prop.name].forEach(k=>{
                                txListItemAdd(prop.name,k);
                            });
                        }     
                     }
                     break;
                 case 'category':
-                    if(data.Application.hasOwnProperty(prop.name) && data.Application[prop.name].length==1){
+                    if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length==1){
                             txCategoryItemLoad(prop.name,()=>{
                                 Array.from(document.querySelector('#tx-list-select-'+prop.name).options).forEach(opt=>{
-                                if(data.Application[prop.name][0]==opt.value){
+                                if(data.application[prop.name][0]==opt.value){
                                     opt.selected = true;
                                     txCategoryItemAdd(prop.name,opt.value);
                                 }
@@ -583,16 +583,16 @@
                     break;
                 case 'enum':
                     Array.from(pv.options).forEach(opt=>{
-                        if(data.Header.hasOwnProperty(prop.name) && data.Header[prop.name]-opt.value==0){
+                        if(data.header.hasOwnProperty(prop.name) && data.header[prop.name]-opt.value==0){
                             opt.selected = true;
                         }
                     });
                     break;
                 case 'boolean':
-                    pv.checked = data.Header[prop.name];    
+                    pv.checked = data.header[prop.name];    
                     break;
                 default:
-                    pv.value = data.Header[prop.name];    
+                    pv.value = data.header[prop.name];    
                     break;
             }
         });

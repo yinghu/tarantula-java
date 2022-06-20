@@ -23,7 +23,7 @@ public class GameApplicationAdminModule implements Module {
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("typeId/"+app.category()));
-            session.write(new ItemContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
+            session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
             String[] query = session.name().split("#");
@@ -34,7 +34,7 @@ public class GameApplicationAdminModule implements Module {
             app.distributionKey(query[1]);
             if(preSetup.load(context,desc,app)){
                 app.setup();
-                session.write(app.toJson().toString().getBytes());
+                session.write(new ApplicationSerializer().serialize(app,Application.class,null).toString().getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,query[1]+" not existed").getBytes());

@@ -118,7 +118,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 app.configurableSetting(conf);
                 if(conf!=null&&SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    session.write(app.toJson().toString().getBytes());
+                    session.write(new AssetSerializer().serialize(app,Application.class,null).toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
@@ -138,7 +138,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 Descriptor desc = gameCluster.serviceWithCategory("item");
                 app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
-                    session.write(app.toJson().toString().getBytes());
+                    session.write(new ComponentSerializer().serialize(app,Application.class,null).toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save component").getBytes());
@@ -162,7 +162,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                     Category category = app.category(desc);
                     category.list();
                     category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
-                    session.write(app.toJson().toString().getBytes());
+                    session.write(new CommoditySerializer().serialize(app,Application.class,null).toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
@@ -183,7 +183,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     app.setup();
-                    session.write(app.toJson().toString().getBytes());
+                    session.write(new ItemSerializer().serialize(app,Application.class,null).toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
@@ -205,7 +205,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 app.configurableSetting(conf);
                 if(conf!=null && SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).save(this.context,desc,app)){
                     app.setup();
-                    session.write(app.toJson().toString().getBytes());
+                    session.write(new ApplicationSerializer().serialize(app,Application.class,null).toString().getBytes());
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"failed to save application").getBytes());
@@ -221,7 +221,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
-            session.write(new ItemContext(true,query[1],items).toJson().toString().getBytes());
+            session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

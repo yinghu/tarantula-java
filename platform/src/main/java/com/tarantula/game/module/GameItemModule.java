@@ -4,7 +4,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ItemContext;
+import com.tarantula.game.ItemContext;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
