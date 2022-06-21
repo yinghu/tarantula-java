@@ -2,6 +2,7 @@ package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
@@ -9,6 +10,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
@@ -40,7 +42,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected Configurable.Listener listener;
     protected ArrayList<ConfigurableObject> _reference;
-    protected JsonArray _configurableSetting = new JsonArray();
+    protected JsonObject _configurableSetting = new JsonObject();
 
     public ConfigurableObject(){}
     public ConfigurableObject(ConfigurableObject configurableObject){
@@ -55,6 +57,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.reference = configurableObject.reference;
         this.listener = configurableObject.listener;
         this._reference = configurableObject._reference;
+        this._configurableSetting = configurableObject._configurableSetting;
         this.distributionKey(configurableObject.distributionKey());
     }
 
@@ -139,7 +142,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
         this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
-        this._configurableSetting = JsonUtil.parseAsArray((String) properties.getOrDefault(SETTINGS_KEY, "[]"));
+        this._configurableSetting = JsonUtil.parse((String) properties.getOrDefault(SETTINGS_KEY, "{}"));
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -152,16 +155,14 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("ConfigurationType",configurationType);
-        jsonObject.addProperty("ConfigurationTypeId",configurationTypeId);
-        jsonObject.addProperty("ConfigurationName",configurationName);
-        jsonObject.addProperty("ConfigurationCategory",configurationCategory);
-        jsonObject.addProperty("ConfigurationVersion",configurationVersion);
         jsonObject.addProperty("ItemId", distributionKey());
-        jsonObject.addProperty("Disabled",disabled);
-        jsonObject.add("Header",header);
-        jsonObject.add("Application",application);
-        jsonObject.add("Reference",reference);
+        header.entrySet().forEach(e->{
+            String k  = e.getKey();
+            JsonPrimitive pv = e.getValue().getAsJsonPrimitive();
+            if(pv.isString()) jsonObject.addProperty(k,pv.getAsString());
+            if(pv.isNumber()) jsonObject.addProperty(k,pv.getAsNumber());
+            if(pv.isBoolean()) jsonObject.addProperty(k,pv.getAsBoolean());
+        });
         return jsonObject;
     }
 
@@ -189,9 +190,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             return false;
         }
         this.header = config.getAsJsonObject("header");
-        //if(header.entrySet().isEmpty()){
-            //return false;
-        //}
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
         if(config.has("itemId")){
@@ -250,7 +248,11 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
 
     public void configurableSetting(ConfigurableSetting configurableSetting){
-        this._configurableSetting = configurableSetting.properties;
+        configurableSetting.properties.forEach(e->{
+            String fn = e.getAsJsonObject().get("name").getAsString();
+            if(_configurableSetting.has(fn)) _configurableSetting.remove(fn);
+            _configurableSetting.add(fn,e);
+        });
     }
 
     public JsonObject header(){
@@ -261,6 +263,40 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
     public JsonArray reference(){
         return reference;
+    }
+
+    protected JsonObject toJson(JsonObject json){
+        HashMap<String,ConfigurableObject> _ref = new HashMap<>();
+        _reference.forEach(cob-> _ref.put(cob.distributionKey(),cob));
+        application.entrySet().forEach(e->{
+            String k = e.getKey();
+            JsonObject _type = _configurableSetting.get(k).getAsJsonObject();
+            String f = k.substring(0,1);
+            String fk = k.replaceFirst(f,"_"+f.toLowerCase());
+            String cat = _type.get("type").getAsString();
+            if(cat.equals("category")){
+                JsonArray keys = e.getValue().getAsJsonArray();
+                if(keys.size()==1) {
+                    json.add(fk,_ref.get(keys.get(0).getAsString()).toJson());
+                }
+            }
+            else if(cat.equals("list") || cat.equals("set")){
+                if(!json.has(fk)) json.add(fk,new JsonArray());
+                JsonArray arr = json.get(fk).getAsJsonArray();
+                String refType = _type.get("reference").getAsString();
+                if(refType.startsWith("category")){
+                    e.getValue().getAsJsonArray().forEach(key->{
+                        arr.add(_ref.get(key.getAsString()).toJson());
+                    });
+                }
+                else{
+                    e.getValue().getAsJsonArray().forEach(key->{
+                        arr.add(key);
+                    });
+                }
+            }
+        });
+        return json;
     }
 
 

@@ -1,10 +1,12 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Item extends ConfigurableObject{
@@ -32,11 +34,7 @@ public class Item extends ConfigurableObject{
     }
     @Override
     public JsonObject toJson(){
-        JsonObject json = super.toJson();
-        _reference.forEach((cob)->{
-            json.add(cob.distributionKey(),cob.toJson());
-        });
-        return json;
+        return super.toJson(super.toJson());
     }
 
     @Override

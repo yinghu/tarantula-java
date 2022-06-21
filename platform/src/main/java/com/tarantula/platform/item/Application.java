@@ -33,11 +33,7 @@ public class Application extends ConfigurableObject implements Configurable.List
     }
     @Override
     public JsonObject toJson(){
-        JsonObject json = super.toJson();
-        _reference.forEach((cob)->{
-            json.add(cob.distributionKey(),cob.toJson());
-        });
-        return json;
+        return super.toJson(super.toJson());
     }
 
     @Override

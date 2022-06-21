@@ -1,7 +1,5 @@
 package com.tarantula.platform.store;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
@@ -27,22 +25,6 @@ public class Shop extends Application {
         return configurationName;
     }
 
-    @Override
-    public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("Successful",true);
-        jsonObject.addProperty("Name",configurationName);
-        if(_reference==null) {
-            jsonObject.add("_itemList",new JsonArray());
-            return jsonObject;
-        }
-        JsonArray alist = new JsonArray();
-        _reference.forEach((v)->{
-            alist.add(v.toJson());
-        });
-        jsonObject.add("_itemList",alist);
-        return jsonObject;
-    }
 
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
