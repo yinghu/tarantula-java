@@ -59,7 +59,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         jsonObject.addProperty("GameId",this.distributionKey());
         jsonObject.addProperty("DeviceId",index);
         jsonObject.addProperty("DeviceName",name);
-        jsonObject.addProperty("Owner",owner);
+        jsonObject.addProperty("OwnerId",owner);
         jsonObject.addProperty("Version",version);
         jsonObject.addProperty("Timestamp",timestamp);
         if(dailyLoginTrack!=null) jsonObject.add("_dailyLogin", dailyLoginTrack.toJson());
