@@ -2,58 +2,52 @@
   "type": "category",
   "category": "system",
   "version": "1.0",
-  "description": "category commodity template list",
-  "name": "commodities/commodity-type-settings",
+  "description": "category item template list",
+  "name": "application-type-settings",
   "itemList":
   [
     {
       "header": {
-        "scope": "commodity",
-        "type": "GameCurrency",
-        "description": "virtual currency",
+        "scope": "application.achievement",
+        "type": "Achievement",
+        "description": "achievement category",
         "version": "1.0",
-        "rechargeable": true
+        "rechargeable": false
       },
       "application": {
         "properties": [
           {
-            "name": "Name",
+            "name": "Description",
             "type": "string",
-            "reference": "Name",
+            "reference": "Description",
+            "nullable": true,
+            "downloadable": false
+          },
+          {
+            "name": "Tier",
+            "type": "number",
+            "reference": "Integer",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "Amount",
+            "name": "Target",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Objective",
             "type": "number",
             "reference": "Double",
             "nullable": false,
             "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "commodity",
-        "type": "GameAward",
-        "description": "visual game item",
-        "version": "1.0",
-        "rechargeable": true
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
           },
           {
-            "name": "DisplayCard",
+            "name": "Award",
             "type": "category",
-            "reference": "category:DisplayCard",
+            "reference": "category:AchievementAwardItem",
             "nullable": false,
             "downloadable": false
           }
@@ -62,9 +56,9 @@
     },
     {
       "header": {
-        "scope": "commodity",
-        "type": "Arena",
-        "description": "lobby category",
+        "scope": "application.achievement",
+        "type": "AchievementAwardItem",
+        "description": "achievement category",
         "version": "1.0",
         "rechargeable": false
       },
@@ -78,9 +72,9 @@
             "downloadable": false
           },
           {
-            "name": "Level",
-            "type": "number",
-            "reference": "Integer",
+            "name": "ItemPack",
+            "type": "category",
+            "reference": "category:ItemPack",
             "nullable": false,
             "downloadable": false
           }

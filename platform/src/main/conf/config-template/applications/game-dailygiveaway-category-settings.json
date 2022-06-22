@@ -1,0 +1,78 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "application-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "application.giveaway",
+        "type": "DailyGiveaway",
+        "description": "giveaway category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Description",
+            "type": "string",
+            "reference": "Description",
+            "nullable": true,
+            "downloadable": false
+          },
+          {
+            "name": "Tier",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Day",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Reward",
+            "type": "category",
+            "reference": "category:DailyRewardItem",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.giveaway",
+        "type": "DailyRewardItem",
+        "description": "application category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ItemPack",
+            "type": "category",
+            "reference": "category:ItemPack",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

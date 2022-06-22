@@ -1,0 +1,44 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "item-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "item",
+        "type": "ItemPack",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "SkuList",
+            "type": "list",
+            "reference": "category:Sku",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku",
+        "description": "item category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+
+        ]
+      }
+    }
+  ]
+}

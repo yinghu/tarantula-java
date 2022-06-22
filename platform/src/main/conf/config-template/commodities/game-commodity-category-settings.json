@@ -1,0 +1,91 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category commodity template list",
+  "name": "commodity-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "GameCurrency",
+        "description": "virtual currency",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Amount",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "GameAward",
+        "description": "visual game item",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "DisplayCard",
+            "type": "category",
+            "reference": "category:DisplayCard",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "Arena",
+        "description": "lobby category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Level",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

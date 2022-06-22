@@ -1,0 +1,11 @@
+{
+  "type": "item",
+  "category": "type",
+  "version": "1.0",
+  "description": "types of item category",
+  "itemList":
+  [
+    {"type": "category","name": "ItemPack"},
+    {"type": "category","name": "Sku"}
+  ]
+}

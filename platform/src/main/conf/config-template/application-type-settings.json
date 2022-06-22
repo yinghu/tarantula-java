@@ -8,6 +8,10 @@
     {"type": "category","name": "Shop"},
     {"type": "category","name": "Achievement"},
     {"type": "category","name": "DailyGiveaway"},
-    {"type": "category","name": "Map"}
+    {"type": "category","name": "Map"},
+    {"type": "category","name": "DailyRewardItem"},
+    {"type": "category","name": "ShoppingItem"},
+    {"type": "category","name": "AchievementAwardItem"},
+    {"type": "category","name": "Zone"}
   ]
 }

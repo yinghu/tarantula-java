@@ -37,11 +37,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
     public final static String PLAY_LIST_INDEX ="playlist";
 
-    public final static String GAME_ASSET_CATEGORY_TEMPLATE = "game-asset-category-settings";
-    public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "game-component-category-settings";
-    public final static String GAME_COMMODITY_CATEGORY_TEMPLATE = "game-commodity-category-settings";
-    public final static String GAME_ITEM_CATEGORY_TEMPLATE = "game-item-category-settings";
-    public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "game-application-category-settings";
+    public final static String GAME_ASSET_CATEGORY_TEMPLATE = "assets";
+    public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "components";
+    public final static String GAME_COMMODITY_CATEGORY_TEMPLATE = "commodities";
+    public final static String GAME_ITEM_CATEGORY_TEMPLATE = "items";
+    public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "applications";
 
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 

@@ -155,6 +155,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
+        if(distributionKey()==null) return jsonObject;
         jsonObject.addProperty("ItemId", distributionKey());
         header.entrySet().forEach(e->{
             String k  = e.getKey();
@@ -267,6 +268,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected JsonObject toJson(JsonObject json){
         HashMap<String,ConfigurableObject> _ref = new HashMap<>();
+        if(_reference==null) return json;
         _reference.forEach(cob-> _ref.put(cob.distributionKey(),cob));
         application.entrySet().forEach(e->{
             String k = e.getKey();

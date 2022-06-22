@@ -3,14 +3,14 @@
   "category": "system",
   "version": "1.0",
   "description": "category item template list",
-  "name": "items/item-type-settings",
+  "name": "application-type-settings",
   "itemList":
   [
     {
       "header": {
-        "scope": "item",
-        "type": "DailyRewardItem",
-        "description": "item category",
+        "scope": "application.lobby",
+        "type": "Map",
+        "description": "lobby category",
         "version": "1.0",
         "rechargeable": false
       },
@@ -24,9 +24,9 @@
             "downloadable": false
           },
           {
-            "name": "ItemPack",
-            "type": "category",
-            "reference": "category:ItemPack",
+            "name": "ZoneSet",
+            "type": "set",
+            "reference": "category:Zone",
             "nullable": false,
             "downloadable": false
           }
@@ -35,70 +35,9 @@
     },
     {
       "header": {
-        "scope": "item",
-        "type": "AchievementAwardItem",
-        "description": "item category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "ItemPack",
-            "type": "category",
-            "reference": "category:ItemPack",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
-        "type": "ItemPack",
-        "description": "item category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "SkuList",
-            "type": "list",
-            "reference": "category:Sku",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
-        "type": "Sku",
-        "description": "item category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
+        "scope": "application.lobby",
         "type": "Zone",
-        "description": "item category",
+        "description": "application category",
         "version": "1.0",
         "rechargeable": false
       },
