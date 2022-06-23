@@ -218,8 +218,14 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            Descriptor app = gameCluster.serviceWithCategory("item");
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            Descriptor app = gameCluster.serviceWithCategory("item");
+            ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
+            ConfigurableSetting configurableSetting = categories.configurableSetting(query[1].split("/")[1]);
+            if(configurableSetting != null && configurableSetting.scope.startsWith("application.")){
+                String serviceCategory = configurableSetting.scope.substring(12);
+                app = gameCluster.serviceWithCategory(serviceCategory);
+            }
             List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery(query[1]));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }

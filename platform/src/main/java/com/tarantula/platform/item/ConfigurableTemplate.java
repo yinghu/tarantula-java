@@ -55,4 +55,9 @@ public class ConfigurableTemplate extends RecoverableObject implements Configura
         jsonObject.add("itemList",(JsonArray)property("itemList"));
         return jsonObject;
     }
+
+    @Override
+    public String toString(){
+        return toJson().toString();
+    }
 }

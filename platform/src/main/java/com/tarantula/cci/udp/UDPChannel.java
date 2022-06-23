@@ -90,7 +90,7 @@ public class UDPChannel extends GameChannel {
         jsonObject.addProperty("ChannelId",channelId);
         jsonObject.addProperty("SessionId",sessionId);
         jsonObject.addProperty("Timeout",timeout);
-        jsonObject.addProperty("_serverKey", Base64.getEncoder().encodeToString(serverKey));
+        jsonObject.addProperty("ServerKey", Base64.getEncoder().encodeToString(serverKey));
         jsonObject.add("_connection",connection.toJson());
         return jsonObject;
     }

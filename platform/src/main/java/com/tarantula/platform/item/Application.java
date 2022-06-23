@@ -44,7 +44,7 @@ public class Application extends ConfigurableObject implements Configurable.List
     @Override
     public boolean configureAndValidate(){
         setup();
-        return validated;
+        return true;//validated;
     }
     @Override
     public  <T extends Configurable> T setup(){
@@ -53,7 +53,7 @@ public class Application extends ConfigurableObject implements Configurable.List
             ConfigurableObject cob = new ConfigurableObject();
             cob.distributionKey(je.getAsString());
             cob.dataStore(dataStore);
-            if(this.dataStore.load(cob) && !cob.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)){
+            if(this.dataStore.load(cob)){
                 cob.registerListener(this);
                 _reference.add(cob.setup());
             }
