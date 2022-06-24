@@ -44,7 +44,7 @@ public class Application extends ConfigurableObject implements Configurable.List
     @Override
     public boolean configureAndValidate(){
         setup();
-        return true;//validated;
+        return validated;
     }
     @Override
     public  <T extends Configurable> T setup(){

@@ -227,7 +227,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
             return item.setup();
         }
         if(this.configurationType.startsWith(Configurable.APPLICATION_CONFIG_TYPE)){
-            Application application = new Application(this);
+            Item application = new Item(this);
             application.dataStore(dataStore);
             return application.setup();
         }

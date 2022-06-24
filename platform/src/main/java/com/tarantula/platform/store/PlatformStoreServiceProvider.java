@@ -79,6 +79,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public <T extends Configurable> void register(T t) {
+        if(!t.configurationCategory().equals("Shop")) return;
         t.registered();
         distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
@@ -105,7 +106,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Shop> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("typeId/"+descriptor.category()));
+        List<Shop> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
                 registerShop(a);

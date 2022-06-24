@@ -45,12 +45,11 @@ public class GameApplicationAdminModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
             ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Application app = new Application();//gameServiceProvider.createApplication(query[2]);
+            Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             if(preSetup.load(context,desc,app) && app.configureAndValidate()){
                 session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
-                //ConfigurableObject cfg = gameServiceProvider.createApplication(query[2]);
                 gameServiceProvider.configurationServiceProvider(query[2]).register(app);
             }
             else{
@@ -61,7 +60,7 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            Application app = new Application();//gameServiceProvider.createApplication(query[2]);
+            Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
