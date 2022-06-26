@@ -71,8 +71,12 @@
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
-                    <div class="w3-panel w3-green tx-padding-title" style="display: none;"><span class="tx-text-14">Lobby Management</span></div>
-                    <div id='tx-game-cluster-lobby-bar' class='w3-bar w3-white' style="display: none;">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Lobby Management</span></div>
+                    <div id='tx-game-cluster-lobby-bar' class='w3-bar w3-white'>
+                        <span id='game-arena-id-0' tx-game-category='asset' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Arena</span>           
+                        <span id='game-room-id-0' tx-game-category='commodity' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Room</span>   
+                        <span id='game-zone-id-0' tx-game-category='item' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Zone</span>   
+                        <span id='game-lobby-id-0' tx-game-category='application' tx-service-category='lobby' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Lobby</span>   
                     </div>
                     <!-- Data Store bar -->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Data Management</span></div>
@@ -308,6 +312,10 @@
                     document.querySelector('#game-component-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-commodity-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-configuration-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    document.querySelector('#game-lobby-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-zone-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    document.querySelector('#game-room-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    document.querySelector('#game-arena-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
@@ -354,28 +362,28 @@
                         reset_t_action_event();
                     }       
                 });
-                let lbar = document.querySelector('#tx-game-cluster-lobby-bar');
-                lbar.innerHTML = '';
-                TARA_API.onGet('role/lobby','onGameLobbyList',_gameClusterId,(resp3)=>{
+                //let lbar = document.querySelector('#tx-game-cluster-lobby-bar');
+                //lbar.innerHTML = '';
+                //TARA_API.onGet('role/lobby','onGameLobbyList',_gameClusterId,(resp3)=>{
                     //console.log(resp3);
-                    if(resp3.successful){
-                        resp3.gameLobbyList.forEach(a=>{
-                            console.log(a)
-                            if(!a.disabled){
-                                let tem = [];
-                                tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                                tem.push('api.game.lobby\' tx-game-lobby-id=\'');
-                                tem.push(a.applicationId+'\' tx-game-category=\'application\' tx-service-category=\'');
-                                tem.push(a.category);
-                                tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
-                                tem.push(a.name);
-                                tem.push('</span>');  
-                                lbar.innerHTML += tem.join('');
-                            }   
-                        });
-                        reset_t_action_event();
-                    }
-                });
+                    //if(resp3.successful){
+                        //resp3.gameLobbyList.forEach(a=>{
+                            //console.log(a)
+                            //if(!a.disabled){
+                              //  let tem = [];
+                               // tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
+                               // tem.push('api.game.lobby\' tx-game-lobby-id=\'');
+                               // tem.push(a.applicationId+'\' tx-game-category=\'application\' tx-service-category=\'');
+                               // tem.push(a.category);
+                               // tem.push('\' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-lobby-action\'>');
+                               // tem.push(a.name);
+                               // tem.push('</span>');  
+                               // lbar.innerHTML += tem.join('');
+                            //}   
+                        //});
+                        //reset_t_action_event();
+                    //}
+                //});
             } 
             else{
                 console.log(resp.message);

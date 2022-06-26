@@ -9,10 +9,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;
@@ -50,21 +48,10 @@ public class GameLobbyAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"no game data ["+session.name()+"]").getBytes());
             }
         }
-
-       //else if(session.action().equals("onGameLobby")){
-            //Map<String,Object> cmd = JsonUtil.toMap(payload);
-            //String gameClusterId = (String) cmd.get("gameClusterId");
-            //String applicationId = (String) cmd.get("applicationId");
-            //GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            //Descriptor app = gameCluster.gameWithKey(applicationId);
-            //GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            //session.write(toJson(app,lobby).toString().getBytes());
-        //}
         else if (session.action().equals("onAddLobby")){
-            //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
-            String gameClusterId = query[0];//(String) cmd.get("gameClusterId");
-            int lobbyIndex = Integer.parseInt(query[1]);//(Number) cmd.get("lobbyIndex")).intValue();
+            String gameClusterId = query[0];
+            int lobbyIndex = Integer.parseInt(query[1]);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Lobby lobby = gameCluster.gameLobby;
             if(lobby.entryList().size()<maxGameLobbyCount&&lobbyIndex<=maxGameLobbyCount){
@@ -93,50 +80,17 @@ public class GameLobbyAdminModule implements Module {
             }
         }
         else if(session.action().equals("onDisableLobby")){
-            //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
             boolean suc = this.deploymentServiceProvider.disableApplication(query[1]);
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else if(session.action().equals("onEnableLobby")){
-            //Map<String,Object> cmd = JsonUtil.toMap(payload);
             String[] query = session.name().split("#");
             boolean suc = this.deploymentServiceProvider.enableApplication(query[1]);
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
-        else if(session.action().equals("onReloadLobby")){
-            Map<String,Object> cmd = JsonUtil.toMap(payload);
-            String gameClusterId = (String) cmd.get("gameClusterId");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
-            String lobbyId = (String)cmd.get("lobbyId");
-            Descriptor app = gameCluster.gameWithKey(lobbyId);
-            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            lobby.setup(context);
-            ///lobby.reload();
-            //GameZone zone = lobby.list().get(0);
-            //this.deploymentServiceProvider.configure(zone.distributionKey());
-            session.write(JsonUtil.toSimpleResponse(true,"Lobby reloaded").getBytes());
-        }
-        else if(session.action().equals("onSaveLobbyZone")){
-            String[] keys = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-            Descriptor app = gameCluster.gameWithKey(keys[1]);
-            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            lobby.setup(context);
-            //lobby.configureGameZone(payload);
-            session.write(JsonUtil.toSimpleResponse(true,"zone updated").getBytes());
-        }
-        else if(session.action().equals("onSaveLobbyLevel")){
-            String[] keys = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(keys[0]);
-            Descriptor app = gameCluster.gameWithKey(keys[1]);
-            GameLobby lobby = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(this.context,app);
-            lobby.setup(context);
-            //lobby.configureArena(payload);
-            session.write(JsonUtil.toSimpleResponse(true,"level updated").getBytes());
-        }
-        else {
-            throw new UnsupportedOperationException(session.action()+" not supported");
+        else{
+            session.write(JsonUtil.toSimpleResponse(false, session.action()+" operation not supported").getBytes());
         }
         return false;
     }
@@ -163,43 +117,4 @@ public class GameLobbyAdminModule implements Module {
         jsonObject.add("gameLobbyList",alist);
         return jsonObject;
     }
-    /**
-    private JsonObject toJson(Descriptor lobby,GameLobby gameLobby){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray zarray = new JsonArray();
-        gameLobby.list().forEach((zone)->{
-            JsonObject _jo = new JsonObject();
-            JsonObject jzon = new JsonObject();
-            jzon.addProperty("zoneId",zone.distributionKey());
-            jzon.addProperty("name",zone.name()!=null?zone.name():lobby.name());
-            jzon.addProperty("levelMatch",zone.levelMatch());
-            jzon.addProperty("tag",lobby.tag());
-            jzon.addProperty("rank",lobby.accessRank());
-            jzon.addProperty("capacity",zone.capacity());
-            jzon.addProperty("maxJoinsPerRoom",zone.maxJoinsPerRoom());
-            jzon.addProperty("joinsOnStart",zone.joinsOnStart());
-            jzon.addProperty("duration",zone.roundDuration()/60000);
-            jzon.addProperty("playMode",zone.playMode());
-            jzon.addProperty("disabled",lobby.disabled());
-            _jo.add("zone",jzon);
-            JsonArray jds = new JsonArray();
-            for(Arena a: zone.arenas()){
-                JsonObject jd = new JsonObject();
-                jd.addProperty("arenaId",a.distributionKey());
-                jd.addProperty("name",a.name());
-                jd.addProperty("level",a.level);
-                jd.addProperty("xp",a.xp);
-                jd.addProperty("capacity",a.capacity);
-                jd.addProperty("joinsOnStart",a.joinsOnStart);
-                jd.addProperty("duration",a.duration/60000);
-                jd.addProperty("disabled",a.disabled());
-                jds.add(jd);
-            }
-            _jo.add("levels",jds);
-            zarray.add(_jo);
-        });
-        jsonObject.add("list",zarray);
-        return jsonObject;
-    }**/
 }

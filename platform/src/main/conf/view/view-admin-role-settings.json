@@ -15,8 +15,6 @@
     {"type":"game.data.list","moduleResourceFile":"admin/game.data.list.view.html"},
     {"type":"game.cluster.launch","moduleResourceFile":"admin/game.cluster.launch.view.html"},
     {"type":"game.cluster.shutdown","moduleResourceFile":"admin/game.cluster.shutdown.view.html"},
-    {"type":"game.cluster.edit","moduleResourceFile":"admin/game.cluster.edit.view.html"},
-    {"type":"api.service.data","moduleResourceFile":"admin/api.service.data.view.html"},
-    {"type":"api.game.lobby","moduleResourceFile":"admin/api.game.lobby.view.html"}
+    {"type":"game.cluster.edit","moduleResourceFile":"admin/game.cluster.edit.view.html"}
   ]
 }
