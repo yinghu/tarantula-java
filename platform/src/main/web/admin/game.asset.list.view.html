@@ -299,14 +299,28 @@
             bars.itemBar[0].innerHTML = '';
             bars.applicationBar[0].innerHTML = '';
             resp.itemList.forEach((a,i)=>{
-                if(a.header.scope.startsWith('application')){
-                    if(a.header.scope == 'application.'+TARA_API.query().serviceCategory){
+                let ascope = a.header.scope;
+                let acategory = null;
+                let aix = ascope.indexOf('.');
+                if(aix>0){
+                    acategory = ascope.substring(aix+1);
+                    ascope = ascope.substring(0,aix);
+                }
+                console.log(ascope);
+                if(ascope == 'application'){
+                    if(ascope == 'application.'+TARA_API.query().serviceCategory){
                         bars['applicationBar'][0].innerHTML += toHtmlBarItem(a,i);        
                     }
-                }else{
-                    bars[a.header.scope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
                 }
-                //bars[a.header.scope+'Bar'][1].style.display = 'block';
+                else if(acategory!=null){
+                    
+                    if(TARA_API.query().serviceCategory !=null && acategory == TARA_API.query().serviceCategory){
+                        bars[ascope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);        
+                    }
+                }
+                else if(acategory==null){
+                    bars[ascope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
+                }
             });
             bars[TARA_API.query().category+'Bar'][2].checked = true;
             bars[TARA_API.query().category+'Bar'][1].style.display = 'block';

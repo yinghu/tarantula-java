@@ -1,0 +1,37 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category commodity template list",
+  "name": "commodity-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "commodity.lobby",
+        "type": "Arena",
+        "description": "lobby category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "Name",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Level",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}
