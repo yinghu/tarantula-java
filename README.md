@@ -9,6 +9,7 @@
 
 
 # System Features
+
 ### 1. Global Unique Key Cluster Indexing Support 
 ### 2. Large Data Sharding And Distribution With Master To Master Replication Mode   
 ### 3. Univeral HTTP Support With Web Socket/UDP Integration
@@ -22,41 +23,9 @@
 ### 11. Pure JAVA Implmentation With High Concurrecy Throughput
 ### 12. Hot Runtime Deployment Support 
 
+# Document List
 
-## How To Use
-1. Over 9.* JAVA runtime is required. JDK 12 is suggested.
-2. Maven 3 is the build tool.
-3. Node JS 10.* is to run a websocket server working as the websocket frontend for the platform.
-4. Download the source tree from github.com/yinghu/gameenginecluster.
-5. Go to platform to run mvn clean first (MAKE SURE Berkeley DB lib on local maven repository) and then run mvn install separately for maven local repository.
-```
-    mvn clean
-    mvn install
-```
-
-## How To Run (Run Module On Platform)
-1. All modules are the runtime plugins on the platform runtime. Modules can be launching/shuttingdown on the platform in runtime.
-2. Build the platform from source (go to platform folder in the source tree and run mvn clean install).
-3. Run node win.bootstrap.js on Windows or run node ux.bootstrap.js on linux/mac (use sudo) in the target/release/gec-platform-bin-1.0/gec-platform-1.0/bin.
-```
-    cd target/release/gec-platform-bin-1.0/gec-platform-1.0/bin
-    tarantula.bat on Windows or tarantula.sh on linux/mac
-```
-2. Once it is runing, go to http://localhost:8090 via browsers.
-3. Use the admin tool to drop the module to run. (login/password as root/root created by the platform).
-4. Login as root and go to admin-setup application.
-5. Click Add Module to open the module setup page (place the module jar file some folder use file:/// as codebase, remote deployment use http:// ). 
-6. Input codebase, artifact name, and version for the module, then click add module.
-7. Launch the module on the main setup-tool under the module.
-
-## DOCKER
-To run with docker rather than directly on your machine, make sure you have [Docker](https://www.docker.com/products/docker-desktop/) and docker-compose (included with docker-desktop) installed.
-
-1. Ensure `platform/src/main/conf/tarantula.properties` has these properties set
-```
-tarantula.data.store.dir=/tarantula/data
-tarantula.service.deployment.dir=/tarantula/deploy
-```
-2. Simply run `docker-compose up -d` and navigate to `localhost:8090`
-
-If you make a code change, the image will need to get rebuilt, and can be done by running `docker-compose up --build -d`
+## How to set up
+[Setup](doc/setup.md)
+## How to write a module
+[Module](doc/module.md)
