@@ -82,12 +82,13 @@
     Edit:
         `host box ip address`
 ## Run
-cd to `target/release/gec-platform-2.0-bin/gec-platform-2.0/bin`
-run tarantula.bat on Windows 
-run tatantula.sh on unix-like OS 
 
 ### Run on local box
 
+cd to `target/release/gec-platform-2.0-bin/gec-platform-2.0/bin`
+run tarantula.bat on Windows 
+run tatantula.sh on unix-like OS 
+ 
 ### Run on docker container
 
 To run with docker rather than directly on your machine, make sure you have [Docker](https://www.docker.com/products/docker-desktop/) and docker-compose (included with docker-desktop) installed.
@@ -104,4 +105,4 @@ If you make a code change, the image will need to get rebuilt, and can be done b
 ## Test web
 open index page `localhost:8090`
 click signin icon to popup login page with user/pwd pair root/root
-dashboard page includes player/acount/developer/sudo tabs 
+dashboard page includes player/acount/developer/sudo tabs
