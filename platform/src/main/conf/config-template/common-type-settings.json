@@ -8,7 +8,6 @@
     {"type": "string","name": "String","value": "text","reference": "String"},
     {"type": "number","name": "Short","value": "number","reference": "short"},
     {"type": "number","name": "Integer","value": "number","reference": "integer"},
-    {"type": "number","name": "Age","value": "number","reference": "integer","entry": "[^a-zA-Z0-9]"},
     {"type": "number","name": "Long","value": "number","reference": "long"},
     {"type": "number","name": "Double","value": "number","reference": "double"},
     {"type": "number","name": "Float","value": "number","reference": "float"},
