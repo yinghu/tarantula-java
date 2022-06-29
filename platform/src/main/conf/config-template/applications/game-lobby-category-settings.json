@@ -10,7 +10,7 @@
       "header": {
         "scope": "application.lobby",
         "type": "Map",
-        "description": "lobby category",
+        "description": "map category",
         "version": "1.0",
         "rechargeable": false
       },

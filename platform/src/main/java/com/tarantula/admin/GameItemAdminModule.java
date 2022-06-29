@@ -1,6 +1,7 @@
 package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
@@ -35,7 +36,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             ConfigurableTypes configurableTypes = this.configurableTypes(query[1],gameCluster,applicationPreSetup);
             session.write(configurableTypes.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onUpdateTypesSettings")){
+        else if(session.action().equals("onUpdateTypeSettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
@@ -49,6 +50,28 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 applicationPreSetup.save(context, gameCluster, configurableTypes);
                 if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
             });
+        }
+        else if(session.action().equals("onUpdateTypesSettings")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            JsonArray jtypes = JsonUtil.parse(payload).get("types").getAsJsonArray();
+            boolean[] send = {true};
+            for(JsonElement je : jtypes){
+                JsonObject jo = je.getAsJsonObject();
+                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
+                applicationPreSetup.save(context,gameCluster,typeIndex);
+                List<String> updates = availableUpdates(query[1]);
+                updates.forEach((update)-> {
+                    ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
+                    configurableTypes.addType(jo);
+                    applicationPreSetup.save(context, gameCluster, configurableTypes);
+                    if(send[0] && update.equals(query[1])){
+                        send[0] = false;
+                        session.write(configurableTypes.toJson().toString().getBytes());
+                    }
+                });
+            }
         }
         else if(session.action().equals("onCreateCategorySettings")){
             String[] query = session.name().split("#");

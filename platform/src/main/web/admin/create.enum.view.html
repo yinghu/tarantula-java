@@ -139,7 +139,7 @@
         document.querySelector('#tx-create-enum-save').style.display ='none';
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
-        TARA_API.onSet('role/item','onUpdateTypesSettings',query,item,(resp)=>{
+        TARA_API.onSet('role/item','onUpdateTypeSettings',query,item,(resp)=>{
             editor.set(resp);   
         });
     };

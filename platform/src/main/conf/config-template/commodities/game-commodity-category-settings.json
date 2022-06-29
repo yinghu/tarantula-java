@@ -37,9 +37,9 @@
       "header": {
         "scope": "commodity",
         "type": "GameAward",
-        "description": "visual game item",
+        "description": "visual game award",
         "version": "1.0",
-        "rechargeable": true
+        "rechargeable": false
       },
       "application": {
         "properties": [

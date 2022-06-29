@@ -10,7 +10,7 @@
       "header": {
         "scope": "asset",
         "type": "DisplayCard",
-        "description": "general icon view",
+        "description": "general asset view",
         "version": "1.0",
         "rechargeable": false
       },

@@ -10,7 +10,7 @@
       "header": {
         "scope": "commodity.lobby",
         "type": "Arena",
-        "description": "lobby category",
+        "description": "arena category",
         "version": "1.0",
         "rechargeable": false
       },

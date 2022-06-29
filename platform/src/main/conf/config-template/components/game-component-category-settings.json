@@ -10,55 +10,12 @@
       "header": {
         "scope": "component",
         "type": "GameStatistics",
-        "description": "general component",
+        "description": "game statistics header",
         "version": "1.0",
         "rechargeable": true
       },
       "application": {
-        "properties": [
-          {
-            "name": "Health",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "MeleeDamage",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "RangedDamage",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "CriticalDamagePercent",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Recovery",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Speed",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
+        "properties": []
       }
     }
   ]

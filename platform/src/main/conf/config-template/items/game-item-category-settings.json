@@ -10,7 +10,7 @@
       "header": {
         "scope": "item",
         "type": "ItemPack",
-        "description": "item category",
+        "description": "item pack category",
         "version": "1.0",
         "rechargeable": false
       },
@@ -30,7 +30,7 @@
       "header": {
         "scope": "item",
         "type": "Sku",
-        "description": "item category",
+        "description": "sku category",
         "version": "1.0",
         "rechargeable": false
       },

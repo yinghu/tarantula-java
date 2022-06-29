@@ -6,6 +6,7 @@
   "itemList":
   [
     {"type": "category","name": "ItemPack"},
-    {"type": "category","name": "Sku"}
+    {"type": "category","name": "Sku"},
+    {"type": "category","name": "Zone"}
   ]
 }
