@@ -300,25 +300,17 @@
             bars.applicationBar[0].innerHTML = '';
             resp.itemList.forEach((a,i)=>{
                 let ascope = a.header.scope;
-                let acategory = null;
                 let aix = ascope.indexOf('.');
-                if(aix>0){
-                    acategory = ascope.substring(aix+1);
-                    ascope = ascope.substring(0,aix);
-                }
-                console.log(ascope);
-                if(ascope == 'application'){
+                //console.log(ascope+">>>"+aix)
+                if(aix > 0 && TARA_API.query().serviceCategory != null){
                     if(ascope == 'application.'+TARA_API.query().serviceCategory){
                         bars['applicationBar'][0].innerHTML += toHtmlBarItem(a,i);        
                     }
-                }
-                else if(acategory!=null){
-                    
-                    if(TARA_API.query().serviceCategory !=null && acategory == TARA_API.query().serviceCategory){
-                        bars[ascope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);        
+                    else if(ascope.substring(aix+1) == TARA_API.query().serviceCategory){
+                        bars[ascope.substring(0,aix)+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
                     }
                 }
-                else if(acategory==null){
+                else if(aix < 0 && TARA_API.query().serviceCategory == null){
                     bars[ascope+'Bar'][0].innerHTML += toHtmlBarItem(a,i);
                 }
             });
@@ -348,7 +340,14 @@
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
-                        serviceBar.innerHTML += toHtmlBarStockItem(a,i);
+                        let aix = a.configurationType.indexOf('.');
+                        if(aix > 0 && TARA_API.query().serviceCategory != null 
+                            && a.configurationType.substring(aix+1) == TARA_API.query().serviceCategory){
+                            serviceBar.innerHTML += toHtmlBarStockItem(a,i);
+                        }
+                        else if(aix < 0 && TARA_API.query().serviceCategory == null){
+                            serviceBar.innerHTML += toHtmlBarStockItem(a,i);
+                        }
                     });
                 }
                 hookEvent();

@@ -35,7 +35,7 @@ public class Component extends ConfigurableObject{
     }
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.COMPONENT_CONFIG_TYPE);
+        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.COMPONENT_CONFIG_TYPE);
     }
     @Override
     public  <T extends Configurable> T setup(){

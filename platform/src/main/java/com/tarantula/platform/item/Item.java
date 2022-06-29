@@ -37,7 +37,7 @@ public class Item extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE);
+        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.ITEM_CONFIG_TYPE);
     }
 
     @Override

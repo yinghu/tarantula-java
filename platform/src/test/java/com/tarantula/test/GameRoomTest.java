@@ -1,6 +1,7 @@
 package com.tarantula.test;
 
 
+import com.icodesoftware.Configurable;
 import com.tarantula.game.Arena;
 import com.tarantula.platform.room.PVPGameRoom;
 import org.testng.Assert;
@@ -66,6 +67,9 @@ public class GameRoomTest {
             Assert.assertEquals(true,r.resetIfEmpty());
             return false;
         });
+
+        Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
+        Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
     }
 
 }

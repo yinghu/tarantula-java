@@ -60,7 +60,12 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),scope,jo);
             if(!applicationPreSetup.load(context,gameCluster,typeIndex)){
                 applicationPreSetup.save(context,gameCluster,typeIndex);
-                List<String> updates = this.availableUpdates(typeIndex.index().startsWith(Configurable.APPLICATION_CONFIG_TYPE+".")?Configurable.APPLICATION_CONFIG_TYPE:typeIndex.index());
+                String ctype = typeIndex.index();
+                int aix = ctype.indexOf('.');
+                if(aix>0){
+                    ctype = ctype.substring(0,aix);
+                }
+                List<String> updates = this.availableUpdates(ctype);
                 updates.forEach(update->{
                     ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                     if(categories.addCategory(jo)){
@@ -91,7 +96,12 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 if(typeIndex.index().equals(scope)){
                     typeIndex.payload = jo;
                     applicationPreSetup.save(context,gameCluster,typeIndex);
-                    List<String> updates = this.availableUpdates(typeIndex.index().startsWith(Configurable.APPLICATION_CONFIG_TYPE+".")?Configurable.APPLICATION_CONFIG_TYPE:typeIndex.index());
+                    String ctype = typeIndex.index();
+                    int aix = ctype.indexOf('.');
+                    if(aix>0){
+                        ctype = ctype.substring(0,aix);
+                    }
+                    List<String> updates = this.availableUpdates(ctype);
                     updates.forEach(update->{
                         ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
                         if(categories.updateCategory(jo)){
@@ -193,7 +203,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
             }
         }
-        else if (session.action().startsWith("onCreateApplication")||session.action().startsWith("onUpdateApplication")){
+        else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();

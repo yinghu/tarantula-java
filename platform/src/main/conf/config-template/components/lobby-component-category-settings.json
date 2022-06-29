@@ -8,53 +8,39 @@
   [
     {
       "header": {
-        "scope": "component",
-        "type": "GameStatistics",
-        "description": "general component",
+        "scope": "component.lobby",
+        "type": "Room",
+        "description": "room category",
         "version": "1.0",
-        "rechargeable": true
+        "rechargeable": false
       },
       "application": {
         "properties": [
           {
-            "name": "Health",
+            "name": "Capacity",
             "type": "number",
-            "reference": "Float",
+            "reference": "Integer",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "MeleeDamage",
+            "name": "Duration",
             "type": "number",
-            "reference": "Float",
+            "reference": "Long",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "RangedDamage",
+            "name": "Overtime",
             "type": "number",
-            "reference": "Float",
+            "reference": "Long",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "CriticalDamagePercent",
+            "name": "JoinsOnStart",
             "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Recovery",
-            "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Speed",
-            "type": "number",
-            "reference": "Float",
+            "reference": "Integer",
             "nullable": false,
             "downloadable": false
           }

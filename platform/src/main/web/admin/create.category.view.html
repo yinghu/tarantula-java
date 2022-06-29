@@ -302,7 +302,7 @@
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
             return; 
         }
-        if(scope == 'application' && TARA_API.query().serviceCategory != null){
+        if(TARA_API.query().serviceCategory != null){
             categoryTemplate.header.scope = scope+'.'+TARA_API.query().serviceCategory;
         }else{
             categoryTemplate.header.scope = scope;

@@ -32,54 +32,6 @@
           }
         ]
       }
-    },
-    {
-      "header": {
-        "scope": "application.lobby",
-        "type": "Zone",
-        "description": "application category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "PlayMode",
-            "type": "enum",
-            "reference": "PlayMode",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "Name",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Rank",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Room",
-            "type": "category",
-            "reference": "category:Room",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "ArenaSet",
-            "type": "set",
-            "reference": "category:Arena",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
     }
   ]
 }

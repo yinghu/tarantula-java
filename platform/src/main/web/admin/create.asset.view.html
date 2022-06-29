@@ -539,7 +539,10 @@
         return tem.join(''); 
     }
     function toCmd(category){
-        return "on"+TARA_API.query().operation+category[0].toUpperCase() + category.slice(1).toLowerCase();
+        let cmd = "on"+TARA_API.query().operation+category[0].toUpperCase() + category.slice(1).toLowerCase();
+        let aix = cmd.indexOf('.');
+        if(aix<0) return cmd;
+        return cmd.substring(0,aix);
     }
     function populate(data){
         console.log(data);
