@@ -139,7 +139,7 @@
         document.querySelector('#tx-create-enum-save').style.display ='none';
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
-        TARA_API.onSet('role/item','onUpdateTypeSettings',query,item,(resp)=>{
+        TARA_API.onSet('role/item','onUpdateEnumSettings',query,item,(resp)=>{
             editor.set(resp);   
         });
     };
@@ -152,9 +152,9 @@
             return;
         }
         if(types.has(ptype)){
-            document.querySelector("#tx-create-enum-warning-message").innerHTML = "Enum ["+ptype+"]already existed";
+            document.querySelector("#tx-create-enum-warning-message").innerHTML = "Enum ["+ptype+"] is going to upgrade!";
             document.querySelector('#tx-create-enum-warning-message-board').style.display = 'block';   
-            return;
+            //return;
         }
         let pendingEnum = {type:'enum',name:ptype}
         let value = []
