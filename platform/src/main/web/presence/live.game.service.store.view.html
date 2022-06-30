@@ -56,6 +56,9 @@
         case 'giveaway':
             tx_live_giveaway_setup();
             break;
+        case 'statistics':
+            tx_live_statistics_setup();
+            break;
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -78,14 +81,14 @@
             editor.set(resp);
             if(resp.Successful){
                 shoppingList.innerHTML ='';
-                resp._itemList.forEach((gi,i)=>{
+                resp._shoppingItemList.forEach((gi,i)=>{
                     let tem = [];
                     tem.push('<div class=\'w3-container\'>');
                     tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
                     tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
-                    tem.push(gi.ConfigurationCategory);
+                    tem.push(gi.Name);
                     tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-                    tem.push(gi.ConfigurationName);
+                    tem.push(gi.SkuName);
                     tem.push('</span><span tx-item-id=\''+gi.ItemId+'\'');
                     tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>Buy With Admin</span>');
                     tem.push('</div>'); 
@@ -193,6 +196,12 @@
     function tx_live_giveaway_setup(){
         console.log(TARA_API.query()); 
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+            editor.set(resp);
+        });   
+    }
+    function tx_live_statistics_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
             editor.set(resp);
         });   
     }

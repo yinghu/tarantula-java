@@ -326,7 +326,7 @@
                 itemTemplate.header[p.name] = document.querySelector('#tx-asset-property-'+p.name).checked;     
             }
             else if(typeRef.type == 'enum'){
-                itemTemplate.header[p.name] = document.querySelector('#tx-asset-property-'+p.name).value;
+                itemTemplate.header[p.name] = document.querySelector('#tx-asset-property-'+p.name).value/1;
             }
             else{
                 let pv = document.querySelector('#tx-asset-property-'+p.name).value;
@@ -446,6 +446,7 @@
         });
     }
     function toHtmlInputType(prop){
+        console.log(prop);
         let tem = [];
         tem.push('<div class=\'tx-margin-bottom-8\'>');
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');

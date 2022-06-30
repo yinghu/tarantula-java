@@ -33,7 +33,9 @@ public class Application extends ConfigurableObject implements Configurable.List
     }
     @Override
     public JsonObject toJson(){
-        return super.toJson(super.toJson());
+        JsonObject jso = super.toJson(super.toJson());
+        jso.addProperty("Successful",true);
+        return jso;
     }
 
     @Override

@@ -19,7 +19,7 @@
           {
             "name": "Description",
             "type": "string",
-            "reference": "Description",
+            "reference": "String",
             "nullable": true,
             "downloadable": false
           },
@@ -67,7 +67,7 @@
           {
             "name": "Name",
             "type": "string",
-            "reference": "Name",
+            "reference": "String",
             "nullable": false,
             "downloadable": false
           },

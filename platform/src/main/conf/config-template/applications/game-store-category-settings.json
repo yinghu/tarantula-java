@@ -19,7 +19,7 @@
           {
             "name": "Name",
             "type": "string",
-            "reference": "Name",
+            "reference": "String",
             "nullable": false,
             "downloadable": false
           },
@@ -46,14 +46,14 @@
           {
             "name": "Name",
             "type": "string",
-            "reference": "Name",
+            "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
             "name": "SkuName",
             "type": "string",
-            "reference": "Name",
+            "reference": "String",
             "nullable": false,
             "downloadable": false
           },

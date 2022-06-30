@@ -33,10 +33,10 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             params.put(OnAccess.SERVICE_TYPE_ID,serviceTypeId);
-            params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.configurationName());
+            params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.skuName());
             if(this.context.validator().validateToken(params)){
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-                if(shoppingItem.configurationName().equals(sku)){
+                if(shoppingItem.skuName().equals(sku)){
                     this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
                     StorePurchase storePurchase = new StorePurchase();
                     storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);

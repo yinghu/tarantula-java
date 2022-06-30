@@ -28,6 +28,10 @@ public class ShoppingItem extends Item{
         return configurationName();
     }
 
+    public String skuName(){
+        return header.get("SkuName").getAsString();
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
