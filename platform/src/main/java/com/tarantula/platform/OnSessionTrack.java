@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
@@ -73,5 +74,17 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     public String toString(){
         return "OnSession->["+token+"]";
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject jp = new JsonObject();
+        jp.addProperty("Successful",true);
+        jp.addProperty("SystemId",systemId);
+        jp.addProperty("Stub",stub);
+        jp.addProperty("Token",token);
+        jp.addProperty("Ticket",ticket);
+        jp.addProperty("Login",login);
+        return jp;
     }
 }

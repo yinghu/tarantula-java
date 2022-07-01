@@ -157,8 +157,12 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsn = JSON.parse(aj.responseText);
-            if(jsn.successful){
-                presence = jsn.presence;
+            if(jsn.Successful){
+                presence.systemId = jsn.SystemId;
+                presence.token = jsn.Token;
+                presence.stub = jsn.Stub;
+                presence.login = jsn.Login;
+
                 qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
@@ -187,12 +191,21 @@ var TARA_API = (function(){
       aj.onreadystatechange = function(){
           if(aj.status === 200 && aj.readyState === 4){
               let jsn = JSON.parse(aj.responseText);
-              if(jsn.successful){
-                presence = jsn.presence;
+              if(jsn.Successful){
+                presence.systemId = jsn.SystemId;
+                presence.token = jsn.Token;
+                presence.stub = jsn.Stub;
+                presence.login = jsn.Login;
+
                 qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
+                //presence = jsn.presence;
+                //qdata.systemId = presence.systemId;
+                //qdata.token = presence.token;
+                //qdata.stub = presence.stub;
+                //qdata.login = presence.login;
                 _parse(jsn);
                 callback({successful:true});                          
               }
@@ -412,7 +425,7 @@ var TARA_API = (function(){
       send : _send,
       disconnect : _disconnect,
       onPlay : _play,
-      onDeveloper : _developer,
+      //onDeveloper : _developer,
   };
     
 })();

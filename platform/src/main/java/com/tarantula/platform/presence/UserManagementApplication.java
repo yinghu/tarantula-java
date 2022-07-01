@@ -11,23 +11,22 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
 
-    private String lobbyId;
+    //private String lobbyId;
     private boolean activated;
-    private String role = AccessControl.player.name();
+    private int trialDays;
+    //private String role = AccessControl.admin.name();
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private UserService userService;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private List<Access.Role> roleList;
+    //private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
     //private List<String> gameList;
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
@@ -42,16 +41,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration configuration = this.context.configuration("account");
-        this.lobbyId = (String)configuration.property("lobbyId");
+        //this.lobbyId = (String)configuration.property("lobbyId");
         this.activated = (boolean)configuration.property("activated");
         this.initialBalance = ((Number)configuration.property("initialBalance")).doubleValue();
-        this.role = (String)configuration.property("roleName");
+        this.trialDays = ((Number)configuration.property("trialDays")).intValue();
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        this.roleList = this.tokenValidatorProvider.list();
+        //this.roleList = this.tokenValidatorProvider.list();
         this.onLobbyIndex = new ConcurrentHashMap<>();
         //this.gameList = new CopyOnWriteArrayList<>();
         String root = (String)configuration.property("root");
@@ -64,30 +63,23 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         accountDatastore = this.context.dataStore(Account.DataStore);
         developerLoginDatastore = this.context.dataStore(DeveloperLogin.DataStore);
         accountIndex = this.context.dataStore(Account.IndexDataStore);
-        DataStore mDatastore = this.context.dataStore(Subscription.DataStore);
         accessIndexService.set("serverPush",0);
         AccessIndex accessIndex = accessIndexService.set(root,0);
         if(accessIndex!=null){
             Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
-            Account acc = new UserAccount();
-            acc.distributionKey(user.distributionKey());
-            acc.trial(false);
-            acc.subscribed(true);
             LocalDateTime loc = LocalDateTime.now();
-            acc.timestamp(TimeUtil.toUTCMilliseconds(loc));
-            accountDatastore.create(acc);
             Membership membership = new Membership();
-            membership.distributionKey(user.distributionKey());
             membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
-            membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusMonths(12)));
+            membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusYears(10)));
             membership.timestamp(TimeUtil.toUTCMilliseconds(loc));
-            mDatastore.create(membership);
+            membership.trial(true);
+            this.userService.createOrUpdateAccount(user,membership);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account
             OnAccess uadded = (OnAccess)a;
             if(uadded.property("command").equals("onAddUser")){
-                Access user = createLogin(uadded,uadded.distributionKey(),role,false,"password",false);
+                Access user = createLogin(uadded,uadded.distributionKey(),AccessControl.player.name(),false,"password",false);
                 Account account = new UserAccount();
                 account.distributionKey(uadded.owner());
                 if(accountDatastore.load(account)){
@@ -164,7 +156,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     thirdPartyLogin.distributionKey(session.systemId());
                     thirdPartyLoginDatastore.createIfAbsent(thirdPartyLogin,false);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
-                    Access user = createLogin(acc,session.systemId(),role,true,acc.name(),true);
+                    Access user = createLogin(acc,session.systemId(),AccessControl.player.name(),true,acc.name(),true);
                     user.emailAddress((String) params.get("email"));
                     user.activated(true);
                     userDatastore.update(user);
@@ -184,7 +176,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
             }
             else{
-                Access access = this.createLogin(acc,session.systemId(),role,false,"password",true);
+                Access access = this.createLogin(acc,session.systemId(),AccessControl.admin.name(),false,"password",true);
+                Membership membership = new Membership();
+                LocalDateTime loc = LocalDateTime.now();
+                membership.trial(true);
+                membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
+                membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusDays(trialDays)));
+                this.userService.createOrUpdateAccount(access,membership);
                 session.systemId(access.distributionKey());
                 OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                 if(this.onSession(_onSession,session)) this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
@@ -211,7 +209,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 thirdPartyLoginDatastore.createIfAbsent(thirdPartyLogin,false);
                 acc.property("login",deviceId);
                 acc.property("password",thirdPartyLogin.password());
-                this.createLogin(acc,session.systemId(),role,true,"device",true);
+                this.createLogin(acc,session.systemId(),AccessControl.player.name(),true,"device",true);
                 OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
                 if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVICE_COUNT,1);
             }
@@ -263,6 +261,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
+                //create association with the master account
                 DeveloperLogin developerLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
                 developerLogin.distributionKey(session.systemId());
                 developerLoginDatastore.createIfAbsent(developerLogin,false);
@@ -282,13 +281,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     }
     private boolean onSession(OnSession access, Session session){
         if(access.successful()){
-            PresenceContext ptx = new PresenceContext("onLogin");
-            ptx.presence= access;
-            //List<Lobby> lobbyList = new ArrayList<>();
-            //lobbyList.add(this.context.lobby(this.lobbyId));
-            //ptx.lobbyList=(lobbyList);
-            //session.write(this.builder.create().toJson(ptx).getBytes());
-            session.write(new OnSessionSerializer().serialize(access,OnSession.class,null).toString().getBytes());
+            session.write(access.toJson().toString().getBytes());
             session.systemId(access.systemId());
             session.stub(access.stub());
             session.ticket(access.ticket());

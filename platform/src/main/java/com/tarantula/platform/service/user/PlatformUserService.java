@@ -4,20 +4,26 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.PresenceIndex;
+import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
+
+import java.time.LocalDateTime;
 
 public class PlatformUserService implements UserService {
 
     private DataStore userDataStore;
     private DataStore presenceDataStore;
     private DataStore accountDataStore;
+    private DataStore membershipDataStore;
     private TokenValidatorProvider tokenValidatorProvider;
     private TarantulaLogger logger;
     @Override
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
+        acc.emailAddress((String)onAccess.property(OnAccess.EMAIL_ADDRESS));
         acc.distributionKey((String)onAccess.property(OnAccess.SYSTEM_ID));
         String pwd = (String)onAccess.property(OnAccess.PASSWORD);
         String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
@@ -55,7 +61,17 @@ public class PlatformUserService implements UserService {
     }
     @Override
     public Account createOrUpdateAccount(Access access,Subscription subscription){
-
+        Membership _existing = new Membership();
+        _existing.distributionKey(access.distributionKey());
+        if(membershipDataStore.load(_existing)){
+            subscription.count(_existing.count(0));
+        }
+        else{
+            subscription.count(1);
+        }
+        subscription.distributionKey(access.distributionKey());
+        subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        membershipDataStore.update(subscription);
         UserAccount account = new UserAccount();
         account.distributionKey(access.distributionKey());
         account.trial(subscription.trial());
@@ -78,6 +94,7 @@ public class PlatformUserService implements UserService {
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
         presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.partitionNumber());
         accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.partitionNumber());
+        membershipDataStore = serviceContext.dataStore(Subscription.DataStore,serviceContext.partitionNumber());
         logger.warn("User service started");
     }
 

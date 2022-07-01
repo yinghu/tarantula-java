@@ -257,6 +257,7 @@
     reset_t_action_event();
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
+            console.log(resp);
             if(resp.successful){
                 TARA_API.query().role=resp.access.role;
             }    

@@ -13,4 +13,5 @@ public interface UserService extends ServiceProvider{
     boolean changePassword(OnAccess access);
     boolean updateEmail(OnAccess access);
     Account createOrUpdateAccount(Access access, Subscription subscription);
+
 }
