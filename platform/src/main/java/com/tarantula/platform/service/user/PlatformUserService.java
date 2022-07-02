@@ -5,6 +5,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
@@ -18,8 +19,11 @@ public class PlatformUserService implements UserService {
     private DataStore presenceDataStore;
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
+    private DataStore accountIndexDataStore;
     private TokenValidatorProvider tokenValidatorProvider;
     private TarantulaLogger logger;
+    private int trialMaxUsersPerAccount = 10;
+    private int subscribedMaxUsersPerAccount = 10;
     @Override
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
@@ -34,12 +38,33 @@ public class PlatformUserService implements UserService {
             acc.owner(onAccess.owner());
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
-        if(userDataStore.create(acc)){
-            PresenceIndex px = new PresenceIndex((Double)onAccess.property(OnAccess.BALANCE));
-            px.distributionKey(acc.distributionKey());
-            presenceDataStore.create(px);
-        }
+        if(!userDataStore.create(acc)) throw new RuntimeException("Failed to create user");
+        PresenceIndex px = new PresenceIndex((Double)onAccess.property(OnAccess.BALANCE));
+        px.distributionKey(acc.distributionKey());
+        presenceDataStore.create(px);
         return acc;
+    }
+    public Access createUser(String accountId,OnAccess access){
+        Account account = new UserAccount();
+        account.distributionKey(accountId);
+        if(!accountDataStore.load(account)) throw new RuntimeException("Account not existed");
+        if(!account.trial() && !account.subscribed()) throw new RuntimeException("Account expired");
+        int maxUsersPerAccount = account.trial()?trialMaxUsersPerAccount:subscribedMaxUsersPerAccount;
+        if(account.userCount(0)> maxUsersPerAccount) throw new RuntimeException("over max user count");
+        account.userCount(1);
+        account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        accountDataStore.update(account);
+        access.owner(accountId);
+        Access user = createUser(access);
+        IndexSet idx = new IndexSet();
+        idx.distributionKey(account.distributionKey());
+        idx.label(Account.UserLabel);
+        idx.addKey(user.distributionKey());
+        if(!accountIndexDataStore.createIfAbsent(idx,true)){
+            idx.addKey(user.distributionKey());//update on existing
+            accountIndexDataStore.update(idx);
+        }
+        return user;
     }
     public boolean updateEmail(OnAccess access){
         String email = (String)access.property(OnAccess.EMAIL_ADDRESS);
@@ -77,6 +102,7 @@ public class PlatformUserService implements UserService {
         account.trial(subscription.trial());
         if(!accountDataStore.createIfAbsent(account,true)){
             account.trial(subscription.trial());
+            account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             accountDataStore.update(account);
         }
         return account;
@@ -94,8 +120,12 @@ public class PlatformUserService implements UserService {
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
         presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.partitionNumber());
         accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.partitionNumber());
+        accountIndexDataStore = serviceContext.dataStore(Account.IndexDataStore,serviceContext.partitionNumber());
         membershipDataStore = serviceContext.dataStore(Subscription.DataStore,serviceContext.partitionNumber());
-        logger.warn("User service started");
+        Configuration configuration = serviceContext.configuration("account-role-user-settings");
+        trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();
+        subscribedMaxUsersPerAccount = ((Number)configuration.property("subscribedMaxUserCount")).intValue();
+        logger.warn("User service started with max users per account ["+trialMaxUsersPerAccount+","+subscribedMaxUsersPerAccount+"]");
     }
 
     @Override

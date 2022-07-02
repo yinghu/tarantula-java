@@ -24,7 +24,9 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     private DataStore user;
     private DataStore account;
     private DataStore accountIndex;
-    private int maxUserCount;
+    private int trialMaxUserCount;
+    private int subscribedMaxUserCount;
+
     private TokenValidatorProvider tokenValidatorProvider;
     private AtomicBoolean accessIndexEnabled;
     @Override
@@ -77,6 +79,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 Account acc = new UserAccount();
                 acc.distributionKey(ua.primary()?session.systemId():ua.owner());
                 if(account.load(acc)){
+                    int maxUserCount = acc.trial()?trialMaxUserCount:subscribedMaxUserCount;
                     if(acc.userCount(0)<maxUserCount){
                         AccessIndex query = accessIndexService.set((String)onAccess.property("login"),0);
                         if(query!=null){
@@ -118,10 +121,11 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);
         this.accountIndex = this.context.dataStore(Account.IndexDataStore);
-        this.maxUserCount = ((Number)this.context.configuration("user").property("maxUserCount")).intValue();
+        this.trialMaxUserCount = ((Number)this.context.configuration("user").property("trialMaxUserCount")).intValue();
+        this.subscribedMaxUserCount = ((Number)this.context.configuration("user").property("subscribedMaxUserCount")).intValue();
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerAccessIndexListener(this);
-        this.context.log("Account role module started with max user count ["+maxUserCount+"]", OnLog.INFO);
+        this.context.log("Account role module started with max user count ["+trialMaxUserCount+","+subscribedMaxUserCount+"]", OnLog.INFO);
     }
 
     private JsonObject toMessage(String msg, boolean suc){

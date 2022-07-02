@@ -63,7 +63,7 @@ public class SystemValidator{
         @Override
         public boolean validateTicket(String systemId, int stub, String ticket) {
             Presence ptx = systemValidatorProvider.presence(systemId);
-            if(stub!=ptx.count(0)){
+            if(stub > ptx.count(0)){
                 return false;
             }
             return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),systemId,stub,ticket);

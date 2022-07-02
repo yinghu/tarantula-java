@@ -263,13 +263,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             if(accessIndex!=null){
                 //create association with the master account
                 GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(session.trackId());
-                this.context.log((String)gameCluster.property(GameCluster.OWNER),OnLog.WARN);
+                String owner = (String)gameCluster.property(GameCluster.OWNER);
                 DeveloperLogin developerLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
                 developerLogin.distributionKey(session.systemId());
-                developerLoginDatastore.createIfAbsent(developerLogin,false);
+                //developerLoginDatastore.createIfAbsent(developerLogin,false);
                 acc.property("login",deviceId);
                 acc.property("password",developerLogin.password());
-                this.createLogin(acc,session.systemId(),AccessControl.admin.name(),true,"key",true);
+                this.createLogin(owner,acc,session.systemId(),AccessControl.admin.name(),true,"key",false);
+                developerLoginDatastore.createIfAbsent(developerLogin,false);
                 OnSession access = this.login(session.systemId(),developerLogin.password(),session);
                 if(onSession(access,session)) this.deploymentServiceProvider.onUpdated(Metrics.DEVELOPER_LOGIN_COUNT,1);
             }
@@ -303,6 +304,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             _onSession.systemId(systemId);
         }
         return _onSession;
+    }
+    private Access createLogin(String accountId,OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
+        payload.property(OnAccess.SYSTEM_ID,systemId);
+        payload.property(OnAccess.ACCESS_CONTROL,roleName);
+        payload.property(OnAccess.VALIDATOR,validator);
+        payload.property(OnAccess.VALIDATED,validated);
+        payload.property(OnAccess.PRIMARY_USER,primary);
+        payload.property(OnAccess.BALANCE,initialBalance);
+        payload.property(OnAccess.ACTIVATED,activated);
+        return userService.createUser(accountId,payload);
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);

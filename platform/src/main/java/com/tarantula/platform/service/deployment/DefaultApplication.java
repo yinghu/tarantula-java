@@ -20,7 +20,7 @@ public class DefaultApplication implements ApplicationProvider {
     }
 
     public boolean checkAccessControl(Event event){
-        if(this.deploymentDescriptor.accessMode()== Access.PUBLIC_ACCESS_MODE){
+        if(this.deploymentDescriptor.accessMode() == Access.PUBLIC_ACCESS_MODE){
             return true;
         }
         return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
