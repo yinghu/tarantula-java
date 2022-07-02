@@ -262,6 +262,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
                 //create association with the master account
+                GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(session.trackId());
+                this.context.log((String)gameCluster.property(GameCluster.OWNER),OnLog.WARN);
                 DeveloperLogin developerLogin = new DeveloperLogin("developer",SystemUtil.oid(),deviceId);
                 developerLogin.distributionKey(session.systemId());
                 developerLoginDatastore.createIfAbsent(developerLogin,false);

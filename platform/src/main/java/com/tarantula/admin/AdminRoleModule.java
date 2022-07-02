@@ -70,7 +70,8 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onTestAccessKey")){
             //test access key
-            String key = tokenValidatorProvider.validateGameClusterAccessKey(session.name());
+            GameCluster key = tokenValidatorProvider.validateGameClusterAccessKey(session.name());
+            this.context.log(key.property(GameCluster.GAME_LOBBY).toString(),OnLog.WARN);
             session.write(JsonUtil.toSimpleResponse(key!=null,key!=null?"key passed":"key failed").getBytes());
         }
         else if(session.action().equals("onRevokeAccessKey")){

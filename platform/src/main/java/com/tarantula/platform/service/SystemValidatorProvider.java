@@ -111,7 +111,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId).equals(hash);
     }
 
-    public String validateGameClusterAccessKey(String accessKey){
+    public <T extends OnAccess> T validateGameClusterAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
         AccessKey akey = new AccessKey();
         akey.distributionKey(sp[0]);
@@ -119,7 +119,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
         if(gameCluster==null) return null;
         String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-        return SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp())?validLobby:null;
+        if(SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp())) return (T)gameCluster;
+        return null;
     }
     public String createGameClusterAccessKey(String gameClusterId){
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);

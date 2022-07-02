@@ -1,6 +1,7 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.Access;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.Presence;
 import com.icodesoftware.TokenValidator;
 
@@ -26,7 +27,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     boolean validateTicket(String key,int stub,String ticket);
 
     //game server register key on game cluster lobby tyeId
-    String validateGameClusterAccessKey(String gameClusterId);
+    <T extends OnAccess> T validateGameClusterAccessKey(String gameClusterId);
     String createGameClusterAccessKey(String gameClusterId);
     List<String> gameClusterAccessKeyList(String gameClusterId);
 
