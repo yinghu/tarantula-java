@@ -19,13 +19,72 @@
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
         <div class="w3-display-container w3-white tx-content-8"></div>  
         <div id="tx-Account" class="w3-container tx-pane">
-            <div class="w3-panel w3-border w3-border-red">
-                <div class='w3-bar w3-white tx-margin-top-8'>
-                    <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                    <span view-id='upgrade.role.account' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upgrade Account</span>
-                    <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
-                    <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
-                </div>            
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-panel w3-border w3-border-red">
+                    <div class='w3-bar w3-white tx-margin-top-8'>
+                        <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
+                        <span view-id='user.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Access</span>
+                        <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
+                        <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
+                        <span view-id='subscribe.membership' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscribe</span>
+                    </div>            
+                </div>
+                <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Presence</span></div>
+                <div id='tx-user-presence-view-bar' class='w3-bar w3-white'>
+                    <div class="w3-display-container tx-content-64">
+                        <div class="w3-display-topleft w3-padding">
+                            <span><i class="fa fa-handshake-o" style="font-size:18px; color: orange"></i></span>            
+                        </div>
+                        <div class="w3-display-topright w3-padding">
+                            <span id='tx-presence-system-id' class="tx-text-12">system id</span>            
+                        </div>
+                        <div class="w3-display-bottomright w3-padding">
+                            <span id='tx-presence-stub' class="tx-text-12">1</span>            
+                        </div>
+                    </div>        
+                </div>
+                <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">User</span></div>
+                <div id='tx-user-access-view-bar' class='w3-bar w3-white'>
+                    <div class="w3-display-container tx-content-64">
+                        <div class="w3-display-topleft w3-padding">
+                            <span><i class="fa fa-user-o" style="font-size:18px; color: orange;"></i></span> 
+                        </div>
+                        <div class="w3-display-topright w3-padding">
+                            <span id='tx-access-login' class="tx-text-12">login</span>            
+                        </div>
+                        <div class="w3-display-bottomright w3-padding">
+                            <span id='tx-access-role' class="tx-text-12">role</span>            
+                        </div>
+                    </div>
+                </div>
+                <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Account</span></div>
+                <div id='tx-user-account-view-bar' class='w3-bar w3-white'>
+                    <div class="w3-display-container tx-content-64">
+                        <div class="w3-display-topleft w3-padding">
+                            <span><i class="fa fa-square-o" style="font-size:18px; color: orange"></i></span>            
+                        </div>
+                        <div class="w3-display-topright w3-padding">
+                            <span id='tx-account-game-cluster-count' class="tx-text-12">game cluster count</span>            
+                        </div>
+                        <div class="w3-display-bottomright w3-padding">
+                            <span id='tx-account-user-count' class="tx-text-12">user count</span>            
+                        </div>
+                    </div>
+                </div>
+                <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Subscription</span></div>
+                <div id='tx-user-subscription-view-bar' class='w3-bar w3-white'>
+                    <div class="w3-display-container tx-content-64">
+                        <div class="w3-display-topleft w3-padding">
+                            <span><i class="fa fa-check-square-o" style="font-size:18px; color: orange"></i></span>            
+                        </div>
+                        <div class="w3-display-topright w3-padding">
+                            <span id='tx-subscription-start-time' class="tx-text-12">start time</span>            
+                        </div>
+                        <div class="w3-display-bottomright w3-padding">
+                            <span id='tx-subscription-end-time' class="tx-text-12">end time</span>            
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
@@ -260,6 +319,14 @@
             console.log(resp);
             if(resp.successful){
                 TARA_API.query().role=resp.access.role;
+                document.querySelector('#tx-presence-system-id').innerHTML = 'System ID : '+resp.presence.systemId;
+                document.querySelector('#tx-presence-stub').innerHTML = 'Presence Stub : '+resp.presence.stub;
+                document.querySelector('#tx-access-login').innerHTML = 'Login Name : '+resp.access.login;
+                document.querySelector('#tx-access-role').innerHTML = 'Role Name : '+resp.access.role;
+                document.querySelector('#tx-account-game-cluster-count').innerHTML = 'Game Cluster Count : '+resp.account.gameClusterCount;
+                document.querySelector('#tx-account-user-count').innerHTML = 'User Count : '+resp.account.userCount;
+                document.querySelector('#tx-subscription-start-time').innerHTML = 'Start Time : '+resp.subscription.startTime;
+                document.querySelector('#tx-subscription-end-time').innerHTML = 'End Time : '+resp.subscription.endTime;
             }    
         });
     }

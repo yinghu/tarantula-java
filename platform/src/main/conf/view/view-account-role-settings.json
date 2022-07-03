@@ -4,6 +4,7 @@
   "viewList":
   [
     {"type": "add.user","moduleResourceFile": "account/add.user.view.html"},
-    {"type": "user.list","moduleResourceFile": "account/user.list.view.html"}
+    {"type": "user.list","moduleResourceFile": "account/user.list.view.html"},
+    {"type": "subscribe.membership","moduleResourceFile": "account/subscribe.membership.view.html"}
   ]
 }

@@ -79,22 +79,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             //add player user to the account
             OnAccess uadded = (OnAccess)a;
             if(uadded.property("command").equals("onAddUser")){
-                Access user = createLogin(uadded,uadded.distributionKey(),AccessControl.player.name(),false,"password",false);
-                Account account = new UserAccount();
-                account.distributionKey(uadded.owner());
-                if(accountDatastore.load(account)){
-                    account.userCount(1);
-                    account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                    accountDatastore.update(account);
-                    IndexSet idx = new IndexSet();
-                    idx.distributionKey(account.distributionKey());
-                    idx.label(Account.UserLabel);
-                    idx.addKey(user.distributionKey());
-                    if(!accountIndex.createIfAbsent(idx,true)){
-                        idx.addKey(user.distributionKey());//update on existing
-                        accountIndex.update(idx);
-                    }
-                }
+                createLogin(uadded.owner(),uadded,uadded.distributionKey(),AccessControl.player.name(),false,"password",false);
             }
         });
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);

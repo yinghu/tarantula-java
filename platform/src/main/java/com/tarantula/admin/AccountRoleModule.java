@@ -76,28 +76,15 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             if(accessIndexEnabled.get()){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
                 User ua = _user(session.systemId());
-                Account acc = new UserAccount();
-                acc.distributionKey(ua.primary()?session.systemId():ua.owner());
-                if(account.load(acc)){
-                    int maxUserCount = acc.trial()?trialMaxUserCount:subscribedMaxUserCount;
-                    if(acc.userCount(0)<maxUserCount){
-                        AccessIndex query = accessIndexService.set((String)onAccess.property("login"),0);
-                        if(query!=null){
-                            onAccess.owner(acc.distributionKey());//make sure acc id as the owner
-                            onAccess.distributionKey(query.distributionKey());
-                            this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                            session.write(this.toMessage("user added",true).toString().getBytes());
-                        }
-                        else{
-                            session.write(this.toMessage("user already existed",false).toString().getBytes());
-                        }
-                    }
-                    else{
-                        session.write(this.toMessage("you already have max user count",false).toString().getBytes());
-                    }
+                AccessIndex query = accessIndexService.set((String)onAccess.property("login"),0);
+                if(query!=null){
+                    onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner
+                    onAccess.distributionKey(query.distributionKey());
+                    this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
+                    session.write(this.toMessage("add user event send",true).toString().getBytes());
                 }
-                else{
-                    session.write(this.toMessage("no permission to add user",false).toString().getBytes());
+                else {
+                    session.write(this.toMessage("user already existed", false).toString().getBytes());
                 }
             }
             else{
