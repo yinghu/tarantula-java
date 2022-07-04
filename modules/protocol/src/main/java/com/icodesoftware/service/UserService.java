@@ -14,5 +14,6 @@ public interface UserService extends ServiceProvider{
     boolean changePassword(OnAccess access);
     boolean updateEmail(OnAccess access);
     Account createOrUpdateAccount(Access access, Subscription subscription);
+    Subscription subscribe(String accountId,int durationMonth);
 
 }

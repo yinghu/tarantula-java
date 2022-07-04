@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.presence.User;
@@ -30,6 +31,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     private int subscribedMaxUserCount;
 
     private TokenValidatorProvider tokenValidatorProvider;
+    private UserService userService;
     private AtomicBoolean accessIndexEnabled;
     private ConcurrentHashMap<String,SubscriptionItem> _items = new ConcurrentHashMap<>();
     @Override
@@ -108,6 +110,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             chargeParams.put("currency", "usd");
             chargeParams.put("description",item.description);
             if(this.context.validator().validateToken(chargeParams)){
+                Subscription subscription = userService.subscribe(session.systemId(),12);
                 session.write(JsonUtil.toSimpleResponse(true, "on commit").getBytes());
             }
             else {
@@ -127,6 +130,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        this.userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.user = this.context.dataStore(Access.DataStore);
         this.account = this.context.dataStore(Account.DataStore);

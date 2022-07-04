@@ -108,6 +108,31 @@ public class PlatformUserService implements UserService {
         return account;
     }
 
+    public Subscription subscribe(String accountId,int durationMonth){
+        Access access = new User();
+        access.distributionKey(accountId);
+        if(!userDataStore.load(access)){
+            throw new RuntimeException("no such user");
+        }
+        Account account = new UserAccount();
+        account.distributionKey(access.primary()?access.distributionKey(): access.owner());
+        if(!accountDataStore.load(account)){
+            throw new RuntimeException("no such account");
+        }
+        account.trial(false);
+        account.subscribed(true);
+        Membership membership = new Membership();
+        membership.distributionKey(account.distributionKey());
+        membershipDataStore.load(membership);
+        LocalDateTime end = TimeUtil.fromUTCMilliseconds(membership.endTimestamp());
+        membership.endTimestamp(TimeUtil.toUTCMilliseconds(end.plusMonths(durationMonth)));
+        membership.count(1);
+        membership.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        membershipDataStore.update(membership);
+        accountDataStore.update(account);
+        return membership;
+    }
+
     @Override
     public String name() {
         return UserService.NAME;
