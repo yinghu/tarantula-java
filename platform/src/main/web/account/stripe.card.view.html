@@ -1,0 +1,171 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx_close_shopping"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-user-plus" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Subscription</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div id='tx-subscription-list-bar' class="w3-container">
+
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div> 
+    <div class="w3-card-4 w3-border w3-round w3-white tx-text-12 tx-checkout" id="tx_checkout">
+        <div class="w3-display-container w3-round w3-light-green tx-content-120">
+            <div class="w3-display-topright tx-margin-left-4 tx-margin-top-4"><i id='tx_checkout_cancel' class='w3-button fa fa-close'></i></div>
+            <div class="w3-display-topmiddle"><img style="margin-top: -40px" src='https://stripe.com/img/documentation/checkout/marketplace.png' width="70" height="70"></div>
+            <div class="w3-display-middle tx-pay-amount">Amount : $ <span id="tx_checkout_price"></span></div>
+            <div class="w3-display-bottomleft tx-margin-left-8 tx-margin-bottom-8 w3-text-white tx-pay-no-refund"><span id="tx_checkout_name"></span></div>
+            <div class="w3-display-bottomright tx-margin-right-8 tx-margin-bottom-8 w3-text-white tx-pay-no-refund">No Refund Item</div>
+        </div>
+        <div class="w3-panel">
+            <div class="w3-round w3-border w3-border-green w3-padding" id="tx_card_number"></div>
+            <div class="w3-round w3-border w3-border-green w3-padding tx-margin-top-4" id="tx_card_expiry"></div>
+            <div class="w3-round w3-border w3-border-green w3-padding tx-margin-top-4" id="tx_card_cvc"></div>
+            <div class="w3-round w3-button w3-block w3-green tx-margin-top-16 tx-pay-now" id='tx_checkout_pay'>Pay Now</div>
+            <div class="w3-panel w3-round w3-yellow w3-text-red tx-pay-note" id="tx_checkout_error" style="display: none"></div>
+            <div class="w3-panel w3-round w3-yellow w3-text-green tx-pay-note" id="tx_checkout_message" style="display: none"></div>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector("#tx_close_shopping").onclick = tx_close_shopping;
+    TARA_API.onGet('role/account','onSubscription','',(resp)=>{
+        let ubar = document.querySelector('#tx-subscription-list-bar');
+        ubar.innerHTML = ''; 
+        resp.subscriptionList.forEach((a,i)=>{
+            let tem = [];
+            tem.push('<div class=\'w3-display-container w3-border w3-border-red tx-content-80\'>');
+            tem.push('<div class=\'w3-display-topleft w3-padding\'>');
+            tem.push('<span><i class=\'fa fa-cc-stripe tx-margin-top-8\' style=\'font-size:24px; color: green\'></i></span>');
+            tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>Recurring</label>');
+            tem.push('<input id=\'oid-'+a.oid+'\' class=\'w3-check tx-text-12 tx-margin-left-4\' type=\'checkbox\'>');
+            tem.push('</div>');
+            tem.push('<div class=\'w3-display-topright w3-padding\'><span class=\'tx-text-12\'>');
+            tem.push(a.name+' : $'+a.price);
+            tem.push('</span></div><div class=\'w3-display-bottomleft w3-padding\'><span class=\'tx-text-12\'>');
+            tem.push(a.description);
+            tem.push('</span></div><div class=\'w3-display-bottomright w3-padding\'><span tx-subscription-list-id=\'');
+            tem.push(a.oid+'\' tx-subscription-price=\'');
+            tem.push(a.price+'\' tx-subscription-name=\'');
+            tem.push(a.name);    
+            tem.push('\' class=\'w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-subscription-checkout\'>');
+            tem.push('Pay Via Stripe');
+            tem.push('</span></div></div>');  
+            tem.push('<div class=\'w3-display-container w3-white tx-content-8\'></div>');          
+            
+            ubar.innerHTML += tem.join('');
+        });
+        _tx_load();
+    });
+    //payment provider stripe integration and check out to commit orderId to server for verification
+    var elementStyles = {
+            base: {
+              color: '#32325D',
+              fontFamily: 'Oswald',
+              fontSize: '16px',
+              fontSmoothing: 'antialiased',
+              '::placeholder': {
+                color: '#CFD7DF',
+              },
+              ':-webkit-autofill': {
+                color: '#e39f48',
+              },
+            },
+            invalid: {
+              color: '#E25950',
+              '::placeholder': {
+                color: '#FFCCA5',
+              },
+            },
+    };
+    function _tx_load(){
+        document.querySelectorAll('.tx-subscription-checkout').forEach((a,i)=>{
+            a.onclick = ()=>{
+                TARA_API.query().packId = a.getAttribute('tx-subscription-list-id');
+                TARA_API.query().recurring = document.querySelector('#oid-'+TARA_API.query().packId).checked;
+                TARA_API.query().amount = (a.getAttribute('tx-subscription-price'))/1;
+                TARA_API.query().name =   a.getAttribute('tx-subscription-name');
+                TARA_API.query().price = a.getAttribute('tx-subscription-price');
+                document.querySelector("#tx_checkout_error").innerHTML = "";
+                document.querySelector("#tx_checkout_error").style.display = "none";
+                document.querySelector("#tx_checkout_message").innerHTML = "";
+                document.querySelector("#tx_checkout_message").style.display = "none";
+                _tx_checkout();        
+            };
+        });
+        document.querySelector('#tx_checkout_cancel').onclick = function(){document.querySelector('#tx_checkout').style.display='none';};
+    }
+    function _tx_checkout(){
+        document.querySelector("#tx_checkout_name").innerHTML = TARA_API.query().name; 
+        document.querySelector("#tx_checkout_price").innerHTML = TARA_API.query().price; 
+        document.querySelector("#tx_checkout_message").innerHTML = 'pay via stripe.com'; 
+        document.querySelector("#tx_checkout_message").style.display = "block";
+        document.querySelector("#tx_checkout").style.display = 'block';    
+        try{
+        var stripe = Stripe(TARA_API.query().stripeId);
+        var elements = stripe.elements();
+        var card = elements.create('cardNumber',{style:elementStyles,placeholder:'card number'});
+        var expiry = elements.create('cardExpiry',{style:elementStyles,placeholder:'expiry month/year'});
+        var cvc = elements.create('cardCvc',{style:elementStyles,placeholder:'verification code'});
+        card.mount('#tx_card_number');
+        expiry.mount('#tx_card_expiry');
+        cvc.mount('#tx_card_cvc');
+        document.querySelector('#tx_checkout_pay').onclick = function(){
+            stripe.createToken(card).then(function(ret){
+                console.log(ret);
+                if(ret.token){
+                    document.querySelector("#tx_checkout_message").innerHTML = "You card validated via stripe.com"; 
+                    document.querySelector("#tx_checkout_message").style.display = "block";
+                    document.querySelector("#tx_checkout_error").style.display = "none";
+                    tx_shopping_commit(ret.token);
+                }
+                else if(ret.error){
+                    //display error to player
+                    document.querySelector("#tx_checkout_error").innerHTML = ret.error.message; 
+                    document.querySelector("#tx_checkout_error").style.display = "block";
+                    document.querySelector("#tx_checkout_message").style.display = "none";
+                }
+                else{
+                    document.querySelector("#tx_checkout_error").innerHTML = "unknown error, please try later";
+                    document.querySelector("#tx_checkout_error").style.display = "block";
+                    document.querySelector("#tx_checkout_message").style.display = "none";
+                }
+            });    
+        };
+        }catch(err){
+           document.querySelector("#tx_checkout_error").innerHTML = err;
+           document.querySelector("#tx_checkout_error").style.display = "block"; 
+        }   
+    }
+    function tx_shopping_commit(token){
+        let _mcommit ={serviceTag:'role/account',command:'onCommit',provider:'stripe'};
+        _mcommit.checkoutId = TARA_API.query().packId;
+        _mcommit.recurring = TARA_API.query().recurring;
+        _mcommit.source = token.id;
+        TARA_API.onService(true,_mcommit,(resp)=>{    
+            console.log(resp);
+            document.querySelector("#tx_checkout_message").innerHTML = "You purchase item added to your account."; 
+            setTimeout(function(){document.querySelector("#tx_checkout").style.display = 'none'},2000);
+        });
+    }
+    
+    function tx_close_shopping(){
+         this.style.display = 'none';
+         let m1 = document.querySelector('#tx-popup');
+         m1.innerHTML='';
+         m1.style.display = 'none';
+    }
+    
+</script>

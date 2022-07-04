@@ -318,6 +318,7 @@
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
             console.log(resp);
             if(resp.successful){
+                TARA_API.query().stripeId = resp.stripeClientId;
                 TARA_API.query().role=resp.access.role;
                 document.querySelector('#tx-presence-system-id').innerHTML = 'System ID : '+resp.presence.systemId;
                 document.querySelector('#tx-presence-stub').innerHTML = 'Presence Stub : '+resp.presence.stub;
