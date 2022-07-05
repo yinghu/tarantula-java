@@ -508,7 +508,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         RecoverService recoverService = integrationCluster.recoverService();
         DataStore userDataStore = this.dataStore(User.DataStore,partitionNumber());
         DataStore presenceDataStore = this.dataStore(Presence.DataStore,partitionNumber());
-        DataStore sessionDataStore = this.dataStore(OnSession.DataStore,partitionNumber());
+        //DataStore sessionDataStore = this.dataStore(OnSession.DataStore,partitionNumber());
         DataStore subscriptionDataStore = this.dataStore(Subscription.DataStore,partitionNumber());
 
         accountDataStore.backup().list((k,v)->{//pull account and associated data set
@@ -524,10 +524,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             if(ret!=null){
                 subscriptionDataStore.backup().set(k,ret);
             }
-            ret = recoverService.recover(OnSession.DataStore,k);
-            if(ret!=null){
-                sessionDataStore.backup().set(k,ret);
-            }
+            //ret = recoverService.recover(OnSession.DataStore,k);
+            //if(ret!=null){
+                //sessionDataStore.backup().set(k,ret);
+            //}
             return true;
         });
         for(String s : this.integrationCluster.recoverService().listModules()){

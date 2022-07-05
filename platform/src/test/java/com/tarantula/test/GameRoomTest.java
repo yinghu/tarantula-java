@@ -2,11 +2,17 @@ package com.tarantula.test;
 
 
 import com.icodesoftware.Configurable;
+import com.icodesoftware.OnSession;
 import com.tarantula.game.Arena;
 import com.tarantula.platform.room.PVPGameRoom;
+import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.security.MessageDigest;
+
+import static com.icodesoftware.service.TokenValidatorProvider.MDA;
 
 public class GameRoomTest {
 
@@ -67,9 +73,22 @@ public class GameRoomTest {
             Assert.assertEquals(true,r.resetIfEmpty());
             return false;
         });
-
+        /**
         Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
         Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
+        String token = "BDS01/7c88ac77da684826857c63816a1ce442 tarantula 1656978601324 DA2195B286A6A3D3144D5A42123C997D25360361-84-1656972601324-F2FBD235841399B0EFE2A7D88D37F48D9F325397";
+        try{
+            MessageDigest msg = MessageDigest.getInstance(MDA);
+            OnSession session = SystemUtil.validToken(msg,token);
+            Assert.assertEquals(true,session.systemId()!=null);
+            boolean suc = SystemUtil.validTicket(msg,session.systemId(),session.stub(),session.ticket());
+            System.out.println(session.ticket()+">>>"+suc);
+            System.out.println(session.systemId());
+            System.out.println(session.stub());
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        **/
     }
 
 }

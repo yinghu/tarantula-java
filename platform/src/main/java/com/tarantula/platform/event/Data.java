@@ -24,7 +24,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
 
     protected String clientId;
 
-    protected boolean streaming;
     protected String action;
 
     protected String trackId;
@@ -43,12 +42,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.routingNumber = routingNumber;
     }
 
-    public boolean streaming(){
-        return this.streaming;
-    }
-    public void streaming(boolean streaming){
-        this.streaming = streaming;
-    }
     public boolean closed(){
         return this.closed;
     }

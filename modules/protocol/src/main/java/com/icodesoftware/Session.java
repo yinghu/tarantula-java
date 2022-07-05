@@ -54,8 +54,6 @@ public interface Session extends OnApplication {
     String clientId();
     void clientId(String clientId);
 
-    boolean streaming();
-    void streaming(boolean streaming);
 
     String action();
     void action(String action);

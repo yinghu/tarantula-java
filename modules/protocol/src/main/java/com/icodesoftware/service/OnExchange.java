@@ -18,12 +18,6 @@ public interface OnExchange extends EventListener {
         return "0.0.0.0";
     }
 
-    default boolean streaming(){
-        return false;
-    }
-    default boolean oneWay(){
-        return false;
-    }
     default void onError(Exception ex,String message){}
 
     default InputStream onStream(){ return null;}
