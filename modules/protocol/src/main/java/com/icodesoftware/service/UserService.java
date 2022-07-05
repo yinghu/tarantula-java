@@ -13,7 +13,7 @@ public interface UserService extends ServiceProvider{
     Access createUser(String accountId,OnAccess access);
     boolean changePassword(OnAccess access);
     boolean updateEmail(OnAccess access);
-    Account createOrUpdateAccount(Access access, Subscription subscription);
+    Account createAccount(Access access, Subscription subscription);
     Subscription subscribe(String accountId,int durationMonth);
 
 }

@@ -85,26 +85,18 @@ public class PlatformUserService implements UserService {
         return userDataStore.update(user);
     }
     @Override
-    public Account createOrUpdateAccount(Access access,Subscription subscription){
-        Membership _existing = new Membership();
-        _existing.distributionKey(access.distributionKey());
-        if(membershipDataStore.load(_existing)){
-            subscription.count(_existing.count(0));
-        }
-        else{
-            subscription.count(1);
-        }
+    public Account createAccount(Access access,Subscription subscription){
+        if(!userDataStore.load(access)) throw new RuntimeException("No such user existed");
+        if(!access.primary()) throw new RuntimeException("Only primary user can have an account");
         subscription.distributionKey(access.distributionKey());
         subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        subscription.count(1);
         membershipDataStore.update(subscription);
         UserAccount account = new UserAccount();
         account.distributionKey(access.distributionKey());
         account.trial(subscription.trial());
-        if(!accountDataStore.createIfAbsent(account,true)){
-            account.trial(subscription.trial());
-            account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            accountDataStore.update(account);
-        }
+        account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        accountDataStore.update(account);
         return account;
     }
 

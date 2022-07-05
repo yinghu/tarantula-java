@@ -73,7 +73,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusYears(10)));
             membership.timestamp(TimeUtil.toUTCMilliseconds(loc));
             membership.trial(true);
-            this.userService.createOrUpdateAccount(user,membership);
+            this.userService.createAccount(user,membership);
         }
         this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
             //add player user to the account
@@ -167,7 +167,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 membership.trial(true);
                 membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
                 membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusDays(trialDays)));
-                this.userService.createOrUpdateAccount(access,membership);
+                this.userService.createAccount(access,membership);
                 session.systemId(access.distributionKey());
                 OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                 if(this.onSession(_onSession,session)) this.deploymentServiceProvider.onUpdated(Metrics.PASSWORD_COUNT,1);
