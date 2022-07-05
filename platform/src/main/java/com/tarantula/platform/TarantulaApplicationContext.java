@@ -60,8 +60,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public ScheduledFuture<?> schedule(SchedulingTask task){
         return this.tarantulaContext.schedule(task);
     }
-    public Presence presence(String systemId){ //always available on cluster scope if access is active
-        return this.tarantulaContext.tokenValidatorProvider().presence(systemId);
+    public Presence presence(Session session){ //always available on cluster scope if access is active
+        return this.tarantulaContext.tokenValidatorProvider().presence(session);
     }
     public void absence(Session session){
         this.validator.offSession(session.systemId(),session.stub());

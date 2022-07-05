@@ -23,7 +23,7 @@ public class DefaultApplication implements ApplicationProvider {
         if(this.deploymentDescriptor.accessMode() == Access.PUBLIC_ACCESS_MODE){
             return true;
         }
-        return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event.systemId(),event.stub(),event.ticket());
+        return this.tarantulaContext.tokenValidatorProvider().tokenValidator().validateTicket(event);
     }
     //@Override
     public Descriptor descriptor() {

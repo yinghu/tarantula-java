@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
@@ -43,6 +44,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
+    private HttpCaller httpCaller;
 
     public MessageDigest messageDigest(){
         try{
@@ -54,6 +56,21 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
+    }
+    public Presence presence(Session session){
+        //log.warn("Token->"+session.trackId());
+        Presence presence = pMap.computeIfAbsent(session.systemId(),(k)->{
+            PresenceIndex px = new PresenceIndex();
+            px.distributionKey(session.systemId());
+            if(!pdataStore.load(px)) return null;
+            px.dataStore(pdataStore);
+            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
+            return px;
+        });
+        if(presence==null){
+            log.warn("Fetching presence from presence service ...");
+        }
+        return presence;
     }
     public Presence presence(String systemId){
         return pMap.computeIfAbsent(systemId,(k)->{

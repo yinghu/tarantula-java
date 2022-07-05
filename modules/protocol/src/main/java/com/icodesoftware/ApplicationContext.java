@@ -11,7 +11,7 @@ public interface ApplicationContext {
     Lobby lobby(String typeId);
     List<Lobby> index();
 
-    Presence presence(String systemId);
+    Presence presence(Session session);
 
     void absence(Session session);
 

@@ -16,7 +16,7 @@ public interface TokenValidator {
     //generate the ticket with limited life circle
     String ticket(String systemId,int stub);
     //validate ticket, call before application callback
-    boolean validateTicket(String systemId,int stub,String ticket);
+    boolean validateTicket(Session session);
 
 
     void offSession(String systemId,int stub);

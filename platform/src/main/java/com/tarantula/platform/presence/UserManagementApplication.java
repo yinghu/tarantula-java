@@ -123,7 +123,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
         }
         else if(session.action().equals("onTicket")){//validate game server connection
-            if(this.context.validator().validateTicket(session.systemId(),acc.stub(),(String)acc.property(OnAccess.ACCESS_KEY))){
+            session.stub(acc.stub());
+            session.ticket((String)acc.property(OnAccess.ACCESS_KEY));
+            if(this.context.validator().validateTicket(session)){
                 PresenceContext ptx = new PresenceContext();
                 ptx.successful(true);
                 session.write(this.builder.create().toJson(ptx).getBytes());

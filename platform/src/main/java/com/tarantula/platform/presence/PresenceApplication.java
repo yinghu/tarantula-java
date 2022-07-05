@@ -40,7 +40,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onPresence")) {
-            Presence presence = this.context.presence(session.systemId());
+            Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             pc.presence.stub(presence.count(0));

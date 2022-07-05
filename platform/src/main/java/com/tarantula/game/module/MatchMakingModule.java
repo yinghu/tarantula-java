@@ -36,7 +36,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby!=null) {
-                Response response = context.presence(session.systemId()).onPlay(session, lobby);
+                Response response = context.presence(session).onPlay(session, lobby);
                 if (response != null) session.write(this.builder.create().toJson(response).getBytes());
             }
             else{

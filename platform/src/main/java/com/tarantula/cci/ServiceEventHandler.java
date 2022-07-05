@@ -51,7 +51,7 @@ public class ServiceEventHandler implements RequestHandler {
             actionEvent.systemId(id.systemId());
             actionEvent.stub(id.stub());
             actionEvent.ticket(id.ticket());
-            actionEvent.trackId(id.oid());
+            actionEvent.trackId(token);
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());
             actionEvent.destination(routingKey.route());

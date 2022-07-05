@@ -25,8 +25,8 @@ public class ApplicationContextProxy implements ApplicationContext {
     }
 
     @Override
-    public Presence presence(String systemId) {
-        return this.tarantulaApplicationContext.presence(systemId);
+    public Presence presence(Session session) {
+        return this.tarantulaApplicationContext.presence(session);
     }
 
     @Override

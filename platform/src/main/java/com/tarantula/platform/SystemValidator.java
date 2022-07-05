@@ -61,12 +61,12 @@ public class SystemValidator{
             return SystemUtil.ticket(systemValidatorProvider.messageDigest(),input,stub,timeoutSeconds);
         }
         @Override
-        public boolean validateTicket(String systemId, int stub, String ticket) {
-            Presence ptx = systemValidatorProvider.presence(systemId);
-            if(stub > ptx.count(0)){
+        public boolean validateTicket(Session session) {
+            Presence ptx = systemValidatorProvider.presence(session);
+            if(session.stub() > ptx.count(0)){
                 return false;
             }
-            return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),systemId,stub,ticket);
+            return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
         }
         @Override
         public OnSession token(String systemId,int stub){

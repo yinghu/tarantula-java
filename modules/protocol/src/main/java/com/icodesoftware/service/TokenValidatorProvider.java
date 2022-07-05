@@ -1,9 +1,6 @@
 package com.icodesoftware.service;
 
-import com.icodesoftware.Access;
-import com.icodesoftware.OnAccess;
-import com.icodesoftware.Presence;
-import com.icodesoftware.TokenValidator;
+import com.icodesoftware.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     void timeout(int minutes,int seconds);
 
-    Presence presence(String systemId);
+    Presence presence(Session session);
 
     Access.Role role(String systemId);
     boolean checkRole(Access access,String role);
