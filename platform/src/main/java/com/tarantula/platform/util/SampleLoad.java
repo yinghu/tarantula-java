@@ -1,9 +1,13 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -107,9 +111,26 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,100000);
-        sampleLoad._init();
-        sampleLoad.register();
+        //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,100000);
+        //sampleLoad._init();
+        //sampleLoad.register();
+        //PresenceFetcher presenceFetcher  =new PresenceFetcher("https://gameclustering.com");
+        //presenceFetcher._init();
+        //OnSession onSession = presenceFetcher.login("root","X123!Y123");
+
+       //PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.17:8090");
+        //presenceFetcher1._init();
+        //presenceFetcher1.presence(onSession.token());
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] key = new byte[16];
+        secureRandom.nextBytes(key);
+        System.out.println(SystemUtil.toHexString(key));
+        int v = 5;
+        byte[] orig = ByteBuffer.allocate(4).putInt(v).array();
+        byte[] enc = CipherUtil.encrypt(key).doFinal(orig);
+        byte[] rev = CipherUtil.decrypt(key).doFinal(enc);
+        int t = ByteBuffer.wrap(rev).getInt();
+        System.out.println("TV->"+t);
     }
 
 }

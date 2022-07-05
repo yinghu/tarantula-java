@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.time.*;
 import java.util.Arrays;
 
+import java.util.Base64;
 import java.util.UUID;
 
 
@@ -56,7 +57,7 @@ public class SystemUtil {
             return false;
         }
     }
-    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes) {
+    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark) {
         //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
         //ticket=> {tarantula} {stub} {end} {hash}
         StringBuffer token = new StringBuffer(systemId);
@@ -71,6 +72,7 @@ public class SystemUtil {
         token.append("-").append(stub);//1
         token.append("-").append(start); //2
         token.append("-").append(hash); //3
+        token.append("-").append(mark);
         return token.toString();
     }
     public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp) {
@@ -98,13 +100,13 @@ public class SystemUtil {
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash vm[4] -- mark
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
         messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
         if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[3])){// hash
-            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0]);
+            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0],vm[4]);
         }
         else{
             throw new RuntimeException("Wrong session token");
@@ -241,5 +243,12 @@ public class SystemUtil {
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
+    }
+
+    public static String toBase64String(byte[] data){
+        return Base64.getEncoder().encodeToString(data);
+    }
+    public static byte[] fromBase64String(String data){
+        return Base64.getDecoder().decode(data);
     }
 }

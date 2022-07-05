@@ -4,6 +4,8 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
+
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Map;
 
@@ -30,7 +32,11 @@ public class SystemValidator{
 
         @Override
         public OnSession validateToken(String token) {
-            return SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
+            OnSession onSession = SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
+            byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(onSession.stub()).array());
+            String wmark = SystemUtil.toHexString(mark);
+            if(!wmark.equals(onSession.label())) throw new RuntimeException("Illegal access");
+            return onSession;
         }
         @Override
         public String hashPassword(String password) {
@@ -46,7 +52,8 @@ public class SystemValidator{
                 _ox.stub(presence.count(1));
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
-                _ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes));
+                byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(_ox.stub()).array());
+                _ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark)));
                 _ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
                 _ox.successful(true);
                 return _ox;
@@ -68,12 +75,7 @@ public class SystemValidator{
             }
             return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
         }
-        @Override
-        public OnSession token(String systemId,int stub){
-            OnSession onSession = new OnSessionTrack(systemId,stub);
-            onSession.token(SystemUtil.token(systemValidatorProvider.messageDigest(),systemId,stub,timeoutMinutes));
-            return onSession;
-        }
+
         @Override
         public void offSession(String systemId, int stub) {
             systemValidatorProvider.offSession(systemId);

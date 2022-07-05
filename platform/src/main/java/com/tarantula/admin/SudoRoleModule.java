@@ -13,6 +13,7 @@ import com.tarantula.platform.presence.User;
 
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,6 +35,9 @@ public class SudoRoleModule implements Module {
             acc.distributionKey(session.systemId());
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onKey")){
+            session.write(SystemUtil.toBase64String(tokenValidatorProvider.key()).getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){
             this.context.log(new String(payload),OnLog.WARN);

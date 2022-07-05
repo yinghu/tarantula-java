@@ -15,6 +15,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
     String hashJoinTicket(String roomId,String systemId);
     boolean validHash(String roomId,String systemId,String hash);
 
+    byte[] key();
     //labeled access key
     String validateAccessKey(String accessKey);
     String createAccessKey(String label);

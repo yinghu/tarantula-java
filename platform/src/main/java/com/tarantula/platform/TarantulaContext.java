@@ -123,6 +123,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
+    public static boolean presenceServiceEnabled = true;
+    public static String presenceServiceHost;
     public String authContext = "localhost";
 
     public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
@@ -969,5 +971,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             }
         }
         return _vlist;
+    }
+    public boolean presenceServiceEnabled(){
+ 	    return presenceServiceEnabled;
+    }
+    public String presenceServiceHost(){
+        return presenceServiceHost;
     }
 }

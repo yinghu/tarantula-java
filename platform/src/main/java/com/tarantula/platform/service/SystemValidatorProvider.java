@@ -3,15 +3,19 @@ package com.tarantula.platform.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
+import com.tarantula.platform.util.PresenceFetcher;
 import com.tarantula.platform.util.SystemUtil;
 
+import javax.crypto.Cipher;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -44,8 +48,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private HttpCaller httpCaller;
-
+    private PresenceFetcher httpCaller;
+    private boolean remotePresenceEnabled;
+    private byte[] key;
+    private Cipher encrypt;
+    private Cipher decrypt;
     public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -67,9 +74,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
             return px;
         });
-        if(presence==null){
+        if(presence==null&&remotePresenceEnabled){
             log.warn("Fetching presence from presence service ...");
         }
+        //else{
+            //log.warn("Illegal access");
+            //httpCaller = new PresenceFetcher(serviceContext.presenceServiceHost());
+            //try{httpCaller._init();}catch (Exception ex){}
+            //httpCaller.presence(session.trackId());
+        //}
         return presence;
     }
     public Presence presence(String systemId){
@@ -81,6 +94,23 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
             return px;
         });
+    }
+    public byte[] key(){
+        return key;
+    }
+    public byte[] encrypt(byte[] data){
+        try{
+            return encrypt.doFinal(data);
+        }catch (Exception ex){
+            return data;
+        }
+    }
+    public byte[] decrypt(byte[] data){
+        try{
+            return decrypt.doFinal(data);
+        }catch (Exception ex){
+            return data;
+        }
     }
     public void offSession(String systemId){
         Presence presence = pMap.remove(systemId);
@@ -265,6 +295,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        this.remotePresenceEnabled = !serviceContext.presenceServiceEnabled();
         this.deploymentServiceProvider = serviceContext.deploymentServiceProvider();
         this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
@@ -319,7 +350,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     @Override
     public void waitForData() {
-        log.info("System validator provider started");
+        try{
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
+            secureRandom.nextBytes(_key);
+            encrypt = CipherUtil.encrypt(_key);
+            decrypt = CipherUtil.decrypt(_key);
+            key = _key;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        log.info("System validator provider started with presence service enabled ["+serviceContext.presenceServiceEnabled()+"]["+serviceContext.presenceServiceHost()+"]");
     }
 
     @Override
