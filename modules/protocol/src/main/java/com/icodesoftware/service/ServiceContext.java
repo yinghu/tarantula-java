@@ -23,8 +23,7 @@ public interface ServiceContext {
     String bucket();
     String bucketId();
     String nodeId();
-    boolean presenceServiceEnabled();
-    String presenceServiceHost();
+
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);

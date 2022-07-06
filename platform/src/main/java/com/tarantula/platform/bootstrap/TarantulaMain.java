@@ -62,8 +62,6 @@ public class TarantulaMain {
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
 			TarantulaContext.lobbySubscriptionEnabled = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
-			TarantulaContext.presenceServiceEnabled = Boolean.parseBoolean(override(overriding,"tarantula.presence.service.enabled",_user,_config));
-			TarantulaContext.presenceServiceHost = override(overriding,"tarantula.presence.service.host",_user,_config);
 			btx.platformVersion = override(overriding,"tarantula.platform.version",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));

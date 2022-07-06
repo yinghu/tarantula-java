@@ -91,10 +91,4 @@ public class ServiceContextProxy implements ServiceContext {
     public <T extends OnAccess> void setup(T configuration){
         this.tarantulaContext.setup(configuration);
     }
-    public boolean presenceServiceEnabled(){
-        return tarantulaContext.presenceServiceEnabled();
-    }
-    public String presenceServiceHost(){
-        return tarantulaContext.presenceServiceHost();
-    }
 }

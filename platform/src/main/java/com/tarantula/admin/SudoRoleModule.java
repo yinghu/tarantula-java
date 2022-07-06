@@ -36,8 +36,21 @@ public class SudoRoleModule implements Module {
             uDatastore.load(acc);
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onKey")){
-            session.write(SystemUtil.toBase64String(tokenValidatorProvider.key()).getBytes());
+        else if(session.action().equals("onEnablePresenceService")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String root = (String) onAccess.property("user");
+            String password = (String) onAccess.property("password");
+            String host = (String) onAccess.property("host");
+            this.tokenValidatorProvider.enablePresenceService(root,password,host);
+            session.write(JsonUtil.toSimpleResponse(true,"remote presence service enabled on ["+host+"]").getBytes());
+        }
+        else if(session.action().equals("onDisablePresenceService")){
+            this.tokenValidatorProvider.disablePresenceService();
+            session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
+        }
+        else if(session.action().equals("onPresenceKey")){
+            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.key()));
+            session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){
             this.context.log(new String(payload),OnLog.WARN);

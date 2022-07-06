@@ -7,6 +7,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
+import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.*;
 
@@ -24,6 +25,8 @@ public class PortableRegistry extends AbstractRecoverableListener {
     public static final int MODULE_INDEX_CID = 14;
 
     public static final int ACCESS_KEY = 16;
+
+    public static final int PRESENCE_KEY_CID = 17;
 
     public static final int ON_SESSION_CID = 25;//DEPLOY OBJECT
 
@@ -102,6 +105,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case ROOM_REGISTRY_CID:
                 _ins = new RoomRegistry();
+                break;
+            case PRESENCE_KEY_CID:
+                _ins = new PresenceKey();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

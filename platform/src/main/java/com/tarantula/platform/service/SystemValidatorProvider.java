@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.CipherUtil;
-import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
@@ -50,7 +49,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DeploymentServiceProvider deploymentServiceProvider;
     private PresenceFetcher httpCaller;
     private boolean remotePresenceEnabled;
-    private byte[] key;
+    private PresenceKey presenceKey;
     private Cipher encrypt;
     private Cipher decrypt;
     public MessageDigest messageDigest(){
@@ -65,7 +64,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return systemValidator.tokenValidator();
     }
     public Presence presence(Session session){
-        //log.warn("Token->"+session.trackId());
         Presence presence = pMap.computeIfAbsent(session.systemId(),(k)->{
             PresenceIndex px = new PresenceIndex();
             px.distributionKey(session.systemId());
@@ -76,13 +74,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
         if(presence==null&&remotePresenceEnabled){
             log.warn("Fetching presence from presence service ...");
+            httpCaller.presence(session.trackId());
         }
-        //else{
-            //log.warn("Illegal access");
-            //httpCaller = new PresenceFetcher(serviceContext.presenceServiceHost());
-            //try{httpCaller._init();}catch (Exception ex){}
-            //httpCaller.presence(session.trackId());
-        //}
         return presence;
     }
     public Presence presence(String systemId){
@@ -96,7 +89,23 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public byte[] key(){
-        return key;
+        return presenceKey.key;
+    }
+    public boolean enablePresenceService(String root,String password,String presenceServiceHost){
+        try {
+            httpCaller = new PresenceFetcher(presenceServiceHost);
+            httpCaller._init();
+            OnSession onSession = httpCaller.login(root,password);
+            this.presenceKey.key = httpCaller.presenceKey(onSession.token());
+            this.remotePresenceEnabled = true;
+            return true;
+        }catch (Exception ex){
+            log.error("error",ex);
+            return false;
+        }
+    }
+    public  void disablePresenceService(){
+        this.remotePresenceEnabled = false;
     }
     public byte[] encrypt(byte[] data){
         try{
@@ -295,7 +304,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.remotePresenceEnabled = !serviceContext.presenceServiceEnabled();
         this.deploymentServiceProvider = serviceContext.deploymentServiceProvider();
         this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
         this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
@@ -351,16 +359,22 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     @Override
     public void waitForData() {
         try{
-            SecureRandom secureRandom = new SecureRandom();
-            byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
-            secureRandom.nextBytes(_key);
-            encrypt = CipherUtil.encrypt(_key);
-            decrypt = CipherUtil.decrypt(_key);
-            key = _key;
+            PresenceKey pKey = new PresenceKey();
+            pKey.distributionKey(serviceContext.nodeId());
+            if(!deployDataStore.load(pKey)){
+                SecureRandom secureRandom = new SecureRandom();
+                byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
+                secureRandom.nextBytes(_key);
+                pKey.key = _key;
+                deployDataStore.update(pKey);
+            }
+            encrypt = CipherUtil.encrypt(pKey.key);
+            decrypt = CipherUtil.decrypt(pKey.key);
+            this.presenceKey = pKey;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.info("System validator provider started with presence service enabled ["+serviceContext.presenceServiceEnabled()+"]["+serviceContext.presenceServiceHost()+"]");
+        log.info("System validator provider started ["+serviceContext.nodeId()+"]");
     }
 
     @Override

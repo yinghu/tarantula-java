@@ -16,6 +16,9 @@ public interface TokenValidatorProvider extends ServiceProvider {
     boolean validHash(String roomId,String systemId,String hash);
 
     byte[] key();
+    boolean enablePresenceService(String root,String password,String presenceServiceHost);
+    void disablePresenceService();
+
     //labeled access key
     String validateAccessKey(String accessKey);
     String createAccessKey(String label);

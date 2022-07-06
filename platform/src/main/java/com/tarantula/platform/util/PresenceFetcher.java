@@ -14,24 +14,32 @@ public class PresenceFetcher extends HttpCaller {
     public PresenceFetcher(String host){
         super(host);
     }
-    public OnSession login(String loginName, String password) {
-        try {
-            String[] headers = new String[]{
-                    Session.TARANTULA_TAG,"index/user",
-                    Session.TARANTULA_ACTION,"onLogin",
-                    Session.TARANTULA_MAGIC_KEY, loginName
-            };
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("login",loginName);
-            jsonObject.addProperty("password",password);
-            String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
-            JsonObject json = JsonUtil.parse(resp);
-            OnSession onSession = new OnSessionTrack();
-            onSession.token(json.get("Token").getAsString());
-            return onSession;
-        }catch (Exception ex){
-            return null;
-        }
+
+    public OnSession login(String loginName, String password) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,"index/user",
+                Session.TARANTULA_ACTION,"onLogin",
+                Session.TARANTULA_MAGIC_KEY, loginName
+        };
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("login",loginName);
+        jsonObject.addProperty("password",password);
+        String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+        JsonObject json = JsonUtil.parse(resp);
+        OnSession onSession = new OnSessionTrack();
+        onSession.token(json.get("Token").getAsString());
+        return onSession;
+    }
+    public byte[] presenceKey(String token) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,"role/sudo",
+                Session.TARANTULA_ACTION,"onPresenceKey",
+                Session.TARANTULA_TOKEN,token,
+        };
+        String resp = super.get("service/action",headers);
+        JsonObject jsonObject = JsonUtil.parse(resp);
+        String skey = jsonObject.get("accessKey").getAsString();
+        return SystemUtil.fromBase64String(skey);
     }
     public Presence presence(String token) {
         try {
