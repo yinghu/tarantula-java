@@ -33,9 +33,9 @@ public class SystemValidator{
         @Override
         public OnSession validateToken(String token) {
             OnSession onSession = SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
-            byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(onSession.stub()).array());
-            String wmark = SystemUtil.toHexString(mark);
-            if(!wmark.equals(onSession.label())) throw new RuntimeException("Illegal access");
+            //byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(onSession.stub()).array());
+            //String wmark = SystemUtil.toHexString(mark);
+            //if(!wmark.equals(onSession.label())) throw new RuntimeException("Illegal access");
             return onSession;
         }
         @Override
@@ -65,16 +65,16 @@ public class SystemValidator{
         }
         @Override
         public String ticket(String input, int stub) {
-            return SystemUtil.ticket(systemValidatorProvider.messageDigest(),input,stub,timeoutSeconds);
+            byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(stub).array());
+            return SystemUtil.ticket(systemValidatorProvider.messageDigest(),input,stub,timeoutSeconds,SystemUtil.toHexString(mark));
         }
         @Override
         public boolean validateTicket(Session session) {
             Presence ptx = systemValidatorProvider.presence(session);
-            //if(session.stub() > ptx.count(0)){
-                //System.out.println(session.stub()+">>>"+ptx.count(0));
-                //return false;
-            //}
-            return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
+            String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
+            byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
+            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data): systemValidatorProvider.encryptFromRemoteKey(data);
+            return SystemUtil.toHexString(mark).equals(waterMark);
         }
 
         @Override

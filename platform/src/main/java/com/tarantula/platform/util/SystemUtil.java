@@ -28,7 +28,7 @@ public class SystemUtil {
         }
         return sb.toString().toUpperCase();
     }
-    public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds) {
+    public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds,String waterMark) {
         LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
         long end = TimeUtil.toUTCMilliseconds(_st);
         StringBuffer _ticket = new StringBuffer();
@@ -38,11 +38,11 @@ public class SystemUtil {
         messageDigest.update(Integer.toHexString(stub).getBytes());
         messageDigest.update(Long.toHexString(end).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        _ticket.append(hash);
+        _ticket.append(hash).append(" ").append(waterMark);
         return _ticket.toString();
     }
 
-    public static boolean validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
+    public static String validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
         String[] tlist = ticket.split(" ");//validate
         long end = Long.parseLong(tlist[1]);
         messageDigest.reset();
@@ -51,10 +51,10 @@ public class SystemUtil {
         messageDigest.update(Long.toHexString(end).getBytes());
         if(tlist[2].equals(SystemUtil.toHexString(messageDigest.digest()))){
             LocalDateTime ending = TimeUtil.fromUTCMilliseconds(end);
-            return ending.isAfter(LocalDateTime.now());
+            return ending.isAfter(LocalDateTime.now())?tlist[3]:null;
         }
         else{
-            return false;
+            return null;
         }
     }
     public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark) {
@@ -67,12 +67,12 @@ public class SystemUtil {
         long start = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         messageDigest.update(Long.toHexString(start).getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60);//assign a ticket
+        String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60,mark);//assign a ticket
         token.append(" ").append(ticket);//0 embedded to token
         token.append("-").append(stub);//1
         token.append("-").append(start); //2
         token.append("-").append(hash); //3
-        token.append("-").append(mark);
+        //token.append("-").append(mark);
         return token.toString();
     }
     public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp) {
@@ -100,13 +100,13 @@ public class SystemUtil {
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash vm[4] -- mark
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
         messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
         if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[3])){// hash
-            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0],vm[4]);
+            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0]);
         }
         else{
             throw new RuntimeException("Wrong session token");

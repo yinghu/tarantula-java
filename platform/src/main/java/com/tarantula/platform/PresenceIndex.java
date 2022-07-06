@@ -12,6 +12,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private double balance;
     private int counter;
 
+    private boolean local = true;
     private EventService eventService;
 
     public PresenceIndex(double initialBalance){
@@ -22,6 +23,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this();
         this.counter = stub;
         this.balance = initialBalance;
+        this.local = false;
     }
 
     public PresenceIndex(){
@@ -91,7 +93,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.properties.put("2",counter);
         this.properties.put("3",disabled);
         this.properties.put("4",this.timestamp);
-        //this.properties.put("5",this.sessionId);
+        this.properties.put("5",this.local);
         return this.properties;
     }
     @Override
@@ -100,7 +102,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-        //this.sessionId = ((Number)properties.getOrDefault("5",0)).intValue();
+        this.local = (Boolean)properties.getOrDefault("3",true);
     }
 
     public int count(int delta){
@@ -117,6 +119,9 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public boolean online(){
         this.timestamp = System.currentTimeMillis();
         return (!this.disabled);
+    }
+    public boolean local(){
+        return local;
     }
     @Override
     public String toString(){

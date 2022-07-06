@@ -51,7 +51,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
-    //private Cipher decrypt;
+    private Cipher remoteEncrypt;
     public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -103,8 +103,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             httpCaller = new PresenceFetcher(presenceServiceHost);
             httpCaller._init();
             OnSession onSession = httpCaller.login(root,password);
-            this.presenceKey.key = httpCaller.presenceKey(onSession.token());
-            encrypt = CipherUtil.encrypt(this.presenceKey.key);
+            byte[] key = httpCaller.presenceKey(onSession.token());
+            remoteEncrypt = CipherUtil.encrypt(key);
             this.remotePresenceEnabled = true;
             return true;
         }catch (Exception ex){
@@ -119,7 +119,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             return encrypt.doFinal(data);
         }catch (Exception ex){
-            return data;
+            throw new RuntimeException(ex);
+        }
+    }
+    public byte[] encryptFromRemoteKey(byte[] data){
+        try{
+            return remoteEncrypt.doFinal(data);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
         }
     }
     public void offSession(String systemId){
@@ -202,10 +209,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String ticket(String key,int stub,int duration){
-        return SystemUtil.ticket(messageDigest(),key,stub,duration);
+        return SystemUtil.ticket(messageDigest(),key,stub,duration,"");
     }
     public boolean validateTicket(String key,int stub,String ticket){
-        return SystemUtil.validTicket(messageDigest(),key,stub,ticket);
+        return SystemUtil.validTicket(messageDigest(),key,stub,ticket)!=null;
     }
     public List<Access.Role> list(){
         return roleList;

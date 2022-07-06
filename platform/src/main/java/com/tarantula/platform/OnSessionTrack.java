@@ -27,12 +27,11 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.systemId = systemId;
         this.balance = balance;
     }
-    public OnSessionTrack(String systemId,int stub,String ticket,String mark){
+    public OnSessionTrack(String systemId,int stub,String ticket){
         this();
         this.systemId = systemId;
         this.stub = stub;
         this.ticket = ticket;
-        this.label = mark;
     }
     public OnSessionTrack(String systemId,int stub){
         this();

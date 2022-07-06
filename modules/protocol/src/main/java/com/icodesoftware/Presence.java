@@ -10,4 +10,6 @@ public interface Presence extends Balance,DataStore.Updatable,Countable{
 
     boolean online();
 
+    boolean local();
+
 }
