@@ -18,7 +18,11 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this();
         this.balance = initialBalance;
     }
-
+    public PresenceIndex(int stub,double initialBalance){
+        this();
+        this.counter = stub;
+        this.balance = initialBalance;
+    }
 
     public PresenceIndex(){
         this.label = "Presence";

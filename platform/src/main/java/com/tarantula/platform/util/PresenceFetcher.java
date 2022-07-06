@@ -41,7 +41,7 @@ public class PresenceFetcher extends HttpCaller {
         String skey = jsonObject.get("accessKey").getAsString();
         return SystemUtil.fromBase64String(skey);
     }
-    public Presence presence(String token) {
+    public OnSession presence(String token) {
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"presence/lobby",
@@ -49,11 +49,38 @@ public class PresenceFetcher extends HttpCaller {
                     Session.TARANTULA_TOKEN,token,
             };
             String resp = super.get("service/action",headers);
-            System.out.println(resp);
-            Presence presence = new PresenceIndex();
+            JsonObject jsonObject = JsonUtil.parse(resp).get("presence").getAsJsonObject();
+            OnSession presence = new OnSessionTrack();
+            presence.systemId(jsonObject.get("systemId").getAsString());
+            presence.stub(jsonObject.get("stub").getAsInt());
+            presence.balance(jsonObject.get("balance").getAsDouble());
             return presence;
         }catch (Exception ex){
+            ex.printStackTrace();
             return null;
+        }
+    }
+
+    public void play(String token) {
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_TAG,"robotquest/lobby",
+                    Session.TARANTULA_ACTION,"onPlay",
+                    Session.TARANTULA_TOKEN,token,
+                    Session.TARANTULA_CLIENT_ID,"SAMPLE-1",
+                    Session.TARANTULA_NAME,"Sample111"
+            };
+            String resp = super.get("service/action",headers);
+            System.out.println(resp);
+            //JsonObject jsonObject = JsonUtil.parse(resp).get("presence").getAsJsonObject();
+            //OnSession presence = new OnSessionTrack();
+            //presence.systemId(jsonObject.get("systemId").getAsString());
+            //presence.stub(jsonObject.get("stub").getAsInt());
+            //presence.balance(jsonObject.get("balance").getAsDouble());
+            //return presence;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            //return null;
         }
     }
 }

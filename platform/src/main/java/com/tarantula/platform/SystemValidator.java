@@ -70,9 +70,10 @@ public class SystemValidator{
         @Override
         public boolean validateTicket(Session session) {
             Presence ptx = systemValidatorProvider.presence(session);
-            if(session.stub() > ptx.count(0)){
-                return false;
-            }
+            //if(session.stub() > ptx.count(0)){
+                //System.out.println(session.stub()+">>>"+ptx.count(0));
+                //return false;
+            //}
             return SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
         }
 

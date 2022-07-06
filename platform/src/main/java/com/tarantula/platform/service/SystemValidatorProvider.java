@@ -51,7 +51,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
-    private Cipher decrypt;
+    //private Cipher decrypt;
     public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -74,7 +74,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
         if(presence==null&&remotePresenceEnabled){
             log.warn("Fetching presence from presence service ...");
-            httpCaller.presence(session.trackId());
+            OnSession onSession = httpCaller.presence(session.trackId());
+            PresenceIndex px = new PresenceIndex(onSession.stub(),onSession.balance());
+            px.distributionKey(onSession.systemId());
+            pdataStore.update(px);
+            px.dataStore(pdataStore);
+            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
+            pMap.put(session.systemId(),px);
+            return px;
         }
         return presence;
     }
@@ -97,6 +104,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             httpCaller._init();
             OnSession onSession = httpCaller.login(root,password);
             this.presenceKey.key = httpCaller.presenceKey(onSession.token());
+            encrypt = CipherUtil.encrypt(this.presenceKey.key);
             this.remotePresenceEnabled = true;
             return true;
         }catch (Exception ex){
@@ -110,13 +118,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public byte[] encrypt(byte[] data){
         try{
             return encrypt.doFinal(data);
-        }catch (Exception ex){
-            return data;
-        }
-    }
-    public byte[] decrypt(byte[] data){
-        try{
-            return decrypt.doFinal(data);
         }catch (Exception ex){
             return data;
         }
@@ -369,7 +370,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 deployDataStore.update(pKey);
             }
             encrypt = CipherUtil.encrypt(pKey.key);
-            decrypt = CipherUtil.decrypt(pKey.key);
             this.presenceKey = pKey;
         }catch (Exception ex){
             throw new RuntimeException(ex);
