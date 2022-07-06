@@ -73,7 +73,7 @@ public class SystemValidator{
             Presence ptx = systemValidatorProvider.presence(session);
             String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
             byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
-            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data): systemValidatorProvider.encryptFromRemoteKey(data);
+            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encryptFromRemoteKey(data);
             return SystemUtil.toHexString(mark).equals(waterMark);
         }
 

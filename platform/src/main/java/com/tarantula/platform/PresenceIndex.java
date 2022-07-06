@@ -102,7 +102,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-        this.local = (Boolean)properties.getOrDefault("3",true);
+        this.local = (Boolean)properties.getOrDefault("5",true);
     }
 
     public int count(int delta){
