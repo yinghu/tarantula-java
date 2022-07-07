@@ -421,6 +421,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
     }
 
+    public byte[] clusterKey() {
+        return this.tarantulaContext.tokenValidatorProvider().key();
+    }
+
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
 

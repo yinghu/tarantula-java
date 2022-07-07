@@ -109,6 +109,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public DataStore dataStore(String name){
+        //String _dname = this._descriptor.typeId().replaceAll("-","_")+"_"+name;
         return this.tarantulaContext.dataStore(name,this.tarantulaContext.partitionNumber());
     }
 

@@ -492,4 +492,21 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
+
+    @Override
+    public byte[] clusterKey() {
+        NodeEngine nodeEngine = getNodeEngine();
+        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
+            logger.warn("Master node on local node, load key from local disk");
+            return null;
+        }
+        ClusterKeyOperation operation = new ClusterKeyOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
+        try {
+            final Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
 }

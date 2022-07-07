@@ -47,4 +47,6 @@ public interface DeployService extends ServiceProvider {
     void registerConnection(Connection connection);
     void releaseConnection(Connection connection);
 
+    byte[] clusterKey();
+
 }

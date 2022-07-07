@@ -118,7 +118,7 @@ public class SampleLoad {
         presenceFetcher._init();
         OnSession onSession = presenceFetcher.login("pop","pop");
         System.out.println(onSession.token());
-        PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.17:8090");
+        PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.9:8090");
         presenceFetcher1._init();
         presenceFetcher1.play(onSession.token());
     }

@@ -368,20 +368,26 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void waitForData() {
         try{
             PresenceKey pKey = new PresenceKey();
-            pKey.distributionKey(serviceContext.nodeId());
-            if(!deployDataStore.load(pKey)){
-                SecureRandom secureRandom = new SecureRandom();
-                byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
-                secureRandom.nextBytes(_key);
-                pKey.key = _key;
-                deployDataStore.update(pKey);
+            byte[] clusterKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService().clusterKey();
+            if(clusterKey!=null){
+                pKey.key = clusterKey;
+            }
+            else{
+                pKey.distributionKey(serviceContext.bucketId());
+                if(!deployDataStore.load(pKey)){
+                    SecureRandom secureRandom = new SecureRandom();
+                    byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
+                    secureRandom.nextBytes(_key);
+                    pKey.key = _key;
+                    deployDataStore.update(pKey);
+                }
             }
             encrypt = CipherUtil.encrypt(pKey.key);
             this.presenceKey = pKey;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.info("System validator provider started ["+serviceContext.nodeId()+"]");
+        log.info("System validator provider started ["+serviceContext.nodeId()+"]["+serviceContext.bucketId()+"]");
     }
 
     @Override
