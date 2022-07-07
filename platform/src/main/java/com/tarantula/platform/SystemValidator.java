@@ -64,9 +64,8 @@ public class SystemValidator{
             }
         }
         @Override
-        public String ticket(String input, int stub) {
-            byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(stub).array());
-            return SystemUtil.ticket(systemValidatorProvider.messageDigest(),input,stub,timeoutSeconds,SystemUtil.toHexString(mark));
+        public String ticket(String input, int stub) {//short live ticket
+            return systemValidatorProvider.ticket(input,stub,timeoutSeconds);
         }
         @Override
         public boolean validateTicket(Session session) {

@@ -13,6 +13,7 @@ import com.tarantula.platform.util.PresenceFetcher;
 import com.tarantula.platform.util.SystemUtil;
 
 import javax.crypto.Cipher;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -209,10 +210,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String ticket(String key,int stub,int duration){
-        return SystemUtil.ticket(messageDigest(),key,stub,duration,"");
+        byte[] mark = encrypt(ByteBuffer.allocate(4).putInt(stub).array());
+        return SystemUtil.ticket(messageDigest(),key,stub,duration,SystemUtil.toHexString(mark));
     }
     public boolean validateTicket(String key,int stub,String ticket){
-        return SystemUtil.validTicket(messageDigest(),key,stub,ticket)!=null;
+        String waterMark = SystemUtil.validTicket(messageDigest(),key,stub,ticket);
+        byte[] data = ByteBuffer.allocate(4).putInt(stub).array();
+        byte[] mark = encrypt(data);
+        return SystemUtil.toHexString(mark).equals(waterMark);
     }
     public List<Access.Role> list(){
         return roleList;
