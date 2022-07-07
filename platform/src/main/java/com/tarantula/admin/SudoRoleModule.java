@@ -48,8 +48,12 @@ public class SudoRoleModule implements Module {
             this.tokenValidatorProvider.disablePresenceService();
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
         }
+        else if(session.action().equals("onResetClusterKey")){
+            this.tokenValidatorProvider.resetClusterKey();
+            session.write(JsonUtil.toSimpleResponse(true,"Cluster reset").getBytes());
+        }
         else if(session.action().equals("onPresenceKey")){
-            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.key()));
+            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.clusterKey()));
             session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){

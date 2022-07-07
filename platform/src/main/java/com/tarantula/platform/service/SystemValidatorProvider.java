@@ -96,7 +96,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return px;
         });
     }
-    public byte[] key(){
+    public byte[] clusterKey(){
         return presenceKey.key;
     }
     public boolean enablePresenceService(String root,String password,String presenceServiceHost){
@@ -115,6 +115,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public  void disablePresenceService(){
         this.remotePresenceEnabled = false;
+    }
+
+    public void resetClusterKey(){
+
     }
     public byte[] encrypt(byte[] data){
         try{

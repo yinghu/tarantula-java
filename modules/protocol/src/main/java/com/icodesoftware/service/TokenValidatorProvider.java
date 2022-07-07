@@ -15,9 +15,11 @@ public interface TokenValidatorProvider extends ServiceProvider {
     String hashJoinTicket(String roomId,String systemId);
     boolean validHash(String roomId,String systemId,String hash);
 
-    byte[] key();
+    byte[] clusterKey();
     boolean enablePresenceService(String root,String password,String presenceServiceHost);
     void disablePresenceService();
+
+    void resetClusterKey();
 
     //labeled access key
     String validateAccessKey(String accessKey);

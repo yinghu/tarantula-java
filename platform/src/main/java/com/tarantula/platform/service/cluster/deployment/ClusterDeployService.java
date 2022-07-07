@@ -422,7 +422,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
 
     public byte[] clusterKey() {
-        return this.tarantulaContext.tokenValidatorProvider().key();
+        return this.tarantulaContext.tokenValidatorProvider().clusterKey();
     }
 
     @Override

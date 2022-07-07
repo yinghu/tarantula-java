@@ -32,11 +32,7 @@ public class SystemValidator{
 
         @Override
         public OnSession validateToken(String token) {
-            OnSession onSession = SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
-            //byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(onSession.stub()).array());
-            //String wmark = SystemUtil.toHexString(mark);
-            //if(!wmark.equals(onSession.label())) throw new RuntimeException("Illegal access");
-            return onSession;
+            return SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
         }
         @Override
         public String hashPassword(String password) {
