@@ -9,11 +9,16 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 
+import javax.crypto.Cipher;
+
 public class PresenceFetcher extends HttpCaller {
+
+    public Cipher encrypt;
 
     public PresenceFetcher(String host){
         super(host);
     }
+
 
     public OnSession login(String loginName, String password) throws Exception{
         String[] headers = new String[]{
@@ -30,10 +35,11 @@ public class PresenceFetcher extends HttpCaller {
         onSession.token(json.get("Token").getAsString());
         return onSession;
     }
-    public byte[] presenceKey(String token) throws Exception{
+    public byte[] presenceKey(String token,String clusterNameSuffix) throws Exception{
         String[] headers = new String[]{
                 Session.TARANTULA_TAG,"role/sudo",
                 Session.TARANTULA_ACTION,"onPresenceKey",
+                Session.TARANTULA_NAME,clusterNameSuffix,
                 Session.TARANTULA_TOKEN,token,
         };
         String resp = super.get("service/action",headers);

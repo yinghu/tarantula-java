@@ -28,6 +28,8 @@ abstract public class Data extends OnApplicationHeader implements Portable{
 
     protected String trackId;
 
+    protected String token;
+
     protected boolean closed;
 
     protected SessionForward forward;
@@ -137,6 +139,12 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.trackId = trackId;
     }
 
+    public String token(){
+        return this.token;
+    }
+    public void token(String token){
+        this.token = token;
+    }
     public void eventService(EventService eventService){
         this.eventService = eventService;
     }

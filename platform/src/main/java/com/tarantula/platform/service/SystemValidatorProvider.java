@@ -48,11 +48,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private PresenceFetcher httpCaller;
+
+    private ConcurrentHashMap<String,PresenceFetcher> fMap;
+
     private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
-    private Cipher remoteEncrypt;
+
     public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -75,8 +77,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
         if(presence==null&&remotePresenceEnabled){
             log.warn("Fetching presence from presence service ...");
-            OnSession onSession = httpCaller.presence(session.trackId());
-            PresenceIndex px = new PresenceIndex(onSession.stub(),onSession.balance());
+            PresenceFetcher httpCaller = fMap.get(session.trackId());
+            OnSession onSession = httpCaller.presence(session.token());
+            PresenceIndex px = new PresenceIndex(onSession.stub(),onSession.balance(),session.trackId());
             px.distributionKey(onSession.systemId());
             pdataStore.update(px);
             px.dataStore(pdataStore);
@@ -96,17 +99,19 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return px;
         });
     }
-    public byte[] clusterKey(){
+    public byte[] clusterKey(String clusterNameSuffix){
+        //if(!clusterNameSuffix.equals(this.serviceContext.clusterNameSuffix())) return new RuntimeException(clusterNameSuffix);
         return presenceKey.key;
     }
-    public boolean enablePresenceService(String root,String password,String presenceServiceHost){
+    public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
         try {
-            httpCaller = new PresenceFetcher(presenceServiceHost);
+            PresenceFetcher httpCaller = new PresenceFetcher(presenceServiceHost);
             httpCaller._init();
             OnSession onSession = httpCaller.login(root,password);
-            byte[] key = httpCaller.presenceKey(onSession.token());
-            remoteEncrypt = CipherUtil.encrypt(key);
+            byte[] key = httpCaller.presenceKey(onSession.token(),clusterNameSuffix);
+            httpCaller.encrypt = CipherUtil.encrypt(key);
             this.remotePresenceEnabled = true;
+            fMap.put(clusterNameSuffix,httpCaller);
             return true;
         }catch (Exception ex){
             log.error("error",ex);
@@ -120,6 +125,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void resetClusterKey(){
 
     }
+
+    public String clusterNameSuffix(){
+        return this.serviceContext.clusterNameSuffix();
+    }
     public byte[] encrypt(byte[] data){
         try{
             return encrypt.doFinal(data);
@@ -127,9 +136,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             throw new RuntimeException(ex);
         }
     }
-    public byte[] encryptFromRemoteKey(byte[] data){
+    public byte[] encrypt(Presence presence,byte[] data){
         try{
-            return remoteEncrypt.doFinal(data);
+            return fMap.get(presence.index()).encrypt.doFinal(data);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -329,6 +338,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
         this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.partitionNumber());
         oMap = new ConcurrentHashMap<>();
+        fMap = new ConcurrentHashMap<>();
         AuthVendor google = this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){
             google.registerMetricsLister(this.deploymentServiceProvider);

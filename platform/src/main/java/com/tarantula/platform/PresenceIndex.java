@@ -19,11 +19,12 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this();
         this.balance = initialBalance;
     }
-    public PresenceIndex(int stub,double initialBalance){
+    public PresenceIndex(int stub,double initialBalance,String index){
         this();
         this.counter = stub;
         this.balance = initialBalance;
         this.local = false;
+        this.index = index;
     }
 
     public PresenceIndex(){
@@ -94,6 +95,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.properties.put("3",disabled);
         this.properties.put("4",this.timestamp);
         this.properties.put("5",this.local);
+        this.properties.put("6",this.index);
         return this.properties;
     }
     @Override
@@ -103,6 +105,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
         this.local = (Boolean)properties.getOrDefault("5",true);
+        this.index = (String)properties.get("6");
     }
 
     public int count(int delta){

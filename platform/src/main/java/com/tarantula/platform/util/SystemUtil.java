@@ -57,7 +57,7 @@ public class SystemUtil {
             return null;
         }
     }
-    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark) {
+    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark,String index) {
         //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
         //ticket=> {tarantula} {stub} {end} {hash}
         StringBuffer token = new StringBuffer(systemId);
@@ -66,13 +66,14 @@ public class SystemUtil {
         messageDigest.update(Integer.toHexString(stub).getBytes());
         long start = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         messageDigest.update(Long.toHexString(start).getBytes());
+        messageDigest.update(index.getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
         String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60,mark);//assign a ticket
         token.append(" ").append(ticket);//0 embedded to token
         token.append("-").append(stub);//1
         token.append("-").append(start); //2
-        token.append("-").append(hash); //3
-        //token.append("-").append(mark);
+        token.append("-").append(index);//3 -- cluster name suffix
+        token.append("-").append(hash); //4 -- hash
         return token.toString();
     }
     public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp) {
@@ -100,13 +101,14 @@ public class SystemUtil {
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash  vm[4] -- cluster suffix
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
         messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
-        if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[3])){// hash
-            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0]);
+        messageDigest.update(vm[3].getBytes());
+        if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[4])){// hash
+            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0],vm[3]);
         }
         else{
             throw new RuntimeException("Wrong session token");

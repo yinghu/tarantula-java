@@ -68,6 +68,9 @@ public interface Session extends OnApplication {
     String trackId();
     void trackId(String trackId);
 
+    String token();
+    void token(String token);
+
     interface TimeoutListener{
         void timeout(String systemId,int stub);
     }

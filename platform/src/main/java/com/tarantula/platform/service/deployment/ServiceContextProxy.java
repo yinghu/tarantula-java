@@ -60,6 +60,9 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.partitionNumber();
     }
 
+    public String clusterNameSuffix(){
+        return this.tarantulaContext.clusterNameSuffix();
+    }
     @Override
     public String bucket() {
         return this.tarantulaContext.bucket();

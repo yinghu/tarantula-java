@@ -20,6 +20,7 @@ public interface ServiceContext {
     OnPartition[] partitions();
     int partitionNumber();
 
+    String clusterNameSuffix();
     String bucket();
     String bucketId();
     String nodeId();

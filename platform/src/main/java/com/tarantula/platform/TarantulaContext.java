@@ -114,7 +114,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public long timeoutOnInstance;
     public int metricsUpdateIntervalMinutes=1;
     private StatisticsIndex nodeMetrics;
-    public String clusterNamePrefix;
+    public String clusterNameSuffix;
 
     public String platformVersion;
     public int platformRoutingNumber;
@@ -160,7 +160,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);
-        gcfg.getGroupConfig().setName(this.clusterNamePrefix+"-integration");
+        gcfg.getGroupConfig().setName("tarantula-integration-"+this.clusterNameSuffix);
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
         new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
         new ServiceBootstrap(_accessIndexServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
@@ -426,6 +426,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public int partitionNumber(){
  	    return this.platformRoutingNumber;
+    }
+
+    public String clusterNameSuffix(){
+         return this.clusterNameSuffix;
     }
 
     //list the database list on deploy service

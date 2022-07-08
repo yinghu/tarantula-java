@@ -49,7 +49,7 @@ public class SystemValidator{
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
                 byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(_ox.stub()).array());
-                _ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark)));
+                _ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark),systemValidatorProvider.clusterNameSuffix()));
                 _ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
                 _ox.successful(true);
                 return _ox;
@@ -68,7 +68,7 @@ public class SystemValidator{
             Presence ptx = systemValidatorProvider.presence(session);
             String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
             byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
-            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encryptFromRemoteKey(data);
+            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encrypt(ptx,data);
             return SystemUtil.toHexString(mark).equals(waterMark);
         }
 

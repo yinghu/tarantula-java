@@ -41,7 +41,8 @@ public class SudoRoleModule implements Module {
             String root = (String) onAccess.property("user");
             String password = (String) onAccess.property("password");
             String host = (String) onAccess.property("host");
-            this.tokenValidatorProvider.enablePresenceService(root,password,host);
+            String suffix = (String) onAccess.property("suffix");
+            this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service enabled on ["+host+"]").getBytes());
         }
         else if(session.action().equals("onDisablePresenceService")){
@@ -53,7 +54,7 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"Cluster reset").getBytes());
         }
         else if(session.action().equals("onPresenceKey")){
-            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.clusterKey()));
+            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.clusterKey(session.name())));
             session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){

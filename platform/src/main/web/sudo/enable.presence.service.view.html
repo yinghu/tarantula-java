@@ -21,6 +21,10 @@
             <input id ="tx-enable-presence-service-artifact" class="w3-input w3-round w3-border tx-text-16" type="password" placeholder='Password'/>
         </div>
         <div class="w3-panel">
+            <label class="tx-text-12">Cluster Name Suffix</label>
+            <input id ="tx-enable-presence-service-suffix" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='Cluster Name Suffix'/>
+        </div>
+        <div class="w3-panel">
             <label class="tx-text-12">Host</label>
             <input id ="tx-enable-presence-service-version" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='Host'/>
         </div>
@@ -41,8 +45,9 @@
     document.querySelector('#tx-enable-presence-service').onclick=()=>{
         let _c = document.querySelector('#tx-enable-presence-service-codebase').value;
         let _a = document.querySelector('#tx-enable-presence-service-artifact').value;
+        let _s = document.querySelector('#tx-enable-presence-service-suffix').value;
         let _v = document.querySelector('#tx-enable-presence-service-version').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onEnablePresenceService',user:_c,password:_a,host:_v},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onEnablePresenceService',user:_c,password:_a,host:_v,suffix:_s},(resp)=>{
             document.querySelector('#tx-enable-presence-service-message').innerHTML = resp.message;
         });
     };
