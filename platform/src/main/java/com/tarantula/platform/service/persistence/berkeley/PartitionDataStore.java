@@ -79,9 +79,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
             dso.database.close();
         }
     }
-    public int scope(){
-        return Distributable.DATA_SCOPE;
-    }
+    //public int scope(){
+        //return Distributable.DATA_SCOPE;
+    //}
     @Override
     public <T extends Recoverable> boolean create(T t) {
         try {

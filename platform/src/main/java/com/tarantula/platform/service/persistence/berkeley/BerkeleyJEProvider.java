@@ -143,7 +143,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.integrationCluster = serviceContext.clusterProvider();
         for(int i=0;i<workSize;i++){
             replicationPool.execute(()->{
                 while (true){

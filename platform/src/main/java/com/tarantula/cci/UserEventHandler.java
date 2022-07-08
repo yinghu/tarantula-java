@@ -243,7 +243,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
     }
     public void setup(ServiceContext tcx){
         this.onIndex = new AtomicBoolean(false);
-        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.eventService = tcx.eventService();
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.deploymentServiceProvider.registerAccessIndexListener(this);
         this.accessIndexService = tcx.accessIndexService();

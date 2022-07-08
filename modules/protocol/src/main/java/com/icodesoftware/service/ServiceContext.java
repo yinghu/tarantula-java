@@ -11,8 +11,8 @@ public interface ServiceContext {
     DataStore dataStore(String name, int partition);
 
     ScheduledFuture<?> schedule(SchedulingTask task);
-    EventService eventService(int scope);
-    ClusterProvider clusterProvider(int scope);
+    EventService eventService();
+    ClusterProvider clusterProvider();
     ServiceProvider serviceProvider(String name);
     DeploymentServiceProvider deploymentServiceProvider();
     AccessIndexService accessIndexService();

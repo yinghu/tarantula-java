@@ -42,8 +42,8 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
         this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());//typeId_service
-        this.publisher = serviceContext.eventService(Distributable.INTEGRATION_SCOPE);
-        integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.publisher = serviceContext.eventService();
+        integrationCluster = serviceContext.clusterProvider();
         integrationCluster.subscribe(name,(e)->{
             if(e instanceof LeaderBoardGlobalEvent){
                 LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());

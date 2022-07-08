@@ -72,9 +72,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.clusterProvider = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.clusterProvider = serviceContext.clusterProvider();
         this.systemValidatorProvider  = (SystemValidatorProvider)serviceContext.serviceProvider(SystemValidatorProvider.NAME);
-        this.distributionRoomService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).serviceProvider(DistributionRoomService.NAME);
+        this.distributionRoomService = this.serviceContext.clusterProvider().serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
@@ -88,7 +88,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
-        this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
+        this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
@@ -114,7 +114,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void shutdown() throws Exception {
         this.serviceContext.deploymentServiceProvider().unregisterGameChannelListener(registerKey);
-        this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).unregisterReloadListener(reloadKey);
+        this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
         scheduledFuture.cancel(true);
     }
 

@@ -26,13 +26,13 @@ public class ServiceContextProxy implements ServiceContext {
     }
 
     @Override
-    public EventService eventService(int scope) {
-        return this.tarantulaContext.eventService(scope);
+    public EventService eventService() {
+        return this.tarantulaContext.eventService();
     }
 
     @Override
-    public ClusterProvider clusterProvider(int scope) {
-        return this.tarantulaContext.clusterProvider(scope);
+    public ClusterProvider clusterProvider() {
+        return this.tarantulaContext.clusterProvider();
     }
 
     @Override

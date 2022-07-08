@@ -118,9 +118,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.lookupTournamentKey.dataStore(this.dataStore);
         this.lookupScheduleKey.dataStore(this.dataStore);
         this.logger = this.serviceContext.logger(PlatformTournamentServiceProvider.class);
-        this.reloadKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).registerReloadListener(this);
-        this.distributionTournamentService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionTournamentService.NAME);
-        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
+        this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
+        this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
+        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
     @Override
     public void waitForData(){
@@ -144,7 +144,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void shutdown() throws Exception {
         this.logger.warn("distributed tournament shutdown");
-        this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).unregisterReloadListener(reloadKey);
+        this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
     }
 
     public Tournament tournament(String tournamentId){//schedule node

@@ -7,10 +7,6 @@ import com.icodesoftware.RecoverableFactory;
 import java.util.List;
 
 public class EmptyDataStore implements DataStore {
-    @Override
-    public int scope() {
-        return 0;
-    }
 
     @Override
     public String bucket() {

@@ -59,7 +59,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         this.serviceContext = serviceContext;
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
-        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).serviceProvider(DistributionItemService.NAME);
+        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
     @Override
     public String name() {

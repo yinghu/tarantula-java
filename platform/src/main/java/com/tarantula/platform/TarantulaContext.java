@@ -433,11 +433,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    return this.deploymentDataStoreProvider;
     }
     @Override
-    public ClusterProvider clusterProvider(int scope){
+    public ClusterProvider clusterProvider(){
         return integrationCluster;
     }
 
-    public EventService eventService(int scope){
+    public EventService eventService(){
  	    return integrationCluster.publisher();
     }
     @Override

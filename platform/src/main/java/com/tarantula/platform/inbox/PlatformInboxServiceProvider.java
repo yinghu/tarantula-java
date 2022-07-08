@@ -53,6 +53,6 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
         this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformInboxServiceProvider.class);
         this.dataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
-        this.distributionItemService = this.serviceContext.clusterProvider(Distributable.DATA_SCOPE).serviceProvider(DistributionItemService.NAME);
+        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 }

@@ -58,7 +58,7 @@ public class AccountEventHandler implements RequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        this.recoverService = tcx.clusterProvider(Distributable.INTEGRATION_SCOPE).recoverService();
+        this.recoverService = tcx.clusterProvider().recoverService();
         tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }

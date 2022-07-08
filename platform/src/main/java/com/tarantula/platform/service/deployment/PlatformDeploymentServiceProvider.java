@@ -423,7 +423,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
         this.metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
-        this.integrationCluster = serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE);
+        this.integrationCluster = serviceContext.clusterProvider();
         this.integrationEventService = integrationCluster.publisher();
         try{
             contentDir = this.tarantulaContext.deployDir+"/web";

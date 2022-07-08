@@ -89,7 +89,7 @@ public class ServiceEventHandler implements RequestHandler {
         return true;
     }
     public void setup(ServiceContext tcx){
-        this.eventService = tcx.eventService(Distributable.INTEGRATION_SCOPE);
+        this.eventService = tcx.eventService();
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.auth = tp.tokenValidator();

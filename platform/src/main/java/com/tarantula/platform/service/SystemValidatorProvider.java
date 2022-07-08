@@ -70,7 +70,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.distributionKey(session.systemId());
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
-            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
+            px.registerEventService(this.serviceContext.eventService());
             return px;
         });
         if(presence==null&&remotePresenceEnabled){
@@ -80,7 +80,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.distributionKey(onSession.systemId());
             pdataStore.update(px);
             px.dataStore(pdataStore);
-            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
+            px.registerEventService(this.serviceContext.eventService());
             pMap.put(session.systemId(),px);
             return px;
         }
@@ -92,7 +92,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.distributionKey(systemId);
             pdataStore.load(px);
             px.dataStore(pdataStore);
-            px.registerEventService(this.serviceContext.eventService(Distributable.INTEGRATION_SCOPE));
+            px.registerEventService(this.serviceContext.eventService());
             return px;
         });
     }
@@ -377,7 +377,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void waitForData() {
         try{
             PresenceKey pKey = new PresenceKey();
-            byte[] clusterKey = this.serviceContext.clusterProvider(Distributable.INTEGRATION_SCOPE).deployService().clusterKey();
+            byte[] clusterKey = this.serviceContext.clusterProvider().deployService().clusterKey();
             if(clusterKey!=null){
                 pKey.key = clusterKey;
             }
