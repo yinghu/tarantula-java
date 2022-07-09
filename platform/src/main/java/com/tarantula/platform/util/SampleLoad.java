@@ -116,7 +116,7 @@ public class SampleLoad {
         //sampleLoad.register();
         PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");
         presenceFetcher._init();
-        OnSession onSession = presenceFetcher.login("pop","pop");
+        OnSession onSession = presenceFetcher.login("mop","mop");
         System.out.println(onSession.token());
         PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.9:8090");
         presenceFetcher1._init();
