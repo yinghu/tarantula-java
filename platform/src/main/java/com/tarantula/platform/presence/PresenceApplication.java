@@ -39,7 +39,18 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
 
     @Override
     public void callback(Session session, byte[] payload) throws Exception {
-        if (session.action().equals("onPresence")) {
+        if (session.action().equals("onSession")) {
+            Presence presence = this.context.presence(session);
+            PresenceContext pc = new PresenceContext(session.action());
+            pc.presence = new OnSessionTrack(session.systemId(),presence.balance());
+            pc.presence.stub(presence.count(0));
+            //pc.access = user(session.systemId());
+            //pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
+            //pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
+            //pc.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
+            session.write(this.builder.create().toJson(pc).getBytes());
+        }
+        else if (session.action().equals("onPresence")) {
             Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());

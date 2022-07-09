@@ -46,7 +46,7 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service enabled on ["+host+"]").getBytes());
         }
         else if(session.action().equals("onDisablePresenceService")){
-            this.tokenValidatorProvider.disablePresenceService();
+            this.tokenValidatorProvider.disablePresenceService(session.name());
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
         }
         else if(session.action().equals("onResetClusterKey")){
@@ -54,7 +54,8 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"Cluster reset").getBytes());
         }
         else if(session.action().equals("onPresenceKey")){
-            PermissionContext permissionContext = new PermissionContext(SystemUtil.toBase64String(tokenValidatorProvider.clusterKey(session.name())));
+            byte[] key = this.tokenValidatorProvider.clusterKey(session.name());
+            PermissionContext permissionContext = new PermissionContext(key!=null?SystemUtil.toBase64String(key):null);
             session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){

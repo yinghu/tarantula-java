@@ -100,7 +100,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public byte[] clusterKey(String clusterNameSuffix){
-        //if(!clusterNameSuffix.equals(this.serviceContext.clusterNameSuffix())) return new RuntimeException(clusterNameSuffix);
+        if(!clusterNameSuffix.equals(this.serviceContext.clusterNameSuffix())) return null;
         return presenceKey.key;
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
@@ -109,6 +109,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             httpCaller._init();
             OnSession onSession = httpCaller.login(root,password);
             byte[] key = httpCaller.presenceKey(onSession.token(),clusterNameSuffix);
+            if(key==null) return false;
             httpCaller.encrypt = CipherUtil.encrypt(key);
             this.remotePresenceEnabled = true;
             fMap.put(clusterNameSuffix,httpCaller);
@@ -118,8 +119,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return false;
         }
     }
-    public  void disablePresenceService(){
-        this.remotePresenceEnabled = false;
+    public  void disablePresenceService(String classNameSuffix){
+        fMap.remove(classNameSuffix);
+        this.remotePresenceEnabled = fMap.size()>0;
     }
 
     public void resetClusterKey(){

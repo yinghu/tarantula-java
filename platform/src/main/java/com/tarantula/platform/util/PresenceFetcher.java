@@ -2,12 +2,10 @@ package com.tarantula.platform.util;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
-import com.icodesoftware.Presence;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.OnSessionTrack;
-import com.tarantula.platform.PresenceIndex;
 
 import javax.crypto.Cipher;
 
@@ -44,6 +42,7 @@ public class PresenceFetcher extends HttpCaller {
         };
         String resp = super.get("service/action",headers);
         JsonObject jsonObject = JsonUtil.parse(resp);
+        if(!jsonObject.get("successful").getAsBoolean()) return null;
         String skey = jsonObject.get("accessKey").getAsString();
         return SystemUtil.fromBase64String(skey);
     }
@@ -51,7 +50,7 @@ public class PresenceFetcher extends HttpCaller {
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"presence/lobby",
-                    Session.TARANTULA_ACTION,"onPresence",
+                    Session.TARANTULA_ACTION,"onSession",
                     Session.TARANTULA_TOKEN,token,
             };
             String resp = super.get("service/action",headers);

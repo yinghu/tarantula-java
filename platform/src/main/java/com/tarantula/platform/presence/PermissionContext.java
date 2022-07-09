@@ -30,7 +30,7 @@ public class PermissionContext extends ResponseHeader {
         this.accessKey = accessKey;
         this.successful = accessKey!=null;
         if(!successful){
-            message = "try again later";
+            message = "access key not available";
         }
     }
     public PermissionContext(List<String> accessKeyList){

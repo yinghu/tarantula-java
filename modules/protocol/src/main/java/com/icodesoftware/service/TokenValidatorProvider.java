@@ -17,7 +17,7 @@ public interface TokenValidatorProvider extends ServiceProvider {
 
     byte[] clusterKey(String clusterNameSuffix);
     boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost);
-    void disablePresenceService();
+    void disablePresenceService(String clusterNameSuffix);
 
     void resetClusterKey();
 
