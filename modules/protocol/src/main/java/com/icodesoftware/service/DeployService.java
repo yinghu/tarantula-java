@@ -48,5 +48,8 @@ public interface DeployService extends ServiceProvider {
     void releaseConnection(Connection connection);
 
     byte[] clusterKey();
+    void enablePresenceService(String root,String password,String classNameSuffix,String host);
+    void disablePresenceService(String classNameSuffix);
+
 
 }

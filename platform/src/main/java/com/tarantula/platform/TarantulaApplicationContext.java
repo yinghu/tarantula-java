@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.cci.udp.UDPEndpoint;
@@ -165,5 +166,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         EndPoint udp = (UDPEndpoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
         Channel channel = udp.register(session,requestListener,timeoutListener);
         return channel;
+    }
+
+    public ClusterProvider clusterProvider(){
+        return this.tarantulaContext.clusterProvider();
     }
 }

@@ -3,6 +3,7 @@ package com.tarantula.platform.service.deployment;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
 
@@ -95,5 +96,9 @@ public class ApplicationContextProxy implements ApplicationContext {
 
     public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
         return this.tarantulaApplicationContext.register(session,requestListener,timeoutListener);
+    }
+
+    public ClusterProvider clusterProvider(){
+        return this.tarantulaApplicationContext.clusterProvider();
     }
 }

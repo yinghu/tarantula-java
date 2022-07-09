@@ -509,4 +509,39 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
+
+    public void enablePresenceService(String root,String password,String clusterNameSuffix,String host){
+        NodeEngine nodeEngine = getNodeEngine();
+        EnablePresenceServiceOperation operation = new EnablePresenceServiceOperation(root,password,clusterNameSuffix,host);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                logger.error("enable presence service error on node->"+m.getAddress(),e);
+                //goes to next node if failed
+            }
+        }
+    }
+    public void disablePresenceService(String clusterNameSuffix){
+        NodeEngine nodeEngine = getNodeEngine();
+        DisablePresenceServiceOperation operation = new DisablePresenceServiceOperation(clusterNameSuffix);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                logger.error("disable presence service error on node->"+m.getAddress(),e);
+                //goes to next node if failed
+            }
+        }
+    }
 }

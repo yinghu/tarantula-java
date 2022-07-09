@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
@@ -42,11 +43,15 @@ public class SudoRoleModule implements Module {
             String password = (String) onAccess.property("password");
             String host = (String) onAccess.property("host");
             String suffix = (String) onAccess.property("suffix");
-            this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
-            session.write(JsonUtil.toSimpleResponse(true,"remote presence service enabled on ["+host+"]").getBytes());
+            boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
+            if(suc){
+                this.context.clusterProvider().deployService().enablePresenceService(root,password,suffix,host);
+            }
+            session.write(JsonUtil.toSimpleResponse(suc,suc?"remote presence service enabled on ["+host+"]":"failed").getBytes());
         }
         else if(session.action().equals("onDisablePresenceService")){
             this.tokenValidatorProvider.disablePresenceService(session.name());
+            this.context.clusterProvider().deployService().disablePresenceService(session.name());
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
         }
         else if(session.action().equals("onResetClusterKey")){
