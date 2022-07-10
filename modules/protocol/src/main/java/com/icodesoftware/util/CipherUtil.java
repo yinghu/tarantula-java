@@ -6,6 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
 
 public class CipherUtil {
 
@@ -22,5 +23,12 @@ public class CipherUtil {
         Cipher cipher = Cipher.getInstance(DeploymentServiceProvider.CIPHER_NAME_CBC_PKC5PADDING);
         cipher.init(Cipher.DECRYPT_MODE,secretKey,iv);
         return cipher;
+    }
+
+    public static byte[] key(){
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
+        secureRandom.nextBytes(_key);
+        return _key;
     }
 }

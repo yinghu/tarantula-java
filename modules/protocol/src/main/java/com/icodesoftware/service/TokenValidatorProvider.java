@@ -5,7 +5,7 @@ import com.icodesoftware.*;
 import java.util.List;
 import java.util.Map;
 
-public interface TokenValidatorProvider extends ServiceProvider {
+public interface TokenValidatorProvider extends ServiceProvider,Resettable {
 
     String NAME = "TokenValidatorProvider";
     String MDA = "SHA-1";

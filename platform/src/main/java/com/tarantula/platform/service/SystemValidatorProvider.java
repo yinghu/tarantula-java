@@ -15,7 +15,6 @@ import com.tarantula.platform.util.SystemUtil;
 import javax.crypto.Cipher;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -126,16 +125,25 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public boolean resetClusterKey(){
         try{
-            SecureRandom secureRandom = new SecureRandom();
-            byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
-            secureRandom.nextBytes(_key);
-            presenceKey.key = _key;
+            presenceKey.key = CipherUtil.key();
             this.deployDataStore.update(presenceKey);
-            this.encrypt = CipherUtil.encrypt(_key);
+            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),presenceKey.key);
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
             return false;
+        }
+    }
+
+    public void reset(){
+        try{
+            byte[] key = this.serviceContext.clusterProvider().get(presenceKey.distributionKey().getBytes());
+            if(key==null) return;
+            presenceKey.key = key;
+            encrypt = CipherUtil.encrypt(presenceKey.key);
+            log.warn("Cluster key has set!");
+        }catch (Exception ex){
+            log.error("reset key error",ex);
         }
     }
 
@@ -409,10 +417,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             else{
                 pKey.distributionKey(serviceContext.bucketId());
                 if(!deployDataStore.load(pKey)){
-                    SecureRandom secureRandom = new SecureRandom();
-                    byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
-                    secureRandom.nextBytes(_key);
-                    pKey.key = _key;
+                    pKey.key = CipherUtil.key();
                     deployDataStore.update(pKey);
                 }
             }

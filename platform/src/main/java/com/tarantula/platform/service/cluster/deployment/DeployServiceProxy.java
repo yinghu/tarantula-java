@@ -515,7 +515,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
-            if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {
