@@ -3,6 +3,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
@@ -182,7 +183,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
                 this.eventService.publish(event);
             }
             else if(action.equals("onDeveloper")){
-                String validTypeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+                GameCluster validTypeId = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
                 if(validTypeId==null) throw new RuntimeException("Illegal access");
                 AccessIndex acc = accessIndexService.get(magicKey);
                 if(acc!=null){

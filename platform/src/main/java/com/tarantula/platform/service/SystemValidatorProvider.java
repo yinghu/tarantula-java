@@ -131,9 +131,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             secureRandom.nextBytes(_key);
             presenceKey.key = _key;
             this.deployDataStore.update(presenceKey);
-            encrypt = CipherUtil.encrypt(_key);
+            this.encrypt = CipherUtil.encrypt(_key);
             return true;
         }catch (Exception ex){
+            log.error("reset key error",ex);
             return false;
         }
     }

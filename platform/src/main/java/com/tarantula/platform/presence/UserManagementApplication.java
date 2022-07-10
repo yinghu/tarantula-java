@@ -34,8 +34,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private DataStore userDatastore;
     private DataStore thirdPartyLoginDatastore;
     private DataStore developerLoginDatastore;
-    private DataStore accountDatastore;
-    private DataStore accountIndex;
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -60,9 +58,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         onAccess.property("password",pwd);
         userDatastore = this.context.dataStore(Access.DataStore);
         thirdPartyLoginDatastore = this.context.dataStore(ThirdPartyLogin.DataStore);
-        accountDatastore = this.context.dataStore(Account.DataStore);
         developerLoginDatastore = this.context.dataStore(DeveloperLogin.DataStore);
-        accountIndex = this.context.dataStore(Account.IndexDataStore);
         accessIndexService.set("serverPush",0);
         AccessIndex accessIndex = accessIndexService.set(root,0);
         if(accessIndex!=null){
