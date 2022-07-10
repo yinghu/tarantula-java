@@ -127,6 +127,7 @@
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
                     <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update</span>
+                    <span id='game-metrics-0' tx-game-cluster-id='' view-id='game.cluster.metrics' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
@@ -233,7 +234,8 @@
                     <div class='w3-bar w3-white'>
                         <span view-id='stop.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Stop Access Index</span>
                         <span view-id='start.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Start Access Index</span>    
-                        <span view-id='create.labeled.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create key</span>
+                        <!--<span view-id='create.labeled.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create key</span>
+                        -->
                         <span view-id='enable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Enable Presence Service</span>
                         <span view-id='disable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Disable Presence Service</span>
                         <span view-id='reset.cluster.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Cluster Key</span>
@@ -365,6 +367,7 @@
                     lnc.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let gcl = document.querySelector('#game-edit-lobby-'+i);
                     gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    document.querySelector('#game-metrics-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     if(disabled == true){
                         shd.style.display='none';
                         gcl.style.display = 'none';

@@ -7,11 +7,13 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
+import com.icodesoftware.Statistics;
+import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable, MetricsListener {
 
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
@@ -31,6 +33,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public Lobby gameLobby;
     public Lobby serviceLobby;
     public Lobby dataLobby;
+
+    public Statistics statistics;
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
 
@@ -122,5 +126,13 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             }
         }
         return loaded;
+    }
+
+    @Override
+    public void onUpdated(String s, double v) {
+        if(statistics==null){
+            statistics.distributionKey(this.distributionKey());
+            
+        }
     }
 }

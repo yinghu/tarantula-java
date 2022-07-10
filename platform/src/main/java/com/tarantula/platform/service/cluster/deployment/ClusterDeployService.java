@@ -17,6 +17,7 @@ import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.deployment.*;
+import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -359,6 +360,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             gameCluster.message("["+name+"] game created successfully");
             mds.update(gameCluster);
+            StatisticsIndex statisticsIndex = new StatisticsIndex();
+            statisticsIndex.distributionKey(gameCluster.distributionKey());
+            mds.create(statisticsIndex);
         }catch (Exception ex){
             gameCluster.message(ex.getMessage());
             gameCluster.successful(false);

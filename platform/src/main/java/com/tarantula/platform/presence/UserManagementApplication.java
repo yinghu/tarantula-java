@@ -6,7 +6,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.Metrics;
-import com.tarantula.platform.util.OnSessionSerializer;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -20,15 +19,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     //private String lobbyId;
     private boolean activated;
     private int trialDays;
-    //private String role = AccessControl.admin.name();
+
     private double initialBalance;
     private AccessIndexService accessIndexService;
     private UserService userService;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    //private List<Access.Role> roleList;
     private TokenValidatorProvider tokenValidatorProvider;
-    //private List<String> gameList;
+
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
 
     private DataStore userDatastore;
@@ -87,7 +85,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onIndex")){
             PresenceContext ic = new PresenceContext("onIndex");
-            ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId();
             ic.lobbyList = this.context.index();
             session.write(builder.create().toJson(ic).getBytes());
         }
@@ -95,7 +92,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             PresenceContext ic = new PresenceContext("onAvailable");
             String typeId = session.trackId();
             if(onLobbyIndex.containsKey(typeId)){
-                //ic.googleClientId = this.tokenValidatorProvider.authVendor(OnAccess.GOOGLE).clientId(typeId);
                 session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
             }
             else{
