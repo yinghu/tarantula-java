@@ -55,8 +55,11 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
         }
         else if(session.action().equals("onResetClusterKey")){
-            this.tokenValidatorProvider.resetClusterKey();
-            session.write(JsonUtil.toSimpleResponse(true,"Cluster reset").getBytes());
+            boolean suc = this.tokenValidatorProvider.resetClusterKey();
+            if(suc){
+                this.context.clusterProvider().deployService().resetClusterKey();
+            }
+            session.write(JsonUtil.toSimpleResponse(suc,suc?"Cluster reset":"failed to reset key").getBytes());
         }
         else if(session.action().equals("onPresenceKey")){
             byte[] key = this.tokenValidatorProvider.clusterKey(session.name());

@@ -425,6 +425,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.clusterNameSuffix());
     }
 
+    public void resetClusterKey() {
+        this.tarantulaContext.tokenValidatorProvider().resetClusterKey();
+    }
     public void enablePresenceService(String root,String password,String clusterNameSuffix,String host) {
         this.tarantulaContext.tokenValidatorProvider().enablePresenceService(root,password,clusterNameSuffix,host);
     }

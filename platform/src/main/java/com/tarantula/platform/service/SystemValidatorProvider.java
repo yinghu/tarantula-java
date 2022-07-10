@@ -124,8 +124,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.remotePresenceEnabled = fMap.size()>0;
     }
 
-    public void resetClusterKey(){
-
+    public boolean resetClusterKey(){
+        try{
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
+            secureRandom.nextBytes(_key);
+            presenceKey.key = _key;
+            this.deployDataStore.update(presenceKey);
+            encrypt = CipherUtil.encrypt(_key);
+            return true;
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     public String clusterNameSuffix(){
@@ -164,7 +174,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(!deployDataStore.load(ck) || ck.disabled()) return null;
         long stmp = ck.timestamp();//((Number)ck.property(AccessKey.TIMESTAMP)).longValue();
         String label = ck.typeId();//(String)ck.property(AccessKey.KEY_LABEL);
-        return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp)?label:null;
+        return SystemUtil.validAccessKey(messageDigest(),accessKey,label,stmp)!=null?label:null;
     }
     public String createAccessKey(String label){
         AccessKey ck = new AccessKey();
@@ -172,7 +182,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         ck.timestamp(stmp);//property(AccessKey.TIMESTAMP,stmp);
         ck.typeId(label);//property(AccessKey.KEY_LABEL,label);
         if(deployDataStore.create(ck)){
-            return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp);
+            byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
+            return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp,SystemUtil.toHexString(wmark));
         }
         return null;
     }
@@ -199,20 +210,21 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
         if(gameCluster==null) return null;
         String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-        if(SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp())) return (T)gameCluster;
+        String wmark = SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp());
+        String wm = SystemUtil.toHexString(encrypt(ByteBuffer.allocate(8).putLong(akey.timestamp()).array()));
+        if(wm.equals(wmark)) return (T)gameCluster;
         return null;
     }
     public String createGameClusterAccessKey(String gameClusterId){
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
-        long stmp =TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId((String)gc.property(GameCluster.GAME_LOBBY));
         accessKey.timestamp(stmp);
         accessKey.owner(gameClusterId);
         if(!this.deployDataStore.create(accessKey)) return null;
-        //gc.property(GameCluster.TIMESTAMP,stmp);
-        //gc.update();
-        return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp);
+        byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
+        return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp,SystemUtil.toHexString(wmark));
     }
     public List<String> gameClusterAccessKeyList(String gameClusterId){
         AccessKeyQuery query = new AccessKeyQuery(gameClusterId);

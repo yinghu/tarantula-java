@@ -76,25 +76,27 @@ public class SystemUtil {
         token.append("-").append(hash); //4 -- hash
         return token.toString();
     }
-    public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp) {
+    public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp,String waterMark) {
         //{gameClusterId}-{hash}
         StringBuffer token = new StringBuffer(gameClusterId);
         messageDigest.reset();
         messageDigest.update(typeId.getBytes());
         messageDigest.update(gameClusterId.getBytes());
         messageDigest.update(Long.toHexString(timestamp).getBytes());//saved on game cluster id
+        messageDigest.update(waterMark.getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        token.append("-").append(hash);
+        token.append("-").append(hash).append("-"+waterMark);
         return token.toString();
     }
-    public static boolean validAccessKey(MessageDigest messageDigest,String accessKey,String typeId,long timestamp){
+    public static String validAccessKey(MessageDigest messageDigest,String accessKey,String typeId,long timestamp){
         String[] sp = accessKey.split("-");
         messageDigest.reset();
         messageDigest.update(typeId.getBytes());
         messageDigest.update(sp[0].getBytes());
         messageDigest.update(Long.toHexString(timestamp).getBytes());
+        messageDigest.update(sp[2].getBytes());
         String hash = SystemUtil.toHexString(messageDigest.digest());
-        return hash.equals(sp[1]);
+        return hash.equals(sp[1])?sp[2]:null;
     }
     public  static OnSession validToken(MessageDigest messageDigest, String token) {
         //System.out.println(token);

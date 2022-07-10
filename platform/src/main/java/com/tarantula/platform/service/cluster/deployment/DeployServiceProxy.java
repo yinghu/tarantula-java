@@ -510,6 +510,24 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
+    public void resetClusterKey(){
+        NodeEngine nodeEngine = getNodeEngine();
+        ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                logger.error("reset cluster key error on node->"+m.getAddress(),e);
+                //goes to next node if failed
+            }
+        }
+    }
+
     public void enablePresenceService(String root,String password,String clusterNameSuffix,String host){
         NodeEngine nodeEngine = getNodeEngine();
         EnablePresenceServiceOperation operation = new EnablePresenceServiceOperation(root,password,clusterNameSuffix,host);
