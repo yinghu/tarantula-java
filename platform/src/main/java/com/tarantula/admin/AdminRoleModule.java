@@ -13,6 +13,7 @@ import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
+import com.tarantula.platform.statistics.StatisticsSerializer;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
@@ -43,7 +44,9 @@ public class AdminRoleModule implements Module{
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterMetrics")){
-            session.write(JsonUtil.toSimpleResponse(true,"metrics->"+session.name()).getBytes());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            gameCluster.setup();
+            session.write(new StatisticsSerializer().serialize(gameCluster.statistics,Statistics.class,null).toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

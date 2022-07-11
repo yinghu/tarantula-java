@@ -10,6 +10,7 @@ import com.icodesoftware.Lobby;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.statistics.StatisticsIndex;
 
 import java.io.IOException;
 
@@ -130,9 +131,17 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     @Override
     public void onUpdated(String s, double v) {
-        if(statistics==null){
-            statistics.distributionKey(this.distributionKey());
-            
-        }
+        if(statistics==null) setup();
+        statistics.entry(s).update(v).update();
     }
+
+    public <T extends Configurable> T setup(){
+        StatisticsIndex statisticsIndex = new StatisticsIndex();
+        statisticsIndex.distributionKey(this.distributionKey());
+        statisticsIndex.dataStore(this.dataStore);
+        this.dataStore.createIfAbsent(statisticsIndex,true);
+        this.statistics = statisticsIndex;
+        return null;
+    }
+
 }

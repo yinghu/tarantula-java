@@ -15,12 +15,13 @@ import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 import com.tarantula.platform.util.SystemUtil;
 
 
-public class GameServiceProvider implements ServiceProvider{
+public class GameServiceProvider implements ServiceProvider,MetricsListener{
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -101,6 +102,7 @@ public class GameServiceProvider implements ServiceProvider{
     @Override
     public void waitForData(){
         this.configuration = serviceContext.configuration("game-cluster-settings");
+        this.gameCluster.setup();
     }
     @Override
     public void atMidnight(){
@@ -230,5 +232,10 @@ public class GameServiceProvider implements ServiceProvider{
         if(name.equals("giveaway")) return presenceServiceProvider;
         if(name.equals("lobby")) return lobbyServiceProvider;
         return null;
+    }
+
+    @Override
+    public void onUpdated(String s, double v) {
+        this.gameCluster.onUpdated(s,v);
     }
 }

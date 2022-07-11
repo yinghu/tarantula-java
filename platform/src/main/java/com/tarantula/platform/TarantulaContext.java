@@ -263,6 +263,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public synchronized void setGameServiceProvider(GameCluster gameCluster){
         try{
             GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+            gameCluster.dataStore(masterDataStore());
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.start();
         }catch (Exception ex){
