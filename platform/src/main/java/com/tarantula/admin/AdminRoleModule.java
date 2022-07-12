@@ -8,6 +8,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 
@@ -25,21 +26,21 @@ public class AdminRoleModule implements Module{
 
     private ApplicationContext context;
     private GsonBuilder builder;
-    private DataStore account;
+
     private DataStore accountIndex;
-    private DataStore user;
+
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
+
+    private UserService userService;
     private int maxGameClusterCount;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            User user = _user(session.systemId());
-            Account acc = new UserAccount();
-            acc.distributionKey(user.primary()?session.systemId():user.owner());
-            account.load(acc);
+            Access user = _user(session.systemId());
+            Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
@@ -50,15 +51,13 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            User user = _user(session.systemId());
+            Access user = _user(session.systemId());
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = new ArrayList<>();
             adminContext.index = index;
-            IndexSet idx = new IndexSet();
-            idx.distributionKey(user.primary()?session.systemId():user.owner());
-            idx.label(Account.GameClusterLabel);
-            if(accountIndex.load(idx)){
+            IndexSet idx = this.userService.loadGameClusterIndex(user);
+            if(idx!=null){
                 idx.keySet().forEach((k)->{
                     GameCluster g = this.deploymentServiceProvider.gameCluster(k);
                     if(g!=null){
@@ -104,10 +103,9 @@ public class AdminRoleModule implements Module{
                 session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 4 chars at least").getBytes());
             }
             else{
-                User ua = _user(session.systemId());
-                Account acc = new UserAccount();
-                acc.distributionKey(ua.primary()?session.systemId():ua.owner());
-                if(account.load(acc)&&acc.gameClusterCount(0)<maxGameClusterCount){
+                Access ua = _user(session.systemId());
+                Account acc = userService.loadAccount(ua);
+                if(acc.gameClusterCount(0)<maxGameClusterCount){
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
                     if(gc.successful()){
                         IndexSet idx = new IndexSet();
@@ -120,7 +118,7 @@ public class AdminRoleModule implements Module{
                         }
                         acc.gameClusterCount(1);
                         acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                        account.update(acc);
+                        acc.update();
                         gc.message("Game cluster created successfully");
                     }
                     session.write(gc.toJson().toString().getBytes());
@@ -178,10 +176,8 @@ public class AdminRoleModule implements Module{
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(accessId);
-            User _u = _user(session.systemId());
-            Account acc = new UserAccount();
-            acc.distributionKey(_u.primary()?session.systemId():_u.owner());
-            account.load(acc);
+            Access _u = _user(session.systemId());
+            Account acc = userService.loadAccount(_u);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
                 session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
@@ -210,22 +206,16 @@ public class AdminRoleModule implements Module{
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.account = this.context.dataStore(Account.DataStore);
         this.accountIndex = this.context.dataStore(Account.IndexDataStore);
-        this.user = this.context.dataStore(Access.DataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        this.userService = this.context.serviceProvider(UserService.NAME);
         this.maxGameClusterCount = ((Number)this.context.configuration("cluster").property("maxGameClusterCount")).intValue();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 
-    private User _user(String systemId){
-        User u = new User();
-        u.distributionKey(systemId);
-        if(user.load(u)){
-            return u;
-        }
-        return null;
+    private Access _user(String systemId){
+        return this.userService.loadUser(systemId);
     }
     private byte[] toJson(List<ExposedGameService> exposedGameServices){
         JsonObject jsonObject = new JsonObject();

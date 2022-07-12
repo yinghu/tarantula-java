@@ -13,11 +13,11 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-enable-presence-service-message"></div>
     <div><!-- send form -->
         <div class="w3-panel">
-            <label class="tx-text-12">User</label>
+            <label class="tx-text-12">Remote User</label>
             <input id ="tx-enable-presence-service-codebase" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='User Name'/>
         </div>
         <div class="w3-panel">
-            <label class="tx-text-12">Password</label>
+            <label class="tx-text-12">Remote Password</label>
             <input id ="tx-enable-presence-service-artifact" class="w3-input w3-round w3-border tx-text-16" type="password" placeholder='Password'/>
         </div>
         <div class="w3-panel">
@@ -27,6 +27,10 @@
         <div class="w3-panel">
             <label class="tx-text-12">Host</label>
             <input id ="tx-enable-presence-service-version" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='Host'/>
+        </div>
+        <div class="w3-panel">
+            <label class="tx-text-12">Local Password</label>
+            <input id ="tx-enable-presence-service-password" class="w3-input w3-round w3-border tx-text-16" type="password" placeholder='Password'/>
         </div>
         <div class="w3-panel">
             <span id="tx-enable-presence-service" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Enable</span>
@@ -47,7 +51,8 @@
         let _a = document.querySelector('#tx-enable-presence-service-artifact').value;
         let _s = document.querySelector('#tx-enable-presence-service-suffix').value;
         let _v = document.querySelector('#tx-enable-presence-service-version').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onEnablePresenceService',user:_c,password:_a,host:_v,suffix:_s},(resp)=>{
+        let _p = document.querySelector('#tx-enable-presence-service-password').value;
+        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onEnablePresenceService',user:_c,password:_a,host:_v,suffix:_s,localPassword:_p},(resp)=>{
             document.querySelector('#tx-enable-presence-service-message').innerHTML = resp.message;
         });
     };

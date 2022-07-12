@@ -10,15 +10,12 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
-import java.util.Base64;
 
 public class PresenceApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
-    private DataStore userDs;
-    private DataStore accountDs;
-    private DataStore memberDs;
+
     private LiveGameContext liveGameContext;
     private UserService userService;
 
@@ -31,9 +28,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         this.userService = this.context.serviceProvider(UserService.NAME);
         liveGameContext = new LiveGameContext();
-        userDs = this.context.dataStore(Access.DataStore);
-        accountDs = this.context.dataStore(Account.DataStore);
-        memberDs = this.context.dataStore(Subscription.DataStore);
         this.context.log("Presence application started on ["+descriptor.tag()+"]",OnLog.INFO);
     }
 
@@ -44,10 +38,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             PresenceContext pc = new PresenceContext(session.action());
             pc.presence = new OnSessionTrack(session.systemId(),presence.balance());
             pc.presence.stub(presence.count(0));
-            //pc.access = user(session.systemId());
-            //pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
-            //pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
-            //pc.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             session.write(this.builder.create().toJson(pc).getBytes());
         }
         else if (session.action().equals("onPresence")) {
@@ -106,12 +96,12 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             }
         }
         else if(session.action().equals("onRequestCode")){
-            User u = user(session.systemId());
+            Access u = user(session.systemId());
             if(u.activated()){
                 session.write(JsonUtil.toSimpleResponse(false,"Email already has validated").getBytes());
             }
             else{
-                if(u.emailAddress()!=null&&u.emailAddress.contains("@")){
+                if(u.emailAddress()!=null&&u.emailAddress().contains("@")){
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
                     if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(u.emailAddress(),code)){
                         session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
@@ -128,9 +118,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String code = (String) onAccess.property("validationCode");
             if(this.deploymentServiceProvider.checkCode(code).equals(session.systemId())){
-                User u = user(session.systemId());
+                Access u = user(session.systemId());
                 u.activated(true);
-                userDs.update(u);
+                u.update();
                 session.write(JsonUtil.toSimpleResponse(true,"validated email").getBytes());
             }
             else{
@@ -140,19 +130,19 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if(session.action().equals("onCheckRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String role = (String)onAccess.property("role");
-            User u = this.user(session.systemId());
+            Access u = this.user(session.systemId());
             if(tokenValidatorProvider.checkRole(u,role)){
                 PresenceContext pc = new PresenceContext(session.action());
                 pc.access = u;
                 session.write(this.builder.create().toJson(pc).getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid role upgrade for ["+role+"] from ["+u.role+"]").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"invalid role upgrade for ["+role+"] from ["+u.role()+"]").getBytes());
             }
         }
         else if(session.action().equals("onUpgradeAccountRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            User user = this.user(session.systemId());
+            Access user = this.user(session.systemId());
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
             PermissionContext permissionContext = new PermissionContext(role,suc);
@@ -160,13 +150,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         }
         else if(session.action().equals("onUpgradeAdminRole")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            User user = this.user(session.systemId());
+            Access user = this.user(session.systemId());
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
             String developerName = (String)onAccess.property("developerName");
             Account acc = this.account(session.systemId());
             acc.owner(developerName);
-            accountDs.update(acc);
+            acc.update();
             PermissionContext permissionContext = new PermissionContext(role,suc);
             session.write(permissionContext.toJson().toString().getBytes());
         }
@@ -185,29 +175,17 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes());
         }
     }
-    private User user(String systemId){
-        User user = new User();
-        user.distributionKey(systemId);
-        if(userDs.load(user)){
-            return user;
-        }
-        return null;
+    private Access user(String systemId){
+        return this.userService.loadUser(systemId);
     }
     private Account account(String systemId){
-        UserAccount acc = new UserAccount();
-        acc.distributionKey(systemId);
-        if(accountDs.load(acc)){
-            return acc;
-        }
-        return null;
+        Access access = userService.loadUser(systemId);
+        if(access == null) return null;
+        return this.userService.loadAccount(access);
     }
     private Subscription membership(String systemId){
-        Membership acc = new Membership();
-        acc.distributionKey(systemId);
-        if(memberDs.load(acc)){
-            return acc;
-        }
-        return null;
+        Access access = userService.loadUser(systemId);
+        return userService.loadSubscription(access);
     }
     @Override
     public void onUpdated(OnLobby onLobby) {

@@ -29,7 +29,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
 
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
 
-    private DataStore userDatastore;
     private DataStore thirdPartyLoginDatastore;
     private DataStore developerLoginDatastore;
 
@@ -54,7 +53,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        userDatastore = this.context.dataStore(Access.DataStore);
+
         thirdPartyLoginDatastore = this.context.dataStore(ThirdPartyLogin.DataStore);
         developerLoginDatastore = this.context.dataStore(DeveloperLogin.DataStore);
         accessIndexService.set("serverPush",0);
@@ -89,7 +88,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             session.write(builder.create().toJson(ic).getBytes());
         }
         else if(session.action().equals("onAvailable")){
-            PresenceContext ic = new PresenceContext("onAvailable");
             String typeId = session.trackId();
             if(onLobbyIndex.containsKey(typeId)){
                 session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
@@ -135,10 +133,10 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     thirdPartyLogin.distributionKey(session.systemId());
                     thirdPartyLoginDatastore.createIfAbsent(thirdPartyLogin,false);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
-                    Access user = createLogin(acc,session.systemId(),AccessControl.player.name(),true,acc.name(),true);
-                    user.emailAddress((String) params.get("email"));
-                    user.activated(true);
-                    userDatastore.update(user);
+                    createLogin(acc,session.systemId(),AccessControl.player.name(),true,acc.name(),true);
+                    //user.emailAddress((String) params.get("email"));
+                    //user.activated(true);
+                    //userDatastore.update(user);
                     OnSession onSession = login(session.systemId(),thirdPartyLogin.password(),session);
                     onSession(onSession,session);
                 }
@@ -207,15 +205,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onResetPassword")){
             String code = (String)acc.property(OnAccess.ACCESS_KEY);
-            Access user = new User();
-            user.distributionKey(session.systemId());
-            if(!userDatastore.load(user)){
+            Access user = this.userService.loadUser(session.systemId());
+            if(user==null){
                 session.write(JsonUtil.toSimpleResponse(false,"wrong user name").getBytes());
             }
             else{
                 if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
                     user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
-                    userDatastore.update(user);
+                    user.update();
                     OnSession onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(onSession,session);
                 }
@@ -274,10 +271,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         return access.successful();
     }
     private OnSession login(String systemId, String password, Session session){
-        Access access = new User();
-        access.distributionKey(systemId);
+        Access access = this.userService.loadUser(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
-        if(userDatastore.load(access)){
+        if(access!=null){
             access.routingNumber(session.routingNumber());
             _onSession=this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);

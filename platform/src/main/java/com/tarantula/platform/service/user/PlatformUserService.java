@@ -5,6 +5,8 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.admin.AccessContext;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
@@ -12,6 +14,8 @@ import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlatformUserService implements UserService {
 
@@ -123,6 +127,73 @@ public class PlatformUserService implements UserService {
         membershipDataStore.update(membership);
         accountDataStore.update(account);
         return membership;
+    }
+
+    public Access loadUser(String systemId){
+        User u = new User();
+        u.distributionKey(systemId);
+        u.dataStore(userDataStore);
+        if(userDataStore.load(u)) return u;
+        return null;
+    }
+
+    public Account loadAccount(Access access){
+        Account account = new UserAccount();
+        account.distributionKey(account.primary()?access.distributionKey():access.owner());
+        account.dataStore(accountDataStore);
+        if(accountDataStore.load(account)) return account;
+        return null;
+    }
+
+    public List<Access> loadUsers(Access access){
+        ArrayList<Access> alist = new ArrayList<>();
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(access.primary()?access.distributionKey():access.owner());
+        indexSet.label(Account.UserLabel);
+        if(!accountIndexDataStore.load(indexSet)) return alist;
+        indexSet.keySet().forEach((k)->{
+            Access u = loadUser(k);
+            if(u!=null){
+                alist.add(u);
+            }
+        });
+        return alist;
+    }
+    public List<Access> loadUsers(Account account){
+        ArrayList<Access> alist = new ArrayList<>();
+        IndexSet indexSet = new IndexSet();
+        indexSet.distributionKey(account.distributionKey());
+        indexSet.label(Account.UserLabel);
+        if(!accountIndexDataStore.load(indexSet)) return alist;
+        indexSet.keySet().forEach((k)->{
+          Access u = loadUser(k);
+            if(u!=null){
+              alist.add(u);
+            }
+        });
+        return alist;
+    }
+
+    public Subscription loadSubscription(Account account){
+        Membership acc = new Membership();
+        acc.distributionKey(account.distributionKey());
+        if(membershipDataStore.load(acc)) return acc;
+        return null;
+    }
+    public Subscription loadSubscription(Access access){
+        Membership acc = new Membership();
+        acc.distributionKey(access.primary()?access.distributionKey():access.owner());
+        if(membershipDataStore.load(acc)) return acc;
+        return null;
+    }
+
+    public <T extends Recoverable> T loadGameClusterIndex(Access access){
+        IndexSet idx = new IndexSet();
+        idx.distributionKey(access.primary()?access.distributionKey():access.owner());
+        idx.label(Account.GameClusterLabel);
+        idx.dataStore(accountIndexDataStore);
+        if(!accountIndexDataStore.load(idx)) return null;
+        return (T)idx;
     }
 
     @Override

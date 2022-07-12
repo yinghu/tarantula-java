@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface Access extends Recoverable {
+public interface Access extends Recoverable,DataStore.Updatable {
 
     //application access level control
 

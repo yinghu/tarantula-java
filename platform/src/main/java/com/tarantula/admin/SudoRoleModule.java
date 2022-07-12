@@ -43,6 +43,7 @@ public class SudoRoleModule implements Module {
             String password = (String) onAccess.property("password");
             String host = (String) onAccess.property("host");
             String suffix = (String) onAccess.property("suffix");
+            String localPassword = (String) onAccess.property("localPassword");
             boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
             if(suc){
                 this.context.clusterProvider().deployService().enablePresenceService(root,password,suffix,host);
