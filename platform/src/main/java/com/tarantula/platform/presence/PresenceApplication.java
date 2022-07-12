@@ -46,7 +46,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             pc.presence= new OnSessionTrack(session.systemId(),presence.balance());
             pc.presence.stub(presence.count(0));
             pc.access = user(session.systemId());
-            pc.account = account(pc.access.primary()?session.systemId():pc.access.owner());
+            pc.account = account(pc.access);
             pc.subscription = membership(pc.access.primary()?session.systemId():pc.access.owner());
             pc.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             session.write(this.builder.create().toJson(pc).getBytes());
@@ -154,7 +154,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             String role = (String)onAccess.property("role");
             boolean suc = this.context.validator().upgradeRole(user,role);
             String developerName = (String)onAccess.property("developerName");
-            Account acc = this.account(session.systemId());
+            Account acc = this.account(user);
             acc.owner(developerName);
             acc.update();
             PermissionContext permissionContext = new PermissionContext(role,suc);
@@ -178,8 +178,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     private Access user(String systemId){
         return this.userService.loadUser(systemId);
     }
-    private Account account(String systemId){
-        Access access = userService.loadUser(systemId);
+    private Account account(Access access){
         if(access == null) return null;
         return this.userService.loadAccount(access);
     }

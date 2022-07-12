@@ -139,7 +139,7 @@ public class PlatformUserService implements UserService {
 
     public Account loadAccount(Access access){
         Account account = new UserAccount();
-        account.distributionKey(account.primary()?access.distributionKey():access.owner());
+        account.distributionKey(access.primary()?access.distributionKey():access.owner());
         account.dataStore(accountDataStore);
         if(accountDataStore.load(account)) return account;
         return null;
