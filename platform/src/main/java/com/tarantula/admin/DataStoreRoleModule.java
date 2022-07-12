@@ -5,9 +5,9 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.TokenValidatorProvider;
+
+import com.icodesoftware.service.UserService;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
@@ -18,17 +18,16 @@ public class DataStoreRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private TokenValidatorProvider tokenValidatorProvider;
+
     private AccessIndexService accessIndexService;
+
+    private UserService userService;
     private GsonBuilder builder;
-    private DataStore uDatastore;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            User acc = new User();
-            acc.distributionKey(session.systemId());
-            uDatastore.load(acc);
+            Access acc = userService.loadUser(session.systemId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onFindUser")){
@@ -48,20 +47,12 @@ public class DataStoreRoleModule implements Module {
         else if(session.action().equals("onLoadDataStore")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String dataStore = onAccess.property("dataStore").toString();
-            if(this.deploymentServiceProvider.validDataStore(dataStore)){
-                DataStore ds = this.context.dataStore(dataStore);
-                JsonObject summary = new JsonObject();
-                summary.addProperty("name",ds.name());
-                summary.addProperty("partitionNumber",ds.partitionNumber());
-                summary.addProperty("totalRecords",ds.count());
-                for(int i=0;i<ds.partitionNumber();i++){
-                    summary.addProperty("records on partition["+i+"]",ds.count(i));
-                }
-                session.write(summary.toString().getBytes());
-            }else{
-                session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes());
-            }
-
+            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(dataStore);
+            JsonObject summary = new JsonObject();
+            summary.addProperty("name",sum.name());
+            summary.addProperty("partitionNumber",sum.partitionNumber());
+            summary.addProperty("totalRecords",sum.totalRecords());
+            session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onAccessIndexStore")){
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
@@ -94,9 +85,8 @@ public class DataStoreRoleModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
-        this.uDatastore = this.context.dataStore(Access.DataStore);
+        this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.context.log("Admin Datastore module started", OnLog.INFO);

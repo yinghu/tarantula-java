@@ -56,4 +56,11 @@ public interface DataStore {
         void dataStore(DataStore dataStore);
         void update();
     }
+
+    interface Summary{
+        String name();
+        int partitionNumber();
+
+        long totalRecords();
+    }
 }

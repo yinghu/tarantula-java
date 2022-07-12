@@ -782,8 +782,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<String> listDataStore(){
         return this.tarantulaContext.dataStoreProvider().list();
     }
-    public boolean validDataStore(String dataStore){
-        return this.tarantulaContext.dataStoreProvider().existed(dataStore);
+    public DataStore.Summary validDataStore(String dataStore){
+        DataStoreSummary summary = new DataStoreSummary();
+        summary.name = dataStore;
+        summary.partitionNumber = 0;
+        summary.totalRecords = 0;
+        if(!this.tarantulaContext.dataStoreProvider().existed(dataStore)) return summary;
+        DataStore ds = this.tarantulaContext.dataStore(dataStore);
+        summary.partitionNumber = ds.partitionNumber();
+        summary.totalRecords = ds.count();
+        return summary;
     }
     public List<String> listClusterMember(){
         ArrayList<String> mlist = new ArrayList<>();

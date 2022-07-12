@@ -3,10 +3,7 @@ package com.tarantula.admin;
 import com.google.gson.*;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
@@ -26,15 +23,14 @@ public class SudoRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private AccessIndexService accessIndexService;
+
+    private UserService userService;
     private GsonBuilder builder;
-    private DataStore uDatastore;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            User acc = new User();
-            acc.distributionKey(session.systemId());
-            uDatastore.load(acc);
+            Access acc = userService.loadUser(session.systemId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onEnablePresenceService")){
@@ -172,36 +168,6 @@ public class SudoRoleModule implements Module {
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
-        else if(session.action().equals("onListDataStore")){
-            List<String> dlist = this.deploymentServiceProvider.listDataStore();
-            session.write(toJsonList(dlist).toString().getBytes());
-        }
-        else if(session.action().equals("onLoadDataStore")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String dataStore = onAccess.property("dataStore").toString();
-            if(this.deploymentServiceProvider.validDataStore(dataStore)){
-                DataStore ds = this.context.dataStore(dataStore);
-                JsonArray list = new JsonArray();
-                JsonParser parser = new JsonParser();
-                ds.backup().list((k,v)->{
-                    JsonObject r = new JsonObject();
-                    r.addProperty("id",new String(k));
-                    r.add("payload",_parse(parser,k,v));
-                    list.add(r);
-                    return true;
-                });
-                JsonObject ret = new JsonObject();
-                ret.add("resultRet",list);
-                session.write(ret.toString().getBytes());
-            }else{
-                session.write(toMessage("data store not existed->"+dataStore,false).toString().getBytes());
-            }
-
-        }
-        else if(session.action().equals("onBackupDataStore")){
-            this.deploymentServiceProvider.issueDataStoreBackup();
-            session.write(toMessage("backup commnad issued",true).toString().getBytes());
-        }
         else if(session.action().equals("onMetrics")){
             Metrics metrics = this.deploymentServiceProvider.metrics();
             MetricsContext adminContext = new MetricsContext();
@@ -220,7 +186,7 @@ public class SudoRoleModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
-        this.uDatastore = this.context.dataStore(Access.DataStore);
+        this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.context.log("Sudo setup module started", OnLog.INFO);

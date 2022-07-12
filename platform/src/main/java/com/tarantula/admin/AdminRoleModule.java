@@ -27,9 +27,6 @@ public class AdminRoleModule implements Module{
     private ApplicationContext context;
     private GsonBuilder builder;
 
-    private DataStore accountIndex;
-
-
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
 
@@ -108,14 +105,9 @@ public class AdminRoleModule implements Module{
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
                     if(gc.successful()){
-                        IndexSet idx = new IndexSet();
-                        idx.distributionKey(acc.distributionKey());
-                        idx.label(Account.GameClusterLabel);
+                        IndexSet idx = this.userService.loadGameClusterIndex(ua);
                         idx.addKey(gc.distributionKey());
-                        if(!accountIndex.createIfAbsent(idx,true)){
-                            idx.addKey(gc.distributionKey());//update on existing
-                            accountIndex.update(idx);
-                        }
+                        idx.update();
                         acc.gameClusterCount(1);
                         acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                         acc.update();
@@ -206,7 +198,6 @@ public class AdminRoleModule implements Module{
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.accountIndex = this.context.dataStore(Account.IndexDataStore);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);

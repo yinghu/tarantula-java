@@ -81,7 +81,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void issueDataStoreBackup();
     List<String> listDataStore();
     List<String> listClusterMember();
-    boolean validDataStore(String dataStore);
+    DataStore.Summary validDataStore(String dataStore);
 
     RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
     void unregisterRecoverableListener(String topic);

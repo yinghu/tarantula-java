@@ -192,7 +192,7 @@ public class PlatformUserService implements UserService {
         idx.distributionKey(access.primary()?access.distributionKey():access.owner());
         idx.label(Account.GameClusterLabel);
         idx.dataStore(accountIndexDataStore);
-        if(!accountIndexDataStore.load(idx)) return null;
+        accountIndexDataStore.createIfAbsent(idx,true);
         return (T)idx;
     }
 
