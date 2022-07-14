@@ -8,7 +8,6 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.shoppingItems = new ConcurrentHashMap<>();
         this.shopIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformStoreServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
@@ -93,7 +92,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,configurableObject)) return false;
+        if(!applicationPreSetup.load(app,configurableObject)) return false;
         registerShop(configurableObject);
         return true;
     }
@@ -106,7 +105,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Shop> items = applicationPreSetup.list(serviceContext,descriptor,new ShoppingItemObjectQuery("category/Shop"));
+        List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery("category/Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
                 registerShop(a);

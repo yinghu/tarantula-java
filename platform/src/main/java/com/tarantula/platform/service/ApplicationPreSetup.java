@@ -12,26 +12,24 @@ public interface ApplicationPreSetup {
     //[game]_service
     void setup(ServiceContext serviceContext,Descriptor application,String configName);
 
-    <T extends Configurable> T load(ApplicationContext context,Descriptor application);
-    <T extends Configurable> T load(ServiceContext context,Descriptor application);
+    <T extends Configurable> T load(Descriptor application);
 
-    <T extends Configurable> boolean save(ApplicationContext context,Descriptor application,T t);
-    <T extends Configurable> boolean load(ApplicationContext context,Descriptor application,T t);
 
-    <T extends Configurable> List<T> list(ApplicationContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
+    <T extends Configurable> boolean save(Descriptor application,T t);
+    <T extends Configurable> boolean load(Descriptor application,T t);
 
-    <T extends Configurable> boolean load(ServiceContext context,Descriptor application,T t);
-    <T extends Configurable> List<T> list(ServiceContext context, Descriptor application, RecoverableFactory<T> recoverableFactory);
+    <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory);
+
 
     //[game]_service_configuration data store
-    <T extends Configurable> boolean save(ApplicationContext context, GameCluster gameCluster, T t);
-    <T extends Configurable> boolean save(ServiceContext context,GameCluster gameCluster,T t);
-    <T extends Configurable> boolean load(ApplicationContext context, GameCluster gameCluster, T t);
-    <T extends Configurable> boolean load(ServiceContext context,GameCluster gameCluster,T t);
-    <T extends Configurable> List<T> list(ApplicationContext context, GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
+    <T extends Configurable> boolean save(GameCluster gameCluster, T t);
 
-    DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster);
-    DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster);
-    DataStore dataStore(ServiceContext serviceContext,GameCluster gameCluster,String service);
-    DataStore dataStore(ApplicationContext applicationContext,GameCluster gameCluster,String service);
+    <T extends Configurable> boolean load(GameCluster gameCluster, T t);
+
+    <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
+
+    DataStore dataStore(GameCluster gameCluster);
+    DataStore dataStore(GameCluster gameCluster,String service);
+
+    void setup(ServiceContext serviceContext);
 }

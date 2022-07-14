@@ -16,7 +16,6 @@ import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.statistics.StatisticsIndex;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,8 +79,8 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.presenceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.presenceDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
@@ -194,7 +193,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
 
 
     public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
-        List<DailyGiveaway> items = applicationPreSetup.list(serviceContext,application,new DailygGiveawayObjectQuery("typeId/"+application.category()));
+        List<DailyGiveaway> items = applicationPreSetup.list(application,new DailygGiveawayObjectQuery("typeId/"+application.category()));
         items.forEach((a)-> {
             if(!application.disabled()) {
                 a.setup();
@@ -210,7 +209,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyGiveaway.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,dailyGiveaway)){
+        if(!applicationPreSetup.load(app,dailyGiveaway)){
             return false;
         }
         dailyGiveaway.setup();

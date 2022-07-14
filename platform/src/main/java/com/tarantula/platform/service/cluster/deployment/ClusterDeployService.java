@@ -10,12 +10,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -330,7 +328,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 if(presetup!=null){
                     String cname = (String) presetup.property(ApplicationPreSetup.SET_UP_NAME);
                     gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
-                    preSetup[0] = SystemUtil.applicationPreSetup(cname);
+                    preSetup[0] = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup(cname);
                 }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;

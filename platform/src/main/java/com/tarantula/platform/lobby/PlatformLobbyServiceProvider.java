@@ -2,7 +2,7 @@ package com.tarantula.platform.lobby;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
-import com.icodesoftware.Distributable;
+
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -11,7 +11,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.util.SystemUtil;
+
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +38,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.lobbyListeners = new ConcurrentHashMap<>();
         this.lobbyItems = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
         this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameName);
@@ -74,7 +74,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         lobbyItem.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,lobbyItem)){
+        if(!applicationPreSetup.load(app,lobbyItem)){
             return false;
         }
         lobbyItem.setup();
@@ -96,7 +96,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
-        List<LobbyItem> items = applicationPreSetup.list(serviceContext,descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
+        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             if(!a.disabled()){
                 a.setup();

@@ -35,8 +35,8 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
     }
 
     @Override
-    public <T extends Configurable> T load(ApplicationContext context, Descriptor application) {
-        DataStore dataStore = context.dataStore(serviceDataStore(application));
+    public <T extends Configurable> T load(Descriptor application) {
+        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         if(!dataStore.load(gameLobby)) throw new RuntimeException("no lobby data for key->"+application.distributionKey());
@@ -48,19 +48,6 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         return (T)gameLobby;
     }
 
-    @Override
-    public <T extends Configurable> T load(ServiceContext context, Descriptor application) {
-        DataStore dataStore = context.dataStore(serviceDataStore(application),context.partitionNumber());
-        DynamicGameLobby gameLobby = new DynamicGameLobby();
-        gameLobby.distributionKey(application.distributionKey());
-        if(!dataStore.load(gameLobby)) throw new RuntimeException("no lobby data for key->"+application.distributionKey());
-        gameLobby.dataStore(dataStore);
-        gameLobby.keySet().forEach((k)->{
-            GameZone zone = loadGameZone(dataStore,k);
-            gameLobby.addGameZone(zone);
-        });
-        return (T)gameLobby;
-    }
     protected GameZone createGameZone(DataStore dataStore,String name,String configName,int levelMatch,int arenaLimit,int capacity,int roomCapacity,int joinsOnStart,long roundDuration,int levelUpXpBase){
         DynamicZone zone = new DynamicZone(name,configName,levelMatch,arenaLimit,capacity,roomCapacity,joinsOnStart,roundDuration);
         dataStore.create(zone);

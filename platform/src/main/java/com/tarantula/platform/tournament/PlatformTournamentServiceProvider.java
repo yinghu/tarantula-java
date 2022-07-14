@@ -12,7 +12,6 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -106,13 +105,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.configuration = serviceContext.configuration(CONFIG);
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
         this.lookupScheduleKey.distributionKey(gameCluster.distributionKey());
-        this.dataStore = applicationPreSetup.dataStore(serviceContext,gameCluster,name());//serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,name());//serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
@@ -268,7 +267,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     Map<Integer,TournamentPrize> prize(String scheduleId){
         TournamentScheduleParser parser = new TournamentScheduleParser();
         parser.distributionKey(scheduleId);
-        if(this.applicationPreSetup.load(serviceContext,application,parser)) return parser.prize();
+        if(this.applicationPreSetup.load(application,parser)) return parser.prize();
         return new HashMap<>();
     }
 

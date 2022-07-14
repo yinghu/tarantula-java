@@ -8,7 +8,6 @@ import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,9 +49,9 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformInboxServiceProvider.class);
-        this.dataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
+        this.dataStore = this.applicationPreSetup.dataStore(gameCluster,name());
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 }

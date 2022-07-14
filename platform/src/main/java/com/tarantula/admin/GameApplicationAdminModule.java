@@ -8,7 +8,6 @@ import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 
@@ -21,18 +20,18 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("typeId/"+app.category()));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery("typeId/"+app.category()));
             session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();
             app.distributionKey(query[1]);
-            if(preSetup.load(context,desc,app)){
+            if(preSetup.load(desc,app)){
                 app.setup();
                 session.write(new ApplicationSerializer().serialize(app,Application.class,null).toString().getBytes());
             }
@@ -44,11 +43,11 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-            if(preSetup.load(context,desc,app) && app.configureAndValidate()){
+            if(preSetup.load(desc,app) && app.configureAndValidate()){
                 session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
                 gameServiceProvider.configurationServiceProvider(query[2]).register(app);
             }
@@ -63,7 +62,7 @@ public class GameApplicationAdminModule implements Module {
             Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-            if(SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME)).load(context,desc,app)){
+            if(gameCluster.applicationPreSetup().load(desc,app)){
                 session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
                 gameServiceProvider.configurationServiceProvider(query[2]).release(app);
             }

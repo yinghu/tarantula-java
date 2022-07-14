@@ -15,10 +15,10 @@ import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.statistics.StatisticsIndex;
+
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.tournament.*;
-import com.tarantula.platform.util.SystemUtil;
+
 
 
 public class GameServiceProvider implements ServiceProvider,MetricsListener{
@@ -50,7 +50,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     }
 
     public GameLobby lobby(Descriptor descriptor){
-        return applicationPreSetup.load(serviceContext,descriptor);
+        return applicationPreSetup.load(descriptor);
     }
     public Configuration configuration(){
         return configuration;
@@ -63,10 +63,11 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
-        serviceContext.setup(gameCluster);
+        gameCluster.setup(serviceContext);
+        //serviceContext.setup(gameCluster);
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.serviceDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,"player");
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
         this.lobbyServiceProvider = new PlatformLobbyServiceProvider(gameCluster);
         this.lobbyServiceProvider.setup(serviceContext);
         this.lobbyServiceProvider.waitForData();

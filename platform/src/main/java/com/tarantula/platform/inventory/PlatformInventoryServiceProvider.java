@@ -10,7 +10,6 @@ import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.inventoryDataStore = this.applicationPreSetup.dataStore(serviceContext,gameCluster,name());
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }
     public DataStore inventoryDataStore(){
@@ -82,7 +81,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
@@ -91,7 +90,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
@@ -100,7 +99,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
@@ -109,7 +108,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory("store");
-        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
@@ -118,7 +117,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(serviceContext,app,redeemer)) return false;
+        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
     }
@@ -132,10 +131,10 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     private Category category(Category.Filter filter){
         GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gameCluster.serviceWithCategory("item");
-        ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        ApplicationPreSetup preSetup = _gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         Category category = new Category();
         category.distributionKey(app.distributionKey());
-        preSetup.load(serviceContext,app,category);
+        preSetup.load(app,category);
         category.list((ci)-> filter.onFilter(ci));
         return category;
     }
@@ -155,13 +154,13 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     private ConfigurableCategories configurableCategories(String type,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
         ConfigurableCategories categories = new ConfigurableCategories();
         categories.name(type);
-        if(!applicationPreSetup.load(serviceContext,gameCluster,categories)){
+        if(!applicationPreSetup.load(gameCluster,categories)){
             ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
             JsonArray cclasses = (JsonArray)configuration.property("itemList");
             cclasses.forEach((c)->{
                 categories.addCategory(c.getAsJsonObject());
             });
-            applicationPreSetup.save(serviceContext,gameCluster,categories);
+            applicationPreSetup.save(gameCluster,categories);
         }
         return categories;
     }

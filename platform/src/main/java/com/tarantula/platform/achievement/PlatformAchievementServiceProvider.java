@@ -8,7 +8,6 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
         this.dataStore = serviceContext.dataStore(gameServiceName.replace("-","_"),serviceContext.partitionNumber());
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
@@ -100,7 +99,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(serviceContext,app,configurableObject)){
+        if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
         configurableObject.setup();
@@ -118,7 +117,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Achievement> items = applicationPreSetup.list(serviceContext,descriptor,new AchievementObjectQuery("typeId/"+descriptor.category()));
+        List<Achievement> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()) achievements.put(a.name(),a);

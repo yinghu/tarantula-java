@@ -25,9 +25,11 @@ public interface ServiceContext {
     String bucketId();
     String nodeId();
 
+    String deployDirectory();
+
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);
-    <T extends OnAccess> void setup(T configuration);
+    //<T extends OnAccess> void setup(T configuration);
     List<Descriptor> availableServices();
 }

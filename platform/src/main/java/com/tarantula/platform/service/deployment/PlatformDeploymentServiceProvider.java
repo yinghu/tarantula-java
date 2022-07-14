@@ -7,7 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.udp.UDPEndpoint;
+
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
@@ -657,7 +657,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         GameCluster gameCluster = this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
         if(gameCluster.successful()){
-            this.tarantulaContext.setup(gameCluster);
+            gameCluster.setup(tarantulaContext);
             oListeners.forEach((k,o)->
                     {
                         if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
@@ -679,6 +679,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.gameLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_LOBBY));
             gc.serviceLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_SERVICE));
             gc.dataLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_DATA));
+            gc.setup(this.tarantulaContext);
             return (T)gc;
         }
         return null;

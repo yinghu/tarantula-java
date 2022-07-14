@@ -10,7 +10,6 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.tournament.TournamentScheduleParser;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 
@@ -24,18 +23,18 @@ public class TournamentAdminModule implements Module {
         if(session.action().equals("onList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Descriptor app = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            List<ConfigurableObject> items = preSetup.list(this.context,app,new ConfigurableObjectQuery("typeId/"+app.category()));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery("typeId/"+app.category()));
             session.write(new ItemAdminContext(true,items.size()>0?"Configure tournament item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             Application app = new Application();
             app.distributionKey(query[1]);
-            if(preSetup.load(context,desc,app)){
+            if(preSetup.load(desc,app)){
                 session.write(app.toJson().toString().getBytes());
             }
             else{
@@ -45,11 +44,11 @@ public class TournamentAdminModule implements Module {
         else if(session.action().equals("onRegister")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
             TournamentScheduleParser app = new TournamentScheduleParser();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(this.context.descriptor().category());
-            boolean loaded = applicationPreSetup.load(context,desc,app);
+            boolean loaded = applicationPreSetup.load(desc,app);
             if(loaded&&(boolean)gameCluster.property(GameCluster.TOURNAMENT_ENABLED)){
                 JsonObject config = JsonUtil.parse(payload);
                 app.schedule(config.getAsJsonObject("application"));
