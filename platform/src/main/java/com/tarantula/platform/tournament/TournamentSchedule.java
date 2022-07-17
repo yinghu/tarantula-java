@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
@@ -7,14 +8,6 @@ import java.time.LocalDateTime;
 
 public class TournamentSchedule extends Application {
 
-    private String type;
-
-    private LocalDateTime start;
-    private LocalDateTime close;
-    private LocalDateTime end;
-    private int duration;
-    private int maxEntries;
-    private int schedule;
 
 
     public TournamentSchedule(){
@@ -28,36 +21,32 @@ public class TournamentSchedule extends Application {
     public String name(){
         return header.get("Name").getAsString();
     }
-    //@Override
+
     public String type() {
         return header.get("Type").getAsString();
     }
 
-    //@Override
+    public String description() {
+        return header.get("Description").getAsString();
+    }
+
     public int schedule(){ return header.get("Schedule").getAsInt();}
-    //@Override
+
     public LocalDateTime startTime() {
-        return start;
+        return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }
 
-    //@Override
-    public LocalDateTime closeTime() {
-        return close;
+    public int durationHoursPerSchedule() {
+        return header.get("DurationHoursPerSchedule").getAsInt();
     }
 
-    ///@Override
-    public LocalDateTime endTime() {
-        return end;
-    }
 
-    //@Override
     public int maxEntriesPerInstance() {
         return header.get("MaxEntriesPerInstance").getAsInt();
     }
 
-    //@Override
     public int instanceDurationInMinutes() {
-        return header.get("DurationPerInstance").getAsInt();
+        return header.get("DurationMinutesPerInstance").getAsInt();
     }
 
     @Override

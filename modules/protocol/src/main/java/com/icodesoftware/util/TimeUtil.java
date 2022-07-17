@@ -1,6 +1,7 @@
 package com.icodesoftware.util;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 public class TimeUtil {
     public static long toUTCMilliseconds(LocalDateTime dateTime){
@@ -31,5 +32,10 @@ public class TimeUtil {
     }
     public static boolean expired(LocalDateTime dateTime){
         return dateTime.isBefore(LocalDateTime.now());
+    }
+
+    public static LocalDateTime fromString(String format,String dateTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        return LocalDateTime.from(formatter.parse(dateTime));
     }
 }

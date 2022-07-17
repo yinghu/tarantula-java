@@ -49,8 +49,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.type = schedule.type();
         this.name = schedule.name();
         this.startTime = schedule.startTime();
-        this.closeTime = schedule.closeTime();
-        this.endTime = schedule.endTime();
+        this.endTime = schedule.startTime().minusHours(schedule.durationHoursPerSchedule());
+        this.closeTime = endTime.minusMinutes(10);
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.instanceDurationInMinutes();
     }

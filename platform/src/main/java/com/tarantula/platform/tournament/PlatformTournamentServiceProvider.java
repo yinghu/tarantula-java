@@ -276,11 +276,25 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public <T extends Configurable> void register(T t) {
         t.registered();
         TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
-        logger.warn("SCHEDULE>>"+schedule.schedule());
-        this.distributionItemService.register(gameServiceName,name(),t.configurationCategory(),t.distributionKey());
-        //TournamentScheduleParser parser = (TournamentScheduleParser)t;
-        //TournamentSchedule schedule = new TournamentSchedule();
-        //if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)){
+        switch (schedule.schedule()){
+            case Tournament.DAILY_SCHEDULE:
+
+                break;
+            case Tournament.WEEKLY_SCHEDULE:
+                break;
+
+            case Tournament.MONTHLY_SCHEDULE:
+                break;
+            case Tournament.ON_DEMAND_SCHEDULE:
+                createTournament(schedule);
+                distributionItemService.register(gameServiceName,name(),t.configurationCategory(),t.distributionKey());
+                break;
+            default:
+                break;
+        }
+
+
+        //if(schedule.schedule()==(Tournament.ON_DEMAND_SCHEDULE)){
             //Tournament tournament = createTournament(schedule);
             //distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
         //}
