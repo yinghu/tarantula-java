@@ -26,7 +26,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final int END_BUFFER_MINUTES = 3;
 
     protected String scheduleId;
-    protected String schedule;
+    protected int schedule;
     protected String type;
     protected Status status = Status.STARTED;
     protected LocalDateTime startTime;
@@ -58,7 +58,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public TournamentHeader(){
 
     }
-    public String schedule(){
+    public int schedule(){
         return this.schedule;
     }
     @Override
@@ -94,7 +94,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     }
     public void fromMap(Map<String,Object> properties){
         this.scheduleId = (String)properties.get("s0");
-        this.schedule = (String)properties.get("s1");
+        this.schedule = ((Number)properties.get("s1")).intValue();
         this.status = Status.valueOf((String)properties.get("s2"));
         this.type = (String)properties.get("1");
         this.name = (String)properties.get("2");

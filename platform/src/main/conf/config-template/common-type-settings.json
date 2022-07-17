@@ -16,6 +16,7 @@
     {"type": "list","name": "List"},
     {"type": "set","name": "Set"},
     {"type": "enum","name": "Environment","value": [{"name":"Development","value":0},{"name":"Production","value":1},{"name":"Disabled","value":2}]},
-    {"type": "enum","name": "PlayMode","value": [{"name":"pve","value":0},{"name":"pvp","value":1},{"name":"tve","value":2},{"name":"tvt","value":3}]}
+    {"type": "enum","name": "PlayMode","value": [{"name":"pve","value":0},{"name":"pvp","value":1},{"name":"tve","value":2},{"name":"tvt","value":3}]},
+    {"type": "enum","name": "Schedule","value": [{"name":"Daily","value":0},{"name":"Weekly","value":1},{"name":"Monthly","value":2},{"name":"OnDemand","value":3}]}
   ]
 }

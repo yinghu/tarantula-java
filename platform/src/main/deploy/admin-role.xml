@@ -41,17 +41,6 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
-            <application>
-                <type-id>admin-role</type-id>
-                <name>Admin Role</name>
-                <type>application</type>
-                <category>tournament</category>
-                <tag>role/tournament</tag>
-                <module-name>com.tarantula.admin.TournamentAdminModule</module-name>
-                <deploy-priority>10</deploy-priority>
-                <deploy-version>1</deploy-version>
-                <access-control>30</access-control>
-            </application>
 
 
             <application>

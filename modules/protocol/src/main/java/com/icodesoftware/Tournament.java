@@ -8,15 +8,15 @@ public interface Tournament extends Configurable {
     String ENTRY_LABEL = "TEE";
     String HISTORY_LABEL = "History";
 
-    String DAILY_SCHEDULE = "daily";
-    String WEEKLY_SCHEDULE = "weekly";
-    String MONTHLY_SCHEDULE = "monthly";
-    String ON_DEMAND_SCHEDULE = "onDemand";
+    int DAILY_SCHEDULE = 0;
+    int WEEKLY_SCHEDULE = 1;
+    int MONTHLY_SCHEDULE = 2;
+    int ON_DEMAND_SCHEDULE = 3;
 
     enum Status{
         STARTED,CLOSED,ENDED
     }
-    String schedule();
+    int schedule();
     String type();
     void type(String type);
     String name();

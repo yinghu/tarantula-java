@@ -9,6 +9,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
@@ -265,32 +266,41 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         logger.warn(message);
     }
     Map<Integer,TournamentPrize> prize(String scheduleId){
-        TournamentScheduleParser parser = new TournamentScheduleParser();
-        parser.distributionKey(scheduleId);
-        if(this.applicationPreSetup.load(application,parser)) return parser.prize();
+        //TournamentScheduleParser parser = new TournamentScheduleParser();
+        //parser.distributionKey(scheduleId);
+        //if(this.applicationPreSetup.load(application,parser)) return parser.prize();
         return new HashMap<>();
     }
 
     @Override
     public <T extends Configurable> void register(T t) {
-        TournamentScheduleParser parser = (TournamentScheduleParser)t;
-        TournamentSchedule schedule = parser.schedule();
-        if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)){
-            Tournament tournament = createTournament(schedule);
-            distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
-        }
-        else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-            this.createSchedule(schedule);
-        }
-        else if(schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)){
-            this.createSchedule(schedule);
-        }
-        else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-            this.createSchedule(schedule);
-        }
-        else{
-            throw new UnsupportedOperationException(schedule.schedule());
-        }
+        t.registered();
+        TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
+        logger.warn("SCHEDULE>>"+schedule.schedule());
+        this.distributionItemService.register(gameServiceName,name(),t.configurationCategory(),t.distributionKey());
+        //TournamentScheduleParser parser = (TournamentScheduleParser)t;
+        //TournamentSchedule schedule = new TournamentSchedule();
+        //if(schedule.schedule().equals(Tournament.ON_DEMAND_SCHEDULE)){
+            //Tournament tournament = createTournament(schedule);
+            //distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
+        //}
+        //else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
+            //this.createSchedule(schedule);
+        //}
+        //else if(schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)){
+            //this.createSchedule(schedule);
+        //}
+        //else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
+            //this.createSchedule(schedule);
+        //}
+        //else{
+            //throw new UnsupportedOperationException(schedule.schedule());
+        //}
+    }
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
     @Override
@@ -308,6 +318,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRelease(String category, String itemId) {
+        logger.warn("tournament release->"+itemId+">>>>"+category);
         return false;
     }
     private Tournament createTournament(TournamentSchedule schedule){

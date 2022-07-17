@@ -11,6 +11,8 @@
     {"type": "category","name": "Map"},
     {"type": "category","name": "DailyRewardItem"},
     {"type": "category","name": "ShoppingItem"},
-    {"type": "category","name": "AchievementAwardItem"}
+    {"type": "category","name": "AchievementAwardItem"},
+    {"type": "category","name": "TournamentSchedule"},
+    {"type": "category","name": "TournamentPrize"}
   ]
 }

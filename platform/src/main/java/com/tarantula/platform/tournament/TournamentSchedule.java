@@ -1,12 +1,11 @@
 package com.tarantula.platform.tournament;
 
-import com.icodesoftware.util.RecoverableObject;
-import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
-public class TournamentSchedule extends RecoverableObject {
+public class TournamentSchedule extends Application {
 
     private String type;
 
@@ -15,30 +14,27 @@ public class TournamentSchedule extends RecoverableObject {
     private LocalDateTime end;
     private int duration;
     private int maxEntries;
-    private String schedule;
+    private int schedule;
 
 
     public TournamentSchedule(){
 
     }
 
-    public TournamentSchedule(String type, String name, String schedule, LocalDateTime start, LocalDateTime close, LocalDateTime end, int duration, int maxEntries){
-        this.type = type;
-        this.name = name;
-        this.schedule = schedule;
-        this.start = start;
-        this.close = close;
-        this.end = end;
-        this.duration = duration;
-        this.maxEntries = maxEntries;
+    public TournamentSchedule(ConfigurableObject configurableObject){
+        super(configurableObject);
+    }
+
+    public String name(){
+        return header.get("Name").getAsString();
     }
     //@Override
     public String type() {
-        return type;
+        return header.get("Type").getAsString();
     }
 
     //@Override
-    public String schedule(){ return schedule;}
+    public int schedule(){ return header.get("Schedule").getAsInt();}
     //@Override
     public LocalDateTime startTime() {
         return start;
@@ -56,36 +52,14 @@ public class TournamentSchedule extends RecoverableObject {
 
     //@Override
     public int maxEntriesPerInstance() {
-        return maxEntries;
+        return header.get("MaxEntriesPerInstance").getAsInt();
     }
 
     //@Override
     public int instanceDurationInMinutes() {
-        return duration;
+        return header.get("DurationPerInstance").getAsInt();
     }
-    public Map<String,Object> toMap(){
-        properties.put("type",type);
-        properties.put("name",name);
-        properties.put("schedule",schedule);
-        properties.put("start", TimeUtil.toUTCMilliseconds(start));
-        properties.put("close",TimeUtil.toUTCMilliseconds(close));
-        properties.put("end",TimeUtil.toUTCMilliseconds(end));
-        properties.put("maxEntries",maxEntries);
-        properties.put("duration",duration);
-        properties.put("index",index);//config key
-        return properties;
-    }
-    public void fromMap(Map<String,Object> properties){
-        this.type = (String) properties.get("type");
-        this.name = (String) properties.get("name");
-        this.schedule = (String) properties.get("schedule");
-        this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.get("start")).longValue());
-        this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.get("close")).longValue());
-        this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("end")).longValue());
-        this.maxEntries = ((Number)properties.get("maxEntries")).intValue();
-        this.duration = ((Number)properties.get("duration")).intValue();
-        this.index = (String) properties.get("index");
-    }
+
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
@@ -94,6 +68,12 @@ public class TournamentSchedule extends RecoverableObject {
     @Override
     public int getClassId() {
         return TournamentPortableRegistry.TOURNAMENT_SCHEDULE_CID;
+    }
+
+    @Override
+    public boolean configureAndValidate() {
+        setup();
+        return validated;
     }
 
 }
