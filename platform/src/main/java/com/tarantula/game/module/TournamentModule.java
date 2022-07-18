@@ -44,5 +44,20 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
         this.context.log("Tournament module started", OnLog.WARN);
     }
 
+    @Override
+    public void tournamentStarted(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" STARTED",OnLog.WARN);
+    }
+
+    @Override
+    public void tournamentClosed(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" CLOSED",OnLog.WARN);
+    }
+
+    @Override
+    public void tournamentEnded(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
+    }
+
 
 }

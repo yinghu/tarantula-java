@@ -18,8 +18,13 @@ public interface Tournament extends Configurable {
     }
     int schedule();
     String type();
-    void type(String type);
+
     String name();
+
+    String description();
+
+    double enterCost();
+
     Status status();
     LocalDateTime startTime();
     LocalDateTime closeTime();
@@ -61,9 +66,9 @@ public interface Tournament extends Configurable {
     }
 
     interface Listener{
-        default void tournamentStarted(Tournament tournament){}
-        default void tournamentClosed(Tournament tournament){}
-        default void tournamentEnded(Tournament tournament){}
+        void tournamentStarted(Tournament tournament);
+        void tournamentClosed(Tournament tournament);
+        void tournamentEnded(Tournament tournament);
     }
 
     interface OnEntry{

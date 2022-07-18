@@ -46,7 +46,7 @@ public class Stub extends PlayerGameObject {
         //jo.add("rating",rating.toJson());
         //if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(shop!=null) jo.add("_shop",shop.toJson());
-        //if(tournament!=null) jo.add("tournament",tournament.toJson());
+        if(tournament!=null) jo.add("tournament",tournament.toJson());
         if(pushChannel!=null) jo.add("_pushChannel",pushChannel.toJson());
         if(inbox!=null) jo.add("_inbox",inbox.toJson());
         if(playerSavedGames!=null) jo.add("_playerSavedGames", playerSavedGames.toJson());

@@ -219,7 +219,7 @@
                 tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
                 tem.push(gi.type);
                 tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-                tem.push(gi.name);
+                tem.push(gi.name+':'+gi.enterCost);
                 tem.push('</span><span tx-tournament-id=\''+gi.tournamentId+'\' tx-category=\''+gi.name);
                 tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-test\'>Test With Admin</span>');
                 tem.push('</div>'); 
@@ -229,7 +229,7 @@
                 a.onclick=()=>{
                     let tid = a.getAttribute('tx-tournament-id');
                     console.log(tid);
-                    TARA_API.onGet('robotquest/lobby1','onTest',tid,(resp)=>{
+                    TARA_API.onGet('robotquest/lobby1','onTestTournament',tid,(resp)=>{
                         editor.set(resp);
                     });   
                 };

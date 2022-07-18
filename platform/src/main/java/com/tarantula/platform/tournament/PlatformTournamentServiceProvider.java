@@ -8,8 +8,6 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.achievement.Achievement;
-import com.tarantula.platform.achievement.AchievementObjectQuery;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
@@ -274,10 +272,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         logger.warn(message);
     }
     Map<Integer,TournamentPrize> prize(String scheduleId){
-        //TournamentScheduleParser parser = new TournamentScheduleParser();
-        //parser.distributionKey(scheduleId);
-        //if(this.applicationPreSetup.load(application,parser)) return parser.prize();
-        return new HashMap<>();
+        TournamentSchedule schedule = new TournamentSchedule();
+        schedule.distributionKey(scheduleId);
+        if(!this.applicationPreSetup.load(application,schedule)) return new HashMap<>();
+        Map<Integer,TournamentPrize> _prizes = new HashMap<>();
+        schedule.list().forEach(c->_prizes.put(c.rank(),c));
+        return _prizes;
     }
 
     @Override
@@ -286,12 +286,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
         switch (schedule.schedule()){
             case Tournament.DAILY_SCHEDULE:
-
-                break;
             case Tournament.WEEKLY_SCHEDULE:
-                break;
-
             case Tournament.MONTHLY_SCHEDULE:
+                createSchedule(schedule);
                 break;
             case Tournament.ON_DEMAND_SCHEDULE:
                 createTournament(schedule);
@@ -300,24 +297,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             default:
                 break;
         }
-
-
-        //if(schedule.schedule()==(Tournament.ON_DEMAND_SCHEDULE)){
-            //Tournament tournament = createTournament(schedule);
-            //distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
-        //}
-        //else if(schedule.schedule().equals(Tournament.DAILY_SCHEDULE)){
-            //this.createSchedule(schedule);
-        //}
-        //else if(schedule.schedule().equals(Tournament.WEEKLY_SCHEDULE)){
-            //this.createSchedule(schedule);
-        //}
-        //else if(schedule.schedule().equals(Tournament.MONTHLY_SCHEDULE)){
-            //this.createSchedule(schedule);
-        //}
-        //else{
-            //throw new UnsupportedOperationException(schedule.schedule());
-        //}
     }
     @Override
     public <T extends Configurable> void release(T t) {

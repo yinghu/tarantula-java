@@ -1,12 +1,11 @@
 package com.tarantula.platform.tournament;
 
-import com.google.gson.JsonElement;
+
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
@@ -25,16 +24,17 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final String TOURNAMENT_PLAY = "play";
     private static final int END_BUFFER_MINUTES = 3;
 
-    protected String scheduleId;
+
     protected int schedule;
     protected String type;
+    protected String description;
+    protected double enterCost;
     protected Status status = Status.STARTED;
     protected LocalDateTime startTime;
     protected LocalDateTime closeTime;
     protected LocalDateTime endTime;
     protected int maxEntriesPerInstance;
     protected int durationMinutes;
-    protected JsonObject payload = new JsonObject();
 
     public IndexSet tournamentRegisterIndex;
     public IndexSet tournamentPlayIndex;
@@ -44,7 +44,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     public TournamentHeader(TournamentSchedule schedule){
-        this.scheduleId = schedule.index();
         this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();
@@ -53,6 +52,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.closeTime = endTime.minusMinutes(10);
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.instanceDurationInMinutes();
+        this.enterCost = schedule.enterCost();
+
     }
 
     public TournamentHeader(){
@@ -65,11 +66,15 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     public String type() {
         return type;
     }
-    @Override
-    public void type(String type){
-        this.type = type;
+
+
+    public String description() {
+        return description;
     }
 
+    public  double enterCost(){
+        return enterCost;
+    }
     @Override
     public Status status(){
         return status;
@@ -79,31 +84,29 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         return startTime;
     }
     public Map<String,Object> toMap(){
-        properties.put("s0",scheduleId);
-        properties.put("s1",schedule);
-        properties.put("s2",status.name());
-        properties.put("1",type);
-        properties.put("2",name);
-        properties.put("3", TimeUtil.toUTCMilliseconds(startTime));
-        properties.put("4", TimeUtil.toUTCMilliseconds(closeTime));
-        properties.put("5", TimeUtil.toUTCMilliseconds(endTime));
-        properties.put("6",maxEntriesPerInstance);
-        properties.put("7",durationMinutes);
-        properties.put("8",payload.toString());
+        properties.put("1",schedule);
+        properties.put("2",status.name());
+        properties.put("3",type);
+        properties.put("4",name);
+        properties.put("5", TimeUtil.toUTCMilliseconds(startTime));
+        properties.put("6", TimeUtil.toUTCMilliseconds(closeTime));
+        properties.put("7", TimeUtil.toUTCMilliseconds(endTime));
+        properties.put("8",maxEntriesPerInstance);
+        properties.put("9",durationMinutes);
+        properties.put("10",enterCost);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
-        this.scheduleId = (String)properties.get("s0");
-        this.schedule = ((Number)properties.get("s1")).intValue();
-        this.status = Status.valueOf((String)properties.get("s2"));
-        this.type = (String)properties.get("1");
-        this.name = (String)properties.get("2");
-        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
-        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
-        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("5")).longValue());
-        this.maxEntriesPerInstance = ((Number)properties.get("6")).intValue();
-        this.durationMinutes = ((Number)properties.get("7")).intValue();
-        this.payload = JsonUtil.parse((String) properties.getOrDefault("8","{}"));
+        this.schedule = ((Number)properties.get("1")).intValue();
+        this.status = Status.valueOf((String)properties.get("2"));
+        this.type = (String)properties.get("3");
+        this.name = (String)properties.get("4");
+        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("5")).longValue());
+        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("6")).longValue());
+        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("7")).longValue());
+        this.maxEntriesPerInstance = ((Number)properties.get("8")).intValue();
+        this.durationMinutes = ((Number)properties.get("9")).intValue();
+        this.enterCost = ((Number)properties.get("10")).intValue();
     }
     @Override
     public LocalDateTime closeTime() {
@@ -171,7 +174,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("0",scheduleId);
         portableWriter.writeUTF("1",type);
         portableWriter.writeUTF("2",name);
         portableWriter.writeLong("4",TimeUtil.toUTCMilliseconds(startTime));
@@ -180,12 +182,10 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         portableWriter.writeInt("7",durationMinutes);
         portableWriter.writeUTF("8",bucket);
         portableWriter.writeUTF("9",oid);
-        portableWriter.writeUTF("10",payload.toString());
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.scheduleId = portableReader.readUTF("0");
         this.type = portableReader.readUTF("1");
         this.name = portableReader.readUTF("2");
         this.startTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("4"));
@@ -194,7 +194,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.durationMinutes = portableReader.readInt("7");
         this.bucket = portableReader.readUTF("8");
         this.oid = portableReader.readUTF("9");
-        this.payload = JsonUtil.parse(portableReader.readUTF("10"));
     }
 
     public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex, PlatformTournamentServiceProvider tournamentServiceProvider){
@@ -240,11 +239,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
             }
         });
     }
-    @Override
-    public boolean configureAndValidate(Map<String,Object> data){
-        payload = ((JsonElement) data.getOrDefault("payload",new JsonObject())).getAsJsonObject();
-        return true;
-    }
+
     void tournamentRegistryClosed(TournamentRegistry closed){
         //remove closed register
         this.pendingRegistryQueue.remove(closed);
@@ -260,7 +255,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.tournamentServiceProvider.log("Tournament ended->"+ended.distributionKey());
         tournamentPlayIndex.removeKey(ended.distributionKey());
         tournamentPlayIndex.update();
-        Map<Integer,TournamentPrize> _prizes = this.tournamentServiceProvider.prize(this.scheduleId);
+        Map<Integer,TournamentPrize> _prizes = this.tournamentServiceProvider.prize(this.distributionKey());
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
         int rank =1;
         for(TournamentEntry entry : _ended.end()){
@@ -284,6 +279,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         jsonObject.addProperty("tournamentId",this.distributionKey());
         jsonObject.addProperty("type",type);
         jsonObject.addProperty("name",name);
+        jsonObject.addProperty("enterCost",enterCost);
         return jsonObject;
     }
 

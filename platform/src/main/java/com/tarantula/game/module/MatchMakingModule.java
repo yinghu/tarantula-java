@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem> {
+public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem>,Tournament.Listener {
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
@@ -61,6 +61,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.tournamentServiceProvider().registerTournamentListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
     @Override
@@ -95,6 +96,22 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
         //});
         return lobby;
     }
+
+    @Override
+    public void tournamentStarted(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" STARTED",OnLog.WARN);
+    }
+
+    @Override
+    public void tournamentClosed(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" CLOSED",OnLog.WARN);
+    }
+
+    @Override
+    public void tournamentEnded(Tournament tournament) {
+        this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
+    }
+
     private class OnLobbyListener implements Configurable.Listener<OnLobby>,Lobby.Listener{
 
         public OnLobbyListener(){

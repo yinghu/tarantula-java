@@ -73,9 +73,9 @@
             "downloadable": false
           },
           {
-            "name": "EntryCost",
+            "name": "EnterCost",
             "type": "number",
-            "reference": "Integer",
+            "reference": "Double",
             "nullable": false,
             "downloadable": false
           },
