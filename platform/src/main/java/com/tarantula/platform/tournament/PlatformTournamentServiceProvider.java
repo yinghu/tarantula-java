@@ -63,6 +63,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             a.setup();
             logger.warn(">>>"+a.distributionKey());
             logger.warn(">>>"+a.header());
+            logger.warn(">>>"+a.list().size());
         });
         return null;
     }

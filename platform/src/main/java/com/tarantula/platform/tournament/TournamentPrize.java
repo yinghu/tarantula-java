@@ -1,11 +1,12 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.Map;
 
-public class TournamentPrize extends ConfigurableObject implements Tournament.Prize {
+public class TournamentPrize extends Application implements Tournament.Prize {
 
     private int rank;
 
@@ -13,6 +14,9 @@ public class TournamentPrize extends ConfigurableObject implements Tournament.Pr
 
     }
 
+    public TournamentPrize(ConfigurableObject configurableObject){
+        super(configurableObject);
+    }
     @Override
     public Map<String,Object> toMap(){
         super.toMap();
@@ -37,13 +41,12 @@ public class TournamentPrize extends ConfigurableObject implements Tournament.Pr
 
     @Override
     public boolean configureAndValidate(){
-        boolean valid = this.header.has("name")&&this.header.has("rank");
-        name = header.get("name").getAsString();
-        rank = header.get("rank").getAsInt();
+        boolean valid = this.header.has("Rank");
+        rank = header.get("Rank").getAsInt();
         return valid;
     }
     public String toString(){
-        return "Tournament Prize->"+name+"<>"+rank;
+        return "Tournament Prize Rank>>>"+rank;
     }
 
 }

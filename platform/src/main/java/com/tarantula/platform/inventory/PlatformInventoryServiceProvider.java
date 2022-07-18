@@ -10,6 +10,7 @@ import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
+import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +113,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.redeem();
         return true;
     }
-    public boolean redeem(String systemId, Tournament.Prize item){
+    public boolean redeem(String systemId, TournamentPrize item){
         ItemRedeemer redeemer = new ItemRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());

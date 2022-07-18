@@ -5,6 +5,8 @@ import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TournamentSchedule extends Application {
 
@@ -63,6 +65,14 @@ public class TournamentSchedule extends Application {
     public boolean configureAndValidate() {
         setup();
         return validated;
+    }
+
+    public List<TournamentPrize> list(){
+        ArrayList<TournamentPrize> prizes = new ArrayList<>();
+        _reference.forEach(c->{
+            prizes.add(new TournamentPrize(c));
+        });
+        return prizes;
     }
 
 }
