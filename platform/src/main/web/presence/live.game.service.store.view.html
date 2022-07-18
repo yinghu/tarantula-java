@@ -59,6 +59,9 @@
         case 'statistics':
             tx_live_statistics_setup();
             break;
+        case 'tournament':
+            tx_live_tournament_setup();
+            break;
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -204,5 +207,34 @@
         TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
             editor.set(resp);
         });   
+    }
+    function tx_live_tournament_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+            shoppingList.innerHTML ='';
+            resp.tournamentList.forEach((gi,i)=>{
+                let tem = [];
+                tem.push('<div class=\'w3-container\'>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                tem.push(gi.type);
+                tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                tem.push(gi.name);
+                tem.push('</span><span tx-tournament-id=\''+gi.tournamentId+'\' tx-category=\''+gi.name);
+                tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-tournament-test\'>Test With Admin</span>');
+                tem.push('</div>'); 
+                shoppingList.innerHTML += tem.join('');  
+            });
+            document.querySelectorAll('.tx-live-tournament-test').forEach(a=>{
+                a.onclick=()=>{
+                    let tid = a.getAttribute('tx-tournament-id');
+                    console.log(tid);
+                    TARA_API.onGet('robotquest/lobby1','onTest',tid,(resp)=>{
+                        editor.set(resp);
+                    });   
+                };
+            });    
+            editor.set(resp);
+        });
     }
 </script>

@@ -8,6 +8,8 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.AchievementObjectQuery;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
@@ -22,7 +24,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ClusterConfigurationCallback {
 
     private static final String CONFIG = "game-tournament-settings";
-    private static final String DS_SUFFIX = "_tournament";
 
     private TarantulaLogger logger;
     private ServiceContext serviceContext;
@@ -57,6 +58,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         application = descriptor;
+        List<TournamentSchedule> items = applicationPreSetup.list(descriptor,new TournamentScheduleQuery("category/TournamentSchedule"));
+        items.forEach((a)-> {
+            a.setup();
+            logger.warn(">>>"+a.distributionKey());
+            logger.warn(">>>"+a.header());
+        });
         return null;
     }
 
@@ -337,6 +344,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private Tournament createTournament(TournamentSchedule schedule){
         TournamentHeader tournament = new TournamentHeader(schedule);
+        tournament.distributionKey(schedule.distributionKey());
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupTournamentKey.addKey(tournament.distributionKey());
