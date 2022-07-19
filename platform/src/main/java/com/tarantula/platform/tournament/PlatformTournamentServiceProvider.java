@@ -299,11 +299,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 createSchedule(schedule);
                 break;
             case Tournament.ON_DEMAND_SCHEDULE:
-                createTournament(schedule);
-                distributionItemService.register(gameServiceName,name(),t.configurationCategory(),t.distributionKey());
+                Tournament tournament = createTournament(schedule);
+                distributionItemService.register(gameServiceName,name(),t.configurationCategory(),tournament.distributionKey());
                 break;
             default:
-                break;
+                throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
         }
     }
     @Override
