@@ -36,7 +36,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private IndexSet lookupTournamentKey;
     private IndexSet lookupScheduleKey;
-    private Configuration configuration;
+
+    private int pendingTournamentPoolSize =  100;
+    private int minDurationHoursPerSchedule = 1;
+    private int minDurationMinutesPerInstance =  5;
     private String reloadKey;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -113,7 +116,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.configuration = serviceContext.configuration(CONFIG);
+        Configuration configuration = serviceContext.configuration(CONFIG);
+        this.pendingTournamentPoolSize = ((Number)configuration.property("pendingTournamentPoolSize")).intValue();
+        this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
+        this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
@@ -144,7 +150,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         this.serviceContext.schedule(new TournamentMidnightTask(this));
-        this.logger.warn("Tournament service provider started with pending pool size->"+configuration.property("pendingTournamentPoolSize")+" on ->"+gameServiceName);
+        this.logger.warn("Tournament service provider started with pending pool size->["+pendingTournamentPoolSize+"] on ->"+gameServiceName);
     }
 
     @Override
@@ -282,8 +288,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public <T extends Configurable> void register(T t) {
-        t.registered();
         TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
+        if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+        if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+        t.registered();
         switch (schedule.schedule()){
             case Tournament.DAILY_SCHEDULE:
             case Tournament.WEEKLY_SCHEDULE:
@@ -324,7 +332,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private Tournament createTournament(TournamentSchedule schedule){
         TournamentHeader tournament = new TournamentHeader(schedule);
-        tournament.distributionKey(schedule.distributionKey());
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
         lookupTournamentKey.addKey(tournament.distributionKey());

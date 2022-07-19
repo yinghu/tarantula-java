@@ -24,7 +24,6 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private static final String TOURNAMENT_PLAY = "play";
     private static final int END_BUFFER_MINUTES = 3;
 
-
     protected int schedule;
     protected String type;
     protected String description;
@@ -47,13 +46,13 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();
+        this.description = schedule.description();
         this.startTime = schedule.startTime();
-        this.endTime = schedule.startTime().minusHours(schedule.durationHoursPerSchedule());
-        this.closeTime = endTime.minusMinutes(10);
+        this.endTime = schedule.startTime().plusHours(schedule.durationHoursPerSchedule());
+        this.closeTime = endTime.minusMinutes(schedule.durationMinutesPerInstance());
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
-        this.durationMinutes = schedule.instanceDurationInMinutes();
+        this.durationMinutes = schedule.durationMinutesPerInstance();
         this.enterCost = schedule.enterCost();
-
     }
 
     public TournamentHeader(){
@@ -197,6 +196,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     }
 
     public void setup(ConcurrentHashMap<String,TournamentInstanceHeader> instanceIndex, PlatformTournamentServiceProvider tournamentServiceProvider){
+        tournamentServiceProvider.log(toString());
         this._instanceIndex = instanceIndex;
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.pendingRegistryQueue = new ConcurrentLinkedDeque();
@@ -233,7 +233,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
                     this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
                 }
                 else{
-                    this.tournamentServiceProvider.log("Expired tournament scheduled to end->"+instanceHeader.distributionKey());
+                    this.tournamentServiceProvider.log("Expired tournament instance scheduled to end->"+instanceHeader.distributionKey());
                     this.tournamentServiceProvider.monitorInstanceOnEnd(this,instanceHeader);
                 }
             }
@@ -281,6 +281,11 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("enterCost",enterCost);
         return jsonObject;
+    }
+
+    @Override
+    public String toString(){
+        return "Tournament ["+distributionKey()+"] start from ["+startTime.toString()+"] to end ["+endTime+"]";
     }
 
 }

@@ -48,7 +48,7 @@ public class TournamentSchedule extends Application {
         return header.get("MaxEntriesPerInstance").getAsInt();
     }
 
-    public int instanceDurationInMinutes() {
+    public int durationMinutesPerInstance() {
         return header.get("DurationMinutesPerInstance").getAsInt();
     }
 

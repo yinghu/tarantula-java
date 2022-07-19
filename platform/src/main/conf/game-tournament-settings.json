@@ -1,3 +1,5 @@
 {
-  "pendingTournamentPoolSize": 100
+  "pendingTournamentPoolSize": 100,
+  "minDurationHoursPerSchedule": 1,
+  "minDurationMinutesPerInstance": 5
 }

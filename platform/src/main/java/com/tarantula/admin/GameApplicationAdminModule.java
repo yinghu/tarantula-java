@@ -48,8 +48,8 @@ public class GameApplicationAdminModule implements Module {
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             if(preSetup.load(desc,app) && app.configureAndValidate()){
-                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
                 gameServiceProvider.configurationServiceProvider(query[2]).register(app);
+                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
             }
             else{
                session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
