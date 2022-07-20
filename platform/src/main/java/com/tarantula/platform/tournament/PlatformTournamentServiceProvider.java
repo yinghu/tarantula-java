@@ -201,6 +201,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!this.dataStore.load(tournamentHeader)) return false;
         if(TimeUtil.expired(tournamentHeader.closeTime())){
             logger.warn("Tournament is expired and set to end");
+            this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
             return false;
         }
         tournamentHeader.dataStore(this.dataStore);
@@ -262,7 +263,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
-
+        this.distributionItemService.release(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));

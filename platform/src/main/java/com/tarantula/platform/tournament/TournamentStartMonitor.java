@@ -27,9 +27,8 @@ public class TournamentStartMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        LocalDateTime current  = LocalDateTime.now();
-        if(current.isAfter(tournamentHeader.startTime())) return 3000;
-        return TimeUtil.durationUTCMilliseconds(current,tournamentHeader.startTime());
+        if(TimeUtil.expired(tournamentHeader.startTime())) return 3000;
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),tournamentHeader.startTime());
     }
 
     @Override
