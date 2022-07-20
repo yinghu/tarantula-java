@@ -76,4 +76,10 @@ public class TournamentSchedule extends Application {
         return prizes;
     }
 
+    public TournamentScheduleStatus status(){
+        TournamentScheduleStatus status = new TournamentScheduleStatus();
+        status.distributionKey(this.distributionKey());
+        return status;
+    }
+
 }

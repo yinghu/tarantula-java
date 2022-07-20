@@ -63,11 +63,11 @@ public class GameApplicationAdminModule implements Module {
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             if(gameCluster.applicationPreSetup().load(desc,app)){
-                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
                 gameServiceProvider.configurationServiceProvider(query[2]).release(app);
+                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"failed to release item").getBytes());
             }
         }
         else {
