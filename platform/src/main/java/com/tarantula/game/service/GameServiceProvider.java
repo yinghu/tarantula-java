@@ -204,6 +204,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     public boolean onTournamentScheduleFinished(String scheduleId){
         return this.tournamentServiceProvider.finishSchedule(scheduleId);
     }
+    public void onCloseTournament(String tournamentId){
+        this.tournamentServiceProvider.tournament(tournamentId).close();
+    }
 
     public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(itemServiceProvider.name())){

@@ -19,4 +19,6 @@ public interface DistributionTournamentService extends ServiceProvider {
     boolean trySchedule(String serviceName,String scheduleId);
     boolean scheduleFinished(String serviceName,String scheduleId);
 
+    void closeTournament(String serviceName,String tournamentId);
+
 }

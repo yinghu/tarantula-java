@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster.tournament;
 
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
@@ -9,6 +10,7 @@ import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.tournament.DistributionTournamentService;
 import com.tarantula.platform.tournament.TournamentHeaderIndex;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -165,5 +167,21 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             future.cancel(true);
             return false;
         }
+    }
+
+    public void closeTournament(String serviceName,String tournamentId){
+        NodeEngine nodeEngine = getNodeEngine();
+        CloseTournamentOperation operation = new CloseTournamentOperation(serviceName,tournamentId);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        mlist.forEach(m->{
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                //return false;
+            }
+        });
     }
 }

@@ -34,6 +34,9 @@ public interface Tournament extends Configurable {
 
     String register(String systemId);
 
+    void close();
+
+
     interface Entry extends Configurable {
         String systemId();
         double score(double delta);

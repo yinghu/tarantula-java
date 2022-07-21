@@ -53,6 +53,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.durationMinutesPerInstance();
         this.enterCost = schedule.enterCost();
+        this.index = schedule.distributionKey();
     }
 
     public TournamentHeader(){
@@ -93,6 +94,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         properties.put("8",maxEntriesPerInstance);
         properties.put("9",durationMinutes);
         properties.put("10",enterCost);
+        properties.put("11",index);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -106,6 +108,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.maxEntriesPerInstance = ((Number)properties.get("8")).intValue();
         this.durationMinutes = ((Number)properties.get("9")).intValue();
         this.enterCost = ((Number)properties.get("10")).intValue();
+        this.index = (String)properties.get("11");
     }
     @Override
     public LocalDateTime closeTime() {
@@ -126,6 +129,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     @Override
     public String register(String systemId) {
+        if(status != Status.STARTED) return null;
         TournamentRegistry tournamentRegistry = pendingRegistryQueue.poll();
         if(tournamentRegistry==null){
             LocalDateTime closeTime = LocalDateTime.now().plusMinutes(this.durationMinutesPerInstance()-END_BUFFER_MINUTES);
@@ -238,6 +242,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
                 }
             }
         });
+        status = Status.STARTED;
+        this.dataStore.update(this);
     }
 
     void tournamentRegistryClosed(TournamentRegistry closed){
@@ -255,7 +261,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         this.tournamentServiceProvider.log("Tournament ended->"+ended.distributionKey());
         tournamentPlayIndex.removeKey(ended.distributionKey());
         tournamentPlayIndex.update();
-        Map<Integer,TournamentPrize> _prizes = this.tournamentServiceProvider.prize(this.distributionKey());
+        Map<Integer,TournamentPrize> _prizes = this.tournamentServiceProvider.prize(this.index());
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
         int rank =1;
         for(TournamentEntry entry : _ended.end()){
@@ -280,12 +286,22 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         jsonObject.addProperty("type",type);
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("enterCost",enterCost);
+        jsonObject.addProperty("scheduleId",this.index);
         return jsonObject;
     }
 
     @Override
     public String toString(){
         return "Tournament ["+distributionKey()+"] start from ["+startTime.toString()+"] to end ["+endTime+"]";
+    }
+
+    public void close(){
+        status = Status.CLOSED;
+        this.dataStore.update(this);
+    }
+    public void end(){
+        status = Status.ENDED;
+        this.dataStore.update(this);
     }
 
 }
