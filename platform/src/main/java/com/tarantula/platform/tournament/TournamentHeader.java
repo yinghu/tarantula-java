@@ -265,6 +265,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         TournamentInstanceHeader _ended = _instanceIndex.remove(ended.distributionKey());
         int rank =1;
         for(TournamentEntry entry : _ended.end()){
+            tournamentServiceProvider.log(entry.systemId()+">>>>>>>");
             entry.rank(rank);
             entry.update();
             IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);

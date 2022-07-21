@@ -5,7 +5,6 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -214,6 +213,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
+        logger.warn("Midnight checking ... ");
         this.lookupScheduleKey.keySet().forEach(k->{
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionKey(k);
@@ -268,9 +268,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     Map<Integer,TournamentPrize> prize(String scheduleId){
         TournamentSchedule schedule = new TournamentSchedule();
         schedule.distributionKey(scheduleId);
-        if(!this.applicationPreSetup.load(gameCluster,schedule)) return new HashMap<>();
+        logger.warn("Load prize->"+scheduleId);
+        if(!this.applicationPreSetup.load(application,schedule)) return new HashMap<>();
+        schedule.setup();
         Map<Integer,TournamentPrize> _prizes = new HashMap<>();
-        schedule.list().forEach(c->_prizes.put(c.rank(),c));
+        schedule.list().forEach(c->{
+            logger.warn("Rank->"+c.rank());
+            _prizes.put(c.rank(),c);
+        });
         return _prizes;
     }
 
@@ -337,9 +342,15 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournamentHeader.distributionKey(tournamentId);
         if(!this.dataStore.load(tournamentHeader)) return false;
         tournamentHeader.dataStore(this.dataStore);
-        if(TimeUtil.expired(tournamentHeader.closeTime())){
-            logger.warn("Tournament is expired and set to end ["+tournamentHeader.distributionKey()+"]");
-            this.serviceContext.schedule(new TournamentCloseMonitor(tournamentHeader,this));
+        if(tournamentHeader.status == Tournament.Status.ENDED){
+            TournamentScheduleStatus status = new TournamentScheduleStatus();
+            status.distributionKey(tournamentHeader.index());
+            status.index(null);
+            dataStore.update(status);
+            ConfigurableObject configurableObject = new ConfigurableObject();
+            configurableObject.distributionKey(tournamentHeader.index());
+            applicationPreSetup.load(application,configurableObject);
+            configurableObject.released();
             return false;
         }
         launch(tournamentHeader);

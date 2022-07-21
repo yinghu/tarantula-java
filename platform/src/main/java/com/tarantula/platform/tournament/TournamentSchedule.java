@@ -71,7 +71,9 @@ public class TournamentSchedule extends Application {
     public List<TournamentPrize> list(){
         ArrayList<TournamentPrize> prizes = new ArrayList<>();
         _reference.forEach(c->{
-            prizes.add(new TournamentPrize(c));
+            TournamentPrize prize = new TournamentPrize(c);
+            prize.configureAndValidate();
+            prizes.add(prize);
         });
         return prizes;
     }
