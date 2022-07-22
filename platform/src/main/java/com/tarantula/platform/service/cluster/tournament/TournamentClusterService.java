@@ -85,19 +85,14 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.onRaceBoard(instanceId);
     }
-    public boolean trySchedule(String serviceName,String scheduleId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.onTryScheduleTournament(scheduleId);
-    }
-
-    public boolean scheduleFinished(String serviceName,String scheduleId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.onTournamentScheduleFinished(scheduleId);
-    }
 
     public void closeTournament(String serviceName,String tournamentId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         tsp.onCloseTournament(tournamentId);
     }
 
+    public void endTournament(String serviceName,String tournamentId){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        tsp.onEndTournament(tournamentId);
+    }
 }

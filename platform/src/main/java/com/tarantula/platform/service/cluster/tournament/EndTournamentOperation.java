@@ -8,42 +8,42 @@ import com.hazelcast.spi.PartitionAwareOperation;
 import java.io.IOException;
 
 
-public class TournamentTryScheduleOperation extends Operation implements PartitionAwareOperation {
+public class EndTournamentOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private String scheduleId;
-    private boolean ret;
+    private String tournamentId;
 
-    public TournamentTryScheduleOperation() {
+
+    public EndTournamentOperation() {
     }
 
 
-    public TournamentTryScheduleOperation(String serviceName, String scheduleId) {
+    public EndTournamentOperation(String serviceName, String tournamentId) {
         this.serviceName = serviceName;
-        this.scheduleId = scheduleId;
+        this.tournamentId = tournamentId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        ret = ais.trySchedule(serviceName,scheduleId);
+        ais.endTournament(serviceName,tournamentId);
     }
 
     @Override
     public Object getResponse() {
-        return this.ret;
+        return null;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeUTF(this.scheduleId);
+        out.writeUTF(this.tournamentId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        scheduleId = in.readUTF();
+        tournamentId = in.readUTF();
     }
 }

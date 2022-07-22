@@ -16,9 +16,10 @@ public interface DistributionTournamentService extends ServiceProvider {
     Tournament.RaceBoard list(String serviceName,String instanceId);
     TournamentHeaderIndex localManaged(String key);
 
-    boolean trySchedule(String serviceName,String scheduleId);
-    boolean scheduleFinished(String serviceName,String scheduleId);
+    //boolean trySchedule(String serviceName,String scheduleId);
+    //boolean scheduleFinished(String serviceName,String scheduleId);
 
     void closeTournament(String serviceName,String tournamentId);
+    void endTournament(String serviceName,String tournamentId);
 
 }

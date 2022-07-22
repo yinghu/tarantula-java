@@ -217,11 +217,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.lookupScheduleKey.keySet().forEach(k->{
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionKey(k);
-            if(applicationPreSetup.load(application,schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
-                if(distributionTournamentService.trySchedule(gameServiceName,k)){
-                    Tournament tournament = createTournament(schedule);
-                    this.distributionItemService.register(gameServiceName,name(),schedule.configurationCategory(),tournament.distributionKey());
-                    distributionTournamentService.scheduleFinished(gameServiceName,k);
+            if(applicationPreSetup.load(application,schedule)){
+                if(schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
+                    if(distributionTournamentService.localManaged(k).localManaged){
+                        Tournament tournament = createTournament(schedule);
+                        this.distributionItemService.register(gameServiceName,name(),schedule.configurationCategory(),tournament.distributionKey());
+                    }
                 }
             }
         });
@@ -234,17 +235,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
-        serviceContext.schedule(new TournamentEndTask(tournamentHeader));
-        TournamentScheduleStatus status = new TournamentScheduleStatus();
-        status.distributionKey(tournamentHeader.index());
-        status.index(null);
-        dataStore.update(status);
-        ConfigurableObject schedule = new ConfigurableObject();
-        schedule.distributionKey(tournamentHeader.index());
-        applicationPreSetup.load(application,schedule);
-        schedule.released();
-        lookupTournamentKey.removeKey(tournamentHeader.distributionKey());
-        lookupTournamentKey.update();
+        endTournament(tournamentHeader);
         this.distributionItemService.release(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
@@ -289,6 +280,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             case Tournament.DAILY_SCHEDULE:
             case Tournament.WEEKLY_SCHEDULE:
             case Tournament.MONTHLY_SCHEDULE:
+                LocalDateTime _current = LocalDateTime.now();
+                if(schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear()) throw new RuntimeException("start time already expired on daily midnight launch");
                 createSchedule(schedule);
                 break;
             case Tournament.ON_DEMAND_SCHEDULE:
@@ -304,10 +297,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(t.distributionKey());
         dataStore.createIfAbsent(status,true);
-        if(status.index() != null) throw new RuntimeException("schedule is running on tournament ["+status.index()+"]");
-        lookupScheduleKey.removeKey(t.distributionKey());
-        lookupScheduleKey.update();
-        t.released();
+        if(status.index() == null) {
+            lookupScheduleKey.removeKey(t.distributionKey());
+            lookupScheduleKey.update();
+            t.released();
+            distributionItemService.release(gameServiceName, name(), t.configurationTypeId(), t.distributionKey());
+            return;
+        }
+        distributionTournamentService.endTournament(gameServiceName,status.index());
         distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
@@ -375,12 +372,25 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.setup(instanceIndex,this);
         this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
     }
-    public boolean trySchedule(String scheduleId){
-        logger.warn("tournament schedule ready to launch ->"+scheduleId);
-        return true;
+
+    public void endTournamentForcefully(String tournamentId){
+        logger.warn("Tournament forcefully end ->"+tournamentId);
+        TournamentHeaderIndex tournamentHeaderIndex = tournamentIndex.remove(tournamentId);
+        if(tournamentHeaderIndex!=null) onTournamentEnd(tournamentHeaderIndex.tournamentHeader);
     }
-    public boolean finishSchedule(String scheduleId){
-        logger.warn("tournament schedule launched ->"+scheduleId);
-        return true;
+
+    private void endTournament(TournamentHeader tournamentHeader){
+        serviceContext.schedule(new TournamentEndTask(tournamentHeader));
+        TournamentScheduleStatus status = new TournamentScheduleStatus();
+        status.distributionKey(tournamentHeader.index());
+        status.index(null);
+        dataStore.update(status);
+        ConfigurableObject schedule = new ConfigurableObject();
+        schedule.distributionKey(tournamentHeader.index());
+        applicationPreSetup.load(application,schedule);
+        schedule.released();
+        lookupTournamentKey.removeKey(tournamentHeader.distributionKey());
+        lookupTournamentKey.update();
     }
+
 }

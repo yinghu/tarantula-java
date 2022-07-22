@@ -293,7 +293,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
 
     @Override
     public String toString(){
-        return "Tournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+endTime+"]\n End Time ["+endTime+"]";
+        return "Tournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]";
     }
 
     public void close(){
@@ -307,6 +307,7 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
         });
         status = Status.ENDED;
         this.dataStore.update(this);
+        this.tournamentServiceProvider.log("Tournament ["+distributionKey()+"] ended at ["+LocalDateTime.now()+"]");
     }
 
     private void rank(TournamentInstanceHeader ended){

@@ -198,14 +198,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         return this.tournamentServiceProvider.instance(instanceId).raceBoard();
     }
 
-    public boolean onTryScheduleTournament(String scheduleId){
-        return this.tournamentServiceProvider.trySchedule(scheduleId);
-    }
-    public boolean onTournamentScheduleFinished(String scheduleId){
-        return this.tournamentServiceProvider.finishSchedule(scheduleId);
-    }
+
     public void onCloseTournament(String tournamentId){
         this.tournamentServiceProvider.tournament(tournamentId).close();
+    }
+
+    public void onEndTournament(String tournamentId){
+        this.tournamentServiceProvider.endTournamentForcefully(tournamentId);
     }
 
     public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){

@@ -226,11 +226,35 @@
                 shoppingList.innerHTML += tem.join('');  
             });
             document.querySelectorAll('.tx-live-tournament-test').forEach(a=>{
+                actionList.innerHTML = "";
                 a.onclick=()=>{
                     let tid = a.getAttribute('tx-tournament-id');
                     console.log(tid);
                     TARA_API.onGet('robotquest/lobby1','onTestTournament',tid,(resp)=>{
                         editor.set(resp);
+                        //add actionList
+                        let tem = [];
+                        tem.push('<div class=\'w3-container\'>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                        tem.push('Score');
+                        tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                        tem.push('');
+                        tem.push('</span><span tx-game-id=\''+resp.Tag+'\' tx-reward-id=\''+resp.Tag);
+                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-daily-reward-claim\'>Claim</span>');
+                        tem.push('</div>'); 
+                        actionList.innerHTML += tem.join('');
+                        document.querySelectorAll('.tx-live-service-daily-reward-claim').forEach(a=>{
+                            a.onclick =()=>{
+                                let gameId = a.getAttribute('tx-game-id'); 
+                                console.log("score->"+gameId);
+                                let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+                                TARA_API.onSet(gameId,'onTestScore','tournament',payload,(resp1)=>{
+                                    editor.set(resp1);    
+                                }); 
+                            }
+                        }); 
+                        
                     });   
                 };
             });    

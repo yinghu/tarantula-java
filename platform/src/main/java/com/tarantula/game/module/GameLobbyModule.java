@@ -68,6 +68,12 @@ public class GameLobbyModule implements Module{
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
         }
+        else if(session.action().equals("onTestScore")){
+            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            this.gameLobby.update(session,payload);
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
