@@ -5,6 +5,7 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TournamentServiceProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -213,11 +214,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
-        logger.warn("Midnight checking ... ");
         this.lookupScheduleKey.keySet().forEach(k->{
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionKey(k);
-            if(applicationPreSetup.load(gameCluster,schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
+            if(applicationPreSetup.load(application,schedule)&&schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
                 if(distributionTournamentService.trySchedule(gameServiceName,k)){
                     Tournament tournament = createTournament(schedule);
                     this.distributionItemService.register(gameServiceName,name(),schedule.configurationCategory(),tournament.distributionKey());
@@ -227,16 +227,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
     void onTournamentStart(Tournament tournamentHeader){
-        log("tournament is starting->"+tournamentHeader.distributionKey());
         this.distributionItemService.register(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
     void onTournamentClose(TournamentHeader tournamentHeader){
-        log("tournament is closing->"+tournamentHeader.distributionKey());
         this.distributionTournamentService.closeTournament(gameServiceName,tournamentHeader.distributionKey());
         this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
-        log("tournament is ending->"+tournamentHeader.distributionKey());
         serviceContext.schedule(new TournamentEndTask(tournamentHeader));
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(tournamentHeader.index());
@@ -268,14 +265,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     Map<Integer,TournamentPrize> prize(String scheduleId){
         TournamentSchedule schedule = new TournamentSchedule();
         schedule.distributionKey(scheduleId);
-        logger.warn("Load prize->"+scheduleId);
         if(!this.applicationPreSetup.load(application,schedule)) return new HashMap<>();
         schedule.setup();
         Map<Integer,TournamentPrize> _prizes = new HashMap<>();
-        schedule.list().forEach(c->{
-            logger.warn("Rank->"+c.rank());
-            _prizes.put(c.rank(),c);
-        });
+        schedule.list().forEach(c-> _prizes.put(c.rank(),c));
         return _prizes;
     }
 
@@ -290,6 +283,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
         if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
         if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+        if(TimeUtil.expired(schedule.startTime())) throw new RuntimeException("start time already expired");
         t.registered();
         switch (schedule.schedule()){
             case Tournament.DAILY_SCHEDULE:
@@ -319,7 +313,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRegister(String category, String itemId) {
-        logger.warn("tournament register->"+itemId+">>>>"+category);
         TournamentHeader tournament = new TournamentHeader();
         tournament.distributionKey(itemId);
         if(!this.dataStore.load(tournament)){
@@ -332,7 +325,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRelease(String category, String itemId) {
-        logger.warn("tournament release->"+itemId+">>>>"+category);
         tournamentIndex.remove(itemId);
         return false;
     }
