@@ -45,6 +45,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void leave(Session session) {
+        if(usingDefault){
+            defaultLobby.leave(session);
+            return;
+        }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null) return;
@@ -53,6 +57,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void update(Session session, byte[] payload){
+        if(usingDefault){
+            defaultLobby.update(session,payload);
+            return;
+        }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
@@ -64,6 +72,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void list(Session session){
+        if(usingDefault){
+            defaultLobby.list(session);
+            return;
+        }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){

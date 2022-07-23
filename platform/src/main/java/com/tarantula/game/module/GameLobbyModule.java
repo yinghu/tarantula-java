@@ -56,23 +56,17 @@ public class GameLobbyModule implements Module{
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onTestTournament")){
-            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
-                throw new RuntimeException("no permission");
-            }
-            session.tournamentId(session.name());
-            session.clientId("device_"+session.stub());
-            session.name("web_device");
-            Rating rating = gameServiceProvider.rating(session.systemId());
-            rating.level = this.context.descriptor().accessRank()*100-99;
-            Stub stub = gameLobby.join(session,rating);
-            session.write(stub.toJson().toString().getBytes());
-        }
         else if(session.action().equals("onTestScore")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
             this.gameLobby.update(session,payload);
+        }
+        else if(session.action().equals("onTestList")){
+            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            this.gameLobby.list(session);
         }
         else{
             throw new UnsupportedOperationException(session.action());

@@ -7,8 +7,10 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
+import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -43,6 +45,26 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
             }
         }
+        else if(session.action().equals("onTestTournament")){
+            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            session.tournamentId(session.name());
+            session.clientId("device_"+session.stub());
+            session.name("web_device");
+            session.action("onPlay");
+            Rating rating = this.gameServiceProvider.rating(session.systemId());
+            int mix = rating.rank>maxRank?maxRank:rating.rank;
+            Descriptor lobby = mLobby.get(mix);
+            if(lobby!=null) {
+                Response response = context.presence(session).onPlay(session, lobby);
+                if (response != null) session.write(this.builder.create().toJson(response).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
+            }
+        }
+
         else{
             throw new UnsupportedOperationException(session.action());
         }

@@ -229,8 +229,9 @@
                 actionList.innerHTML = "";
                 a.onclick=()=>{
                     let tid = a.getAttribute('tx-tournament-id');
-                    console.log(tid);
-                    TARA_API.onGet('robotquest/lobby1','onTestTournament',tid,(resp)=>{
+                    let tag = TARA_API.query().serviceTag.split('/')[0]+'/lobby';
+                    console.log(tag+'>>>>'+tid);
+                    TARA_API.onGet(tag,'onTestTournament',tid,(resp)=>{
                         editor.set(resp);
                         //add actionList
                         let tem = [];
@@ -241,10 +242,31 @@
                         tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
                         tem.push('');
                         tem.push('</span><span tx-game-id=\''+resp.Tag+'\' tx-reward-id=\''+resp.Tag);
-                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-daily-reward-claim\'>Claim</span>');
+                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-tournament-claim\'>Claim</span>');
                         tem.push('</div>'); 
+
+                        tem.push('<div class=\'w3-container\'>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                        tem.push('List');
+                        tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                        tem.push('');
+                        tem.push('</span><span tx-game-id=\''+resp.Tag+'\' tx-reward-id=\''+resp.Tag);
+                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-tournament-list\'>List</span>');
+                        tem.push('</div>');
+                        
+                        tem.push('<div class=\'w3-container\'>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                        tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                        tem.push('List');
+                        tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
+                        tem.push('');
+                        tem.push('</span><span tx-game-id=\''+resp.Tag+'\' tx-reward-id=\''+resp.Tag);
+                        tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-service-tournament-history\'>History</span>');
+                        tem.push('</div>');
+
                         actionList.innerHTML += tem.join('');
-                        document.querySelectorAll('.tx-live-service-daily-reward-claim').forEach(a=>{
+                        document.querySelectorAll('.tx-live-service-tournament-claim').forEach(a=>{
                             a.onclick =()=>{
                                 let gameId = a.getAttribute('tx-game-id'); 
                                 console.log("score->"+gameId);
@@ -254,7 +276,26 @@
                                 }); 
                             }
                         }); 
-                        
+                        document.querySelectorAll('.tx-live-service-tournament-list').forEach(a=>{
+                            a.onclick =()=>{
+                                let gameId = a.getAttribute('tx-game-id'); 
+                                console.log("score->"+gameId);
+                                //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+                                TARA_API.onGet(gameId,'onTestList','tournament',(resp1)=>{
+                                    editor.set(resp1);    
+                                }); 
+                            }
+                        }); 
+                        document.querySelectorAll('.tx-live-service-tournament-history').forEach(a=>{
+                            a.onclick =()=>{
+                                let gameId = a.getAttribute('tx-game-id'); 
+                                console.log("score->"+gameId);
+                                //let payload ={rating:{rank:0,delta:10},stats:[{name:'wins',value:1}],tournament:{score:100}}; 
+                                TARA_API.onGet(TARA_API.query().serviceTag,'onPlayerHistory','tournament',(resp1)=>{
+                                    editor.set(resp1);    
+                                }); 
+                            }
+                        }); 
                     });   
                 };
             });    
