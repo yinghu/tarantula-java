@@ -26,8 +26,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
     private final Config config;
     private final String bucket;
-    private final String INDEX_MAP = "integration.recoverable.index";
-    private final String DATA_MAP = "integration.recoverable.data";
+    private final String INDEX_MAP_PREFIX = "integration.recoverable.index.";
+    private final String DATA_MAP_PREFIX = "integration.recoverable.data.";
 
     private HazelcastInstance _cluster;
 
@@ -37,6 +37,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final ConcurrentHashMap<String,EventSubscriber> eventSubscribers = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String,IntegrationClusterStore> cMap = new ConcurrentHashMap<>();
     public PartitionState[] partitionStates;
 
     private ExecutorService inboundEventPool;
@@ -90,8 +92,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         _integrationInstanceStarted.await();
-        mIndex = this._cluster.getMultiMap(INDEX_MAP);
-        vMap = this._cluster.getMap(DATA_MAP);
+        mIndex = this._cluster.getMultiMap(INDEX_MAP_PREFIX+"Master");
+        vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
+
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
@@ -292,6 +295,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void onReload(int partition,boolean localMember){
         rMap.forEach((k,v)->v.reload(partition,localMember));
+    }
+
+    public ClusterStore clusterStore(String name){
+        if(name.equals("Master")) throw new RuntimeException("Master is reserved for system level cluster store");
+        return cMap.computeIfAbsent(name,k->{
+            MultiMap<String, byte[]> mIndex = _cluster.getMultiMap(INDEX_MAP_PREFIX+name);
+            IMap<byte[],byte[]> vMap = _cluster.getMap(DATA_MAP_PREFIX+name);
+            IntegrationClusterStore integrationClusterStore = new IntegrationClusterStore(mIndex,vMap);
+            return integrationClusterStore;
+        });
     }
 
 }
