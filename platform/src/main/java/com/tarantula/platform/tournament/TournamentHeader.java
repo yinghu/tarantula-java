@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ScheduledFuture;
 
 public class TournamentHeader extends RecoverableObject implements Tournament, Portable {
 
@@ -41,6 +42,8 @@ public class TournamentHeader extends RecoverableObject implements Tournament, P
     private ConcurrentLinkedDeque<TournamentRegistry> pendingRegistryQueue;
 
     private PlatformTournamentServiceProvider tournamentServiceProvider;
+
+    public ScheduledFuture<?> pendingSchedule;
 
     public TournamentHeader(TournamentSchedule schedule){
         this.schedule = schedule.schedule();

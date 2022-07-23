@@ -43,16 +43,22 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Application app = new Application();
-            app.distributionKey(query[1]);
-            Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-            if(preSetup.load(desc,app) && app.configureAndValidate()){
-                gameServiceProvider.configurationServiceProvider(query[2]).register(app);
-                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
+            if(!gameServiceProvider.itemServiceProvider().lock(session.systemId(),query[1])){
+                session.write(JsonUtil.toSimpleResponse(false,"application item ["+query[1]+"] has locked by another operator").getBytes());
             }
             else{
-               session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
+                ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+                Application app = new Application();
+                app.distributionKey(query[1]);
+                Descriptor desc = gameCluster.serviceWithCategory(query[2]);
+                if(preSetup.load(desc,app) && app.configureAndValidate()){
+                    gameServiceProvider.configurationServiceProvider(query[2]).register(app);
+                    session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
+                }
+                else{
+                   session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
+                }
+                gameServiceProvider.itemServiceProvider().unlock(session.owner(),query[1]);
             }
         }
         else if (session.action().equals("onRelease")){

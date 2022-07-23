@@ -6,4 +6,5 @@ public interface DistributionItemService extends ServiceProvider {
     String NAME = "DistributionItemService";
     boolean register(String gameServiceName,String serviceName,String category,String itemId);
     boolean release(String gameServiceName,String serviceName,String category,String itemId);
+
 }

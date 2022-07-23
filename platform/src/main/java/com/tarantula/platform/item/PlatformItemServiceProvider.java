@@ -1,6 +1,7 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
@@ -17,6 +18,8 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
+
+    private ClusterProvider clusterProvider;
     private DistributionItemService distributionItemService;
 
     private final String gameServiceName;
@@ -89,5 +92,14 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     }
     public boolean onRelease(String category,String itemId){
         return false;
+    }
+
+    public boolean lock(String owner,String itemId){
+
+        return true;
+    }
+
+    public void unlock(String owner,String itemId){
+
     }
 }

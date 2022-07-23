@@ -266,6 +266,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     ///schedule and launch
     @Override
     public <T extends Configurable> void register(T t) {
+        //boolean locked = distributionItemService.lock(gameServiceName,name(),"",t.distributionKey());
         if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(t.distributionKey());
@@ -285,8 +286,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 createSchedule(schedule);
                 break;
             case Tournament.ON_DEMAND_SCHEDULE:
-                Tournament tournament = createTournament(schedule);
-                serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+                TournamentHeader tournament = createTournament(schedule);
+                tournament.pendingSchedule = serviceContext.schedule(new TournamentStartMonitor(tournament,this));
                 break;
             default:
                 throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
@@ -350,7 +351,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupScheduleKey.addKey(schedule.distributionKey());
         lookupScheduleKey.update();
     }
-    private Tournament createTournament(TournamentSchedule schedule){
+    private TournamentHeader createTournament(TournamentSchedule schedule){
         TournamentHeader tournament = new TournamentHeader(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
@@ -370,13 +371,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.tournamentIndex.put(tkey,index);
         if(!index.localManaged) return;
         tournament.setup(instanceIndex,this);
-        this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
     }
 
     public void endTournamentForcefully(String tournamentId){
         logger.warn("Tournament forcefully end ->"+tournamentId);
         TournamentHeaderIndex tournamentHeaderIndex = tournamentIndex.remove(tournamentId);
-        if(tournamentHeaderIndex!=null) onTournamentEnd(tournamentHeaderIndex.tournamentHeader);
+        if(tournamentHeaderIndex!=null) {
+            tournamentHeaderIndex.tournamentHeader.pendingSchedule.cancel(true);
+            onTournamentEnd(tournamentHeaderIndex.tournamentHeader);
+        }
     }
 
     private void endTournament(TournamentHeader tournamentHeader){
@@ -392,5 +396,4 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupTournamentKey.removeKey(tournamentHeader.distributionKey());
         lookupTournamentKey.update();
     }
-
 }
