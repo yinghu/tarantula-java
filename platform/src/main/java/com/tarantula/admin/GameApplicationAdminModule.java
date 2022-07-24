@@ -20,7 +20,7 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
-            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery("typeId/"+app.category()));
             session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
@@ -28,7 +28,7 @@ public class GameApplicationAdminModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
             app.distributionKey(query[1]);
             if(preSetup.load(desc,app)){
@@ -40,26 +40,22 @@ public class GameApplicationAdminModule implements Module {
             }
         }
         else if (session.action().equals("onRegister")){
+
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            if(!gameServiceProvider.itemServiceProvider().lock(session.systemId(),query[1])){
-                session.write(JsonUtil.toSimpleResponse(false,"application item ["+query[1]+"] has locked by another operator").getBytes());
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
+            Application app = new Application();
+            app.distributionKey(query[1]);
+            Descriptor desc = gameCluster.serviceWithCategory(query[2]);
+            if(preSetup.load(desc,app) && app.configureAndValidate()){
+                gameServiceProvider.configurationServiceProvider(query[2]).register(app);
+                session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
             }
             else{
-                ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-                Application app = new Application();
-                app.distributionKey(query[1]);
-                Descriptor desc = gameCluster.serviceWithCategory(query[2]);
-                if(preSetup.load(desc,app) && app.configureAndValidate()){
-                    gameServiceProvider.configurationServiceProvider(query[2]).register(app);
-                    session.write(JsonUtil.toSimpleResponse(true,query[1]).getBytes());
-                }
-                else{
-                   session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
-                }
-                gameServiceProvider.itemServiceProvider().unlock(session.owner(),query[1]);
+               session.write(JsonUtil.toSimpleResponse(false,"application items have to have at least one commodity item").getBytes());
             }
+
         }
         else if (session.action().equals("onRelease")){
             String[] query = session.name().split("#");

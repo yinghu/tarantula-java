@@ -16,7 +16,6 @@ import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.SystemUtil;
-import com.icodesoftware.util.JsonUtil;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -94,7 +93,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _integrationInstanceStarted.await();
         mIndex = this._cluster.getMultiMap(INDEX_MAP_PREFIX+"Master");
         vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
-
         AccessIndexService accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);

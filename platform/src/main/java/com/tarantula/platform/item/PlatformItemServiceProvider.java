@@ -19,7 +19,6 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
 
-    private ClusterProvider clusterProvider;
     private DistributionItemService distributionItemService;
 
     private final String gameServiceName;
@@ -59,7 +58,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
@@ -94,12 +93,4 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         return false;
     }
 
-    public boolean lock(String owner,String itemId){
-
-        return true;
-    }
-
-    public void unlock(String owner,String itemId){
-
-    }
 }

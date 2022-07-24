@@ -1,10 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.ConfigurationServiceProvider;
-import com.icodesoftware.service.ReloadListener;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TournamentServiceProvider;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
@@ -45,6 +42,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
+
+    private ClusterProvider.ClusterStore clusterStore;
 
     public PlatformTournamentServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -130,6 +129,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
+        this.clusterStore = this.serviceContext.clusterProvider().clusterStore((String)gameCluster.property(GameCluster.NAME));
     }
     @Override
     public void waitForData(){
@@ -266,31 +266,35 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     ///schedule and launch
     @Override
     public <T extends Configurable> void register(T t) {
-        //boolean locked = distributionItemService.lock(gameServiceName,name(),"",t.distributionKey());
-        if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
-        TournamentScheduleStatus status = new TournamentScheduleStatus();
-        status.distributionKey(t.distributionKey());
-        dataStore.createIfAbsent(status,true);
-        if(status.index() != null) throw new RuntimeException("schedule is running on tournament ["+status.index()+"]");
-        TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
-        if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
-        if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
-        if(TimeUtil.expired(schedule.startTime())) throw new RuntimeException("start time already expired");
-        t.registered();
-        switch (schedule.schedule()){
-            case Tournament.DAILY_SCHEDULE:
-            case Tournament.WEEKLY_SCHEDULE:
-            case Tournament.MONTHLY_SCHEDULE:
-                LocalDateTime _current = LocalDateTime.now();
-                if(schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear()) throw new RuntimeException("start time already expired on daily midnight launch");
-                createSchedule(schedule);
-                break;
-            case Tournament.ON_DEMAND_SCHEDULE:
-                TournamentHeader tournament = createTournament(schedule);
-                tournament.pendingSchedule = serviceContext.schedule(new TournamentStartMonitor(tournament,this));
-                break;
-            default:
-                throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
+        try{
+            clusterStore.lock(t.distributionKey().getBytes());
+            if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
+            TournamentScheduleStatus status = new TournamentScheduleStatus();
+            status.distributionKey(t.distributionKey());
+            dataStore.createIfAbsent(status,true);
+            if(status.index() != null) throw new RuntimeException("schedule is running on tournament ["+status.index()+"]");
+            TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
+            if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+            if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+            if(TimeUtil.expired(schedule.startTime())) throw new RuntimeException("start time already expired");
+            t.registered();
+            switch (schedule.schedule()){
+                case Tournament.DAILY_SCHEDULE:
+                case Tournament.WEEKLY_SCHEDULE:
+                case Tournament.MONTHLY_SCHEDULE:
+                    LocalDateTime _current = LocalDateTime.now();
+                    if(schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear()) throw new RuntimeException("start time already expired on daily midnight launch");
+                    createSchedule(schedule);
+                    break;
+                case Tournament.ON_DEMAND_SCHEDULE:
+                    TournamentHeader tournament = createTournament(schedule);
+                    tournament.pendingSchedule = serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+                    break;
+                default:
+                    throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
+            }
+        }finally {
+            clusterStore.unlock(t.distributionKey().getBytes());
         }
     }
     @Override
@@ -357,6 +361,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         dataStore.create(tournament);
         TournamentScheduleStatus status = schedule.status();
         status.index(tournament.distributionKey());
+        status.status = Tournament.Status.STARTING;
         dataStore.update(status);
         lookupTournamentKey.addKey(tournament.distributionKey());
         lookupTournamentKey.update();
@@ -372,6 +377,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!index.localManaged) return;
         tournament.setup(instanceIndex,this);
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        TournamentScheduleStatus status = new TournamentScheduleStatus();
+        status.distributionKey(tournament.index());
+        status.index(tournament.distributionKey());
+        status.status = Tournament.Status.STARTED;
+        dataStore.update(status);
     }
 
     public void endTournamentForcefully(String tournamentId){

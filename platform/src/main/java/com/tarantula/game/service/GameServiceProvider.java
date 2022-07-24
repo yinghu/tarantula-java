@@ -64,7 +64,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
         gameCluster.setup(serviceContext);
-        //serviceContext.setup(gameCluster);
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");

@@ -30,8 +30,6 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int INDEX_CID = 11;
 
-    public static final int CONFIGURABLE_HEADER_CID = 12;
-
     public static final int SHOPPING_ITEM_CID = 13;
 
     public static final int TRANSACTION_CID = 14;

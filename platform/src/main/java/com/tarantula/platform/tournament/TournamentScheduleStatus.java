@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
@@ -7,14 +8,17 @@ import java.util.Map;
 public class TournamentScheduleStatus extends RecoverableObject {
 
 
+    public Tournament.Status status = Tournament.Status.SCHEDULED;//-> STARTING -> STARTED
     @Override
     public Map<String,Object> toMap(){
         properties.put("index",index);
+        properties.put("status",status.name());
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.index = (String)properties.get("index");
+        this.status = Tournament.Status.valueOf((String)properties.get("status"));
     }
 
     public int getFactoryId() {

@@ -49,4 +49,11 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         mIndex.remove(index);
     }
 
+    public void lock(byte[] key){
+        vMap.lock(key);
+    }
+    public void unlock(byte[] key){
+        vMap.unlock(key);
+    }
+
 }
