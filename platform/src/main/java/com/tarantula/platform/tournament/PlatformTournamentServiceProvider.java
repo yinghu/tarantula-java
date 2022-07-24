@@ -215,28 +215,43 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
         this.lookupScheduleKey.keySet().forEach(k->{
+            clusterStore.lock(k.getBytes());
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionKey(k);
             if(applicationPreSetup.load(application,schedule)){
                 if(schedule.startTime().getDayOfYear() == LocalDateTime.now().getDayOfYear()){
                     if(distributionTournamentService.localManaged(k).localManaged){
-                        Tournament tournament = createTournament(schedule);
-                        this.distributionItemService.register(gameServiceName,name(),schedule.configurationCategory(),tournament.distributionKey());
+                        TournamentHeader tournament = createTournament(schedule);
+                        this.serviceContext.schedule(new TournamentRegisterTask(tournament,this));
                     }
                 }
             }
+            clusterStore.unlock(k.getBytes());
         });
     }
-    void onTournamentStart(Tournament tournamentHeader){
+    void onTournamentRegister(Tournament tournamentHeader){
         this.distributionItemService.register(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
     void onTournamentClose(TournamentHeader tournamentHeader){
-        this.distributionTournamentService.closeTournament(gameServiceName,tournamentHeader.distributionKey());
-        this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader,this));
+        byte[] lockKey = tournamentHeader.index().getBytes();
+        try {
+            clusterStore.lock(lockKey);
+            this.distributionTournamentService.closeTournament(gameServiceName, tournamentHeader.distributionKey());
+            this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader, this));
+        }finally {
+            clusterStore.unlock(lockKey);
+        }
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
-        endTournament(tournamentHeader);
-        this.distributionItemService.release(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
+        byte[] lockKey = tournamentHeader.index().getBytes();
+        try {
+            clusterStore.lock(lockKey);
+            endTournament(tournamentHeader);
+            this.distributionItemService.release(gameServiceName, name(), "TournamentSchedule", tournamentHeader.distributionKey());
+        }
+        finally {
+            clusterStore.unlock(lockKey);
+        }
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
         this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
@@ -266,8 +281,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     ///schedule and launch
     @Override
     public <T extends Configurable> void register(T t) {
+        byte[] lockKey = t.distributionKey().getBytes();
         try{
-            clusterStore.lock(t.distributionKey().getBytes());
+            clusterStore.lock(lockKey);
             if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
             TournamentScheduleStatus status = new TournamentScheduleStatus();
             status.distributionKey(t.distributionKey());
@@ -288,40 +304,52 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                     break;
                 case Tournament.ON_DEMAND_SCHEDULE:
                     TournamentHeader tournament = createTournament(schedule);
-                    tournament.pendingSchedule = serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+                    this.serviceContext.schedule(new TournamentRegisterTask(tournament,this));
                     break;
                 default:
                     throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
             }
         }finally {
-            clusterStore.unlock(t.distributionKey().getBytes());
+            clusterStore.unlock(lockKey);
         }
     }
     @Override
     public <T extends Configurable> void release(T t) {
-        TournamentScheduleStatus status = new TournamentScheduleStatus();
-        status.distributionKey(t.distributionKey());
-        dataStore.createIfAbsent(status,true);
-        if(status.index() == null) {
-            lookupScheduleKey.removeKey(t.distributionKey());
-            lookupScheduleKey.update();
-            t.released();
+        byte[] lockKey = t.distributionKey().getBytes();
+        try {
+            clusterStore.lock(lockKey);
+            TournamentScheduleStatus status = new TournamentScheduleStatus();
+            status.distributionKey(t.distributionKey());
+            dataStore.createIfAbsent(status, true);
+            if (status.index() == null) {
+                lookupScheduleKey.removeKey(t.distributionKey());
+                lookupScheduleKey.update();
+                t.released();
+                distributionItemService.release(gameServiceName, name(), t.configurationTypeId(), t.distributionKey());
+                return;
+            }
+            distributionTournamentService.endTournament(gameServiceName, status.index());
             distributionItemService.release(gameServiceName, name(), t.configurationTypeId(), t.distributionKey());
-            return;
+        }finally {
+            clusterStore.unlock(lockKey);
         }
-        distributionTournamentService.endTournament(gameServiceName,status.index());
-        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
     @Override
     public boolean onRegister(String category, String itemId) {
         TournamentHeader tournament = new TournamentHeader();
         tournament.distributionKey(itemId);
-        if(!this.dataStore.load(tournament)){
+        if (!this.dataStore.load(tournament)) {
             return false;
         }
-        tournament.dataStore(dataStore);
-        launch(tournament);
+        byte[] scheduleId = tournament.index().getBytes();
+        try {
+            clusterStore.lock(scheduleId);
+            tournament.dataStore(dataStore);
+            launch(tournament);
+        } finally {
+            clusterStore.unlock(scheduleId);
+        }
         return true;
     }
 
@@ -335,20 +363,27 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentHeader tournamentHeader = new TournamentHeader();
         tournamentHeader.distributionKey(tournamentId);
         if(!this.dataStore.load(tournamentHeader)) return false;
-        tournamentHeader.dataStore(this.dataStore);
-        if(tournamentHeader.status == Tournament.Status.ENDED){
-            TournamentScheduleStatus status = new TournamentScheduleStatus();
-            status.distributionKey(tournamentHeader.index());
-            status.index(null);
-            dataStore.update(status);
-            ConfigurableObject configurableObject = new ConfigurableObject();
-            configurableObject.distributionKey(tournamentHeader.index());
-            applicationPreSetup.load(application,configurableObject);
-            configurableObject.released();
-            return false;
+        byte[] lockKey = tournamentHeader.index().getBytes();
+        try{
+            clusterStore.lock(lockKey);
+            tournamentHeader.dataStore(this.dataStore);
+            if(tournamentHeader.status == Tournament.Status.ENDED) return false;
+                //TournamentScheduleStatus status = new TournamentScheduleStatus();
+                //status.distributionKey(tournamentHeader.index());
+                //status.index(null);
+                //dataStore.update(status);
+                //ConfigurableObject configurableObject = new ConfigurableObject();
+                //configurableObject.distributionKey(tournamentHeader.index());
+                //applicationPreSetup.load(application,configurableObject);
+                //configurableObject.released();
+                //return false;
+            //}
+            launch(tournamentHeader);
+            return true;
+        }finally {
+            clusterStore.unlock(lockKey);
         }
-        launch(tournamentHeader);
-        return true;
+        //return true;
     }
 
     private void createSchedule(TournamentSchedule schedule){
@@ -384,12 +419,19 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         dataStore.update(status);
     }
 
+
+    public void closeTournament(String tournamentId){
+        TournamentHeaderIndex index = tournamentIndex.get(tournamentId);
+        if(index==null) return;
+        index.tournamentHeader.close();
+    }
+
     public void endTournamentForcefully(String tournamentId){
         logger.warn("Tournament forcefully end ->"+tournamentId);
         TournamentHeaderIndex tournamentHeaderIndex = tournamentIndex.remove(tournamentId);
         if(tournamentHeaderIndex!=null) {
             tournamentHeaderIndex.tournamentHeader.pendingSchedule.cancel(true);
-            onTournamentEnd(tournamentHeaderIndex.tournamentHeader);
+            endTournament(tournamentHeaderIndex.tournamentHeader);
         }
     }
 

@@ -2,16 +2,14 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.TimeUtil;
 
-import java.time.LocalDateTime;
 
-public class TournamentStartMonitor implements SchedulingTask {
+public class TournamentRegisterTask implements SchedulingTask {
 
     private final Tournament tournamentHeader;
     private final PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentStartMonitor(Tournament tournamentHeader, PlatformTournamentServiceProvider tournamentServiceProvider){
+    public TournamentRegisterTask(TournamentHeader tournamentHeader, PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
         this.tournamentServiceProvider = tournamentServiceProvider;
     }
@@ -27,12 +25,11 @@ public class TournamentStartMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        if(TimeUtil.expired(tournamentHeader.startTime())) return 3000;
-        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),tournamentHeader.startTime());
+        return 1000;
     }
 
     @Override
     public void run() {
-        this.tournamentServiceProvider.onTournamentStart(tournamentHeader);
+        this.tournamentServiceProvider.onTournamentRegister(tournamentHeader);
     }
 }

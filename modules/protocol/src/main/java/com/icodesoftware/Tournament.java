@@ -34,7 +34,7 @@ public interface Tournament extends Configurable {
 
     String register(String systemId);
 
-    void close();
+    //void close();
 
 
     interface Entry extends Configurable {

@@ -199,7 +199,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
 
 
     public void onCloseTournament(String tournamentId){
-        this.tournamentServiceProvider.tournament(tournamentId).close();
+        this.tournamentServiceProvider.closeTournament(tournamentId);
     }
 
     public void onEndTournament(String tournamentId){
