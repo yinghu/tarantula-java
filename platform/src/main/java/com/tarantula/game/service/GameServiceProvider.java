@@ -179,32 +179,11 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         return achievementServiceProvider;
     }
     //tournament service provider hook calls
-    public TournamentServiceProvider tournamentServiceProvider(){
+    public PlatformTournamentServiceProvider tournamentServiceProvider(){
         return this.tournamentServiceProvider;
     }
 
-    public Tournament onTournament(String tournamentId){ //register node
-        return this.tournamentServiceProvider.tournament(tournamentId);
-    }
 
-    public Tournament.Instance onInstance(String tournamentId,String instanceId){//play node
-        return this.tournamentServiceProvider.instance(tournamentId,instanceId);
-    }
-    public Tournament.Instance onInstance(String instanceId) { //play node
-        return this.tournamentServiceProvider.instance(instanceId);
-    }
-    public Tournament.RaceBoard onRaceBoard(String instanceId){
-        return this.tournamentServiceProvider.instance(instanceId).raceBoard();
-    }
-
-
-    public void onCloseTournament(String tournamentId){
-        this.tournamentServiceProvider.closeTournament(tournamentId);
-    }
-
-    public void onEndTournament(String tournamentId){
-        this.tournamentServiceProvider.endTournamentForcefully(tournamentId);
-    }
 
     public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(itemServiceProvider.name())){
