@@ -65,9 +65,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean available(String tournamentId) {
-        TournamentHeader tournament = new TournamentHeader();
-        tournament.distributionKey(tournamentId);
-        return dataStore.load(tournament);
+        return tournamentIndex.get(tournamentId)!=null;
     }
 
     @Override
@@ -292,14 +290,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
             if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
             if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
-            if(TimeUtil.expired(schedule.startTime())) throw new RuntimeException("start time already expired");
-            t.registered();
             switch (schedule.schedule()){
                 case Tournament.DAILY_SCHEDULE:
                 case Tournament.WEEKLY_SCHEDULE:
                 case Tournament.MONTHLY_SCHEDULE:
                     LocalDateTime _current = LocalDateTime.now();
-                    if(schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear()) throw new RuntimeException("start time already expired on daily midnight launch");
+                    if(TimeUtil.expired(schedule.startTime())
+                            || (schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear())) throw new RuntimeException("start time already expired on daily midnight launch");
                     createSchedule(schedule);
                     break;
                 case Tournament.ON_DEMAND_SCHEDULE:
@@ -309,6 +306,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 default:
                     throw new RuntimeException("schedule plan not supported ["+schedule.schedule()+"]");
             }
+            t.registered();
         }finally {
             clusterStore.unlock(lockKey);
         }
@@ -321,15 +319,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             TournamentScheduleStatus status = new TournamentScheduleStatus();
             status.distributionKey(t.distributionKey());
             dataStore.createIfAbsent(status, true);
-            if (status.index() == null) {
+            if (status.index() == null) { //cancel schedule
                 lookupScheduleKey.removeKey(t.distributionKey());
                 lookupScheduleKey.update();
                 t.released();
-                distributionItemService.release(gameServiceName, name(), t.configurationTypeId(), t.distributionKey());
                 return;
             }
+            if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
+            //forcefully end tournament
             distributionTournamentService.endTournament(gameServiceName, status.index());
-            distributionItemService.release(gameServiceName, name(), t.configurationTypeId(), t.distributionKey());
+            distributionItemService.release(gameServiceName, name(), t.configurationTypeId(),status.index());
         }finally {
             clusterStore.unlock(lockKey);
         }
@@ -355,7 +354,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onRelease(String category, String itemId) {
-        tournamentIndex.remove(itemId);
+        TournamentHeaderIndex index = tournamentIndex.remove(itemId);
+        if(index==null) return false;
+        listeners.forEach(l->l.tournamentClosed(index.tournamentHeader));
         return false;
     }
 
@@ -368,16 +369,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             clusterStore.lock(lockKey);
             tournamentHeader.dataStore(this.dataStore);
             if(tournamentHeader.status == Tournament.Status.ENDED) return false;
-                //TournamentScheduleStatus status = new TournamentScheduleStatus();
-                //status.distributionKey(tournamentHeader.index());
-                //status.index(null);
-                //dataStore.update(status);
-                //ConfigurableObject configurableObject = new ConfigurableObject();
-                //configurableObject.distributionKey(tournamentHeader.index());
-                //applicationPreSetup.load(application,configurableObject);
-                //configurableObject.released();
-                //return false;
-            //}
             launch(tournamentHeader);
             return true;
         }finally {
@@ -428,7 +419,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     public void endTournamentForcefully(String tournamentId){
         logger.warn("Tournament forcefully end ->"+tournamentId);
-        TournamentHeaderIndex tournamentHeaderIndex = tournamentIndex.remove(tournamentId);
+        TournamentHeaderIndex tournamentHeaderIndex = tournamentIndex.get(tournamentId);
         if(tournamentHeaderIndex!=null) {
             tournamentHeaderIndex.tournamentHeader.pendingSchedule.cancel(true);
             endTournament(tournamentHeaderIndex.tournamentHeader);
