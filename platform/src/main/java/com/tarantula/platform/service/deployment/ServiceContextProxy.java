@@ -95,4 +95,8 @@ public class ServiceContextProxy implements ServiceContext {
     public String deployDirectory(){
         return this.tarantulaContext.deployDirectory();
     }
+
+    public String servicePushAddress(){
+        return tarantulaContext.servicePushAddress();
+    }
 }

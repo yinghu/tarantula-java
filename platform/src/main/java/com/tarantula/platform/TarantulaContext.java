@@ -82,6 +82,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
     public String deployDir;
+
+    public String servicePushAddress;
     public String singleModuleApplication;
 
     public  String eventThreadPoolSetting;
@@ -431,6 +433,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public String clusterNameSuffix(){
          return this.clusterNameSuffix;
+    }
+
+    public String servicePushAddress(){
+         return servicePushAddress;
     }
 
     //list the database list on deploy service

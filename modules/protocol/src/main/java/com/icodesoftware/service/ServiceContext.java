@@ -25,6 +25,8 @@ public interface ServiceContext {
     String bucketId();
     String nodeId();
 
+    String servicePushAddress();
+
     String deployDirectory();
 
     RecoverableRegistry recoverableRegistry(int registryId);
