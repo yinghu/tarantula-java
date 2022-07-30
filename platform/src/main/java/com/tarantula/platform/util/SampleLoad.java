@@ -1,11 +1,13 @@
 package com.tarantula.platform.util;
 
+
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.UUID;
@@ -13,6 +15,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 
 public class SampleLoad {
     private final String host;
@@ -114,13 +120,23 @@ public class SampleLoad {
         //SampleLoad sampleLoad = new SampleLoad("http://10.0.0.153:8090",null,100000);
         //sampleLoad._init();
         //sampleLoad.register();
-        PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");
-        presenceFetcher._init();
-        OnSession onSession = presenceFetcher.login("mop","mop");
-        System.out.println(onSession.token());
-        PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.9:8090");
-        presenceFetcher1._init();
-        presenceFetcher1.play(onSession.token());
+        //PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");
+        //presenceFetcher._init();
+        //OnSession onSession = presenceFetcher.login("mop","mop");
+        //System.out.println(onSession.token());
+        //PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.9:8090");
+        //presenceFetcher1._init();
+        //presenceFetcher1.play(onSession.token());
+
+        Region region = Region.US_WEST_2;
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(()->AwsBasicCredentials.create("AKIAXFCYWT3U2D77MNWM","klvu5syA4q4I/6cf+kfsaIKVnVOS9bQpFLERX9uT"))
+                .build();
+        s3.listBuckets().buckets().forEach(b->{
+            System.out.println(b.name());
+        });
+
     }
 
 }
