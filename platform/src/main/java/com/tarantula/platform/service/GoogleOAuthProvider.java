@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Map;
@@ -8,7 +9,7 @@ public class GoogleOAuthProvider extends AuthObject {
 
     private Map<String,GoogleOAuthTokenValidator> googleIdTokenVerifiers;
     public GoogleOAuthProvider(Map<String,GoogleOAuthTokenValidator> validatorMappings){
-        super("google","","","","","",new String[0]);
+        super(OnAccess.GOOGLE,"","","","","",new String[0]);
         this.googleIdTokenVerifiers = validatorMappings;
     }
     @Override

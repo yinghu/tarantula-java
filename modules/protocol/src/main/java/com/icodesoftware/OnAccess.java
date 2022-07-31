@@ -18,6 +18,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String GOOGLE = "google";
     String STRIPE = "stripe";
     String FACEBOOK = "facebook";
+    String AMAZON = "amazon";
 
     String APPLE_STORE = "appleStore";
     String GAME_CENTER = "gameCenter";

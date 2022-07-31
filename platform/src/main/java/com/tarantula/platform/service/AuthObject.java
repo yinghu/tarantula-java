@@ -1,12 +1,13 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.service.CloudServiceProvider;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.Map;
 
-public class AuthObject implements TokenValidatorProvider.AuthVendor {
+public class AuthObject implements TokenValidatorProvider.AuthVendor, CloudServiceProvider {
 
     protected static String ACCEPT = "Accept";
     protected static String ACCEPT_JSON = "application/json";
@@ -83,6 +84,11 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     }
     @Override
     public boolean validate(Map<String,Object> params){
+        return false;
+    }
+
+    @Override
+    public boolean upload(String s, byte[] bytes) {
         return false;
     }
 }
