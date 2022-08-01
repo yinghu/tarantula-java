@@ -13,6 +13,8 @@
     {"type": "category","name": "ShoppingItem"},
     {"type": "category","name": "AchievementAwardItem"},
     {"type": "category","name": "TournamentSchedule"},
-    {"type": "category","name": "TournamentPrize"}
+    {"type": "category","name": "TournamentPrize"},
+    {"type": "category","name": "AwsIamConfiguration"}
+
   ]
 }

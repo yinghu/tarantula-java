@@ -89,39 +89,48 @@
         </div> 
     </div>
     <!-- upload form -->
-    <div class="w3-card-4 w3-border w3-round w3-white tx-popup-w300-h200" id="tx-create-asset-upload-board">
+    <div class="w3-card-4 w3-border w3-round w3-white tx-popup-w300-h248" id="tx-create-asset-upload-board">
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
-            <div class="w3-display-topright w3-padding">
-                <!--<span><i class="fa fa-close" style="font-size:12px"></i></span>-->            
-            </div>
             <div class="w3-display-topleft w3-padding">
                 <span><i class="fa fa-upload w3-text-yellow tx-margin-top-4" style="font-size:16px;color: green;"></i></span>
                 <span id='tx-create-asset-upload-message' class="tx-margin-left-8 tx-text-12">Warning</span>
             </div>
         </div>
-        <div class="w3-display-container" style="height: 128px;">
-            <div class="w3-display-topleft tx-margin-left-8 tx-margin-top-8">
-                <span id='tx-create-asset-upload-progress' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">Pending</span>
+        <div class="w3-display-container" style="height: 16px">
+            <div class="w3-container tx-margin-top-8">
+                <div class="w3-border">
+                    <div id="tx-create-asset-upload-progress" class="w3-green" style="height:16px;width:1%"></div>
+                </div>
             </div>
-            <div class="w3-display-topright tx-margin-top-8 tx-margin-right-16">
-                <span class="w3-padding w3-right w3-text-orange tx-margin-right-16" id="tx-create-asset-upload-view-spin">
-                    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-                </span>
+        </div>
+        <div class="w3-display-container" style="height: 48px;">
+            <div class="w3-panel">
+                <select id='tx-upload-vendor' class="w3-select w3-border w3-round tx-text-10" name='vendor'>
+                    <option value="" disabled selected>Choose Upload Service Vendor</option>
+                    <option value="amazon">Amazon S3</option>
+                    <option value="google">Goolge Storage</option>   
+                </select>
             </div>
-            <div class="w3-display-left tx-margin-left-8 tx-margin-bottom-8">
-                <span id='tx-create-asset-upload-file' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12">uploading file</span>
+        </div> 
+        <div class="w3-display-container" style="height: 16px;">
+            <div class="w3-container w3-center tx-margin-top-4">
+                <span id='tx-create-asset-upload-file' class="tx-text-12">Choose Icon To Upload (PNG ONLY)</span>
             </div>
-            <div class="w3-display-right tx-margin-right-8 tx-margin-bottom-8">
-                <span id='tx-create-asset-upload-ok' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Upload</span>
+        </div>
+        <div class="w3-display-container" style="height: 32px;">
+            <div class="w3-panel">
+                <span id='tx-create-asset-upload-ok' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button" style="display: block;">Upload</span>
             </div>
-            <div class="w3-display-bottomleft tx-margin-left-8 tx-margin-bottom-8">
+        </div>  
+        <div class="w3-display-container" style="height: 30px;">    
+            <div class="w3-display-bottomleft tx-margin-left-16 tx-margin-bottom-8">
                 <span id="tx-create-asset-upload-cancel" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Cancel</span>     
             </div>
-            <div class="w3-display-bottomright tx-margin-right-8 tx-margin-bottom-8">
-                <label for="tx-item-upload-file" class="tx-file-upload w3-round">
-                    <span class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Choose File</span>
+            <div class="w3-display-bottomright tx-margin-right-16">
+                <label for="tx-item-upload-file"" class="tx-file-upload w3-round">
+                    <span class="w3-tag w3-right w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button">Choose File</span>
                 </label>
-                <input id ="tx-item-upload-file" type="file"/>
+                <input id ="tx-item-upload-file"" type="file"/>
             </div>
         </div>
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -157,7 +166,7 @@
     });
     assetForm.innerHTML = props.join('');  
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},'{}');
-    let pendingUpload ={};
+    let pendingUpload ={ready:false,progress:1};
     if(TARA_API.query().operation == 'Update'){
         populate(TARA_API.query().pendingUpdate);
     }
@@ -219,10 +228,11 @@
             let pname = a.getAttribute('tx-property-name');
             document.querySelector("#tx-create-asset-upload-message").innerHTML = "Upload File";
             document.querySelector('#tx-create-asset-upload-board').style.display = 'block'; 
-            document.querySelector('#tx-create-asset-upload-ok').style.display = 'none';
-            document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none'; 
+            //document.querySelector('#tx-create-asset-upload-ok').style.display = 'none';
+            //document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none'; 
             console.log("upload ->"+pname);
             pendingUpload.property = pname;
+            pendingUpload.vendor = "local";
         };    
     });
     document.querySelector("#tx-item-upload-file").onchange = (e)=>{
@@ -233,15 +243,22 @@
         var reader = new FileReader();
         reader.onloadend = (fe)=>{
             pendingUpload.data = reader.result;
-            document.querySelector("#tx-create-asset-upload-ok").style.display = 'block'; 
+            //document.querySelector("#tx-create-asset-upload-ok").style.display = 'block'; 
+            pendingUpload.ready = true; 
         };
         reader.readAsArrayBuffer(_fd); 
     }; 
     document.querySelector('#tx-create-asset-upload-cancel').onclick=()=>{
         document.querySelector('#tx-create-asset-upload-board').style.display = 'none';
     };
+    document.querySelector('#tx-upload-vendor').onchange = ()=>{
+        pendingUpload.vendor = document.querySelector('#tx-upload-vendor').value;
+    };
     document.querySelector('#tx-create-asset-upload-ok').onclick=()=>{
-        document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'block';
+        if(!pendingUpload.ready){ 
+            document.querySelector("#tx-create-asset-upload-file").innerHTML = 'Select asset file first!'; 
+            return;
+        }
         let f =  pendingUpload.file;
         let sfx = f.name.split('.').pop();
         let ctype = 'text/html';
@@ -254,13 +271,23 @@
         else if(sfx=='jpg'||sfx=='jpeg'){
             ctype = 'image/jpeg';
         }
-        TARA_API.onUpload(pendingUpload.data,f.name,ctype,TARA_API.query().gameClusterId,(resp)=>{
+        console.log(pendingUpload.vendor);
+        TARA_API.onUpload(pendingUpload.data,f.name,ctype,TARA_API.query().gameClusterId+"#"+pendingUpload.vendor,(resp)=>{
             if(resp.successful){
                 document.querySelector('#tx-asset-property-'+pendingUpload.property).value = resp.message;
-                document.querySelector('#tx-create-asset-upload-board').style.display = 'none';     
+                document.querySelector('#tx-create-asset-upload-progress').style.width = '1%'; 
+                pendingUpload = {ready:false,progress:1};
+                document.querySelector('#tx-create-asset-upload-board').style.display = 'none';
+
             }else{
-                document.querySelector("#tx-create-asset-upload-progress").innerHTML = 'try again'; 
-                document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none';
+                console.log(resp);
+                if(resp.code == 0 || resp.code == 200){
+                    pendingUpload.progress += 20;
+                    document.querySelector('#tx-create-asset-upload-progress').style.width = pendingUpload.progress+'%'; 
+                }else{
+                    document.querySelector("#tx-create-asset-upload-file").innerHTML = "something wrong, try again";  
+                    pendingUpload = {ready:false,progress:1};
+                }
             }   
         });
     };

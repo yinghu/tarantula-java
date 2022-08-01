@@ -1,0 +1,37 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "application-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "application.data",
+        "type": "AwsIamConfiguration",
+        "description": "access category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "AccessKeyId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SecretAccessKey",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

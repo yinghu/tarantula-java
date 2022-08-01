@@ -57,7 +57,8 @@ public class UploadEventHandler implements RequestHandler {
             if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.admin.accessControl()) {
                 throw new RuntimeException("no access permission");
             }
-            GameCluster gameCluster = deploymentServiceProvider.gameCluster(typeId);
+            String[] query = typeId.split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
             if(gameCluster==null){
                 throw new RuntimeException("no game cluster setup");
             }
@@ -66,7 +67,8 @@ public class UploadEventHandler implements RequestHandler {
             InputStream in = exchange.onStream();
             byte[] data = in.readAllBytes();
             String fn = gameClusterName+ path.substring(path.lastIndexOf("/"));
-            //log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]");
+            //tokenValidator.authVendor(OnAccess.AMAZON).upload(fn,data);
+            log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
             boolean suc = deployService.upload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
         }

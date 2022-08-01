@@ -515,4 +515,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         access.role(rMap.get("player").name());
         return udataStore.update(access);
     }
+
+    public void registerAuthVendor(AuthVendor authVendor){}
+    public void releaseAuthVendor(AuthVendor authVendor){}
 }

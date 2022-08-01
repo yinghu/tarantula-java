@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
+import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
@@ -39,6 +40,8 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     private PlatformTournamentServiceProvider tournamentServiceProvider;
     private PlatformPresenceServiceProvider presenceServiceProvider;
     private PlatformInboxServiceProvider inboxServiceProvider;
+
+    private PlatformConfigurationServiceProvider configurationServiceProvider;
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -97,6 +100,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         this.roomServiceProvider = new PlatformRoomServiceProvider(gameCluster);
         this.roomServiceProvider.setup(serviceContext);
         this.roomServiceProvider.waitForData();
+        this.configurationServiceProvider = new PlatformConfigurationServiceProvider(gameCluster);
+        this.configurationServiceProvider.setup(serviceContext);
+        this.configurationServiceProvider.waitForData();
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
@@ -120,6 +126,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         this.presenceServiceProvider.start();
         this.inboxServiceProvider.start();
         this.roomServiceProvider.start();
+        this.configurationServiceProvider.start();
     }
 
     @Override
@@ -130,6 +137,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         this.tournamentServiceProvider.shutdown();
         this.itemServiceProvider.shutdown();
         this.roomServiceProvider.shutdown();
+        this.configurationServiceProvider.shutdown();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
     public DataStore serviceDataStore(){

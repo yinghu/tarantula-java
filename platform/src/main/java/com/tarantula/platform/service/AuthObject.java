@@ -1,13 +1,13 @@
 package com.tarantula.platform.service;
 
-import com.icodesoftware.service.CloudServiceProvider;
+
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.Map;
 
-public class AuthObject implements TokenValidatorProvider.AuthVendor, CloudServiceProvider {
+public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
     protected static String ACCEPT = "Accept";
     protected static String ACCEPT_JSON = "application/json";
