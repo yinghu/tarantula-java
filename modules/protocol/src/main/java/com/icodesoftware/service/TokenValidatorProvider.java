@@ -46,6 +46,8 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     boolean revokeAccess(Access access);
     List<Access.Role> list();
     AuthVendor authVendor(String name);
+    void registerAuthVendor(AuthVendor authVendor);
+    void releaseAuthVendor(AuthVendor authVendor);
     void onCheck(OnLobby onLobby);
     boolean checkSubscription(String systemId);
     int updateSubscription(String systemId,int months);
@@ -61,5 +63,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
         void registerMetricsLister(MetricsListener metricsListener);
         void setup(ServiceContext serviceContext);
         boolean validate(Map<String,Object> params);
+        boolean upload(String context,byte[] content);
     }
 }
