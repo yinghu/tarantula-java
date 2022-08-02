@@ -14,7 +14,6 @@
     {"type": "category","name": "AchievementAwardItem"},
     {"type": "category","name": "TournamentSchedule"},
     {"type": "category","name": "TournamentPrize"},
-    {"type": "category","name": "AwsIamConfiguration"}
-
+    {"type": "category","name": "AwsS3Configuration"}
   ]
 }

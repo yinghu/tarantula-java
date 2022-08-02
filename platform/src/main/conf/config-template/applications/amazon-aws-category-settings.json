@@ -9,13 +9,27 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AwsIamConfiguration",
+        "type": "AwsS3Configuration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false
       },
       "application": {
         "properties": [
+          {
+            "name": "Region",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Bucket",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
           {
             "name": "AccessKeyId",
             "type": "string",
