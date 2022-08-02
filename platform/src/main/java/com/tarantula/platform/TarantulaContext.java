@@ -636,6 +636,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
         if(name.equals(OnAccess.GOOGLE_STORE)) return loadGoogleStoreCredentials();
 
+        if(name.equals(OnAccess.AMAZON)) return loadAmazonAwsCredentials();
+
         return null;
 
     }
@@ -710,6 +712,23 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.close();
             GsonBuilder gb = new GsonBuilder();
             gb.registerTypeAdapter(AuthObject.class,new AppleStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthObject.class);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private AuthObject loadAmazonAwsCredentials(){
+        try{
+            String config = this.authContext+"-amazon-iam-credentials.json";
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            in.close();
+            GsonBuilder gb = new GsonBuilder();
+            gb.registerTypeAdapter(AuthObject.class,new AmazonAuthCredentialsDeserializer());
             return gb.create().fromJson(new String(data),AuthObject.class);
         }catch (Exception ex){
             ex.printStackTrace();

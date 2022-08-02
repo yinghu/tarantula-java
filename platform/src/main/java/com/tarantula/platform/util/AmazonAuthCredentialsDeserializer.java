@@ -15,18 +15,13 @@ public class AmazonAuthCredentialsDeserializer implements JsonDeserializer<AuthO
         HashMap<String, AmazonAWSProvider> _validators = new HashMap<>();
         ja.forEach(a->{
             String typeId = a.getAsJsonObject().get("typeId").getAsString();
-            String accessKey = a.getAsJsonObject().get("access_key").getAsString();
-            JsonObject android = a.getAsJsonObject().get("android").getAsJsonObject();
-            String applicationId = android.get("application_id").getAsString();
-            String verifyUri = android.get("verify_uri").getAsString();
-            JsonObject jo = a.getAsJsonObject().get("web").getAsJsonObject();
-            String clientId = jo.getAsJsonPrimitive("client_id").getAsString();
-            String secureKey = jo.getAsJsonPrimitive("client_secret").getAsString();
-            String authUri = jo.getAsJsonPrimitive("auth_uri").getAsString();
-            String tokenUri = jo.getAsJsonPrimitive("token_uri").getAsString();
-            String certUri = jo.getAsJsonPrimitive("auth_provider_x509_cert_url").getAsString();
-            //_validators.put(typeId,new GoogleOAuthTokenValidator(typeId,clientId,secureKey,authUri,tokenUri,certUri,verifyUri,applicationId,accessKey));
+            JsonObject iam = a.getAsJsonObject().get("iam").getAsJsonObject();
+            String region = iam.get("region").getAsString();
+            String bucket = iam.get("bucket").getAsString();
+            String accessKeyId = iam.get("access_key_id").getAsString();
+            String secureKey = iam.get("secret_access_key").getAsString();
+            _validators.put(typeId,new AmazonAWSProvider(region,bucket,accessKeyId,secureKey));
         });
-        return new AmazonCloudServiceProvider(_validators);
+        return new AmazonServiceProvider(_validators);
     }
 }

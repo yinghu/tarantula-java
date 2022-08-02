@@ -67,7 +67,10 @@ public class UploadEventHandler implements RequestHandler {
             InputStream in = exchange.onStream();
             byte[] data = in.readAllBytes();
             String fn = gameClusterName+ path.substring(path.lastIndexOf("/"));
-            //tokenValidator.authVendor(OnAccess.AMAZON).upload(fn,data);
+            TokenValidatorProvider.AuthVendor authVendor = tokenValidator.authVendor(query[1]);
+            if(authVendor != null){
+                authVendor.upload(gameClusterName.toLowerCase()+"#"+fn,data);
+            }
             log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
             boolean suc = deployService.upload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));

@@ -404,6 +404,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             googleStore.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE_STORE,googleStore);
         }
+        AuthVendor amazonAws = this.serviceContext.authVendor(OnAccess.AMAZON);
+        if(amazonAws!=null){
+            amazonAws.registerMetricsLister(this.deploymentServiceProvider);
+            amazonAws.setup(serviceContext);
+            aMap.put(OnAccess.AMAZON,amazonAws);
+        }
     }
 
     @Override
