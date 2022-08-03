@@ -24,7 +24,7 @@
             "downloadable": false
           },
           {
-            "name": "Icon",
+            "name": "IconURL",
             "type": "string",
             "reference": "String",
             "nullable": false,

@@ -17,6 +17,13 @@
       "application": {
         "properties": [
           {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "Region",
             "type": "string",
             "reference": "String",
