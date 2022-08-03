@@ -29,12 +29,16 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected static String SETTINGS_KEY = "10";
 
+    protected static String SCOPE_KEY = "11";
+
 
     protected String configurationType;
     protected String configurationTypeId;
     protected String configurationName;
     protected String configurationCategory;
     protected String configurationVersion;
+
+    protected String configurationScope;
 
     protected JsonObject header = new JsonObject();
     protected JsonObject application = new JsonObject();
@@ -51,6 +55,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = configurableObject.configurationName;
         this.configurationCategory = configurableObject.configurationCategory;
         this.configurationVersion = configurableObject.configurationVersion;
+        this.configurationScope = configurableObject.configurationScope;
         this.disabled = configurableObject.disabled;
         this.header = configurableObject.header;
         this.application = configurableObject.application;
@@ -128,6 +133,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.properties.put(APPLICATION_KEY,application.toString());
         this.properties.put(REFERENCE_KEY,reference.toString());
         this.properties.put(SETTINGS_KEY,_configurableSetting.toString());
+        this.properties.put(SCOPE_KEY,configurationScope);
         return this.properties;
     }
 
@@ -143,6 +149,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
         this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
         this._configurableSetting = JsonUtil.parse((String) properties.getOrDefault(SETTINGS_KEY, "{}"));
+        this.configurationScope = (String) properties.get(SCOPE_KEY);
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -249,6 +256,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
 
     public void configurableSetting(ConfigurableSetting configurableSetting){
+        configurationScope = configurableSetting.scope;
         configurableSetting.properties.forEach(e->{
             String fn = e.getAsJsonObject().get("name").getAsString();
             if(_configurableSetting.has(fn)) _configurableSetting.remove(fn);

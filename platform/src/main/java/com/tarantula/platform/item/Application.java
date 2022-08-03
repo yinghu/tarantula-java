@@ -45,6 +45,7 @@ public class Application extends ConfigurableObject implements Configurable.List
 
     @Override
     public boolean configureAndValidate(){
+        if(configurationScope.endsWith("data")) return true;
         setup();
         return validated;
     }

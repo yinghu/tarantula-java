@@ -51,6 +51,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     }
     @Override
     public <T extends Configurable> void register(T t) {
+        logger.warn(t.configurationCategory()+">>>"+t.distributionKey());
         t.registered();
         //distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
