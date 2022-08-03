@@ -191,6 +191,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         return this.tournamentServiceProvider;
     }
 
+    public PlatformConfigurationServiceProvider configurationServiceProvider(){return this.configurationServiceProvider;}
 
 
     public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){

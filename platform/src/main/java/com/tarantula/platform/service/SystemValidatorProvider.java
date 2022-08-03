@@ -522,6 +522,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return udataStore.update(access);
     }
 
-    public void registerAuthVendor(AuthVendor authVendor){}
+    public void registerAuthVendor(AuthVendor authVendor){
+        //aMap.get(authVendor.name())
+    }
     public void releaseAuthVendor(AuthVendor authVendor){}
 }

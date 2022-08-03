@@ -5,10 +5,11 @@ import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MappingObject;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 
 
-public class KeyValueDataStoreModule implements Module {
+public class KeyValueDataStoreModule implements Module,Configurable.Listener<ConfigurableObject>{
 
     private ApplicationContext context;
     private DataStore dataStore;
@@ -56,6 +57,7 @@ public class KeyValueDataStoreModule implements Module {
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         this.dataStore = this.gameServiceProvider.serviceDataStore();
         this.maxSizeOnSet = ((Number)this.gameServiceProvider.configuration().property("maxSizeOnSet")).intValue();
+        this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Data store module ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }
 
