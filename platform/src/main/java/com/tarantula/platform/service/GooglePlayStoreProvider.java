@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ public class GooglePlayStoreProvider extends AuthObject{
     private Map<String,GoogleStorePurchaseValidator> googleStorePurchaseValidators;
 
     public GooglePlayStoreProvider(Map<String,GoogleStorePurchaseValidator> validatorMappings){
-        super("googleStore","","","","","",new String[0]);
+        super(OnAccess.GOOGLE_STORE,"","","","","",new String[0]);
         this.googleStorePurchaseValidators  = validatorMappings;
     }
 

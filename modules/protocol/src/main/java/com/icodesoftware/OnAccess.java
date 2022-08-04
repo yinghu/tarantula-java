@@ -51,6 +51,9 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String SYSTEM_ID = "systemId";
     String SERVICE_TYPE_ID = "serviceTypeId";
+    String TYPE_ID = "typeId";
+    String PROVIDER = "provider";
+
 
     Object property(String name);
     void property(String name,Object value);

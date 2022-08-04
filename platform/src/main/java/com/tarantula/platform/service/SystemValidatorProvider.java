@@ -523,7 +523,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public void registerAuthVendor(AuthVendor authVendor){
-        //aMap.get(authVendor.name())
+        
     }
     public void releaseAuthVendor(AuthVendor authVendor){}
 }
