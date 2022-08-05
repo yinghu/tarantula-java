@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AwsS3Configuration",
+        "type": "AppleStoreConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false
@@ -24,28 +24,14 @@
             "downloadable": false
           },
           {
-            "name": "Region",
+            "name": "VerifyUrl",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "Bucket",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AccessKeyId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SecretAccessKey",
+            "name": "SecretKey",
             "type": "string",
             "reference": "String",
             "nullable": false,

@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AwsS3Configuration",
+        "type": "GooglePlayConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false
@@ -24,28 +24,48 @@
             "downloadable": false
           },
           {
-            "name": "Region",
+            "name": "VerifyUrl",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "Bucket",
+            "name": "SecretKey",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.data",
+        "type": "GoogleStoreConfiguration",
+        "description": "access category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Provider",
+            "type": "enum",
+            "reference": "Provider",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "VerifyUrl",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "AccessKeyId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SecretAccessKey",
+            "name": "SecretKey",
             "type": "string",
             "reference": "String",
             "nullable": false,

@@ -213,6 +213,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         if(serviceName.equals(lobbyServiceProvider.name())){
             return lobbyServiceProvider;
         }
+        if(serviceName.equals(configurationServiceProvider.name())){
+            return configurationServiceProvider;
+        }
         return null;
     }
 

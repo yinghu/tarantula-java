@@ -9,12 +9,14 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
+import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.ClusterConfigurationCallback;
 
 import java.util.List;
 
-public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider{
+public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
 
 
     private GameCluster gameCluster;
@@ -23,6 +25,10 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ApplicationPreSetup applicationPreSetup;
     private TokenValidatorProvider tokenValidatorProvider;
+
+    private DistributionItemService distributionItemService;
+
+    private ServiceContext serviceContext;
 
     public PlatformConfigurationServiceProvider(GameCluster gameCluster){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
@@ -56,23 +62,37 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     }
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn(t.configurationCategory()+">>>"+t.distributionKey());
         t.registered();
-        //distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        //this.tokenValidatorProvider.releaseAuthVendor();
-
+        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
+
+    public boolean onRegister(String category,String itemId){
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory("item");
+        if(!applicationPreSetup.load(app,configurableObject)){
+            return false;
+        }
+        return true;
+    }
+    public boolean onRelease(String category,String itemId){
+        logger.warn("CAT->"+category+">>>"+itemId);
+        return false;
+    }
+
+
     @Override
     public void setup(ServiceContext serviceContext) {
-        //this.serviceContext = serviceContext;
+        this.serviceContext = serviceContext;
         this.tokenValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         this.applicationPreSetup = gameCluster.applicationPreSetup();
-        //this.presenceDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
-        //this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
+        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Configuration service provider started on ->"+gameServiceName);
     }

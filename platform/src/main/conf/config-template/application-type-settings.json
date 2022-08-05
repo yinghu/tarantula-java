@@ -14,6 +14,10 @@
     {"type": "category","name": "AchievementAwardItem"},
     {"type": "category","name": "TournamentSchedule"},
     {"type": "category","name": "TournamentPrize"},
-    {"type": "category","name": "AwsS3Configuration"}
+    {"type": "category","name": "AwsS3Configuration"},
+    {"type": "category","name": "AppleStoreConfiguration"},
+    {"type": "category","name": "FacebookConfiguration"},
+    {"type": "category","name": "GooglePlayConfiguration"},
+    {"type": "category","name": "GoogleStoreConfiguration"}
   ]
 }

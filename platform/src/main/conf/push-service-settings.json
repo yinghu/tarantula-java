@@ -1,6 +1,5 @@
 {
   "sessionTimeout" : 30000,
   "sessionPoolSize": 100,
-  "receiverTimeout": 1000,
-  "IP": "10.0.0.192"
+  "receiverTimeout": 1000
 }

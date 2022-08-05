@@ -29,13 +29,13 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
 
     @Override
     public String clientId() {
-        return null;
+        throw new RuntimeException("Operation not support");
     }
 
     @Override
     public String clientId(String typeId) {
         TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
-        if(vendor == null) throw new RuntimeException("No author vendor associated with ["+typeId+"]");
+        if(vendor == null) throw new RuntimeException("No auth vendor associated with ["+typeId+"]");
         return vendor.clientId();
     }
 
