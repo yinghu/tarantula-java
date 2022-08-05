@@ -1,24 +1,26 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
-import com.tarantula.platform.service.AuthObject;
+import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.platform.service.AuthVendorRegistry;
 import com.tarantula.platform.service.MockStoreProvider;
+import com.tarantula.platform.service.ThirdPartyServiceProvider;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-
-public class MockStoreCredentialsDeserializer implements JsonDeserializer<AuthObject> {
+public class MockStoreCredentialsDeserializer implements JsonDeserializer<AuthVendorRegistry> {
 
     @Override
-    public AuthObject deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public AuthVendorRegistry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        Map<String,String> serviceKeys = new HashMap<>();
+        List<TokenValidatorProvider.AuthVendor> authList = new ArrayList<>();
         jo.get("serviceKeys").getAsJsonArray().forEach((a)->{
             JsonObject sk = a.getAsJsonObject();
-            serviceKeys.put(sk.get("name").getAsString(),sk.get("key").getAsString());
+            authList.add(new MockStoreProvider(sk.get("name").getAsString(),sk.get("key").getAsString()));
         });
-        return new MockStoreProvider(serviceKeys);
+        return new ThirdPartyServiceProvider(OnAccess.MOCK_STORE,authList);
     }
 }

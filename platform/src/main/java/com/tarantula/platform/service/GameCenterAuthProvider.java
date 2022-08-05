@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -19,7 +20,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 
-public class GameCenterAuthProvider extends AuthObject{
+public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegistry{
 
     private HttpClient client;
 
@@ -70,6 +71,17 @@ public class GameCenterAuthProvider extends AuthObject{
         signature.update(_hash);
         return signature.verify(_signature_bytes);
     }
+
+    @Override
+    public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
+
+    }
+
+    @Override
+    public void releaseAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
+
+    }
+
     private class _X509TrustManager implements X509TrustManager {
         private X509Certificate[] certificate;
         @Override
@@ -90,6 +102,8 @@ public class GameCenterAuthProvider extends AuthObject{
         public X509Certificate[] getAcceptedIssuers() {
             return this.certificate;
         }
+
+
 
     }
 }

@@ -33,7 +33,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,Presence> pMap;
     private HashMap<String,Access.Role> rMap;
-    private HashMap<String,AuthVendor> aMap;
+    private HashMap<String,AuthVendorRegistry> aMap;
     private DataStore pdataStore;//presence
     private DataStore udataStore;//user
     private DataStore adataStore;//account
@@ -215,7 +215,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         String[] sp = accessKey.split("-");
         AccessKey akey = new AccessKey();
         akey.distributionKey(sp[0]);
-        if(!this.deployDataStore.load(akey)|| akey.disabled()) return null;
+        if(!this.deployDataStore.load(akey) || akey.disabled()) return null;
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
         if(gameCluster==null) return null;
         String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
@@ -362,49 +362,49 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.partitionNumber());
         oMap = new ConcurrentHashMap<>();
         fMap = new ConcurrentHashMap<>();
-        AuthVendor google = this.serviceContext.authVendor(OnAccess.GOOGLE);
+        AuthVendorRegistry google = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){
             google.registerMetricsLister(this.deploymentServiceProvider);
             google.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE,(google));
         }
-        AuthVendor facebook = this.serviceContext.authVendor(OnAccess.FACEBOOK);
+        AuthVendorRegistry facebook = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.FACEBOOK);
         if(facebook!=null){
             facebook.registerMetricsLister(this.deploymentServiceProvider);
             facebook.setup(serviceContext);
             aMap.put(OnAccess.FACEBOOK,facebook);
         }
-        AuthVendor appleStore = this.serviceContext.authVendor(OnAccess.APPLE_STORE);
+        AuthVendorRegistry appleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.APPLE_STORE);
         if(appleStore!=null){
             appleStore.registerMetricsLister(this.deploymentServiceProvider);
             appleStore.setup(serviceContext);
             aMap.put(OnAccess.APPLE_STORE,appleStore);
         }
-        AuthVendor gameCenter = this.serviceContext.authVendor(OnAccess.GAME_CENTER);
+        AuthVendorRegistry gameCenter = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GAME_CENTER);
         if(gameCenter!=null){
             gameCenter.registerMetricsLister(this.deploymentServiceProvider);
             gameCenter.setup(serviceContext);
             aMap.put(OnAccess.GAME_CENTER,gameCenter);
         }
-        AuthVendor mockStore = this.serviceContext.authVendor(OnAccess.MOCK_STORE);
+        AuthVendorRegistry mockStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.MOCK_STORE);
         if(mockStore!=null){
             mockStore.registerMetricsLister(this.deploymentServiceProvider);
             mockStore.setup(serviceContext);
             aMap.put(OnAccess.MOCK_STORE,mockStore);
         }
-        AuthVendor stripe = this.serviceContext.authVendor(OnAccess.STRIPE);
+        AuthVendorRegistry stripe = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){
             stripe.registerMetricsLister(this.deploymentServiceProvider);
             stripe.setup(serviceContext);
             aMap.put(OnAccess.STRIPE,(stripe));
         }
-        AuthVendor googleStore = this.serviceContext.authVendor(OnAccess.GOOGLE_STORE);
+        AuthVendorRegistry googleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GOOGLE_STORE);
         if(googleStore!=null){
             googleStore.registerMetricsLister(this.deploymentServiceProvider);
             googleStore.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE_STORE,googleStore);
         }
-        AuthVendor amazonAws = this.serviceContext.authVendor(OnAccess.AMAZON);
+        AuthVendorRegistry amazonAws = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.AMAZON);
         if(amazonAws!=null){
             amazonAws.registerMetricsLister(this.deploymentServiceProvider);
             amazonAws.setup(serviceContext);
@@ -522,8 +522,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return udataStore.update(access);
     }
 
-    public void registerAuthVendor(AuthVendor authVendor){
-        
+    public void registerAuthVendor(String provider,AuthVendor authVendor){
+        aMap.get(provider).registerAuthVendor(authVendor);
     }
-    public void releaseAuthVendor(AuthVendor authVendor){}
+    public void releaseAuthVendor(String provider,AuthVendor authVendor){
+        aMap.get(provider).registerAuthVendor(authVendor);
+    }
 }

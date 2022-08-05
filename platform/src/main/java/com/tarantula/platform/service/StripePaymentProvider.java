@@ -1,15 +1,17 @@
 package com.tarantula.platform.service;
+import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.stripe.Stripe;
 import com.stripe.model.Charge;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class StripePaymentProvider extends AuthObject {
+public class StripePaymentProvider extends AuthObject implements AuthVendorRegistry {
 
 
     public StripePaymentProvider(String clientId, String secureKey) {
-        super("stripe", clientId, secureKey, null, null, null, null);
+        super(OnAccess.STRIPE, clientId, secureKey, null, null, null, null);
     }
 
     @Override
@@ -20,7 +22,7 @@ public class StripePaymentProvider extends AuthObject {
             requestParams.put("amount",params.get("amount"));
             requestParams.put("currency",params.get("currency"));
             requestParams.put("description",params.get("description"));
-            Stripe.apiKey = secureKey();
+            Stripe.apiKey = secureKey;
             Charge c = Charge.create(requestParams);
             boolean paid = c.getPaid();
             if(paid) metricsListener.onUpdated(Metrics.STRIPE_COUNT,1);
@@ -29,5 +31,15 @@ public class StripePaymentProvider extends AuthObject {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
+
+    }
+
+    @Override
+    public void releaseAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
+
     }
 }

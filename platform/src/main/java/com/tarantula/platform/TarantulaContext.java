@@ -621,7 +621,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
  	    }
         this.schedule(new MidnightCheck(this));
     }
-    public TokenValidatorProvider.AuthVendor authVendor(String name){
+    public AuthVendorRegistry authVendor(String name){
  	    if(name.equals(OnAccess.GOOGLE)) return loadGoogleCredentials();
 
  	    if(name.equals(OnAccess.FACEBOOK)) return loadFacebookCredentials();
@@ -641,7 +641,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         return null;
 
     }
-    private AuthObject loadFacebookCredentials(){
+    private AuthVendorRegistry loadFacebookCredentials(){
         try{
             String config = this.authContext+"-facebook-auth.json";
             File f = new File("/etc/tarantula/"+config);
@@ -650,13 +650,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new FacebookAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new FacebookAuthCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             return null;
         }
     }
-    private AuthObject loadGoogleCredentials(){
+    private AuthVendorRegistry loadGoogleCredentials(){
  	    try{
             String config = this.authContext+"-google-auth.json";
             File f = new File("/etc/tarantula/"+config);
@@ -665,13 +665,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new GoogleAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new GoogleAuthCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
  	    }catch (Exception ex){
  	        return null;
         }
     }
-    private AuthObject loadGoogleStoreCredentials(){
+    private AuthVendorRegistry loadGoogleStoreCredentials(){
         try{
             String config = this.authContext+"-google-store.json";
             File f = new File("/etc/tarantula/"+config);
@@ -680,13 +680,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new GoogleStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new GoogleStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             return null;
         }
     }
-    private AuthObject loadStripeCredentials(){
+    private AuthVendorRegistry loadStripeCredentials(){
         try{
             String config = this.authContext+"-stripe-credentials.json";
             File f = new File("/etc/tarantula/"+config);
@@ -695,14 +695,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new StripePaymentCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new StripePaymentCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             return null;
         }
     }
 
-    private AuthObject loadAppleStoreCredentials(){
+    private AuthVendorRegistry loadAppleStoreCredentials(){
         try{
             String config = this.authContext+"-apple-iap-credentials.json";
             File f = new File("/etc/tarantula/"+config);
@@ -711,15 +711,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new AppleStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new AppleStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    private AuthObject loadAmazonAwsCredentials(){
+    private AuthVendorRegistry loadAmazonAwsCredentials(){
         try{
             String config = this.authContext+"-amazon-iam-credentials.json";
             File f = new File("/etc/tarantula/"+config);
@@ -728,15 +728,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new AmazonAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new AmazonAuthCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    private AuthObject loadMockStoreCredentials(){
+    private AuthVendorRegistry loadMockStoreCredentials(){
         try{
             String config = this.authContext+"-mock-store-credentials.json";
             File f = new File("/etc/tarantula/"+config);
@@ -745,8 +745,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
             in.read(data);
             in.close();
             GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthObject.class,new MockStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthObject.class);
+            gb.registerTypeAdapter(AuthVendorRegistry.class,new MockStoreCredentialsDeserializer());
+            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
         }catch (Exception ex){
             ex.printStackTrace();
             return null;

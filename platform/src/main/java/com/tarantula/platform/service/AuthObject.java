@@ -16,13 +16,13 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
     protected static String AUTHORIZATION = "Authorization";
 
-    private  String name;
-    private  String clientId;
-    private  String secureKey;
-    private  String authUri;
-    private  String tokenUri;
-    private  String certUri;
-    private  String[] origins;
+    protected final String name;
+    protected   String clientId;
+    protected   String secureKey;
+    protected   String authUri;
+    protected   String tokenUri;
+    protected   String certUri;
+    protected   String[] origins;
     protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
     public AuthObject(String name,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
@@ -51,30 +51,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
         return this.clientId;
     }
 
-    @Override
-    public String secureKey() {
-        return this.secureKey;
-    }
 
-    @Override
-    public String authUri() {
-        return this.authUri;
-    }
-
-    @Override
-    public String tokenUri() {
-        return this.tokenUri;
-    }
-
-    @Override
-    public String certUri() {
-        return this.certUri;
-    }
-
-    @Override
-    public String[] origins() {
-        return this.origins;
-    }
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;

@@ -5,21 +5,21 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ThirdPartyServiceProvider implements TokenValidatorProvider.AuthVendor {
+public class ThirdPartyServiceProvider implements AuthVendorRegistry {
 
     private final ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> aMap;
     private final String name;
-    private final MetricsListener metricsListener;
-    private final ServiceContext serviceContext;
+    private MetricsListener metricsListener;
+    private ServiceContext serviceContext;
 
-    public ThirdPartyServiceProvider(String name,MetricsListener metricsListener,ServiceContext serviceContext){
+    public ThirdPartyServiceProvider(String name, List<TokenValidatorProvider.AuthVendor> preload){
         this.name = name;
-        this.metricsListener = metricsListener;
-        this.serviceContext = serviceContext;
         this.aMap = new ConcurrentHashMap<>();
+        preload.forEach((v)-> aMap.put(v.name(),v));
     }
 
     @Override
@@ -33,41 +33,25 @@ public class ThirdPartyServiceProvider implements TokenValidatorProvider.AuthVen
     }
 
     @Override
-    public String clientId(String s) {
-        return null;
+    public String clientId(String typeId) {
+        TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
+        if(vendor == null) throw new RuntimeException("No author vendor associated with ["+typeId+"]");
+        return vendor.clientId();
     }
 
-    @Override
-    public String secureKey() {
-        return null;
-    }
-
-    @Override
-    public String authUri() {
-        return null;
-    }
-
-    @Override
-    public String tokenUri() {
-        return null;
-    }
-
-    @Override
-    public String certUri() {
-        return null;
-    }
-
-    @Override
-    public String[] origins() {
-        return new String[0];
-    }
 
     @Override
     public void registerMetricsLister(MetricsListener metricsListener) {
+        this.metricsListener = metricsListener;
     }
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
+        aMap.forEach((k,v)->{
+            v.registerMetricsLister(metricsListener);
+            v.setup(this.serviceContext);
+        });
     }
 
     @Override

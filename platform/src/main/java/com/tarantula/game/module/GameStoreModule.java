@@ -32,7 +32,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(bundleId);
             if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
             params.put(OnAccess.SYSTEM_ID,session.systemId());
-            params.put(OnAccess.SERVICE_TYPE_ID,serviceTypeId);
+            params.put(OnAccess.TYPE_ID,serviceTypeId);
             params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.skuName());
             if(this.context.validator().validateToken(params)){
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);

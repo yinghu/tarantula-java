@@ -1,6 +1,6 @@
 { "validators":
   [
-    {"typeId":"robotquest",
+    { "typeId":"robotquest",
       "access_key": "AIzaSyDL9vEOIIxyGN-kUAiKI4MKBSoBFG_VnJU",
       "android":
       {

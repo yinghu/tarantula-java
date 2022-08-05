@@ -1,25 +1,29 @@
 package com.tarantula.platform.util;
 
 import com.google.gson.*;
+import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.AppleStoreProvider;
-import com.tarantula.platform.service.AuthObject;
+
+import com.tarantula.platform.service.AuthVendorRegistry;
+import com.tarantula.platform.service.ThirdPartyServiceProvider;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthObject> {
+public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthVendorRegistry> {
 
     @Override
-    public AuthObject deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public AuthVendorRegistry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
         String certUri = jo.getAsJsonPrimitive("verifyUrl").getAsString();
-        Map<String,String> serviceKeys = new HashMap<>();
-        jo.get("serviceKeys").getAsJsonArray().forEach((a)->{
+        List<TokenValidatorProvider.AuthVendor> _validators = new ArrayList<>();
+        jo.get("validators").getAsJsonArray().forEach((a)->{
             JsonObject sk = a.getAsJsonObject();
-            serviceKeys.put(sk.get("name").getAsString(),sk.get("key").getAsString());
+            _validators.add(new AppleStoreProvider(sk.get("name").getAsString(),certUri,sk.get("key").getAsString()));
         });
-        return new AppleStoreProvider(certUri,serviceKeys);
+        return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE,_validators);
     }
 }
