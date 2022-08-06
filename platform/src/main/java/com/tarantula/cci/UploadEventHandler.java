@@ -71,7 +71,7 @@ public class UploadEventHandler implements RequestHandler {
             if(authVendor != null){
                 authVendor.upload(gameClusterName.toLowerCase()+"#"+fn,data);
             }
-            log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
+            //log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
             boolean suc = deployService.upload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
         }

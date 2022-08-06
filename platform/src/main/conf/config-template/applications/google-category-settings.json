@@ -9,6 +9,54 @@
     {
       "header": {
         "scope": "application.data",
+        "type": "GoogleStoreConfiguration",
+        "description": "access category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Provider",
+            "type": "enum",
+            "reference": "Provider",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "PackageName",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ValidationUrl",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "AcknowledgeUrl",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SecretKey",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.data",
         "type": "GooglePlayConfiguration",
         "description": "access category",
         "version": "1.0",
@@ -36,38 +84,18 @@
             "reference": "String",
             "nullable": false,
             "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "application.data",
-        "type": "GoogleStoreConfiguration",
-        "description": "access category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Provider",
-            "type": "enum",
-            "reference": "Provider",
-            "nullable": false,
-            "downloadable": false
           },
           {
-            "name": "VerifyUrl",
+            "name": "ApplicationId",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "SecretKey",
-            "type": "string",
-            "reference": "String",
+            "name": "WebConfiguration",
+            "type": "category",
+            "reference": "category:GoogleWebConfiguration",
             "nullable": false,
             "downloadable": false
           }
