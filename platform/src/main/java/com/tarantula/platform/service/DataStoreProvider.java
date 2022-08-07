@@ -4,7 +4,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.service.persistence.Node;
-import com.tarantula.platform.service.persistence.ShardingProvider;
+import com.tarantula.platform.service.persistence.BackupProvider;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface DataStoreProvider extends ServiceProvider {
     int CONCURRENCY_ACCESS_LIMIT = 17;
 
     void configure(Map<String,String> properties);
-    void addShardingProvider(ShardingProvider shardingProvider);
+    void addBackupProvider(BackupProvider shardingProvider);
 
     Node node();
     //create none-partitioned integration scope data store

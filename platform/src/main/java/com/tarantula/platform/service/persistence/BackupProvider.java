@@ -6,12 +6,13 @@ import com.icodesoftware.service.ServiceProvider;
 
 import java.util.Map;
 
-public interface ShardingProvider extends ServiceProvider {
+public interface BackupProvider extends ServiceProvider {
 
     boolean enabled();
+
     int scope();
+
     void configure(Map<String,String> properties);
-    void addShard(Shard shard);
     void registerDataStore(String name);
     void registerDataStore(String prefix,int partitions);
 

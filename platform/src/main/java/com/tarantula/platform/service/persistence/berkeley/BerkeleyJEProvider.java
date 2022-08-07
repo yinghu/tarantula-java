@@ -61,8 +61,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private Environment integrationEnvironment;
 
 
-    private ShardingProvider iShardingProvider;
-    private ShardingProvider dShardingProvider;
+    private BackupProvider iBackupProvider;
+    private BackupProvider dBackupProvider;
     private List<String> dataStoreList;
 
     @Override
@@ -79,12 +79,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.node = new Node(properties.get("bucket"),properties.get("node"));
         this.replicationPoolSetting = properties.get("poolSetting");
     }
-    public void addShardingProvider(ShardingProvider shardingProvider){
-        if(shardingProvider.scope()== Distributable.INTEGRATION_SCOPE){
-            iShardingProvider = shardingProvider;
+    public void addBackupProvider(BackupProvider backProvider){
+        if(backProvider.scope()== Distributable.INTEGRATION_SCOPE){
+            iBackupProvider = backProvider;
         }
-        else if(shardingProvider.scope()==Distributable.DATA_SCOPE){
-            dShardingProvider = shardingProvider;
+        else if(backProvider.scope()==Distributable.DATA_SCOPE){
+            dBackupProvider = backProvider;
         }
     }
     public Node node(){
@@ -94,7 +94,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
-            this.iShardingProvider.registerDataStore(name);
+            this.iBackupProvider.registerDataStore(name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
     }
@@ -125,7 +125,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
-            this.dShardingProvider.registerDataStore(name,partition);
+            this.dBackupProvider.registerDataStore(name,partition);
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }
@@ -161,8 +161,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
             });
         }
-        this.iShardingProvider.setup(serviceContext);
-        this.dShardingProvider.setup(serviceContext);
+        this.iBackupProvider.setup(serviceContext);
+        this.dBackupProvider.setup(serviceContext);
     }
     @Override
     public void waitForData() {
@@ -242,8 +242,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void shutdown() throws Exception {
-        iShardingProvider.shutdown();
-        dShardingProvider.shutdown();
+        iBackupProvider.shutdown();
+        dBackupProvider.shutdown();
         dMap.forEach((k,v)->{
             v.close();
         });
@@ -256,19 +256,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public <T extends Recoverable> void onCreating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> dShardingProvider.create(metadata,key,t));
+            replicationPendingQueue.offer(()-> dBackupProvider.create(metadata,key,t));
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()-> iShardingProvider.create(metadata,key,t));
+            replicationPendingQueue.offer(()-> iBackupProvider.create(metadata,key,t));
         }
     }
     @Override
     public <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> dShardingProvider.update(metadata,key,t));
+            replicationPendingQueue.offer(()-> dBackupProvider.update(metadata,key,t));
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()-> iShardingProvider.update(metadata,key,t));
+            replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
         }
     }
 

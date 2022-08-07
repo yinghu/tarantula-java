@@ -5,37 +5,18 @@
         <property name="integrationPath">tarantula/integration</property>
         <property name="backupPath">backup</property>
     </data-source>
-    <sharding-provider name="integration" scope="2" shards="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider" enabled="false">
-        <shard sharding-number="0">
-            <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">integration_data_n4</property>
-            <property name="user">tarantula</property>
-            <property name="password">tarantula</property>
-            <property name="poolSize">8</property>
-        </shard>
-        <!--
-        <shard sharding-number="1">
-            <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">integration_data_tx</property>
-            <property name="user">tarantula</property>
-            <property name="password">tarantula</property>
-            <property name="poolSize">8</property>
-        </shard>
-        <shard sharding-number="2">
-            <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">integration_data_tx</property>
-            <property name="user">tarantula</property>
-            <property name="password">tarantula</property>
-            <property name="poolSize">8</property>
-        </shard>-->
-    </sharding-provider>
-    <sharding-provider name="data" scope="1" shards="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlShardingProvider" enabled="false">
-        <shard sharding-number="0">
-            <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-            <property name="database">tarantula_data_n4</property>
-            <property name="user">tarantula</property>
-            <property name="password">tarantula</property>
-            <property name="poolSize">8</property>
-        </shard>
-    </sharding-provider>
+    <backup-provider name="integration" scope="2" provider="com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider" enabled="false">
+        <property name="url">jdbc:mysql://10.0.0.153:3306</property>
+        <property name="database">integration_data_n4</property>
+        <property name="user">tarantula</property>
+        <property name="password">tarantula</property>
+        <property name="poolSize">8</property>
+    </backup-provider>
+    <backup-provider name="data" scope="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider" enabled="false">
+        <property name="url">jdbc:mysql://10.0.0.153:3306</property>
+        <property name="database">tarantula_data_n4</property>
+        <property name="user">tarantula</property>
+        <property name="password">tarantula</property>
+        <property name="poolSize">8</property>
+    </backup-provider>
 </data-store-service>

@@ -33,8 +33,8 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private int accessIndexPartitionNumber;
     private String dataStoreDailyBackup;
 
-    private ShardingProvider shardingProvider;
-    private Shard shard;
+    private BackupProvider backupProvider;
+
     private TarantulaContext tarantulaContext;
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx){
         this.dataStoreProviderConfiguration = dconfig;
@@ -58,15 +58,11 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
             properties.clear();
         }
-        else if(qname.equals("sharding-provider")){
-            _start(this.shardingProvider);
-            this.tarantulaContext.deploymentDataStoreProvider.addShardingProvider(this.shardingProvider);
+        else if(qname.equals("backup-provider")){
+            this.backupProvider.configure(properties);
+            _start(this.backupProvider);
+            this.tarantulaContext.deploymentDataStoreProvider.addBackupProvider(this.backupProvider);
             properties.clear();
-        }
-        else if(qname.equals("shard")){
-            this._start(properties,this.shard);
-            this.shardingProvider.addShard(this.shard);
-            this.properties.clear();
         }
         else if(qname.equals("property")){
             properties.put(currentProperty, value);
@@ -94,20 +90,12 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
         }
-        else if(qname.equals("sharding-provider")){
-            this.shardingProvider = this.shardingProvider(attributes.getValue("provider"));
-            HashMap<String,String> _cfg = new HashMap<>();
-            _cfg.put("name",attributes.getValue("name"));
-            _cfg.put("scope",attributes.getValue("scope"));
-            _cfg.put("p2",this.partitionNumber+"");
-            _cfg.put("p1",this.accessIndexPartitionNumber+"");
-            //_cfg.put("node",tarantulaContext.dataBucketNode);
-            _cfg.put("shards",attributes.getValue("shards"));
-            _cfg.put("enabled",attributes.getValue("enabled"));
-            this.shardingProvider.configure(_cfg);
-        }
-        else if(qname.equals("shard")){
-            this.shard = new Shard(Integer.parseInt(attributes.getValue("sharding-number")),this.shardingProvider.enabled());
+        else if(qname.equals("backup-provider")){
+            properties.clear();
+            this.backupProvider = this.backupProvider(attributes.getValue("provider"));
+            properties.put("name",attributes.getValue("name"));
+            properties.put("scope",attributes.getValue("scope"));
+            properties.put("enabled",attributes.getValue("enabled"));
         }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
@@ -124,9 +112,9 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             throw new RuntimeException(ex);
         }
     }
-    ShardingProvider shardingProvider(String provider){
+    BackupProvider backupProvider(String provider){
         try {
-            return (ShardingProvider)Class.forName(provider).getConstructor().newInstance();
+            return (BackupProvider)Class.forName(provider).getConstructor().newInstance();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -140,17 +128,9 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             throw new RuntimeException(ex);
         }
     }
-    void _start(ShardingProvider ds){
+    void _start(BackupProvider ds){
         try{
             ds.start();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
-    void _start(HashMap<String,String> config,Shard shard){
-        try{
-            shard.configuration(config);
-            shard.start();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
