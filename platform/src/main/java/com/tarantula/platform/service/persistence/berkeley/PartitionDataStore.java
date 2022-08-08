@@ -17,7 +17,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 public class PartitionDataStore extends ReplicatedDataStore{
 
@@ -42,7 +42,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         for(int i=0;i<this.partition;i++){
             this.partitions[i]=new DataStoreOnPartition(i,shards[i]);
             this.partitions[i].metadata = new RecoverableMetadata(this.prefix,i,Distributable.DATA_SCOPE);
-            this.partitions[i].lock = new ReentrantLock();
+            //this.partitions[i].lock = new ReentrantLock();
         }
     }
     @Override
@@ -85,25 +85,28 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public <T extends Recoverable> boolean create(T t) {
         try {
-            String okey = t.key().asString();
-            if (okey == null) {
+            String akey = t.key().asString();
+            if (akey == null) {
                 //use bucket/oid as the key
                 t.bucket(this.bucket);
                 t.oid(SystemUtil.oid());
-                okey = t.key().asString();
+                akey = t.key().asString();
             }
+            final String okey = akey;
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] value = t.toBinary();//SystemUtil.toJson(t.toMap());
-            if(!_put(dso,key,value)) return false;
-            //do backup and replication
-            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
-            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
-            Listener listener = rMap.get(t.getFactoryId());
-            if(listener!=null) listener.onCreated(t,okey,key,value);
-            //set edge index
-            if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t,okey);
-            return true;
+            return dso.lock(key,()->{
+                byte[] value = t.toBinary();
+                if(!_put(dso,key,value)) return false;
+                //do backup and replication
+                if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
+                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                Listener listener = rMap.get(t.getFactoryId());
+                if(listener!=null) listener.onCreated(t,okey,key,value);
+                //set edge index
+                if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t,okey);
+                return true;
+            });
         }catch (Exception ex){
             log.error("Error on create",ex);
             return false;
@@ -144,21 +147,22 @@ public class PartitionDataStore extends ReplicatedDataStore{
         try{
             String akey = t.key().asString();
             if(akey==null) return false;
-
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            byte[] value = t.toBinary();
-            if(!_put(dso,key,value)) return false;
+            return dso.lock(key,()->{
+                byte[] value = t.toBinary();
+                if(!_put(dso,key,value)) return false;
 
-            if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata,akey,t);
+                if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata,akey,t);
 
-            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
 
-            Listener listener = rMap.get(t.getFactoryId());
+                Listener listener = rMap.get(t.getFactoryId());
 
-            if(listener!=null) listener.onUpdated(t,akey,key,value);
+                if(listener!=null) listener.onUpdated(t,akey,key,value);
 
-            return true;
+                return true;
+            });
 
         }catch (Exception ex){
             log.error("Error on update",ex);
@@ -176,26 +180,29 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 akey = t.key().asString();
             }
             byte[] key = akey.getBytes();
+            final String okey = akey;
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            byte[] v = _get(dso,key);//from local
-            if(v==null){
-                v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
-                if(v!=null) _put(dso,key,v);
-            }
-            if(v!=null){//existed no creation
-                if(loading) t.fromBinary(v);
-                return false;
-            }
-            byte[] vx = t.toBinary();
-            if(!_put(dso,key,vx)) return false;
-            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,akey,t);
+            return dso.lock(key,()->{
+                byte[] v = _get(dso,key);//from local
+                if(v==null){
+                    v = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
+                    if(v!=null) _put(dso,key,v);
+                }
+                if(v!=null){//existed no creation
+                    if(loading) t.fromBinary(v);
+                    return false;
+                }
+                byte[] vx = t.toBinary();
+                if(!_put(dso,key,vx)) return false;
+                if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
 
-            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, key,vx);
+                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, key,vx);
 
-            Listener listener = rMap.get(t.getFactoryId());
-            if(listener!=null) listener.onCreated(t,akey,key,vx);
-            if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t, akey);
-            return true;
+                Listener listener = rMap.get(t.getFactoryId());
+                if(listener!=null) listener.onCreated(t,okey,key,vx);
+                if(t.onEdge()&&t.owner()!=null&&t.label()!=null) onEdge(t,okey);
+                return true;
+            });
 
         }catch (Exception ex){
             log.error("Error on createIfAbsent",ex);
@@ -227,8 +234,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public void set(byte[] key, byte[] value) {
         try{
-            int pt = SystemUtil.partition(key,partition);
-            _put(this.partitions[pt],key,value);
+            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            dso.lock(key,()-> _put(dso,key,value));
         }
         catch (Exception ex){
             log.error("Error on set",ex);
@@ -330,24 +337,15 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return this;
     }
     private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
-        try {
-            dso.lock.lock();
-            return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
-        }finally {
-            dso.lock.unlock();
-        }
+        return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
     }
+
     public void registerListener(int registerId,Listener listener){
         rMap.putIfAbsent(registerId,listener);
     }
     private byte[] _get(DataStoreOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
-        try {
-            dso.lock.lock();
-            OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
-            return status==OperationStatus.SUCCESS?ve.getData():null;
-        }finally {
-            dso.lock.unlock();
-        }
+        OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
+        return status==OperationStatus.SUCCESS?ve.getData():null;
     }
 }

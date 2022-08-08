@@ -5,6 +5,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.OnSession;
 import com.tarantula.game.Arena;
 import com.tarantula.platform.room.PVPGameRoom;
+import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

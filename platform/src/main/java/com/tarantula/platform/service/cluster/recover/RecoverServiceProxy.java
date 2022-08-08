@@ -8,6 +8,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
@@ -22,9 +23,15 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
     private static TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
 
+    private MetricsListener metricsListener;
+    private MetricsListener metricsListenerHook;
+
     public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService clusterRecoverService){
         super(nodeEngine,clusterRecoverService);
         this.objectName = objectName;
+        this.metricsListener = (k,v)->{
+            if(metricsListenerHook != null) metricsListenerHook.onUpdated(k,v);
+        };
     }
 
 
@@ -80,7 +87,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     }
                 } catch (Exception e) {
                     future.cancel(true);
-                    logger.error("recover error on node->"+m.getAddress(),e);
+                    metricsListener.onUpdated("1",1);
                     //goes to next node if failed
                 }
             }
@@ -167,5 +174,13 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListenerHook = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListenerHook = null;
+    }
+
 
 }

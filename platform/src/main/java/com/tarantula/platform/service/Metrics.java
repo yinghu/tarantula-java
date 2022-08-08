@@ -7,14 +7,15 @@ import com.tarantula.platform.OnApplicationHeader;
 public class Metrics extends OnApplicationHeader {
 
     //metrics entry
-    public final static String STATS_KEY = "a";
-    public final static String START_TIME ="b";
-    
+    //public final static String STATS_KEY = "a";
+    //public final static String START_TIME ="b";
+
 
     //stats entry
     public final static String REQUEST_COUNT = "1";
     public final static String EVENT_OUT_COUNT = "2";
     public final static String EVENT_IN_COUNT = "3";
+
     public final static String GOOGLE_COUNT = "4";
     public final static String STRIPE_COUNT = "5";
     public final static String PASSWORD_COUNT = "6";
@@ -22,6 +23,7 @@ public class Metrics extends OnApplicationHeader {
     public final static String FACEBOOK_COUNT = "8";
     public final static String APPLE_STORE_COUNT = "9";
     public final static String GAME_CENTER = "10";
+
     public final static String GOOGLE_STORE_COUNT = "11";
     public final static String DEVELOPER_LOGIN_COUNT = "12";
 
