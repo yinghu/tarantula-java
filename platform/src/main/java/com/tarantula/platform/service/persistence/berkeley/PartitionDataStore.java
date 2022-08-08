@@ -42,7 +42,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         for(int i=0;i<this.partition;i++){
             this.partitions[i]=new DataStoreOnPartition(i,shards[i]);
             this.partitions[i].metadata = new RecoverableMetadata(this.prefix,i,Distributable.DATA_SCOPE);
-            //this.partitions[i].lock = new ReentrantLock();
         }
     }
     @Override
@@ -79,9 +78,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             dso.database.close();
         }
     }
-    //public int scope(){
-        //return Distributable.DATA_SCOPE;
-    //}
+
     @Override
     public <T extends Recoverable> boolean create(T t) {
         try {
@@ -219,8 +216,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             byte[] value;
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            if((value=_get(dso,key))==null){//get local
-                if((value=mapStoreListener.onRecovering(dso.metadata,key))==null) return false;
+            if((value = _get(dso,key)) == null){//get local
+                if((value = mapStoreListener.onRecovering(dso.metadata,key)) == null) return false;
                 _put(dso,key,value);
             }
             t.fromBinary(value);

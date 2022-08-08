@@ -23,7 +23,7 @@ public class RecoverableObject implements Recoverable {
     protected  boolean onEdge;
 
     protected long timestamp;
-    protected int version;
+    protected long revision;
 
     protected int routingNumber;
 
@@ -119,11 +119,11 @@ public class RecoverableObject implements Recoverable {
     public void disabled(boolean disabled) {
         this.disabled = disabled;
     }
-    public int version(){
-        return this.version;
+    public long revision(){
+        return this.revision;
     }
-    public void version(int version){
-        this.version = version;
+    public void revision(long revision){
+        this.revision = revision;
     }
 
     public int routingNumber(){

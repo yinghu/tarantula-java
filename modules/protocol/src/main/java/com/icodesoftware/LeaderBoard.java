@@ -30,6 +30,8 @@ public interface LeaderBoard {
         String category();
         String classifier();//board name daily, weekly, total
         double value();
+
+        int rank();
         Entry update(Entry entry);
     }
     interface Listener{

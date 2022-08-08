@@ -33,9 +33,9 @@ public interface Recoverable extends Distributable,JsonSerializable {
     long timestamp();
     void timestamp(long timestamp);
 
-    //the shard version
-    int version();
-    void version(int version);
+    //the data store version; never use it in application
+    long revision();
+    void revision(long revision);
 
 
     boolean onEdge();

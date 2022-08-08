@@ -17,6 +17,8 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public AchievementProgress achievementProgress;
     public PlayerSaveIndex playerSaveIndex;
 
+    public int version;
+
     public SavedGame(){
 
     }

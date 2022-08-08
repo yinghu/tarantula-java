@@ -13,6 +13,8 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     private double value=0;
     private String classifier;
     private String category;
+
+    private int rank;
     public LeaderBoardEntry(){
         //this.vertex ="Entry";
         this.owner="--";
@@ -20,11 +22,11 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.timestamp=0;
     }
     //query entry
-    public LeaderBoardEntry(String classifier, String category, int version){
+    public LeaderBoardEntry(String classifier, String category, int position){
         this();
         this.classifier = classifier;
         this.category = category;
-        this.version = version;
+        this.rank = position;
     }
     public LeaderBoardEntry(String systemId, double value, long timestamp){
         this();
@@ -33,11 +35,11 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         this.timestamp = timestamp;
     }
     //value entry
-    public LeaderBoardEntry(String classifier, String category, int version, String systemId, double value, long timestamp){
+    public LeaderBoardEntry(String classifier, String category, int position, String systemId, double value, long timestamp){
         this();
         this.classifier = classifier;
         this.category = category;
-        this.version = version;
+        this.rank = position;
         this.owner = systemId;
         this.value = value;
         this.timestamp = timestamp;
@@ -63,6 +65,10 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
 
     public double value() {
         return value;
+    }
+
+    public int rank(){
+        return rank;
     }
 
     @Override
@@ -97,10 +103,10 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
         String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
         classifier = k[0];
         category = k[1];
-        version = Integer.parseInt(k[2]);
+        rank = Integer.parseInt(k[2]);
     }
     public Key key(){
-        return new NaturalKey(this.classifier+ Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+version);
+        return new NaturalKey(this.classifier+ Recoverable.PATH_SEPARATOR+category+Recoverable.PATH_SEPARATOR+rank);
     }
 
     @Override

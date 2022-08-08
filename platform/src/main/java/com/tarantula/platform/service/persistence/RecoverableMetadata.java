@@ -46,7 +46,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     public void writePortable(PortableWriter out) throws IOException {
         out.writeInt("1",this.factoryId);
         out.writeInt("2",this.classId);
-        out.writeInt("3",this.version);
+        out.writeLong("3",this.revision);
         out.writeLong("4",this.timestamp);
         out.writeInt("5",this.partition);
         out.writeBoolean("6",this.onEdge);
@@ -57,7 +57,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     public void readPortable(PortableReader in) throws IOException {
         this.factoryId = in.readInt("1");
         this.classId = in.readInt("2");
-        this.version = in.readInt("3");
+        this.revision = in.readLong("3");
         this.timestamp = in.readLong("4");
         this.partition = in.readInt("5");
         this.onEdge = in.readBoolean("6");

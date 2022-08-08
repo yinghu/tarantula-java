@@ -14,14 +14,14 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class AccessIndexTrack extends RecoverableObject implements AccessIndex, Portable {
 
-
+    private int referenceId;
     public AccessIndexTrack(){
     }
     public AccessIndexTrack(String owner,String bucket,String oid,int referenceId){
         this.owner = owner;
         this.bucket = bucket;
         this.oid = oid;
-        this.version = referenceId;
+        this.referenceId = referenceId;
     }
 
     public AccessIndexTrack(String owner){
@@ -29,7 +29,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         this.owner = owner;
     }
     public int referenceId(){
-        return version;
+        return referenceId;
     }
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
@@ -55,7 +55,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         out.writeUTF("1",this.owner);
         out.writeUTF("2",this.bucket);
         out.writeUTF("3",this.oid);
-        out.writeInt("4",this.version);
+        out.writeInt("4",this.referenceId);
     }
 
     @Override
@@ -63,25 +63,25 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
         this.oid = in.readUTF("3");
-        this.version = in.readInt("4");
+        this.referenceId = in.readInt("4");
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",bucket);
         this.properties.put("2",oid);
-        this.properties.put("3",version);
+        this.properties.put("3",referenceId);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucket = (String)properties.get("1");
         this.oid = (String)properties.get("2");
-        this.version = ((Number)properties.get("3")).intValue();
+        this.referenceId = ((Number)properties.get("3")).intValue();
     }
 
     @Override
     public String toString(){
-        return "Access Index ["+owner+"]->"+bucket+"/"+oid+"] referenceID =>"+version+"]";
+        return "Access Index ["+owner+"]->"+bucket+"/"+oid+"] referenceID =>"+referenceId+"]";
     }
     public void distributionKey(String distributionKey){
        //skip the natural key

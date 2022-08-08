@@ -46,7 +46,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
         integrationCluster = serviceContext.clusterProvider();
         integrationCluster.subscribe(name,(e)->{
             if(e instanceof LeaderBoardGlobalEvent){
-                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),e.version(),e.owner(),e.balance(),e.timestamp());
+                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),((LeaderBoardGlobalEvent) e).rank,e.owner(),e.balance(),e.timestamp());
                 LeaderBoardSync ldb = this.leaderBoard(update.category());
                 ldb.onView(update);
             }

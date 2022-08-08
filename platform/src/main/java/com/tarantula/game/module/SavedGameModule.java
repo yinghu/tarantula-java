@@ -33,7 +33,7 @@ public class SavedGameModule implements Module {
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
             SavedGame savedGame = this.gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
-                savedGame.version(updated.version());
+                savedGame.version=(updated.version);
                 savedGame.index(updated.index());
                 savedGame.owner(updated.owner());
                 savedGame.name(updated.name());
@@ -53,7 +53,7 @@ public class SavedGameModule implements Module {
                 if(dailyLoginTrack!=null) dailyLoginTrack.reset();
                 AchievementProgress achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(savedGame.distributionKey());
                 if(achievementProgress!=null) achievementProgress.reset();
-                savedGame.version(0);
+                savedGame.version=(0);
                 savedGame.update();
                 JsonObject resp = savedGame.toJson();
                 resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
@@ -67,7 +67,7 @@ public class SavedGameModule implements Module {
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
             SavedGame current = gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(), session.name());
             SavedGame remote = gameServiceProvider.presenceServiceProvider().loadSavedGame(updated.owner(), updated.distributionKey());
-            current.version(remote.version());
+            current.version=(remote.version);
             current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
             JsonObject resp = new JsonObject();

@@ -15,7 +15,7 @@ public class SavedGameDeserializer implements JsonDeserializer<SavedGame> {
         savedGame.name(jsonObject.get("DeviceName").getAsString());
         savedGame.index(jsonObject.get("DeviceId").getAsString());
         savedGame.owner(jsonObject.get("OwnerId").getAsString());
-        savedGame.version(jsonObject.get("Version").getAsInt());
+        savedGame.version = (jsonObject.get("Version").getAsInt());
         savedGame.timestamp(jsonObject.get("Timestamp").getAsLong());
         savedGame.distributionKey(jsonObject.get("GameId").getAsString());
         return savedGame;
