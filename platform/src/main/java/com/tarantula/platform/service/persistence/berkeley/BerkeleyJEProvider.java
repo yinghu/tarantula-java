@@ -275,7 +275,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().replicate(metadata.source(),metadata.partition(),key,value,replicationNodeNumber));
+            replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().replicate(metadata.source(),key,value,replicationNodeNumber));
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value,replicationNodeNumber));

@@ -7,7 +7,7 @@ public interface RecoverService extends ServiceProvider{
     //operates master or member node
 
     byte[] recover(String source,byte[] key);
-    int replicate(String source,int partition,byte[] key,byte[] value,int nodeNumber);
+    int replicate(String source,byte[] key,byte[] value,int nodeNumber);
 
     //operates on master node
     int syncStart(String source,String syncKey);

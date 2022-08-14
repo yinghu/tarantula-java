@@ -13,13 +13,9 @@ public class RevisionObjectTest {
 
     @Test(groups = { "RevisionObject" })
     public void setupTest() {
-        RevisionObject toData = new RevisionObject("abc".getBytes(),100);
-        byte[] data = toData.toBinary();
-        RevisionObject fromData = new RevisionObject();
-        fromData.fromBinary(data);
-        Assert.assertEquals(true,fromData.revision()==100);
+        byte[] data = RevisionObject.toBinary(100,"abc".getBytes());
+        RevisionObject fromData =  RevisionObject.fromBinary(data);
+        Assert.assertEquals(true,fromData.revision == 100);
         Assert.assertEquals(true,new String(fromData.data).equals("abc"));
     }
-
-
 }

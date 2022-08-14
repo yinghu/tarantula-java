@@ -1,31 +1,29 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.util.RecoverableObject;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-public class RevisionObject extends RecoverableObject {
+public class RevisionObject {
 
-    public byte[] data;
+    public final byte[] data;
+    public final long revision;
 
-    public RevisionObject(){
-    }
-    public RevisionObject(byte[] payload,long revision){
-        this.data = payload;
+    private RevisionObject(long revision,byte[] data){
         this.revision = revision;
+        this.data = data;
     }
-    public byte[] toBinary(){
+
+    public static byte[] toBinary(long revision,byte[] data){
         ByteBuffer buffer = ByteBuffer.allocate(data.length+8);
         buffer.putLong(revision).put(data);
         return buffer.array();
     }
-    public void fromBinary(byte[] payload){
+    public static RevisionObject fromBinary(byte[] payload){
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(payload,0,8);
         buffer.flip();
-        revision = buffer.getLong();
-        data = Arrays.copyOfRange(payload,8,payload.length);
+        return new RevisionObject(buffer.getLong(),Arrays.copyOfRange(payload,8,payload.length));
     }
 
 }

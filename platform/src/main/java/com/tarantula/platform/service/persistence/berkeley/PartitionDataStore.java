@@ -8,10 +8,7 @@ import com.sleepycat.je.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;
 
-import com.tarantula.platform.service.persistence.DataStoreOnPartition;
-import com.tarantula.platform.service.persistence.MapStoreListener;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
-import com.tarantula.platform.service.persistence.ReplicatedDataStore;
+import com.tarantula.platform.service.persistence.*;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -93,9 +90,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = okey.getBytes();
             DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             return dso.lock(key,()->{
-                byte[] value = t.toBinary();
+                byte[] value = t.toBinary();//RevisionObject.toBinary(1,t.toBinary());
                 if(!_put(dso,key,value)) return false;
                 //do backup and replication
+                //t.revision(1);
                 if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
                 if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
                 Listener listener = rMap.get(t.getFactoryId());
@@ -147,7 +145,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             byte[] key = akey.getBytes();
             DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             return dso.lock(key,()->{
-                byte[] value = t.toBinary();
+                byte[] value = t.toBinary(); //RevisionObject.toBinary(t.revision(),t.toBinary());
                 if(!_put(dso,key,value)) return false;
 
                 if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata,akey,t);
