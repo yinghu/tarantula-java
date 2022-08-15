@@ -18,6 +18,7 @@ public class AccessSerializer implements JsonSerializer<Access> {
         jo.addProperty("role",access.role());
         jo.addProperty("validator",access.validator());
         jo.addProperty("primary",access.primary());
+        jo.addProperty("revision",Long.toString(access.revision()));
         return jo;
     }
 }

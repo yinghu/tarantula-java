@@ -86,7 +86,8 @@ public class PlatformUserService implements UserService {
         String pwd = (String)access.property(OnAccess.PASSWORD);
         String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
         user.password(hash);
-        return userDataStore.update(user);
+        boolean suc = userDataStore.update(user);
+        return suc;
     }
     @Override
     public Account createAccount(Access access,Subscription subscription){

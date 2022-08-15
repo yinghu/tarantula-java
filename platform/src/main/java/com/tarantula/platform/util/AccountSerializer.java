@@ -14,10 +14,9 @@ public class AccountSerializer implements JsonSerializer<Account> {
         JsonObject jo = new JsonObject();
         jo.addProperty("trial",access.trial());
         jo.addProperty("subscribed",access.subscribed());
-        //jo.addProperty("emailAddress",access.emailAddress());
         jo.addProperty("userCount",access.userCount(0));
         jo.addProperty("gameClusterCount",access.gameClusterCount(0));
-        //jo.addProperty("lastUpdated",SystemUtil.fromUTCMilliseconds(access.timestamp()).format(DateTimeFormatter.ISO_DATE_TIME));
+        jo.addProperty("revision",Long.toString(access.revision()));
         return jo;
     }
 }

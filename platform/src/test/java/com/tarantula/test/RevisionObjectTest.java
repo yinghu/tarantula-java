@@ -12,10 +12,20 @@ public class RevisionObjectTest {
     }
 
     @Test(groups = { "RevisionObject" })
-    public void setupTest() {
-        byte[] data = RevisionObject.toBinary(100,"abc".getBytes());
+    public void localTest() {
+        byte[] data = RevisionObject.toBinary(100,"abc".getBytes(),true);
         RevisionObject fromData =  RevisionObject.fromBinary(data);
-        Assert.assertEquals(true,fromData.revision == 100);
-        Assert.assertEquals(true,new String(fromData.data).equals("abc"));
+        Assert.assertEquals(fromData.revision == 100,true);
+        Assert.assertEquals(new String(fromData.data).equals("abc"),true);
+        Assert.assertEquals(fromData.local,true);
+    }
+
+    @Test(groups = { "RevisionObject" })
+    public void remoteTest() {
+        byte[] data = RevisionObject.toBinary(100,"abc".getBytes(),false);
+        RevisionObject fromData =  RevisionObject.fromBinary(data);
+        Assert.assertEquals(fromData.revision == 100,true);
+        Assert.assertEquals(new String(fromData.data).equals("abc"),true);
+        Assert.assertEquals(fromData.local,false);
     }
 }

@@ -587,9 +587,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 cursor.close();
             }
         }
-        public void list(RecoverableFactory<Recoverable> query,Binary binary){
-            throw new UnsupportedOperationException();
-        }
+
         @Override
         public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
             throw new UnsupportedOperationException();

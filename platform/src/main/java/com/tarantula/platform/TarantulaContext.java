@@ -489,7 +489,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     }
     public void _registerNode() throws Exception{
  	    this.accessIndexService().disable();
- 	    _access_index_syc_finished.await();for(int i=0;i<accessIndexRoutingNumber;i++){
+ 	    _access_index_syc_finished.await();
+         for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
  	        String _pk = "p"+i;
  	        _syncLatch.put(_pk,countDownLatch);
@@ -503,6 +504,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         _tarantula_sync.await();
         _syncLatch.remove("t100");
 
+        /**
         CountDownLatch _account_sync = new CountDownLatch(1);
         _syncLatch.put("t200",_account_sync);
         this.integrationCluster.recoverService().syncStart(Account.DataStore,"t200");
@@ -515,32 +517,25 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         _account_index_sync.await();
         _syncLatch.remove("t300");
 
-        DataStore accountDataStore = this.dataStore(Account.DataStore,partitionNumber());
-        RecoverService recoverService = integrationCluster.recoverService();
-        DataStore userDataStore = this.dataStore(User.DataStore,partitionNumber());
-        DataStore presenceDataStore = this.dataStore(Presence.DataStore,partitionNumber());
-        //DataStore sessionDataStore = this.dataStore(OnSession.DataStore,partitionNumber());
-        DataStore subscriptionDataStore = this.dataStore(Subscription.DataStore,partitionNumber());
+        CountDownLatch _user_sync = new CountDownLatch(1);
+        _syncLatch.put("t400",_user_sync);
+        this.integrationCluster.recoverService().syncStart(User.DataStore,"t400");
+        _user_sync.await();
+        _syncLatch.remove("t400");
 
-        accountDataStore.backup().list((k,v)->{//pull account and associated data set
-            byte[] ret = recoverService.recover(User.DataStore,k);
-            if(ret!=null){
-                userDataStore.backup().set(k,ret);
-            }
-            ret = recoverService.recover(Presence.DataStore,k);
-            if(ret!=null){
-                presenceDataStore.backup().set(k,ret);
-            }
-            ret = recoverService.recover(Subscription.DataStore,k);
-            if(ret!=null){
-                subscriptionDataStore.backup().set(k,ret);
-            }
-            //ret = recoverService.recover(OnSession.DataStore,k);
-            //if(ret!=null){
-                //sessionDataStore.backup().set(k,ret);
-            //}
-            return true;
-        });
+        CountDownLatch _presence_sync = new CountDownLatch(1);
+        _syncLatch.put("t500",_presence_sync);
+        this.integrationCluster.recoverService().syncStart(Presence.DataStore,"t500");
+        _presence_sync.await();
+        _syncLatch.remove("t500");
+
+        CountDownLatch _subscription_sync = new CountDownLatch(1);
+        _syncLatch.put("t600",_subscription_sync);
+        this.integrationCluster.recoverService().syncStart(Subscription.DataStore,"t600");
+        _subscription_sync.await();
+        _syncLatch.remove("t600");
+        **/
+
         for(String s : this.integrationCluster.recoverService().listModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);
