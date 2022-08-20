@@ -1,27 +1,28 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Metadata;
 import com.sleepycat.je.Database;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DataStoreOnPartition {
+public class DataBaseOnPartition {
     public final int partition;
     public final String name;
-    public DataStore dataStore;//set on data store ready
 
+    public Database database;
     public Metadata metadata;
 
-    private ConcurrentHashMap<String,Boolean> locks = new ConcurrentHashMap<>();
-    public DataStoreOnPartition(int partition,String name){
+    private ConcurrentHashMap<byte[],Boolean> locks = new ConcurrentHashMap<>();
+
+    public DataBaseOnPartition(int partition, Database dataStore){
         this.partition = partition;
-        this.name = name;
+        this.name = dataStore.getDatabaseName();
+        this.database = dataStore;
+        //this.metadata = new RecoverableMetadata(name,partition, Distributable.DATA_SCOPE);
     }
 
-
-    public boolean lock(String key, Callable<Boolean> runnable){
+    public boolean lock(byte[] key, Callable<Boolean> runnable){
         boolean[] ret = {false};
         locks.compute(key,(k,v)->{
             try{

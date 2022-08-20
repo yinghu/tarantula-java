@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PartitionDataStore extends ReplicatedDataStore{
 
-    private final DataStoreOnPartition[] partitions;
+    private final DataBaseOnPartition[] partitions;
     private final int partition;
     private final String bucket;
     private final String node;
@@ -35,9 +35,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
         this.node = node;
         this.prefix = prefix;
         this.mapStoreListener = mapStoreListener;
-        this.partitions = new DataStoreOnPartition[this.partition];
+        this.partitions = new DataBaseOnPartition[this.partition];
         for(int i=0;i<this.partition;i++){
-            this.partitions[i]=new DataStoreOnPartition(i,shards[i]);
+            this.partitions[i]=new DataBaseOnPartition(i,shards[i]);
             this.partitions[i].metadata = new RecoverableMetadata(this.prefix,i,Distributable.DATA_SCOPE);
         }
     }
@@ -57,7 +57,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public long count() {
         long ct = 0;
-        for(DataStoreOnPartition dso: partitions){
+        for(DataBaseOnPartition dso: partitions){
             ct +=dso.database.count();
         }
         return ct;
@@ -71,7 +71,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return partitions[partition].database.count();
     }
     public void close(){
-        for(DataStoreOnPartition dso : partitions){
+        for(DataBaseOnPartition dso : partitions){
             dso.database.close();
         }
     }
@@ -88,7 +88,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             final String okey = akey;
             byte[] key = okey.getBytes();
-            DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()->{
                 if(_get(dso,key) != null) return false;
                 byte[] value = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
@@ -116,7 +116,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         indexSet.label(t.label());
         indexSet.revision(Long.MIN_VALUE);
         byte[] _kn = indexSet.key().asString().getBytes();
-        DataStoreOnPartition dso = this.partitions[SystemUtil.partition(_kn,partition)];
+        DataBaseOnPartition dso = this.partitions[SystemUtil.partition(_kn,partition)];
         return dso.lock(_kn,()->{
             RevisionObject ro = _getRevisionObject(dso,_kn);//from local
             if(ro != null && ro.local){
@@ -155,7 +155,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             String akey = t.key().asString();
             if(akey==null) return false;
             byte[] key = akey.getBytes();
-            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             return dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);
                 boolean creating = ro==null;
@@ -210,7 +210,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             byte[] key = akey.getBytes();
             final String okey = akey;
-            DataStoreOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);//from local
                 if(ro==null){
@@ -255,7 +255,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             String akey = t.key().asString();
             if(akey==null) return false;
             byte[] key = akey.getBytes();
-            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             return dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);
                 if(ro == null){//get from cluster
@@ -277,7 +277,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     @Override
     public void set(byte[] key, byte[] value) {
         try{
-            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);
                 RevisionObject rd = RevisionObject.fromBinary(value);
@@ -292,7 +292,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     }
     public byte[] get(byte[] key){
         try{
-            DataStoreOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             RevisionObject[] ros = new RevisionObject[1];
             boolean suc = dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);
@@ -308,7 +308,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
     }
     public void list(Binary binary){
-        for(DataStoreOnPartition dso : partitions){
+        for(DataBaseOnPartition dso : partitions){
             Cursor cursor = dso.database.openCursor(null,null);
             DatabaseEntry _key = new DatabaseEntry();
             DatabaseEntry _value = new DatabaseEntry();
@@ -330,7 +330,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         try {
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
-            DataStoreOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
             RevisionObject ro = _getRevisionObject(dso,owner);
             if(ro==null|| !ro.local){
                 //recovering from remote
@@ -346,7 +346,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             for(String b: indexSet.keySet()){
                 RevisionObject v;
                 byte[] ka = b.getBytes();
-                DataStoreOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
+                DataBaseOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
                 if((v =_getRevisionObject(dwso,ka)) == null){//from local
                     byte[] data = mapStoreListener.onRecovering(dwso.metadata,ka);
                     if(data!=null){
@@ -379,20 +379,21 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public Backup backup(){
         return this;
     }
-    private boolean _put(DataStoreOnPartition dso,byte[] key,byte[] value){
+
+    private boolean _put(DataBaseOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
     }
 
     public void registerListener(int registerId,Listener listener){
         rMap.putIfAbsent(registerId,listener);
     }
-    private byte[] _get(DataStoreOnPartition dso,byte[] key){
+    private byte[] _get(DataBaseOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
         return status==OperationStatus.SUCCESS?ve.getData():null;
     }
 
-    private RevisionObject _getRevisionObject(DataStoreOnPartition dso,byte[] key){
+    private RevisionObject _getRevisionObject(DataBaseOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
         return status==OperationStatus.SUCCESS?RevisionObject.fromBinary(ve.getData()):null;

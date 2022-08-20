@@ -64,6 +64,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupProvider iBackupProvider;
     private BackupProvider dBackupProvider;
     private List<String> dataStoreList;
+    //private List<String> accessIndexStoreList;
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -95,6 +96,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
             this.iBackupProvider.registerDataStore(name);
+            //this.accessIndexStoreList.add(name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
     }
@@ -131,7 +133,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
     public List<String> list(){
-       return dataStoreList;
+       ArrayList<String>  alist = new ArrayList<>();
+       alist.addAll(dataStoreList);
+       return alist;
     }
     public boolean existed(String name){
         return dMap.containsKey(name);
@@ -205,6 +209,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             fo.close();
         }
         this.dataStoreList = new CopyOnWriteArrayList<>();
+        //this.accessIndexStoreList = new CopyOnWriteArrayList<>();
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);
@@ -447,7 +452,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         private final int partition;
         private final Metadata metadata1;
 
-        private final Semaphore pass = new Semaphore(DataStoreProvider.CONCURRENCY_ACCESS_LIMIT);
 
         public AccessIndexDataStore(Node node,Database database,MapStoreListener mapStoreListener){
             this.node = node;
@@ -494,7 +498,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         @Override
         public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
             try{
-                pass.acquire();
                 String akey = t.key().asString();
                 if(akey==null) return false;
                 byte[] k = akey.getBytes();
@@ -516,15 +519,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 log.error("error on createIfAbsent",ex);
                 return false;
             }
-            finally {
-                pass.release();
-            }
         }
 
         @Override
         public <T extends Recoverable> boolean load(T t) {
             try{
-                pass.acquire();
                 String akey = t.key().asString();
                 if(akey==null) return false;
                 byte[] key = akey.getBytes();
@@ -541,13 +540,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 log.error("error on load",ex);
                 return false;
             }
-            finally {
-                pass.release();
-            }
         }
         public void set(byte[] key,byte[] value){
             try{
-                pass.acquire();
                 if(!_set(key,value)){
                     log.warn("failed to se key/value->"+new String(key));
                 }
@@ -555,21 +550,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             catch (Exception ex){
                 log.error("error on set",ex);
             }
-            finally {
-                pass.release();
-            }
         }
         public byte[] get(byte[] key){
             try{
-                pass.acquire();
                 return _get(key);
             }catch (Exception ex){
                 log.error("error on get",ex);
                 return null;
             }
-            finally {
-                pass.release();
-            }
+
         }
         public void list(Binary binary){
             Cursor cursor = berkeleyStore.openCursor(null,null);
@@ -609,6 +598,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public int scope(){
             return Distributable.INTEGRATION_SCOPE;
         }
+
         private boolean _set(byte[] key,byte[] value){
             return berkeleyStore.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;
         }

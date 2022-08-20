@@ -176,8 +176,8 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             final Future<Integer> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
         } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-            //return 0;
+            //throw ExceptionUtil.rethrow(e);
+            return -1;
         }
     }
     public void sync(int size,byte[][] keys,byte[][] values,String memberId,int partition){

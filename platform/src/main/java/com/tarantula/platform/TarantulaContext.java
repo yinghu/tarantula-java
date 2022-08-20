@@ -490,51 +490,23 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public void _registerNode() throws Exception{
  	    this.accessIndexService().disable();
  	    _access_index_syc_finished.await();
-         for(int i=0;i<accessIndexRoutingNumber;i++){
+ 	    for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
  	        String _pk = "p"+i;
  	        _syncLatch.put(_pk,countDownLatch);
- 	        this.accessIndexService().syncStart(i,_pk);
+ 	        if(this.accessIndexService().syncStart(i,_pk)==-1){
+ 	            countDownLatch.countDown();
+            }
  	        countDownLatch.await();
  	        _syncLatch.remove(_pk);
         }
+ 	    log.warn("Access index data sync has finished");
         CountDownLatch _tarantula_sync = new CountDownLatch(1);
         _syncLatch.put("t100",_tarantula_sync);
         this.integrationCluster.recoverService().syncStart(DeploymentServiceProvider.DEPLOY_DATA_STORE,"t100");
         _tarantula_sync.await();
         _syncLatch.remove("t100");
 
-        /**
-        CountDownLatch _account_sync = new CountDownLatch(1);
-        _syncLatch.put("t200",_account_sync);
-        this.integrationCluster.recoverService().syncStart(Account.DataStore,"t200");
-        _account_sync.await();
-        _syncLatch.remove("t200");
-
-        CountDownLatch _account_index_sync = new CountDownLatch(1);
-        _syncLatch.put("t300",_account_index_sync);
-        this.integrationCluster.recoverService().syncStart(Account.IndexDataStore,"t300");
-        _account_index_sync.await();
-        _syncLatch.remove("t300");
-
-        CountDownLatch _user_sync = new CountDownLatch(1);
-        _syncLatch.put("t400",_user_sync);
-        this.integrationCluster.recoverService().syncStart(User.DataStore,"t400");
-        _user_sync.await();
-        _syncLatch.remove("t400");
-
-        CountDownLatch _presence_sync = new CountDownLatch(1);
-        _syncLatch.put("t500",_presence_sync);
-        this.integrationCluster.recoverService().syncStart(Presence.DataStore,"t500");
-        _presence_sync.await();
-        _syncLatch.remove("t500");
-
-        CountDownLatch _subscription_sync = new CountDownLatch(1);
-        _syncLatch.put("t600",_subscription_sync);
-        this.integrationCluster.recoverService().syncStart(Subscription.DataStore,"t600");
-        _subscription_sync.await();
-        _syncLatch.remove("t600");
-        **/
 
         for(String s : this.integrationCluster.recoverService().listModules()){
             log.warn("Loading module files from master node ["+s+"]");
