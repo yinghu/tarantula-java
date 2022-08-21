@@ -7,15 +7,14 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnExchange;
-import com.icodesoftware.service.RequestHandler;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.Metrics;
+import com.tarantula.platform.service.PerformanceMetrics;
 import com.tarantula.platform.util.OnViewSerializer;
 
 
-public class ViewEventHandler implements RequestHandler {
+public class ViewEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(ViewEventHandler.class);
 
@@ -36,7 +35,7 @@ public class ViewEventHandler implements RequestHandler {
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
     @Override
     public void start() throws Exception {

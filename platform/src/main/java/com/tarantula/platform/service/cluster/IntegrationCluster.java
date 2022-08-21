@@ -99,7 +99,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._storageStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
-        this.metricsListener = (k,v)->{};
     }
     public void shutdown() throws Exception {
         try{
@@ -117,7 +116,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(message.destination()!=null){
             ITopic<Event> _t = this.topicList.computeIfAbsent(message.destination(),(String d)-> this._cluster.getTopic(d));
             _t.publish(message);
-            metricsListener.onUpdated(Metrics.EVENT_OUT_COUNT,1);
+            metricsListener.onUpdated(PerformanceMetrics.CLUSTER_OUTBOUND_MESSAGE_COUNT,1);
         }else{
             log.warn("No destination message ->"+message);
         }
@@ -200,7 +199,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private void onDispatch(Event event){
         //dispatch event to registered callback
         this.replicationQueue.offer(event);
-        metricsListener.onUpdated(Metrics.EVENT_IN_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.CLUSTER_INBOUND_MESSAGE_COUNT,1);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
         BucketReceiver br = bMap.computeIfAbsent(bucketReceiver.bucket(),(b)->bucketReceiver);

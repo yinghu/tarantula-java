@@ -73,7 +73,9 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         GameServerEventHandler gameServerEventHandler = new GameServerEventHandler();
         gameServerEventHandler.setup(this.tarantulaContext);
         gameServerEventHandler.start();
-        rMap.put(gameServerEventHandler.name(),gameServerEventHandler);
+
+        //register performance mestrics
+        rMap.forEach((k,h)->h.registerMetricsListener(this.tarantulaContext.performanceMetrics));
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);

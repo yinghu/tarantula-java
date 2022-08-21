@@ -10,6 +10,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.room.ConnectionStub;
+import com.tarantula.platform.service.PerformanceMetrics;
 import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -18,7 +19,7 @@ import javax.crypto.Cipher;
 import java.util.Base64;
 
 
-public class GameServerEventHandler implements RequestHandler {
+public class GameServerEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(GameServerEventHandler.class);
 
@@ -87,6 +88,7 @@ public class GameServerEventHandler implements RequestHandler {
             resp.addProperty("token", Base64.getEncoder().encodeToString(cipher.doFinal("hello".getBytes())));
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override

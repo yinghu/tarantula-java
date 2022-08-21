@@ -12,10 +12,8 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class PresenceEventHandler implements RequestHandler {
+public class PresenceEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(PresenceEventHandler.class);
 
@@ -41,7 +39,7 @@ public class PresenceEventHandler implements RequestHandler {
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override

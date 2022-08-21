@@ -12,7 +12,7 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-public class AdminEventHandler implements RequestHandler{
+public class AdminEventHandler extends AbstractRequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
 
@@ -40,7 +40,7 @@ public class AdminEventHandler implements RequestHandler{
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override

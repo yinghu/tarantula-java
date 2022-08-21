@@ -12,18 +12,18 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-public class AccountEventHandler implements RequestHandler {
+public class AccountEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AccountEventHandler.class);
 
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private RecoverService recoverService;
+    //private RecoverService recoverService;
     private GsonBuilder builder;
     private OnView invalidView;
 
     public AccountEventHandler(){
-
+        super();
     }
 
     public String name(){
@@ -41,7 +41,7 @@ public class AccountEventHandler implements RequestHandler {
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class AccountEventHandler implements RequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        this.recoverService = tcx.clusterProvider().recoverService();
-        tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        //this.recoverService = tcx.clusterProvider().recoverService();
+        this.tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){

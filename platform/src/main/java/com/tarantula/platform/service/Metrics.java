@@ -13,8 +13,8 @@ public class Metrics extends OnApplicationHeader {
 
     //stats entry
     public final static String REQUEST_COUNT = "1";
-    public final static String EVENT_OUT_COUNT = "2";
-    public final static String EVENT_IN_COUNT = "3";
+    //public final static String EVENT_OUT_COUNT = "2";
+    //public final static String EVENT_IN_COUNT = "3";
 
     public final static String GOOGLE_COUNT = "4";
     public final static String STRIPE_COUNT = "5";

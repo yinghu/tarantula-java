@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class ServiceEventHandler implements RequestHandler {
+public class ServiceEventHandler extends AbstractRequestHandler {
 
 	private static final JDKLogger log = JDKLogger.getLogger(ServiceEventHandler.class);
 
@@ -21,6 +21,7 @@ public class ServiceEventHandler implements RequestHandler {
     private String bucket;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
     private DeploymentServiceProvider deploymentServiceProvider;
+
     public ServiceEventHandler(){
 
 	}
@@ -65,7 +66,7 @@ public class ServiceEventHandler implements RequestHandler {
         else{
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
         }
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override

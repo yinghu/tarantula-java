@@ -14,7 +14,7 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.io.InputStream;
 
-public class UploadEventHandler implements RequestHandler {
+public class UploadEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
 

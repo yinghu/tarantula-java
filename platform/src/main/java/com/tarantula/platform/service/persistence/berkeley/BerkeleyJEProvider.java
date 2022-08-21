@@ -6,6 +6,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TimeUtil;
@@ -14,6 +15,7 @@ import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
 
 import java.io.*;
@@ -64,7 +66,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupProvider iBackupProvider;
     private BackupProvider dBackupProvider;
     private List<String> dataStoreList;
-    //private List<String> accessIndexStoreList;
+
+    private MetricsListener metricsListener;
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -285,6 +288,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value,replicationNodeNumber));
         }
+        onMetrics();
     }
     @Override
     public byte[] onRecovering(Metadata metadata,byte[] key){
@@ -440,6 +444,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             backup(Distributable.DATA_SCOPE);//daily incremental backup
             backup(Distributable.INTEGRATION_SCOPE);
         }
+    }
+    private void onMetrics(){
+        try{
+            this.metricsListener.onUpdated(PerformanceMetrics.DATA_STORE_COUNT,1);
+        }catch (Exception ex){
+            //ignore if metricsListener swapping
+        }
+    }
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        metricsListener = (m,v)->{};//swapping to empty
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

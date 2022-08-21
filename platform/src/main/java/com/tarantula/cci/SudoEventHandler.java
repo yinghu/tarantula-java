@@ -13,7 +13,7 @@ import com.tarantula.platform.util.OnAccessSerializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
 
-public class SudoEventHandler implements RequestHandler {
+public class SudoEventHandler extends AbstractRequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(SudoEventHandler.class);
 
@@ -38,7 +38,7 @@ public class SudoEventHandler implements RequestHandler {
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
     }
 
     @Override

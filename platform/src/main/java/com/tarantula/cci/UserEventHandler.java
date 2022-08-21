@@ -7,14 +7,14 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.service.Metrics;
+import com.tarantula.platform.service.PerformanceMetrics;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UserEventHandler implements RequestHandler, AccessIndexService.Listener{
+public class UserEventHandler extends AbstractRequestHandler implements AccessIndexService.Listener{
 
     private static TarantulaLogger log = JDKLogger.getLogger(UserEventHandler.class);
 
@@ -37,7 +37,7 @@ public class UserEventHandler implements RequestHandler, AccessIndexService.List
     }
     public void onRequest(OnExchange onExchange) throws Exception {
 
-        deploymentServiceProvider.onUpdated(Metrics.REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
         String path = onExchange.path();
         String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
         String name = onExchange.header(Session.TARANTULA_NAME);

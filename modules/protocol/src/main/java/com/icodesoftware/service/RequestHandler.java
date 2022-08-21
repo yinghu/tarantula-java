@@ -2,7 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.EventListener;
 
-public interface RequestHandler extends EventListener, Serviceable {
+public interface RequestHandler extends EventListener, ServiceProvider {
 
     String HEALTH_CHECK_PATH = "/health";
 
@@ -20,9 +20,9 @@ public interface RequestHandler extends EventListener, Serviceable {
     String USER_PATH = "/user";
     String VIEW_PATH = "/view";
 
-    String name();
+    //String name();
     void onRequest(OnExchange exchange) throws Exception;
-    void setup(ServiceContext tcx);
+    //void setup(ServiceContext tcx);
     default void onCheck(){}
     default boolean deployable(){return false;}
 }

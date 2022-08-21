@@ -115,6 +115,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public long timeoutOnInstance;
     public int metricsUpdateIntervalMinutes=1;
     private StatisticsIndex nodeMetrics;
+    public PerformanceMetrics performanceMetrics;
+
     public String clusterNameSuffix;
 
     public String platformVersion;
@@ -488,6 +490,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         });
     }
     public void _registerNode() throws Exception{
+ 	    this.performanceMetrics = new PerformanceMetrics();
+ 	    this.performanceMetrics.setup(this);
+ 	    this.deploymentDataStoreProvider.registerMetricsListener(this.performanceMetrics);
+        this.integrationCluster.registerMetricsListener(this.performanceMetrics);
  	    this.accessIndexService().disable();
  	    _access_index_syc_finished.await();
  	    for(int i=0;i<accessIndexRoutingNumber;i++){
@@ -524,7 +530,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         nodeMetrics.distributionKey(node.nodeId);
         nodeMetrics.dataStore(masterDataStore());
         masterDataStore().createIfAbsent(nodeMetrics,true);
-        this.integrationCluster.registerMetricsListener(this);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
  	}
