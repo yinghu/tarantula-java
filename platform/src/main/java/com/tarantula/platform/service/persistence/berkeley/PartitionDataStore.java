@@ -281,6 +281,10 @@ public class PartitionDataStore extends ReplicatedDataStore{
             dso.lock(key,()->{
                 RevisionObject ro = _getRevisionObject(dso,key);
                 RevisionObject rd = RevisionObject.fromBinary(value);
+                if(ro == null){
+                    _put(dso,key,RevisionObject.toBinary(rd.revision,rd.data,false));
+                   return true;
+                }
                 if(rd.revision <= ro.revision) return false;
                 _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,false));
                 return true;
