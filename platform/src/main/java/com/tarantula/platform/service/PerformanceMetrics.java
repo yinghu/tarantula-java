@@ -47,7 +47,7 @@ public class PerformanceMetrics implements MetricsListener, SchedulingTask {
 
     @Override
     public void run() {
-        logger.warn("Total count ->"+count);
+        //logger.warn("Total count ->"+count);
         count = 0;
     }
 }

@@ -73,6 +73,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //System metrics data
     <T extends OnAccess> T metrics();
 
+    void registerMetricsListener(String name,MetricsListener metricsListener);
+    void unregisterMetricsListener(String name);
+    MetricsListener metricsListener(String name);
+
     //Access index set operation API
     void registerAccessIndexListener(AccessIndexService.Listener listener);
     AccessIndexService.AccessIndexStore accessIndexStore();

@@ -45,6 +45,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     //push event cache mappings
     private ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String,MetricsListener> mListeners = new ConcurrentHashMap<>();
+
     //module class loader mappings
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
 
@@ -842,7 +844,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void onUpdated(String key,double value){
         this.tarantulaContext.onUpdated(key,value);
     }
-
+    public void registerMetricsListener(String name,MetricsListener metricsListener){
+        this.mListeners.put(name,metricsListener);
+    }
+    public void unregisterMetricsListener(String name){
+        this.mListeners.remove(name);
+    }
+    public MetricsListener metricsListener(String name){
+        return this.mListeners.get(name);
+    }
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;

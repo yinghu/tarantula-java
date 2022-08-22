@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
@@ -18,6 +19,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     private ApplicationContext context;
     private PlatformStoreServiceProvider storeServiceProvider;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
+    private GameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
     private String serviceTypeId;
     @Override
@@ -74,11 +76,11 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         this.context = applicationContext;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        GameServiceProvider gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
-        this.serviceTypeId = this.context.descriptor().typeId();
+        this.serviceTypeId = this.context.descriptor().typeId().replace("-service","");
         this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
     }
 }

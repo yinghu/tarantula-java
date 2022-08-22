@@ -6,7 +6,6 @@ import com.tarantula.platform.TarantulaContext;
 
 public class ApplicationMetrics implements MetricsListener, SchedulingTask {
 
-    public final static String DATA_STORE_COUNT = "dataStoreCount";
 
     public ApplicationMetrics(TarantulaContext tarantulaContext){
 
