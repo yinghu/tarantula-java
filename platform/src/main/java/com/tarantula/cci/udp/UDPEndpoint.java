@@ -5,10 +5,12 @@ import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.ClientConnection;
+import com.tarantula.platform.service.PerformanceMetrics;
 
 import javax.crypto.Cipher;
 import java.util.UUID;
@@ -31,6 +33,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
+    private MetricsListener metricsListener;
 
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
@@ -128,6 +131,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             String ticket = messageBuffer.readUTF8();
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
+            metricsListener.onUpdated(PerformanceMetrics.UDP_REQUEST_COUNT,1);
             return sessionId==messageHeader.sessionId && suc;
         }catch (Exception ex){
             logger.error("unexpected error on validate",ex);
@@ -148,7 +152,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 messageBuffer.flip();
                 messageBuffer.readHeader();
                 udpChannel.onMessage(messageHeader,messageBuffer);
-
+                metricsListener.onUpdated(PerformanceMetrics.UDP_REQUEST_COUNT,1);
             }catch (Exception ex){
                 logger.error("error on message",ex);
             }
@@ -162,5 +166,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onPing() {
 
+    }
+
+    @Override
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
     }
 }

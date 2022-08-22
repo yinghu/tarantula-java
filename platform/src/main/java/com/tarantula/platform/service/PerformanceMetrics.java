@@ -12,7 +12,7 @@ public class PerformanceMetrics implements MetricsListener, SchedulingTask {
     public final static String CLUSTER_INBOUND_MESSAGE_COUNT = "clusterInboundMessageCount";
     public final static String CLUSTER_OUTBOUND_MESSAGE_COUNT = "clusterOutboundMessageCount";
     public final static String HTTP_REQUEST_COUNT = "httpRequestCount";
-
+    public final static String UDP_REQUEST_COUNT = "udpRequestCount";
 
 
     private TarantulaLogger logger;
