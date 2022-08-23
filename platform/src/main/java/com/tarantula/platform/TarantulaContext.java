@@ -917,4 +917,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public String deployDirectory(){
          return deployDir;
     }
+
+    public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
+
+    }
 }

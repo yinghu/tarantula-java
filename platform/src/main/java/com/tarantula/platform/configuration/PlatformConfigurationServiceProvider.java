@@ -11,7 +11,9 @@ import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.service.AmazonAWSProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.AuthObject;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 
 import java.util.List;
@@ -51,12 +53,16 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        //this.tokenValidatorProvider.registerAuthVendor();
         List<ConfigurableObject> items = applicationPreSetup.list(descriptor,new ConfigurableObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             a.setup();
-            logger.warn(a.configurationCategory()+">>"+a.distributionKey());
-            //if(!a.disabled()) achievements.put(a.name(),a);
+            if(!a.disabled()){
+                TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
+                if(a!=null){
+                    logger.warn(vendor.name());
+                    //serviceContext.registerAuthVendor(vendor);
+                }
+            }
         });
         return null;
     }
@@ -99,6 +105,14 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     @Override
     public void waitForData(){
 
+    }
+    private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
+        if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
+            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(configurableObject));
+            amazonAWSProvider.registerMetricsLister(gameCluster);
+            return amazonAWSProvider;
+        }
+        return null;
     }
 
 }

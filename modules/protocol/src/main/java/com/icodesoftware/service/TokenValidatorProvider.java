@@ -53,6 +53,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     int updateSubscription(String systemId,int months);
     interface AuthVendor{
         String name();
+        String typeId();
         String clientId();
         String clientId(String typeId);
         void registerMetricsLister(MetricsListener metricsListener);

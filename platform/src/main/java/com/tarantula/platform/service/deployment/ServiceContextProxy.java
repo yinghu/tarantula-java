@@ -99,4 +99,8 @@ public class ServiceContextProxy implements ServiceContext {
     public String servicePushAddress(){
         return tarantulaContext.servicePushAddress();
     }
+
+    public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
+        this.tarantulaContext.registerAuthVendor(authVendor);
+    }
 }

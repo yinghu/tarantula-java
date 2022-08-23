@@ -1,8 +1,8 @@
 package com.tarantula.platform.service;
 
-import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.configuration.AwsS3Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -17,6 +17,11 @@ public class AmazonAWSProvider extends AuthObject{
     private S3Client s3Client;
     private String region;
     private String bucket;
+
+    public AmazonAWSProvider(AwsS3Configuration configuration){
+        this(configuration.configurationTypeId(),configuration.region(),configuration.bucket(),configuration.accessKeyId(),configuration.secretAccessKey());
+    }
+
     public AmazonAWSProvider(String typeId,String region,String bucket,String accessKeyId,String secretKey){
         super(typeId,accessKeyId,secretKey,"","","",new String[]{region});
         this.region = region;

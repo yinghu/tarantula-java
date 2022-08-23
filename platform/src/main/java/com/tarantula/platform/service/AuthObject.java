@@ -15,7 +15,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static String CONTENT_TYPE = "Content-type";
     protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
     protected static String AUTHORIZATION = "Authorization";
-
+    protected String typeId;
     protected final String name;
     protected   String clientId;
     protected   String secureKey;
@@ -39,6 +39,11 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     @Override
     public String name(){
         return this.name;
+    }
+
+    @Override
+    public String typeId(){
+        return typeId;
     }
 
     @Override

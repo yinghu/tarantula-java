@@ -22,6 +22,10 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         preload.forEach((v)-> aMap.put(v.name(),v));
     }
 
+    public String typeId(){
+        return name;
+    }
+
     @Override
     public String name() {
         return name;
@@ -73,8 +77,8 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     }
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
-        authVendor.registerMetricsLister(metricsListener);
         authVendor.setup(serviceContext);
+        aMap.put(authVendor.name(),authVendor);
     }
     public void releaseAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         aMap.remove(authVendor.name());

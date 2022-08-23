@@ -103,6 +103,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         this.configurationServiceProvider = new PlatformConfigurationServiceProvider(gameCluster);
         this.configurationServiceProvider.setup(serviceContext);
         this.configurationServiceProvider.waitForData();
+        //serviceContext.registerAuthVendor();
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
