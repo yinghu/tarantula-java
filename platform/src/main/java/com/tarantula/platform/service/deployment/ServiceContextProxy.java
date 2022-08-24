@@ -103,4 +103,7 @@ public class ServiceContextProxy implements ServiceContext {
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         this.tarantulaContext.registerAuthVendor(authVendor);
     }
+    public void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
+        this.tarantulaContext.unregisterAuthVendor(authVendor);
+    }
 }

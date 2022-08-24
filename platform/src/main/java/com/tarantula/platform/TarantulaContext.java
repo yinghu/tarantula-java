@@ -925,4 +925,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         log.warn("Third party provider ["+authVendor.name()+"] registered with type id ["+authVendor.typeId()+"]");
         thirdPartyServiceProvider.registerAuthVendor(authVendor);
  	}
+    public void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
+        TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider)this.serviceProvider(TokenValidatorProvider.NAME);
+        ThirdPartyServiceProvider thirdPartyServiceProvider = (ThirdPartyServiceProvider)tokenValidatorProvider.authVendor(authVendor.name());
+        if(thirdPartyServiceProvider == null) throw new RuntimeException("third party provider not existed ["+authVendor.name()+"]");
+        log.warn("Third party provider ["+authVendor.name()+"] unregistered with type id ["+authVendor.typeId()+"]");
+        thirdPartyServiceProvider.releaseAuthVendor(authVendor);
+    }
 }

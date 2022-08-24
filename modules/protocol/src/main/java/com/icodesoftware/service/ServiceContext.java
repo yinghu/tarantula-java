@@ -35,5 +35,5 @@ public interface ServiceContext {
     List<Descriptor> availableServices();
 
     void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
-    //void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
+    void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
 }

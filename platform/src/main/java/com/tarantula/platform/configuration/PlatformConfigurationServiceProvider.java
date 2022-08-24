@@ -89,8 +89,16 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         return true;
     }
     public boolean onRelease(String category,String itemId){
-        logger.warn("CAT->"+category+">>>"+itemId);
-        return false;
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(itemId);
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = _gc.serviceWithCategory("item");
+        if(!applicationPreSetup.load(app,configurableObject)){
+            return false;
+        }
+        TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
+        this.serviceContext.unregisterAuthVendor(authVendor);
+        return true;
     }
 
 

@@ -13,8 +13,6 @@ public class SystemServiceBootstrap implements Serviceable {
     @Override
     public void start() throws Exception {
         this.tarantulaContext._setup();
-        //this.tarantulaContext.tokenValidatorProvider().setup(this.tarantulaContext);
-        //this.tarantulaContext.tokenValidatorProvider().waitForData();
     }
 
     @Override
