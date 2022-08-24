@@ -50,12 +50,16 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
         if(!dataStore.update(t)){
             dataStore.create(t);
+
             categoryIndex.addKey(t.distributionKey());
             dataStore.update(categoryIndex);
+
             typeIndex.addKey(t.distributionKey());
             dataStore.update(typeIndex);
+
             typeIdIndex.addKey(t.distributionKey());
             dataStore.update(typeIdIndex);
+
             nameIndex.addKey(t.distributionKey());
             dataStore.update(nameIndex);
 

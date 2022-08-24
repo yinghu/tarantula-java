@@ -15,8 +15,8 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static String CONTENT_TYPE = "Content-type";
     protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
     protected static String AUTHORIZATION = "Authorization";
-    protected String typeId;
-    protected final String name;
+    protected final String typeId;
+    //protected final String name;
     protected   String clientId;
     protected   String secureKey;
     protected   String authUri;
@@ -25,8 +25,8 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected   String[] origins;
     protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
-    public AuthObject(String name,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
-        this.name = name;
+    public AuthObject(String typeId,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
+        this.typeId = typeId;
         this.clientId = clientId;
         this.secureKey = secureKey;
         this.authUri = authUri;
@@ -38,7 +38,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
     @Override
     public String name(){
-        return this.name;
+        return typeId;
     }
 
     @Override

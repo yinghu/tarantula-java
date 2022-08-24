@@ -325,6 +325,7 @@
         let itemTemplate = {header:{},application:{},reference:[]};
         if(TARA_API.query().operation == 'Update'){
             itemTemplate.itemId = TARA_API.query().pendingUpdate.itemId;
+            itemTemplate.revision = TARA_API.query().pendingUpdate.revision;
         }
         itemTemplate.configurationType = selectedItem.header.scope;//TARA_API.query().category;
         itemTemplate.configurationTypeId = _typeId;

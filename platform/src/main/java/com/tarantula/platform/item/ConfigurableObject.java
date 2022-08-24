@@ -183,6 +183,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationName = config.get("configurationName").getAsString();
         this.configurationCategory = config.get("configurationCategory").getAsString();
         this.configurationVersion = config.get("configurationVersion").getAsString();
+        this.revision = Long.parseLong(config.get("revision").getAsString());
         return configureAndValidate(config);
     }
 
@@ -202,6 +203,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.reference = config.getAsJsonArray("reference");
         if(config.has("itemId")){
             this.distributionKey(config.get("itemId").getAsString());
+            this.revision = Long.parseLong(config.get("revision").getAsString());
         }
         return true;
     }

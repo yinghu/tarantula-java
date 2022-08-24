@@ -26,7 +26,6 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     private final String gameServiceName;
 
     private ApplicationPreSetup applicationPreSetup;
-    private TokenValidatorProvider tokenValidatorProvider;
 
     private DistributionItemService distributionItemService;
 
@@ -85,6 +84,8 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
+        TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
+        this.serviceContext.registerAuthVendor(authVendor);
         return true;
     }
     public boolean onRelease(String category,String itemId){
@@ -96,7 +97,6 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.tokenValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
@@ -108,7 +108,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
-            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(configurableObject));
+            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(gameServiceName.replace("-service",""),configurableObject));
             amazonAWSProvider.registerMetricsLister(gameCluster);
             return amazonAWSProvider;
         }

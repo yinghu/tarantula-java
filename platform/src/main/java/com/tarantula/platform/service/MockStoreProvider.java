@@ -17,7 +17,7 @@ public class MockStoreProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        String ds = name.replaceAll("-","_")+"_mock_store_transaction";
+        String ds = typeId.replaceAll("-","_")+"_mock_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.partitionNumber());
     }
     @Override

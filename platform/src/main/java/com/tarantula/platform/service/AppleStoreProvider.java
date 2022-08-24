@@ -41,7 +41,7 @@ public class AppleStoreProvider extends AuthObject{
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         jsonParser = new JsonParser();
-        String ds = name.replaceAll("-","_")+"_apple_store_transaction";
+        String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.partitionNumber());
 
     }

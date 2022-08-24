@@ -229,6 +229,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
                 byte[] vx = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
                 if(!_put(dso,key,vx)) return false;
+                t.revision(Long.MIN_VALUE);
                 if(t.backup()) this.mapStoreListener.onCreating(dso.metadata,okey,t);
 
                 if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, key,vx);
