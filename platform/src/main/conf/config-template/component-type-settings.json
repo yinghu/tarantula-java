@@ -6,7 +6,6 @@
   "itemList":
   [
     {"type": "category","name": "GameStatistics"},
-    {"type": "category","name": "Room"},
-    {"type": "category","name": "GoogleWebConfiguration"}
+    {"type": "category","name": "Room"}
   ]
 }

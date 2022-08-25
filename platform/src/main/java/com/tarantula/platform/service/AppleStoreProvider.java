@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.configuration.AppleStoreConfiguration;
 import com.tarantula.platform.store.Transaction;
 
 import javax.net.ssl.SSLContext;
@@ -27,6 +28,11 @@ public class AppleStoreProvider extends AuthObject{
     private HttpClient client;
     private JsonParser jsonParser;
     private DataStore dataStore;
+
+    public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration){
+        this(appleStoreConfiguration.typeId(), appleStoreConfiguration.verifyUrl(),appleStoreConfiguration.secureKey());
+    }
+
     public AppleStoreProvider(String typeId,String validationUrl,String key){
         super(typeId,"",key,"","",validationUrl,new String[0]);
         try{

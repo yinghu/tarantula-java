@@ -1,28 +1,36 @@
 package com.tarantula.platform.configuration;
 
+import com.icodesoftware.OnAccess;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
 public class GoogleStoreConfiguration extends Application {
 
-
-    public GoogleStoreConfiguration(ConfigurableObject configurableObject){
+    private String typeId;
+    public GoogleStoreConfiguration(String typeId,ConfigurableObject configurableObject){
         super(configurableObject);
+        this.typeId = typeId;
+    }
+
+
+    public String typeId(){
+        return typeId;
     }
 
     public String name(){
-        return header.get("Name").getAsString();
+        return OnAccess.GOOGLE_STORE;
     }
-    public String region(){
-        return header.get("Region").getAsString();
+
+    public String packageName(){
+        return header.get("PackageName").getAsString();
     }
-    public String bucket(){
-        return header.get("Bucket").getAsString();
+    public String secretKey(){
+        return header.get("SecretKey").getAsString();
     }
-    public String accessKeyId(){
-        return header.get("AccessKeyId").getAsString();
+    public String validationUrl(){
+        return header.get("ValidationUrl").getAsString();
     }
-    public String secretAccessKey(){
-        return header.get("SecretAccessKey").getAsString();
+    public String acknowledgeUrl(){
+        return header.get("AcknowledgeUrl").getAsString();
     }
 }

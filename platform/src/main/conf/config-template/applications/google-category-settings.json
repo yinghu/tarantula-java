@@ -17,13 +17,6 @@
       "application": {
         "properties": [
           {
-            "name": "Provider",
-            "type": "enum",
-            "reference": "Provider",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "PackageName",
             "type": "string",
             "reference": "String",
@@ -65,13 +58,6 @@
       "application": {
         "properties": [
           {
-            "name": "Provider",
-            "type": "enum",
-            "reference": "Provider",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "VerifyUrl",
             "type": "string",
             "reference": "String",
@@ -79,7 +65,7 @@
             "downloadable": false
           },
           {
-            "name": "SecretKey",
+            "name": "AccessKey",
             "type": "string",
             "reference": "String",
             "nullable": false,
@@ -93,9 +79,44 @@
             "downloadable": false
           },
           {
-            "name": "WebConfiguration",
-            "type": "category",
-            "reference": "category:GoogleWebConfiguration",
+            "name": "WebClientId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "WebProjectId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "WebAuthUrl",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "WebTokenUrl",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "WebCertUrl",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "WebClientSecret",
+            "type": "string",
+            "reference": "String",
             "nullable": false,
             "downloadable": false
           }

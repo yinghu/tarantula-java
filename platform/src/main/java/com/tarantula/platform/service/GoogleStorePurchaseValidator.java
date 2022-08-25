@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.configuration.GoogleStoreConfiguration;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -24,6 +25,11 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private String accessKey;
     private String packageName;
     private String validationUri;
+
+    public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration){
+        this(googleStoreConfiguration.typeId(),googleStoreConfiguration.validationUrl(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
+    }
+
     public GoogleStorePurchaseValidator(String typeId,String validationUri, String packageName, String accessKey) {
         super(typeId,"", "", "", "","", new String[0]);
         this.validationUri = validationUri;

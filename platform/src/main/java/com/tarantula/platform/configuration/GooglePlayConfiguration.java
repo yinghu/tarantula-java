@@ -1,28 +1,55 @@
 package com.tarantula.platform.configuration;
 
+import com.icodesoftware.OnAccess;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
 public class GooglePlayConfiguration extends Application {
 
 
-    public GooglePlayConfiguration(ConfigurableObject configurableObject){
+    private String typeId;
+
+    public GooglePlayConfiguration(String typeId, ConfigurableObject configurableObject){
         super(configurableObject);
+        this.typeId = typeId;
+    }
+
+    public String typeId(){
+        return typeId;
     }
 
     public String name(){
-        return header.get("Name").getAsString();
+        return OnAccess.GOOGLE;
     }
-    public String region(){
-        return header.get("Region").getAsString();
+    //android
+    public String applicationId(){
+        return header.get("ApplicationId").getAsString();
     }
-    public String bucket(){
-        return header.get("Bucket").getAsString();
+    public String accessKey(){
+        return header.get("AccessKey").getAsString();
     }
-    public String accessKeyId(){
-        return header.get("AccessKeyId").getAsString();
+    public String verifyUrl(){
+        return header.get("VerifyUrl").getAsString();
     }
-    public String secretAccessKey(){
-        return header.get("SecretAccessKey").getAsString();
+
+    //web
+    public String authUrl(){
+        return header.get("WebAuthUrl").getAsString();
     }
+    public String tokenUrl(){
+        return header.get("WebTokenUrl").getAsString();
+    }
+    public String certUrl(){
+        return header.get("WebTokenUrl").getAsString();
+    }
+    public String clientId(){
+        return header.get("WebApplicationId").getAsString();
+    }
+    public String projectId(){
+        return header.get("WebSecretKey").getAsString();
+    }
+    public String clientSecret(){
+        return header.get("WebClientSecret").getAsString();
+    }
+
 }

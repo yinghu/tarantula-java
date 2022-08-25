@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.configuration.GooglePlayConfiguration;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -30,6 +31,11 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private String accessKey;
     private String applicationId;
     private String verifyUri;
+
+    public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration){
+        this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.authUrl(),googlePlayConfiguration.tokenUrl(),googlePlayConfiguration.certUrl(),googlePlayConfiguration.verifyUrl(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
+    }
+
     public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey, String authUri, String tokenUri, String certUri,String verifyUri,String applicationId,String accessKey) {
         super(typeId, clientId, secureKey, authUri, tokenUri, certUri, new String[0]);
         this.verifyUri = verifyUri;

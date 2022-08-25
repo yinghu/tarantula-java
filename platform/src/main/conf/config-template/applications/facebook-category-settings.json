@@ -17,13 +17,6 @@
       "application": {
         "properties": [
           {
-            "name": "Provider",
-            "type": "enum",
-            "reference": "Provider",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "AppName",
             "type": "string",
             "reference": "String",

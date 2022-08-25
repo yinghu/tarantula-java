@@ -11,10 +11,7 @@ import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
-import com.tarantula.platform.service.AmazonAWSProvider;
-import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.AuthObject;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.service.*;
 
 import java.util.List;
 
@@ -58,8 +55,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
             if(!a.disabled()){
                 TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
                 if(a!=null){
-                    logger.warn(vendor.name());
-                    //serviceContext.registerAuthVendor(vendor);
+                    serviceContext.registerAuthVendor(vendor);
                 }
             }
         });
@@ -115,10 +111,31 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
+        String typeId = gameServiceName.replace("-service","");
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
-            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(gameServiceName.replace("-service",""),configurableObject));
+            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(typeId,configurableObject));
             amazonAWSProvider.registerMetricsLister(gameCluster);
             return amazonAWSProvider;
+        }
+        else if(configurableObject.configurationCategory().equals("AppleStoreConfiguration")){
+            AppleStoreProvider appleStoreProvider = new AppleStoreProvider(new AppleStoreConfiguration(typeId,configurableObject));
+            appleStoreProvider.registerMetricsLister(gameCluster);
+            return appleStoreProvider;
+        }
+        else if(configurableObject.configurationCategory().equals("FacebookConfiguration")){
+            FacebookAuthProvider facebookAuthProvider = new FacebookAuthProvider(new FacebookConfiguration(typeId,configurableObject));
+            facebookAuthProvider.registerMetricsLister(gameCluster);
+            return facebookAuthProvider;
+        }
+        else if(configurableObject.configurationCategory().equals("GoogleStoreConfiguration")){
+            GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(new GoogleStoreConfiguration(typeId,configurableObject));
+            googleStorePurchaseValidator.registerMetricsLister(gameCluster);
+            return googleStorePurchaseValidator;
+        }
+        else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
+            GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject));
+            googleOAuthTokenValidator.registerMetricsLister(gameCluster);
+            return googleOAuthTokenValidator;
         }
         return null;
     }

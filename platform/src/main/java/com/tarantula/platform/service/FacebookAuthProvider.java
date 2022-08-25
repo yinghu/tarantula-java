@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.tarantula.platform.configuration.FacebookConfiguration;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -20,6 +21,10 @@ public class FacebookAuthProvider extends AuthObject{
 
     private HttpClient client;
     private String accessToken;
+
+    public FacebookAuthProvider(FacebookConfiguration facebookConfiguration){
+        this(facebookConfiguration.typeId(),facebookConfiguration.appId(),facebookConfiguration.secretKey(),facebookConfiguration.authUrl(),facebookConfiguration.tokenUrl(),facebookConfiguration.certUrl(),new String[]{facebookConfiguration.appName()});
+    }
 
     public FacebookAuthProvider(String typeId,String clientId, String secureKey, String authUri, String tokenUri, String certUri, String[] origins) {
         super(typeId, clientId, secureKey, authUri, tokenUri, certUri, origins);
