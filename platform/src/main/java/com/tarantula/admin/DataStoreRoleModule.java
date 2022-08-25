@@ -6,9 +6,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.UserService;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public class DataStoreRoleModule implements Module {
             session.write(toMessage("backup commnad issued",true).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            Metrics metrics = this.deploymentServiceProvider.metrics();
+            Metrics metrics = context.metrics(Metrics.PERFORMANCE);
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes());

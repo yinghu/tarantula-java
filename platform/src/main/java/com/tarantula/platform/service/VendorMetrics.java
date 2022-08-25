@@ -4,7 +4,7 @@ import com.icodesoftware.Statistics;
 import com.tarantula.platform.OnApplicationHeader;
 
 
-public class Metrics extends OnApplicationHeader {
+public class VendorMetrics extends OnApplicationHeader {
 
     //metrics entry
     //public final static String STATS_KEY = "a";
@@ -74,7 +74,7 @@ public class Metrics extends OnApplicationHeader {
 
     public Statistics statistics;
 
-    public Metrics(Statistics statistics){
+    public VendorMetrics(Statistics statistics){
         this.statistics = statistics;
     }
 }

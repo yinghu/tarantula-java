@@ -2,6 +2,7 @@ package com.icodesoftware;
 
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 
 import java.util.List;
@@ -40,4 +41,6 @@ public interface ApplicationContext {
     PostOffice postOffice();
 
     ClusterProvider clusterProvider();
+
+    Metrics metrics(String name);
 }

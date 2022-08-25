@@ -1,12 +1,14 @@
 package com.tarantula.platform.presence;
 
+import com.icodesoftware.service.LoginProvider;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
 
-public class DeveloperLogin extends RecoverableObject {
+public class DeveloperLogin extends RecoverableObject implements LoginProvider {
 
     public static final String DataStore = "developer_login";
+
 
     public DeveloperLogin(){
 
@@ -46,7 +48,9 @@ public class DeveloperLogin extends RecoverableObject {
     public String password(){
         return index;
     }
-    public String deviceId(){
+
+    @Override
+    public String clientId() {
         return name;
     }
 }

@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.platform.event.*;
@@ -170,5 +171,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public ClusterProvider clusterProvider(){
         return this.tarantulaContext.clusterProvider();
+    }
+
+    public Metrics metrics(String name){
+        return this.tarantulaContext.metrics(name);
     }
 }

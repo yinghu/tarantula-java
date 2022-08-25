@@ -364,49 +364,49 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         fMap = new ConcurrentHashMap<>();
         AuthVendorRegistry google = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.GOOGLE);
         if(google!=null){
-            google.registerMetricsLister(this.deploymentServiceProvider);
+            //google.registerMetricsLister(this.deploymentServiceProvider);
             google.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE,(google));
         }
         AuthVendorRegistry facebook = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.FACEBOOK);
         if(facebook!=null){
-            facebook.registerMetricsLister(this.deploymentServiceProvider);
+            //facebook.registerMetricsLister(this.deploymentServiceProvider);
             facebook.setup(serviceContext);
             aMap.put(OnAccess.FACEBOOK,facebook);
         }
         AuthVendorRegistry appleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.APPLE_STORE);
         if(appleStore!=null){
-            appleStore.registerMetricsLister(this.deploymentServiceProvider);
+            //appleStore.registerMetricsLister(this.deploymentServiceProvider);
             appleStore.setup(serviceContext);
             aMap.put(OnAccess.APPLE_STORE,appleStore);
         }
         AuthVendorRegistry gameCenter = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GAME_CENTER);
         if(gameCenter!=null){
-            gameCenter.registerMetricsLister(this.deploymentServiceProvider);
+            //gameCenter.registerMetricsLister(this.deploymentServiceProvider);
             gameCenter.setup(serviceContext);
             aMap.put(OnAccess.GAME_CENTER,gameCenter);
         }
         AuthVendorRegistry mockStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.MOCK_STORE);
         if(mockStore!=null){
-            mockStore.registerMetricsLister(this.deploymentServiceProvider);
+            //mockStore.registerMetricsLister(this.deploymentServiceProvider);
             mockStore.setup(serviceContext);
             aMap.put(OnAccess.MOCK_STORE,mockStore);
         }
         AuthVendorRegistry stripe = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){
-            stripe.registerMetricsLister(this.deploymentServiceProvider);
+            //stripe.registerMetricsLister(this.deploymentServiceProvider);
             stripe.setup(serviceContext);
             aMap.put(OnAccess.STRIPE,(stripe));
         }
         AuthVendorRegistry googleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GOOGLE_STORE);
         if(googleStore!=null){
-            googleStore.registerMetricsLister(this.deploymentServiceProvider);
+            //googleStore.registerMetricsLister(this.deploymentServiceProvider);
             googleStore.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE_STORE,googleStore);
         }
         AuthVendorRegistry amazonAws = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.AMAZON);
         if(amazonAws!=null){
-            amazonAws.registerMetricsLister(this.deploymentServiceProvider);
+            //amazonAws.registerMetricsLister(this.deploymentServiceProvider);
             amazonAws.setup(serviceContext);
             aMap.put(OnAccess.AMAZON,amazonAws);
         }

@@ -3,8 +3,8 @@ package com.tarantula.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.service.Metrics;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.service.Metrics;
 
 public class MetricsContext extends ResponseHeader {
 
@@ -16,9 +16,9 @@ public class MetricsContext extends ResponseHeader {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",successful);
         JsonArray ja = new JsonArray();
-        for(Statistics.Entry kv : metrics.statistics.summary()){
+        for(Statistics.Entry kv : metrics.statistics().summary()){
             JsonObject xv = new JsonObject();
-            xv.addProperty("name",Metrics.toName(kv.name()));
+            xv.addProperty("name", kv.name());
             xv.addProperty("daily",kv.daily());
             xv.addProperty("weekly",kv.weekly());
             xv.addProperty("monthly",kv.monthly());

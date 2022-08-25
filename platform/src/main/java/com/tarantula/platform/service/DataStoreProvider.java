@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface DataStoreProvider extends ServiceProvider {
 
-    int CONCURRENCY_ACCESS_LIMIT = 17;
+    //int CONCURRENCY_ACCESS_LIMIT = 17;
 
     void configure(Map<String,String> properties);
     void addBackupProvider(BackupProvider shardingProvider);

@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
 
@@ -100,5 +101,8 @@ public class ApplicationContextProxy implements ApplicationContext {
 
     public ClusterProvider clusterProvider(){
         return this.tarantulaApplicationContext.clusterProvider();
+    }
+    public Metrics metrics(String name){
+        return this.tarantulaApplicationContext.metrics(name);
     }
 }

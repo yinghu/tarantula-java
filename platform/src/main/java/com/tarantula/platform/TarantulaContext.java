@@ -12,13 +12,13 @@ import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
-import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
@@ -29,7 +29,7 @@ import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.*;
 
 
-public class TarantulaContext implements Serviceable, ServiceContext, MetricsListener {
+public class TarantulaContext implements Serviceable, ServiceContext {
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
@@ -113,8 +113,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
 
     public int maxIdlesOnInstance;
     public long timeoutOnInstance;
-    public int metricsUpdateIntervalMinutes=1;
-    private StatisticsIndex nodeMetrics;
+
     public PerformanceMetrics performanceMetrics;
 
     public String clusterNameSuffix;
@@ -178,6 +177,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         this.schedule(new MidnightCheck(this));
 	}
 	public void shutdown() throws Exception {
+        performanceMetrics.shutdown();
 	    this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
@@ -490,10 +490,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         });
     }
     public void _registerNode() throws Exception{
- 	    this.performanceMetrics = new PerformanceMetrics();
- 	    this.performanceMetrics.setup(this);
- 	    this.deploymentDataStoreProvider.registerMetricsListener(this.performanceMetrics);
-        this.integrationCluster.registerMetricsListener(this.performanceMetrics);
  	    this.accessIndexService().disable();
  	    _access_index_syc_finished.await();
  	    for(int i=0;i<accessIndexRoutingNumber;i++){
@@ -526,10 +522,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
-        nodeMetrics = new StatisticsIndex();
-        nodeMetrics.distributionKey(node.nodeId);
-        nodeMetrics.dataStore(masterDataStore());
-        masterDataStore().createIfAbsent(nodeMetrics,true);
+        this.performanceMetrics = new PerformanceMetrics();
+        this.performanceMetrics.setup(this);
+        this.deploymentDataStoreProvider.registerMetricsListener(this.performanceMetrics);
+        this.integrationCluster.registerMetricsListener(this.performanceMetrics);
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
  	}
@@ -567,12 +563,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
     public String nodeId(){
         return node.nodeId;
     }
-    public Statistics metrics(){
- 	    return this.nodeMetrics;
-    }
-    public void onUpdated(String mkey,double delta){
-        this.nodeMetrics.entry(mkey).update(delta);
-    }
+
+
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);
  	    return memberDiscovery;
@@ -932,5 +924,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsLis
         if(thirdPartyServiceProvider == null) throw new RuntimeException("third party provider not existed ["+authVendor.name()+"]");
         log.warn("Third party provider ["+authVendor.name()+"] unregistered with type id ["+authVendor.typeId()+"]");
         thirdPartyServiceProvider.releaseAuthVendor(authVendor);
+    }
+
+    public Metrics metrics(String name){
+         return performanceMetrics;
     }
 }

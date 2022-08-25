@@ -27,4 +27,6 @@ public interface UserService extends ServiceProvider{
     Account createAccount(Access access, Subscription subscription);
     Subscription subscribe(String accountId,int durationMonth);
 
+    LoginProvider loginProvider(String systemId);
+    void createLoginProvider(LoginProvider loginProvider);
 }

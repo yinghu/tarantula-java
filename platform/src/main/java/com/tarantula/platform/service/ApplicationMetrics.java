@@ -1,15 +1,13 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.service.MetricsListener;
-import com.tarantula.platform.TarantulaContext;
+import com.icodesoftware.Statistics;
+import com.icodesoftware.service.Metrics;
+import com.icodesoftware.service.ServiceContext;
 
-public class ApplicationMetrics implements MetricsListener, SchedulingTask {
+public class ApplicationMetrics implements Metrics, SchedulingTask {
 
 
-    public ApplicationMetrics(TarantulaContext tarantulaContext){
-
-    }
 
 
     @Override
@@ -34,6 +32,26 @@ public class ApplicationMetrics implements MetricsListener, SchedulingTask {
 
     @Override
     public void run() {
+
+    }
+
+    @Override
+    public void setup(ServiceContext serviceContext) {
+
+    }
+
+    @Override
+    public Statistics statistics() {
+        return null;
+    }
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
 
     }
 }

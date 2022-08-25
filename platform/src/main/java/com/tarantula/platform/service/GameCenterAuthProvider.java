@@ -43,7 +43,7 @@ public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegi
     public boolean validate(Map<String,Object> params){
         try{
             boolean verified = verifySignature(params);
-            metricsListener.onUpdated(Metrics.GAME_CENTER,1);
+            metricsListener.onUpdated(VendorMetrics.GAME_CENTER,1);
             return verified;
         }catch (Exception ex){
             ex.printStackTrace();

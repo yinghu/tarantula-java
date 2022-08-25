@@ -36,4 +36,6 @@ public interface ServiceContext {
 
     void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
     void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
+
+    Metrics metrics(String name);
 }

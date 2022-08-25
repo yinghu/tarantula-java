@@ -212,7 +212,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             fo.close();
         }
         this.dataStoreList = new CopyOnWriteArrayList<>();
-        //this.accessIndexStoreList = new CopyOnWriteArrayList<>();
+        this.metricsListener = (n,d)->{};
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);
@@ -446,17 +446,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
     private void onMetrics(){
-        try{
-            this.metricsListener.onUpdated(PerformanceMetrics.DATA_STORE_COUNT,1);
-        }catch (Exception ex){
-            //ignore if metricsListener swapping
-        }
+        this.metricsListener.onUpdated(PerformanceMetrics.DATA_STORE_COUNT,1);
     }
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
-    }
-    public void releaseMetricsListener(){
-        metricsListener = (m,v)->{};//swapping to empty
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

@@ -1,15 +1,15 @@
 package com.tarantula.platform.service.user;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.LoginProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.admin.AccessContext;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
+import com.tarantula.platform.presence.ThirdPartyLogin;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 
@@ -24,6 +24,8 @@ public class PlatformUserService implements UserService {
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
     private DataStore accountIndexDataStore;
+
+    private DataStore loginProviderDataStore;
     private TokenValidatorProvider tokenValidatorProvider;
     private TarantulaLogger logger;
     private int trialMaxUsersPerAccount = 10;
@@ -197,6 +199,15 @@ public class PlatformUserService implements UserService {
         return (T)idx;
     }
 
+    public LoginProvider loginProvider(String systemId){
+        ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();
+        thirdPartyLogin.distributionKey(systemId);
+        return loginProviderDataStore.load(thirdPartyLogin)?thirdPartyLogin:null;
+    }
+    public void createLoginProvider(LoginProvider loginProvider){
+        this.loginProviderDataStore.createIfAbsent(loginProvider,false);
+    }
+
     @Override
     public String name() {
         return UserService.NAME;
@@ -211,6 +222,7 @@ public class PlatformUserService implements UserService {
         accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.partitionNumber());
         accountIndexDataStore = serviceContext.dataStore(Account.IndexDataStore,serviceContext.partitionNumber());
         membershipDataStore = serviceContext.dataStore(Subscription.DataStore,serviceContext.partitionNumber());
+        loginProviderDataStore = serviceContext.dataStore(LoginProvider.DataStore,serviceContext.partitionNumber());
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();
         subscribedMaxUsersPerAccount = ((Number)configuration.property("subscribedMaxUserCount")).intValue();

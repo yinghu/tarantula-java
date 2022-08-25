@@ -79,6 +79,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public void start() throws Exception {
+        metricsListener = (n,d)->{};
         TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool, poolSize, rh)->{
             this.inboundEventPool = pool;
             this.workerSize = poolSize;

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider,SchedulingTask, DeploymentServiceProvider.DistributionCallback {
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider, DeploymentServiceProvider.DistributionCallback {
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -45,7 +45,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     //push event cache mappings
     private ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,MetricsListener> mListeners = new ConcurrentHashMap<>();
 
     //module class loader mappings
     private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
@@ -63,8 +62,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
-    private long metricsFreshRate;
-    private static long TIMER = 10000;
+
 
     @Override
     public void start() throws Exception {
@@ -81,9 +79,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return DeploymentServiceProvider.NAME;
     }
 
-    public <T extends OnAccess> T metrics(){
-        return (T)new Metrics(this.tarantulaContext.metrics());
-    }
+
 
 
     public Module module(Descriptor descriptor){
@@ -424,7 +420,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext){
         this.tarantulaContext = (TarantulaContext)serviceContext;
-        this.metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
         this.integrationCluster = serviceContext.clusterProvider();
         this.integrationEventService = integrationCluster.publisher();
         try{
@@ -469,7 +464,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
-        this.tarantulaContext.schedule(this);
         this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
             String tp = e.trackId();
             RecoverableListener listener = tMap.get(tp);
@@ -817,42 +811,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return new PostOfficeSession();
     }
 
-    @Override
-    public boolean oneTime() {
-        return false;
-    }
 
-    @Override
-    public long initialDelay() {
-        return TIMER;
-    }
 
-    @Override
-    public long delay() {
-        return TIMER;
-    }
 
-    @Override
-    public void run() {
-        metricsFreshRate -= TIMER;
-        if(metricsFreshRate<=0){
-            metricsFreshRate = this.tarantulaContext.metricsUpdateIntervalMinutes*1000*60;
-            this.tarantulaContext.metrics().summary((e)->e.update());
-        }
-    }
-    //metrics update call
-    public void onUpdated(String key,double value){
-        this.tarantulaContext.onUpdated(key,value);
-    }
-    public void registerMetricsListener(String name,MetricsListener metricsListener){
-        this.mListeners.put(name,metricsListener);
-    }
-    public void unregisterMetricsListener(String name){
-        this.mListeners.remove(name);
-    }
-    public MetricsListener metricsListener(String name){
-        return this.mListeners.get(name);
-    }
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;

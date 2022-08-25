@@ -7,14 +7,10 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.presence.User;
-
-import com.tarantula.platform.service.Metrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class SudoRoleModule implements Module {
@@ -169,7 +165,7 @@ public class SudoRoleModule implements Module {
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            Metrics metrics = this.deploymentServiceProvider.metrics();
+            Metrics metrics = context.metrics(Metrics.PERFORMANCE);
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes());

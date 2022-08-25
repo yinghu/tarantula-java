@@ -56,8 +56,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         aMap.forEach((k,v)->{
-            MetricsListener _m = serviceContext.deploymentServiceProvider().metricsListener(k);
-            v.registerMetricsLister(_m);
+            v.registerMetricsLister((n,d)->{});
             v.setup(this.serviceContext);
         });
     }
