@@ -7,7 +7,9 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.SystemStatistics;
+
+import java.time.LocalDateTime;
 
 
 public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable {
@@ -20,19 +22,22 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
 
 
     private DataStore dataStore;
-    private Statistics statistics;
+    private SystemStatistics statistics;
+    private ServiceContext serviceContext;
 
     private TarantulaLogger logger;
 
-
     public void setup(ServiceContext serviceContext){
+        this.serviceContext = serviceContext;
         this.logger = serviceContext.logger(PerformanceMetrics.class);
         dataStore = serviceContext.dataStore("metrics_performance",serviceContext.partitionNumber());
         String nodeId = serviceContext.nodeId();
-        logger.warn("Performance metrics hooked on ->"+nodeId);
-        this.statistics = new StatisticsIndex();
+        String dayAndYear = labelDayAndYear();
+        logger.warn("Performance metrics hooked on ->"+nodeId+">>"+dayAndYear);
+        this.statistics = new SystemStatistics();
         statistics.distributionKey(nodeId);
-        ((StatisticsIndex)statistics).dataStore(this.dataStore);
+        statistics.label(dayAndYear);
+        statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
         serviceContext.schedule(this);
     }
@@ -60,7 +65,11 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
 
     @Override
     public void run() {
-        this.dataStore.update(this.statistics);
+        try {
+            this.dataStore.update(this.statistics);
+        }catch (Exception ex){
+            //ignore
+        }
     }
 
     @Override
@@ -77,5 +86,19 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     public void shutdown() throws Exception {
         logger.warn("Flushing last data on shut down");
         this.dataStore.update(statistics);
+    }
+
+    public void atMidnight(){
+        SystemStatistics next = new SystemStatistics();
+        next.distributionKey(this.serviceContext.nodeId());
+        next.label(labelDayAndYear());
+        this.dataStore.createIfAbsent(next,true);
+        this.dataStore.update(statistics);
+        statistics = next;
+    }
+
+    private String labelDayAndYear(){
+        LocalDateTime today = LocalDateTime.now();
+        return today.getYear()+"_"+today.getDayOfYear();
     }
 }

@@ -15,6 +15,7 @@ public class MetricsContext extends ResponseHeader {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",successful);
+        jsonObject.addProperty("id",metrics.statistics().key().asString());
         JsonArray ja = new JsonArray();
         for(Statistics.Entry kv : metrics.statistics().summary()){
             JsonObject xv = new JsonObject();

@@ -54,4 +54,8 @@ public class ApplicationMetrics implements Metrics, SchedulingTask {
     public void shutdown() throws Exception {
 
     }
+
+    public void atMidnight(){
+
+    }
 }

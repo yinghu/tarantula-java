@@ -11,19 +11,24 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
     public static final int STATISTICS_CID = 3;
     public static final int STATISTICS_ENTRY_CID = 5;
     public static final int STATISTICS_DELTA_CID = 7;
+    public static final int SYSTEM_STATISTICS_CID = 8;
+
 
 
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
             case STATISTICS_CID:
-                pt = new StatisticsIndex();
+                pt = new UserStatistics();
                 break;
             case STATISTICS_ENTRY_CID:
                 pt = new StatisticsEntry();
                 break;
             case STATISTICS_DELTA_CID:
                 pt = new StatsDelta();
+                break;
+            case SYSTEM_STATISTICS_CID:
+                pt = new SystemStatistics();
                 break;
             default:
         }

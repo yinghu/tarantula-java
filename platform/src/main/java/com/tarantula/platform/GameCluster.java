@@ -12,7 +12,7 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.UserStatistics;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.File;
@@ -147,7 +147,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
 
     public <T extends Configurable> T setup(){
-        StatisticsIndex statisticsIndex = new StatisticsIndex();
+        UserStatistics statisticsIndex = new UserStatistics();
         statisticsIndex.distributionKey(this.distributionKey());
         statisticsIndex.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statisticsIndex,true);

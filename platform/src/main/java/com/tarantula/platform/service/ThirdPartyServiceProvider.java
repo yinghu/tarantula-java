@@ -11,9 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ThirdPartyServiceProvider implements AuthVendorRegistry {
 
-    public static final String AMAZON = "amazon";
-    //public static final String
-
     private final ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> aMap;
     private final String name;
     private MetricsListener metricsListener;

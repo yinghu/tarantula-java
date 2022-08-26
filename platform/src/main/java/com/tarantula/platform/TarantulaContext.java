@@ -25,7 +25,6 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
-import com.tarantula.platform.statistics.StatisticsIndex;
 import com.tarantula.platform.util.*;
 
 
@@ -579,6 +578,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 v.atMidnight();
             });
             endpointService.atMidnight();
+            performanceMetrics.atMidnight();
  	    }catch (Exception ex){
  	        ex.printStackTrace();
  	    }

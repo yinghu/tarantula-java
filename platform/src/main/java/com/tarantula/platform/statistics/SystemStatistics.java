@@ -11,16 +11,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class StatisticsIndex extends RecoverableObject implements Statistics {
+public class SystemStatistics extends RecoverableObject implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
-    private Listener listener;
-    public StatisticsIndex(){
-        this.label = "Stats";
-    }
+
 
     public void registerListener(Listener listener){
-        this.listener = listener;
     }
 
     public Entry entry(String key) {
@@ -33,7 +29,6 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
         if(entry.load()){
             this.dataStore.update(this);//update index
         }//load as request
-        entry.listener(this.listener);
         return entry;
     }
     //memory copy list
@@ -59,7 +54,7 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
 
     @Override
     public int getClassId() {
-        return StatisticsPortableRegistry.STATISTICS_CID;
+        return StatisticsPortableRegistry.SYSTEM_STATISTICS_CID;
     }
 
     @Override
@@ -86,7 +81,7 @@ public class StatisticsIndex extends RecoverableObject implements Statistics {
     public JsonObject toJson() {
         JsonObject jo  = new JsonObject();
         JsonArray ja = new JsonArray();
-        for(Statistics.Entry entry : summary()){
+        for(Entry entry : summary()){
             ja.add(entry.toJson());
         }
         jo.addProperty("Successful",true);

@@ -15,7 +15,7 @@ import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
-import com.tarantula.platform.statistics.StatisticsIndex;
+import com.tarantula.platform.statistics.UserStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +123,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         return rating;
     }
     public Statistics statistics(String systemId, PlatformLeaderBoardProvider leaderBoardProvider){
-        StatisticsIndex deltaStatistics = new StatisticsIndex();
+        UserStatistics deltaStatistics = new UserStatistics();
         deltaStatistics.distributionKey(systemId);
         deltaStatistics.dataStore(this.presenceDataStore);
         this.presenceDataStore.createIfAbsent(deltaStatistics,true);

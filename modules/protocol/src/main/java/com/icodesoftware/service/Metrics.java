@@ -9,4 +9,6 @@ public interface Metrics extends Serviceable,MetricsListener{
     void setup(ServiceContext serviceContext);
 
     Statistics statistics();
+
+    void atMidnight();
 }
