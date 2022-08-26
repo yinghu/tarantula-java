@@ -1,4 +1,4 @@
-package com.tarantula.platform.statistics;
+package com.tarantula.platform.service.metrics;
 
 import com.google.gson.*;
 import com.icodesoftware.Statistics;

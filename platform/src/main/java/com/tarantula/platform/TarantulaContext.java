@@ -23,6 +23,7 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.util.*;

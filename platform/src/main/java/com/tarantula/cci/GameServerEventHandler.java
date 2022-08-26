@@ -10,7 +10,7 @@ import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.room.ConnectionStub;
-import com.tarantula.platform.service.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;

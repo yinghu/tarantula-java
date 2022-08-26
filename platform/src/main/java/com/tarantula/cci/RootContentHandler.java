@@ -4,7 +4,7 @@ import com.icodesoftware.Event;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 public class RootContentHandler extends AbstractRequestHandler {
 

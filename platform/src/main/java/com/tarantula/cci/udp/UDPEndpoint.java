@@ -10,7 +10,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.ClientConnection;
-import com.tarantula.platform.service.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
 import java.util.UUID;

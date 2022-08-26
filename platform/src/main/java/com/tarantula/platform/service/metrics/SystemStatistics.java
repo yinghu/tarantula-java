@@ -1,9 +1,10 @@
-package com.tarantula.platform.statistics;
+package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemStatistics extends RecoverableObject implements Statistics {
 
-    private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
+    private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
 
     public void registerListener(Listener listener){
     }
 
     public Entry entry(String key) {
-        StatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
+        SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
             //new entry
-            StatisticsEntry se = new StatisticsEntry(this.bucket,this.oid,k);
+            SystemStatisticsEntry se = new SystemStatisticsEntry(this.bucket,this.oid,k);
             se.dataStore(this.dataStore);
             return se;
         });
@@ -67,7 +68,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     @Override
     public void fromMap(Map<String,Object> properties){
         properties.forEach((k,v)->{
-            StatisticsEntry entry = new StatisticsEntry(this.bucket,this.oid,k);
+            SystemStatisticsEntry entry = new SystemStatisticsEntry(this.bucket,this.oid,k);
             entry.dataStore(this.dataStore);
             mappings.put(k,entry);
         });
@@ -87,13 +88,5 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         jo.addProperty("Successful",true);
         jo.add("_categories",ja);
         return jo;
-    }
-
-    @Override
-    public void update(){
-        this.dataStore.update(this);
-        this.mappings.forEach((k,v)->{
-            v.update();
-        });
     }
 }

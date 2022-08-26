@@ -24,4 +24,10 @@ public class StatsDelta extends RecoverableObject {
     public int getClassId() {
         return StatisticsPortableRegistry.STATISTICS_DELTA_CID;
     }
+
+    public StatsDelta reset(){
+        StatsDelta pending = new StatsDelta(name,value);
+        value = 0;
+        return pending;
+    }
 }

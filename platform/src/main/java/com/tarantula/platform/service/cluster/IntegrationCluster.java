@@ -15,6 +15,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;

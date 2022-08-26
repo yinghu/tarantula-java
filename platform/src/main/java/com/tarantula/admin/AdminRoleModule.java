@@ -14,7 +14,7 @@ import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
-import com.tarantula.platform.statistics.StatisticsSerializer;
+import com.tarantula.platform.service.metrics.StatisticsSerializer;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 

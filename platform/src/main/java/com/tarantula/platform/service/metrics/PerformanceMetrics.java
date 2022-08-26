@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.SchedulingTask;
@@ -7,9 +7,11 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.platform.statistics.SystemStatistics;
+import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable {
@@ -21,13 +23,22 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     public final static String UDP_REQUEST_COUNT = "udpRequestCount";
 
 
+    private ConcurrentHashMap<String, StatsDelta> pendingUpdats;
+
     private DataStore dataStore;
     private SystemStatistics statistics;
     private ServiceContext serviceContext;
 
+
     private TarantulaLogger logger;
 
     public void setup(ServiceContext serviceContext){
+        this.pendingUpdats = new ConcurrentHashMap<>();
+        this.pendingUpdats.put(DATA_STORE_COUNT,new StatsDelta(DATA_STORE_COUNT,0));
+        this.pendingUpdats.put(CLUSTER_INBOUND_MESSAGE_COUNT,new StatsDelta(CLUSTER_INBOUND_MESSAGE_COUNT,0));
+        this.pendingUpdats.put(CLUSTER_OUTBOUND_MESSAGE_COUNT,new StatsDelta(CLUSTER_OUTBOUND_MESSAGE_COUNT,0));
+        this.pendingUpdats.put(HTTP_REQUEST_COUNT,new StatsDelta(HTTP_REQUEST_COUNT,0));
+        this.pendingUpdats.put(UDP_REQUEST_COUNT,new StatsDelta(UDP_REQUEST_COUNT,0));
         this.serviceContext = serviceContext;
         this.logger = serviceContext.logger(PerformanceMetrics.class);
         dataStore = serviceContext.dataStore("metrics_performance",serviceContext.partitionNumber());
@@ -45,7 +56,11 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
 
     @Override
     public void onUpdated(String s, double delta) {
-        this.statistics.entry(s).update(delta);
+        pendingUpdats.compute(s,(k,v)->{
+            if(v==null || delta<=0) return v;//ignore
+            v.value += delta;
+            return v;
+        });
     }
 
     @Override
@@ -65,11 +80,35 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
 
     @Override
     public void run() {
-        try {
-            this.statistics.update();
-        }catch (Exception ex){
-            //ignore
-        }
+        ArrayList<StatsDelta> pendings = new ArrayList<>();
+        pendingUpdats.compute(DATA_STORE_COUNT,(k,v)->{
+            pendings.add(v.reset());
+            return v;
+        });
+        pendingUpdats.compute(CLUSTER_OUTBOUND_MESSAGE_COUNT,(k,v)->{
+            pendings.add(v.reset());
+            return v;
+        });
+        pendingUpdats.compute(CLUSTER_INBOUND_MESSAGE_COUNT,(k,v)->{
+            pendings.add(v.reset());
+            return v;
+        });
+        pendingUpdats.compute(HTTP_REQUEST_COUNT,(k,v)->{
+            pendings.add(v.reset());
+            return v;
+        });
+        pendingUpdats.compute(UDP_REQUEST_COUNT,(k,v)->{
+            pendings.add(v.reset());
+            return v;
+        });
+        pendings.forEach(p->{
+            try {
+                statistics.entry(p.name).update(p.value).update();
+            }catch (Exception ex){
+                //ignore
+            }
+        });
+        pendings.clear();
     }
 
     @Override
@@ -85,7 +124,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     @Override
     public void shutdown() throws Exception {
         logger.warn("Flushing last data on shut down");
-        statistics.update();
+        this.run();
     }
 
     public void atMidnight(){
@@ -94,7 +133,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
         next.label(labelDayAndYear());
         next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
-        this.statistics.update();
+        this.run();
         statistics = next;
     }
 
