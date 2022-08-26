@@ -66,7 +66,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     @Override
     public void run() {
         try {
-            this.dataStore.update(this.statistics);
+            this.statistics.update();
         }catch (Exception ex){
             //ignore
         }
@@ -85,15 +85,16 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     @Override
     public void shutdown() throws Exception {
         logger.warn("Flushing last data on shut down");
-        this.dataStore.update(statistics);
+        statistics.update();
     }
 
     public void atMidnight(){
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId());
         next.label(labelDayAndYear());
+        next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
-        this.dataStore.update(statistics);
+        this.statistics.update();
         statistics = next;
     }
 

@@ -73,7 +73,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     }
 
     @Override
-    public Statistics.Entry update(double delta) {
+    public synchronized Statistics.Entry update(double delta) {
         LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
         if(_now.getYear()==lastUpdated.getYear()){//check in same year

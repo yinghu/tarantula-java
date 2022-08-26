@@ -88,4 +88,12 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         jo.add("_categories",ja);
         return jo;
     }
+
+    @Override
+    public void update(){
+        this.dataStore.update(this);
+        this.mappings.forEach((k,v)->{
+            v.update();
+        });
+    }
 }
