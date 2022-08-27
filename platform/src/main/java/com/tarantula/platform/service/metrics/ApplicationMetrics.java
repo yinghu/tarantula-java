@@ -18,6 +18,7 @@ public class ApplicationMetrics extends AbstractMetrics{
 
     @Override
     void _setup(ServiceContext serviceContext) {
+        this.name = "application";
         this.logger = serviceContext.logger(ApplicationMetrics.class);
         this.categories = new String[9];
         this.categories[0]=GOOGLE_COUNT;

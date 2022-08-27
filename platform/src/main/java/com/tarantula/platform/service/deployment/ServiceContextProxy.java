@@ -109,4 +109,11 @@ public class ServiceContextProxy implements ServiceContext {
     public Metrics metrics(String name){
         return this.tarantulaContext.metrics(name);
     }
+
+    public void registerMetrics(Metrics metrics){
+        this.tarantulaContext.registerMetrics(metrics);
+    }
+    public void unregisterMetrics(Metrics metrics){
+        this.tarantulaContext.unregisterMetrics(metrics);
+    }
 }

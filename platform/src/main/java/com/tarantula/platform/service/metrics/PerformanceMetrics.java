@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.metrics;
 
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 
 public class PerformanceMetrics extends AbstractMetrics {
@@ -12,6 +13,7 @@ public class PerformanceMetrics extends AbstractMetrics {
 
 
     public void _setup(ServiceContext serviceContext){
+        this.name = Metrics.PERFORMANCE;
         this.categories = new String[5];
         this.categories[0] = DATA_STORE_COUNT;
         this.categories[1] = CLUSTER_INBOUND_MESSAGE_COUNT;

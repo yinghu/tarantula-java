@@ -930,4 +930,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public Metrics metrics(String name){
          return performanceMetrics;
     }
+
+    public void registerMetrics(Metrics metrics){
+
+    }
+    public void unregisterMetrics(Metrics metrics){
+
+    }
 }

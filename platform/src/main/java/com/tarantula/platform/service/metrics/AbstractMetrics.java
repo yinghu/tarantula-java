@@ -27,6 +27,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     private ServiceContext serviceContext;
     protected String[] categories = new String[0];
     protected TarantulaLogger logger;
+    protected String name;
+    public String name(){
+        return name;
+    }
 
     public void setup(ServiceContext serviceContext){
         _setup(serviceContext);
