@@ -51,7 +51,10 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     public double total() {
         return this.total;
     }
-
+    void total(double total,LocalDateTime update){
+        this.total = total;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
     @Override
     public double daily() {
         return daily;
@@ -62,39 +65,35 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         return weekly;
     }
 
+    void weekly(double weekly,LocalDateTime update){
+        this.weekly = weekly;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
     @Override
     public double monthly() {
         return monthly;
     }
 
+    void monthly(double monthly,LocalDateTime update){
+        this.monthly = monthly;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
     @Override
     public double yearly() {
         return yearly;
     }
 
+    void yearly(double yearly,LocalDateTime update){
+        this.yearly = yearly;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
     @Override
     public synchronized Statistics.Entry update(double delta) {
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
-        if(_now.getYear()==lastUpdated.getYear()){//check in same year
-            if(_now.getDayOfYear()==lastUpdated.getDayOfYear()){//same day update
-                daily +=delta;
-                weekly +=delta;
-                monthly +=delta;
-            }//another day
-            else{
-                daily = delta;
-                weekly = (_now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)==lastUpdated.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR))?(weekly+delta):delta;
-                monthly = (_now.getMonth().getValue()==lastUpdated.getMonth().getValue())?(monthly+delta):delta;
-            }
-            yearly +=delta;
-        }
-        else{//reset on another year include week
-            daily = delta;
-            weekly = delta;
-            monthly = delta;
-            yearly = delta;
-        }
+        daily += delta;
+        weekly += delta;
+        monthly += delta;
+        yearly += delta;
         total += delta;
         timestamp = TimeUtil.toUTCMilliseconds(_now);
         if(listener!=null){

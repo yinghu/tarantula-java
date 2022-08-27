@@ -1,0 +1,7 @@
+{
+  "metrics-list": [
+    {"class-name":"com.tarantula.platform.service.metrics.PerformanceMetrics","enabled": true },
+    {"class-name":"com.tarantula.platform.service.metrics.AccessMetrics","enabled": true },
+    {"class-name":"com.tarantula.platform.service.metrics.PaymentMetrics","enabled": true }
+  ]
+}

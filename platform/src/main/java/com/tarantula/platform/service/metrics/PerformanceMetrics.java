@@ -21,7 +21,7 @@ public class PerformanceMetrics extends AbstractMetrics {
         this.categories[3] = HTTP_REQUEST_COUNT;
         this.categories[4] = UDP_REQUEST_COUNT;
         this.logger = serviceContext.logger(PerformanceMetrics.class);
-        this.dataStore = serviceContext.dataStore("metrics_performance",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("performance_metrics",serviceContext.partitionNumber());
     }
 
 }

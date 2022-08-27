@@ -75,13 +75,13 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
         gameServerEventHandler.start();
 
         //register performance mestrics
-        rMap.forEach((k,h)->h.registerMetricsListener(this.tarantulaContext.performanceMetrics));
+        rMap.forEach((k,h)->h.registerMetricsListener(this.tarantulaContext.metrics(Metrics.PERFORMANCE)));
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
             this.tarantulaContext.deployServiceProvider(endPoint);
             endPoint.start();
-            endPoint.registerMetricsListener(this.tarantulaContext.performanceMetrics);
+            endPoint.registerMetricsListener(this.tarantulaContext.metrics(Metrics.PERFORMANCE));
             this.tarantulaContext.node_started.set(true);
         }
     }

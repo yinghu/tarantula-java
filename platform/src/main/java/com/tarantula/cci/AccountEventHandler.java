@@ -18,7 +18,6 @@ public class AccountEventHandler extends AbstractRequestHandler {
 
     private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
-    //private RecoverService recoverService;
     private GsonBuilder builder;
     private OnView invalidView;
 
@@ -58,7 +57,6 @@ public class AccountEventHandler extends AbstractRequestHandler {
 
     }
     public void setup(ServiceContext tcx){
-        //this.recoverService = tcx.clusterProvider().recoverService();
         this.tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }

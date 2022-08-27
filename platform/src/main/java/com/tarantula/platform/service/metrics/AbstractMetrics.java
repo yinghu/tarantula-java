@@ -18,14 +18,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 abstract public class AbstractMetrics implements Metrics, SchedulingTask, Serviceable {
 
 
-    private ConcurrentHashMap<String, StatsDelta> pendingUpdats;
+    private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
     private AtomicBoolean atMidnight;
 
-    protected long pendingUpdateInterval = 100000;
+    protected long pendingUpdateInterval = 10000;
     protected DataStore dataStore;
     private SystemStatistics statistics;
     private ServiceContext serviceContext;
-    protected String[] categories = new String[0];
+    protected String[] categories;
     protected TarantulaLogger logger;
     protected String name;
     public String name(){
@@ -36,24 +36,25 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         _setup(serviceContext);
         this.serviceContext = serviceContext;
         atMidnight = new AtomicBoolean(false);
-        this.pendingUpdats = new ConcurrentHashMap<>();
+        this.pendingUpdates = new ConcurrentHashMap<>();
         for(String category : categories){
-            this.pendingUpdats.put(category,new StatsDelta(category,0));
+            this.pendingUpdates.put(category,new StatsDelta(category,0));
         }
         String nodeId = serviceContext.nodeId();
-        String dayAndYear = labelDayAndYear();
+        String dayAndYear = labelDayAndYear(LocalDateTime.now());
         this.statistics = new SystemStatistics();
         this.statistics.distributionKey(nodeId);
         this.statistics.label(dayAndYear);
         this.statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
         serviceContext.schedule(this);
+        logger.warn("Metrics ["+name+"] has registered");
     }
 
 
     @Override
     public void onUpdated(String s, double delta) {
-        pendingUpdats.compute(s,(k,v)->{
+        pendingUpdates.compute(s,(k,v)->{
             if(v==null || delta<=0) return v;//ignore
             v.value += delta;
             return v;
@@ -76,11 +77,14 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     }
 
     @Override
-    public void run() {
-        if(!atMidnight.get()) return;
+    public void run(){
+        if(atMidnight.get()) return;
+        _run();
+    }
+    private void _run() {
         ArrayList<StatsDelta> pendings = new ArrayList<>();
         for(String category : categories){
-            pendingUpdats.compute(category,(k,v)->{
+            pendingUpdates.compute(category,(k,v)->{
                 pendings.add(v.reset());
                 return v;
             });
@@ -90,6 +94,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 if(p.value>0) statistics.entry(p.name).update(p.value).update();
             }catch (Exception ex){
                 //ignore
+                logger.error("Error on update",ex);
             }
         });
         pendings.clear();
@@ -112,18 +117,32 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     public void atMidnight(){
         atMidnight.set(true);
+        this._run();
+        LocalDateTime end = LocalDateTime.now();
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId());
-        next.label(labelDayAndYear());
+        next.label(labelDayAndYear(end));
         next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
-        this.run();
+        for(String category : categories){
+            SystemStatisticsEntry entry = (SystemStatisticsEntry)next.entry(category);
+            if(end.getDayOfWeek().getValue() != 7){//weekly
+                entry.weekly(statistics.entry(category).weekly(),end);
+            }
+            if(end.getDayOfMonth() != 1){//monthly
+                entry.monthly(statistics.entry(category).monthly(),end);
+            }
+            if(end.getDayOfYear() != 1 ){//yearly
+                entry.yearly(statistics.entry(category).yearly(),end);
+                entry.total(statistics.entry(category).total(),end);
+            }
+            entry.update();
+        }
         statistics = next;
         atMidnight.set(false);
     }
 
-    private String labelDayAndYear(){
-        LocalDateTime today = LocalDateTime.now();
+    private String labelDayAndYear(LocalDateTime today){
         return today.getYear()+"_"+today.getDayOfYear();
     }
     /**

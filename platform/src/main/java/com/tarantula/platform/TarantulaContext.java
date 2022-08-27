@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
@@ -23,6 +24,7 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
+import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
@@ -101,6 +103,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,Metrics> mMap = new ConcurrentHashMap<>();
 
     public String dataBucketGroup;
     public String dataBucketNode;
@@ -114,7 +117,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int maxIdlesOnInstance;
     public long timeoutOnInstance;
 
-    public PerformanceMetrics performanceMetrics;
 
     public String clusterNameSuffix;
 
@@ -177,7 +179,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.schedule(new MidnightCheck(this));
 	}
 	public void shutdown() throws Exception {
-        performanceMetrics.shutdown();
+        mMap.forEach((k,v)-> {try{v.shutdown();}catch (Exception ex){}});
 	    this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
@@ -522,10 +524,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
-        this.performanceMetrics = new PerformanceMetrics();
-        this.performanceMetrics.setup(this);
-        this.deploymentDataStoreProvider.registerMetricsListener(this.performanceMetrics);
-        this.integrationCluster.registerMetricsListener(this.performanceMetrics);
+        initMetricsProvider();
+        this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
+        this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
  	}
@@ -579,7 +580,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 v.atMidnight();
             });
             endpointService.atMidnight();
-            performanceMetrics.atMidnight();
+            mMap.forEach((k,v)->v.atMidnight());
  	    }catch (Exception ex){
  	        ex.printStackTrace();
  	    }
@@ -928,13 +929,26 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public Metrics metrics(String name){
-         return performanceMetrics;
+         return mMap.get(name);
     }
 
     public void registerMetrics(Metrics metrics){
-
+        mMap.put(metrics.name(),metrics);
     }
     public void unregisterMetrics(Metrics metrics){
-
+        mMap.remove(metrics.name());
     }
+
+    private void initMetricsProvider() throws Exception{
+ 	    JsonObject json = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-metrics-provider.json"));
+        JsonArray mlist = json.getAsJsonArray("metrics-list");
+        for(JsonElement e : mlist){
+            String cln = e.getAsJsonObject().get("class-name").getAsString();
+            boolean enabled = e.getAsJsonObject().get("enabled").getAsBoolean();
+            if(!enabled) continue;
+            Metrics metrics = (Metrics) Class.forName(cln).getConstructor().newInstance();
+            metrics.setup(this);
+            mMap.put(metrics.name(),metrics);
+        }
+ 	}
 }
