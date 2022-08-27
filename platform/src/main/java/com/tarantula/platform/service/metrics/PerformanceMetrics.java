@@ -12,6 +12,7 @@ import com.tarantula.platform.statistics.StatsDelta;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable {
@@ -29,10 +30,13 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     private SystemStatistics statistics;
     private ServiceContext serviceContext;
 
+    private AtomicBoolean atMidnight;
+
 
     private TarantulaLogger logger;
 
     public void setup(ServiceContext serviceContext){
+        atMidnight = new AtomicBoolean(false);
         this.pendingUpdats = new ConcurrentHashMap<>();
         this.pendingUpdats.put(DATA_STORE_COUNT,new StatsDelta(DATA_STORE_COUNT,0));
         this.pendingUpdats.put(CLUSTER_INBOUND_MESSAGE_COUNT,new StatsDelta(CLUSTER_INBOUND_MESSAGE_COUNT,0));
@@ -80,6 +84,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
 
     @Override
     public void run() {
+        if(!atMidnight.get()) return;
         ArrayList<StatsDelta> pendings = new ArrayList<>();
         pendingUpdats.compute(DATA_STORE_COUNT,(k,v)->{
             pendings.add(v.reset());
@@ -128,6 +133,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
     }
 
     public void atMidnight(){
+        atMidnight.set(true);
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId());
         next.label(labelDayAndYear());
@@ -135,6 +141,7 @@ public class PerformanceMetrics implements Metrics, SchedulingTask, Serviceable 
         this.dataStore.createIfAbsent(next,true);
         this.run();
         statistics = next;
+        atMidnight.set(false);
     }
 
     private String labelDayAndYear(){

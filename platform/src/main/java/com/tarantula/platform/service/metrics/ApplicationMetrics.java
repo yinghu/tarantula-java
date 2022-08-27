@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.Statistics;
