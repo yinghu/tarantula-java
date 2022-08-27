@@ -3,6 +3,7 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.stripe.Stripe;
 import com.stripe.model.Charge;
+import com.tarantula.platform.service.metrics.PaymentMetrics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,10 @@ public class StripePaymentProvider extends AuthObject implements AuthVendorRegis
             Stripe.apiKey = secureKey;
             Charge c = Charge.create(requestParams);
             boolean paid = c.getPaid();
-            //if(paid) metricsListener.onUpdated(VendorMetrics.STRIPE_COUNT,1);
+            if(paid) {
+                metricsListener.onUpdated(PaymentMetrics.STRIPE_COUNT,1);
+                metricsListener.onUpdated(PaymentMetrics.STRIPE_AMOUNT,(int)params.get("amount"));
+            }
             return  paid;
         }catch (Exception ex){
             ex.printStackTrace();
