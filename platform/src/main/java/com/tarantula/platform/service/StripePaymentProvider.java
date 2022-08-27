@@ -25,7 +25,7 @@ public class StripePaymentProvider extends AuthObject implements AuthVendorRegis
             Stripe.apiKey = secureKey;
             Charge c = Charge.create(requestParams);
             boolean paid = c.getPaid();
-            if(paid) metricsListener.onUpdated(VendorMetrics.STRIPE_COUNT,1);
+            //if(paid) metricsListener.onUpdated(VendorMetrics.STRIPE_COUNT,1);
             return  paid;
         }catch (Exception ex){
             ex.printStackTrace();

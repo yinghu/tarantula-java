@@ -47,7 +47,7 @@ public class FacebookAuthProvider extends AuthObject{
             else{
                 validated = validateMe(params);
             }
-            if(validated) metricsListener.onUpdated(VendorMetrics.FACEBOOK_COUNT,1);
+            //if(validated) metricsListener.onUpdated(VendorMetrics.FACEBOOK_COUNT,1);
             return validated;
         }catch (Exception ex){
             ex.printStackTrace();
