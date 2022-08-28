@@ -118,7 +118,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     public void atMidnight(){
         atMidnight.set(true);
         this._run();
-        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime end = end();
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId());
         next.label(labelDayAndYear(end));
@@ -153,4 +153,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
      * */
     abstract void _setup(ServiceContext serviceContext);
 
+    protected LocalDateTime end(){
+        return LocalDateTime.now();
+    }
 }

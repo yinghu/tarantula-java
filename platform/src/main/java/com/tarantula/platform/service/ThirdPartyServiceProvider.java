@@ -19,6 +19,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     public ThirdPartyServiceProvider(String name, List<TokenValidatorProvider.AuthVendor> preload){
         this.name = name;
         this.aMap = new ConcurrentHashMap<>();
+        this.metricsListener = (n,v)->{};
         preload.forEach((v)-> aMap.put(v.name(),v));
     }
 
