@@ -432,7 +432,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.info("System validator provider started ["+serviceContext.nodeId()+"]["+serviceContext.bucketId()+"]");
+        log.warn("System validator provider started ["+serviceContext.nodeId()+"]["+serviceContext.bucketId()+"]");
     }
 
     @Override

@@ -220,5 +220,4 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void registerPingListener(PingListener pingListener){
         this.pingListener = pingListener!=null?pingListener:()->{};
     }
-
 }

@@ -114,5 +114,4 @@ public class GoogleOAuthTokenValidator extends AuthObject {
         }
 
     }
-
 }

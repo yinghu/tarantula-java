@@ -830,6 +830,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
 
+    public void onUpdated(String mkey,double delta){
+
+    }
+
     private class OnLobbyListener implements Configurable.Listener<OnLobby>{
         @Override
         public void onUpdated(OnLobby onLobby){

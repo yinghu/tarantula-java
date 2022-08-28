@@ -7,7 +7,7 @@ import com.icodesoftware.service.ServiceContext;
 public class AccessMetrics extends AbstractMetrics{
 
     public final static String GOOGLE_COUNT = "googleCount";
-    public final static String PASSWORD_COUNT = "passwordCount";
+    public final static String WEB_COUNT = "webCount";
     public final static String DEVICE_COUNT = "deviceCount";
     public final static String FACEBOOK_COUNT = "facebookCount";
     public final static String GAME_CENTER_COUNT = "gameCenterCount";
@@ -19,7 +19,7 @@ public class AccessMetrics extends AbstractMetrics{
         this.logger = serviceContext.logger(AccessMetrics.class);
         this.categories = new String[6];
         this.categories[0]=GOOGLE_COUNT;
-        this.categories[1]=PASSWORD_COUNT;
+        this.categories[1]=WEB_COUNT;
         this.categories[2]=DEVICE_COUNT;
         this.categories[3]=FACEBOOK_COUNT;
         this.categories[4]=GAME_CENTER_COUNT;

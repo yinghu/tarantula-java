@@ -28,6 +28,8 @@ public class PlatformUserService implements UserService {
     private int trialMaxUsersPerAccount = 10;
     private int subscribedMaxUsersPerAccount = 10;
 
+    private MetricsListener metricsListener;
+
     @Override
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
@@ -213,6 +215,7 @@ public class PlatformUserService implements UserService {
 
     @Override
     public void setup(ServiceContext serviceContext){
+        metricsListener = (m,v)->{};
         logger = serviceContext.logger(PlatformUserService.class);
         tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
@@ -235,6 +238,14 @@ public class PlatformUserService implements UserService {
     @Override
     public void shutdown() throws Exception {
 
+    }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+
+    public void onUpdated(String mkey,double delta){
+        metricsListener.onUpdated(mkey,delta);
     }
 
 }

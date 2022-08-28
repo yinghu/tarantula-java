@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
+import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -95,6 +96,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
+            userService.onUpdated(AccessMetrics.WEB_COUNT,1);
             onSession(access,session);
         }
         else if(session.action().equals("onToken")){//exchange token
