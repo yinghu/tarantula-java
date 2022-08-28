@@ -52,8 +52,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-
-
         accessIndexService.set("serverPush",0);
         AccessIndex accessIndex = accessIndexService.set(root,0);
         if(accessIndex!=null){
@@ -96,7 +94,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
-            userService.onUpdated(AccessMetrics.WEB_COUNT,1);
+            userService.onUpdated(AccessMetrics.WEB_LOGIN_COUNT,1);
             onSession(access,session);
         }
         else if(session.action().equals("onToken")){//exchange token
