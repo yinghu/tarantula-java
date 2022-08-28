@@ -165,7 +165,7 @@ public class SudoRoleModule implements Module {
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            Metrics metrics = context.metrics(Metrics.PAYMENT);
+            Metrics metrics = context.metrics(session.name());
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes());

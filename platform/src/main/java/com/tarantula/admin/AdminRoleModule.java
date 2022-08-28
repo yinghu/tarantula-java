@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
@@ -43,8 +44,10 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onGameClusterMetrics")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            gameCluster.setup();
-            session.write(new StatisticsSerializer().serialize(gameCluster.statistics,Statistics.class,null).toString().getBytes());
+            Metrics metrics = context.metrics((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            MetricsContext metricsContext = new MetricsContext();
+            metricsContext.metrics = metrics;
+            session.write(metricsContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

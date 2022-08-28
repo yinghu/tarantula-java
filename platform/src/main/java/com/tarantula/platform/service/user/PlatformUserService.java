@@ -1,10 +1,7 @@
 package com.tarantula.platform.service.user;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.LoginProvider;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.service.UserService;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
@@ -30,6 +27,7 @@ public class PlatformUserService implements UserService {
     private TarantulaLogger logger;
     private int trialMaxUsersPerAccount = 10;
     private int subscribedMaxUsersPerAccount = 10;
+
     @Override
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
@@ -238,4 +236,5 @@ public class PlatformUserService implements UserService {
     public void shutdown() throws Exception {
 
     }
+
 }

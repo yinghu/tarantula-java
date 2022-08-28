@@ -232,7 +232,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
 
     @Override
     public void onUpdated(String s, double v) {
-        this.gameCluster.onUpdated(s,v);
+        serviceContext.metrics(NAME).onUpdated(s,v);
     }
 
 }

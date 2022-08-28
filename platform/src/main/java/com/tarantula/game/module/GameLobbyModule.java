@@ -9,6 +9,7 @@ import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -29,7 +30,7 @@ public class GameLobbyModule implements Module{
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
-        this.gameServiceProvider.onUpdated("playCount",1);
+        this.gameServiceProvider.onUpdated(GameClusterMetrics.GOOGLE_COUNT,1);
         this.gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
     }
 
@@ -55,6 +56,7 @@ public class GameLobbyModule implements Module{
             rating.level = this.context.descriptor().accessRank()*100-99;
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
+            this.gameServiceProvider.onUpdated(GameClusterMetrics.GOOGLE_COUNT,1);
         }
         else if(session.action().equals("onTestScore")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){

@@ -7,12 +7,9 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
-import com.icodesoftware.Statistics;
-import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.statistics.UserStatistics;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.File;
@@ -23,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable, MetricsListener {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable {
 
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
@@ -44,7 +41,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public Lobby serviceLobby;
     public Lobby dataLobby;
 
-    public Statistics statistics;
+
 
     public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
 
@@ -140,20 +137,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return loaded;
     }
 
-    @Override
-    public void onUpdated(String s, double v) {
-        if(statistics==null) setup();
-        statistics.entry(s).update(v).update();
-    }
-
-    public <T extends Configurable> T setup(){
-        UserStatistics statisticsIndex = new UserStatistics();
-        statisticsIndex.distributionKey(this.distributionKey());
-        statisticsIndex.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(statisticsIndex,true);
-        this.statistics = statisticsIndex;
-        return null;
-    }
 
     public void setup(ServiceContext serviceContext){
         try{

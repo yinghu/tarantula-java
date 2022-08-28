@@ -11,9 +11,9 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
     <div class="w3-panel">  
         <div class='w3-bar w3-white'>
-            <span id='metrics-access' tx-game-category='asset' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Access</span>   
-            <span id='metrice-performance' tx-game-category='component' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Performance</span>   
-            <span id='metrice-payload' tx-game-category='commodity' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Payment</span>   
+            <span tx-metrics-category='access' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Access</span>   
+            <span tx-metrics-category='performance' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Performance</span>   
+            <span tx-metrics-category='payment' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Payment</span>   
         </div>
     </div>    
     <div class="w3-panel">
@@ -35,15 +35,24 @@
             return [];
         }
     };
-    
+    let mname = 'performance';
     let editor = new JSONEditor(document.querySelector("#jsoneditor-metrics-list"),options,{});
-    TARA_API.onService(false,{serviceTag:'role/sudo',command:'onMetrics'},(resp)=>{
-        editor.set(resp);                          
-    });
+    _on_metrics();
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
         editor.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    document.querySelectorAll('.tx-metrics-action').forEach((a)=>{
+        a.onclick =()=>{
+            mname = a.getAttribute('tx-metrics-category');
+            _on_metrics();
+        };
+    });
+    function _on_metrics(){
+        TARA_API.onGet('role/sudo','onMetrics',mname,(resp)=>{
+            editor.set(resp);                          
+        });
+    }
 </script>
