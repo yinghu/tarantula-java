@@ -62,6 +62,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private AtomicBoolean onAccessIndex;
 
+    private MetricsListener metricsListener;
 
 
     @Override
@@ -419,6 +420,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     @Override
     public void setup(ServiceContext serviceContext){
+        this.metricsListener = (n,v)->{};
         this.tarantulaContext = (TarantulaContext)serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
         this.integrationEventService = integrationCluster.publisher();
@@ -829,9 +831,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             configurable.updated(new ServiceContextProxy(this.tarantulaContext));
         }
     }
-
+    @Override
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
     public void onUpdated(String mkey,double delta){
-
+        this.metricsListener.onUpdated(mkey,delta);
     }
 
     private class OnLobbyListener implements Configurable.Listener<OnLobby>{

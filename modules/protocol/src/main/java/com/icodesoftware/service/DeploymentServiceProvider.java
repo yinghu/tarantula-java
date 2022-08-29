@@ -6,7 +6,7 @@ import com.icodesoftware.protocol.GameChannelListener;
 
 import java.util.List;
 
-public interface DeploymentServiceProvider extends ConfigurationServiceProvider{
+public interface DeploymentServiceProvider extends ConfigurationServiceProvider,MetricsListener{
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";

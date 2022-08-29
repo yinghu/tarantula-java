@@ -30,7 +30,7 @@ public class GameLobbyModule implements Module{
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
-        this.gameServiceProvider.onUpdated(GameClusterMetrics.GOOGLE_COUNT,1);
+        this.gameServiceProvider.onUpdated(GameClusterMetrics.PLAY_COUNT,1);
         this.gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
     }
 
@@ -56,7 +56,7 @@ public class GameLobbyModule implements Module{
             rating.level = this.context.descriptor().accessRank()*100-99;
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
-            this.gameServiceProvider.onUpdated(GameClusterMetrics.GOOGLE_COUNT,1);
+            this.gameServiceProvider.onUpdated(GameClusterMetrics.PLAY_COUNT,1);
         }
         else if(session.action().equals("onTestScore")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){

@@ -10,6 +10,7 @@ import com.icodesoftware.Lobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.File;
@@ -177,7 +178,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             if(!Files.exists(_web_game)){
                 Files.createDirectories(_web_game);
             }
-
         }catch (Exception ex){
             //log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
             throw new RuntimeException(ex);

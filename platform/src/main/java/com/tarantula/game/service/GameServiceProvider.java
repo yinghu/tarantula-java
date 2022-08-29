@@ -17,6 +17,7 @@ import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.ClusterConfigurationCallback;
 
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 
@@ -46,6 +47,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private DataStore serviceDataStore;
+    private Metrics metrics;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -67,6 +69,10 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(GameServiceProvider.class);
         gameCluster.setup(serviceContext);
+        this.metrics = new GameClusterMetrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.metrics.setup(serviceContext);
+        serviceContext.registerMetrics(metrics);
+        this.metrics = serviceContext.metrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
@@ -232,7 +238,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
 
     @Override
     public void onUpdated(String s, double v) {
-        serviceContext.metrics(NAME).onUpdated(s,v);
+        metrics.onUpdated(s,v);
     }
 
 }

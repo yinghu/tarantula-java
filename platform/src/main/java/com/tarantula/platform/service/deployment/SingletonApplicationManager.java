@@ -8,6 +8,7 @@ import com.tarantula.platform.event.EventOnAction;
 import com.tarantula.platform.service.BucketReceiver;
 import com.tarantula.platform.service.BucketReceiverListener;
 import com.tarantula.platform.service.cluster.ApplicationBucketReceiver;
+import com.tarantula.platform.service.metrics.DeploymentMetrics;
 
 public class SingletonApplicationManager extends DefaultApplication implements BucketReceiverListener, EventListener {
 
@@ -22,11 +23,13 @@ public class SingletonApplicationManager extends DefaultApplication implements B
         //DeploymentDescriptor dd = this.deploymentDescriptor.deploy();
         //dd.owner(dd.distributionKey());
         this.singleton = this.launch(this.deploymentDescriptor);
+        this.tarantulaContext.deploymentServiceProvider().onUpdated(DeploymentMetrics.APPLICATION_COUNT,1);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
         if(this.deploymentDescriptor.accessMode()!= Access.PRIVATE_ACCESS_MODE){
             for(int r=0;r<this.tarantulaContext.platformRoutingNumber;r++){
                 StringBuffer bs = new StringBuffer(this.tarantulaContext.dataBucketGroup).append(Recoverable.PATH_SEPARATOR).append(singleton.descriptor().tag()).append(Recoverable.PATH_SEPARATOR).append(r);
                 this.tarantulaContext.integrationCluster().registerBucketReceiver(new ApplicationBucketReceiver(bs.toString(),r,this,this));
+                this.tarantulaContext.deploymentServiceProvider().onUpdated(DeploymentMetrics.MESSAGE_RECEIVER_COUNT,1);
             }
         }
         else{

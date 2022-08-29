@@ -528,6 +528,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
+        this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
  	}

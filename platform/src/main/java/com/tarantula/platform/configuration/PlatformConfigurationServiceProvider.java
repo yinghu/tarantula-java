@@ -101,9 +101,6 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        GameClusterMetrics gameClusterMetrics = new GameClusterMetrics(gameServiceName);
-        gameClusterMetrics.setup(serviceContext);
-        serviceContext.registerMetrics(gameClusterMetrics);
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
