@@ -358,9 +358,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             gameCluster.message("["+name+"] game created successfully");
             mds.update(gameCluster);
-            UserStatistics statisticsIndex = new UserStatistics();
-            statisticsIndex.distributionKey(gameCluster.distributionKey());
-            mds.create(statisticsIndex);
+            gameCluster.setup(this.tarantulaContext);
+            this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameCluster);
         }catch (Exception ex){
             gameCluster.message(ex.getMessage());
             gameCluster.successful(false);

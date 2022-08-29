@@ -93,6 +93,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         <T extends OnAccess> void addGameService(T gameCluster);
         <T extends OnAccess> void addGameCluster(T gameCluster);
         <T extends OnAccess> void closeGameCluster(T gameCluster);
+        <T extends OnAccess> void onGameClusterCreated(T gameCluster);
 
         void addLobby(String typeId);
         void removeLobby(String typeId);

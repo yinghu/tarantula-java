@@ -414,6 +414,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
         removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
+    public <T extends OnAccess> void onGameClusterCreated(T gameCluster){
+        //gameCluster.setup(tarantulaContext);
+        oListeners.forEach((k,o)->
+                {
+                    if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                        o.listener.onCreated((GameCluster)gameCluster);
+                    }
+                }
+        );
+    }
     public void addLobby(String typeId){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
         this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener());
@@ -654,6 +664,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return (T)gc;
         }
         GameCluster gameCluster = this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
+        /**
         if(gameCluster.successful()){
             gameCluster.setup(tarantulaContext);
             oListeners.forEach((k,o)->
@@ -663,7 +674,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                         }
                     }
             );
-        }
+        }**/
         return (T)gameCluster;
     }
     public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){
@@ -812,8 +823,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
     }
-
-
 
 
     public <T extends Configurable> void release(T configurable){
