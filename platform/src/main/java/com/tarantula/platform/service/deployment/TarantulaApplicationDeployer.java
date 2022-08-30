@@ -6,6 +6,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
@@ -15,6 +16,7 @@ import com.tarantula.platform.service.ApplicationProvider;
 public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener<OnLobby> {
 
 	private final TarantulaContext context;
+	private TarantulaLogger logger = JDKLogger.getLogger(TarantulaApplicationDeployer.class);
 	public TarantulaApplicationDeployer(final TarantulaContext context ){
 		this.context = context;
 	}
@@ -26,7 +28,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		this.context._registerNode();
 		DataStore datastore = this.context.masterDataStore();
 		String bucketId = this.context.bucketId();
-		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));//query(recoverService,PortableRegistry.OID,new LobbyQuery(bucketId),new String[]{bucketId});
+		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
@@ -41,7 +43,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
-			c.applications = datastore.list(new ApplicationQuery(c.descriptor.distributionKey()));//query(recoverService,PortableRegistry.OID,new ApplicationQuery(c.descriptor.distributionKey()),new String[]{c.descriptor.distributionKey()});
+			c.applications = datastore.list(new ApplicationQuery(c.descriptor.distributionKey()));
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
@@ -64,7 +66,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployModule(String publishingId){
 		try {
-			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));//this.context.queryFromIntegrationNode(memberId,PortableRegistry.OID, new LobbyQuery(publishingId), new String[]{publishingId},false);
+			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));
 			blist.forEach((lb)->{
 				this.context.setOnLobby(lb,this);
 			});
@@ -88,6 +90,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 
 	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
+		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		RecoverableFactory query = new LobbyQuery(bucketId);
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();

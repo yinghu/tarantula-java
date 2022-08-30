@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.tarantula.platform.GameCluster;
@@ -15,14 +16,13 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     private TarantulaContext tarantulaContext;
     private PlatformDeploymentServiceProvider platformDeploymentServiceProvider;
-    private TarantulaLogger log;
+    private TarantulaLogger log = JDKLogger.getLogger(DistributionCallbackProvider.class);
 
     public DistributionCallbackProvider(TarantulaContext tarantulaContext,PlatformDeploymentServiceProvider platformDeploymentServiceProvider){
         this.tarantulaContext = tarantulaContext;
         this.platformDeploymentServiceProvider = platformDeploymentServiceProvider;
-        log = this.tarantulaContext.logger(DistributionCallbackProvider.class);
-    }
 
+    }
     @Override
     public <T extends OnAccess> void addGameService(T gameCluster) {
         if(!this.tarantulaContext.masterDataStore().load(gameCluster)){
@@ -51,8 +51,14 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public <T extends OnAccess> void onGameClusterCreated(T t) {
-
+    public <T extends OnAccess> void onGameClusterCreated(T gameCluster) {
+        platformDeploymentServiceProvider.oListeners.forEach((k,o)->
+                {
+                    if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                        o.listener.onCreated((GameCluster)gameCluster);
+                    }
+                }
+        );
     }
 
     @Override
@@ -144,7 +150,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     @Override
     public void updateView(OnView onView) {
 
-        //checkContent(onView);
+        platformDeploymentServiceProvider.checkContent(onView);
         OnView removed = (OnView) platformDeploymentServiceProvider.vMap.remove(onView.viewId());
         if(removed!=null){
             platformDeploymentServiceProvider.rMap.remove(removed.moduleResourceFile());

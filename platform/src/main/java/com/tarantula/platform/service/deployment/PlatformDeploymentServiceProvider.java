@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider, DeploymentServiceProvider.DistributionCallback {
+public class PlatformDeploymentServiceProvider implements DeploymentServiceProvider{
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
@@ -63,12 +63,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     AtomicBoolean onAccessIndex;
 
     private MetricsListener metricsListener;
-
+    private DistributionCallback distributionCallback;
 
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
         this.onAccessIndex = new AtomicBoolean(true);
+        this.distributionCallback = new DistributionCallbackProvider(this.tarantulaContext,this);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         );
     }
-    private void checkContent(OnView onView){
+    void checkContent(OnView onView){
         try{
             //log.warn("update view->"+onView.toString());
             Path _web_resource = Paths.get(this.contentDir+"/"+onView.moduleContext());
@@ -312,9 +313,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    public void addApplication(String typeId,String applicationId){
-        this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
-    }
 
     public boolean enableApplication(String applicationId){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
@@ -334,28 +332,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc!=null;
     }
-    public void  removeApplication(String typeId,String applicationId){
-        this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
-            if(d.type().equals(Descriptor.TYPE_LOBBY)){
-                this.oListeners.forEach((k,ol)->{ //remove lobby entry
-                    OnLobby onLobby = (OnLobby) vMap.get(d.typeId());
-                    onLobby.closed(true);
-                    if(onLobby.typeId().equals(ol.type)){
-                        ol.listener.onUpdated(onLobby);
-                    }//removed lobby entry
-                });
-                //rListeners.remove(d.tag()); //remove instance entry
-                this.tarantulaContext.integrationCluster().deployService().disableLobby(d.typeId());
-            }
-            if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
-                if(dynamicModuleClassLoader!=null){
-                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"]");
-                    dynamicModuleClassLoader._clear();
-                }
-            }
-        });
-    }
+
     public boolean launchModule(String typeId){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         boolean suc = deployService.enableLobby(typeId);
@@ -372,62 +349,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         return suc;
     }
-    public void removeLobby(String typeId){
-        this.oListeners.forEach((k,ol)->{
-            if(vMap.containsKey(typeId)){//skip system level modules
-                OnLobby onLobby =(OnLobby) vMap.get(typeId);
-                onLobby.closed(true);
-                if(ol.type.equals(onLobby.configurationType())){
-                    ol.listener.onUpdated(onLobby);
-                }
-            }
-        });
-        this.tarantulaContext.unsetLobby(typeId,(d)->{//clean up from runtime context
-            //remove modules
-            if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
-                DynamicModuleClassLoader dynamicModuleClassLoader = cMap.remove(d.moduleId());
-                if(dynamicModuleClassLoader!=null){
-                    log.warn("Module resource clear on ["+d.codebase()+"/"+d.moduleArtifact()+"/"+d.moduleVersion()+"]");
-                    dynamicModuleClassLoader._clear();
-                }
-            }
-        });
-    }
-    public <T extends OnAccess> void addGameService(T gameCluster){
-        if(!this.tarantulaContext.masterDataStore().load(gameCluster)){
-            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
-            return;
-        }
-        this.tarantulaContext.setGameServiceProvider((GameCluster)gameCluster);
-    }
-    public <T extends OnAccess> void addGameCluster(T gameCluster){
-        if(!this.tarantulaContext.masterDataStore().load(gameCluster)) return;
-        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new _OnLobbyListener());
-    }
-    public <T extends OnAccess> void closeGameCluster(T gameCluster){
-        if(!tarantulaContext.masterDataStore().load(gameCluster)){
-            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
-            return;
-        }
-        this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
-    }
-    public <T extends OnAccess> void onGameClusterCreated(T gameCluster){
-        //gameCluster.setup(tarantulaContext);
-        oListeners.forEach((k,o)->
-                {
-                    if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
-                        o.listener.onCreated((GameCluster)gameCluster);
-                    }
-                }
-        );
-    }
-    public void addLobby(String typeId){
-        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
-        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new _OnLobbyListener());
-    }
+
     @Override
     public void setup(ServiceContext serviceContext){
         this.metricsListener = (n,v)->{};
@@ -521,50 +443,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         response.message(suc?"ok":"failed");
         return  response;
     }
-    public void updateResource(String contentUrl,String resourceName){
-        try{
-            //content dir deployDir/web
-            Path _path = Paths.get(this.contentDir+"/"+contentUrl);
-            if(!Files.exists(_path)){
-                Files.createDirectories(_path);
-            }
-            File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
-            File fe = new File(contentDir+"/"+contentUrl+"/"+resourceName);
-            if(!fe.exists()||fe.lastModified()<f.lastModified()){
-                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
-                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
-                fos.write(fin.readAllBytes());
-                fin.close();
-                fos.flush();
-                fos.close();
-                rMap.remove(contentUrl+"/"+resourceName);//clear cache
-            }
-        }catch (Exception ex){
-            log.error(contentUrl+"/"+resourceName,ex);
-        }
-    }
-    public void updateModule(String contentUrl,String resourceName){
-        try{
-            //content dir deployDir/module
-            Path _path = Paths.get(this.tarantulaContext.deployDir+"/module/"+contentUrl);
-            if(!Files.exists(_path)){
-                Files.createDirectories(_path);
-            }
-            File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
-            File fe = new File(this.tarantulaContext.deployDir+"/module/"+contentUrl+"/"+resourceName);
-            if(!fe.exists()||fe.lastModified()<f.lastModified()){
-                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
-                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
-                fos.write(fin.readAllBytes());
-                fin.close();
-                fos.flush();
-                fos.close();
-                //rMap.remove(contentUrl+"/"+resourceName);//clear cache
-            }
-        }catch (Exception ex){
-            log.error(contentUrl+"/"+resourceName,ex);
-        }
-    }
+
+
     public Response createView(OnView onView){
         Response response = this.tarantulaContext.checkResource(onView,"web");
         if(!response.successful()){
@@ -736,44 +616,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void unregisterGameChannelListener(String registerKey){
         cListeners.remove(registerKey);
     }
-    public boolean addChannel(String typeId,Channel channel){
-        try{
-            cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onChannel(channel);
-            });
-            return true;
-        }catch (Exception ex){
-            log.error("error on add channel",ex);
-            return false;
-        }
-    }
-    public void addConnection(String typeId,Connection connection){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onConnection(connection);
-        });
-    }
-    public void removeConnection(String typeId,Connection connection){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onDisConnection(connection);
-        });
-    }
-    public void pingConnection(String typeId,String serverId){
-        try{
-            cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onPing(serverId);
-            });
-        }catch (Exception ex){
-            log.error("error on ping",ex);
-        }
-    }
-    public void stopAccessIndex(){
-        onAccessIndex.set(false);
-        aListeners.forEach((a)->a.onStop());
-    }
-    public void startAccessIndex(){
-        onAccessIndex.set(true);
-        aListeners.forEach((a)->a.onStart());
-    }
+
     public void registerAccessIndexListener(AccessIndexService.Listener listener){
         if(onAccessIndex.get()){
             listener.onStart();
@@ -818,7 +661,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     }
     public DistributionCallback distributionCallback(){
-        return this;
+        return this.distributionCallback;
     }
     public PostOffice registerPostOffice(){
         return new PostOfficeSession();
@@ -848,12 +691,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metricsListener.onUpdated(mkey,delta);
     }
 
-    private class _OnLobbyListener implements Configurable.Listener<OnLobby>{
-        @Override
-        public void onUpdated(OnLobby onLobby){
-            register(onLobby);
-        }
-    }
+
     private class PostOfficeSession implements PostOffice{
 
         //public OnChannel onChannel(Session session){

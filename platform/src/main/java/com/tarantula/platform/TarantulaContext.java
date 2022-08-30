@@ -24,8 +24,7 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
-import com.tarantula.platform.service.metrics.AccessMetrics;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
+
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.util.*;
@@ -505,11 +504,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	        _syncLatch.remove(_pk);
         }
  	    log.warn("Access index data sync has finished");
-        CountDownLatch _tarantula_sync = new CountDownLatch(1);
-        _syncLatch.put("t100",_tarantula_sync);
-        this.integrationCluster.recoverService().syncStart(DeploymentServiceProvider.DEPLOY_DATA_STORE,"t100");
-        _tarantula_sync.await();
-        _syncLatch.remove("t100");
+        //CountDownLatch _tarantula_sync = new CountDownLatch(1);
+        //_syncLatch.put("t100",_tarantula_sync);
+        //this.integrationCluster.recoverService().syncStart(DeploymentServiceProvider.DEPLOY_DATA_STORE,"t100");
+        //_tarantula_sync.await();
+        //_syncLatch.remove("t100");
 
 
         for(String s : this.integrationCluster.recoverService().listModules()){
@@ -524,6 +523,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
+        if(bid==null | nid==null) throw new RuntimeException("Need to restart the server again");
         initMetricsProvider();
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
