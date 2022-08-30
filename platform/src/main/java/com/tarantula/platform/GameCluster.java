@@ -124,20 +124,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         }
         return loaded;
     }
-    public Descriptor gameWithKey(String key){
-        if(gameLobby==null){
-            return null;
-        }
-        Descriptor loaded =null;
-        for(Descriptor d : gameLobby.entryList()){
-            if(d.distributionKey().equals(key)){
-                loaded = d;
-                break;
-            }
-        }
-        return loaded;
-    }
-
 
     public void setup(ServiceContext serviceContext){
         try{

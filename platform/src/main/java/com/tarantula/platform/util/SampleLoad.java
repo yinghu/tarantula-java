@@ -114,7 +114,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,10000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,500000);
         sampleLoad._init();
         sampleLoad.register();
         //PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");
