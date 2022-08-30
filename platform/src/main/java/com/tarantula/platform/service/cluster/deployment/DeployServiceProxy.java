@@ -128,17 +128,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String enableApplication(String applicationId){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnableApplicationOperation operation = new EnableApplicationOperation(applicationId,true);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<String> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean disableLobby(String typeId){
         NodeEngine nodeEngine = getNodeEngine();
         EnableLobbyOperation operation = new EnableLobbyOperation(typeId,false);
@@ -150,17 +140,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public String disableApplication(String applicationId){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnableApplicationOperation operation = new EnableApplicationOperation(applicationId,false);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<String> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
 
     public boolean resetModule(Descriptor descriptor){
         NodeEngine nodeEngine = getNodeEngine();

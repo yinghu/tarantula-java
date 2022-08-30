@@ -90,10 +90,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         return accessIndex;
     }
     public void enable(){
-        this.deploymentServiceProvider.distributionCallback().startAccessIndex();
+        this.deploymentServiceProvider.distributionCallback().onAccessIndexEnabled();
     }
     public void disable(){
-        this.deploymentServiceProvider.distributionCallback().stopAccessIndex();
+        this.deploymentServiceProvider.distributionCallback().onAccessIndexDisabled();
     }
 
 

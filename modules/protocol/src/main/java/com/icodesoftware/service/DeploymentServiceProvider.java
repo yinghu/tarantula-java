@@ -111,8 +111,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void pingConnection(String typeId,String serverId);
         void removeConnection(String typeId,Connection connection);
 
-        void stopAccessIndex();
-        void startAccessIndex();
+        void onAccessIndexDisabled();
+        void onAccessIndexEnabled();
 
         void syncKey(String key);
 

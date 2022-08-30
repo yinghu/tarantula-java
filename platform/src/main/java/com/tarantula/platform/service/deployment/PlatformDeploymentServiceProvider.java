@@ -315,22 +315,28 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean enableApplication(String applicationId){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        String suc = deployService.enableApplication(applicationId);
-        if(suc!=null){//return the lobby typeId
-            deployService = this.tarantulaContext.integrationCluster().deployService();
-            return deployService.onLaunchApplication(suc,applicationId);
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.distributionKey(applicationId);
+        if(!ds.load(app)||!app.disabled()){
+            return false;
         }
-        return suc!=null;
+        app.disabled(false);
+        ds.update(app);
+        DeployService  deployService = this.tarantulaContext.integrationCluster().deployService();
+        return deployService.onLaunchApplication(app.typeId(),applicationId);
     }
     public boolean disableApplication(String applicationId){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        String suc = deployService.disableApplication(applicationId);
-        if(suc!=null){//return the lobby typeId
-            deployService = this.tarantulaContext.integrationCluster().deployService();
-            return deployService.onShutdownApplication(suc,applicationId);
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.distributionKey(applicationId);
+        if(!ds.load(app)||app.disabled()){
+            return false;
         }
-        return suc!=null;
+        app.disabled(true);
+        ds.update(app);
+        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
+        return deployService.onShutdownApplication(app.typeId(),applicationId);
     }
 
     public boolean launchModule(String typeId){

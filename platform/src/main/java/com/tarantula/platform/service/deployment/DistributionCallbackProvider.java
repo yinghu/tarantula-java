@@ -294,11 +294,11 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         });
     }
 
-    public void stopAccessIndex(){
+    public void onAccessIndexDisabled(){
         platformDeploymentServiceProvider.onAccessIndex.set(false);
         platformDeploymentServiceProvider.aListeners.forEach((a)->a.onStop());
     }
-    public void startAccessIndex(){
+    public void onAccessIndexEnabled(){
         platformDeploymentServiceProvider.onAccessIndex.set(true);
         platformDeploymentServiceProvider.aListeners.forEach((a)->a.onStart());
     }

@@ -7,17 +7,13 @@ import com.hazelcast.core.MigrationEvent;
 import com.hazelcast.core.MigrationListener;
 import com.hazelcast.spi.*;
 import com.icodesoftware.*;
-import com.icodesoftware.service.DeployCode;
+
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.service.ApplicationProvider;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.*;
-import com.tarantula.platform.statistics.UserStatistics;
 import com.tarantula.platform.util.ResponseSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
 
@@ -118,28 +114,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         ds.update(lobbyDescriptor);
         return true;
     }
-    public String enableApplication(String applicationId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        DeploymentDescriptor app = new DeploymentDescriptor();
-        app.distributionKey(applicationId);
-        if(!ds.load(app)||!app.disabled()){
-            return null;
-        }
-        app.disabled(false);
-        ds.update(app);
-        return app.typeId();
-    }
-    public String disableApplication(String applicationId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        DeploymentDescriptor app = new DeploymentDescriptor();
-        app.distributionKey(applicationId);
-        if(!ds.load(app)||app.disabled()){
-            return null;
-        }
-        app.disabled(true);
-        ds.update(app);
-        return app.typeId();
-    }
+
+
 
     public boolean addView(OnView view){
         DataStore ds = this.tarantulaContext.masterDataStore();

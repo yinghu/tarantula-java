@@ -11,16 +11,12 @@ public interface DeployService extends ServiceProvider {
     boolean updateView(OnView onView);
     boolean updateResource(String contentUrl,String resourceName);
 
-    //String addApplication(Descriptor application,String postSetup,String configName);
+
     boolean onLaunchApplication(String typeId,String applicationId);
     boolean onShutdownApplication(String typeId,String applicationId);
     boolean resetModule(Descriptor descriptor);
 
-
-    //update lobby or application to set disabled as true/false
-    String enableApplication(String applicationId);
     boolean enableLobby(String typeId);
-    String disableApplication(String applicationId);
     boolean disableLobby(String typeId);
 
     void onCreateGameCluster(String gameClusterId);
