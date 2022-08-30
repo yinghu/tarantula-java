@@ -69,7 +69,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
         this.onAccessIndex = new AtomicBoolean(true);
-        this.distributionCallback = new DistributionCallbackProvider(this.tarantulaContext,this);
     }
 
     @Override
@@ -237,29 +236,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         checked.message(suc?"deployed->"+resourceName:"failed->"+resourceName);
         return checked;
     }
-    public void updateModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-            DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
-            nmc.proxies.addAll(c.proxies);
-            c._clear();
-            nmc._load();
-            return nmc;
-        });
-        mc.proxies.forEach((mp)->{
-            mp.reset();
-        });
 
-        cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-           c.reset(descriptor.resetEnabled());
-           return c;
-        });
-        try{//agent operation into the platform vm
-            Runtime rt  =Runtime.getRuntime();
-            rt.exec("java -jar gec-agent-1.0.jar "+ProcessHandle.current().pid()+" "+descriptor.moduleId());
-        }catch (Exception ex){
-            log.error("error from agent",ex);
-        }
-    }
     public Response createModule(Descriptor descriptor){
         DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
         XMLParser xmlParser = new XMLParser();
@@ -354,6 +331,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.metricsListener = (n,v)->{};
         this.tarantulaContext = (TarantulaContext)serviceContext;
+        this.distributionCallback = new DistributionCallbackProvider(this.tarantulaContext,this);
         this.integrationCluster = serviceContext.clusterProvider();
         this.integrationEventService = integrationCluster.publisher();
         try{
@@ -543,18 +521,79 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        GameCluster gameCluster = this.tarantulaContext.integrationCluster().deployService().createGameCluster(owner,name,mode,tournamentEnabled,accessIndex.distributionKey());
-        /**
-        if(gameCluster.successful()){
-            gameCluster.setup(tarantulaContext);
-            oListeners.forEach((k,o)->
-                    {
-                        if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
-                            o.listener.onCreated(gameCluster);
-                        }
+        String publishingId = accessIndex.distributionKey();
+        GameCluster gameCluster = new GameCluster();
+        try {
+            DataStore mds = this.tarantulaContext.masterDataStore();
+            gameCluster.property(GameCluster.NAME,name);
+            gameCluster.property(GameCluster.MODE,mode);
+            gameCluster.property(GameCluster.OWNER,owner);
+            gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
+            gameCluster.property(GameCluster.ACCESS_KEY,"pending access key");
+            gameCluster.property(GameCluster.TIMESTAMP,0);
+            gameCluster.property(GameCluster.TOURNAMENT_ENABLED,tournamentEnabled);
+            gameCluster.property(GameCluster.DISABLED,true);
+            mds.create(gameCluster);//create first and discharge if any errors on loop
+            gameCluster.successful(true);
+            XMLParser parser = new XMLParser();
+            String typePrefix = name.toLowerCase();
+            parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(tournamentEnabled?"tournament-game-cluster-basic-plan.xml":"game-cluster-basic-plan.xml"));
+            for (LobbyConfiguration configuration : parser.configurations) {
+                configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
+                if(configuration.descriptor.typeId().endsWith("-lobby")){
+                    gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
+                }
+                else if(configuration.descriptor.typeId().endsWith("-service")){
+                    gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
+                    this.tarantulaContext.availableServices().forEach((s)-> configuration.applications.add((DeploymentDescriptor)s));
+                }
+                else if(configuration.descriptor.typeId().endsWith("-data")){
+                    gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
+                }
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),configuration.descriptor.typeId());
+                if(mds.load(lobbyTypeIdIndex)){//stop existed
+                    throw new RuntimeException("["+name+"] duplicated");
+                }
+                ApplicationPreSetup[] preSetup = {null};
+                Configuration presetup = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
+                if(presetup!=null){
+                    String cname = (String) presetup.property(ApplicationPreSetup.SET_UP_NAME);
+                    gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                    preSetup[0] = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup(cname);
+                }
+                //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
+                Descriptor descriptor = configuration.descriptor;
+                descriptor.owner(publishingId);
+                descriptor.label(LobbyDescriptor.LABEL);
+                descriptor.onEdge(true);
+                descriptor.resetEnabled(true);
+                descriptor.disabled(true);//pending launch
+                descriptor.deployCode(DeployCode.USER_GAME_CLUSTER);
+                mds.create(descriptor);
+                lobbyTypeIdIndex.index(descriptor.distributionKey());
+                lobbyTypeIdIndex.owner(gameCluster.distributionKey());
+                mds.create(lobbyTypeIdIndex);
+                configuration.applications.forEach((a)->{
+                    a.owner(descriptor.distributionKey());
+                    a.label(ApplicationProvider.LABEL);
+                    a.onEdge(true);
+                    a.tournamentEnabled(tournamentEnabled);
+                    a.typeId(descriptor.typeId());//replaced with named type id
+                    a.tag(a.tag().replaceFirst("game",typePrefix));
+                    a.applicationClassName(tarantulaContext.singleModuleApplication);
+                    mds.create(a);
+                    if(preSetup[0]!=null){
+                        preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
                     }
-            );
-        }**/
+                });
+            }
+            gameCluster.message("["+name+"] game created successfully");
+            mds.update(gameCluster);
+            this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionKey());
+        }catch (Exception ex){
+            gameCluster.message(ex.getMessage());
+            gameCluster.successful(false);
+        }
         return (T)gameCluster;
     }
     public <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config){

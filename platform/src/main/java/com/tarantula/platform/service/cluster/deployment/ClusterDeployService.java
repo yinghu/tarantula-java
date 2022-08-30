@@ -63,6 +63,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void destroyDistributedObject(String s) {
     }
+
+    public void onCreateGameCluster(String gameClusterId){
+        this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameClusterId);
+    }
     public boolean addLobby(Descriptor descriptor,String publishingId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
@@ -359,7 +363,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             gameCluster.message("["+name+"] game created successfully");
             mds.update(gameCluster);
             gameCluster.setup(this.tarantulaContext);
-            this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameCluster);
+            //this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameCluster);
         }catch (Exception ex){
             gameCluster.message(ex.getMessage());
             gameCluster.successful(false);

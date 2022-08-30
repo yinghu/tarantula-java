@@ -23,7 +23,7 @@ public interface DeployService extends ServiceProvider {
     String disableApplication(String applicationId);
     boolean disableLobby(String typeId);
 
-    //GameCluster createGameCluster(String owner,String name);
+    void onCreateGameCluster(String gameClusterId);
     <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled,String publishingId);
     boolean enableGameCluster(String gameClusterId);
     boolean disableGameCluster(String gameClusterId);

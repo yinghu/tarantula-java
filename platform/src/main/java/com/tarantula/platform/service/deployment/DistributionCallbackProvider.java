@@ -51,13 +51,20 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public <T extends OnAccess> void onGameClusterCreated(T gameCluster) {
+    public void onGameClusterCreated(String gameClusterId) {
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        gameCluster.dataStore(this.tarantulaContext.masterDataStore());
+        if(!tarantulaContext.masterDataStore().load(gameCluster)){
+            log.warn("Game cluster ["+gameClusterId+"] not found");
+        }
+        gameCluster.setup(this.tarantulaContext);
         platformDeploymentServiceProvider.oListeners.forEach((k,o)->
-                {
-                    if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
-                        o.listener.onCreated((GameCluster)gameCluster);
-                    }
+            {
+                if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                    o.listener.onCreated(gameCluster);
                 }
+            }
         );
     }
 
