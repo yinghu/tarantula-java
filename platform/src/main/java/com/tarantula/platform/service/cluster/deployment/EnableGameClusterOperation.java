@@ -23,7 +23,7 @@ public class EnableGameClusterOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.enableGameCluster(this.gameClusterId);
+        this.result = cds.onEnableGameCluster(this.gameClusterId);
     }
 
     @Override

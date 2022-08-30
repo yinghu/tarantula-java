@@ -116,17 +116,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public String addApplication(Descriptor application,String postSetup,String configName){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddApplicationOperation operation = new AddApplicationOperation(application,postSetup,configName);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<String> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean enableLobby(String typeId){
         NodeEngine nodeEngine = getNodeEngine();
         EnableLobbyOperation operation = new EnableLobbyOperation(typeId,true);
@@ -184,18 +174,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public <T extends OnAccess> T createGameCluster(String owner, String name,String mode,boolean tournamentEnabled,String publishingId){
-        NodeEngine nodeEngine = getNodeEngine();
-        CreateGameClusterOperation operation = new CreateGameClusterOperation(owner,name,mode,tournamentEnabled,publishingId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<T> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public boolean enableGameCluster(String gamaClusterId){
+    public boolean onEnableGameCluster(String gamaClusterId){
         NodeEngine nodeEngine = getNodeEngine();
         EnableGameClusterOperation operation = new EnableGameClusterOperation(gamaClusterId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
@@ -206,7 +185,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean disableGameCluster(String gamaClusterId){
+    public boolean onDisableGameCluster(String gamaClusterId){
         NodeEngine nodeEngine = getNodeEngine();
         DisableGameClusterOperation operation = new DisableGameClusterOperation(gamaClusterId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
@@ -237,7 +216,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean launchGameCluster(String gameClusterKey){
+    public boolean onLaunchGameCluster(String gameClusterKey){
         NodeEngine nodeEngine = getNodeEngine();
         LaunchGameClusterOperation operation = new LaunchGameClusterOperation(gameClusterKey);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -256,7 +235,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean launchApplication(String typeId,String applicationId){
+    public boolean onLaunchApplication(String typeId,String applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         LaunchApplicationOperation operation = new LaunchApplicationOperation(typeId,applicationId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -313,7 +292,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean shutdownApplication(String typeId,String applicationId){
+    public boolean onShutdownApplication(String typeId,String applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownApplicationOperation operation = new ShutdownApplicationOperation(typeId,applicationId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -332,7 +311,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean shutdownGameCluster(String gameClusterKey){
+    public boolean onShutdownGameCluster(String gameClusterKey){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownGameClusterOperation operation = new ShutdownGameClusterOperation(gameClusterKey);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

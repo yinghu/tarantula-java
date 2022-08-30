@@ -5,6 +5,8 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.LobbyDescriptor;
+import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.TarantulaContext;
 
 import java.io.*;
@@ -18,8 +20,8 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     private PlatformDeploymentServiceProvider platformDeploymentServiceProvider;
     private TarantulaLogger log = JDKLogger.getLogger(DistributionCallbackProvider.class);
 
-    public DistributionCallbackProvider(TarantulaContext tarantulaContext,PlatformDeploymentServiceProvider platformDeploymentServiceProvider){
-        this.tarantulaContext = tarantulaContext;
+    public DistributionCallbackProvider(PlatformDeploymentServiceProvider platformDeploymentServiceProvider){
+        this.tarantulaContext = TarantulaContext.getInstance();
         this.platformDeploymentServiceProvider = platformDeploymentServiceProvider;
 
     }
@@ -33,13 +35,17 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public <T extends OnAccess> void addGameCluster(T gameCluster) {
+    public void onGameClusterLaunched(String gameClusterId) {
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
         if(!this.tarantulaContext.masterDataStore().load(gameCluster)) return;
-        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new OnLobbyListener(this.platformDeploymentServiceProvider));
+        this.tarantulaContext.setGameClusterOnLobby(gameCluster,new OnLobbyListener(this.platformDeploymentServiceProvider));
     }
 
     @Override
-    public <T extends OnAccess> void closeGameCluster(T gameCluster) {
+    public void onGameClusterShutdown(String gameClusterId) {
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
         if(!tarantulaContext.masterDataStore().load(gameCluster)){
             log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
             return;
@@ -66,6 +72,41 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
                 }
             }
         );
+    }
+
+    public boolean onGameClusterEnabled(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 =enableLobby(data);
+        boolean suc2 =enableLobby(lobby);
+        boolean suc3 =enableLobby(service);
+        gameCluster.property(GameCluster.DISABLED,false);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;//make sure all enabled
+    }
+    public boolean onGameClusterDisabled(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 = disableLobby(data);
+        boolean suc2 = disableLobby(lobby);
+        boolean suc3 = disableLobby(service);
+        gameCluster.property(GameCluster.DISABLED,true);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;
     }
 
     @Override
@@ -99,12 +140,12 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void addApplication(String typeId ,String applicationId) {
+    public void onApplicationLaunched(String typeId ,String applicationId) {
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
     @Override
-    public void removeApplication(String typeId, String applicationId) {
+    public void onApplicationShutdown(String typeId, String applicationId) {
 
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.type().equals(Descriptor.TYPE_LOBBY)){
@@ -268,5 +309,37 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
             Configurable configurable = platformDeploymentServiceProvider.vMap.get(key);
             configurable.updated(new ServiceContextProxy(this.tarantulaContext));
         }
+    }
+
+    private boolean enableLobby(String typeId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
+            return false;
+        }
+        lobbyDescriptor.disabled(false);
+        ds.update(lobbyDescriptor);
+        return true;
+    }
+
+    private boolean disableLobby(String typeId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
+            return false;
+        }
+        lobbyDescriptor.disabled(true);
+        ds.update(lobbyDescriptor);
+        return true;
     }
 }

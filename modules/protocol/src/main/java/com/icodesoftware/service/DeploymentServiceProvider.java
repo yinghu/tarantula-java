@@ -91,14 +91,16 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     interface DistributionCallback{
 
         <T extends OnAccess> void addGameService(T gameCluster);
-        <T extends OnAccess> void addGameCluster(T gameCluster);
-        <T extends OnAccess> void closeGameCluster(T gameCluster);
-        <T extends OnAccess> void onGameClusterCreated(String gameClusterId);
+        void onGameClusterLaunched(String gameClusterId);
+        void onGameClusterShutdown(String gameClusterId);
+        void onGameClusterCreated(String gameClusterId);
+        boolean onGameClusterEnabled(String gameClusterId);
+        boolean onGameClusterDisabled(String gameClusterId);
 
         void addLobby(String typeId);
         void removeLobby(String typeId);
-        void addApplication(String typeId,String applicationId);
-        void removeApplication(String typeId,String applicationId);
+        void onApplicationLaunched(String typeId,String applicationId);
+        void onApplicationShutdown(String typeId,String applicationId);
         void updateModule(Descriptor descriptor);
         void updateView(OnView onView);
         void updateModule(String contentUrl,String resourceName);

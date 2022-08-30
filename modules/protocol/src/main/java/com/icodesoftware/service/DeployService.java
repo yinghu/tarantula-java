@@ -11,9 +11,9 @@ public interface DeployService extends ServiceProvider {
     boolean updateView(OnView onView);
     boolean updateResource(String contentUrl,String resourceName);
 
-    String addApplication(Descriptor application,String postSetup,String configName);
-    boolean launchApplication(String typeId,String applicationId);
-    boolean shutdownApplication(String typeId,String applicationId);
+    //String addApplication(Descriptor application,String postSetup,String configName);
+    boolean onLaunchApplication(String typeId,String applicationId);
+    boolean onShutdownApplication(String typeId,String applicationId);
     boolean resetModule(Descriptor descriptor);
 
 
@@ -24,13 +24,12 @@ public interface DeployService extends ServiceProvider {
     boolean disableLobby(String typeId);
 
     void onCreateGameCluster(String gameClusterId);
-    <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled,String publishingId);
-    boolean enableGameCluster(String gameClusterId);
-    boolean disableGameCluster(String gameClusterId);
+    boolean onEnableGameCluster(String gameClusterId);
+    boolean onDisableGameCluster(String gameClusterId);
 
     boolean startGameService(String gameClusterKey);
-    boolean launchGameCluster(String gameClusterKey);
-    boolean shutdownGameCluster(String gameClusterKey);
+    boolean onLaunchGameCluster(String gameClusterKey);
+    boolean onShutdownGameCluster(String gameClusterKey);
 
     //distribute the module or view content in cluster
     boolean upload(String fileName,byte[] content);

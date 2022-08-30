@@ -22,7 +22,7 @@ public class LaunchApplicationOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.launchApplication(typeId,applicationKey);
+        cds.onLaunchApplication(typeId,applicationKey);
     }
 
     @Override

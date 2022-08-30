@@ -69,6 +69,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
         this.onAccessIndex = new AtomicBoolean(true);
+        this.distributionCallback = new DistributionCallbackProvider(this);
     }
 
     @Override
@@ -272,10 +273,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
             b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            String x = deployService.addApplication(b,null,null);
-            if(x==null){
-                log.warn("Failed to add application ->"+b.toString());
-            }
+            this.createApplication(b,null,null,false);
+            //String x = deployService.addApplication(b,null,null);
+            //if(x==null){
+                //log.warn("Failed to add application ->"+b.toString());
+            //}
         });
         response.successful(true);
         response.message("module created");
@@ -283,12 +285,33 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean createApplication(Descriptor descriptor, String postSetup,String configName,boolean launching){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        String  suc = deployService.addApplication(descriptor,postSetup,configName);
-        if(suc!=null&&launching){//launch if lobby on line
-            this.integrationCluster.deployService().launchApplication(descriptor.typeId(),suc);
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
+        if(!ds.load(query)){
+            return false;
         }
-        return suc!=null;
+        descriptor.owner(query.index());
+        descriptor.label(ApplicationProvider.LABEL);
+        descriptor.onEdge(true);
+        if(!ds.create(descriptor)) return false;
+        if(!descriptor.typeId().equals(descriptor.moduleId())){
+            //create index for moduleId
+            IndexSet indexSet = new IndexSet();
+            indexSet.distributionKey(descriptor.index());
+            indexSet.label(ExposedGameService.INDEX_LABEL);
+            indexSet.addKey(descriptor.distributionKey());
+            if(!ds.createIfAbsent(indexSet,true)){
+                indexSet.addKey(descriptor.distributionKey());
+                ds.update(indexSet);
+            }
+            //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
+        }
+        if(postSetup!=null){
+            ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
+            setup.setup(tarantulaContext,descriptor,configName);
+        }
+        this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionKey());
+        return true;
     }
 
     public boolean enableApplication(String applicationId){
@@ -296,7 +319,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String suc = deployService.enableApplication(applicationId);
         if(suc!=null){//return the lobby typeId
             deployService = this.tarantulaContext.integrationCluster().deployService();
-            return deployService.launchApplication(suc,applicationId);
+            return deployService.onLaunchApplication(suc,applicationId);
         }
         return suc!=null;
     }
@@ -305,7 +328,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String suc = deployService.disableApplication(applicationId);
         if(suc!=null){//return the lobby typeId
             deployService = this.tarantulaContext.integrationCluster().deployService();
-            return deployService.shutdownApplication(suc,applicationId);
+            return deployService.onShutdownApplication(suc,applicationId);
         }
         return suc!=null;
     }
@@ -331,7 +354,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void setup(ServiceContext serviceContext){
         this.metricsListener = (n,v)->{};
         this.tarantulaContext = (TarantulaContext)serviceContext;
-        this.distributionCallback = new DistributionCallbackProvider(this.tarantulaContext,this);
         this.integrationCluster = serviceContext.clusterProvider();
         this.integrationEventService = integrationCluster.publisher();
         try{
@@ -497,8 +519,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(deployService.enableGameCluster(gameCluster.distributionKey())&&deployService.startGameService(gameCluster.distributionKey())){
-            return tarantulaContext.integrationCluster().deployService().launchGameCluster(gameCluster.distributionKey());
+        if(deployService.onEnableGameCluster(gameCluster.distributionKey())&&deployService.startGameService(gameCluster.distributionKey())){
+            return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
@@ -506,8 +528,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(deployService.disableGameCluster(gameCluster.distributionKey())){
-            return this.tarantulaContext.integrationCluster().deployService().shutdownGameCluster(gameCluster.distributionKey());
+        if(deployService.onDisableGameCluster(gameCluster.distributionKey())){
+            return this.tarantulaContext.integrationCluster().deployService().onShutdownGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;

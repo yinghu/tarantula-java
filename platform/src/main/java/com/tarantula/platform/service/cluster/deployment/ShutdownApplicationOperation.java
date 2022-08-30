@@ -21,7 +21,7 @@ public class ShutdownApplicationOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.shutdownApplication(typeId,applicationkey);
+        cds.onShutdownApplication(typeId,applicationkey);
     }
 
     @Override

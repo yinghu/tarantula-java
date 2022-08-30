@@ -20,7 +20,7 @@ public class ShutdownGameClusterOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.shutdownGameCluster(gameClusterkey);
+        cds.onShutdownGameCluster(gameClusterkey);
     }
 
     @Override
