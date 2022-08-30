@@ -34,23 +34,23 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
-    private ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String,TypedListener> oListeners = new ConcurrentHashMap<>();
 
     //callback on access index service
-    private CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<AccessIndexService.Listener> aListeners = new CopyOnWriteArrayList<>();
 
     //on view, on lobby , configs mappings
-    private ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
-    private ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
 
 
     //module class loader mappings
-    private ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String,DynamicModuleClassLoader> cMap = new ConcurrentHashMap<>();
 
     //content cache ( web admin )
-    private ConcurrentHashMap<String,Content> rMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String,Content> rMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
@@ -58,9 +58,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private TarantulaContext tarantulaContext;
 
 
-    private String contentDir;
+    String contentDir;
 
-    private AtomicBoolean onAccessIndex;
+    AtomicBoolean onAccessIndex;
 
     private MetricsListener metricsListener;
 
@@ -402,7 +402,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public <T extends OnAccess> void addGameCluster(T gameCluster){
         if(!this.tarantulaContext.masterDataStore().load(gameCluster)) return;
-        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new OnLobbyListener());
+        this.tarantulaContext.setGameClusterOnLobby((GameCluster)gameCluster,new _OnLobbyListener());
     }
     public <T extends OnAccess> void closeGameCluster(T gameCluster){
         if(!tarantulaContext.masterDataStore().load(gameCluster)){
@@ -426,7 +426,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void addLobby(String typeId){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
-        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener());
+        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new _OnLobbyListener());
     }
     @Override
     public void setup(ServiceContext serviceContext){
@@ -848,7 +848,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metricsListener.onUpdated(mkey,delta);
     }
 
-    private class OnLobbyListener implements Configurable.Listener<OnLobby>{
+    private class _OnLobbyListener implements Configurable.Listener<OnLobby>{
         @Override
         public void onUpdated(OnLobby onLobby){
             register(onLobby);

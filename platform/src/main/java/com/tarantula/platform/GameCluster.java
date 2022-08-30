@@ -10,7 +10,6 @@ import com.icodesoftware.Lobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.io.File;
