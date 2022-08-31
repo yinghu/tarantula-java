@@ -14,10 +14,7 @@ public interface DeployService extends ServiceProvider {
 
     boolean onLaunchApplication(String typeId,String applicationId);
     boolean onShutdownApplication(String typeId,String applicationId);
-    //boolean resetModule(Descriptor descriptor);
 
-    //boolean enableLobby(String typeId);
-    //boolean disableLobby(String typeId);
 
     void onCreateGameCluster(String gameClusterId);
     boolean onEnableGameCluster(String gameClusterId);
