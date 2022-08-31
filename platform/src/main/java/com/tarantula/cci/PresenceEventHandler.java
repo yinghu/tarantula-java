@@ -47,7 +47,7 @@ public class PresenceEventHandler extends AbstractRequestHandler {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
-        this.invalidView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
+        this.invalidView = this.deploymentServiceProvider.view(OnView.INVALID_VIEW_ID);
         log.info("Presence event handler started");
     }
 

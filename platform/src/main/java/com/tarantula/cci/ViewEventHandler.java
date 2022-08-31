@@ -29,9 +29,9 @@ public class ViewEventHandler extends AbstractRequestHandler {
     }
     public void onRequest(OnExchange exchange) throws Exception{
         String viewId = exchange.header(Session.TARANTULA_VIEW_ID);
-        OnView onView = this.deploymentServiceProvider.onView(viewId);
+        OnView onView = this.deploymentServiceProvider.view(viewId);
         if(onView==null){
-            onView = this.deploymentServiceProvider.onView(OnView.INVALID_VIEW_ID);
+            onView = this.deploymentServiceProvider.view(OnView.INVALID_VIEW_ID);
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));

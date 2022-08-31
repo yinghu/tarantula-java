@@ -196,7 +196,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void updateView(OnView onView) {
+    public void onViewUpdated(OnView onView) {
 
         platformDeploymentServiceProvider.checkContent(onView);
         OnView removed = (OnView) platformDeploymentServiceProvider.vMap.remove(onView.viewId());
@@ -233,7 +233,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void updateResource(String contentUrl,String resourceName) {
+    public void onResourceUpdated(String contentUrl,String resourceName) {
         try{
             String contentDir = platformDeploymentServiceProvider.contentDir;
             Path _path = Paths.get(contentDir+"/"+contentUrl);
@@ -257,7 +257,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public boolean addChannel(String typeId, Channel channel) {
+    public boolean onChannelRegistered(String typeId, Channel channel) {
         try{
             platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
                 if(v.typeId().equals(typeId)) v.onChannel(channel);
@@ -270,14 +270,14 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void addConnection(String typeId, Connection connection) {
+    public void onConnectionRegistered(String typeId, Connection connection) {
         platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
             if(v.typeId().equals(typeId)) v.onConnection(connection);
         });
     }
 
     @Override
-    public void pingConnection(String typeId, String serverId) {
+    public void onConnectionVerified(String typeId, String serverId) {
         try{
             platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
                 if(v.typeId().equals(typeId)) v.onPing(serverId);
@@ -288,7 +288,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void removeConnection(String typeId, Connection connection) {
+    public void onConnectionReleased(String typeId, Connection connection) {
         platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
             if(v.typeId().equals(typeId)) v.onDisConnection(connection);
         });
@@ -304,7 +304,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void syncKey(String key) {
+    public void onConfigurableUpdated(String key) {
         if(platformDeploymentServiceProvider.vMap.containsKey(key)){
             Configurable configurable = platformDeploymentServiceProvider.vMap.get(key);
             configurable.updated(new ServiceContextProxy(this.tarantulaContext));

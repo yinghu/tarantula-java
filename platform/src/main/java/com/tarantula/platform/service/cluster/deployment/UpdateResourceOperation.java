@@ -21,7 +21,7 @@ public class UpdateResourceOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.updateResource(contentUrl,resourceName);
+        cds.onUpdateResource(contentUrl,resourceName);
     }
 
     @Override

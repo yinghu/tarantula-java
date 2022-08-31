@@ -22,7 +22,7 @@ public class  DataSyncOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cis = this.getService();
-        cis.sync(akey);
+        cis.onUpdateConfigurable(akey);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class DeployServiceUploadOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.upload(fileName,payload);
+        cds.onUpload(fileName,payload);
     }
 
     @Override

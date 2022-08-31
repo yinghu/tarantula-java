@@ -26,7 +26,7 @@ public class RegisterChannelOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        suc = cds.registerChannel(typeId,channel);
+        suc = cds.onRegisterChannel(typeId,channel);
     }
 
     @Override

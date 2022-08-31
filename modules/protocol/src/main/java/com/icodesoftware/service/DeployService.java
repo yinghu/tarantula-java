@@ -7,9 +7,9 @@ public interface DeployService extends ServiceProvider {
     String NAME = "DeployService";
 
     boolean addLobby(Descriptor lobby,String publishingId);
-    boolean addView(OnView onView);
-    boolean updateView(OnView onView);
-    boolean updateResource(String contentUrl,String resourceName);
+
+    boolean onUpdateView(OnView onView);
+    boolean onUpdateResource(String contentUrl,String resourceName);
 
 
     boolean onLaunchApplication(String typeId,String applicationId);
@@ -28,25 +28,25 @@ public interface DeployService extends ServiceProvider {
     boolean onShutdownGameCluster(String gameClusterKey);
 
     //distribute the module or view content in cluster
-    boolean upload(String fileName,byte[] content);
+    boolean onUpload(String fileName,byte[] content);
 
     boolean launchModule(String typeId);
     boolean shutdownModule(String typeId);
     boolean updateModule(Descriptor descriptor);
     boolean deployModule(String context,String moduleFile);
 
-    boolean sync(String key);
+    boolean onUpdateConfigurable(String key);
 
-    boolean registerChannel(String typeId,Channel channel);
-    void ping(String typeId,String serverId);
-    void registerConnection(Connection connection);
-    void releaseConnection(Connection connection);
+    boolean onRegisterChannel(String typeId,Channel channel);
+    void onVerifyConnection(String typeId,String serverId);
+    void onRegisterConnection(Connection connection);
+    void onReleaseConnection(Connection connection);
 
-    byte[] clusterKey();
+    byte[] onClusterKey();
 
-    void resetClusterKey();
-    void enablePresenceService(String root,String password,String classNameSuffix,String host);
-    void disablePresenceService(String classNameSuffix);
+    void onResetClusterKey();
+    void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
+    void onDisablePresenceService(String classNameSuffix);
 
 
 }

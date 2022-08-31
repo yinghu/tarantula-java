@@ -67,7 +67,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
-            deploymentServiceProvider.ping(typeId,serverId);
+            deploymentServiceProvider.verifyConnection(typeId,serverId);
         }
         else if(action.equals("onStop")){//stop the game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);

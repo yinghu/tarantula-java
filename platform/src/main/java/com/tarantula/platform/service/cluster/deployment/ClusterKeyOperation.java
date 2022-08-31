@@ -18,7 +18,7 @@ public class ClusterKeyOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        this.result = cds.clusterKey();
+        this.result = cds.onClusterKey();
     }
 
     @Override

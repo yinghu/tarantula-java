@@ -25,7 +25,7 @@ public class ReleaseConnectionOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.releaseConnection(typeId,connection);
+        cds.onReleaseConnection(typeId,connection);
     }
 
     @Override

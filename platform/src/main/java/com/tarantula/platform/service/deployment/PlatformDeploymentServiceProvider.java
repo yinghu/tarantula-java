@@ -433,7 +433,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         vMap.put(onView.viewId(),onView);
         //log.warn("View deployed->"+onView.toString());
     }
-    public OnView onView(String viewId){
+    public OnView view(String viewId){
         return (OnView)vMap.get(viewId);
     }
     public Response deployResource(String contentUrl,String resourceName){
@@ -444,7 +444,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!response.successful()){
             return response;
         }
-        boolean suc = this.tarantulaContext.integrationCluster().deployService().updateResource(contentUrl,resourceName);
+        boolean suc = this.tarantulaContext.integrationCluster().deployService().onUpdateResource(contentUrl,resourceName);
         response.successful(suc);
         response.message(suc?"ok":"failed");
         return  response;
@@ -456,10 +456,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!response.successful()){
             return response;
         }
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        boolean updated = deployService.addView(onView);
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),onView.owner());
+        if(!ds.load(query)){
+            return new ResponseHeader("create/update view","cannot create view",false);
+        }
+        boolean updated = false;
+        onView.owner(query.index());
+        if(!ds.createIfAbsent(onView,false)){
+            ds.update(onView);
+            updated = true;
+        }
         if(updated){
-            this.tarantulaContext.integrationCluster().deployService().updateView(onView);
+            this.tarantulaContext.integrationCluster().deployService().onUpdateView(onView);
         }
         return new ResponseHeader("create/update view",updated?"view deployed->"+onView.moduleContext():"cannot create view",updated);
     }
@@ -504,13 +513,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
             this.integrationCluster.index(connection.configurationTypeId(),connection.toBinary());
-            this.integrationCluster.deployService().registerConnection(connection);
+            this.integrationCluster.deployService().onRegisterConnection(connection);
             return;
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
             this.integrationCluster.index(channelStub.serverId,channelStub.toBinary());
-            this.integrationCluster.deployService().registerChannel(channelStub.configurationTypeId(),channelStub);
+            this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -518,7 +527,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public void configure(String key){
         if(vMap.containsKey(key)){
-            this.tarantulaContext.integrationCluster().deployService().sync(key);
+            this.tarantulaContext.integrationCluster().deployService().onUpdateConfigurable(key);
         }
     }
 
@@ -672,8 +681,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return this.integrationCluster.createIfAbsent(typeId.getBytes(),key);
     }
 
-    public void ping(String typeId,String serverId){
-        this.integrationCluster.deployService().ping(typeId,serverId);
+    public void verifyConnection(String typeId,String serverId){
+        this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
     public String registerGameChannelListener(GameChannelListener gameChannelListener){
         String regKey = UUID.randomUUID().toString();
@@ -738,7 +747,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            this.integrationCluster.deployService().releaseConnection(connection);
+            this.integrationCluster.deployService().onReleaseConnection(connection);
             return;
         }
         Configurable removed = this.vMap.remove(configurable.distributionKey());

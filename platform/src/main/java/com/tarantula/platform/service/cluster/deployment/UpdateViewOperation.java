@@ -23,7 +23,7 @@ public class UpdateViewOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.updateView(this.onView);
+        cds.onUpdateView(this.onView);
     }
 
     @Override

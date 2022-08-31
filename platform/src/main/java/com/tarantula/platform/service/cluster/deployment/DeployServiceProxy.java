@@ -87,18 +87,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public boolean addView(OnView onView){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddViewOperation operation = new AddViewOperation(onView);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public boolean updateView(OnView onView){
+    public boolean onUpdateView(OnView onView){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateViewOperation operation = new UpdateViewOperation(onView);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -234,7 +223,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean updateResource(String contentUrl,String resourceName){
+    public boolean onUpdateResource(String contentUrl,String resourceName){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateResourceOperation operation = new UpdateResourceOperation(contentUrl,resourceName);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -367,7 +356,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean upload(String fileName,byte[] content){
+    public boolean onUpload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
         DeployServiceUploadOperation operation = new DeployServiceUploadOperation(fileName,content);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -387,7 +376,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean sync(String key){
+    public boolean onUpdateConfigurable(String key){
         NodeEngine nodeEngine = getNodeEngine();
         DataSyncOperation operation = new DataSyncOperation(key);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -407,7 +396,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean registerChannel(String typeId,Channel channel){
+    public boolean onRegisterChannel(String typeId,Channel channel){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterChannelOperation operation = new RegisterChannelOperation(typeId,channel);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(channel.channelId());
@@ -419,7 +408,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public void registerConnection(Connection connection){
+    public void onRegisterConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterConnectionOperation operation = new RegisterConnectionOperation(connection.configurationTypeId(),connection);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -435,7 +424,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
-    public void ping(String typeId,String serverId){
+    public void onVerifyConnection(String typeId,String serverId){
         NodeEngine nodeEngine = getNodeEngine();
         PingConnectionOperation operation = new PingConnectionOperation(typeId,serverId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -451,7 +440,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
-    public void releaseConnection(Connection connection){
+    public void onReleaseConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         ReleaseConnectionOperation operation = new ReleaseConnectionOperation(connection.configurationTypeId(),connection);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -469,7 +458,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     }
 
     @Override
-    public byte[] clusterKey() {
+    public byte[] onClusterKey() {
         NodeEngine nodeEngine = getNodeEngine();
         if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
             logger.warn("Master node on local node, load key from local disk");
@@ -485,7 +474,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public void resetClusterKey(){
+    public void onResetClusterKey(){
         NodeEngine nodeEngine = getNodeEngine();
         ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -502,7 +491,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public void enablePresenceService(String root,String password,String clusterNameSuffix,String host){
+    public void onEnablePresenceService(String root,String password,String clusterNameSuffix,String host){
         NodeEngine nodeEngine = getNodeEngine();
         EnablePresenceServiceOperation operation = new EnablePresenceServiceOperation(root,password,clusterNameSuffix,host);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -519,7 +508,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
-    public void disablePresenceService(String clusterNameSuffix){
+    public void onDisablePresenceService(String clusterNameSuffix){
         NodeEngine nodeEngine = getNodeEngine();
         DisablePresenceServiceOperation operation = new DisablePresenceServiceOperation(clusterNameSuffix);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

@@ -26,7 +26,7 @@ public class EnablePresenceServiceOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.enablePresenceService(root,password,clusterNameSuffix,host);
+        cds.onEnablePresenceService(root,password,clusterNameSuffix,host);
     }
 
     @Override

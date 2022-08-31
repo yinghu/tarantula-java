@@ -39,7 +39,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
             InputStream in = exchange.onStream();
             String path = exchange.path();
             //log.warn(onSession.systemId() + " is uploading module [" + path + "]");
-            boolean suc = deployService.upload(path.substring(path.lastIndexOf("/") + 1), in.readAllBytes());
+            boolean suc = deployService.onUpload(path.substring(path.lastIndexOf("/") + 1), in.readAllBytes());
             ResponseHeader resp = new ResponseHeader("upload", suc ? "uploaded" : "failed", suc);
             exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
         }
@@ -50,7 +50,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
             InputStream in = exchange.onStream();
             byte[] data = in.readAllBytes();
             String fn = SystemUtil.oid()+".png";
-            boolean suc = deployService.upload("web/"+fn,data);
+            boolean suc = deployService.onUpload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
         }
         else{
@@ -72,7 +72,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
                 authVendor.upload(gameClusterName.toLowerCase()+"#"+fn,data);
             }
             //log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
-            boolean suc = deployService.upload("web/"+fn,data);
+            boolean suc = deployService.onUpload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
         }
     }

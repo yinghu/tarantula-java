@@ -21,7 +21,7 @@ public class DisablePresenceServiceOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.disablePresenceService(clusterNameSuffix);
+        cds.onDisablePresenceService(clusterNameSuffix);
     }
 
     @Override

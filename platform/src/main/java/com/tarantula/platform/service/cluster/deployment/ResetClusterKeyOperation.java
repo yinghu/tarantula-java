@@ -15,7 +15,7 @@ public class ResetClusterKeyOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.resetClusterKey();
+        cds.onResetClusterKey();
     }
 
     @Override

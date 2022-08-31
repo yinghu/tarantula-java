@@ -18,7 +18,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //GAME SERVER APIs
 
     byte[] serverKey(String typeId);
-    void ping(String typeId,String serverId);
+    void verifyConnection(String typeId,String serverId);
 
 
     String registerGameChannelListener(GameChannelListener gameChannelListener);
@@ -32,7 +32,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void release(ServiceProvider serviceProvider);
 
 
-    OnView onView(String viewId);
+    OnView view(String viewId);
     Response createView(OnView onView);
     Response deployResource(String contentUrl,String resourceName);
 
@@ -91,6 +91,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     interface DistributionCallback{
 
         <T extends OnAccess> void addGameService(T gameCluster);
+
         void onGameClusterLaunched(String gameClusterId);
         void onGameClusterShutdown(String gameClusterId);
         void onGameClusterCreated(String gameClusterId);
@@ -99,22 +100,25 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void addLobby(String typeId);
         void removeLobby(String typeId);
+        void updateModule(Descriptor descriptor);
+        void updateModule(String contentUrl,String resourceName);
+
         void onApplicationLaunched(String typeId,String applicationId);
         void onApplicationShutdown(String typeId,String applicationId);
-        void updateModule(Descriptor descriptor);
-        void updateView(OnView onView);
-        void updateModule(String contentUrl,String resourceName);
-        void updateResource(String contentUrl,String resourceName);
 
-        boolean addChannel(String typeId,Channel channel);
-        void addConnection(String typeId,Connection connection);
-        void pingConnection(String typeId,String serverId);
-        void removeConnection(String typeId,Connection connection);
+        void onViewUpdated(OnView onView);
+
+        void onResourceUpdated(String contentUrl,String resourceName);
+
+        boolean onChannelRegistered(String typeId,Channel channel);
+        void onConnectionRegistered(String typeId,Connection connection);
+        void onConnectionVerified(String typeId,String serverId);
+        void onConnectionReleased(String typeId,Connection connection);
 
         void onAccessIndexDisabled();
         void onAccessIndexEnabled();
 
-        void syncKey(String key);
+        void onConfigurableUpdated(String key);
 
     }
 

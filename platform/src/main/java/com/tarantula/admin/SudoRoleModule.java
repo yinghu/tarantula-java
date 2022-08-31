@@ -38,19 +38,19 @@ public class SudoRoleModule implements Module {
             String localPassword = (String) onAccess.property("localPassword");
             boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
             if(suc){
-                this.context.clusterProvider().deployService().enablePresenceService(root,password,suffix,host);
+                this.context.clusterProvider().deployService().onEnablePresenceService(root,password,suffix,host);
             }
             session.write(JsonUtil.toSimpleResponse(suc,suc?"remote presence service enabled on ["+host+"]":"failed").getBytes());
         }
         else if(session.action().equals("onDisablePresenceService")){
             this.tokenValidatorProvider.disablePresenceService(session.name());
-            this.context.clusterProvider().deployService().disablePresenceService(session.name());
+            this.context.clusterProvider().deployService().onDisablePresenceService(session.name());
             session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
         }
         else if(session.action().equals("onResetClusterKey")){
             boolean suc = this.tokenValidatorProvider.resetClusterKey();
             if(suc){
-                this.context.clusterProvider().deployService().resetClusterKey();
+                this.context.clusterProvider().deployService().onResetClusterKey();
             }
             session.write(JsonUtil.toSimpleResponse(suc,suc?"Cluster reset":"failed to reset key").getBytes());
         }

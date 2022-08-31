@@ -116,21 +116,8 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
 
 
-
-    public boolean addView(OnView view){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),view.owner());
-        if(!ds.load(query)){
-            return false;
-        }
-        view.owner(query.index());
-        if(!ds.createIfAbsent(view,false)){
-            ds.update(view);
-        }
-        return true;
-    }
-    public void updateView(OnView onView){
-        this.deploymentServiceProvider.distributionCallback().updateView(onView);
+    public void onUpdateView(OnView onView){
+        this.deploymentServiceProvider.distributionCallback().onViewUpdated(onView);
     }
     public boolean resetModule(Descriptor descriptor){
         boolean[] suc ={false};
@@ -213,7 +200,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
 
 
-    public void upload(String fileName,byte[] content){
+    public void onUpload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
     }
     public void startGameService(String gameClusterKey){
@@ -242,41 +229,41 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void updateModule(Descriptor descriptor){
         this.deploymentServiceProvider.distributionCallback().updateModule(descriptor);
     }
-    public void updateResource(String contentUrl,String resourceName){
-        this.deploymentServiceProvider.distributionCallback().updateResource(contentUrl,resourceName);
+    public void onUpdateResource(String contentUrl,String resourceName){
+        this.deploymentServiceProvider.distributionCallback().onResourceUpdated(contentUrl,resourceName);
     }
     public void deployModule(String contentUrl,String resourceName){
         this.deploymentServiceProvider.distributionCallback().updateModule(contentUrl,resourceName);
     }
 
-    public void sync(String key){
-        this.deploymentServiceProvider.distributionCallback().syncKey(key);
+    public void onUpdateConfigurable(String key){
+        this.deploymentServiceProvider.distributionCallback().onConfigurableUpdated(key);
     }
 
-    public boolean registerChannel(String typeId,Channel channel){
-        return this.deploymentServiceProvider.distributionCallback().addChannel(typeId,channel);
+    public boolean onRegisterChannel(String typeId,Channel channel){
+        return this.deploymentServiceProvider.distributionCallback().onChannelRegistered(typeId,channel);
     }
-    public void registerConnection(String typeId,Connection connection){
-        this.deploymentServiceProvider.distributionCallback().addConnection(typeId,connection);
+    public void onRegisterConnection(String typeId,Connection connection){
+        this.deploymentServiceProvider.distributionCallback().onConnectionRegistered(typeId,connection);
     }
-    public void releaseConnection(String typeId,Connection connection){
-        this.deploymentServiceProvider.distributionCallback().removeConnection(typeId,connection);
+    public void onReleaseConnection(String typeId,Connection connection){
+        this.deploymentServiceProvider.distributionCallback().onConnectionReleased(typeId,connection);
     }
-    public void pingConnection(String typeId,String serverId){
-        this.deploymentServiceProvider.distributionCallback().pingConnection(typeId,serverId);
+    public void onVerifyConnection(String typeId,String serverId){
+        this.deploymentServiceProvider.distributionCallback().onConnectionVerified(typeId,serverId);
     }
 
-    public byte[] clusterKey() {
+    public byte[] onClusterKey() {
         return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.clusterNameSuffix());
     }
 
-    public void resetClusterKey() {
+    public void onResetClusterKey() {
         this.tarantulaContext.tokenValidatorProvider().reset();
     }
-    public void enablePresenceService(String root,String password,String clusterNameSuffix,String host) {
+    public void onEnablePresenceService(String root,String password,String clusterNameSuffix,String host) {
         this.tarantulaContext.tokenValidatorProvider().enablePresenceService(root,password,clusterNameSuffix,host);
     }
-    public void disablePresenceService(String clusterNameSuffix) {
+    public void onDisablePresenceService(String clusterNameSuffix) {
         this.tarantulaContext.tokenValidatorProvider().disablePresenceService(clusterNameSuffix);
     }
     @Override

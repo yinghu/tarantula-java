@@ -25,7 +25,7 @@ public class RegisterConnectionOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.registerConnection(typeId,connection);
+        cds.onRegisterConnection(typeId,connection);
     }
 
     @Override

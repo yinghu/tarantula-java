@@ -417,7 +417,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             PresenceKey pKey = new PresenceKey();
             pKey.distributionKey(serviceContext.bucketId());
-            byte[] clusterKey = this.serviceContext.clusterProvider().deployService().clusterKey();
+            byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
                 pKey.key = clusterKey;
             }
