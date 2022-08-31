@@ -87,7 +87,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
     }
 
-    public boolean enable(){
+    public boolean onEnable(){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
@@ -105,7 +105,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected==0;
     }
-    public boolean disable(){
+    public boolean onDisable(){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = mlist.size();
@@ -124,7 +124,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return expected==0;
     }
 
-    public int replicate(int partition,byte[] key,byte[] value,int nodeNumber){
+    public int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = nodeNumber;
@@ -145,7 +145,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected;
     }
-    public byte[] recover(int partition,byte[] key){
+    public byte[] onRecover(int partition,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
@@ -168,7 +168,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return ret;
     }
 
-    public int syncStart(int partition,String syncKey){
+    public int onStartSync(int partition,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         AccessIndexSyncStartOperation operation = new AccessIndexSyncStartOperation(nodeEngine.getLocalMember().getUuid(),partition,syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getMasterAddress());
@@ -180,7 +180,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             return -1;
         }
     }
-    public void sync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
+    public void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
         NodeEngine nodeEngine = getNodeEngine();
         AccessIndexSyncBatchOperation operation = new AccessIndexSyncBatchOperation(size,keys,values,partition);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
@@ -191,7 +191,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public void syncEnd(String memberId,String syncKey){
+    public void onEndSync(String memberId,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         AccessIndexSyncEndOperation operation = new AccessIndexSyncEndOperation(syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());

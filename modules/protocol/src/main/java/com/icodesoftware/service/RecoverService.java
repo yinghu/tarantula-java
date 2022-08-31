@@ -14,7 +14,7 @@ public interface RecoverService extends ServiceProvider{
     void onSync(int size,byte[][] keys,byte[][] values,String memberId,String source);
     void onEndSync(String memberId,String syncKey);
 
-    String[] listModules();
-    byte[] loadModuleJarFile(String name);
+    String[] onListModules();
+    byte[] onLoadModuleJarFile(String name);
 
 }

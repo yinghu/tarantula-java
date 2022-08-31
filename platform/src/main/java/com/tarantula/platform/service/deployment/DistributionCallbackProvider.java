@@ -24,12 +24,14 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     }
     @Override
-    public <T extends OnAccess> void addGameService(T gameCluster) {
+    public void onGameServiceStarted(String gameClusterId) {
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
         if(!this.tarantulaContext.masterDataStore().load(gameCluster)){
             log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
             return;
         }
-        this.tarantulaContext.setGameServiceProvider((GameCluster)gameCluster);
+        this.tarantulaContext.setGameServiceProvider(gameCluster);
     }
 
     @Override
@@ -49,9 +51,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
             return;
         }
         this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_DATA));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_LOBBY));
-        removeLobby((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        onModuleShutdown((String)gameCluster.property(GameCluster.GAME_DATA));
+        onModuleShutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        onModuleShutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
     }
 
     @Override
@@ -72,49 +74,14 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         );
     }
 
-    public boolean onGameClusterEnabled(String gameClusterId){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        DataStore mds = this.tarantulaContext.masterDataStore();
-        if(!mds.load(gameCluster)){
-            return false;
-        }
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 =platformDeploymentServiceProvider.enableLobby(data);
-        boolean suc2 =platformDeploymentServiceProvider.enableLobby(lobby);
-        boolean suc3 =platformDeploymentServiceProvider.enableLobby(service);
-        gameCluster.property(GameCluster.DISABLED,false);
-        mds.update(gameCluster);
-        return suc1&&suc2&&suc3;//make sure all enabled
-    }
-    public boolean onGameClusterDisabled(String gameClusterId){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        DataStore mds = this.tarantulaContext.masterDataStore();
-        if(!mds.load(gameCluster)){
-            return false;
-        }
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 = platformDeploymentServiceProvider.disableLobby(data);
-        boolean suc2 = platformDeploymentServiceProvider.disableLobby(lobby);
-        boolean suc3 = platformDeploymentServiceProvider.disableLobby(service);
-        gameCluster.property(GameCluster.DISABLED,true);
-        mds.update(gameCluster);
-        return suc1&&suc2&&suc3;
-    }
-
     @Override
-    public void addLobby(String typeId) {
+    public void onModuleLaunched(String typeId) {
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
         this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener(platformDeploymentServiceProvider));
     }
 
     @Override
-    public void removeLobby(String typeId) {
+    public void onModuleShutdown(String typeId) {
 
         platformDeploymentServiceProvider.oListeners.forEach((k,ol)->{
             if(platformDeploymentServiceProvider.vMap.containsKey(typeId)){//skip system level modules
@@ -168,7 +135,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void updateModule(Descriptor descriptor) {
+    public void onModuleUpdated(Descriptor descriptor) {
 
         DynamicModuleClassLoader mc = platformDeploymentServiceProvider.cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
             DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
@@ -207,7 +174,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void updateModule(String contentUrl,String resourceName) {
+    public void onModuleDeployed(String contentUrl,String resourceName) {
         try{
             //content dir deployDir/module
             Path _path = Paths.get(this.tarantulaContext.deployDir+"/module/"+contentUrl);

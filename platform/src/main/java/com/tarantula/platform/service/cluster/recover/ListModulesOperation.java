@@ -17,7 +17,7 @@ public class ListModulesOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterRecoverService cds = this.getService();
-        moduleList =  cds.listModules();
+        moduleList =  cds.onListModules();
     }
 
     @Override

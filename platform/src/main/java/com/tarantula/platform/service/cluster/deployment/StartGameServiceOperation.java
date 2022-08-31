@@ -20,7 +20,7 @@ public class StartGameServiceOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.startGameService(gameClusterKey);
+        cds.onStartGameService(gameClusterKey);
     }
 
     @Override

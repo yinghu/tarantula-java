@@ -106,21 +106,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void memberAttributeChanged(MemberAttributeServiceEvent memberAttributeServiceEvent) {
     }
 
-    public boolean onEnableGameCluster(String gameClusterId){
-        return this.deploymentServiceProvider.distributionCallback().onGameClusterEnabled(gameClusterId);
-    }
-    public boolean onDisableGameCluster(String gameClusterId){
-        return this.deploymentServiceProvider.distributionCallback().onGameClusterDisabled(gameClusterId);
-    }
-
-
     public void onUpload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
     }
-    public void startGameService(String gameClusterKey){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterKey);
-        this.deploymentServiceProvider.distributionCallback().addGameService(gameCluster);
+    public void onStartGameService(String gameClusterKey){
+        this.deploymentServiceProvider.distributionCallback().onGameServiceStarted(gameClusterKey);
     }
     public void onLaunchGameCluster(String gameClusterKey){
         this.deploymentServiceProvider.distributionCallback().onGameClusterLaunched(gameClusterKey);
@@ -134,20 +124,20 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onShutdownApplication(String typeId,String applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationShutdown(typeId,applicationId);
     }
-    public void launchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().addLobby(typeId);
+    public void onLaunchModule(String typeId){
+        this.deploymentServiceProvider.distributionCallback().onModuleLaunched(typeId);
     }
-    public void shutdownModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().removeLobby(typeId);
+    public void onShutdownModule(String typeId){
+        this.deploymentServiceProvider.distributionCallback().onModuleShutdown(typeId);
     }
-    public void updateModule(Descriptor descriptor){
-        this.deploymentServiceProvider.distributionCallback().updateModule(descriptor);
+    public void onUpdateModule(Descriptor descriptor){
+        this.deploymentServiceProvider.distributionCallback().onModuleUpdated(descriptor);
     }
     public void onUpdateResource(String contentUrl,String resourceName){
         this.deploymentServiceProvider.distributionCallback().onResourceUpdated(contentUrl,resourceName);
     }
-    public void deployModule(String contentUrl,String resourceName){
-        this.deploymentServiceProvider.distributionCallback().updateModule(contentUrl,resourceName);
+    public void onDeployModule(String contentUrl,String resourceName){
+        this.deploymentServiceProvider.distributionCallback().onModuleDeployed(contentUrl,resourceName);
     }
 
     public void onUpdateConfigurable(String key){

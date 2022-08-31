@@ -18,7 +18,7 @@ public class LoadModuleJarFileOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterRecoverService cds = this.getService();
-        data = cds.loadModuleJarFile(fileName);
+        data = cds.onLoadModuleJarFile(fileName);
     }
 
     @Override

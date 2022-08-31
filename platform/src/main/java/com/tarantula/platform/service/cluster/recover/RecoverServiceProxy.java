@@ -152,7 +152,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
     }
 
-    public String[] listModules(){
+    public String[] onListModules(){
         NodeEngine nodeEngine = getNodeEngine();
         ListModulesOperation operation = new ListModulesOperation();
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
@@ -163,7 +163,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public byte[] loadModuleJarFile(String fileName){
+    public byte[] onLoadModuleJarFile(String fileName){
         NodeEngine nodeEngine = getNodeEngine();
         LoadModuleJarFileOperation operation = new LoadModuleJarFileOperation(fileName);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());

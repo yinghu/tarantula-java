@@ -96,30 +96,8 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean onEnableGameCluster(String gamaClusterId){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnableGameClusterOperation operation = new EnableGameClusterOperation(gamaClusterId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-    public boolean onDisableGameCluster(String gamaClusterId){
-        NodeEngine nodeEngine = getNodeEngine();
-        DisableGameClusterOperation operation = new DisableGameClusterOperation(gamaClusterId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
 
-    public boolean startGameService(String gameClusterKey){
+    public boolean onStartGameService(String gameClusterKey){
         NodeEngine nodeEngine = getNodeEngine();
         StartGameServiceOperation operation = new StartGameServiceOperation(gameClusterKey);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -195,7 +173,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean deployModule(String contentUrl,String resourceName){
+    public boolean onDeployModule(String contentUrl,String resourceName){
         NodeEngine nodeEngine = getNodeEngine();
         DeployModuleOperation operation = new DeployModuleOperation(contentUrl,resourceName);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -251,7 +229,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean launchModule(String typeId){
+    public boolean onLaunchModule(String typeId){
         NodeEngine nodeEngine = getNodeEngine();
         LaunchModuleOperation operation = new LaunchModuleOperation(typeId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -270,7 +248,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean shutdownModule(String typeId){
+    public boolean onShutdownModule(String typeId){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownModuleOperation operation = new ShutdownModuleOperation(typeId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -289,7 +267,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean updateModule(Descriptor descriptor){
+    public boolean onUpdateModule(Descriptor descriptor){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateModuleOperation operation = new UpdateModuleOperation(descriptor);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

@@ -128,7 +128,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
                 this.dataStoreOnPartitions[partition].dataStore.backup().list((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
-                        recoverService.sync(batch[0],keys,values,memberId,partition);
+                        recoverService.onSync(batch[0],keys,values,memberId,partition);
                         batch[0] = 0;
                     }
                     keys[batch[0]]=k;
@@ -138,9 +138,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     return true;
                 });
                 //last batch
-                recoverService.sync(batch[0],keys,values,memberId,partition);
+                recoverService.onSync(batch[0],keys,values,memberId,partition);
             }
-            recoverService.syncEnd(memberId,syncKey);
+            recoverService.onEndSync(memberId,syncKey);
         }).start();
         return this.tarantulaContext.partitionNumber();
     }

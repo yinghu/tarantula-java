@@ -33,7 +33,7 @@ public class UpdateModuleOperation extends Operation {
         descriptor.codebase(codebase);
         descriptor.moduleArtifact(artifact);
         descriptor.moduleVersion(version);
-        cds.updateModule(descriptor);
+        cds.onUpdateModule(descriptor);
     }
 
     @Override

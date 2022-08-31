@@ -286,7 +286,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().onReplicate(metadata.source(),key,value,replicationNodeNumber));
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().replicate(metadata.partition(),key,value,replicationNodeNumber));
+            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
         }
         onMetrics();
     }
@@ -296,7 +296,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             return this.integrationCluster.recoverService().onRecover(metadata.source(),key);
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return this.integrationCluster.accessIndexService().recover(metadata.partition(),key);
+            return this.integrationCluster.accessIndexService().onRecover(metadata.partition(),key);
         }
         return null;
     }

@@ -6,8 +6,6 @@ public interface DeployService extends ServiceProvider {
 
     String NAME = "DeployService";
 
-    //boolean addLobby(Descriptor lobby,String publishingId);
-
     boolean onUpdateView(OnView onView);
     boolean onUpdateResource(String contentUrl,String resourceName);
 
@@ -17,20 +15,18 @@ public interface DeployService extends ServiceProvider {
 
 
     void onCreateGameCluster(String gameClusterId);
-    boolean onEnableGameCluster(String gameClusterId);
-    boolean onDisableGameCluster(String gameClusterId);
 
-    boolean startGameService(String gameClusterKey);
+    boolean onStartGameService(String gameClusterKey);
     boolean onLaunchGameCluster(String gameClusterKey);
     boolean onShutdownGameCluster(String gameClusterKey);
 
     //distribute the module or view content in cluster
     boolean onUpload(String fileName,byte[] content);
 
-    boolean launchModule(String typeId);
-    boolean shutdownModule(String typeId);
-    boolean updateModule(Descriptor descriptor);
-    boolean deployModule(String context,String moduleFile);
+    boolean onLaunchModule(String typeId);
+    boolean onShutdownModule(String typeId);
+    boolean onUpdateModule(Descriptor descriptor);
+    boolean onDeployModule(String context,String moduleFile);
 
     boolean onUpdateConfigurable(String key);
 

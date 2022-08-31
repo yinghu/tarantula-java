@@ -90,18 +90,16 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //local callbacks on distributed operations
     interface DistributionCallback{
 
-        <T extends OnAccess> void addGameService(T gameCluster);
+        void onGameServiceStarted(String gameClusterId);
 
         void onGameClusterLaunched(String gameClusterId);
         void onGameClusterShutdown(String gameClusterId);
         void onGameClusterCreated(String gameClusterId);
-        boolean onGameClusterEnabled(String gameClusterId);
-        boolean onGameClusterDisabled(String gameClusterId);
 
-        void addLobby(String typeId);
-        void removeLobby(String typeId);
-        void updateModule(Descriptor descriptor);
-        void updateModule(String contentUrl,String resourceName);
+        void onModuleLaunched(String typeId);
+        void onModuleShutdown(String typeId);
+        void onModuleUpdated(Descriptor descriptor);
+        void onModuleDeployed(String contentUrl,String resourceName);
 
         void onApplicationLaunched(String typeId,String applicationId);
         void onApplicationShutdown(String typeId,String applicationId);

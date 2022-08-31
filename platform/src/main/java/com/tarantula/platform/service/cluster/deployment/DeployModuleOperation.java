@@ -21,7 +21,7 @@ public class DeployModuleOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.deployModule(contentUrl,resourceName);
+        cds.onDeployModule(contentUrl,resourceName);
     }
 
     @Override

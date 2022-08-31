@@ -204,7 +204,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         //DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         //boolean suc = deployService.resetModule(descriptor);
         if(suc[0]){
-            this.integrationCluster.deployService().updateModule(descriptor);
+            this.integrationCluster.deployService().onUpdateModule(descriptor);
         }
         return suc[0];
     }
@@ -266,7 +266,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!checked.successful()){
             return checked;
         }
-        boolean suc = this.tarantulaContext.integrationCluster().deployService().deployModule(contextUrl,resourceName);
+        boolean suc = this.tarantulaContext.integrationCluster().deployService().onDeployModule(contextUrl,resourceName);
         checked.successful(suc);
         checked.message(suc?"deployed->"+resourceName:"failed->"+resourceName);
         return checked;
@@ -385,12 +385,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public boolean launchModule(String typeId){
         if(!enableLobby(typeId)) return false;
-        this.integrationCluster.deployService().launchModule(typeId);
+        this.integrationCluster.deployService().onLaunchModule(typeId);
         return true;
     }
     public boolean shutdownModule(String typeId){
         if(!disableLobby(typeId)) return false;
-        this.integrationCluster.deployService().shutdownModule(typeId);
+        this.integrationCluster.deployService().onShutdownModule(typeId);
         return true;
     }
 
@@ -572,7 +572,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(deployService.onEnableGameCluster(gameCluster.distributionKey())&&deployService.startGameService(gameCluster.distributionKey())){
+        if(this.enableGameCluster(gameCluster.distributionKey())&&deployService.onStartGameService(gameCluster.distributionKey())){
             return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionKey());
         }
         else{
@@ -581,8 +581,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(deployService.onDisableGameCluster(gameCluster.distributionKey())){
-            return this.tarantulaContext.integrationCluster().deployService().onShutdownGameCluster(gameCluster.distributionKey());
+        if(this.disableGameCluster(gameCluster.distributionKey())){
+            return deployService.onShutdownGameCluster(gameCluster.distributionKey());
         }
         else{
             return false;
@@ -791,12 +791,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         Configurable removed = this.vMap.remove(configurable.distributionKey());
         removed.released();
     }
-    public void syncKey(String key){
-        if(vMap.containsKey(key)){
-            Configurable configurable = vMap.get(key);
-            configurable.updated(new ServiceContextProxy(this.tarantulaContext));
-        }
-    }
+
     @Override
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
@@ -835,6 +830,41 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         lobbyDescriptor.disabled(true);
         ds.update(lobbyDescriptor);
         return true;
+    }
+
+    boolean enableGameCluster(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 = enableLobby(data);
+        boolean suc2 = enableLobby(lobby);
+        boolean suc3 = enableLobby(service);
+        gameCluster.property(GameCluster.DISABLED,false);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;//make sure all enabled
+    }
+    boolean disableGameCluster(String gameClusterId){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)){
+            return false;
+        }
+        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
+        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
+        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        boolean suc1 = disableLobby(data);
+        boolean suc2 = disableLobby(lobby);
+        boolean suc3 = disableLobby(service);
+        gameCluster.property(GameCluster.DISABLED,true);
+        mds.update(gameCluster);
+        return suc1&&suc2&&suc3;
     }
 
     private class PostOfficeSession implements PostOffice{

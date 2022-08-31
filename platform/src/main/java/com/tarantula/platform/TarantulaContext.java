@@ -491,13 +491,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         });
     }
     public void _registerNode() throws Exception{
- 	    this.accessIndexService().disable();
+ 	    this.accessIndexService().onDisable();
  	    _access_index_syc_finished.await();
  	    for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
  	        String _pk = "p"+i;
  	        _syncLatch.put(_pk,countDownLatch);
- 	        if(this.accessIndexService().syncStart(i,_pk)==-1){
+ 	        if(this.accessIndexService().onStartSync(i,_pk)==-1){
  	            countDownLatch.countDown();
             }
  	        countDownLatch.await();
@@ -505,14 +505,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
  	    log.warn("Access index data sync has finished");
 
-        for(String s : this.integrationCluster.recoverService().listModules()){
+        for(String s : this.integrationCluster.recoverService().onListModules()){
             log.warn("Loading module files from master node ["+s+"]");
-            byte[] ret = this.integrationCluster.recoverService().loadModuleJarFile(s);
+            byte[] ret = this.integrationCluster.recoverService().onLoadModuleJarFile(s);
             if(ret.length>0){
                 _writeContent(s,ret);
             }
         }
-        this.accessIndexService().enable();
+        this.accessIndexService().onEnable();
         AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);

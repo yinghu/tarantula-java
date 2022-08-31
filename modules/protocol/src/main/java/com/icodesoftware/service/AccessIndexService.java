@@ -12,15 +12,15 @@ public interface AccessIndexService extends ServiceProvider {
 
     AccessIndex get(String accessKey);
 
-    int syncStart(int partition,String syncKey);
-    void sync(int size,byte[][] keys,byte[][] values,String memberId,int partition);
-    void syncEnd(String memberId,String syncKey);
+    int onStartSync(int partition,String syncKey);
+    void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition);
+    void onEndSync(String memberId,String syncKey);
 
-    boolean enable();
-    boolean disable();
+    boolean onEnable();
+    boolean onDisable();
 
-    int replicate(int partition,byte[] key,byte[] value,int nodeNumber);
-    byte[] recover(int partition,byte[] key);
+    int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber);
+    byte[] onRecover(int partition,byte[] key);
 
 
     interface Listener{

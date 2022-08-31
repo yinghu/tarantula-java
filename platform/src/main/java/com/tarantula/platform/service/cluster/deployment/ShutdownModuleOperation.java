@@ -20,7 +20,7 @@ public class ShutdownModuleOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.shutdownModule(typeId);
+        cds.onShutdownModule(typeId);
     }
 
     @Override

@@ -97,10 +97,10 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
 
 
-    public String[] listModules(){
+    public String[] onListModules(){
         return this.tarantulaContext._listModuleContent();
     }
-    public byte[] loadModuleJarFile(String fileName){
+    public byte[] onLoadModuleJarFile(String fileName){
         return this.tarantulaContext._readContent(fileName);
     }
 
