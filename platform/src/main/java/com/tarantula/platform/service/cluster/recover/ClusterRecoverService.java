@@ -67,7 +67,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
                 this.tarantulaContext.dataStore(source,this.tarantulaContext.partitionNumber()).backup().list((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
-                        recoverService.sync(batch[0],keys,values,memberId,source);
+                        recoverService.onSync(batch[0],keys,values,memberId,source);
                         batch[0] = 0;
                     }
                     keys[batch[0]]=k;
@@ -77,9 +77,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     return true;
                 });
                 //last batch
-                recoverService.sync(batch[0],keys,values,memberId,source);
+                recoverService.onSync(batch[0],keys,values,memberId,source);
             }
-            recoverService.syncEnd(memberId,syncKey);
+            recoverService.onEndSync(memberId,syncKey);
             //log.warn("Total records ["+total[0]+"] from ["+source+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
         return this.tarantulaContext.partitionNumber();

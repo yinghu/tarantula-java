@@ -5,8 +5,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.LobbyDescriptor;
-import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.TarantulaContext;
 
 import java.io.*;
@@ -84,9 +82,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
         String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
         String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 =enableLobby(data);
-        boolean suc2 =enableLobby(lobby);
-        boolean suc3 =enableLobby(service);
+        boolean suc1 =platformDeploymentServiceProvider.enableLobby(data);
+        boolean suc2 =platformDeploymentServiceProvider.enableLobby(lobby);
+        boolean suc3 =platformDeploymentServiceProvider.enableLobby(service);
         gameCluster.property(GameCluster.DISABLED,false);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all enabled
@@ -101,9 +99,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
         String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
         String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
-        boolean suc1 = disableLobby(data);
-        boolean suc2 = disableLobby(lobby);
-        boolean suc3 = disableLobby(service);
+        boolean suc1 = platformDeploymentServiceProvider.disableLobby(data);
+        boolean suc2 = platformDeploymentServiceProvider.disableLobby(lobby);
+        boolean suc3 = platformDeploymentServiceProvider.disableLobby(service);
         gameCluster.property(GameCluster.DISABLED,true);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;
@@ -157,7 +155,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
                     }//removed lobby entry
                 });
                 //rListeners.remove(d.tag()); //remove instance entry
-                this.tarantulaContext.integrationCluster().deployService().disableLobby(d.typeId());
+                platformDeploymentServiceProvider.disableLobby(d.typeId());
             }
             if(d.moduleName()!=null&&d.codebase()!=null){ //clean class loader if all apps removed on the class loader
                 DynamicModuleClassLoader dynamicModuleClassLoader = platformDeploymentServiceProvider.cMap.remove(d.moduleId());
@@ -311,35 +309,4 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         }
     }
 
-    private boolean enableLobby(String typeId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
-        if(!ds.load(query)){
-            return false;
-        }
-        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
-        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
-            return false;
-        }
-        lobbyDescriptor.disabled(false);
-        ds.update(lobbyDescriptor);
-        return true;
-    }
-
-    private boolean disableLobby(String typeId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
-        if(!ds.load(query)){
-            return false;
-        }
-        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
-        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
-            return false;
-        }
-        lobbyDescriptor.disabled(true);
-        ds.update(lobbyDescriptor);
-        return true;
-    }
 }

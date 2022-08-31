@@ -76,17 +76,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public boolean addLobby(Descriptor lobby,String publishingId){
-        NodeEngine nodeEngine = getNodeEngine();
-        AddLobbyOperation operation = new AddLobbyOperation(lobby,publishingId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public boolean onUpdateView(OnView onView){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateViewOperation operation = new UpdateViewOperation(onView);
@@ -104,43 +94,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
         return expected==0;
-    }
-
-    public boolean enableLobby(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnableLobbyOperation operation = new EnableLobbyOperation(typeId,true);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-
-    public boolean disableLobby(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnableLobbyOperation operation = new EnableLobbyOperation(typeId,false);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
-
-
-    public boolean resetModule(Descriptor descriptor){
-        NodeEngine nodeEngine = getNodeEngine();
-        ResetModuleOperation operation = new ResetModuleOperation(descriptor);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
     }
 
     public boolean onEnableGameCluster(String gamaClusterId){

@@ -63,97 +63,11 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onCreateGameCluster(String gameClusterId){
         this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameClusterId);
     }
-    public boolean addLobby(Descriptor descriptor,String publishingId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
-        if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
-            return false;
-        }
-        ModuleIndex moduleIndex = new ModuleIndex();
-        moduleIndex.distributionKey(publishingId);
-        moduleIndex.index(descriptor.typeId());
-        ds.create(moduleIndex);
-        descriptor.owner(publishingId);
-        descriptor.label(LobbyDescriptor.LABEL);
-        descriptor.onEdge(true);
-        descriptor.resetEnabled(true);
-        descriptor.disabled(true);
-        ds.create(descriptor);
-        lobbyTypeIdIndex.index(descriptor.distributionKey());
-        lobbyTypeIdIndex.owner(publishingId);
-        ds.update(lobbyTypeIdIndex);
-        return descriptor.distributionKey()!=null;
-    }
-    public boolean enableLobby(String typeId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
-        if(!ds.load(query)){
-            return false;
-        }
-        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
-        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
-            return false;
-        }
-        lobbyDescriptor.disabled(false);
-        ds.update(lobbyDescriptor);
-        return true;
-    }
-    public boolean disableLobby(String typeId){
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
-        if(!ds.load(query)){
-            return false;
-        }
-        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
-        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
-            return false;
-        }
-        lobbyDescriptor.disabled(true);
-        ds.update(lobbyDescriptor);
-        return true;
-    }
-
 
     public void onUpdateView(OnView onView){
         this.deploymentServiceProvider.distributionCallback().onViewUpdated(onView);
     }
-    public boolean resetModule(Descriptor descriptor){
-        boolean[] suc ={false};
-        DataStore dataStore = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),descriptor.typeId());
-        if(!dataStore.load(lobbyTypeIdIndex)){
-            if(descriptor.index()!=null){
-                IndexSet indexSet = new IndexSet();
-                indexSet.distributionKey(descriptor.index());
-                indexSet.label(ExposedGameService.INDEX_LABEL);
-                if(dataStore.load(indexSet)){
-                    indexSet.keySet().forEach((k)->{
-                        DeploymentDescriptor app = new DeploymentDescriptor();
-                        app.distributionKey(k);
-                        if(dataStore.load(app)){
-                            app.codebase(descriptor.codebase());
-                            app.moduleArtifact(descriptor.moduleArtifact());
-                            app.moduleVersion(descriptor.moduleVersion());
-                            dataStore.update(app);
-                            suc[0]=true;
-                        }
-                    });
-                }
-            }
-            return suc[0];
-        }
-        dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
-            a.codebase(descriptor.codebase());
-            a.moduleArtifact(descriptor.moduleArtifact());
-            a.moduleVersion(descriptor.moduleVersion());
-            dataStore.update(a);
-            suc[0]=true;
-            return true;
-        });
-        return suc[0];
-    }
+
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
         Member lm = nodeEngine.getLocalMember();

@@ -6,13 +6,13 @@ public interface RecoverService extends ServiceProvider{
 
     //operates master or member node
 
-    byte[] recover(String source,byte[] key);
-    int replicate(String source,byte[] key,byte[] value,int nodeNumber);
+    byte[] onRecover(String source,byte[] key);
+    int onReplicate(String source,byte[] key,byte[] value,int nodeNumber);
 
     //operates on master node
-    int syncStart(String source,String syncKey);
-    void sync(int size,byte[][] keys,byte[][] values,String memberId,String source);
-    void syncEnd(String memberId,String syncKey);
+    int onStartSync(String source,String syncKey);
+    void onSync(int size,byte[][] keys,byte[][] values,String memberId,String source);
+    void onEndSync(String memberId,String syncKey);
 
     String[] listModules();
     byte[] loadModuleJarFile(String name);

@@ -71,7 +71,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
 
     @Override
-    public byte[] recover(String source, byte[] key) {
+    public byte[] onRecover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
@@ -95,7 +95,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         return ret;
     }
     @Override
-    public int replicate(String source,byte[] key,byte[] value,int nodeNumber){
+    public int onReplicate(String source,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         int expected = nodeNumber;
@@ -117,7 +117,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
-    public int syncStart(String source,String syncKey){
+    public int onStartSync(String source,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source,syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
@@ -129,7 +129,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             //return 0;
         }
     }
-    public void sync(int partition,byte[][] keys,byte[][] values,String memberId,String source){
+    public void onSync(int partition,byte[][] keys,byte[][] values,String memberId,String source){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncBatchOperation operation = new DataStoreSyncBatchOperation(partition,keys,values,source);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
@@ -140,7 +140,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             throw ExceptionUtil.rethrow(e);
         }
     }
-    public void syncEnd(String memberId,String syncKey){
+    public void onEndSync(String memberId,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation(syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());

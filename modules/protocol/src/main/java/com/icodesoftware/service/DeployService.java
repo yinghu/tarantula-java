@@ -6,7 +6,7 @@ public interface DeployService extends ServiceProvider {
 
     String NAME = "DeployService";
 
-    boolean addLobby(Descriptor lobby,String publishingId);
+    //boolean addLobby(Descriptor lobby,String publishingId);
 
     boolean onUpdateView(OnView onView);
     boolean onUpdateResource(String contentUrl,String resourceName);
@@ -14,10 +14,10 @@ public interface DeployService extends ServiceProvider {
 
     boolean onLaunchApplication(String typeId,String applicationId);
     boolean onShutdownApplication(String typeId,String applicationId);
-    boolean resetModule(Descriptor descriptor);
+    //boolean resetModule(Descriptor descriptor);
 
-    boolean enableLobby(String typeId);
-    boolean disableLobby(String typeId);
+    //boolean enableLobby(String typeId);
+    //boolean disableLobby(String typeId);
 
     void onCreateGameCluster(String gameClusterId);
     boolean onEnableGameCluster(String gameClusterId);

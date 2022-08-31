@@ -167,12 +167,46 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public boolean resetModule(Descriptor descriptor){
         //update app desc via typeId
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        boolean suc = deployService.resetModule(descriptor);
-        if(suc){
+        boolean[] suc ={false};
+        DataStore dataStore = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),descriptor.typeId());
+        if(!dataStore.load(lobbyTypeIdIndex)){
+            if(descriptor.index()!=null){
+                IndexSet indexSet = new IndexSet();
+                indexSet.distributionKey(descriptor.index());
+                indexSet.label(ExposedGameService.INDEX_LABEL);
+                if(dataStore.load(indexSet)){
+                    indexSet.keySet().forEach((k)->{
+                        DeploymentDescriptor app = new DeploymentDescriptor();
+                        app.distributionKey(k);
+                        if(dataStore.load(app)){
+                            app.codebase(descriptor.codebase());
+                            app.moduleArtifact(descriptor.moduleArtifact());
+                            app.moduleVersion(descriptor.moduleVersion());
+                            dataStore.update(app);
+                            suc[0]=true;
+                        }
+                    });
+                }
+            }
+            return suc[0];
+        }
+        dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
+            a.codebase(descriptor.codebase());
+            a.moduleArtifact(descriptor.moduleArtifact());
+            a.moduleVersion(descriptor.moduleVersion());
+            dataStore.update(a);
+            suc[0]=true;
+            return true;
+        });
+        //return suc[0];
+
+        //DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
+        //boolean suc = deployService.resetModule(descriptor);
+        if(suc[0]){
             this.integrationCluster.deployService().updateModule(descriptor);
         }
-        return suc;
+        return suc[0];
     }
     public ClassLoader classLoader(String moduleId){
         return cMap.get(moduleId);
@@ -255,7 +289,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!response.successful()){
             return response;
         }
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         LobbyConfiguration a = xmlParser.configurations.get(0);
         AccessIndex publishId = this.tarantulaContext.accessIndexService().set(a.descriptor.typeId(),0);
         if(publishId==null){
@@ -263,21 +296,32 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             response.message("module already existed");
             return response;
         }
-        if(!deployService.addLobby(a.descriptor,publishId.distributionKey())){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
+        if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
             response.successful(false);
-            response.message("cannot create module");
+            response.message("module already existed");
             return response;
         }
+        ModuleIndex moduleIndex = new ModuleIndex();
+        moduleIndex.distributionKey(publishId.distributionKey());
+        moduleIndex.index(descriptor.typeId());
+        ds.create(moduleIndex);
+        descriptor.owner(publishId.distributionKey());
+        descriptor.label(LobbyDescriptor.LABEL);
+        descriptor.onEdge(true);
+        descriptor.resetEnabled(true);
+        descriptor.disabled(true);
+        ds.create(descriptor);
+        lobbyTypeIdIndex.index(descriptor.distributionKey());
+        lobbyTypeIdIndex.owner(publishId.distributionKey());
+        ds.update(lobbyTypeIdIndex);
         a.applications.forEach((b)->{
             b.codebase(descriptor.codebase());
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
             b.applicationClassName(this.tarantulaContext.singleModuleApplication);
             this.createApplication(b,null,null,false);
-            //String x = deployService.addApplication(b,null,null);
-            //if(x==null){
-                //log.warn("Failed to add application ->"+b.toString());
-            //}
         });
         response.successful(true);
         response.message("module created");
@@ -340,20 +384,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean launchModule(String typeId){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        boolean suc = deployService.enableLobby(typeId);
-        if(suc){
-            this.integrationCluster.deployService().launchModule(typeId);
-        }
-        return suc;
+        if(!enableLobby(typeId)) return false;
+        this.integrationCluster.deployService().launchModule(typeId);
+        return true;
     }
     public boolean shutdownModule(String typeId){
-        DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        boolean suc = deployService.disableLobby(typeId);
-        if(suc){
-            this.integrationCluster.deployService().shutdownModule(typeId);
-        }
-        return suc;
+        if(!disableLobby(typeId)) return false;
+        this.integrationCluster.deployService().shutdownModule(typeId);
+        return true;
     }
 
     @Override
@@ -767,18 +805,39 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metricsListener.onUpdated(mkey,delta);
     }
 
+    boolean enableLobby(String typeId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
+            return false;
+        }
+        lobbyDescriptor.disabled(false);
+        ds.update(lobbyDescriptor);
+        return true;
+    }
+
+    boolean disableLobby(String typeId){
+        DataStore ds = this.tarantulaContext.masterDataStore();
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        if(!ds.load(query)){
+            return false;
+        }
+        LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
+        lobbyDescriptor.distributionKey(query.index());
+        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
+            return false;
+        }
+        lobbyDescriptor.disabled(true);
+        ds.update(lobbyDescriptor);
+        return true;
+    }
 
     private class PostOfficeSession implements PostOffice{
-
-        //public OnChannel onChannel(Session session){
-            //PresenceIndex presenceIndex = (PresenceIndex) tarantulaContext.tokenValidatorProvider().presence(systemId);
-            //return (label,data)->{
-                //UDPEndpoint udp = (UDPEndpoint) tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-                //Channel c = udp.channel(presenceIndex.sessionId());
-                //c.write();
-                //log.warn("sending message from->>>"+presenceIndex.sessionId());
-            //};
-        //}
 
         public OnTopic onTopic(){
             return (topic,data)->{
