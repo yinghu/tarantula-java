@@ -7,7 +7,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,14 +80,14 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public <T extends Configurable> void register(T t) {
         if(!t.configurationCategory().equals("Shop")) return;
         t.registered();
-        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t){
         t.released();
-        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
-    public boolean onRegister(String category,String itemId){
+    public boolean onItemRegistered(String category,String itemId){
         Shop configurableObject = new Shop();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -96,7 +96,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         registerShop(configurableObject);
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         Shop shop = shopIndex.remove(itemId);
         if(shop==null) return false;
         shopIndex.remove(shop.name());

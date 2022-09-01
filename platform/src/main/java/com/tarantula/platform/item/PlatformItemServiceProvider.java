@@ -1,13 +1,11 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
 import com.tarantula.platform.service.deployment.TypedListener;
 
 import java.util.List;
@@ -36,7 +34,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T config) {
-        distributionItemService.register(gameServiceName,name(),config.configurationCategory(),config.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),config.configurationCategory(),config.distributionKey());
     }
 
 
@@ -76,7 +74,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public void shutdown() throws Exception {
 
     }
-    public boolean onRegister(String category,String itemId){
+    public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -89,7 +87,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         });
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         return false;
     }
 

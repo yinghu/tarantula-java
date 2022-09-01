@@ -7,7 +7,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +87,14 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
-    public boolean onRegister(String category,String itemId){
+    public boolean onItemRegistered(String category,String itemId){
         Achievement configurableObject = new Achievement();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -106,7 +106,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         achievements.put(configurableObject.name(),configurableObject);
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         String[] released = {null};
         achievements.forEach((k,v)->{
             if(v.distributionKey().equals(itemId)) released[0] = k;

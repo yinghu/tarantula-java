@@ -14,7 +14,7 @@ import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 import com.tarantula.platform.statistics.UserStatistics;
 
 import java.util.ArrayList;
@@ -182,13 +182,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        this.distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        this.distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
 
@@ -204,7 +204,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     }
 
     @Override
-    public boolean onRegister(String category, String itemId) {
+    public boolean onItemRegistered(String category, String itemId) {
         DailyGiveaway dailyGiveaway = new DailyGiveaway();
         dailyGiveaway.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -216,7 +216,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         String[] released ={null};
         dailyGiveaways.forEach((k,v)->{
             if(v.distributionKey().equals(itemId)) released[0]=k;

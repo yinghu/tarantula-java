@@ -31,7 +31,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
     }
 
     @Override
-    public boolean register(String gameServiceName,String serviceName,String category,String itemId) {
+    public boolean onRegisterItem(String gameServiceName,String serviceName,String category,String itemId) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         boolean ret = true;
@@ -53,7 +53,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
         return ret;
     }
     @Override
-    public boolean release(String gameServiceName,String serviceName,String category,String itemId) {
+    public boolean onReleaseItem(String gameServiceName,String serviceName,String category,String itemId) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         boolean ret = true;

@@ -10,7 +10,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 
 
 import java.util.List;
@@ -61,15 +61,15 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
+        distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
     }
 
-    public boolean onRegister(String category,String itemId){
+    public boolean onItemRegistered(String category,String itemId){
         LobbyItem lobbyItem = new LobbyItem();
         lobbyItem.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -84,7 +84,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         if(lobbyListener!=null) lobbyListener.listener.onUpdated(lobbyItem);
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         String lobbyTag = gameName+"/"+itemId;
         LobbyItem removed = lobbyItems.remove(lobbyTag);
         if(removed!=null){

@@ -7,12 +7,12 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.util.List;
 
@@ -65,15 +65,15 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        distributionItemService.register(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        this.distributionItemService.release(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
-    public boolean onRegister(String category,String itemId){
+    public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
@@ -85,7 +85,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         this.serviceContext.registerAuthVendor(authVendor);
         return true;
     }
-    public boolean onRelease(String category,String itemId){
+    public boolean onItemReleased(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());

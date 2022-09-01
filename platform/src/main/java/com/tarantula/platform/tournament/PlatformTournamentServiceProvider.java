@@ -9,7 +9,7 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.service.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ClusterConfigurationCallback;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -228,7 +228,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
     void onTournamentRegister(Tournament tournamentHeader){
-        this.distributionItemService.register(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
+        this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
     void onTournamentClose(TournamentHeader tournamentHeader){
         byte[] lockKey = tournamentHeader.index().getBytes();
@@ -245,7 +245,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         try {
             clusterStore.lock(lockKey);
             endTournament(tournamentHeader);
-            this.distributionItemService.release(gameServiceName, name(), "TournamentSchedule", tournamentHeader.distributionKey());
+            this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournamentHeader.distributionKey());
         }
         finally {
             clusterStore.unlock(lockKey);
@@ -328,14 +328,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
             //forcefully end tournament
             distributionTournamentService.endTournament(gameServiceName, status.index());
-            distributionItemService.release(gameServiceName, name(), t.configurationTypeId(),status.index());
+            distributionItemService.onReleaseItem(gameServiceName, name(), t.configurationTypeId(),status.index());
         }finally {
             clusterStore.unlock(lockKey);
         }
     }
 
     @Override
-    public boolean onRegister(String category, String itemId) {
+    public boolean onItemRegistered(String category, String itemId) {
         TournamentHeader tournament = new TournamentHeader();
         tournament.distributionKey(itemId);
         if (!this.dataStore.load(tournament)) {
@@ -353,7 +353,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     @Override
-    public boolean onRelease(String category, String itemId) {
+    public boolean onItemReleased(String category, String itemId) {
         TournamentHeaderIndex index = tournamentIndex.remove(itemId);
         if(index==null) return false;
         listeners.forEach(l->l.tournamentClosed(index.tournamentHeader));
