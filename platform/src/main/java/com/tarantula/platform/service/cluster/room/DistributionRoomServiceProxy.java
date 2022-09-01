@@ -30,7 +30,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     }
 
     @Override
-    public RoomJoinStub register(String serviceName, String zoneId, Rating rating) {
+    public RoomJoinStub onRegisterRoom(String serviceName, String zoneId, Rating rating) {
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
         RoomRegisterOperation roomRegisterOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
@@ -80,7 +80,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public GameRoom join(String serviceName, String ticket, String roomId, String systemId){
+    public GameRoom onJoinRoom(String serviceName, String ticket, String roomId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,ticket,roomId,systemId);
@@ -94,7 +94,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
-    public void leave(String serviceName,String roomId,String systemId){
+    public void onLeaveRoom(String serviceName,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,roomId,systemId);

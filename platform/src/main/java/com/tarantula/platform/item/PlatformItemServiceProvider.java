@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
     private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;

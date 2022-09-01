@@ -1,6 +1,6 @@
 package com.tarantula.platform.item;
 
-public interface ClusterConfigurationCallback {
+public interface ItemDistributionCallback {
 
     boolean onItemRegistered(String category,String itemId);
     boolean onItemReleased(String category,String itemId);

@@ -127,9 +127,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             gameRoom.distributionKey(roomId);
             return gameRoom;
         }
-        RoomJoinStub roomRegistry = this.distributionRoomService.register(name,gameZone.distributionKey(),rating);
+        RoomJoinStub roomRegistry = this.distributionRoomService.onRegisterRoom(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
-        GameRoom room = this.distributionRoomService.join(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
+        GameRoom room = this.distributionRoomService.onJoinRoom(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
         if(room==null) return null;
         room.setup(gameZone.arena(roomRegistry.level));
         return room;
@@ -140,7 +140,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             gameRoom.leave(systemId,room->true);
             return;
         }
-        this.distributionRoomService.leave(name,roomId,systemId);
+        this.distributionRoomService.onLeaveRoom(name,roomId,systemId);
     }
     public RoomJoinStub onRegister(String gameZoneId,Rating rating){
         GameZone gameZone = gameZoneIndex.get(gameZoneId).gameZone;

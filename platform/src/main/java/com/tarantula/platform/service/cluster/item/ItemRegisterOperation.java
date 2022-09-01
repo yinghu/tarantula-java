@@ -29,7 +29,7 @@ public class ItemRegisterOperation extends Operation {
     @Override
     public void run() throws Exception {
         ItemClusterService cis = this.getService();
-        this.ret = cis.register(gameServiceName,serviceName,category,itemId);
+        this.ret = cis.onRegister(gameServiceName,serviceName,category,itemId);
     }
 
     @Override

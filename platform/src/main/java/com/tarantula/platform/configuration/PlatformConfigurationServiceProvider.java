@@ -7,7 +7,7 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
@@ -16,7 +16,7 @@ import com.tarantula.platform.service.*;
 
 import java.util.List;
 
-public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
 
     private GameCluster gameCluster;

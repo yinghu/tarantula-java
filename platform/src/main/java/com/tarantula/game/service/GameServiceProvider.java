@@ -15,7 +15,7 @@ import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ItemDistributionCallback;
 
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
@@ -23,7 +23,7 @@ import com.tarantula.platform.tournament.*;
 
 
 
-public class GameServiceProvider implements ServiceProvider,MetricsListener{
+public class GameServiceProvider implements ServiceProvider,MetricsListener,ItemDistributionCallback{
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -201,7 +201,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
     public PlatformConfigurationServiceProvider configurationServiceProvider(){return this.configurationServiceProvider;}
 
 
-    public ClusterConfigurationCallback clusterConfigurationCallback(String serviceName){
+    public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(itemServiceProvider.name())){
             return itemServiceProvider;
         }
@@ -223,7 +223,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         if(serviceName.equals(configurationServiceProvider.name())){
             return configurationServiceProvider;
         }
-        return null;
+        return this;//default empty implementation
     }
 
     public ConfigurationServiceProvider configurationServiceProvider(String name){
@@ -241,4 +241,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener{
         metrics.onUpdated(s,v);
     }
 
+    @Override
+    public boolean onItemRegistered(String category, String itemId) {
+        return false;
+    }
+
+    @Override
+    public boolean onItemReleased(String category, String itemId) {
+        return false;
+    }
 }

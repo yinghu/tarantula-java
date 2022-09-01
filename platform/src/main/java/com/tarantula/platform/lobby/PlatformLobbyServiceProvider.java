@@ -10,14 +10,14 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ItemDistributionCallback;
 
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
     private ServiceContext serviceContext;
     private TarantulaLogger logger;

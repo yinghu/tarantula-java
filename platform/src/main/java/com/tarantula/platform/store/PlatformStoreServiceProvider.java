@@ -7,13 +7,13 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ItemDistributionCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
     private TarantulaLogger logger;
     private final String gameServiceName;

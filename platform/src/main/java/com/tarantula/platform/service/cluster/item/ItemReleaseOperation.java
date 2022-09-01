@@ -28,7 +28,7 @@ public class ItemReleaseOperation extends Operation {
     @Override
     public void run() throws Exception {
         ItemClusterService cis = this.getService();
-        this.ret = cis.release(gameServiceName,serviceName,category,itemId);
+        this.ret = cis.onRelease(gameServiceName,serviceName,category,itemId);
     }
 
     @Override

@@ -6,13 +6,13 @@ import com.tarantula.game.Rating;
 public interface DistributionRoomService extends ServiceProvider {
 
     String NAME = "DistributionRoomService";
-    RoomJoinStub register(String serviceName,String zoneId,Rating rating);
+    RoomJoinStub onRegisterRoom(String serviceName,String zoneId,Rating rating);
 
     void release(String serviceName,String zoneId,String roomId,String systemId);
     void sync(String serviceName,String zoneId,String roomId,String[] joined);
     GameRoom view(String serviceName, String roomId);
-    GameRoom join(String serviceName, String ticket, String roomId, String systemId);
-    void leave(String serviceName,String roomId,String systemId);
+    GameRoom onJoinRoom(String serviceName, String ticket, String roomId, String systemId);
+    void onLeaveRoom(String serviceName,String roomId,String systemId);
     GameZoneIndex localManaged(String key);
     GameChannelIndex localManaged(int channelId);
     void create(String serviceName,String zoneId,String roomId);

@@ -14,14 +14,14 @@ import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ClusterConfigurationCallback;
+import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.statistics.UserStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ClusterConfigurationCallback {
+public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
     private TarantulaLogger logger;
     private final String gameServiceName;
     private final GameCluster gameCluster;
