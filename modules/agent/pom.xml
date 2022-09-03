@@ -12,6 +12,8 @@
     <groupId>com.icodesoftware</groupId>
     <artifactId>gec-agent</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
+    <name>Game Cluster JAVA Agent Module</name>
     <build>
         <plugins>
             <plugin>

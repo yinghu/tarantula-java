@@ -17,7 +17,7 @@ public class GameObjectSerializer implements JsonSerializer<GameObject> {
         JsonObject jo = new JsonObject();
         jo.addProperty("name",gameObject.name());
         jo.addProperty("label",gameObject.label());
-        jo.addProperty("instanceId",gameObject.instanceId());
+        //jo.addProperty("instanceId",gameObject.instanceId());
         jo.addProperty("successful",gameObject.successful());
         jo.add("gameObject",gameObject.setup(type,jsonSerializationContext));
         return jo;

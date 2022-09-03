@@ -3,8 +3,8 @@ package com.tarantula.game;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.tarantula.RNG;
-import com.tarantula.platform.util.JvmRNG;
+import com.icodesoftware.service.RNG;
+import com.icodesoftware.util.*;
 
 import java.lang.reflect.Type;
 

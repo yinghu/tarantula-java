@@ -1,7 +1,7 @@
 package com.tarantula.game.blackjack;
 
-import com.tarantula.*;
-import com.tarantula.Module;
+import com.icodesoftware.*;
+import com.icodesoftware.Module;
 
 public class BlackjackModule implements Module {
 
@@ -10,13 +10,14 @@ public class BlackjackModule implements Module {
 
 
     @Override
-    public void onJoin(Session session, Connection connection) throws Exception{
+    public void onJoin(Session session) throws Exception{
         //session.write(ret,this.label());
     }
 
+
+
     @Override
-    public boolean onRequest(Session session, byte[] payload, OnUpdate onUpdate) throws Exception {
-        session.write(payload,label());
+    public boolean onRequest(Session session, byte[] payload) throws Exception {
         return false;
     }
 
@@ -26,10 +27,6 @@ public class BlackjackModule implements Module {
         this.context.log("Item service started", OnLog.INFO);
     }
 
-    @Override
-    public String label() {
-        return "item";
-    }
     @Override
     public void clear(){
 
