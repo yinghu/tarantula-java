@@ -2,7 +2,7 @@ package com.tarantula.test;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 import com.tarantula.test.integration.OnPayload;
 
 import javax.net.ssl.HttpsURLConnection;

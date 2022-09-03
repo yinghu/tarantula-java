@@ -1,7 +1,7 @@
 package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 import com.tarantula.test.HTTPCaller;
 
 import java.net.http.WebSocket;
@@ -54,8 +54,8 @@ public class OnGame {
         JsonObject jo = new JsonObject();
         onPayload.on(jo);
         _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
-        _headers.put(Session.TARANTULA_APPLICATION_ID,applicationId);
-        _headers.put(Session.TARANTULA_INSTANCE_ID,instanceId);
+        //_headers.put(Session.TARANTULA_APPLICATION_ID,applicationId);
+        //_headers.put(Session.TARANTULA_INSTANCE_ID,instanceId);
         caller.doAction("application/instance",jo.get("command").getAsString(),_headers,jo.toString().getBytes(),resp -> onMessage(resp.toString()));
     }
 }

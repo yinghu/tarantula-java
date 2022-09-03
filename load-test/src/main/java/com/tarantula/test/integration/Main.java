@@ -1,6 +1,6 @@
 package com.tarantula.test.integration;
 
-import com.tarantula.platform.bootstrap.TarantulaThreadFactory;
+import com.icodesoftware.util.TarantulaThreadFactory;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;

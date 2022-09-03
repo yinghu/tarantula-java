@@ -1,7 +1,7 @@
 package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
-import com.tarantula.Session;
+import com.icodesoftware.Session;
 import com.tarantula.test.HTTPCaller;
 
 import java.net.URI;
