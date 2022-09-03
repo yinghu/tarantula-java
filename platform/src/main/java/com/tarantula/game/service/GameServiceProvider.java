@@ -57,6 +57,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public GameLobby lobby(Descriptor descriptor){
         return applicationPreSetup.load(descriptor);
     }
+
     public Configuration configuration(){
         return configuration;
     }

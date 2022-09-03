@@ -83,7 +83,7 @@ public class GameLobbyModule implements Module{
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        this.gameLobby = new GameLobbyProxy();//this.gameServiceProvider.lobby(this.context.descriptor());
+        this.gameLobby = new GameLobbyProxy();
         this.gameLobby.setup(context);
         this.gameLobby.start();
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this.gameLobby);
