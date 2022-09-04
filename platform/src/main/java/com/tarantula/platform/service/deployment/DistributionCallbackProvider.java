@@ -65,13 +65,6 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
             log.warn("Game cluster ["+gameClusterId+"] not found");
         }
         gameCluster.setup(this.tarantulaContext);
-        platformDeploymentServiceProvider.oListeners.forEach((k,o)->
-            {
-                if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
-                    o.listener.onCreated(gameCluster);
-                }
-            }
-        );
     }
 
     @Override

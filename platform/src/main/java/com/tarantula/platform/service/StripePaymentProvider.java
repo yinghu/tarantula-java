@@ -10,9 +10,10 @@ import java.util.Map;
 
 public class StripePaymentProvider extends AuthObject implements AuthVendorRegistry {
 
-
+    private String secureKey;
     public StripePaymentProvider(String clientId, String secureKey) {
-        super(OnAccess.STRIPE, clientId, secureKey, null, null, null, null);
+        super(OnAccess.STRIPE, clientId);
+        this.secureKey = secureKey;
     }
 
     @Override

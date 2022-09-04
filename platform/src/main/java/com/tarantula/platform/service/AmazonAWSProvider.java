@@ -18,15 +18,17 @@ public class AmazonAWSProvider extends AuthObject{
     private S3Client s3Client;
     private String region;
     private String bucket;
+    private String secretKey;
 
     public AmazonAWSProvider(AwsS3Configuration configuration){
         this(configuration.typeId(),configuration.region(),configuration.bucket(),configuration.accessKeyId(),configuration.secretAccessKey());
     }
 
     public AmazonAWSProvider(String typeId,String region,String bucket,String accessKeyId,String secretKey){
-        super(typeId,accessKeyId,secretKey,"","","",new String[]{region});
+        super(typeId,accessKeyId);
         this.region = region;
         this.bucket = bucket;
+        this.secretKey = secretKey;
     }
 
     public String name(){
@@ -38,7 +40,7 @@ public class AmazonAWSProvider extends AuthObject{
         logger = serviceContext.logger(AmazonAWSProvider.class);
         s3Client = S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(()-> AwsBasicCredentials.create(this.clientId(),this.secureKey))
+                .credentialsProvider(()-> AwsBasicCredentials.create(this.clientId(),this.secretKey))
                 .build();
         int[] bucketCreate ={0};
         s3Client.listBuckets().buckets().forEach(b->{

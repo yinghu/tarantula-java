@@ -17,16 +17,16 @@
       "application": {
         "properties": [
           {
-            "name": "VerifyUrl",
+            "name": "SecretKey",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "SecretKey",
-            "type": "string",
-            "reference": "String",
+            "name": "IsSandbox",
+            "type": "boolean",
+            "reference": "Boolean",
             "nullable": false,
             "downloadable": false
           }

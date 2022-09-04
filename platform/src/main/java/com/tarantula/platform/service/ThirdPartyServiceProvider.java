@@ -16,6 +16,11 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     private MetricsListener metricsListener;
     private ServiceContext serviceContext;
 
+    public ThirdPartyServiceProvider(String name){
+        this.name = name;
+        this.aMap = new ConcurrentHashMap<>();
+        this.metricsListener = (n,v)->{};
+    }
     public ThirdPartyServiceProvider(String name, List<TokenValidatorProvider.AuthVendor> preload){
         this.name = name;
         this.aMap = new ConcurrentHashMap<>();

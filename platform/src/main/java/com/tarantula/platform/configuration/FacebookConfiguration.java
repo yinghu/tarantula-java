@@ -30,13 +30,4 @@ public class FacebookConfiguration extends Application {
     public String secretKey(){
         return header.get("SecretKey").getAsString();
     }
-    public String certUrl(){
-        return header.get("CertUrl").getAsString();
-    }
-    public String authUrl(){
-        return header.get("AuthUrl").getAsString();
-    }
-    public String tokenUrl(){
-        return header.get("TokenUrl").getAsString();
-    }
 }

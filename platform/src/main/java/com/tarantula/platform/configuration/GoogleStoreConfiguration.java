@@ -27,10 +27,5 @@ public class GoogleStoreConfiguration extends Application {
     public String secretKey(){
         return header.get("SecretKey").getAsString();
     }
-    public String validationUrl(){
-        return header.get("ValidationUrl").getAsString();
-    }
-    public String acknowledgeUrl(){
-        return header.get("AcknowledgeUrl").getAsString();
-    }
+
 }

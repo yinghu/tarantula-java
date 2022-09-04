@@ -366,8 +366,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
     }
     @Override
     public void onCreated(GameCluster gameCluster){
-        ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-
+        ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
         ConfigurableCategories assets = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
         ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
         ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -450,5 +449,9 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         applicationPreSetup.save(gameCluster,itemTypes);
         applicationPreSetup.save(gameCluster,applicationTypes);
 
+        Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
+        if(configuration!=null) {
+            this.context.log("setup validators->" + configuration.property("validators"), OnLog.WARN);
+        }
     }
 }

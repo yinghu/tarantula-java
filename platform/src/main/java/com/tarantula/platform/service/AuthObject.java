@@ -16,23 +16,15 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
     protected static String AUTHORIZATION = "Authorization";
     protected final String typeId;
-    //protected final String name;
+
     protected   String clientId;
-    protected   String secureKey;
-    protected   String authUri;
-    protected   String tokenUri;
-    protected   String certUri;
-    protected   String[] origins;
+
     protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
-    public AuthObject(String typeId,String clientId,String secureKey,String authUri,String tokenUri,String certUri,String[] origins){
+
+    public AuthObject(String typeId,String clientId){
         this.typeId = typeId;
         this.clientId = clientId;
-        this.secureKey = secureKey;
-        this.authUri = authUri;
-        this.tokenUri = tokenUri;
-        this.certUri = certUri;
-        this.origins = origins;
         this.metricsListener = (k,v)->{};
     }
 

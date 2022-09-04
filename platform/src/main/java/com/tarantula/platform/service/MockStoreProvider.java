@@ -11,8 +11,10 @@ import java.util.UUID;
 public class MockStoreProvider extends AuthObject{
 
     private DataStore dataStore;
+    private String secureKey;
     public MockStoreProvider(String name,String key){
-        super(name,"",key,"","","",new String[0]);
+        super(name,"");
+        this.secureKey = key;
     }
     @Override
     public void setup(ServiceContext serviceContext){

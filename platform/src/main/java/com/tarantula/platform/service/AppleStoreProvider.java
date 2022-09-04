@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.ValidationUtil;
 import com.tarantula.platform.configuration.AppleStoreConfiguration;
 import com.tarantula.platform.store.Transaction;
 
@@ -24,17 +25,23 @@ import java.util.Map;
 
 public class AppleStoreProvider extends AuthObject{
 
+    private final static String  SANDBOX_VERIFY_URI = "https://sandbox.itunes.apple.com/verifyReceipt";
+    private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
+
 
     private HttpClient client;
     private JsonParser jsonParser;
     private DataStore dataStore;
 
+    private String secureKey;
+
     public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration){
-        this(appleStoreConfiguration.typeId(), appleStoreConfiguration.verifyUrl(),appleStoreConfiguration.secureKey());
+        this(appleStoreConfiguration.typeId(),appleStoreConfiguration.secureKey());
     }
 
-    public AppleStoreProvider(String typeId,String validationUrl,String key){
-        super(typeId,"",key,"","",validationUrl,new String[0]);
+    public AppleStoreProvider(String typeId,String key){
+        super(typeId,"");
+        this.secureKey = key;
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
@@ -58,7 +65,7 @@ public class AppleStoreProvider extends AuthObject{
             String receipt = (String)params.get("receipt");
             String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(certUri))
+                    .uri(URI.create(SANDBOX_VERIFY_URI))
                     .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)

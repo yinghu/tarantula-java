@@ -28,20 +28,8 @@ public class GooglePlayConfiguration extends Application {
     public String accessKey(){
         return header.get("AccessKey").getAsString();
     }
-    public String verifyUrl(){
-        return header.get("VerifyUrl").getAsString();
-    }
 
     //web
-    public String authUrl(){
-        return header.get("WebAuthUrl").getAsString();
-    }
-    public String tokenUrl(){
-        return header.get("WebTokenUrl").getAsString();
-    }
-    public String certUrl(){
-        return header.get("WebTokenUrl").getAsString();
-    }
     public String clientId(){
         return header.get("WebApplicationId").getAsString();
     }

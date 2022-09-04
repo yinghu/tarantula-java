@@ -22,14 +22,14 @@ public class GoogleAuthCredentialsDeserializer implements JsonDeserializer<AuthV
             String accessKey = a.getAsJsonObject().get("access_key").getAsString();
             JsonObject android = a.getAsJsonObject().get("android").getAsJsonObject();
             String applicationId = android.get("application_id").getAsString();
-            String verifyUri = android.get("verify_uri").getAsString();
+            //String verifyUri = android.get("verify_uri").getAsString();
             JsonObject jo = a.getAsJsonObject().get("web").getAsJsonObject();
             String clientId = jo.getAsJsonPrimitive("client_id").getAsString();
             String secureKey = jo.getAsJsonPrimitive("client_secret").getAsString();
-            String authUri = jo.getAsJsonPrimitive("auth_uri").getAsString();
-            String tokenUri = jo.getAsJsonPrimitive("token_uri").getAsString();
-            String certUri = jo.getAsJsonPrimitive("auth_provider_x509_cert_url").getAsString();
-            _validators.add(new GoogleOAuthTokenValidator(typeId,clientId,secureKey,authUri,tokenUri,certUri,verifyUri,applicationId,accessKey));
+            //String authUri = jo.getAsJsonPrimitive("auth_uri").getAsString();
+            //String tokenUri = jo.getAsJsonPrimitive("token_uri").getAsString();
+            //String certUri = jo.getAsJsonPrimitive("auth_provider_x509_cert_url").getAsString();
+            _validators.add(new GoogleOAuthTokenValidator(typeId,clientId,secureKey,applicationId,accessKey));
         });
         return new ThirdPartyServiceProvider(OnAccess.GOOGLE,_validators);
     }

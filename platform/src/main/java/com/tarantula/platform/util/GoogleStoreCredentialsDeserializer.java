@@ -22,8 +22,8 @@ public class GoogleStoreCredentialsDeserializer implements JsonDeserializer<Auth
             String accessKey = a.getAsJsonObject().get("access_key").getAsString();
             JsonObject android = a.getAsJsonObject().get("android").getAsJsonObject();
             String packageName = android.get("package_name").getAsString();
-            String validationUri = android.get("validation_uri").getAsString();
-            _validators.add(new GoogleStorePurchaseValidator(typeId,validationUri,packageName,accessKey));
+            //String validationUri = android.get("validation_uri").getAsString();
+            _validators.add(new GoogleStorePurchaseValidator(typeId,packageName,accessKey));
         });
         return new ThirdPartyServiceProvider(OnAccess.GOOGLE_STORE,_validators);
     }

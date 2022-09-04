@@ -18,11 +18,11 @@ public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthV
     @Override
     public AuthVendorRegistry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        String certUri = jo.getAsJsonPrimitive("verifyUrl").getAsString();
+        //String certUri = jo.getAsJsonPrimitive("verifyUrl").getAsString();
         List<TokenValidatorProvider.AuthVendor> _validators = new ArrayList<>();
         jo.get("validators").getAsJsonArray().forEach((a)->{
             JsonObject sk = a.getAsJsonObject();
-            _validators.add(new AppleStoreProvider(sk.get("name").getAsString(),certUri,sk.get("key").getAsString()));
+            _validators.add(new AppleStoreProvider(sk.get("name").getAsString(),sk.get("key").getAsString()));
         });
         return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE,_validators);
     }

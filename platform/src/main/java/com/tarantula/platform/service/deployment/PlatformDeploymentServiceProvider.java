@@ -630,11 +630,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     throw new RuntimeException("["+name+"] duplicated");
                 }
                 ApplicationPreSetup[] preSetup = {null};
-                Configuration presetup = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
-                if(presetup!=null){
-                    String cname = (String) presetup.property(ApplicationPreSetup.SET_UP_NAME);
+                Configuration setupConfig = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
+                if(setupConfig != null){
+                    String cname = (String) setupConfig.property(ApplicationPreSetup.SET_UP_NAME);
                     gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
-                    preSetup[0] = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup(cname);
+                    preSetup[0] = gameCluster.applicationPreSetup();
                 }
                 //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
                 Descriptor descriptor = configuration.descriptor;
@@ -664,6 +664,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             gameCluster.message("["+name+"] game created successfully");
             mds.update(gameCluster);
+            gameCluster.setup(this.tarantulaContext);
+            oListeners.forEach((k,o)->
+                {
+                    if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                        o.listener.onCreated(gameCluster);
+                    }
+                }
+            );
             this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionKey());
         }catch (Exception ex){
             gameCluster.message(ex.getMessage());

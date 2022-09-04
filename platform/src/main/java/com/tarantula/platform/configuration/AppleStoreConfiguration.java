@@ -17,8 +17,8 @@ public class AppleStoreConfiguration extends Application {
     public String name(){
         return OnAccess.APPLE_STORE;
     }
-    public String verifyUrl(){
-        return header.get("VerifyUrl").getAsString();
+    public boolean isSandbox(){
+        return header.get("IsSandbox").getAsBoolean();
     }
     public String secureKey(){
         return header.get("SecureKey").getAsString();

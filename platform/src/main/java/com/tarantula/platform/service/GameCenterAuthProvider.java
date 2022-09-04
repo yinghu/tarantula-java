@@ -25,7 +25,7 @@ public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegi
     private HttpClient client;
 
     public GameCenterAuthProvider(){
-        super("gameCenter","","","","","",new String[0]);
+        super("gameCenter","");
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new GameCenterAuthProvider._X509TrustManager()},null);

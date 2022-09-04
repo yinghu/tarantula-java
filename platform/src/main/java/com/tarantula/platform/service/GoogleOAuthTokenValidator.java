@@ -25,22 +25,28 @@ import java.util.Map;
 
 public class GoogleOAuthTokenValidator extends AuthObject {
 
+    private final static String AUTH_URI = "https://accounts.google.com/o/oauth2/auth";
+    private final static String TOKEN_URI = "https://oauth2.googleapis.com/token";
+    private final static String AUTH_PROVIDER_X509_CERT_URI = "https://www.googleapis.com/oauth2/v1/certs";
+    private final static String VERIFY_URI = "https://games.googleapis.com/games/v1/applications/";
+
+
     private HttpClient client;
     private NetHttpTransport transport;
     private JacksonFactory jsonFactory;
     private String accessKey;
     private String applicationId;
-    private String verifyUri;
+    private String secureKey;
 
     public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration){
-        this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.authUrl(),googlePlayConfiguration.tokenUrl(),googlePlayConfiguration.certUrl(),googlePlayConfiguration.verifyUrl(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
+        this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
     }
 
-    public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey, String authUri, String tokenUri, String certUri,String verifyUri,String applicationId,String accessKey) {
-        super(typeId, clientId, secureKey, authUri, tokenUri, certUri, new String[0]);
-        this.verifyUri = verifyUri;
+    public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey,String applicationId,String accessKey) {
+        super(typeId, clientId);
         this.applicationId = applicationId;
         this.accessKey = accessKey;
+        this.secureKey = secureKey;
         transport = new NetHttpTransport();
         jsonFactory = JacksonFactory.getDefaultInstance();
         try{
@@ -62,7 +68,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             String token = (String) params.get("token");
             String typeId = (String) params.get("typeId");
             GoogleAuthorizationCodeTokenRequest request =
-                    new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,tokenUri,clientId(typeId),secureKey,token,"");
+                    new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,TOKEN_URI,clientId(typeId),secureKey,token,"");
             GoogleTokenResponse response = request.execute();
             return verifyPlayer(response.getAccessToken(),params);
         }catch (Exception ex){
@@ -73,7 +79,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
 
     private boolean verifyPlayer(String accessToken,Map<String,Object> params){
         try{
-            String query = new StringBuffer(verifyUri).append(applicationId).append("/verify").append("?key=").append(accessKey).toString();
+            String query = new StringBuffer(VERIFY_URI).append(applicationId).append("/verify").append("?key=").append(accessKey).toString();
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))

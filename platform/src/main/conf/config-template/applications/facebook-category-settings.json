@@ -36,27 +36,6 @@
             "reference": "String",
             "nullable": false,
             "downloadable": false
-          },
-          {
-            "name": "CertUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AuthUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "TokenUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
           }
         ]
       }

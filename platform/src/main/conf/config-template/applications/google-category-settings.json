@@ -24,20 +24,6 @@
             "downloadable": false
           },
           {
-            "name": "ValidationUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AcknowledgeUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "SecretKey",
             "type": "string",
             "reference": "String",
@@ -57,13 +43,6 @@
       },
       "application": {
         "properties": [
-          {
-            "name": "VerifyUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
           {
             "name": "AccessKey",
             "type": "string",
@@ -87,27 +66,6 @@
           },
           {
             "name": "WebProjectId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "WebAuthUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "WebTokenUrl",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "WebCertUrl",
             "type": "string",
             "reference": "String",
             "nullable": false,

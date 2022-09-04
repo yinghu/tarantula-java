@@ -21,18 +21,20 @@ import java.util.Map;
 
 public class GoogleStorePurchaseValidator extends AuthObject {
 
+    private final static String VALIDATION_URI = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/";
+
+    //"acknowledge_uri": "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge"
+
     private HttpClient client;
     private String accessKey;
     private String packageName;
-    private String validationUri;
 
     public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration){
-        this(googleStoreConfiguration.typeId(),googleStoreConfiguration.validationUrl(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
+        this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
     }
 
-    public GoogleStorePurchaseValidator(String typeId,String validationUri, String packageName, String accessKey) {
-        super(typeId,"", "", "", "","", new String[0]);
-        this.validationUri = validationUri;
+    public GoogleStorePurchaseValidator(String typeId, String packageName, String accessKey) {
+        super(typeId,"");
         this.packageName = packageName;
         this.accessKey = accessKey;
         try{
@@ -56,7 +58,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             String token = (String)params.get(OnAccess.STORE_RECEIPT);
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
             //{packageName}/purchases/products/{productId}/tokens/{token}",
-            String query = new StringBuffer(validationUri).append(packageName).append("/purchases/products/").append(sku)
+            String query = new StringBuffer(VALIDATION_URI).append(packageName).append("/purchases/products/").append(sku)
                     .append("/tokens/").append(token).append("?key=").append(accessKey).toString();
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
