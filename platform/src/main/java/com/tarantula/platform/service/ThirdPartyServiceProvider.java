@@ -52,6 +52,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
 
     @Override
     public void registerMetricsLister(MetricsListener metricsListener) {
+        if(metricsListener == null) return;
         this.metricsListener = metricsListener;
     }
 

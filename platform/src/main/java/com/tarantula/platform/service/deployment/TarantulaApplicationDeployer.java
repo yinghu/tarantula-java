@@ -25,7 +25,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 
 	}
 	public void start() throws Exception {
-		this.context._registerNode();
+		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
 		String bucketId = this.context.bucketId();
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));

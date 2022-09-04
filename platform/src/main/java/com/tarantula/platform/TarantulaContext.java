@@ -484,13 +484,25 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void serviceProvider(ServiceProvider serviceProvider){
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
-    public void _setup(){
-        this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
+    public void _setup() throws Exception{
+        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
+        node.bucketId = bid.distributionKey();
+        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
+        node.nodeId = nid.distributionKey();
+        if(bid==null | nid==null) throw new RuntimeException("Need to restart the server again");
+        log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
+        log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
+        initMetricsProvider();
+        this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
+        this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
+        this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
+        this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
+ 	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
             v.setup(this);
             v.waitForData();//block for global data sync
         });
     }
-    public void _registerNode() throws Exception{
+    public void _syncNodeData() throws Exception{
  	    this.accessIndexService().onDisable();
  	    _access_index_syc_finished.await();
  	    for(int i=0;i<accessIndexRoutingNumber;i++){
@@ -513,19 +525,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
         }
         this.accessIndexService().onEnable();
-        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
-        node.bucketId = bid.distributionKey();
-        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
-        node.nodeId = nid.distributionKey();
-        if(bid==null | nid==null) throw new RuntimeException("Need to restart the server again");
-        initMetricsProvider();
-        this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
-        this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
-        this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
-        this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
-        log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
-        log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
  	}
+
+
     public boolean deployServiceProvider(ServiceProvider serviceProvider){
         try{
             this.serviceProviders.computeIfAbsent(serviceProvider.name(),(sn)->{
