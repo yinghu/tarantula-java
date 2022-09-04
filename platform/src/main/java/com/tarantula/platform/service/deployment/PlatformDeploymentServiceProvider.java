@@ -615,15 +615,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             parser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(tournamentEnabled?"tournament-game-cluster-basic-plan.xml":"game-cluster-basic-plan.xml"));
             for (LobbyConfiguration configuration : parser.configurations) {
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
+                Lobby _lobby = new DefaultLobby(configuration.descriptor);
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
                     gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
+                    gameCluster.gameLobby = _lobby;
                 }
                 else if(configuration.descriptor.typeId().endsWith("-service")){
                     gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
                     this.tarantulaContext.availableServices().forEach((s)-> configuration.applications.add((DeploymentDescriptor)s));
+                    gameCluster.serviceLobby = _lobby;
                 }
                 else if(configuration.descriptor.typeId().endsWith("-data")){
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
+                    gameCluster.dataLobby  = _lobby;
                 }
                 LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),configuration.descriptor.typeId());
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
@@ -657,6 +661,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     a.tag(a.tag().replaceFirst("game",typePrefix));
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);
+                    _lobby.addEntry(a);
                     if(preSetup[0]!=null){
                         preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
                     }

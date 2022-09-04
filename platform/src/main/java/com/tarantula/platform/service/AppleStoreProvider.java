@@ -34,14 +34,16 @@ public class AppleStoreProvider extends AuthObject{
     private DataStore dataStore;
 
     private String secureKey;
+    private boolean isSandbox;
 
     public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration){
-        this(appleStoreConfiguration.typeId(),appleStoreConfiguration.secureKey());
+        this(appleStoreConfiguration.typeId(),appleStoreConfiguration.secureKey(),appleStoreConfiguration.isSandbox());
     }
 
-    public AppleStoreProvider(String typeId,String key){
+    public AppleStoreProvider(String typeId,String key,boolean isSandbox){
         super(typeId,"");
         this.secureKey = key;
+        this.isSandbox = isSandbox;
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
@@ -65,7 +67,7 @@ public class AppleStoreProvider extends AuthObject{
             String receipt = (String)params.get("receipt");
             String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SANDBOX_VERIFY_URI))
+                    .uri(URI.create(isSandbox?SANDBOX_VERIFY_URI:PRODUCTION_VERIFY_URI))
                     .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)

@@ -27,7 +27,7 @@ public class FacebookAuthCredentialsDeserializer implements JsonDeserializer<Aut
             //String certUri = jo.getAsJsonPrimitive("certUrl").getAsString();
             //String authUri = jo.getAsJsonPrimitive("authUrl").getAsString();
             //String tokenUri = jo.getAsJsonPrimitive("tokenUrl").getAsString();
-            _validators.add(new FacebookAuthProvider(typeId,appId,secureKey,new String[]{appName}));
+            _validators.add(new FacebookAuthProvider(typeId,appId,secureKey));
         });
         return new ThirdPartyServiceProvider(OnAccess.FACEBOOK,_validators);
     }

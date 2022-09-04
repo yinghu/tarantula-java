@@ -451,7 +451,27 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
 
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
         if(configuration!=null) {
-            this.context.log("setup validators->" + configuration.property("validators"), OnLog.WARN);
+            try{
+                JsonArray validators = ((JsonElement)configuration.property("validators")).getAsJsonArray();
+                validators.forEach(validator->{
+                    Application app = new Application();
+                    if(app.configureAndValidate(validator.getAsJsonObject())){
+                        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
+                        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+                        Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
+                        app.disabled(true);
+                        app.configurableSetting(conf);
+                        if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
+                            this.context.log("save validator->"+app.distributionKey(), OnLog.WARN);
+                        }
+                    }
+                    else{
+                        this.context.log("validator not passed ->"+validator, OnLog.WARN);
+                    }
+                });
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 }

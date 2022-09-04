@@ -28,10 +28,10 @@ public class FacebookAuthProvider extends AuthObject{
     private String secureKey;
 
     public FacebookAuthProvider(FacebookConfiguration facebookConfiguration){
-        this(facebookConfiguration.typeId(),facebookConfiguration.appId(),facebookConfiguration.secretKey(),new String[]{facebookConfiguration.appName()});
+        this(facebookConfiguration.typeId(),facebookConfiguration.appId(),facebookConfiguration.secretKey());
     }
 
-    public FacebookAuthProvider(String typeId,String clientId, String secureKey, String[] origins) {
+    public FacebookAuthProvider(String typeId,String clientId, String secureKey) {
         super(typeId, clientId);
         this.secureKey = secureKey;
         try{

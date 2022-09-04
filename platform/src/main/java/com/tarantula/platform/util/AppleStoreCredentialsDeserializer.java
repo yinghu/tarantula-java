@@ -22,7 +22,7 @@ public class AppleStoreCredentialsDeserializer implements JsonDeserializer<AuthV
         List<TokenValidatorProvider.AuthVendor> _validators = new ArrayList<>();
         jo.get("validators").getAsJsonArray().forEach((a)->{
             JsonObject sk = a.getAsJsonObject();
-            _validators.add(new AppleStoreProvider(sk.get("name").getAsString(),sk.get("key").getAsString()));
+            _validators.add(new AppleStoreProvider(sk.get("name").getAsString(),sk.get("key").getAsString(),true));
         });
         return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE,_validators);
     }
