@@ -35,7 +35,7 @@ public class ViewEventHandler extends AbstractRequestHandler {
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));
-        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
     @Override
     public void start() throws Exception {

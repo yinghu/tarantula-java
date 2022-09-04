@@ -94,7 +94,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onLogin")){
             OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
-            userService.onUpdated(AccessMetrics.WEB_LOGIN_COUNT,1);
+            userService.onUpdated(AccessMetrics.ACCESS_WEB_LOGIN_COUNT,1);
             onSession(access,session);
         }
         else if(session.action().equals("onToken")){//exchange token

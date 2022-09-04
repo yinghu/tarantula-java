@@ -28,8 +28,8 @@ public class StripePaymentProvider extends AuthObject implements AuthVendorRegis
             Charge c = Charge.create(requestParams);
             boolean paid = c.getPaid();
             if(paid) {
-                metricsListener.onUpdated(PaymentMetrics.STRIPE_COUNT,1);
-                metricsListener.onUpdated(PaymentMetrics.STRIPE_AMOUNT,(int)params.get("amount"));
+                metricsListener.onUpdated(PaymentMetrics.PAYMENT_STRIPE_COUNT,1);
+                metricsListener.onUpdated(PaymentMetrics.PAYMENT_STRIPE_AMOUNT,(int)params.get("amount"));
             }
             return  paid;
         }catch (Exception ex){

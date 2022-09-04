@@ -49,7 +49,7 @@ public class PlatformUserService implements UserService {
         PresenceIndex px = new PresenceIndex((Double)onAccess.property(OnAccess.BALANCE));
         px.distributionKey(acc.distributionKey());
         presenceDataStore.create(px);
-        this.metricsListener.onUpdated(AccessMetrics.USER_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(AccessMetrics.ACCESS_USER_CREATION_COUNT,1);
         return acc;
     }
     public Access createUser(String accountId,OnAccess access){
@@ -72,7 +72,7 @@ public class PlatformUserService implements UserService {
             idx.addKey(user.distributionKey());//update on existing
             accountIndexDataStore.update(idx);
         }
-        this.metricsListener.onUpdated(AccessMetrics.USER_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(AccessMetrics.ACCESS_USER_CREATION_COUNT,1);
         return user;
     }
     public boolean updateEmail(OnAccess access){
@@ -107,7 +107,7 @@ public class PlatformUserService implements UserService {
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
-        this.metricsListener.onUpdated(AccessMetrics.SUBSCRIPTION_COUNT,1);
+        this.metricsListener.onUpdated(AccessMetrics.ACCESS_SUBSCRIPTION_COUNT,1);
         return account;
     }
 
@@ -133,7 +133,7 @@ public class PlatformUserService implements UserService {
         membership.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         membershipDataStore.update(membership);
         accountDataStore.update(account);
-        this.metricsListener.onUpdated(AccessMetrics.SUBSCRIPTION_COUNT,1);
+        this.metricsListener.onUpdated(AccessMetrics.ACCESS_SUBSCRIPTION_COUNT,1);
         return membership;
     }
 

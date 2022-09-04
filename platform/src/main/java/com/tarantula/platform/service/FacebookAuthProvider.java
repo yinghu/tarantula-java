@@ -2,7 +2,9 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.configuration.FacebookConfiguration;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -27,8 +29,9 @@ public class FacebookAuthProvider extends AuthObject{
     private String accessToken;
     private String secureKey;
 
-    public FacebookAuthProvider(FacebookConfiguration facebookConfiguration){
+    public FacebookAuthProvider(FacebookConfiguration facebookConfiguration, MetricsListener metricsListener){
         this(facebookConfiguration.typeId(),facebookConfiguration.appId(),facebookConfiguration.secretKey());
+        this.applicationMetricsListener = metricsListener;
     }
 
     public FacebookAuthProvider(String typeId,String clientId, String secureKey) {
@@ -53,7 +56,7 @@ public class FacebookAuthProvider extends AuthObject{
             else{
                 validated = validateMe(params);
             }
-            //if(validated) metricsListener.onUpdated(VendorMetrics.FACEBOOK_COUNT,1);
+            onMetrics(GameClusterMetrics.ACCESS_FACEBOOK_LOGIN_COUNT);
             return validated;
         }catch (Exception ex){
             ex.printStackTrace();

@@ -21,6 +21,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
     protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
+    protected MetricsListener applicationMetricsListener;
 
     public AuthObject(String typeId,String clientId){
         this.typeId = typeId;
@@ -65,4 +66,15 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     public boolean upload(String s, byte[] bytes) {
         return false;
     }
+
+    protected void onMetrics(String category){
+        try{
+            if(applicationMetricsListener!=null) applicationMetricsListener.onUpdated(category,1);
+            metricsListener.onUpdated(category,1);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+
 }

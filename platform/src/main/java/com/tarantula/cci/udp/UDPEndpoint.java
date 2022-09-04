@@ -131,7 +131,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             String ticket = messageBuffer.readUTF8();
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
-            metricsListener.onUpdated(PerformanceMetrics.UDP_REQUEST_COUNT,1);
+            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
             return sessionId==messageHeader.sessionId && suc;
         }catch (Exception ex){
             logger.error("unexpected error on validate",ex);
@@ -152,7 +152,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 messageBuffer.flip();
                 messageBuffer.readHeader();
                 udpChannel.onMessage(messageHeader,messageBuffer);
-                metricsListener.onUpdated(PerformanceMetrics.UDP_REQUEST_COUNT,1);
+                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
             }catch (Exception ex){
                 logger.error("error on message",ex);
             }

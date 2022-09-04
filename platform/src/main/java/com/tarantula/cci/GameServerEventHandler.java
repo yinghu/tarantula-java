@@ -88,7 +88,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             resp.addProperty("token", Base64.getEncoder().encodeToString(cipher.doFinal("hello".getBytes())));
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
-        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     @Override

@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ValidationUtil;
 import com.tarantula.platform.configuration.AppleStoreConfiguration;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.Transaction;
 
 import javax.net.ssl.SSLContext;
@@ -36,8 +38,9 @@ public class AppleStoreProvider extends AuthObject{
     private String secureKey;
     private boolean isSandbox;
 
-    public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration){
+    public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration, MetricsListener metricsListener){
         this(appleStoreConfiguration.typeId(),appleStoreConfiguration.secureKey(),appleStoreConfiguration.isSandbox());
+        this.applicationMetricsListener = metricsListener;
     }
 
     public AppleStoreProvider(String typeId,String key,boolean isSandbox){
@@ -75,6 +78,7 @@ public class AppleStoreProvider extends AuthObject{
                     .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(serviceTypeId,receipt).toString().getBytes()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            onMetrics(GameClusterMetrics.PAYMENT_APPLE_STORE_AMOUNT);
             return checkResponsePayload(response.body(),params);
         }catch (Exception ex){
             ex.printStackTrace();

@@ -593,7 +593,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         if(name.equals(OnAccess.MOCK_STORE)) return new ThirdPartyServiceProvider(OnAccess.MOCK_STORE);//loadMockStoreCredentials();
 
-        if(name.equals(OnAccess.GAME_CENTER)) return new GameCenterAuthProvider();//no config
+        if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);//GameCenterAuthProvider();//no config
 
         if(name.equals(OnAccess.GOOGLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.GOOGLE_STORE);//loadGoogleStoreCredentials();
 

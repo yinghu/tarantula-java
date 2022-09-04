@@ -6,9 +6,11 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.GooglePlayConfiguration;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -38,8 +40,9 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private String applicationId;
     private String secureKey;
 
-    public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration){
+    public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration, MetricsListener metricsListener){
         this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
+        this.applicationMetricsListener = metricsListener;
     }
 
     public GoogleOAuthTokenValidator(String typeId,String clientId, String secureKey,String applicationId,String accessKey) {
@@ -70,6 +73,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             GoogleAuthorizationCodeTokenRequest request =
                     new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,TOKEN_URI,clientId(typeId),secureKey,token,"");
             GoogleTokenResponse response = request.execute();
+            onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
             return verifyPlayer(response.getAccessToken(),params);
         }catch (Exception ex){
             ex.printStackTrace();

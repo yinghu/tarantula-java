@@ -446,7 +446,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
     private void onMetrics(){
-        this.metricsListener.onUpdated(PerformanceMetrics.DATA_STORE_COUNT,1);
+        this.metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_DATA_STORE_COUNT,1);
     }
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

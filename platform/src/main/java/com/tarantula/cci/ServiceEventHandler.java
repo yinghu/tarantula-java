@@ -66,7 +66,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         else{
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
         }
-        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     @Override

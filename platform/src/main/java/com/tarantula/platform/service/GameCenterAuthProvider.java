@@ -1,7 +1,9 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -20,12 +22,23 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 
-public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegistry{
+public class GameCenterAuthProvider extends AuthObject{
 
     private HttpClient client;
 
-    public GameCenterAuthProvider(){
-        super("gameCenter","");
+    public GameCenterAuthProvider(String typeId, MetricsListener metricsListener){
+        super(typeId,"");
+        this.applicationMetricsListener = metricsListener;
+    }
+
+    @Override
+    public String name(){
+        return OnAccess.GAME_CENTER;
+    }
+
+    @Override
+    public void setup(ServiceContext serviceContext){
+        super.setup(serviceContext);
         try{
             SSLContext sct = SSLContext.getInstance("TLS");
             sct.init(null,new TrustManager[]{new GameCenterAuthProvider._X509TrustManager()},null);
@@ -35,15 +48,10 @@ public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegi
         }
     }
     @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-
-    }
-    @Override
     public boolean validate(Map<String,Object> params){
         try{
             boolean verified = verifySignature(params);
-            //metricsListener.onUpdated(VendorMetrics.GAME_CENTER,1);
+            onMetrics(GameClusterMetrics.ACCESS_GAME_CENTER_LOGIN_COUNT);
             return verified;
         }catch (Exception ex){
             ex.printStackTrace();
@@ -72,15 +80,7 @@ public class GameCenterAuthProvider extends AuthObject implements AuthVendorRegi
         return signature.verify(_signature_bytes);
     }
 
-    @Override
-    public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
 
-    }
-
-    @Override
-    public void releaseAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
-
-    }
 
     private class _X509TrustManager implements X509TrustManager {
         private X509Certificate[] certificate;

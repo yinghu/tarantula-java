@@ -17,6 +17,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 abstract public class AbstractMetrics implements Metrics, SchedulingTask, Serviceable {
 
+    //PAYMENT CATEGORY
+    public final static String PAYMENT_GOOGLE_STORE_COUNT = "googleStoreCount";
+    public final static String PAYMENT_APPLE_STORE_COUNT = "appleStoreCount";
+    public final static String PAYMENT_STRIPE_COUNT = "stripeCount";
+
+    public final static String PAYMENT_GOOGLE_STORE_AMOUNT = "googleStoreAmount";
+    public final static String PAYMENT_APPLE_STORE_AMOUNT = "appleStoreAmount";
+    public final static String PAYMENT_STRIPE_AMOUNT = "stripeAmount";
+
+
+    //GAME CATEGORY
+    public final static String GAME_PLAY_COUNT = "playCount";
+
+
+
+    //ACCESS CATEGORY
+    public final static String ACCESS_GOOGLE_LOGIN_COUNT = "googleLoginCount";
+    public final static String ACCESS_WEB_LOGIN_COUNT = "webLoginCount";
+    public final static String ACCESS_DEVICE_LOGIN_COUNT = "deviceLoginCount";
+    public final static String ACCESS_FACEBOOK_LOGIN_COUNT = "facebookLoginCount";
+    public final static String ACCESS_GAME_CENTER_LOGIN_COUNT = "gameCenterLoginCount";
+    public final static String ACCESS_DEVELOPER_LOGIN_COUNT = "developerLoginCount";
+    public final static String ACCESS_AMAZON_S3_COUNT = "amazonS3Count";
+
+
+
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
     private AtomicBoolean atMidnight;
@@ -25,21 +51,39 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     protected DataStore dataStore;
     private SystemStatistics statistics;
     private ServiceContext serviceContext;
-    protected String[] categories;
+    private ArrayList<String> categories;
     protected TarantulaLogger logger;
     protected String name;
+
     public String name(){
         return name;
     }
 
     public void setup(ServiceContext serviceContext){
+        this.categories = new ArrayList<>();
+        this.pendingUpdates = new ConcurrentHashMap<>();
+
+        //register default categories
+        registerCategory(PAYMENT_GOOGLE_STORE_COUNT);
+        registerCategory(PAYMENT_APPLE_STORE_COUNT);
+        registerCategory(PAYMENT_STRIPE_COUNT);
+        registerCategory(PAYMENT_GOOGLE_STORE_AMOUNT);
+        registerCategory(PAYMENT_APPLE_STORE_AMOUNT);
+        registerCategory(PAYMENT_STRIPE_AMOUNT);
+
+        registerCategory(ACCESS_GOOGLE_LOGIN_COUNT);
+        registerCategory(ACCESS_WEB_LOGIN_COUNT);
+        registerCategory(ACCESS_DEVICE_LOGIN_COUNT);
+        registerCategory(ACCESS_FACEBOOK_LOGIN_COUNT);
+        registerCategory(ACCESS_GAME_CENTER_LOGIN_COUNT);
+        registerCategory(ACCESS_DEVELOPER_LOGIN_COUNT);
+        registerCategory(ACCESS_AMAZON_S3_COUNT);
+
+        registerCategory(GAME_PLAY_COUNT);
+
         _setup(serviceContext);
         this.serviceContext = serviceContext;
         atMidnight = new AtomicBoolean(false);
-        this.pendingUpdates = new ConcurrentHashMap<>();
-        for(String category : categories){
-            this.pendingUpdates.put(category,new StatsDelta(category,0));
-        }
         String nodeId = serviceContext.nodeId();
         String dayAndYear = labelDayAndYear(LocalDateTime.now());
         this.statistics = new SystemStatistics();
@@ -124,7 +168,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         next.label(labelDayAndYear(end));
         next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
-        for(String category : categories){
+        categories.forEach(category->{
             SystemStatisticsEntry entry = (SystemStatisticsEntry)next.entry(category);
             if(end.getDayOfWeek().getValue() != 7){//weekly
                 entry.weekly(statistics.entry(category).weekly(),end);
@@ -137,7 +181,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 entry.total(statistics.entry(category).total(),end);
             }
             entry.update();
-        }
+        });
         statistics = next;
         atMidnight.set(false);
     }
@@ -155,5 +199,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     protected LocalDateTime end(){
         return LocalDateTime.now();
+    }
+    protected void registerCategory(String category){
+        if(pendingUpdates.containsKey(category)) return;
+        categories.add(category);
+        pendingUpdates.put(category,new StatsDelta(category,0));
     }
 }

@@ -4,6 +4,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.GameCluster;
@@ -15,6 +16,7 @@ import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.service.*;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
@@ -22,6 +24,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     private GameCluster gameCluster;
     private TarantulaLogger logger;
     private final String gameServiceName;
+    private final String typeId;
 
     private ApplicationPreSetup applicationPreSetup;
 
@@ -29,8 +32,11 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ServiceContext serviceContext;
 
+    private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
+
     public PlatformConfigurationServiceProvider(GameCluster gameCluster){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.typeId = gameServiceName.replace("-service","");
         this.gameCluster = gameCluster;
     }
 
@@ -46,7 +52,9 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     @Override
     public void shutdown() throws Exception {
-
+        registered.forEach((k,v)->{
+            serviceContext.unregisterAuthVendor(v);
+        });
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
@@ -57,9 +65,13 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
                 TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
                 if(a!=null){
                     serviceContext.registerAuthVendor(vendor);
+                    registered.put(vendor.name(),vendor);
                 }
             }
         });
+        GameCenterAuthProvider gameCenterAuthProvider = new GameCenterAuthProvider(typeId,serviceContext.metrics(gameServiceName));
+        serviceContext.registerAuthVendor(gameCenterAuthProvider);
+        registered.put(gameCenterAuthProvider.name(),gameCenterAuthProvider);
         return null;
     }
     @Override
@@ -83,6 +95,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
         this.serviceContext.registerAuthVendor(authVendor);
+        registered.put(authVendor.name(),authVendor);
         return true;
     }
     public boolean onItemReleased(String category,String itemId){
@@ -95,6 +108,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
         this.serviceContext.unregisterAuthVendor(authVendor);
+        this.registered.remove(authVendor.name());
         return true;
     }
 
@@ -112,30 +126,28 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
-        String typeId = gameServiceName.replace("-service","");
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
-            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(typeId,configurableObject));
-            //amazonAWSProvider.registerMetricsLister(gameCluster);
+            AmazonAWSProvider amazonAWSProvider = new AmazonAWSProvider(new AwsS3Configuration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
             return amazonAWSProvider;
         }
         else if(configurableObject.configurationCategory().equals("AppleStoreConfiguration")){
-            AppleStoreProvider appleStoreProvider = new AppleStoreProvider(new AppleStoreConfiguration(typeId,configurableObject));
-            //appleStoreProvider.registerMetricsLister(gameCluster);
+            AppleStoreProvider appleStoreProvider = new AppleStoreProvider(new AppleStoreConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
+            appleStoreProvider.registerMetricsLister(serviceContext.metrics(gameServiceName));
             return appleStoreProvider;
         }
         else if(configurableObject.configurationCategory().equals("FacebookConfiguration")){
-            FacebookAuthProvider facebookAuthProvider = new FacebookAuthProvider(new FacebookConfiguration(typeId,configurableObject));
-            //facebookAuthProvider.registerMetricsLister(gameCluster);
+            FacebookAuthProvider facebookAuthProvider = new FacebookAuthProvider(new FacebookConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
+            facebookAuthProvider.registerMetricsLister(serviceContext.metrics(gameServiceName));
             return facebookAuthProvider;
         }
         else if(configurableObject.configurationCategory().equals("GoogleStoreConfiguration")){
-            GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(new GoogleStoreConfiguration(typeId,configurableObject));
-            //googleStorePurchaseValidator.registerMetricsLister(gameCluster);
+            GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(new GoogleStoreConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
+            googleStorePurchaseValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
             return googleStorePurchaseValidator;
         }
         else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
-            GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject));
-            //googleOAuthTokenValidator.registerMetricsLister(gameCluster);
+            GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
+            googleOAuthTokenValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
             return googleOAuthTokenValidator;
         }
         return null;

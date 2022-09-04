@@ -2,9 +2,11 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.GoogleStoreConfiguration;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -29,8 +31,9 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private String accessKey;
     private String packageName;
 
-    public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration){
+    public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
         this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
+        this.applicationMetricsListener = metricsListener;
     }
 
     public GoogleStorePurchaseValidator(String typeId, String packageName, String accessKey) {
@@ -69,6 +72,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                     .build();
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
             JsonObject payload = JsonUtil.parse(_response.body());
+            onMetrics(GameClusterMetrics.PAYMENT_GOOGLE_STORE_COUNT);
             return (payload.has("orderId")&&payload.get("orderId").getAsString().equals(orderId));
         }catch (Exception ex){
             ex.printStackTrace();

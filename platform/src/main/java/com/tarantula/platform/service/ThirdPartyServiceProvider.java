@@ -59,7 +59,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         aMap.forEach((k,v)->{
-            v.registerMetricsLister((n,d)->{});
+            v.registerMetricsLister(this.metricsListener);
             v.setup(this.serviceContext);
         });
     }
@@ -83,6 +83,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         authVendor.setup(serviceContext);
+        authVendor.registerMetricsLister(this.metricsListener);
         aMap.put(authVendor.typeId(),authVendor);
     }
     public void releaseAuthVendor(TokenValidatorProvider.AuthVendor authVendor){

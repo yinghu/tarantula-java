@@ -2,8 +2,10 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.configuration.AwsS3Configuration;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -20,8 +22,9 @@ public class AmazonAWSProvider extends AuthObject{
     private String bucket;
     private String secretKey;
 
-    public AmazonAWSProvider(AwsS3Configuration configuration){
+    public AmazonAWSProvider(AwsS3Configuration configuration, MetricsListener metricsListener){
         this(configuration.typeId(),configuration.region(),configuration.bucket(),configuration.accessKeyId(),configuration.secretAccessKey());
+        this.applicationMetricsListener = metricsListener;
     }
 
     public AmazonAWSProvider(String typeId,String region,String bucket,String accessKeyId,String secretKey){
@@ -53,6 +56,7 @@ public class AmazonAWSProvider extends AuthObject{
         }
     }
     public boolean upload(String name,byte[] content){
+        onMetrics(GameClusterMetrics.ACCESS_AMAZON_S3_COUNT);
         PutObjectRequest request = PutObjectRequest.builder().bucket(bucket).key(name).build();
         PutObjectResponse response = s3Client.putObject(request, RequestBody.fromBytes(content));
         return response.sdkHttpResponse().isSuccessful();

@@ -39,7 +39,7 @@ public class PresenceEventHandler extends AbstractRequestHandler {
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
-        metricsListener.onUpdated(PerformanceMetrics.HTTP_REQUEST_COUNT,1);
+        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     @Override

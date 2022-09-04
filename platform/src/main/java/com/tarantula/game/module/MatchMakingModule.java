@@ -13,6 +13,7 @@ import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.lobby.LobbyItem;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.Collections;
@@ -44,6 +45,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
             }
+            this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_PLAY_COUNT,1);
         }
         else if(session.action().equals("onTestTournament")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
