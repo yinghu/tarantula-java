@@ -10,6 +10,9 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>    
     <div class="w3-panel">
+        <canvas id="tchart"></canvas>
+    </div>
+    <div class="w3-panel">
         <div id="jsoneditor-game-cluster-metrics-list" style="width: 100%;"></div> 
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -22,13 +25,37 @@
     </div>
 </div>
 <script>
+    const labels = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+    ];
+
+    const data = {
+        labels: labels,
+        datasets: [{
+        label: 'My First dataset',
+        backgroundColor: 'rgb(255, 99, 132)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: [0, 10, 5, 2, 20, 30, 45],
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {}
+    };
     const options ={
         mode : 'tree',
         onCreateMenu : (items, node)=>{
             return [];
         }
     };
-    
+    const ct = new Chart(document.querySelector("#tchart"),config);
     let editor = new JSONEditor(document.querySelector("#jsoneditor-game-cluster-metrics-list"),options,{});
     TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
         editor.set(resp);                          

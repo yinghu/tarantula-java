@@ -51,7 +51,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private DeployService deployService;
     private RecoverService recoverService;
     private CountDownLatch _integrationInstanceStarted ;
-    private MetricsListener metricsListener;
+    private MetricsListener metricsListener =(n,d)->{};
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
@@ -80,7 +80,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public void start() throws Exception {
-        metricsListener = (n,d)->{};
         TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool, poolSize, rh)->{
             this.inboundEventPool = pool;
             this.workerSize = poolSize;
@@ -260,6 +259,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return SystemUtil.partition(magicKey,this.tarantulaContext.platformRoutingNumber);
     }
     public void registerMetricsListener(MetricsListener metricsListener){
+        if(metricsListener == null) return;
         this.metricsListener = metricsListener;
     }
 

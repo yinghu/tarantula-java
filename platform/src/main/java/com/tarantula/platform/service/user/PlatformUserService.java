@@ -29,7 +29,7 @@ public class PlatformUserService implements UserService {
     private int trialMaxUsersPerAccount = 10;
     private int subscribedMaxUsersPerAccount = 10;
 
-    private MetricsListener metricsListener;
+    private MetricsListener metricsListener = (m,v)->{};
 
     @Override
     public Access createUser(OnAccess onAccess) {
@@ -220,7 +220,6 @@ public class PlatformUserService implements UserService {
 
     @Override
     public void setup(ServiceContext serviceContext){
-        metricsListener = (m,v)->{};
         logger = serviceContext.logger(PlatformUserService.class);
         tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
@@ -246,6 +245,7 @@ public class PlatformUserService implements UserService {
     }
 
     public void registerMetricsListener(MetricsListener metricsListener){
+        if(metricsListener == null) return;
         this.metricsListener = metricsListener;
     }
 

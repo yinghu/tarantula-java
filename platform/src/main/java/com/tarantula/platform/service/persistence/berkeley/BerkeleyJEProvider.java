@@ -67,7 +67,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupProvider dBackupProvider;
     private List<String> dataStoreList;
 
-    private MetricsListener metricsListener;
+    private MetricsListener metricsListener = (k,v)->{};
 
     @Override
     public void configure(Map<String, String> properties) {
@@ -212,7 +212,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             fo.close();
         }
         this.dataStoreList = new CopyOnWriteArrayList<>();
-        this.metricsListener = (n,d)->{};
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setSharedCache(true);
@@ -449,6 +448,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_DATA_STORE_COUNT,1);
     }
     public void registerMetricsListener(MetricsListener metricsListener){
+        if(metricsListener==null) return;
         this.metricsListener = metricsListener;
     }
 
