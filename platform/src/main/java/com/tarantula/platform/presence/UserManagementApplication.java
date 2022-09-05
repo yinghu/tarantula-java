@@ -225,6 +225,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"Developer not registered").getBytes());
             }
+            userService.onUpdated(AccessMetrics.ACCESS_DEVELOPER_LOGIN_COUNT,1);
         }
         else if(session.action().equals("onDeveloperRegister")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
@@ -245,6 +246,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onDeveloper","wrong device id", false)).getBytes());
             }
+            userService.onUpdated(AccessMetrics.ACCESS_DEVELOPER_LOGIN_COUNT,1);
         }
         else{
             throw new UnsupportedOperationException(session.action());

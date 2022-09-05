@@ -159,6 +159,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         }
         else{
             udpChannel.onMessage(messageHeader,messageBuffer);
+            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
         }
         return null;
     }

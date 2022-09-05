@@ -8,6 +8,7 @@ public interface Metrics extends Serviceable,MetricsListener{
     String ACCESS = "access";
     String PAYMENT = "payment";
     String DEPLOYMENT = "deployment";
+    String SYSTEM ="system";
 
     String name();
 

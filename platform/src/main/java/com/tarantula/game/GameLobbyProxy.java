@@ -5,6 +5,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.service.*;
 import com.tarantula.platform.lobby.LobbyItem;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -101,6 +102,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
         Stub removed = stubIndex.remove(stubKey.asString());
         removed.zone.leave(removed);
+        gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
         return  removed!=null;
     }
 

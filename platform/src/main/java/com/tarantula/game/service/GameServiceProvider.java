@@ -47,11 +47,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private DataStore serviceDataStore;
+    private MetricsListener metricsListener;
     private Metrics metrics;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
+        metricsListener = (k,v)->{};
     }
 
     public GameLobby lobby(Descriptor descriptor){
@@ -238,8 +240,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     }
 
     @Override
-    public void onUpdated(String s, double v) {
-        metrics.onUpdated(s,v);
+    public void onUpdated(String category, double delta) {
+        metrics.onUpdated(category,delta);
+        metricsListener.onUpdated(category,delta);
     }
 
     @Override
@@ -250,5 +253,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     @Override
     public boolean onItemReleased(String category, String itemId) {
         return false;
+    }
+    public void registerMetricsListener(MetricsListener metricsListener){
+        if(metricsListener== null) return;
+        this.metricsListener = metricsListener;
     }
 }

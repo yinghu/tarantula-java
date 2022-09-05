@@ -28,7 +28,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
 
     //GAME CATEGORY
-    public final static String GAME_PLAY_COUNT = "playCount";
+    public final static String GAME_JOIN_COUNT = "joinCount";
+    public final static String GAME_TIMEOUT_COUNT = "timeoutCount";
 
 
 
@@ -40,8 +41,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     public final static String ACCESS_GAME_CENTER_LOGIN_COUNT = "gameCenterLoginCount";
     public final static String ACCESS_DEVELOPER_LOGIN_COUNT = "developerLoginCount";
     public final static String ACCESS_AMAZON_S3_COUNT = "amazonS3Count";
-
-
 
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
@@ -79,7 +78,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         registerCategory(ACCESS_DEVELOPER_LOGIN_COUNT);
         registerCategory(ACCESS_AMAZON_S3_COUNT);
 
-        registerCategory(GAME_PLAY_COUNT);
+
+        registerCategory(GAME_JOIN_COUNT);
+        registerCategory(GAME_TIMEOUT_COUNT);
 
         _setup(serviceContext);
         this.serviceContext = serviceContext;

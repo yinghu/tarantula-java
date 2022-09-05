@@ -6,6 +6,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,6 +88,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
         Stub removed = stubIndex.remove(stubKey.asString());
         removed.zone.leave(removed);
+        gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
         return  removed!=null;
     }
 
