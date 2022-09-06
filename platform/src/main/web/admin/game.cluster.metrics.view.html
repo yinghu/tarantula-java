@@ -8,12 +8,33 @@
             <span class="tx-margin-left-8 tx-text-24">GameClusterMetrics</span>
         </div>
     </div>
-    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>    
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-panel">
-        <canvas id="tchart"></canvas>
+        <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
+        <select id='tx-gc-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
+            <option value="current">Current</option>
+            <option value="daily" selected>Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearyly</option>  
+        </select>
     </div>
     <div class="w3-panel">
-        <div id="jsoneditor-game-cluster-metrics-list" style="width: 100%;"></div> 
+        <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
+        <select id='tx-gc-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
+            <option value="googleLogin" selected>GoogleLogin</option>
+            <option value="facebookLogin">FacebookLogin</option>   
+        </select>
+    </div>
+    <div class="w3-panel">
+        <canvas id="gcchart"></canvas>
+    </div>
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-right-4">Chart Type :</label>
+        <select id='tx-gc-chart-type' class="w3-select w3-border w3-round tx-text-12" name='chart'>
+            <option value="line" selected>Line</option>
+            <option value="bar">Bar</option>   
+        </select>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -25,6 +46,8 @@
     </div>
 </div>
 <script>
+    let _category = 'daily';
+    let _metrics = 'googleLogin';
     const labels = [
         'January',
         'February',
@@ -32,36 +55,58 @@
         'April',
         'May',
         'June',
+        'July',
+        'August'
     ];
 
     const data = {
         labels: labels,
         datasets: [{
-        label: 'My First dataset',
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: [0, 10, 5, 2, 20, 30, 45],
+            label: _category+'/'+_metrics,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [140, 110, 50, 200, 120, 130, 445,860],
         }]
     };
 
     const config = {
         type: 'line',
         data: data,
-        options: {}
-    };
-    const options ={
-        mode : 'tree',
-        onCreateMenu : (items, node)=>{
-            return [];
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true
+               }
+            }
         }
     };
-    const ct = new Chart(document.querySelector("#tchart"),config);
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-game-cluster-metrics-list"),options,{});
+    Chart.defaults.font.family = 'Oswald';
+    const chart = new Chart(document.querySelector("#gcchart"),config);
     TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
-        editor.set(resp);                          
+        chart.update();                          
     });
+    
+
+    document.querySelector('#tx-gc-chart-type').onchange = ()=>{
+        let chartType = document.querySelector('#tx-gc-chart-type').value;
+        config.type = chartType;
+        chart.update();
+    };
+
+    document.querySelector('#tx-gc-metrics-category').onchange = ()=>{
+        _category = document.querySelector('#tx-gc-metrics-category').value;
+        data.datasets[0].label = _category+'/'+_metrics;
+        chart.update();
+    };
+
+    document.querySelector('#tx-gc-metrics-data').onchange = ()=>{
+        _metrics = document.querySelector('#tx-gc-metrics-data').value;
+        data.datasets[0].label = _category+'/'+_metrics;
+        chart.update();
+    };
+
     document.querySelector('#tx-game-cluster-metrics-list-close').onclick=()=>{
-        editor.destroy();
+        chart.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

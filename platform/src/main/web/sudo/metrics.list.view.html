@@ -9,17 +9,42 @@
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
-    <div class="w3-panel">  
-        <div class='w3-bar w3-white'>
-            <span tx-metrics-category='access' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Access</span>   
-            <span tx-metrics-category='performance' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Performance</span>   
-            <span tx-metrics-category='payment' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Payment</span>  
-            <span tx-metrics-category='deployment' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>Deployment</span>
-            <span tx-metrics-category='system' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-metrics-action'>System</span>    
-        </div>
-    </div>    
     <div class="w3-panel">
-        <div id="jsoneditor-metrics-list" style="width: 100%;"></div> 
+        <label class="tx-text-12 tx-margin-right-4">Metrics Type :</label>
+        <select id='tx-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
+            <option value="performance" selected>Performance</option>
+            <option value="access">Access</option>
+            <option value="payment">Payment</option>
+            <option value="system">System</option>
+            <option value="deployment">Deployment</option>  
+        </select>
+    </div>
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
+        <select id='tx-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
+            <option value="current">Current</option>
+            <option value="daily" selected>Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearyly</option>  
+        </select>
+    </div>
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
+        <select id='tx-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
+            <option value="googleLogin" selected>GoogleLogin</option>
+            <option value="facebookLogin">FacebookLogin</option>   
+        </select>
+    </div>
+    <div class="w3-panel">
+        <canvas id="tchart"></canvas>
+    </div>
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-right-4">Chart Type :</label>
+        <select id='tx-chart-type' class="w3-select w3-border w3-round tx-text-12" name='chart'>
+            <option value="line" selected>Line</option>
+            <option value="bar">Bar</option>   
+        </select>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -31,30 +56,77 @@
     </div>
 </div>
 <script>
-    const options ={
-        mode : 'tree',
-        onCreateMenu : (items, node)=>{
-            return [];
+    let _type = 'performance';
+    let _category = 'daily';
+    let _metrics = 'googleLogin';
+    const labels = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August'
+    ];
+
+    const data = {
+        labels: labels,
+        datasets: [{
+            label:_type+'/'+_category+'/'+_metrics,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [140, 110, 50, 200, 120, 130, 445,860],
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true
+               }
+            }
         }
     };
-    let mname = 'performance';
-    let editor = new JSONEditor(document.querySelector("#jsoneditor-metrics-list"),options,{});
-    _on_metrics();
+    Chart.defaults.font.family = 'Oswald';
+    const chart = new Chart(document.querySelector("#tchart"),config);
+    
+
+    document.querySelector('#tx-chart-type').onchange = ()=>{
+        let chartType = document.querySelector('#tx-chart-type').value;
+        config.type = chartType;
+        chart.update();
+    };
+    document.querySelector('#tx-metrics-type').onchange = ()=>{
+        _type = document.querySelector('#tx-metrics-type').value;
+        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
+        chart.update();
+    };
+
+    document.querySelector('#tx-metrics-category').onchange = ()=>{
+        _category = document.querySelector('#tx-metrics-category').value;
+        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
+        chart.update();
+    };
+
+    document.querySelector('#tx-metrics-data').onchange = ()=>{
+        _metrics = document.querySelector('#tx-metrics-data').value;
+        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
+        chart.update();
+    };
+    
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
-        editor.destroy();
+        chart.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    document.querySelectorAll('.tx-metrics-action').forEach((a)=>{
-        a.onclick =()=>{
-            mname = a.getAttribute('tx-metrics-category');
-            _on_metrics();
-        };
+   
+    TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
+        chart.update();
     });
-    function _on_metrics(){
-        TARA_API.onGet('role/sudo','onMetrics',mname,(resp)=>{
-            editor.set(resp);                          
-        });
-    }
+    
 </script>
