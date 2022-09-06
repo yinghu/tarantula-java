@@ -11,6 +11,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
+import java.util.Random;
 
 
 public class SudoRoleModule implements Module {
@@ -168,7 +169,17 @@ public class SudoRoleModule implements Module {
             Metrics metrics = context.metrics(session.name());
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
-            session.write(adminContext.toJson().toString().getBytes());
+            JsonObject m = new JsonObject();
+            JsonArray ms = new JsonArray();
+            Random r = new Random();
+            for(int i=1;i<=12;i++){
+                JsonObject js = new JsonObject();
+                js.addProperty("x",session.name()+i);
+                js.addProperty("y",i*r.nextInt(1000000));
+                ms.add(js);
+            }
+            m.add("metrics",ms);
+            session.write(m.toString().getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

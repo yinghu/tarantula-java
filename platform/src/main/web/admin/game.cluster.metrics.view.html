@@ -48,15 +48,22 @@
 <script>
     let _category = 'daily';
     let _metrics = 'googleLogin';
+    Chart.defaults.font.family = 'Oswald';
+    //Chart.defaults.backgroundColor = 'rgb(255, 99, 132)';
+    //Chart.defaults.borderColor = 'rgb(255, 99, 132)'; 
     const labels = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August'
+        '2021 10',
+        '2021 11',
+        '2021 12',
+        '2022 01',
+        '2022 02',
+        '2022 03',
+        '2022 04',
+        '2022 05',
+        '2022 06',
+        '2022 07',
+        '2022 08',
+        '2022 09'
     ];
 
     const data = {
@@ -65,7 +72,7 @@
             label: _category+'/'+_metrics,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
-            data: [140, 110, 50, 200, 120, 130, 445,860],
+            data: [140, 110, 50, 200, 120, 130, 445,860,3000,2990,3100,2900],
         }]
     };
 
@@ -80,7 +87,7 @@
             }
         }
     };
-    Chart.defaults.font.family = 'Oswald';
+    
     const chart = new Chart(document.querySelector("#gcchart"),config);
     TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
         chart.update();                          

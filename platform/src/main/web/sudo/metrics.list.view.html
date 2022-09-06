@@ -71,12 +71,12 @@
     ];
 
     const data = {
-        labels: labels,
+        //labels: labels,
         datasets: [{
             label:_type+'/'+_category+'/'+_metrics,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
-            data: [140, 110, 50, 200, 120, 130, 445,860],
+            data: [],
         }]
     };
 
@@ -99,23 +99,27 @@
         let chartType = document.querySelector('#tx-chart-type').value;
         config.type = chartType;
         chart.update();
+        //_load_metrics();
     };
     document.querySelector('#tx-metrics-type').onchange = ()=>{
         _type = document.querySelector('#tx-metrics-type').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
+        //chart.update();
+        _load_metrics();
     };
 
     document.querySelector('#tx-metrics-category').onchange = ()=>{
         _category = document.querySelector('#tx-metrics-category').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
+        //chart.update();
+        _load_metrics();
     };
 
     document.querySelector('#tx-metrics-data').onchange = ()=>{
         _metrics = document.querySelector('#tx-metrics-data').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
+        //chart.update();
+        _load_metrics();
     };
     
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
@@ -124,9 +128,19 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-   
-    TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
+    _load_metrics();
+    //TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
+        //console.log(resp);
+        //data.datasets[0].data = resp.metrics;
+        //chart.update();
+    //});
+
+    function _load_metrics(){
+        TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
+        console.log(resp);
+        data.datasets[0].data = resp.metrics;
         chart.update();
-    });
+        }); 
+    }
     
 </script>
