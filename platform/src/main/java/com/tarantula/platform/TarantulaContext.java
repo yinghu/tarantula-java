@@ -25,6 +25,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
+import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
 import com.tarantula.platform.service.persistence.Node;
 import com.tarantula.platform.util.*;
@@ -102,7 +103,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String,Metrics> mMap = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<String,Metrics> mMap = new ConcurrentHashMap<>();
+    private final MetricsManager metricsManager;
 
     public String dataBucketGroup;
     public String dataBucketNode;
@@ -133,6 +135,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
  	private TarantulaContext(){
  	    this.endpointService = new EndpointService(this);
+ 	    this.metricsManager = new MetricsManager(this);
     }
 
 	public static TarantulaContext getInstance(){
@@ -176,10 +179,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.serviceProviders.put(DeploymentServiceProvider.NAME,this.deploymentServiceProvider);
         new ServiceBootstrap(_tarantulaApplicationStarted,null,this.endpointService,"endPointService",true).start();
         this.schedule(new MidnightCheck(this));
+        this.schedule(metricsManager);
 	}
 	public void shutdown() throws Exception {
-        mMap.forEach((k,v)-> {try{v.shutdown();}catch (Exception ex){}});
-	    this.scheduledExecutorService.shutdown();
+        metricsManager.shutdown();
+        this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
         for(ServiceProvider ds : serviceProviders.values()){
@@ -579,7 +583,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 v.atMidnight();
             });
             endpointService.atMidnight();
-            mMap.forEach((k,v)->v.atMidnight());
+
  	    }catch (Exception ex){
  	        ex.printStackTrace();
  	    }
@@ -928,14 +932,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public Metrics metrics(String name){
-         return mMap.get(name);
+         return metricsManager.metrics(name);
     }
 
     public void registerMetrics(Metrics metrics){
-        mMap.put(metrics.name(),metrics);
+        metricsManager.addMetrics(metrics);
     }
     public void unregisterMetrics(Metrics metrics){
-        mMap.remove(metrics.name());
+        metricsManager.removeMetrics(metrics);
     }
 
     private void initMetricsProvider() throws Exception{
@@ -947,7 +951,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             if(!enabled) continue;
             Metrics metrics = (Metrics) Class.forName(cln).getConstructor().newInstance();
             metrics.setup(this);
-            mMap.put(metrics.name(),metrics);
+            metricsManager.addMetrics(metrics);
         }
  	}
 }

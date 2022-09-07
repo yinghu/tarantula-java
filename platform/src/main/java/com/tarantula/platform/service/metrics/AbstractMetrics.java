@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
-import com.tarantula.platform.DistributedProperty;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.LocalDateTime;
@@ -43,15 +42,22 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
-    private AtomicBoolean atMidnight;
+
+    private AtomicBoolean atHourly;
 
     protected long pendingUpdateInterval = 10000;
+    protected int metricsTrackingNumber = 12;
+
     protected DataStore dataStore;
     private SystemStatistics statistics;
     private ServiceContext serviceContext;
     private ArrayList<String> categories;
     protected TarantulaLogger logger;
     protected String name;
+
+    protected String bucket;
+    protected String oid;
+
 
     public String name(){
         return name;
@@ -83,7 +89,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
         _setup(serviceContext);
         this.serviceContext = serviceContext;
-        atMidnight = new AtomicBoolean(false);
+        atHourly = new AtomicBoolean(false);
         String nodeId = serviceContext.nodeId();
         String dayAndYear = labelDayAndYear(LocalDateTime.now());
         this.statistics = new SystemStatistics();
@@ -91,8 +97,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         this.statistics.label(dayAndYear);
         this.statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
+        this.bucket = this.statistics.bucket();
+        this.oid = this.statistics.oid();
         serviceContext.schedule(this);
-        logger.warn("Metrics ["+name+"] has registered");
+        logger.warn("Metrics ["+name+"] has registered with update rate at ["+(pendingUpdateInterval/1000)+"] seconds");
     }
 
 
@@ -122,7 +130,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     @Override
     public void run(){
-        if(atMidnight.get()) return;
+        if(atHourly.get()) return;
         _run();
     }
     private void _run() {
@@ -154,7 +162,60 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     }
 
     public Property[] snapshot(String category, String classifier){
-        return processMetrics(category,classifier);
+        Property[] properties = new Property[metricsTrackingNumber];
+        LocalDateTime _cur = LocalDateTime.now();
+        switch (classifier){
+            case "hourly":
+                LocalDateTime hf = _cur.minusMinutes(_cur.getMinute());
+                HourlyMetrics hourlyMetrics = new HourlyMetrics(metricsTrackingNumber);
+                hourlyMetrics.name(category);
+                hourlyMetrics.bucket(this.bucket);
+                hourlyMetrics.oid(this.oid);
+                hourlyMetrics.dataStore(this.dataStore);
+                if(this.dataStore.load(hourlyMetrics)){
+                    logger.warn(hourlyMetrics.key().asString());
+                    Property[] mts = hourlyMetrics.metrics();
+                    for(int i=0;i<metricsTrackingNumber;i++){
+                        properties[i]= mts[i];
+                    }
+                }else{
+                    for(int i=0;i<metricsTrackingNumber;i++){
+                        String xh = hf.minusHours(11-i).format(DateTimeFormatter.ofPattern("hh:mm a"));
+                        hourlyMetrics.property(new MetricsProperty(i,xh,i));
+                    }
+                    hourlyMetrics.update();
+                }
+                break;
+            case "daily":
+                for(int i=0;i<12;i++){
+                    String xd = _cur.minusDays(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    properties[i]= new MetricsProperty(0,xd,1);
+                }
+                break;
+            case "weekly":
+                LocalDateTime wf = _cur.minusDays(_cur.getDayOfWeek().getValue()-1);//toMonday
+                for(int i=0;i<12;i++){
+                    String xw = wf.minusWeeks(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    properties[i]= new MetricsProperty(i,xw,1);
+                }
+                break;
+            case "monthly":
+                LocalDateTime mf = _cur.minusDays(_cur.getDayOfMonth()-1);//toFirstDayOfMonth
+                for(int i=0;i<12;i++){
+                    String xm = mf.minusMonths(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    properties[i]= new MetricsProperty(i,xm,1);
+                }
+                break;
+            case "yearly":
+                LocalDateTime yf = _cur.minusDays(_cur.getDayOfYear()-1);//toFirstDayOfYear
+                for(int i=0;i<12;i++){
+                    String xd = yf.minusYears(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    properties[i]= new MetricsProperty(i,xd,1);
+                }
+                break;
+
+        }
+        return properties;
     }
 
     @Override
@@ -168,7 +229,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     }
 
     public void atMidnight(){
-        atMidnight.set(true);
+        atHourly.set(true);
         this._run();
         LocalDateTime end = end();
         SystemStatistics next = new SystemStatistics();
@@ -191,7 +252,11 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             entry.update();
         });
         statistics = next;
-        atMidnight.set(false);
+        atHourly.set(false);
+    }
+
+    public void atHourly(){
+
     }
 
     private String labelDayAndYear(LocalDateTime today){
@@ -214,41 +279,47 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         pendingUpdates.put(category,new StatsDelta(category,0));
     }
     protected Property[] processMetrics(String category,String classifier){
-        Property[] properties = new Property[12];
+        Property[] properties = new Property[metricsTrackingNumber];
         LocalDateTime _cur = LocalDateTime.now();
         switch (classifier){
             case "hourly":
                 LocalDateTime hf = _cur.minusMinutes(_cur.getMinute());
-                for(int i=0;i<12;i++){
+                HourlyMetrics hourlyMetrics = new HourlyMetrics(metricsTrackingNumber);
+                hourlyMetrics.name(category);
+                hourlyMetrics.bucket(this.bucket);
+                hourlyMetrics.oid(this.oid);
+                hourlyMetrics.dataStore(this.dataStore);
+                for(int i=0;i<metricsTrackingNumber;i++){
                     String xh = hf.minusHours(11-i).format(DateTimeFormatter.ofPattern("hh:mm a"));
-                    properties[i]= new DistributedProperty(xh,1);
+                    hourlyMetrics.property(new MetricsProperty(i,xh,1));
                 }
+                hourlyMetrics.update();
                 break;
             case "daily":
                 for(int i=0;i<12;i++){
                     String xd = _cur.minusDays(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    properties[i]= new DistributedProperty(xd,1);
+                    properties[i]= new MetricsProperty(0,xd,1);
                 }
                 break;
             case "weekly":
                 LocalDateTime wf = _cur.minusDays(_cur.getDayOfWeek().getValue()-1);//toMonday
                 for(int i=0;i<12;i++){
                     String xw = wf.minusWeeks(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    properties[i]= new DistributedProperty(xw,1);
+                    properties[i]= new MetricsProperty(i,xw,1);
                 }
                 break;
             case "monthly":
                 LocalDateTime mf = _cur.minusDays(_cur.getDayOfMonth()-1);//toFirstDayOfMonth
                 for(int i=0;i<12;i++){
                     String xm = mf.minusMonths(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    properties[i]= new DistributedProperty(xm,1);
+                    properties[i]= new MetricsProperty(i,xm,1);
                 }
                 break;
             case "yearly":
                 LocalDateTime yf = _cur.minusDays(_cur.getDayOfYear()-1);//toFirstDayOfYear
                 for(int i=0;i<12;i++){
                     String xd = yf.minusYears(11-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    properties[i]= new DistributedProperty(xd,1);
+                    properties[i]= new MetricsProperty(i,xd,1);
                 }
                 break;
 
