@@ -165,17 +165,24 @@ public class SudoRoleModule implements Module {
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
-        else if(session.action().equals("onMetrics")){
+        else if(session.action().equals("onMetricsCategory")){
             Metrics metrics = context.metrics(session.name());
-            MetricsContext adminContext = new MetricsContext();
-            adminContext.metrics = metrics;
+            List<String> categories = metrics.categories();
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
-            Random r = new Random();
-            for(int i=1;i<=12;i++){
+            categories.forEach(category->ms.add(category));
+            m.add("categories",ms);
+            session.write(m.toString().getBytes());
+        }
+        else if(session.action().equals("onMetrics")){
+            String[] query = session.name().split("#");
+            Metrics metrics = context.metrics(query[0]);
+            JsonObject m = new JsonObject();
+            JsonArray ms = new JsonArray();
+            for(Property p : metrics.snapshot(query[2],query[1])){
                 JsonObject js = new JsonObject();
-                js.addProperty("x",session.name()+i);
-                js.addProperty("y",i*r.nextInt(1000000));
+                js.addProperty("x",p.name());
+                js.addProperty("y",p.value().toString());
                 ms.add(js);
             }
             m.add("metrics",ms);

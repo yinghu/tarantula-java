@@ -1,6 +1,9 @@
 package com.icodesoftware.service;
 
+import com.icodesoftware.Property;
 import com.icodesoftware.Statistics;
+
+import java.util.List;
 
 public interface Metrics extends Serviceable,MetricsListener{
 
@@ -11,10 +14,13 @@ public interface Metrics extends Serviceable,MetricsListener{
     String SYSTEM ="system";
 
     String name();
+    List<String> categories();
 
     void setup(ServiceContext serviceContext);
 
     Statistics statistics();
 
     void atMidnight();
+
+    Property[] snapshot(String category, String classifier);
 }

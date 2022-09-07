@@ -22,8 +22,8 @@
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
         <select id='tx-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
-            <option value="current">Current</option>
-            <option value="daily" selected>Daily</option>
+            <option value="hourly" selected>Hourly</option>
+            <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearyly</option>  
@@ -32,8 +32,7 @@
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
         <select id='tx-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
-            <option value="googleLogin" selected>GoogleLogin</option>
-            <option value="facebookLogin">FacebookLogin</option>   
+            
         </select>
     </div>
     <div class="w3-panel">
@@ -57,21 +56,12 @@
 </div>
 <script>
     let _type = 'performance';
-    let _category = 'daily';
-    let _metrics = 'googleLogin';
-    const labels = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August'
-    ];
+    let _category = 'hourly';
+    let _metrics = '';
+    let _metricsBar = document.querySelector('#tx-metrics-data');
+    let _metricsLoaded = '';
 
     const data = {
-        //labels: labels,
         datasets: [{
             label:_type+'/'+_category+'/'+_metrics,
             backgroundColor: 'rgb(255, 99, 132)',
@@ -99,26 +89,28 @@
         let chartType = document.querySelector('#tx-chart-type').value;
         config.type = chartType;
         chart.update();
-        //_load_metrics();
     };
     document.querySelector('#tx-metrics-type').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
         _type = document.querySelector('#tx-metrics-type').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        //chart.update();
-        _load_metrics();
+        chart.update();
+        _load_metrics_categories();
     };
 
     document.querySelector('#tx-metrics-category').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
         _category = document.querySelector('#tx-metrics-category').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        //chart.update();
+        chart.update();
         _load_metrics();
     };
 
     document.querySelector('#tx-metrics-data').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
         _metrics = document.querySelector('#tx-metrics-data').value;
         data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        //chart.update();
+        chart.update();
         _load_metrics();
     };
     
@@ -128,18 +120,33 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    _load_metrics();
-    //TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
-        //console.log(resp);
-        //data.datasets[0].data = resp.metrics;
-        //chart.update();
-    //});
+    _load_metrics_categories();
+    
+    function _load_metrics_categories(){
+        _metricsLoaded = 'loading';
+        TARA_API.onGet('role/sudo','onMetricsCategory',_type,(resp)=>{
+            console.log(resp);
+            let tem =[];
+            _metricsBar.innerHTML='';
+            resp.categories.forEach((category,i) => {
+                if(i==0){
+                    _metrics = category;
+                    tem.push('<option value=\''+category+'\' selected>'+category+'</option>');
+                }else{
+                    tem.push('<option value=\''+category+'\'>'+category+'</option>');
+                }
+            });
+            _metricsBar.innerHTML = tem.join('');
+            _load_metrics();
+            _metricsLoaded = '';
+        }); 
+    }
 
     function _load_metrics(){
-        TARA_API.onGet('role/sudo','onMetrics',_type,(resp)=>{
-        console.log(resp);
-        data.datasets[0].data = resp.metrics;
-        chart.update();
+        TARA_API.onGet('role/sudo','onMetrics',_type+'#'+_category+'#'+_metrics,(resp)=>{
+            console.log(resp);
+            data.datasets[0].data = resp.metrics;
+            chart.update();
         }); 
     }
     

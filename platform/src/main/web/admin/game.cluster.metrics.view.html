@@ -8,12 +8,18 @@
             <span class="tx-margin-left-8 tx-text-24">GameClusterMetrics</span>
         </div>
     </div>
-    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div> 
+    <div class="w3-panel">
+        <label class="tx-text-12 tx-margin-right-4">Metrics Type :</label>
+        <select id='tx-gc-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
+            <option value="gameCluster" selected>GameCluster</option>  
+        </select>
+    </div>  
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
         <select id='tx-gc-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
-            <option value="current">Current</option>
-            <option value="daily" selected>Daily</option>
+            <option value="hourly" selected>Hourly</option>
+            <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearyly</option>  
@@ -46,11 +52,10 @@
     </div>
 </div>
 <script>
-    let _category = 'daily';
+    let _category = 'hourly';
     let _metrics = 'googleLogin';
+    let _type = 'gameCluster';
     Chart.defaults.font.family = 'Oswald';
-    //Chart.defaults.backgroundColor = 'rgb(255, 99, 132)';
-    //Chart.defaults.borderColor = 'rgb(255, 99, 132)'; 
     const labels = [
         '2021 10',
         '2021 11',
@@ -100,6 +105,12 @@
         chart.update();
     };
 
+    document.querySelector('#tx-gc-metrics-type').onchange = ()=>{
+        _type = document.querySelector('#tx-gc-metrics-type').value;
+        //data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
+        //chart.update();
+        //_load_metrics();
+    };
     document.querySelector('#tx-gc-metrics-category').onchange = ()=>{
         _category = document.querySelector('#tx-gc-metrics-category').value;
         data.datasets[0].label = _category+'/'+_metrics;
