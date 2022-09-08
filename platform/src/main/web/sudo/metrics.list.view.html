@@ -59,8 +59,12 @@
     let _category = 'hourly';
     let _metrics = '';
     let _metricsBar = document.querySelector('#tx-metrics-data');
-    let _metricsLoaded = '';
-
+    let _metricsLoaded = 'loading';
+    let _timer = setInterval(()=>{
+        if(_metricsLoaded != 'loading'){
+            _load_metrics();
+        }     
+    },10000);
     const data = {
         datasets: [{
             label:_type+'/'+_category+'/'+_metrics,
@@ -115,13 +119,13 @@
     };
     
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
+        clearInterval(_timer);
         chart.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
     _load_metrics_categories();
-    
     function _load_metrics_categories(){
         _metricsLoaded = 'loading';
         TARA_API.onGet('role/sudo','onMetricsCategory',_type,(resp)=>{

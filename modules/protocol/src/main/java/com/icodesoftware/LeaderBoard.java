@@ -2,6 +2,7 @@ package com.icodesoftware;
 
 public interface LeaderBoard {
 
+    String HOURLY = "hourly";
     String DAILY = "daily";
     String WEEKLY = "weekly";
     String MONTHLY = "monthly";

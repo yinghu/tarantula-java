@@ -20,9 +20,6 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.name = category;
         this.index = classifier;
         this.metrics = new Property[trackingNumber];
-        for(int i=0;i<trackingNumber;i++){
-            this.metrics[i] = new MetricsProperty(i,"x"+i,0);
-        }
     }
 
     public MetricsSnapshot(){
@@ -73,7 +70,16 @@ public class MetricsSnapshot extends RecoverableObject  {
         return new ResourceKey(this.bucket,oid,new String[]{index,name});
     }
 
-    public void property(Property property){
+    public void initialize(Property property){
         metrics[property.routingNumber()]=property;
+    }
+    public void update(double currentData){
+        ((MetricsProperty)metrics[trackingNumber-1]).value = currentData;
+    }
+    public void push(Property property){
+        for(int i=0;i<trackingNumber-1;i++){
+            metrics[i]=metrics[i+1];
+        }
+        metrics[trackingNumber-1] = property;
     }
 }
