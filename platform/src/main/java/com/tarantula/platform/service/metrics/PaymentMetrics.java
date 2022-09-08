@@ -10,6 +10,7 @@ public class PaymentMetrics extends AbstractMetrics{
     @Override
     void _setup(ServiceContext serviceContext) {
         this.name = Metrics.PAYMENT;
+        this.paymentIncluded = true;
         this.logger = serviceContext.logger(PaymentMetrics.class);
         this.dataStore = serviceContext.dataStore("payment_metrics",serviceContext.partitionNumber());
     }

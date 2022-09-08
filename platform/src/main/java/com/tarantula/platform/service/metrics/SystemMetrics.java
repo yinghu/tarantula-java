@@ -10,6 +10,9 @@ public class SystemMetrics extends AbstractMetrics{
     @Override
     void _setup(ServiceContext serviceContext) {
         this.name = Metrics.SYSTEM;
+        this.accessIncluded = true;
+        this.gameIncluded = true;
+        this.paymentIncluded = true;
         this.logger = serviceContext.logger(SystemMetrics.class);
         this.dataStore = serviceContext.dataStore("system_metrics",serviceContext.partitionNumber());
     }

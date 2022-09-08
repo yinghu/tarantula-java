@@ -39,4 +39,9 @@ public class TimeUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return LocalDateTime.from(formatter.parse(dateTime));
     }
+    public static long durationToNextHour(){
+        LocalDateTime _cur = LocalDateTime.now();
+        LocalDateTime _end = _cur.plusHours(1).minusSeconds(_cur.getMinute()*60+_cur.getSecond());
+        return Duration.between(_cur,_end).toMillis();
+    }
 }

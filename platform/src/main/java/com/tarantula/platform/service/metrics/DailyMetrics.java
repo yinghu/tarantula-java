@@ -9,7 +9,7 @@ import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.util.Map;
 
-public class DailyMetrics extends RecoverableObject {
+public class DailyMetrics extends RecoverableObject  {
 
     private Property[] metrics;
     private int trackingNumber;

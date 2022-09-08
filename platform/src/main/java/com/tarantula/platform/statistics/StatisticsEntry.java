@@ -16,6 +16,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
 
     private String name;
     private double total=0;
+    private double hourly = 0;
     private double daily=0;
     private double weekly=0;
     private double monthly=0;
@@ -51,6 +52,12 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     public double total() {
         return this.total;
     }
+
+    @Override
+    public double hourly() {
+        return hourly;
+    }
+
 
     @Override
     public double daily() {

@@ -17,10 +17,12 @@ public interface Statistics extends Recoverable{
     interface Entry extends Recoverable, DataStore.Updatable{
         String name();
         double total();
+        double hourly();
         double daily();
         double weekly();
         double monthly();
         double yearly();
+
         Entry update(double delta);
     }
     interface Stream{

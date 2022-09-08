@@ -9,13 +9,13 @@ import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.time.LocalDateTime;
-import java.time.temporal.IsoFields;
 import java.util.Map;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
     private String name;
     private double total=0;
+    private double hourly=0;
     private double daily=0;
     private double weekly=0;
     private double monthly=0;
@@ -34,6 +34,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     }
     public SystemStatisticsEntry(Statistics.Entry entry){
         this.name = entry.name();
+        this.hourly = entry.hourly();
         this.daily = entry.daily();
         this.weekly = entry.weekly();
         this.monthly = entry.monthly();
@@ -53,6 +54,14 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     }
     void total(double total,LocalDateTime update){
         this.total = total;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
+    @Override
+    public double hourly() {
+        return hourly;
+    }
+    void hourly(double hourly,LocalDateTime update){
+        this.hourly = hourly;
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
@@ -90,6 +99,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     @Override
     public synchronized Statistics.Entry update(double delta) {
         LocalDateTime _now = LocalDateTime.now();
+        hourly += delta;
         daily += delta;
         weekly += delta;
         monthly += delta;
@@ -114,6 +124,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("total",total);
+        this.properties.put("hourly",hourly);
         this.properties.put("daily",daily);
         this.properties.put("weekly",weekly);
         this.properties.put("monthly",monthly);
@@ -124,6 +135,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     @Override
     public void fromMap(Map<String,Object> properties){
         this.total = ((Number)properties.get("total")).doubleValue();
+        this.hourly =((Number)properties.get("hourly")).doubleValue();
         this.daily =((Number)properties.get("daily")).doubleValue();
         this.weekly = ((Number)properties.get("weekly")).doubleValue();
         this.monthly =((Number)properties.get("monthly")).doubleValue();
@@ -155,6 +167,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("Hourly",hourly);
         jsonObject.addProperty("Daily",daily);
         jsonObject.addProperty("Weekly",weekly);
         jsonObject.addProperty("Monthly",monthly);

@@ -42,6 +42,16 @@ public class AdminRoleModule implements Module{
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
+        else if(session.action().equals("onGameClusterMetricsCategory")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            Metrics metrics = context.metrics((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            List<String> categories = metrics.categories();
+            JsonObject m = new JsonObject();
+            JsonArray ms = new JsonArray();
+            categories.forEach(category->ms.add(category));
+            m.add("categories",ms);
+            session.write(m.toString().getBytes());
+        }
         else if(session.action().equals("onGameClusterMetrics")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Metrics metrics = context.metrics((String) gameCluster.property(GameCluster.GAME_SERVICE));

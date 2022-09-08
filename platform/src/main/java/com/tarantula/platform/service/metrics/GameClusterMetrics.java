@@ -11,6 +11,9 @@ public class GameClusterMetrics extends AbstractMetrics{
     }
     @Override
     void _setup(ServiceContext serviceContext) {
+        this.gameIncluded = true;
+        this.paymentIncluded = true;
+        this.accessIncluded = true;
         this.logger = serviceContext.logger(GameClusterMetrics.class);
         this.dataStore = serviceContext.dataStore(name.replaceAll("-","_")+"_game_cluster_metrics",serviceContext.partitionNumber());
     }

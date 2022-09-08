@@ -24,6 +24,8 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
     public static final int MONTHLY_METRICS_CID = 14;
     public static final int YEARLY_METRICS_CID = 15;
 
+    public static final int METRICS_SNAPSHOT_CID = 16;
+
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -60,6 +62,9 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
                 break;
             case YEARLY_METRICS_CID:
                 pt = new YearlyMetrics();
+                break;
+            case METRICS_SNAPSHOT_CID:
+                pt = new MetricsSnapshot();
                 break;
             default:
         }

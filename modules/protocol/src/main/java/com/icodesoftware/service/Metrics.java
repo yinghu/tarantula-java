@@ -20,7 +20,7 @@ public interface Metrics extends Serviceable,MetricsListener{
 
     Statistics statistics();
 
-    void atMidnight();
+    void atHourly();
 
     Property[] snapshot(String category, String classifier);
 }

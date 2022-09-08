@@ -28,8 +28,6 @@
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
         <select id='tx-gc-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
-            <option value="googleLogin" selected>GoogleLogin</option>
-            <option value="facebookLogin">FacebookLogin</option>   
         </select>
     </div>
     <div class="w3-panel">
@@ -55,6 +53,7 @@
     let _category = 'hourly';
     let _metrics = 'googleLogin';
     let _type = 'gameCluster';
+    let _metricsLoaded ='';
     Chart.defaults.font.family = 'Oswald';
     const labels = [
         '2021 10',
@@ -94,9 +93,7 @@
     };
     
     const chart = new Chart(document.querySelector("#gcchart"),config);
-    TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
-        chart.update();                          
-    });
+    
     
 
     document.querySelector('#tx-gc-chart-type').onchange = ()=>{
@@ -114,13 +111,15 @@
     document.querySelector('#tx-gc-metrics-category').onchange = ()=>{
         _category = document.querySelector('#tx-gc-metrics-category').value;
         data.datasets[0].label = _category+'/'+_metrics;
-        chart.update();
+        //chart.update();
+        _load_gc_metrics();
     };
 
     document.querySelector('#tx-gc-metrics-data').onchange = ()=>{
         _metrics = document.querySelector('#tx-gc-metrics-data').value;
         data.datasets[0].label = _category+'/'+_metrics;
-        chart.update();
+        _load_gc_metrics();
+        //chart.update();
     };
 
     document.querySelector('#tx-game-cluster-metrics-list-close').onclick=()=>{
@@ -129,4 +128,31 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
+    _load_gc_metrics_categories();
+    function _load_gc_metrics_categories(){
+        _metricsLoaded = 'loading';
+        let _metricsBar = document.querySelector('#tx-gc-metrics-data');
+        TARA_API.onGet('role/admin','onGameClusterMetricsCategory',TARA_API.query().gameClusterId,(resp)=>{
+            console.log(resp);
+            let tem =[];
+            _metricsBar.innerHTML='';
+            resp.categories.forEach((category,i) => {
+                if(i==0){
+                    _metrics = category;
+                    tem.push('<option value=\''+category+'\' selected>'+category+'</option>');
+                }else{
+                    tem.push('<option value=\''+category+'\'>'+category+'</option>');
+                }
+            });
+            _metricsBar.innerHTML = tem.join('');
+            _load_gc_metrics();
+            _metricsLoaded = '';
+        }); 
+    }
+
+    function _load_gc_metrics(){
+        TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
+            chart.update();                          
+        });
+    }
 </script>
