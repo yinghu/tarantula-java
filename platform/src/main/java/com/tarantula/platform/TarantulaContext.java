@@ -54,6 +54,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public static CountDownLatch _systemServiceStarted;
 
+
     public AtomicBoolean node_started;
 
     public static CountDownLatch _access_index_syc_finished;
@@ -155,13 +156,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         _systemServiceStarted = new CountDownLatch(1);
         _access_index_syc_finished = new CountDownLatch(1);
         node_started = new AtomicBoolean(false);
-
-        ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
-        new ServiceBootstrap(new CountDownLatch(0),null,spc,"service-provider",true).start();
         DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
@@ -502,12 +500,16 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             v.setup(this);
             v.waitForData();//block for global data sync
         });
+        //bootstrap user service providers
+        ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
+        spc.start(this);
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
         this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
     }
     public void _syncNodeData() throws Exception{
+        _systemServiceStarted.await();
  	    this.accessIndexService().onDisable();
  	    _access_index_syc_finished.await();
  	    for(int i=0;i<accessIndexRoutingNumber;i++){

@@ -94,6 +94,7 @@ public class SampleLoad {
                         long st = System.currentTimeMillis();
                         //httpCaller.index();
                         httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
+                        Thread.sleep(1000);
                         long ed = System.currentTimeMillis()-st;
                         timeRun.addAndGet(ed);
                     }catch (Exception ex){
@@ -114,7 +115,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,500000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.19:8090",null,500000);
         sampleLoad._init();
         sampleLoad.register();
         //PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");

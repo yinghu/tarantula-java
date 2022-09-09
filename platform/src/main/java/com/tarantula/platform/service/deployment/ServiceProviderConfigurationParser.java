@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.deployment;
 
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.service.Serviceable;
 import org.xml.sax.Attributes;
@@ -12,7 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ServiceProviderConfigurationParser extends DefaultHandler implements Serviceable {
+public class ServiceProviderConfigurationParser extends DefaultHandler  {
 
 
     private ArrayList<ServiceProviderConfiguration> configurationMapping = new ArrayList<>();
@@ -45,19 +46,17 @@ public class ServiceProviderConfigurationParser extends DefaultHandler implement
     public void characters(char[] ch, int start, int length) throws SAXException {
     }
 
-    @Override
-    public void start() throws Exception {
+    //@Override
+    public void start(ServiceContext serviceContext) throws Exception {
         parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(_config));
         configurationMapping.forEach((sp)->{
             ServiceProvider s = newServiceProvider(sp.serviceProviderImplementation);
+            s.setup(serviceContext);
+            s.waitForData();
             _loaded.put(s.name(),s);
         });
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
     private ServiceProvider newServiceProvider(String cname){
         try {
             ServiceProvider sp = (ServiceProvider) Class.forName(cname).getConstructor().newInstance();
