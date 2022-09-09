@@ -44,4 +44,9 @@ public class TimeUtil {
         LocalDateTime _end = _cur.plusHours(1).minusSeconds(_cur.getMinute()*60+_cur.getSecond());
         return Duration.between(_cur,_end).toMillis();
     }
+
+    public static long durationToNextHour(LocalDateTime start){
+        LocalDateTime _end = start.plusHours(1).minusSeconds(start.getMinute()*60+start.getSecond());
+        return Duration.between(start,_end).toMillis();
+    }
 }
