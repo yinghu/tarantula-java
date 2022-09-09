@@ -3,6 +3,8 @@ package com.tarantula.test;
 
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
+import com.tarantula.platform.service.metrics.MetricsHistory;
+import com.tarantula.platform.service.metrics.MetricsProperty;
 import com.tarantula.platform.service.metrics.MetricsSnapshot;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import org.testng.Assert;
@@ -114,6 +116,20 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
+    }
+
+    @Test(groups = { "PerformanceMetrics" })
+    public void metricsHistoryTest() {
+        MetricsHistory metricsHistory = new MetricsHistory(12);
+        for(int i=0;i<12;i++) {
+            metricsHistory.push(new MetricsProperty(i, "m"+i, i));
+        }
+        int ix =0;
+        for(Property p : metricsHistory.metrics()){
+            Assert.assertEquals(p.name().equals("m"+ix),true);
+            Assert.assertEquals(p.value().equals(ix),true);
+            ix++;
+        }
     }
 
     private class MockMetrics extends PerformanceMetrics{

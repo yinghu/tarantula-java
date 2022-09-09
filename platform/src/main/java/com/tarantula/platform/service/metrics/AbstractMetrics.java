@@ -313,9 +313,11 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
                 Property history = snapshot.push(property);
-                MetricsHistory metricsHistory = new MetricsHistory();
+                MetricsHistory metricsHistory = new MetricsHistory(MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
                 metricsHistory.distributionKey(historyLabel(category,LeaderBoard.HOURLY,end));
-                System.out.println(metricsHistory.key().asString());
+                this.dataStore.createIfAbsent(metricsHistory,true);
+                metricsHistory.push(history);
+                this.dataStore.update(metricsHistory);
                 this.dataStore.update(snapshot);
                 //reset hourly metrics
                 entry.hourly(0,end);

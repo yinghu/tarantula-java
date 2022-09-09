@@ -17,10 +17,8 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
     public static final int SYSTEM_STATISTICS_CID = 9;
 
     public static final int METRICS_PROPERTY_CID= 11;
-
-
-    public static final int METRICS_SNAPSHOT_CID = 16;
-
+    public static final int METRICS_SNAPSHOT_CID = 12;
+    public static final int METRICS_HISTORY_CID = 13;
 
     public Recoverable create(int i) {
         Recoverable pt = null;
@@ -45,6 +43,9 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
                 break;
             case METRICS_SNAPSHOT_CID:
                 pt = new MetricsSnapshot();
+                break;
+            case METRICS_HISTORY_CID:
+                pt = new MetricsHistory();
                 break;
             default:
         }
