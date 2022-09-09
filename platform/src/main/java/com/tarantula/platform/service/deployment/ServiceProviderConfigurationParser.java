@@ -2,7 +2,6 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.icodesoftware.service.Serviceable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
