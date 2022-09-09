@@ -241,10 +241,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         this.run();
     }
 
-    public void atMidnight(LocalDateTime end){
+    private void atMidnight(LocalDateTime end){
         SystemStatistics next = new SystemStatistics();
-        next.distributionKey(this.serviceContext.nodeId());
-        next.label(labelDayAndYear(end));
+        next.distributionKey(this.serviceContext.nodeId()+Recoverable.PATH_SEPARATOR+labelDayAndYear(end));
         next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
         categories.forEach(category->{
@@ -324,6 +323,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             }
         }catch (Exception ex){
             //ignore
+            ex.printStackTrace();
         }
         finally {
             lock.unlock();
