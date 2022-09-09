@@ -437,7 +437,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.info("Platform deployment provider started");
+        //log.info("Platform deployment provider started");
     }
 
     @Override

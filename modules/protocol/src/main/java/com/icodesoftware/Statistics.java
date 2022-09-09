@@ -12,7 +12,7 @@ public interface Statistics extends Recoverable{
     List<Entry> summary();
     void summary(Stream query);
 
-    void registerListener(Listener listener);
+    default void registerListener(Listener listener){}
 
     interface Entry extends Recoverable, DataStore.Updatable{
         String name();
