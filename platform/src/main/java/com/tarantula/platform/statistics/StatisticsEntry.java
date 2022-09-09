@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
-    private String name;
+    //private String name;
     private double total=0;
     private double hourly = 0;
     private double daily=0;

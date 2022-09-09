@@ -139,8 +139,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         String nodeId = serviceContext.nodeId();
         String dayAndYear = labelDayAndYear(LocalDateTime.now());
         this.statistics = new SystemStatistics();
-        this.statistics.distributionKey(nodeId);
-        this.statistics.label(dayAndYear);
+        this.statistics.distributionKey(nodeId+Recoverable.PATH_SEPARATOR+dayAndYear);
         this.statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
         this.bucket = this.statistics.bucket();
@@ -199,6 +198,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 if(p.value>0){
                     Statistics.Entry e = statistics.entry(p.name);
                     e.update(p.value).update();
+                    //logger.warn(e.key().asString());
                     metricsSnapshot(e.name(),LeaderBoard.HOURLY).update(e.hourly());
                     metricsSnapshot(e.name(),LeaderBoard.DAILY).update(e.daily());
                     metricsSnapshot(e.name(),LeaderBoard.WEEKLY).update(e.weekly());

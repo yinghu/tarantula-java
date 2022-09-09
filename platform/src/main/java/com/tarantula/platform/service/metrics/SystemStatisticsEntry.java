@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
-    private String name;
+    //private String name;
     private double total=0;
     private double hourly=0;
     private double daily=0;
@@ -22,9 +22,9 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     private double yearly=0;
 
     private boolean loaded;
-    private Statistics.Listener listener;
+
     public SystemStatisticsEntry(){
-        this.label = "Stats";
+        this.label = "category";
     }
     public SystemStatisticsEntry(String bucket, String oid, String name){
         this();
@@ -33,6 +33,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.name = name;
     }
     public SystemStatisticsEntry(Statistics.Entry entry){
+        this();
         this.name = entry.name();
         this.hourly = entry.hourly();
         this.daily = entry.daily();
@@ -41,9 +42,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.yearly = entry.yearly();
         this.total = entry.total();
     }
-    public void listener(Statistics.Listener listener){
-        this.listener = listener;
-    }
+
     @Override
     public String name() {
         return name;
@@ -106,9 +105,6 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         yearly += delta;
         total += delta;
         timestamp = TimeUtil.toUTCMilliseconds(_now);
-        if(listener!=null){
-            listener.entryUpdated(this);
-        }
         return this;
     }
     @Override
@@ -147,6 +143,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
         bucket = k[0];
         oid = k[1];
+        label = k[2];
         name = k[3];
     }
     @Override
@@ -161,7 +158,8 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
             return false;
         }
         loaded = true;
-        return this.dataStore.createIfAbsent(this,true);
+        this.dataStore.createIfAbsent(this,true);
+        return true;
     }
     @Override
     public JsonObject toJson(){

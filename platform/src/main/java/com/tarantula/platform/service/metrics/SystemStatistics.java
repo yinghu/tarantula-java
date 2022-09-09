@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
@@ -16,9 +17,6 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
 
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
-
-    public void registerListener(Listener listener){
-    }
 
     public Entry entry(String key) {
         SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
@@ -36,7 +34,6 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     public List<Entry> summary(){
         ArrayList<Entry> elist = new ArrayList<>();
         mappings.forEach((k,v)->{
-            v.load();
             elist.add(v.duplicate());
         });
         return elist;
@@ -44,7 +41,6 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     //original streaming
     public void summary(Stream query){
         mappings.forEach((k,v)->{
-            v.load();
             query.onEntry(v);
         });
     }
@@ -60,8 +56,9 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
 
     @Override
     public Map<String,Object> toMap(){
+        this.properties.clear();
         this.mappings.forEach((k,v)->{
-            this.properties.put(v.name(),"");//index stats name
+            this.properties.put(v.name(),"1");//index stats name
         });
         return this.properties;
     }
@@ -70,8 +67,16 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         properties.forEach((k,v)->{
             SystemStatisticsEntry entry = new SystemStatisticsEntry(this.bucket,this.oid,k);
             entry.dataStore(this.dataStore);
+            //entry.load();
             mappings.put(k,entry);
         });
+    }
+    public void distributionKey(String distributionKey){
+        //parse key
+        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        bucket = k[0];
+        oid = k[1];
+        label = k[2];
     }
     @Override
     public Key key(){
