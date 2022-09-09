@@ -61,5 +61,7 @@ public interface DataStore {
         int partitionNumber();
 
         long totalRecords();
+
+        DataStore dataStore();
     }
 }

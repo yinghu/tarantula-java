@@ -107,7 +107,7 @@ public class PlatformUserService implements UserService {
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
-        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
         return account;
     }
 

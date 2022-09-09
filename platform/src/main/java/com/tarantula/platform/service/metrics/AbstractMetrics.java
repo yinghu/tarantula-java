@@ -54,6 +54,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     //ACCOUNT CATEGORY
     public final static String ACCOUNT_USER_CREATION_COUNT = "userCreationCount";
+    public final static String ACCOUNT_ACCOUNT_CREATION_COUNT = "accountCreationCount";
+
     public final static String ACCOUNT_SUBSCRIPTION_COUNT = "subscriptionCount";
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
@@ -128,6 +130,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
         if(accountIncluded){
             registerCategory(ACCOUNT_USER_CREATION_COUNT);
+            registerCategory(ACCOUNT_ACCOUNT_CREATION_COUNT);
             registerCategory(ACCOUNT_SUBSCRIPTION_COUNT);
         }
 
@@ -144,6 +147,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         this.dataStore.createIfAbsent(statistics,true);
         this.bucket = this.statistics.bucket();
         this.oid = this.statistics.oid();
+        logger.warn("Metrics statistics loaded->"+statistics.key().asString());
         serviceContext.schedule(this);
         logger.warn("Metrics ["+name+"] has registered with update rate at ["+(pendingUpdateInterval/1000)+"] seconds");
     }
@@ -199,11 +203,11 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                     Statistics.Entry e = statistics.entry(p.name);
                     e.update(p.value).update();
                     //logger.warn(e.key().asString());
-                    metricsSnapshot(e.name(),LeaderBoard.HOURLY).update(e.hourly());
-                    metricsSnapshot(e.name(),LeaderBoard.DAILY).update(e.daily());
-                    metricsSnapshot(e.name(),LeaderBoard.WEEKLY).update(e.weekly());
-                    metricsSnapshot(e.name(),LeaderBoard.MONTHLY).update(e.monthly());
-                    metricsSnapshot(e.name(),LeaderBoard.YEARLY).update(e.yearly());
+                    metricsSnapshot(e.name(),LeaderBoard.HOURLY).update(e.hourly()).update();
+                    metricsSnapshot(e.name(),LeaderBoard.DAILY).update(e.daily()).update();
+                    metricsSnapshot(e.name(),LeaderBoard.WEEKLY).update(e.weekly()).update();
+                    metricsSnapshot(e.name(),LeaderBoard.MONTHLY).update(e.monthly()).update();
+                    metricsSnapshot(e.name(),LeaderBoard.YEARLY).update(e.yearly()).update();
                 }
             }catch (Exception ex){
                 //ignore
@@ -384,6 +388,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             pending.bucket(bucket);
             pending.oid(oid);
             initialize(classifier,pending);
+            pending.dataStore(this.dataStore);
             this.dataStore.createIfAbsent(pending,true);
             return pending;
         });

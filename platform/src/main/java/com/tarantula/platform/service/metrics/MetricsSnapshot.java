@@ -73,8 +73,9 @@ public class MetricsSnapshot extends RecoverableObject  {
     public void initialize(Property property){
         metrics[property.routingNumber()]=property;
     }
-    public void update(double currentData){
+    public MetricsSnapshot update(double currentData){
         ((MetricsProperty)metrics[trackingNumber-1]).value = currentData;
+        return this;
     }
     public void push(Property property){
         for(int i=0;i<trackingNumber-1;i++){

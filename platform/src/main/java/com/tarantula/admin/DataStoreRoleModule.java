@@ -8,7 +8,9 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.UserService;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.List;
@@ -45,13 +47,22 @@ public class DataStoreRoleModule implements Module {
             session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStore")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String dataStore = onAccess.property("dataStore").toString();
-            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(dataStore);
+            String[] query = session.name().split("#");
+            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             summary.addProperty("name",sum.name());
             summary.addProperty("partitionNumber",sum.partitionNumber());
             summary.addProperty("totalRecords",sum.totalRecords());
+            if(sum.dataStore()!=null&&query[1]!=null){
+                byte[] data = sum.dataStore().backup().get(query[1].getBytes());
+                if(data!=null) {
+                    RevisionObject revisionObject = RevisionObject.fromBinary(data);
+                    JsonObject debug = new JsonObject();
+                    debug.addProperty("revision",Long.toString(revisionObject.revision));
+                    debug.add("payload",JsonUtil.parse(revisionObject.data));
+                    summary.add("debug",debug);
+                }
+            }
             session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onAccessIndexStore")){

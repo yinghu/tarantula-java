@@ -7,7 +7,7 @@ public class DataStoreSummary implements DataStore.Summary {
     public String  name;
     public int partitionNumber;
     public long totalRecords;
-
+    public DataStore dataStore;
     @Override
     public String name() {
         return name;
@@ -21,5 +21,9 @@ public class DataStoreSummary implements DataStore.Summary {
     @Override
     public long totalRecords() {
         return totalRecords;
+    }
+
+    public DataStore dataStore(){
+        return dataStore;
     }
 }

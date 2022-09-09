@@ -13,6 +13,10 @@
         <label class="tx-text-16 tx-margin-left-4">Data Store Name</label>
         <input id='tx-data-store-name' class="w3-input tx-text-16" type="text">    
     </div>
+    <div class="w3-panel  tx-margin-bottom-8">
+        <label class="tx-text-16 tx-margin-left-4">Data Store Key</label>
+        <input id='tx-data-store-key' class="w3-input tx-text-16" type="text">    
+    </div>
     <div class='w3-panel w3-border-bottom w3-border-red'>
        <span id="tx-data-store-load" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Load</span>       
     </div>
@@ -38,7 +42,8 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-load"),options,{});
     document.querySelector('#tx-data-store-load').onclick=()=>{
         let _c = document.querySelector('#tx-data-store-name').value;
-        TARA_API.onService(true,{serviceTag:'role/datastore',command:'onLoadDataStore',dataStore:_c},(resp)=>{
+        let _k = document.querySelector('#tx-data-store-key').value;
+        TARA_API.onGet('role/datastore','onLoadDataStore',_c+"#"+_k,(resp)=>{
             editor.set(resp);                          
         });    
     };

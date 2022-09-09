@@ -771,6 +771,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DataStore ds = this.tarantulaContext.dataStore(dataStore);
         summary.partitionNumber = ds.partitionNumber();
         summary.totalRecords = ds.count();
+        summary.dataStore = ds;
         return summary;
     }
     public List<String> listClusterMember(){
