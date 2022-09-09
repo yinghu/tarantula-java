@@ -15,8 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemStatistics extends RecoverableObject implements Statistics {
 
-    private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
+    final static String LABEL_PREFIX = "statistics";
+
+    private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     public Entry entry(String key) {
         SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{

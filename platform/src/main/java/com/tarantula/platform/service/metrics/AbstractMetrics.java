@@ -140,7 +140,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         }
         this.serviceContext = serviceContext;
         String nodeId = serviceContext.nodeId();
-        String dayAndYear = labelDayAndYear(LocalDateTime.now());
+        String dayAndYear = labelDayAndYear(SystemStatistics.LABEL_PREFIX,LocalDateTime.now());
         this.statistics = new SystemStatistics();
         this.statistics.distributionKey(nodeId+Recoverable.PATH_SEPARATOR+dayAndYear);
         this.statistics.dataStore(this.dataStore);
@@ -243,7 +243,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     private void atMidnight(LocalDateTime end){
         SystemStatistics next = new SystemStatistics();
-        next.distributionKey(this.serviceContext.nodeId()+Recoverable.PATH_SEPARATOR+labelDayAndYear(end));
+        next.distributionKey(this.serviceContext.nodeId()+Recoverable.PATH_SEPARATOR+labelDayAndYear(SystemStatistics.LABEL_PREFIX,end));
         next.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(next,true);
         categories.forEach(category->{
@@ -312,7 +312,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 LocalDateTime hf = end.minusMinutes(end.getMinute()).plusHours(1);
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
-                snapshot.push(property);
+                Property history = snapshot.push(property);
+                MetricsHistory metricsHistory = new MetricsHistory();
+                metricsHistory.distributionKey(historyLabel(category,LeaderBoard.HOURLY,end));
+                System.out.println(metricsHistory.key().asString());
                 this.dataStore.update(snapshot);
                 //reset hourly metrics
                 entry.hourly(0,end);
@@ -331,9 +334,12 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     }
 
-
-    private String labelDayAndYear(LocalDateTime today){
-        return today.getYear()+"_"+today.getDayOfYear();
+    private String historyLabel(String category,String classifier,LocalDateTime today){
+        String prefix = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_").append(classifier).toString();
+        return labelDayAndYear(prefix,today);
+    }
+    private String labelDayAndYear(String prefix,LocalDateTime today){
+        return new StringBuffer().append(prefix).append("_").append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
     }
     private String categoryKey(String category,String classifier){
         return new StringBuffer().append(category).append("_").append(classifier).toString();
