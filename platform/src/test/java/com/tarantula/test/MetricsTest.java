@@ -120,16 +120,17 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsHistoryTest() {
-        MetricsHistory metricsHistory = new MetricsHistory(12);
-        for(int i=0;i<12;i++) {
-            metricsHistory.push(new MetricsProperty(i, "m"+i, i));
-        }
-        int ix =0;
-        for(Property p : metricsHistory.metrics()){
-            Assert.assertEquals(p.name().equals("m"+ix),true);
-            Assert.assertEquals(p.value().equals(ix),true);
-            ix++;
-        }
+        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        LocalDateTime end = LocalDate.parse("2022-08-07").atTime(LocalTime.MIDNIGHT).minusHours(1);
+        MockMetrics metrics = new MockMetrics(end);
+        metrics.setup(serviceContext);
+        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
+        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
+        metrics.atHourly();
+        Property[] his = metrics.history(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,LeaderBoard.HOURLY,end,end);
+        String hkey = end.getYear()+"/"+end.getDayOfYear()+"/"+end.getHour();
+        Assert.assertEquals(his[0].name().equals(hkey),true);
+        Assert.assertEquals(his[1]==null,true);
     }
 
     private class MockMetrics extends PerformanceMetrics{

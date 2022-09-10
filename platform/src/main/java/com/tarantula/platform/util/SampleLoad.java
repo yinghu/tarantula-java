@@ -2,16 +2,9 @@ package com.tarantula.platform.util;
 
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
-import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.TimeUtil;
 
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -116,7 +109,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,100000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,10000);
         sampleLoad._init();
         sampleLoad.register();
         //PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");

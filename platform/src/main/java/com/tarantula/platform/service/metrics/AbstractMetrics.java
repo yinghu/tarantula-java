@@ -83,6 +83,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     private Lock lock = new ReentrantLock();
 
     private ConcurrentHashMap<String, MetricsSnapshot> snapshots;
+    private ConcurrentHashMap<String,MetricsHistory> archives;
 
 
     public String name(){
@@ -93,6 +94,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         this.categories = new ArrayList<>();
         this.pendingUpdates = new ConcurrentHashMap<>();
         this.snapshots = new ConcurrentHashMap<>();
+        this.archives = new ConcurrentHashMap<>();
         _setup(serviceContext);
         //register default categories
         if(paymentIncluded) {
@@ -229,8 +231,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
-    public Property[] history(String category, String classifier, LocalDateTime start,LocalDateTime end){
-        return new Property[0];
+    public Property[] history(String category, String classifier,LocalDateTime start,LocalDateTime end){
+        MetricsHistory metricsHistory = metricsHistory(category,classifier,start,MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
+        return metricsHistory.metrics();
     }
 
     @Override
@@ -244,7 +247,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     }
 
     private void atMidnight(LocalDateTime end){
-        logger.warn("Running midnight check at ["+end+"]");
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId()+Recoverable.PATH_SEPARATOR+labelDayAndYear(SystemStatistics.LABEL_PREFIX,end));
         next.dataStore(this.dataStore);
@@ -316,11 +318,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
                 Property history = snapshot.push(property);
-                //history
-                MetricsHistory metricsHistory = new MetricsHistory(MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
-                metricsHistory.distributionKey(historyLabel(category,LeaderBoard.HOURLY,end));
-                this.dataStore.createIfAbsent(metricsHistory,true);
-                metricsHistory.push(new MetricsProperty(end.getYear()+"/"+end.getDayOfYear()+"/"+end.getHour(),history.value()));
+                //archive history hourly
+                MetricsHistory metricsHistory = metricsHistory(category,LeaderBoard.HOURLY,end,MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
+                metricsHistory.push(new MetricsProperty(historyPropertyLabel(end),history.value()));
                 this.dataStore.update(metricsHistory);
                 this.dataStore.update(snapshot);
                 //reset hourly metrics
@@ -339,7 +339,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         }
 
     }
-
+    private String historyPropertyLabel(LocalDateTime current){
+        return new StringBuffer().append(current.getYear()).append(Recoverable.PATH_SEPARATOR).append(current.getDayOfYear()).append(Recoverable.PATH_SEPARATOR).append(current.getHour()).toString();
+    }
     private String historyLabel(String category,String classifier,LocalDateTime today){
         String prefix = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_").append(classifier).toString();
         return labelDayAndYear(prefix,today);
@@ -405,7 +407,15 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             return pending;
         });
     }
-
+    private MetricsHistory metricsHistory(String category,String classifier,LocalDateTime end,int bufferSize){
+        String akey = historyLabel(category,classifier,end);
+        return archives.computeIfAbsent(akey,k->{
+            MetricsHistory metricsHistory = new MetricsHistory(bufferSize);
+            metricsHistory.distributionKey(akey);
+            this.dataStore.createIfAbsent(metricsHistory,true);
+            return metricsHistory;
+        });
+    }
     /**
      * set data store
      * set categories
