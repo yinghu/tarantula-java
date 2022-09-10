@@ -22,6 +22,10 @@ public class MetricsProperty extends RecoverableObject implements Property {
         this.name = name;
         this.value = value;
     }
+    public MetricsProperty(String name, Object value){
+        this.name = name;
+        this.value = value;
+    }
 
 
     @Override

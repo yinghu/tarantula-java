@@ -244,6 +244,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     }
 
     private void atMidnight(LocalDateTime end){
+        logger.warn("Running midnight check at ["+end+"]");
         SystemStatistics next = new SystemStatistics();
         next.distributionKey(this.serviceContext.nodeId()+Recoverable.PATH_SEPARATOR+labelDayAndYear(SystemStatistics.LABEL_PREFIX,end));
         next.dataStore(this.dataStore);
@@ -319,7 +320,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 MetricsHistory metricsHistory = new MetricsHistory(MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
                 metricsHistory.distributionKey(historyLabel(category,LeaderBoard.HOURLY,end));
                 this.dataStore.createIfAbsent(metricsHistory,true);
-                metricsHistory.push(history);
+                metricsHistory.push(new MetricsProperty(end.getYear()+"/"+end.getDayOfYear()+"/"+end.getHour(),history.value()));
                 this.dataStore.update(metricsHistory);
                 this.dataStore.update(snapshot);
                 //reset hourly metrics
