@@ -229,7 +229,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
-
+    public Property[] history(String category, String classifier, LocalDateTime start,LocalDateTime end){
+        return new Property[0];
+    }
 
     @Override
     public void start() throws Exception {
@@ -313,6 +315,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
                 Property history = snapshot.push(property);
+                //history
                 MetricsHistory metricsHistory = new MetricsHistory(MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
                 metricsHistory.distributionKey(historyLabel(category,LeaderBoard.HOURLY,end));
                 this.dataStore.createIfAbsent(metricsHistory,true);

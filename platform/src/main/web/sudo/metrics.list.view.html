@@ -36,6 +36,26 @@
         </select>
     </div>
     <div class="w3-panel">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Metrics Archive View</legend>
+            <div class="w3-container"><p class="tx-text-12 w3-text-red">Select start and end date before today. Then mark checkbox below</p></div>
+            <div class="w3-container">
+                <div class="w3-panel">
+                    <label class="tx-text-12 tx-margin-right-4">Archived Metrics</label>
+                    <input id='tx-metrics-history-enabled' class="w3-check tx-text-12" type="checkbox">
+                </div>
+                <div class="w3-panel">
+                    <label class="tx-text-12 tx-margin-right-4">Start Date :</label></br>
+                    <input id='tx-metrics-history-start-date' class="w3-date-local tx-text-12" type="datetime-local">
+                </div>
+                <div class="w3-panel">
+                    <label class="tx-text-12 tx-margin-right-4">End Date :</label></br>
+                    <input id='tx-metrics-history-end-date' class="w3-date-local tx-text-12" type="datetime-local">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="w3-panel">
         <canvas id="tchart"></canvas>
     </div>
     <div class="w3-panel">
@@ -117,7 +137,12 @@
         chart.update();
         _load_metrics();
     };
-    
+    document.querySelector('#tx-metrics-history-enabled').onchange = ()=>{
+        let ched = document.querySelector('#tx-metrics-history-enabled').checked;
+        if(ched){
+            console.log("history arcive checked->"+ched);
+        }
+    };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
         clearInterval(_timer);
         chart.destroy();

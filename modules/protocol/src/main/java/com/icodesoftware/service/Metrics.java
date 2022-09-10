@@ -3,6 +3,7 @@ package com.icodesoftware.service;
 import com.icodesoftware.Property;
 import com.icodesoftware.Statistics;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface Metrics extends Serviceable,MetricsListener{
@@ -23,4 +24,5 @@ public interface Metrics extends Serviceable,MetricsListener{
     void atHourly();
 
     Property[] snapshot(String category, String classifier);
-}
+    Property[] history(String category, String classifier, LocalDateTime start,LocalDateTime end);
+ }
