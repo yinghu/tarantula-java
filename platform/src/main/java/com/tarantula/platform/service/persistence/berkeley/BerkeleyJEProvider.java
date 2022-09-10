@@ -54,7 +54,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private boolean dailyBackup;
     private int replicationNodeNumber = 3;
 
-    private Node node;
+    private ClusterNode node;
 
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
@@ -80,7 +80,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
         this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
-        this.node = new Node(properties.get("bucket"),properties.get("node"));
+        this.node = new ClusterNode(properties.get("bucket"),properties.get("node"));
         this.replicationPoolSetting = properties.get("poolSetting");
     }
     public void addBackupProvider(BackupProvider backProvider){
@@ -91,7 +91,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             dBackupProvider = backProvider;
         }
     }
-    public Node node(){
+    public ClusterNode node(){
         return this.node;
     }
     @Override
@@ -456,14 +456,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private static class AccessIndexDataStore extends ReplicatedDataStore {
 
         private final Database berkeleyStore;
-        private final Node node;
+        private final ClusterNode node;
         private final MapStoreListener mapStoreListener;
         private final String dataStore;
         private final int partition;
         private final Metadata metadata1;
 
 
-        public AccessIndexDataStore(Node node,Database database,MapStoreListener mapStoreListener){
+        public AccessIndexDataStore(ClusterNode node, Database database, MapStoreListener mapStoreListener){
             this.node = node;
             this.berkeleyStore = database;
             this.dataStore = this.berkeleyStore.getDatabaseName();

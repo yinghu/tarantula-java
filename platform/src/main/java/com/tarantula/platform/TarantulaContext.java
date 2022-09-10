@@ -27,7 +27,7 @@ import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
-import com.tarantula.platform.service.persistence.Node;
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.*;
 
 
@@ -109,7 +109,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String dataBucketGroup;
     public String dataBucketNode;
-    private Node node;
+    private ClusterNode node;
     public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
@@ -145,7 +145,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
-        this.node = new Node(this.dataBucketGroup,this.dataBucketNode);
+        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode);
  	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);

@@ -1,7 +1,10 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.EventListener;
+
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 public interface ClusterProvider extends Serviceable {
 
@@ -52,6 +55,24 @@ public interface ClusterProvider extends Serviceable {
 
         void lock(byte[] key);
         void unlock(byte[] key);
+
+    }
+
+    interface Summary{
+        String clusterName();
+        LocalDateTime startTime();
+        List<Node> clusterNodes();
+    }
+
+    interface Node{
+
+        String bucketName();
+        String nodeName();
+        String bucketId();
+        String nodeId();
+
+        String memberId();
+        LocalDateTime startTime();
 
     }
 

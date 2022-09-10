@@ -80,6 +80,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     List<String> listDataStore();
     List<String> listClusterMember();
     DataStore.Summary validDataStore(String dataStore);
+    ClusterProvider.Summary clusterSummary();
 
     RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
     void unregisterRecoverableListener(String topic);
