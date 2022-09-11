@@ -343,8 +343,24 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         return new StringBuffer().append(current.getYear()).append(Recoverable.PATH_SEPARATOR).append(current.getDayOfYear()).append(Recoverable.PATH_SEPARATOR).append(current.getHour()).toString();
     }
     private String historyLabel(String category,String classifier,LocalDateTime today){
-        String prefix = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_").append(classifier).toString();
-        return labelDayAndYear(prefix,today);
+        StringBuffer buffer = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid);
+        buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_").append(classifier).append("_");
+        int day = today.getDayOfYear();
+        int hour = today.getHour();
+        int year = today.getYear();
+        if(day == 1 && hour==0){ //new year midnight
+            year = year-1;
+            day = today.minusHours(1).getDayOfYear();
+            buffer.append(year).append("_").append(day);
+            return buffer.toString();
+        }
+        if(hour == 0){ //every midnight
+            day = day-1; //save last hour data into previous day
+            buffer.append(year).append("_").append(day);
+            return buffer.toString();
+        }
+        buffer.append(year).append("_").append(day);
+        return buffer.toString();
     }
     private String labelDayAndYear(String prefix,LocalDateTime today){
         return new StringBuffer().append(prefix).append("_").append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
