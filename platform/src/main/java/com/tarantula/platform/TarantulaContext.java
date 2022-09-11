@@ -145,7 +145,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 	public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
-        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode);
  	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);
@@ -279,7 +278,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
- 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+ 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
@@ -299,8 +298,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
-        lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
-        lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new OnViewQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+        lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));
+        lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));
         this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
@@ -314,8 +313,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()},false);
-        //lc.views = this.queryFromDataMaster(PortableRegistry.OID,new OnViewQuery(lobbyDescriptor.distributionKey()),new String[]{lobbyDescriptor.distributionKey()});
+        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionKey()));
         //this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
@@ -326,12 +324,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new LobbyQuery(publishingId),new String[]{publishingId},false);
+        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));//this.queryFromIntegrationNode(memberId,PortableRegistry.OID,new ApplicationQuery(d.distributionKey()),new String[]{d.distributionKey()},false);
+            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionKey()));
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onUpdated(ob);
@@ -488,6 +486,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
+        this.node = this.dataStoreProvider().node();
         AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);

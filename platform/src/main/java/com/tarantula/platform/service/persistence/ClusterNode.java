@@ -1,11 +1,15 @@
 package com.tarantula.platform.service.persistence;
 
 
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.service.ClusterProvider;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class ClusterNode implements ClusterProvider.Node {
+public class ClusterNode implements ClusterProvider.Node, Portable {
 
     public String bucketName;
     public String nodeName;
@@ -50,5 +54,25 @@ public class ClusterNode implements ClusterProvider.Node {
     @Override
     public LocalDateTime startTime() {
         return null;
+    }
+
+    @Override
+    public int getFactoryId() {
+        return 0;
+    }
+
+    @Override
+    public int getClassId() {
+        return 0;
+    }
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+
+    }
+
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+
     }
 }
