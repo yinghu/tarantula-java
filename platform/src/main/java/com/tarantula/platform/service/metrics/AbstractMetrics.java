@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.LocalDateTime;
@@ -142,7 +143,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         }
         this.serviceContext = serviceContext;
         String nodeId = serviceContext.nodeId();
-        String dayAndYear = labelDayAndYear(SystemStatistics.LABEL_PREFIX,LocalDateTime.now());
+        LocalDateTime _cur = LocalDateTime.now();
+        String dayAndYear = labelDayAndYear(SystemStatistics.LABEL_PREFIX,_cur);
         this.statistics = new SystemStatistics();
         this.statistics.distributionKey(nodeId+Recoverable.PATH_SEPARATOR+dayAndYear);
         this.statistics.dataStore(this.dataStore);
@@ -150,6 +152,21 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         this.bucket = this.statistics.bucket();
         this.oid = this.statistics.oid();
         logger.warn("Metrics statistics loaded->"+statistics.key().asString());
+        //reset snapshots
+        for(String category : categories){
+            MetricsSnapshot snapshot = metricsSnapshot(category,LeaderBoard.HOURLY);
+            if(!snapshot.validate(_cur)){
+                logger.warn("Snapshot is going to reset ["+category+"]");
+                Property[] archived = snapshot.metrics();
+                for(Property p : archived) {
+                    LocalDateTime updated = TimeUtil.fromUTCMilliseconds(p.timestamp());
+                    MetricsHistory metricsHistory = metricsHistory(category, LeaderBoard.HOURLY,updated, MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
+                    metricsHistory.archiveHourly(new MetricsProperty(metricsTrackingNumber-1,historyPropertyLabel(updated),p.value(),updated));
+                }
+                initialize(LeaderBoard.HOURLY,snapshot,_cur);
+            }
+            metricsHistory(category,LeaderBoard.HOURLY,_cur,MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
+        }
         serviceContext.schedule(this);
         logger.warn("Metrics ["+name+"] has registered with update rate at ["+(pendingUpdateInterval/1000)+"] seconds");
     }
@@ -257,7 +274,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             MetricsSnapshot md = metricsSnapshot(category,LeaderBoard.DAILY);
             md.update(daily);
             String xd = end.plusDays(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-            Property pd = new MetricsProperty(metricsTrackingNumber-1,xd,0);
+            Property pd = new MetricsProperty(metricsTrackingNumber-1,xd,0,end.plusDays(1));
             md.push(pd,end);
             this.dataStore.update(md);
 
@@ -269,7 +286,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 MetricsSnapshot mw = metricsSnapshot(category,LeaderBoard.WEEKLY);
                 mw.update(weekly);
                 String xw = end.plusDays(7).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                Property pw = new MetricsProperty(metricsTrackingNumber-1,xw,0);
+                Property pw = new MetricsProperty(metricsTrackingNumber-1,xw,0,end.plusDays(7));
                 mw.push(pw,end);
                 this.dataStore.update(mw);
 
@@ -282,7 +299,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 MetricsSnapshot mm = metricsSnapshot(category,LeaderBoard.MONTHLY);
                 mm.update(monthly);
                 String xm = end.plusMonths(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                Property pm = new MetricsProperty(metricsTrackingNumber-1,xm,0);
+                Property pm = new MetricsProperty(metricsTrackingNumber-1,xm,0,end.plusMonths(1));
                 mm.push(pm,end);
                 this.dataStore.update(mm);
             }
@@ -295,7 +312,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 MetricsSnapshot my = metricsSnapshot(category,LeaderBoard.MONTHLY);
                 my.update(yearly);
                 String xy = end.plusYears(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                Property py = new MetricsProperty(metricsTrackingNumber-1,xy,0);
+                Property py = new MetricsProperty(metricsTrackingNumber-1,xy,0,end.plusYears(1));
                 my.push(py,end);
                 this.dataStore.update(my);
             }
@@ -316,11 +333,11 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 snapshot.update(hourly);
                 LocalDateTime hf = end.minusMinutes(end.getMinute()).plusHours(1);
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
-                Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
+                Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0,hf);
                 Property history = snapshot.push(property,end);
                 //archive history hourly
                 MetricsHistory metricsHistory = metricsHistory(category,LeaderBoard.HOURLY,end,MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
-                metricsHistory.push(new MetricsProperty(historyPropertyLabel(end),history.value()));
+                metricsHistory.archiveHourly(new MetricsProperty(metricsTrackingNumber-1,historyPropertyLabel(end),history.value(),end));
                 this.dataStore.update(metricsHistory);
                 this.dataStore.update(snapshot);
                 //reset hourly metrics
@@ -368,43 +385,48 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     private String categoryKey(String category,String classifier){
         return new StringBuffer().append(category).append("_").append(classifier).toString();
     }
-    private void initialize(String classifier,MetricsSnapshot metricsSnapshot){
-        LocalDateTime _cur = LocalDateTime.now();
+    private void initialize(String classifier,MetricsSnapshot metricsSnapshot,LocalDateTime current){
+        LocalDateTime _cur = current;//LocalDateTime.now();
         int track = metricsTrackingNumber-1;
         switch (classifier){
             case LeaderBoard.HOURLY:
                 LocalDateTime hf = _cur.minusMinutes(_cur.getMinute()).plusHours(1);
                 for(int i=0;i<metricsTrackingNumber;i++){
-                    String xh = hf.minusHours(track-i).format(DateTimeFormatter.ofPattern("hh:mm a"));
-                    metricsSnapshot.initialize(new MetricsProperty(i,xh,0));
+                    LocalDateTime xhf = hf.minusHours(track-i);
+                    String xh = xhf.format(DateTimeFormatter.ofPattern("hh:mm a"));
+                    metricsSnapshot.initialize(new MetricsProperty(i,xh,0,xhf),_cur);
                 }
                 break;
             case LeaderBoard.DAILY:
                 LocalDateTime df = _cur.plusDays(1);
                 for(int i=0;i<metricsTrackingNumber;i++){
-                    String xd = df.minusDays(track-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    metricsSnapshot.initialize(new MetricsProperty(i,xd,0));
+                    LocalDateTime xdf = df.minusDays(track-i);
+                    String xd = xdf.minusDays(track-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    metricsSnapshot.initialize(new MetricsProperty(i,xd,0,xdf),_cur);
                 }
                 break;
             case LeaderBoard.WEEKLY:
                 LocalDateTime wf = _cur.minusDays(_cur.getDayOfWeek().getValue()-1).plusDays(7);//toMonday
                 for(int i=0;i<metricsTrackingNumber;i++){
-                    String xw = wf.minusWeeks(track-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    metricsSnapshot.initialize(new MetricsProperty(i,xw,0));
+                    LocalDateTime xwf = wf.minusWeeks(track-i);
+                    String xw = xwf.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    metricsSnapshot.initialize(new MetricsProperty(i,xw,0,xwf),_cur);
                 }
                 break;
             case LeaderBoard.MONTHLY:
                 LocalDateTime mf = _cur.minusDays(_cur.getDayOfMonth()-1).plusMonths(1);//toFirstDayOfMonth
                 for(int i=0;i<metricsTrackingNumber;i++){
-                    String xm = mf.minusMonths(track-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    metricsSnapshot.initialize(new MetricsProperty(i,xm,0));
+                    LocalDateTime xmf = mf.minusMonths(track-i);
+                    String xm = xmf.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    metricsSnapshot.initialize(new MetricsProperty(i,xm,0,xmf),_cur);
                 }
                 break;
             case LeaderBoard.YEARLY:
                 LocalDateTime yf = _cur.minusDays(_cur.getDayOfYear()-1).plusYears(1);//toFirstDayOfYear
                 for(int i=0;i<metricsTrackingNumber;i++){
-                    String xd = yf.minusYears(track-i).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    metricsSnapshot.initialize(new MetricsProperty(i,xd,0));
+                    LocalDateTime xyf = yf.minusYears(track-i);
+                    String xd = xyf.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    metricsSnapshot.initialize(new MetricsProperty(i,xd,0,xyf),_cur);
                 }
                 break;
             default:
@@ -417,7 +439,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             MetricsSnapshot pending = new MetricsSnapshot(metricsTrackingNumber,category,classifier);
             pending.bucket(bucket);
             pending.oid(oid);
-            initialize(classifier,pending);
+            initialize(classifier,pending,LocalDateTime.now());
             pending.dataStore(this.dataStore);
             this.dataStore.createIfAbsent(pending,true);
             return pending;
@@ -428,6 +450,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         return archives.computeIfAbsent(akey,k->{
             MetricsHistory metricsHistory = new MetricsHistory(bufferSize);
             metricsHistory.distributionKey(akey);
+            metricsHistory.initializeHourly(end);
             this.dataStore.createIfAbsent(metricsHistory,true);
             return metricsHistory;
         });

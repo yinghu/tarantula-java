@@ -3,9 +3,11 @@ package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Property;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class MetricsProperty extends RecoverableObject implements Property {
@@ -17,14 +19,14 @@ public class MetricsProperty extends RecoverableObject implements Property {
     public MetricsProperty(){
     }
 
-    public MetricsProperty(int index,String name, Object value){
+    public MetricsProperty(int index, String name, Object value,LocalDateTime dateCreated){
+        this(index,name,value,TimeUtil.toUTCMilliseconds(dateCreated));
+    }
+    public MetricsProperty(int index,String name, Object value,long timestamp){
         this.routingNumber = index;
         this.name = name;
         this.value = value;
-    }
-    public MetricsProperty(String name, Object value){
-        this.name = name;
-        this.value = value;
+        this.timestamp = timestamp;
     }
 
 
@@ -42,12 +44,14 @@ public class MetricsProperty extends RecoverableObject implements Property {
     public Map<String,Object> toMap(){
         this.properties.put("name",this.name);
         this.properties.put("value",this.value);
+        this.properties.put("timestamp",timestamp);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.name = (String)properties.get("name");
         this.value = properties.get("value");//
+        this.timestamp = ((Number)properties.get("timestamp")).longValue();
     }
 
     public String name(){

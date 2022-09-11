@@ -45,7 +45,7 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.metrics = new Property[trackingNumber];
         for(int i=0;i<trackingNumber;i++){
             JsonObject mj = JsonUtil.parse((String)properties.get("m"+i));
-            metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),mj.get("value").getAsString());
+            metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),mj.get("value").getAsString(),mj.get("timestamp").getAsLong());
         }
     }
 
@@ -74,8 +74,9 @@ public class MetricsSnapshot extends RecoverableObject  {
         return new ResourceKey(this.bucket,oid,new String[]{index,name});
     }
 
-    public void initialize(Property property){
+    public void initialize(Property property,LocalDateTime timeUpdated){
         metrics[property.routingNumber()]=property;
+        this.timestamp = TimeUtil.toUTCMilliseconds(timeUpdated);
     }
     public MetricsSnapshot update(double currentData){
         ((MetricsProperty)metrics[trackingNumber-1]).value = currentData;
@@ -83,12 +84,17 @@ public class MetricsSnapshot extends RecoverableObject  {
         return this;
     }
     public Property push(Property property,LocalDateTime dateTime){
-        Property toHistory = metrics[0];
+        Property toHistory = metrics[trackingNumber-1];
         for(int i=0;i<trackingNumber-1;i++){
             metrics[i]=metrics[i+1];
         }
         metrics[trackingNumber-1] = property;
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
+    }
+    public boolean validate(LocalDateTime current){
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
+        //keep same day otherwise do reset
+        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getDayOfYear()==current.getDayOfYear()&&lastUpdated.getHour()==current.getHour();
     }
 }
