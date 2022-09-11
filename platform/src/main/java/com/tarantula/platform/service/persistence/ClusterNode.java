@@ -9,7 +9,7 @@ import com.icodesoftware.service.ClusterProvider;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class ClusterNode implements ClusterProvider.Node, Portable {
+public class ClusterNode implements ClusterProvider.Node {
 
     public String bucketName;
     public String nodeName;
@@ -56,23 +56,12 @@ public class ClusterNode implements ClusterProvider.Node, Portable {
         return null;
     }
 
-    @Override
+
     public int getFactoryId() {
         return 0;
     }
 
-    @Override
     public int getClassId() {
         return 0;
-    }
-
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-
     }
 }

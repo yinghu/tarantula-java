@@ -5,9 +5,11 @@ import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class MetricsSnapshot extends RecoverableObject  {
@@ -29,6 +31,7 @@ public class MetricsSnapshot extends RecoverableObject  {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("trackingNumber",trackingNumber);
+        this.properties.put("timestamp",timestamp);
         for(int i=0;i<trackingNumber;i++){
             this.properties.put("m"+i,metrics[i].toJson().toString());
         }
@@ -38,6 +41,7 @@ public class MetricsSnapshot extends RecoverableObject  {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.trackingNumber = ((Number)properties.get("trackingNumber")).intValue();
+        this.timestamp = ((Number)properties.get("timestamp")).longValue();
         this.metrics = new Property[trackingNumber];
         for(int i=0;i<trackingNumber;i++){
             JsonObject mj = JsonUtil.parse((String)properties.get("m"+i));
@@ -75,14 +79,16 @@ public class MetricsSnapshot extends RecoverableObject  {
     }
     public MetricsSnapshot update(double currentData){
         ((MetricsProperty)metrics[trackingNumber-1]).value = currentData;
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         return this;
     }
-    public Property push(Property property){
+    public Property push(Property property,LocalDateTime dateTime){
         Property toHistory = metrics[0];
         for(int i=0;i<trackingNumber-1;i++){
             metrics[i]=metrics[i+1];
         }
         metrics[trackingNumber-1] = property;
+        this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }
 }

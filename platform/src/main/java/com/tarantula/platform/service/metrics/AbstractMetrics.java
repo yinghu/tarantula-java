@@ -258,7 +258,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             md.update(daily);
             String xd = end.plusDays(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
             Property pd = new MetricsProperty(metricsTrackingNumber-1,xd,0);
-            md.push(pd);
+            md.push(pd,end);
             this.dataStore.update(md);
 
             if(end.getDayOfWeek().getValue() != 7){//weekly
@@ -270,7 +270,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 mw.update(weekly);
                 String xw = end.plusDays(7).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                 Property pw = new MetricsProperty(metricsTrackingNumber-1,xw,0);
-                mw.push(pw);
+                mw.push(pw,end);
                 this.dataStore.update(mw);
 
             }
@@ -283,7 +283,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 mm.update(monthly);
                 String xm = end.plusMonths(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                 Property pm = new MetricsProperty(metricsTrackingNumber-1,xm,0);
-                mm.push(pm);
+                mm.push(pm,end);
                 this.dataStore.update(mm);
             }
             if(end.getDayOfYear() != 1 ){//yearly
@@ -296,7 +296,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 my.update(yearly);
                 String xy = end.plusYears(1).format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                 Property py = new MetricsProperty(metricsTrackingNumber-1,xy,0);
-                my.push(py);
+                my.push(py,end);
                 this.dataStore.update(my);
             }
             entry.update();
@@ -317,7 +317,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 LocalDateTime hf = end.minusMinutes(end.getMinute()).plusHours(1);
                 String xh = hf.format(DateTimeFormatter.ofPattern("hh:mm a"));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0);
-                Property history = snapshot.push(property);
+                Property history = snapshot.push(property,end);
                 //archive history hourly
                 MetricsHistory metricsHistory = metricsHistory(category,LeaderBoard.HOURLY,end,MetricsHistory.HOURLY_HISTORY_BUFFER_SIZE);
                 metricsHistory.push(new MetricsProperty(historyPropertyLabel(end),history.value()));
