@@ -30,7 +30,8 @@ public class MetricsManager implements SchedulingTask, Serviceable {
         if(toNextHour<=HOURLY_BUFFER){
             return  TimeUtil.durationToNextHour(cur.plusSeconds(toNextHour/1000))-HOURLY_BUFFER;
         }
-        return TimeUtil.durationToNextHour(cur);
+        return TimeUtil.durationToNextHour(cur)-HOURLY_BUFFER;
+        //BDS/3f332935e95342d7b34279b60d0eb8b9/
     }
 
     @Override
