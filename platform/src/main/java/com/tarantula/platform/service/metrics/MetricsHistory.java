@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
@@ -11,32 +10,36 @@ import com.tarantula.platform.AssociateKey;
 
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
 public class MetricsHistory extends RecoverableObject  {
 
-    final static int HOURLY_HISTORY_BUFFER_SIZE = 24;
+    private final static int HOURLY_HISTORY_BUFFER_SIZE = 24;
 
     final static String LABEL_PREFIX = "history";
 
 
     private Property[] metrics;
 
-
-    public MetricsHistory(int trackingNumber){
-        this.routingNumber = trackingNumber;
-        this.metrics = new Property[this.routingNumber];
-    }
+    private double dailyGain;
+    private double weeklyGain;
+    private double monthlyGain;
+    private double yearlyGain;
 
     public MetricsHistory(){
-
+        this.metrics = new Property[HOURLY_HISTORY_BUFFER_SIZE];
     }
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("trackingNumber",routingNumber);
-        for(int i=0;i<routingNumber;i++){
+        this.properties.put("dailyGain",dailyGain);
+        this.properties.put("weeklyGain",weeklyGain);
+        this.properties.put("monthlyGain",monthlyGain);
+        this.properties.put("yearlyGain",yearlyGain);
+        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
             this.properties.put("m"+i,metrics[i].toJson().toString());
         }
         return this.properties;
@@ -44,9 +47,11 @@ public class MetricsHistory extends RecoverableObject  {
 
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.routingNumber = ((Number)properties.get("trackingNumber")).intValue();
-        this.metrics = new Property[routingNumber];
-        for(int i=0;i<routingNumber;i++){
+        this.dailyGain = ((Number)properties.get("dailyGain")).doubleValue();
+        this.weeklyGain = ((Number)properties.get("weeklyGain")).doubleValue();
+        this.monthlyGain = ((Number)properties.get("monthlyGain")).doubleValue();
+        this.yearlyGain = ((Number)properties.get("yearlyGain")).doubleValue();
+        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
             Object payload = properties.get("m"+i);
             JsonObject mj = JsonUtil.parse((String)payload);
             metrics[i]=(new MetricsProperty(i, mj.get("name").getAsString(), mj.get("value").getAsString(),mj.get("timestamp").getAsLong()));
@@ -57,6 +62,20 @@ public class MetricsHistory extends RecoverableObject  {
     public Property[] metrics(){
         return metrics;
     }
+
+    public double dailyGain(){
+        return dailyGain;
+    }
+    public double weeklyGain(){
+        return weeklyGain;
+    }
+    public double monthlyGain(){
+        return monthlyGain;
+    }
+    public double yearlyGain(){
+        return yearlyGain;
+    }
+
     public void distributionKey(String rkey){
         String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
         bucket = idx[0];
@@ -72,21 +91,64 @@ public class MetricsHistory extends RecoverableObject  {
     public int getClassId() {
         return StatisticsPortableRegistry.METRICS_HISTORY_CID;
     }
-
+    //key label format history_[category]_[year]_[dayofyear]  history_httpRequestCount_2022_145
     public Key key(){
         return new AssociateKey(this.bucket,oid,label);
     }
 
     public void archiveHourly(Property property){
         int hour  = TimeUtil.fromUTCMilliseconds(property.timestamp()).getHour();
-        metrics[hour>0?(hour-1):routingNumber-1]= property;
+        metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1]= property;
     }
 
     public void initializeHourly(LocalDateTime current){
         LocalDateTime start = current.minusHours(current.getHour());
-        for(int i=0;i<routingNumber;i++){
-            archiveHourly(new MetricsProperty(i,"h"+i,0,start.plusHours(i)));
+        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+            LocalDateTime hour = start.plusHours(i);
+            archiveHourly(new MetricsProperty(i,MetricsProperty.historyPropertyLabel(hour),0,hour));
         }
+    }
+
+    public void archiveDaily(double dailyGain,LocalDateTime updated){
+        this.dailyGain = dailyGain;
+        this.timestamp = TimeUtil.toUTCMilliseconds(updated);
+    }
+    public void archiveWeekly(double weeklyGain,LocalDateTime updated){
+        this.weeklyGain = weeklyGain;
+        this.timestamp = TimeUtil.toUTCMilliseconds(updated);
+    }
+    public void archiveMonthly(double monthlyGain,LocalDateTime updated){
+        this.monthlyGain = monthlyGain;
+        this.timestamp = TimeUtil.toUTCMilliseconds(updated);
+    }
+    public void archiveYearly(double yearlyGain,LocalDateTime updated){
+        this.yearlyGain = yearlyGain;
+        this.timestamp = TimeUtil.toUTCMilliseconds(updated);
+    }
+
+    public static String historyLabel(String bucket,String oid,String category,LocalDateTime today){
+        StringBuffer buffer = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid);
+        buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_");
+        int day = today.getDayOfYear();
+        int hour = today.getHour();
+        int year = today.getYear();
+        if(day == 1 && hour==0){ //new year midnight
+            year = year-1;
+            day = today.minusHours(1).getDayOfYear();
+            buffer.append(year).append("_").append(day);
+            return buffer.toString();
+        }
+        if(hour == 0){ //every midnight
+            LocalTime mid = LocalTime.MIDNIGHT;
+            LocalDateTime midnight = LocalDateTime.of(today.toLocalDate(),mid);
+            if(TimeUtil.durationUTCInSeconds(midnight,today)<10){
+                day = day-1; //no restart 10 seconds after midnight
+            }
+            buffer.append(year).append("_").append(day);
+            return buffer.toString();
+        }
+        buffer.append(year).append("_").append(day);
+        return buffer.toString();
     }
 
 }

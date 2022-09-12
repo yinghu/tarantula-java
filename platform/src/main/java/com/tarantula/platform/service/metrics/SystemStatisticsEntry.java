@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
+    private final static String LABEL = "category";
     //private String name;
     private double total=0;
     private double hourly=0;
@@ -24,7 +25,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     private boolean loaded;
 
     public SystemStatisticsEntry(){
-        this.label = "category";
+        this.label = LABEL;
     }
     public SystemStatisticsEntry(String bucket, String oid, String name){
         this();
@@ -68,6 +69,10 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         return daily;
     }
 
+    void daily(double daily,LocalDateTime update){
+        this.daily = daily;
+        this.timestamp = TimeUtil.toUTCMilliseconds(update);
+    }
     @Override
     public double weekly() {
         return weekly;

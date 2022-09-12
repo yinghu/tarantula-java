@@ -15,10 +15,9 @@ import java.util.Map;
 public class MetricsSnapshot extends RecoverableObject  {
 
     private Property[] metrics;
-    private int trackingNumber;
 
     public MetricsSnapshot(int trackingNumber,String category,String classifier){
-        this.trackingNumber = trackingNumber;
+        this.routingNumber = trackingNumber;
         this.name = category;
         this.index = classifier;
         this.metrics = new Property[trackingNumber];
@@ -30,9 +29,9 @@ public class MetricsSnapshot extends RecoverableObject  {
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("trackingNumber",trackingNumber);
+        this.properties.put("trackingNumber",routingNumber);
         this.properties.put("timestamp",timestamp);
-        for(int i=0;i<trackingNumber;i++){
+        for(int i=0;i<routingNumber;i++){
             this.properties.put("m"+i,metrics[i].toJson().toString());
         }
         return this.properties;
@@ -40,10 +39,10 @@ public class MetricsSnapshot extends RecoverableObject  {
 
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.trackingNumber = ((Number)properties.get("trackingNumber")).intValue();
+        this.routingNumber = ((Number)properties.get("trackingNumber")).intValue();
         this.timestamp = ((Number)properties.get("timestamp")).longValue();
-        this.metrics = new Property[trackingNumber];
-        for(int i=0;i<trackingNumber;i++){
+        this.metrics = new Property[routingNumber];
+        for(int i=0;i<routingNumber;i++){
             JsonObject mj = JsonUtil.parse((String)properties.get("m"+i));
             metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),mj.get("value").getAsString(),mj.get("timestamp").getAsLong());
         }
@@ -79,16 +78,16 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.timestamp = TimeUtil.toUTCMilliseconds(timeUpdated);
     }
     public MetricsSnapshot update(double currentData){
-        ((MetricsProperty)metrics[trackingNumber-1]).value = currentData;
+        ((MetricsProperty)metrics[routingNumber-1]).value = currentData;//
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         return this;
     }
     public Property push(Property property,LocalDateTime dateTime){
-        Property toHistory = metrics[trackingNumber-1];
-        for(int i=0;i<trackingNumber-1;i++){
+        Property toHistory = metrics[routingNumber-1];
+        for(int i=0;i<routingNumber-1;i++){
             metrics[i]=metrics[i+1];
         }
-        metrics[trackingNumber-1] = property;
+        metrics[routingNumber-1] = property;
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }

@@ -44,7 +44,7 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==0,true);
-        Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==0,true);
+        Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
     @Test(groups = { "PerformanceMetrics" })
@@ -65,7 +65,7 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).daily()==0,true);
-        Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
@@ -74,7 +74,7 @@ public class MetricsTest {
     @Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
         EmptyServiceContext serviceContext = new EmptyServiceContext();
-        LocalDateTime end = LocalDate.parse("2022-08-07").atTime(LocalTime.MIDNIGHT);//Sun
+        LocalDateTime end = LocalDate.parse("2022-08-08").atTime(LocalTime.MIDNIGHT);//Mon
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
@@ -126,8 +126,8 @@ public class MetricsTest {
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
         metrics.atHourly();
-        Property[] his = metrics.history(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,LeaderBoard.HOURLY,end,end);
-        String hkey = end.getYear()+"/"+end.getDayOfYear()+"/"+end.getHour();
+        Property[] his = metrics.history(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,end,end);
+        String hkey = MetricsProperty.historyPropertyLabel(end);
         Assert.assertEquals(his[0].name().equals(hkey),true);
         Assert.assertEquals(his[1]==null,true);
     }

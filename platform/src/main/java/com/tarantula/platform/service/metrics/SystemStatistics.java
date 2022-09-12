@@ -16,9 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SystemStatistics extends RecoverableObject implements Statistics {
 
 
-    final static String LABEL_PREFIX = "statistics";
+    private final static String LABEL = "statistics";
 
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
+
+    public SystemStatistics(){
+        this.label = LABEL;
+    }
 
     public Entry entry(String key) {
         SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
@@ -72,13 +76,6 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
             //entry.load();
             mappings.put(k,entry);
         });
-    }
-    public void distributionKey(String distributionKey){
-        //parse key
-        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        bucket = k[0];
-        oid = k[1];
-        label = k[2];
     }
     @Override
     public Key key(){

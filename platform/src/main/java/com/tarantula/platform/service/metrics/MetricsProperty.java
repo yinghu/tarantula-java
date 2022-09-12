@@ -2,6 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Property;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexKey;
@@ -69,11 +70,16 @@ public class MetricsProperty extends RecoverableObject implements Property {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("value",value.toString());
+        jsonObject.addProperty("timestamp",timestamp);
         return jsonObject;
     }
 
 
     public Key key(){
         return new IndexKey(this.bucket,oid,routingNumber);
+    }
+
+    public static String historyPropertyLabel(LocalDateTime current){
+        return new StringBuffer().append(current.getYear()).append(Recoverable.PATH_SEPARATOR).append(current.getDayOfYear()).append(Recoverable.PATH_SEPARATOR).append(current.getHour()).toString();
     }
 }

@@ -24,5 +24,6 @@ public interface Metrics extends Serviceable,MetricsListener{
     void atHourly();
 
     Property[] snapshot(String category, String classifier);
-    Property[] history(String category, String classifier, LocalDateTime start,LocalDateTime end);
- }
+    Property[] history(String category, LocalDateTime start,LocalDateTime end);
+
+}
