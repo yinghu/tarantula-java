@@ -10,9 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsManager implements SchedulingTask, Serviceable {
 
+    private final static long HOURLY_BUFFER = 600000;//10 minutes
     private ConcurrentHashMap<String, Metrics> metricsMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
-
+    private boolean firstRunSkip = false;
     public MetricsManager(TarantulaContext tarantulaContext){
         this.tarantulaContext = tarantulaContext;
     }
@@ -23,16 +24,17 @@ public class MetricsManager implements SchedulingTask, Serviceable {
 
     @Override
     public long initialDelay() {
-        return TimeUtil.durationToNextHour();
+        return firstRunSkip?0:TimeUtil.durationToNextHour()-HOURLY_BUFFER;
     }
 
     @Override
     public long delay() {
-        return 0;
+        return firstRunSkip?TimeUtil.durationToNextHour()+HOURLY_BUFFER*5:0;
     }
 
     @Override
     public void run() {
+        firstRunSkip = false;
         new Thread(()->{
             metricsMap.forEach((k,v)->v.atHourly());
         }).start();
@@ -53,9 +55,9 @@ public class MetricsManager implements SchedulingTask, Serviceable {
 
     @Override
     public void start() throws Exception {
-
+        if(TimeUtil.durationToNextHour()<HOURLY_BUFFER) firstRunSkip = true;
+        this.tarantulaContext.schedule(this);
     }
-
     @Override
     public void shutdown() throws Exception {
         metricsMap.forEach((k,v)-> {try{v.shutdown();}catch (Exception ex){}});

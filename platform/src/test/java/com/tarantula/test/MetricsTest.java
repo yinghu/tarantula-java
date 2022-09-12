@@ -20,7 +20,7 @@ public class MetricsTest {
     public void setUp() {
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
         EmptyServiceContext serviceContext = new EmptyServiceContext();
         LocalDateTime end = LocalDate.parse("2022-01-01").atTime(LocalTime.MIDNIGHT);//Sat
@@ -47,7 +47,7 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsMonthlyTest() {
         EmptyServiceContext serviceContext = new EmptyServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-01").atTime(LocalTime.MIDNIGHT);//Mon
@@ -71,7 +71,7 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
         EmptyServiceContext serviceContext = new EmptyServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-08").atTime(LocalTime.MIDNIGHT);//Mon
@@ -94,7 +94,7 @@ public class MetricsTest {
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsDailyTest() {
         EmptyServiceContext serviceContext = new EmptyServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-10").atTime(LocalTime.MIDNIGHT);//Sun

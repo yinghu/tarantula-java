@@ -11,7 +11,7 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-panel  w3-border-bottom w3-border-red">
         <div class="w3-container">
-            <span id='tx-data-store-view' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">View</span>
+            <span id='tx-data-store-view' class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-bottom-8 tx-margin-left-12">Debug</span>
         </div>    
     </div> 
     <div class="w3-panel">
@@ -36,7 +36,8 @@
     
     let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-list"),options,{});
     TARA_API.onService(false,{serviceTag:'role/datastore',command:'onListDataStore'},(resp)=>{
-        editor.set(resp);                          
+        editor.set(resp);  
+        TARA_API.query().dataStoreList = resp;                        
     });
     document.querySelector('#tx-data-store-view').onclick =()=>{
         TARA_API.query().popup='#tx-popup-api';

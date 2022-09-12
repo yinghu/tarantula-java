@@ -129,26 +129,7 @@ public class MetricsHistory extends RecoverableObject  {
     public static String historyLabel(String bucket,String oid,String category,LocalDateTime today){
         StringBuffer buffer = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid);
         buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_");
-        int day = today.getDayOfYear();
-        int hour = today.getHour();
-        int year = today.getYear();
-        if(day == 1 && hour==0){ //new year midnight
-            year = year-1;
-            day = today.minusHours(1).getDayOfYear();
-            buffer.append(year).append("_").append(day);
-            return buffer.toString();
-        }
-        if(hour == 0){ //every midnight
-            LocalTime mid = LocalTime.MIDNIGHT;
-            LocalDateTime midnight = LocalDateTime.of(today.toLocalDate(),mid);
-            if(TimeUtil.durationUTCInSeconds(midnight,today)<10){
-                day = day-1; //no restart 10 seconds after midnight
-            }
-            buffer.append(year).append("_").append(day);
-            return buffer.toString();
-        }
-        buffer.append(year).append("_").append(day);
-        return buffer.toString();
+        return buffer.append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
     }
 
 }
