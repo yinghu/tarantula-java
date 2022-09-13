@@ -17,6 +17,7 @@ public class MetricsManager implements SchedulingTask, Serviceable {
 
     private ConcurrentHashMap<String, Metrics> metricsMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
+    private int nextHour;
 
     public MetricsManager(TarantulaContext tarantulaContext){
         this.tarantulaContext = tarantulaContext;
@@ -29,8 +30,7 @@ public class MetricsManager implements SchedulingTask, Serviceable {
     @Override
     public long initialDelay() {
         LocalDateTime cur = LocalDateTime.now();
-        int hour = cur.getHour();
-        LocalDateTime to50 = cur.toLocalDate().atTime(hour,50,0,0);
+        LocalDateTime to50 = cur.toLocalDate().atTime(nextHour,50,0,0);
         logger.warn("Next run at ["+to50+"]");
         long nextRun = TimeUtil.durationUTCMilliseconds(cur,to50);
         if(nextRun>0) return nextRun;
@@ -44,9 +44,8 @@ public class MetricsManager implements SchedulingTask, Serviceable {
 
     @Override
     public void run() {
-        new Thread(()->{
-            metricsMap.forEach((k,v)->v.atHourly());
-        }).start();
+        metricsMap.forEach((k,v)->v.atHourly());
+        nextHour = LocalDateTime.now().plusHours(1).getHour();
         this.tarantulaContext.schedule(this);
     }
 
@@ -64,6 +63,7 @@ public class MetricsManager implements SchedulingTask, Serviceable {
 
     @Override
     public void start() throws Exception {
+        this.nextHour = LocalDateTime.now().getHour();
         this.tarantulaContext.schedule(this);
     }
     @Override
