@@ -80,11 +80,9 @@
     let _metrics = '';
     let _metricsBar = document.querySelector('#tx-metrics-data');
     let _metricsLoaded = 'loading';
-    let _timer = setInterval(()=>{
-        if(_metricsLoaded != 'loading'){
-            _load_metrics();
-        }     
-    },10000);
+    let _request = 'runtime';
+    let _timer;
+    _start_metrics_timer();
     const data = {
         datasets: [{
             label:_type+'/'+_category+'/'+_metrics,
@@ -141,6 +139,12 @@
         let ched = document.querySelector('#tx-metrics-history-enabled').checked;
         if(ched){
             console.log("history arcive checked->"+ched);
+            clearInterval(_timer);
+            _request = "archive";
+        }
+        else{
+            _request = "runtime";
+            _start_metrics_timer();
         }
     };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
@@ -172,11 +176,28 @@
     }
 
     function _load_metrics(){
-        TARA_API.onGet('role/sudo','onMetrics',_type+'#'+_category+'#'+_metrics,(resp)=>{
-            console.log(resp);
-            data.datasets[0].data = resp.metrics;
-            chart.update();
-        }); 
+        if(_request == 'runtime'){
+            TARA_API.onGet('role/sudo','onMetrics',_type+'#'+_category+'#'+_metrics,(resp)=>{
+                console.log(resp);
+                data.datasets[0].data = resp.metrics;
+                chart.update();
+            });
+        } 
+        else{ //load archive
+            TARA_API.onGet('role/sudo','onMetricsArchive',_type+'#'+_category+'#'+_metrics,(resp)=>{
+                console.log(resp);
+                data.datasets[0].data = resp.metrics;
+                chart.update();
+            });        
+        }
+    }
+
+    function _start_metrics_timer(){
+        _timer = setInterval(()=>{
+            if(_metricsLoaded != 'loading'){
+                _load_metrics();
+            }     
+        },10000);
     }
     
 </script>

@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -180,6 +181,20 @@ public class SudoRoleModule implements Module {
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
             for(Property p : metrics.snapshot(query[2],query[1])){
+                JsonObject js = new JsonObject();
+                js.addProperty("x",p.name());
+                js.addProperty("y",p.value().toString());
+                ms.add(js);
+            }
+            m.add("metrics",ms);
+            session.write(m.toString().getBytes());
+        }
+        else if(session.action().equals("onMetricsArchive")){
+            String[] query = session.name().split("#");
+            Metrics metrics = context.metrics(query[0]);
+            JsonObject m = new JsonObject();
+            JsonArray ms = new JsonArray();
+            for(Property p : metrics.history(query[2],LocalDateTime.now(),LocalDateTime.now())){
                 JsonObject js = new JsonObject();
                 js.addProperty("x",p.name());
                 js.addProperty("y",p.value().toString());
