@@ -32,22 +32,48 @@ public class ShardSetup {
     }
 
     public static void main(String[] args){
-        LocalDateTime _cur = LocalDateTime.now();
-        MetricsSnapshot metricsSnapshot = new MetricsSnapshot(12,AccessMetrics.ACCOUNT_USER_CREATION_COUNT, LeaderBoard.HOURLY);
-        LocalDateTime hf = _cur.minusMinutes(_cur.getMinute()).plusHours(1);
+        LocalDateTime cur = LocalDateTime.now();
+        LocalDateTime hourly = cur.plusHours(1);//.minusHours(11);
         for(int i=0;i<12;i++){
-            LocalDateTime xhf = hf.plusHours(11-i);
-            String xh = xhf.format(DateTimeFormatter.ofPattern("hh:mm a"));
-            metricsSnapshot.initialize(new MetricsProperty(i,xh,0,xhf),_cur);
+            System.out.println(MetricsSnapshot.hourlyLabel(hourly.minusHours(11-i)));
         }
+
+        LocalDateTime daily = cur.plusDays(1);//.minusHours(11);
+        for(int i=0;i<12;i++){
+            System.out.println(MetricsSnapshot.dailyLabel(daily.minusDays(11-i)));
+        }
+
+        LocalDateTime weekly = cur.plusDays(8-cur.getDayOfWeek().getValue());//.minusHours(11);
+        for(int i=0;i<12;i++){
+            System.out.println(MetricsSnapshot.weeklyLabel(weekly.minusWeeks(11-i)));
+        }
+
+        MetricsSnapshot metricsSnapshot = new MetricsSnapshot(12,AccessMetrics.ACCOUNT_USER_CREATION_COUNT, LeaderBoard.HOURLY);
+        //LocalDateTime hf = cur.minusMinutes(cur.getMinute()).plusHours(1);
+        LocalDateTime xhf = cur.plusHours(1);
+        for(int i=0;i<12;i++){
+
+            String xh = MetricsSnapshot.hourlyLabel(xhf.minusHours(11-i));
+            metricsSnapshot.initialize(new MetricsProperty(i,xh,0,cur),cur);
+        }
+        System.out.println(TimeUtil.fromUTCMilliseconds(metricsSnapshot.timestamp()));
+        System.out.println(">>"+metricsSnapshot.validateHourly(cur.plusDays(1)));
         for(Property p : metricsSnapshot.metrics()){
             System.out.println(p.name()+">>>>>>"+TimeUtil.fromUTCMilliseconds(p.timestamp()));
         }
+        System.out.println(TimeUtil.midnight());
+
+        //LocalDateTime cur = LocalDateTime.now();
+        int hour = cur.getHour();
+        LocalDateTime to50 = cur.toLocalDate().atTime(hour,50,0,0).plusHours(1);
+        System.out.println(TimeUtil.durationUTCMilliseconds(cur,to50));
+        //return TimeUtil.durationUTCInSeconds(cur,to50);
+        /**
         metricsSnapshot.update(100);
         if(!metricsSnapshot.validate(_cur.plusHours(1))){
             System.out.println("Need to reset");
 
-        }
+        }**/
         //MetricsHistory history = new MetricsHistory(24);
         //history.initializeHourly(_cur);
         //Property[] mts = history.metrics();

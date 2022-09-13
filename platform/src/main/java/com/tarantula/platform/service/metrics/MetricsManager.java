@@ -1,6 +1,8 @@
 package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.SchedulingTask;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.TimeUtil;
@@ -11,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsManager implements SchedulingTask, Serviceable {
 
-    private final static long HOURLY_BUFFER = 600000;//10 minutes
+    private TarantulaLogger logger = JDKLogger.getLogger(MetricsManager.class);
+
     private ConcurrentHashMap<String, Metrics> metricsMap = new ConcurrentHashMap<>();
     private TarantulaContext tarantulaContext;
 
@@ -26,12 +29,12 @@ public class MetricsManager implements SchedulingTask, Serviceable {
     @Override
     public long initialDelay() {
         LocalDateTime cur = LocalDateTime.now();
-        long toNextHour = TimeUtil.durationToNextHour(cur);
-        if(toNextHour<=HOURLY_BUFFER){
-            return  TimeUtil.durationToNextHour(cur.plusSeconds(toNextHour/1000))-HOURLY_BUFFER;
-        }
-        return TimeUtil.durationToNextHour(cur)-HOURLY_BUFFER;
-        //BDS/3f332935e95342d7b34279b60d0eb8b9/
+        int hour = cur.getHour();
+        LocalDateTime to50 = cur.toLocalDate().atTime(hour,50,0,0);
+        logger.warn("Next run at ["+to50+"]");
+        long nextRun = TimeUtil.durationUTCMilliseconds(cur,to50);
+        if(nextRun>0) return nextRun;
+        return 100;
     }
 
     @Override

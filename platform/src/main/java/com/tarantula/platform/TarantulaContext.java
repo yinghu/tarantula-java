@@ -175,9 +175,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.deploymentServiceProvider.start();
         this.serviceProviders.put(DeploymentServiceProvider.NAME,this.deploymentServiceProvider);
         new ServiceBootstrap(_tarantulaApplicationStarted,null,this.endpointService,"endPointService",true).start();
-        this.schedule(new MidnightCheck(this));
-        //this.schedule(metricsManager);
-        metricsManager.start();
 	}
 	public void shutdown() throws Exception {
         metricsManager.shutdown();
@@ -532,6 +529,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
         }
         this.accessIndexService().onEnable();
+        this.schedule(new MidnightCheck(this));
+        metricsManager.start();
  	}
 
 

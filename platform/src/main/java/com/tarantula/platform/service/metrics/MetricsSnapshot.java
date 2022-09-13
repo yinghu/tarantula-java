@@ -10,6 +10,7 @@ import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class MetricsSnapshot extends RecoverableObject  {
@@ -91,9 +92,48 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }
-    public boolean validate(LocalDateTime current){
+    public boolean validateHourly(LocalDateTime current){
         LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         //keep same day otherwise do reset
         return lastUpdated.getYear()==current.getYear()&&lastUpdated.getDayOfYear()==current.getDayOfYear()&&lastUpdated.getHour()==current.getHour();
+    }
+    public boolean validateDaily(LocalDateTime current){
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
+        //keep same day
+        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getDayOfYear()==current.getDayOfYear();
+    }
+    public boolean validateWeekly(LocalDateTime current){
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
+        int lastMonday = lastUpdated.plusDays(8-lastUpdated.getDayOfWeek().getValue()).getDayOfYear();
+        int thisMonday = current.plusDays(8-current.getDayOfWeek().getValue()).getDayOfYear();
+        //keep same week otherwise do reset
+        return lastUpdated.getYear()==current.getYear() && lastMonday==thisMonday;
+    }
+    public boolean validateMonthly(LocalDateTime current){
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
+        //keep same month otherwise do reset
+        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getMonth().getValue()==current.getMonth().getValue();
+    }
+    public boolean validateYearly(LocalDateTime current){
+        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
+        //keep same year otherwise do reset
+        return lastUpdated.getYear()==current.getYear();
+    }
+    public static String hourlyLabel(LocalDateTime dateTime){
+        int hrs = dateTime.getHour();
+        LocalDateTime labelTime = dateTime.toLocalDate().atTime(hrs,0,0,0);
+        return labelTime.format(DateTimeFormatter.ofPattern("hh:mm a"));
+    }
+    public static String dailyLabel(LocalDateTime dateTime){
+        return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    }
+    public static String weeklyLabel(LocalDateTime dateTime){
+        return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    }
+    public static String monthlyLabel(LocalDateTime dateTime){
+        return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    }
+    public static String yearlyLabel(LocalDateTime dateTime){
+        return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     }
 }

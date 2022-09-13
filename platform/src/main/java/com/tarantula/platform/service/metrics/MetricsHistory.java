@@ -7,12 +7,9 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
-
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Map;
 
 public class MetricsHistory extends RecoverableObject  {
