@@ -352,7 +352,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 double hourly = entry.hourly();
                 MetricsSnapshot snapshot = metricsSnapshot(category,LeaderBoard.HOURLY);
                 snapshot.update(hourly);
-                String xh = MetricsSnapshot.hourlyLabel(end.plusHours(1));
+                String xh = MetricsSnapshot.hourlyLabel(end.plusHours(2));
                 Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0,end);
                 Property history = snapshot.push(property,end);
                 //archive history hourly
