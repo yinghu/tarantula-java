@@ -484,6 +484,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
+
         this.node = this.dataStoreProvider().node();
         AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
         node.bucketId = bid.distributionKey();
@@ -493,6 +494,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         initMetricsProvider();
+
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
             v.setup(this);
             v.waitForData();//block for global data sync
@@ -500,6 +502,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         //bootstrap user service providers
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
+
+
+
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
