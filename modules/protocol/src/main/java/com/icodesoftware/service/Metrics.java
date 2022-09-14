@@ -24,6 +24,14 @@ public interface Metrics extends Serviceable,MetricsListener{
     void atHourly();
 
     Property[] snapshot(String category, String classifier);
-    Property[] history(String category, LocalDateTime start,LocalDateTime end);
+    History[] archive(String category, LocalDateTime start,LocalDateTime end);
+
+    interface History{
+        Property[] hourlyGain();
+        double dailyGain();
+        double weeklyGain();
+        double monthlyGain();
+        double yearlyGain();
+    }
 
 }

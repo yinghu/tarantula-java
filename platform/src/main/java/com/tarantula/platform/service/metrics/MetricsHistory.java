@@ -3,6 +3,7 @@ package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
@@ -12,7 +13,7 @@ import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class MetricsHistory extends RecoverableObject  {
+public class MetricsHistory extends RecoverableObject implements Metrics.History {
 
     private final static int HOURLY_HISTORY_BUFFER_SIZE = 24;
 
@@ -60,6 +61,9 @@ public class MetricsHistory extends RecoverableObject  {
         return metrics;
     }
 
+    public Property[] hourlyGain(){
+        return metrics;
+    }
     public double dailyGain(){
         return dailyGain;
     }

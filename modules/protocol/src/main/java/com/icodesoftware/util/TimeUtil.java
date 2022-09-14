@@ -29,6 +29,10 @@ public class TimeUtil {
         LocalDateTime end = LocalDateTime.of(date.plusDays(1),mid);
         return Duration.between(LocalDateTime.now(),end).toMillis();
     }
+    public static LocalDateTime midnight(LocalDate dateTime){
+        LocalTime mid = LocalTime.MIDNIGHT;
+        return LocalDateTime.of(dateTime.plusDays(1),mid);
+    }
     public static LocalDateTime toMidnight(String dateStr){
         return LocalDateTime.of(LocalDate.parse(dateStr),LocalTime.MIDNIGHT);
     }

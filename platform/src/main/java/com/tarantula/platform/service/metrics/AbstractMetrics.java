@@ -273,9 +273,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
-    public Property[] history(String category,LocalDateTime start,LocalDateTime end){
+    public History[] archive(String category,LocalDateTime start,LocalDateTime end){
         MetricsHistory metricsHistory = metricsHistory(category,start);
-        return metricsHistory.metrics();
+        return new History[]{metricsHistory};
     }
 
     @Override
@@ -365,7 +365,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
                 entry.update();
             });
             if (end.getHour() == 23) {
-                atMidnight(TimeUtil.midnight());
+                atMidnight(TimeUtil.midnight(end.toLocalDate()));
             }
         }catch (Exception ex){
             //ignore
