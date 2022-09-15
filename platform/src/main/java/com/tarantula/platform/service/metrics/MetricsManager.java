@@ -30,7 +30,7 @@ public class MetricsManager implements SchedulingTask, Serviceable {
     @Override
     public long initialDelay() {
         LocalDateTime cur = LocalDateTime.now();
-        LocalDateTime to50 = cur.toLocalDate().atTime(nextHour,50,0,0);
+        LocalDateTime to50 = cur.plusDays(nextHour==0?1:0).toLocalDate().atTime(nextHour,50,0,0);
         logger.warn("Next run at ["+to50+"]");
         long nextRun = TimeUtil.durationUTCMilliseconds(cur,to50);
         if(nextRun>0) return nextRun;

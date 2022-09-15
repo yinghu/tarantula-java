@@ -112,7 +112,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.15:8090",null,30000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,30000);
         sampleLoad._init();
         sampleLoad.register();
         //BDS/baf7f6189ba0423f8b87940260083668/history_userCreationCount_hourly_2022_253

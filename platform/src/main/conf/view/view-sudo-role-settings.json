@@ -23,6 +23,7 @@
     {"type":"metrics.list","moduleResourceFile":"sudo/metrics.list.view.html"},
     {"type":"enable.presence.service","moduleResourceFile":"sudo/enable.presence.service.view.html"},
     {"type":"disable.presence.service","moduleResourceFile":"sudo/disable.presence.service.view.html"},
-    {"type":"reset.cluster.key","moduleResourceFile":"sudo/reset.cluster.key.view.html"}
+    {"type":"reset.cluster.key","moduleResourceFile":"sudo/reset.cluster.key.view.html"},
+    {"type":"enable.jvm.metrics","moduleResourceFile":"sudo/enable.jvm.metrics.view.html"}
   ]
 }

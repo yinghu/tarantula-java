@@ -65,8 +65,9 @@ public class ShardSetup {
 
         //LocalDateTime cur = LocalDateTime.now();
         int hour = cur.getHour();
-        LocalDateTime to50 = cur.toLocalDate().atTime(hour,50,0,0).plusHours(1);
-        System.out.println(TimeUtil.durationUTCMilliseconds(cur,to50));
+        LocalDateTime to50 = cur.toLocalDate().atTime(23,50,0,0).plusHours(1);
+        System.out.println(to50.getHour());
+        System.out.println(TimeUtil.midnight(to50.toLocalDate()));
         //return TimeUtil.durationUTCInSeconds(cur,to50);
         /**
         metricsSnapshot.update(100);

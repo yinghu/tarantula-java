@@ -5,9 +5,6 @@ import com.icodesoftware.service.ServiceContext;
 
 public class PerformanceMetrics extends AbstractMetrics {
 
-    //PERFORMANCE CATEGORY
-
-
 
     public void _setup(ServiceContext serviceContext){
         this.name = Metrics.PERFORMANCE;

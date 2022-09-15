@@ -7,6 +7,8 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.service.metrics.JVMMonitor;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -202,6 +204,13 @@ public class SudoRoleModule implements Module {
             }
             m.add("metrics",ms);
             session.write(m.toString().getBytes());
+        }
+        else if(session.action().equals("onEnableJVMMetrics")){
+            Metrics metrics = context.metrics(Metrics.PERFORMANCE);
+            long rt = (Integer.parseInt(session.name())*60000)/JVMMonitor.timerInternal;
+            JVMMonitor jvmMonitor = new JVMMonitor(this.context,metrics,rt);
+            this.context.schedule(jvmMonitor);
+            session.write(JsonUtil.toSimpleResponse(true,"scheduled with total checks ["+rt+"]").getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
