@@ -5,9 +5,8 @@ import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.service.Metrics;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
+import java.util.concurrent.TimeUnit;
 
 public class JVMMonitor implements SchedulingTask {
 
@@ -15,9 +14,13 @@ public class JVMMonitor implements SchedulingTask {
 
     private static MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+    private static RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+    private static OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+
     private long timerCountDown = 100;
     public final static long timerInternal = 10000;
     private ApplicationContext context;
+
     public JVMMonitor(ApplicationContext context, Metrics performanceMetrics, long timerCountDown){
         this.context = context;
         this.performanceMetrics = performanceMetrics;
@@ -33,7 +36,7 @@ public class JVMMonitor implements SchedulingTask {
         return timerInternal;
     }
 
-    @Override
+
     public long delay() {
         return 0;
     }
@@ -46,11 +49,17 @@ public class JVMMonitor implements SchedulingTask {
         this.context.log("Thread count->"+tc,OnLog.WARN);
         performanceMetrics.onUpdated(PerformanceMetrics.PERFORMANCE_VM_MEMORY_COUNT,mused);
         performanceMetrics.onUpdated(PerformanceMetrics.PERFORMANCE_VM_THREAD_COUNT,threadMXBean.getThreadCount());
-        long cpu = 0;
+        double cpu = 0;
         for(long tid : threadMXBean.getAllThreadIds()){
-            cpu += threadMXBean.getThreadCpuTime(tid);
+            cpu += TimeUnit.NANOSECONDS.toMillis(threadMXBean.getThreadCpuTime(tid));
         }
-        this.context.log("CPU usage->"+cpu,OnLog.WARN);
+        this.context.log("Uptime 1->"+runtimeMXBean.getUptime(),OnLog.WARN);
+        this.context.log("CPU Time->"+ cpu,OnLog.WARN);
+        double rt = runtimeMXBean.getUptime();
+        double cpuUsage = cpu/rt;
+        this.context.log(String.format("CPU usage-> %.2f",cpuUsage),OnLog.WARN);
+        this.context.log("CPU usage 2->"+operatingSystemMXBean.getSystemLoadAverage(),OnLog.WARN);
+
         performanceMetrics.onUpdated(AbstractMetrics.PERFORMANCE_VM_CPU_USAGE_COUNT,cpu);
         timerCountDown--;
         if(timerCountDown <= 0){
