@@ -505,8 +505,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
 
-
-
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));

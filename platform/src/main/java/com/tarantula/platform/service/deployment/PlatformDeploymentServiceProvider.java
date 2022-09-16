@@ -775,7 +775,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return summary;
     }
     public ClusterProvider.Summary clusterSummary(){
-        return new ClusterSummary();
+        return integrationCluster.summary();
     }
     public List<String> listClusterMember(){
         ArrayList<String> mlist = new ArrayList<>();

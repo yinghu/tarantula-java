@@ -41,6 +41,8 @@ public interface ClusterProvider extends Serviceable {
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
 
+    Summary summary();
+
     interface ClusterStore{
         byte[] get(byte[] key);
         byte[] createIfAbsent(byte[] key,byte[] pending);
@@ -60,7 +62,7 @@ public interface ClusterProvider extends Serviceable {
 
     interface Summary{
         String clusterName();
-        LocalDateTime startTime();
+        long startTime();
         List<Node> clusterNodes();
     }
 
@@ -70,9 +72,8 @@ public interface ClusterProvider extends Serviceable {
         String nodeName();
         String bucketId();
         String nodeId();
-
         String memberId();
-        LocalDateTime startTime();
+        long startTime();
 
     }
 

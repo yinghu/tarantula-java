@@ -16,6 +16,7 @@ import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.*;
@@ -53,13 +54,19 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private CountDownLatch _integrationInstanceStarted ;
     private MetricsListener metricsListener =(n,d)->{};
 
+    private final ClusterSummary summary;
+    private final ClusterNode node;
+
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
+        this.tarantulaContext = tcx;
+        this.node = this.tarantulaContext.deploymentDataStoreProvider.node();
+        this.summary = new ClusterSummary(config.getGroupConfig().getName());
+        this.summary.register(this.node);
         this.config = config;
         this.bucket = bucket;
-        this.tarantulaContext = tcx;
         this.partitionStates = new PartitionState[this.tarantulaContext.platformRoutingNumber];
         for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
             this.partitionStates[i]=new PartitionState(i,false);
@@ -304,6 +311,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             IntegrationClusterStore integrationClusterStore = new IntegrationClusterStore(mIndex,vMap);
             return integrationClusterStore;
         });
+    }
+
+    public ClusterSummary summary(){
+        return this.summary;
     }
 
 }

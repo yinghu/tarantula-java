@@ -2,7 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 
 import com.icodesoftware.service.ClusterProvider;
-import java.time.LocalDateTime;
+
 
 public class ClusterNode implements ClusterProvider.Node {
 
@@ -47,16 +47,8 @@ public class ClusterNode implements ClusterProvider.Node {
     }
 
     @Override
-    public LocalDateTime startTime() {
-        return null;
-    }
-
-
-    public int getFactoryId() {
+    public long startTime() {
         return 0;
     }
 
-    public int getClassId() {
-        return 0;
-    }
 }

@@ -5,6 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.JVMMonitor;
@@ -13,6 +14,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
@@ -211,6 +213,16 @@ public class SudoRoleModule implements Module {
             JVMMonitor jvmMonitor = new JVMMonitor(this.context,metrics,rt);
             this.context.schedule(jvmMonitor);
             session.write(JsonUtil.toSimpleResponse(true,"scheduled with total checks ["+rt+"]").getBytes());
+        }
+        else if(session.action().equals("onClusterList")){
+            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("cluster",summary.clusterName());
+            jsonObject.addProperty("startTime", TimeUtil.fromUTCMilliseconds(summary.startTime()).format(DateTimeFormatter.ISO_DATE_TIME));
+            JsonArray nodes = new JsonArray();
+            
+            jsonObject.add("nodes",nodes);
+            session.write(jsonObject.toString().getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
