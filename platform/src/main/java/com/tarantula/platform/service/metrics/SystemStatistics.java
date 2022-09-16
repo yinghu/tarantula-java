@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;

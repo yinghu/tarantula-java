@@ -5,6 +5,7 @@ import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.statistics.StatisticsUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.LocalDateTime;
@@ -160,14 +161,36 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         logger.warn("Metrics statistics loaded->"+statistics.key().asString());
         //reset snapshots
         for(String category : categories){
+            //reset statistics entry and archive history
+            SystemStatisticsEntry entry = (SystemStatisticsEntry)statistics.entry(category);
+            LocalDateTime lastUpdate = TimeUtil.fromUTCMilliseconds(entry.timestamp());
+            MetricsHistory lastMetricsHistory = metricsHistory(category,lastUpdate);
+            if(!StatisticsUtil.validateHourly(lastUpdate,_cur)){
+                String xh = MetricsSnapshot.hourlyLabel(lastUpdate);
+                Property property = new MetricsProperty(metricsTrackingNumber-1,xh,entry.hourly(),_cur);
+                lastMetricsHistory.archiveHourly(property);
+                entry.hourly(0,_cur);
+
+                if(!StatisticsUtil.validateDaily(lastUpdate,_cur)){
+                    lastMetricsHistory.archiveDaily(entry.daily(),_cur);
+                    entry.daily(0,_cur);
+                }
+                if(!StatisticsUtil.validateWeekly(lastUpdate,_cur)){
+                    lastMetricsHistory.archiveWeekly(entry.weekly(),_cur);
+                    entry.weekly(0,_cur);
+                }
+                if(!StatisticsUtil.validateMonthly(lastUpdate,_cur)){
+                    lastMetricsHistory.archiveMonthly(entry.monthly(),_cur);
+                    entry.monthly(0,_cur);
+                }
+                if(!StatisticsUtil.validateYearly(lastUpdate,_cur)){
+                    lastMetricsHistory.archiveYearly(entry.yearly(),_cur);
+                    entry.yearly(0,_cur);
+                }
+                entry.update();
+            }
+            //reset snapshot
             MetricsSnapshot hourly = metricsSnapshot(category,LeaderBoard.HOURLY);
-            hourly.reset(p-> {
-                LocalDateTime updated = TimeUtil.fromUTCMilliseconds(p.timestamp());
-                MetricsHistory metricsHistory = metricsHistory(category,updated);
-                metricsHistory.archiveHourly(new MetricsProperty(metricsTrackingNumber-1,historyPropertyLabel(updated),p.value(),updated));
-                this.dataStore.update(metricsHistory);
-                return false;
-            });
             initialize(LeaderBoard.HOURLY,hourly,_cur);
             this.dataStore.update(hourly);
 

@@ -7,6 +7,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
+import com.tarantula.platform.statistics.StatisticsUtil;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -165,17 +166,5 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         loaded = true;
         this.dataStore.createIfAbsent(this,true);
         return true;
-    }
-    @Override
-    public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("Name",name);
-        jsonObject.addProperty("Hourly",hourly);
-        jsonObject.addProperty("Daily",daily);
-        jsonObject.addProperty("Weekly",weekly);
-        jsonObject.addProperty("Monthly",monthly);
-        jsonObject.addProperty("Yearly",yearly);
-        jsonObject.addProperty("Total",total);
-        return jsonObject;
     }
 }
