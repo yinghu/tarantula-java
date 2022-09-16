@@ -51,7 +51,7 @@ public class MetricsProperty extends RecoverableObject implements Property {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.name = (String)properties.get("name");
-        this.value = properties.get("value");//
+        this.value = Double.parseDouble((String)properties.get("value"));//
         this.timestamp = ((Number)properties.get("timestamp")).longValue();
     }
 

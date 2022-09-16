@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
@@ -45,7 +46,7 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.metrics = new Property[routingNumber];
         for(int i=0;i<routingNumber;i++){
             JsonObject mj = JsonUtil.parse((String)properties.get("m"+i));
-            metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),mj.get("value").getAsString(),mj.get("timestamp").getAsLong());
+            metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),Double.parseDouble(mj.get("value").getAsString()),mj.get("timestamp").getAsLong());
         }
     }
 
@@ -92,33 +93,7 @@ public class MetricsSnapshot extends RecoverableObject  {
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }
-    public boolean validateHourly(LocalDateTime current){
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
-        //keep same day otherwise do reset
-        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getDayOfYear()==current.getDayOfYear()&&lastUpdated.getHour()==current.getHour();
-    }
-    public boolean validateDaily(LocalDateTime current){
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
-        //keep same day
-        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getDayOfYear()==current.getDayOfYear();
-    }
-    public boolean validateWeekly(LocalDateTime current){
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
-        int lastMonday = lastUpdated.plusDays(8-lastUpdated.getDayOfWeek().getValue()).getDayOfYear();
-        int thisMonday = current.plusDays(8-current.getDayOfWeek().getValue()).getDayOfYear();
-        //keep same week otherwise do reset
-        return lastUpdated.getYear()==current.getYear() && lastMonday==thisMonday;
-    }
-    public boolean validateMonthly(LocalDateTime current){
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
-        //keep same month otherwise do reset
-        return lastUpdated.getYear()==current.getYear()&&lastUpdated.getMonth().getValue()==current.getMonth().getValue();
-    }
-    public boolean validateYearly(LocalDateTime current){
-        LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
-        //keep same year otherwise do reset
-        return lastUpdated.getYear()==current.getYear();
-    }
+
     public static String hourlyLabel(LocalDateTime dateTime){
         int hrs = dateTime.getHour();
         LocalDateTime labelTime = dateTime.toLocalDate().atTime(hrs,0,0,0);
@@ -136,4 +111,11 @@ public class MetricsSnapshot extends RecoverableObject  {
     public static String yearlyLabel(LocalDateTime dateTime){
         return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     }
+
+    public void reset(DataStore.Stream<Property> reset){
+        for(Property p : metrics){
+            reset.on(p);
+        }
+    }
+
 }

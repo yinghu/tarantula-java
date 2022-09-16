@@ -52,7 +52,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
             Object payload = properties.get("m"+i);
             JsonObject mj = JsonUtil.parse((String)payload);
-            metrics[i]=(new MetricsProperty(i, mj.get("name").getAsString(), mj.get("value").getAsString(),mj.get("timestamp").getAsLong()));
+            metrics[i]=(new MetricsProperty(i, mj.get("name").getAsString(), Double.parseDouble(mj.get("value").getAsString()),mj.get("timestamp").getAsLong()));
         }
     }
 
@@ -99,14 +99,21 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
 
     public void archiveHourly(Property property){
         int hour  = TimeUtil.fromUTCMilliseconds(property.timestamp()).getHour();
-        metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1]= property;
+        MetricsProperty archive = (MetricsProperty)metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1];
+        if(archive==null){
+            metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1] = property;
+            return;
+        }
+        double v = (Double)archive.value;
+        double d = (Double)property.value();
+        archive.value = v+d;
     }
 
     public void initializeHourly(LocalDateTime current){
         LocalDateTime start = current.minusHours(current.getHour());
         for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
             LocalDateTime hour = start.plusHours(i);
-            archiveHourly(new MetricsProperty(i,MetricsProperty.historyPropertyLabel(hour),0,hour));
+            archiveHourly(new MetricsProperty(i,MetricsProperty.historyPropertyLabel(hour),0d,hour));
         }
     }
 

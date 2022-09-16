@@ -5,9 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -112,7 +109,7 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,100000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.18:8090",null,10000);
         sampleLoad._init();
         sampleLoad.register();
         //BDS/baf7f6189ba0423f8b87940260083668/history_userCreationCount_hourly_2022_253

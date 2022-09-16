@@ -57,7 +57,7 @@ public class ShardSetup {
             metricsSnapshot.initialize(new MetricsProperty(i,xh,0,cur),cur);
         }
         System.out.println(TimeUtil.fromUTCMilliseconds(metricsSnapshot.timestamp()));
-        System.out.println(">>"+metricsSnapshot.validateHourly(cur.plusDays(1)));
+        //System.out.println(">>"+metricsSnapshot.validateHourly(cur.plusDays(1)));
         for(Property p : metricsSnapshot.metrics()){
             System.out.println(p.name()+">>>>>>"+TimeUtil.fromUTCMilliseconds(p.timestamp()));
         }
