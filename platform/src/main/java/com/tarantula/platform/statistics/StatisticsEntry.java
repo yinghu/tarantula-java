@@ -83,27 +83,25 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     public synchronized Statistics.Entry update(double delta) {
         LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
-        if(_now.getYear()==lastUpdated.getYear()){//check in same year
-            if(_now.getDayOfYear()==lastUpdated.getDayOfYear()){//same day update
-                daily +=delta;
-                weekly +=delta;
-                monthly +=delta;
-            }//another day
-            else{
-                daily = delta;
-                weekly = (_now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)==lastUpdated.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR))?(weekly+delta):delta;
-                monthly = (_now.getMonth().getValue()==lastUpdated.getMonth().getValue())?(monthly+delta):delta;
-            }
-            yearly +=delta;
+        if(StatisticsUtil.validateDaily(lastUpdated,_now)){
+            daily += delta;
+            weekly += delta;
+            monthly += delta;
+            yearly += delta;
         }
-        else{//reset on another year include week
-            daily = delta;
-            weekly = delta;
-            monthly = delta;
-            yearly = delta;
+        else{
+            daily = delta; //daily reset reset daily
+            if(_now.getDayOfWeek().getValue()==1){//weekly reset
+                weekly = delta;
+            }
+            if(_now.getDayOfMonth() == 1){
+                monthly = delta;
+            }
+            if(_now.getDayOfYear() == 1){
+                yearly = delta;
+            }
         }
         total += delta;
-        timestamp = TimeUtil.toUTCMilliseconds(_now);
         if(listener!=null){
             listener.entryUpdated(this);
         }

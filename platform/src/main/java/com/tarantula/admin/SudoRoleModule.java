@@ -230,29 +230,10 @@ public class SudoRoleModule implements Module {
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
-    private JsonElement _parse(JsonParser parser, byte[] k,byte[] payload){
-        try{
-            return parser.parse(new String(payload));
-        }catch (Exception ex){
-            this.context.log("KEY->"+new String(k),OnLog.WARN);
-            this.context.log("LOAD->"+new String(payload),OnLog.WARN);
-            return new JsonObject();
-        }
-    }
     private JsonObject toMessage(String msg,boolean suc){
         JsonObject jms = new JsonObject();
         jms.addProperty("successful",suc);
         jms.addProperty("message",msg);
         return jms;
-    }
-    private JsonObject toJsonList(List<String> dataStoreList){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
-        JsonArray clist = new JsonArray();
-        dataStoreList.forEach((d)->{
-            clist.add(d);
-        });
-        jsonObject.add("list",clist);
-        return jsonObject;
     }
 }
