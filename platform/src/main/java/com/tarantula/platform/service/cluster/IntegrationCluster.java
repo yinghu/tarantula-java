@@ -330,7 +330,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _cluster.getCluster().getMembers().forEach((m)->{
             if(!m.localMember()){
                 String[] pnode = m.getStringAttribute("node").split("#");
-                log.warn("existing node->"+pnode[0]+":"+pnode[1]);
+                Node exstingNode = fromCluster(pnode[1]);
+                if(exstingNode != null) this.summary.register(fromCluster(pnode[1]));
             }
         });
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
@@ -342,10 +343,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
-        Node n = new ClusterNode();
-        byte[] ret = this.vMap.get(nodeId.getBytes());
-        n.fromBinary(ret);
-        summary.register(n);
+        summary.register(fromCluster(nodeId));
     }
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
@@ -355,5 +353,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.summary.unregister(new ClusterNode(node[0],node[1]));
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
+    }
+    private Node fromCluster(String nodeId){
+        Node n = new ClusterNode();
+        byte[] ret = this.vMap.get(nodeId.getBytes());
+        if(ret==null) return null;
+        n.fromBinary(ret);
+        return n;
     }
 }
