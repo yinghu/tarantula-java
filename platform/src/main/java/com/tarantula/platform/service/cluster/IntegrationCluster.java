@@ -57,7 +57,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private MetricsListener metricsListener =(n,d)->{};
 
     private ClusterSummary summary;
-    private ClusterNode node;
+
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
@@ -95,10 +95,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
-        this.node = this.tarantulaContext.deploymentDataStoreProvider.node();
         this.summary = new ClusterSummary(config.getGroupConfig().getName());
-        this.summary.register(this.node);
-
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
@@ -322,18 +319,30 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public void registerNode(Node node){
-        byte[] ret = this.vMap.putIfAbsent(node.nodeId().getBytes(),node.toBinary());
+        ClusterNode cnode = (ClusterNode) node;
+        cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
+        byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
-        _cluster.getCluster().getLocalMember().setStringAttribute(node.nodeName(),node.nodeId());
+        _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
-        log.warn("Member joined->"+mEvent.getMember().getUuid()+">>>"+mEvent.getKey()+">>>>>"+mEvent.getValue());
-        this.vMap.putIfAbsent(mEvent.getMember().getUuid().getBytes(),mEvent.getValue().toString().getBytes());
+        String[] node = mEvent.getValue().toString().split("#");
+        String nodeName = node[0];
+        String nodeId = node[1];
+        String memberId = mEvent.getMember().getUuid();
+        log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
+        this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
+        Node n = new ClusterNode();
+        byte[] ret = this.vMap.get(nodeId.getBytes());
+        n.fromBinary(ret);
+        summary.register(n);
     }
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
-        log.warn("Member left->"+mEvent.getMember().getUuid()+">>>");
-        byte[] nodeId = this.vMap.get(mEvent.getMember().getUuid().getBytes());
+        String memberId = mEvent.getMember().getUuid();
+        String nodeName = mEvent.getMember().getStringAttribute("node");
+        log.warn("Member ["+memberId+"] left from node ["+nodeName+"]");
+        byte[] nodeId = this.vMap.get(memberId.getBytes());
         if(nodeId!=null){
             this.vMap.remove(nodeId);
         }
