@@ -104,6 +104,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void memberAttributeChanged(MemberAttributeServiceEvent memberAttributeServiceEvent) {
+        this.tarantulaContext.integrationCluster().onNodeRegistered(memberAttributeServiceEvent);
     }
 
     public void onUpload(String fileName,byte[] content){

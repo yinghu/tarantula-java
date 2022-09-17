@@ -34,7 +34,7 @@ public class ClusterSummary implements ClusterProvider.Summary {
 
     //operations
     public void register(ClusterProvider.Node node){
-        nodeList.put(node.nodeId(),node);
+        nodeList.put(node.nodeName(),node);
     }
 
 

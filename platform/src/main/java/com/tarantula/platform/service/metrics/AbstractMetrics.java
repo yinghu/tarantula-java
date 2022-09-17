@@ -71,7 +71,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
 
     protected DataStore dataStore;
     private SystemStatistics statistics;
-    private ServiceContext serviceContext;
+    //private ServiceContext serviceContext;
     private ArrayList<String> categories;
     protected TarantulaLogger logger;
     protected String name;
@@ -149,7 +149,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             registerCategory(GAME_JOIN_COUNT);
             registerCategory(GAME_TIMEOUT_COUNT);
         }
-        this.serviceContext = serviceContext;
+        //this.serviceContext = serviceContext;
         String nodeId = serviceContext.nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();

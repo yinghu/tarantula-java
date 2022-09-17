@@ -493,6 +493,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
         if(bid==null | nid==null) throw new RuntimeException("Need to restart the server again");
+
+        integrationCluster.registerNode(this.node);
+        //
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         initMetricsProvider();

@@ -4,6 +4,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
 import com.hazelcast.core.Message;
+import com.hazelcast.spi.MemberAttributeServiceEvent;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
@@ -54,17 +55,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private CountDownLatch _integrationInstanceStarted ;
     private MetricsListener metricsListener =(n,d)->{};
 
-    private final ClusterSummary summary;
-    private final ClusterNode node;
+    private ClusterSummary summary;
+    private ClusterNode node;
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
+    //private ConcurrentHashMap<String,CountDownLatch> pendingNode = new ConcurrentHashMap<>();
+    private CountDownLatch pendingNode = new CountDownLatch(1);
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.tarantulaContext = tcx;
-        this.node = this.tarantulaContext.deploymentDataStoreProvider.node();
-        this.summary = new ClusterSummary(config.getGroupConfig().getName());
-        this.summary.register(this.node);
         this.config = config;
         this.bucket = bucket;
         this.partitionStates = new PartitionState[this.tarantulaContext.platformRoutingNumber];
@@ -95,6 +95,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
+        this.node = this.tarantulaContext.deploymentDataStoreProvider.node();
+        this.summary = new ClusterSummary(config.getGroupConfig().getName());
+        this.summary.register(this.node);
+
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
@@ -315,6 +319,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public ClusterSummary summary(){
         return this.summary;
+    }
+
+    public void registerNode(Node node) throws Exception{
+
+        _cluster.getCluster().getLocalMember().setStringAttribute("nodeName",node.nodeName());
+    }
+    public void onNodeRegistered(MemberAttributeServiceEvent memberAttributeServiceEvent){
+        log.warn("Member->"+memberAttributeServiceEvent.getMember().getUuid()+">>>"+memberAttributeServiceEvent.getValue());
     }
 
 }
