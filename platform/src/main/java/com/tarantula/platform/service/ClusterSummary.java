@@ -14,20 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClusterSummary extends RecoverableObject implements ClusterProvider.Summary {
 
     private final String clusterName;
-    private final long startTime;
+    public int partitionNumber;
 
     private final ConcurrentHashMap<String, ClusterProvider.Node> nodeList;
 
-    public ClusterSummary(String clusterName){
+    public ClusterSummary(String clusterName,int partitionNumber){
         this.clusterName = clusterName;
-        this.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.partitionNumber = partitionNumber;
         this.nodeList = new ConcurrentHashMap<>();
     }
     public String clusterName(){
         return clusterName;
     }
-    public long startTime(){
-        return startTime;
+    public int partitionNumber(){
+        return partitionNumber;
     }
 
     public List<ClusterProvider.Node> clusterNodes(){
@@ -48,6 +48,7 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("clusterName",clusterName);
+        jsonObject.addProperty("partitionNumber",partitionNumber);
         JsonArray nodes = new JsonArray();
         nodeList.forEach((k,n)->{
             nodes.add(n.toJson());

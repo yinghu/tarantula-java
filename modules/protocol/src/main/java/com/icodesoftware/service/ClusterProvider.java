@@ -63,7 +63,7 @@ public interface ClusterProvider extends Serviceable {
 
     interface Summary extends Recoverable{
         String clusterName();
-        long startTime();
+        int partitionNumber();
         List<Node> clusterNodes();
     }
 

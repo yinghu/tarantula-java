@@ -97,7 +97,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             EventSubscriptionWorker ese = new EventSubscriptionWorker(this,eventSubscribers,replicationQueue);
             this.inboundEventPool.execute(ese);
         }
-        this.summary = new ClusterSummary(config.getGroupConfig().getName());
+        int partitionCount = Integer.parseInt(config.getProperties().getProperty("hazelcast.partition.count"));
+        this.summary = new ClusterSummary(config.getGroupConfig().getName(),partitionCount);
         config.getSerializationConfig().addPortableFactory(PortableEventRegistry.OID,new PortableEventRegistry());
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
@@ -322,7 +323,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
-        cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        cnode.startTime = _cluster.getCluster().getClusterTime();
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().toString();
         byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
@@ -334,6 +335,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 if(exstingNode != null) this.summary.register(fromCluster(pnode[1]));
             }
         });
+
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
