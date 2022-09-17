@@ -5,6 +5,7 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.core.*;
 import com.hazelcast.core.Message;
 import com.hazelcast.spi.MemberAttributeServiceEvent;
+import com.hazelcast.spi.MembershipServiceEvent;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
@@ -326,10 +327,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _cluster.getCluster().getLocalMember().setStringAttribute(node.nodeName(),node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
-        log.warn("Member->"+mEvent.getMember().getUuid()+">>>"+mEvent.getKey()+">>>>>"+mEvent.getValue());
+        log.warn("Member joined->"+mEvent.getMember().getUuid()+">>>"+mEvent.getKey()+">>>>>"+mEvent.getValue());
     }
 
-    public void onNodeRemoved(){
-
+    public void onNodeRemoved(MembershipServiceEvent mEvent){
+        log.warn("Member left->"+mEvent.getMember().getUuid()+">>>");
     }
 }
