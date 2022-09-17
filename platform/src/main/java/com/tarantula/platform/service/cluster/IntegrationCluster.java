@@ -328,9 +328,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
         log.warn("Member joined->"+mEvent.getMember().getUuid()+">>>"+mEvent.getKey()+">>>>>"+mEvent.getValue());
+        this.vMap.putIfAbsent(mEvent.getMember().getUuid().getBytes(),mEvent.getKey().getBytes());
     }
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         log.warn("Member left->"+mEvent.getMember().getUuid()+">>>");
+        byte[] nodeId = this.vMap.get(mEvent.getMember().getUuid().getBytes());
+        this.vMap.remove(nodeId);
     }
 }
