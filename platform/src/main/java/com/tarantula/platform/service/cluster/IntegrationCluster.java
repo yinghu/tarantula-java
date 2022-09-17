@@ -327,6 +327,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().toString();
         byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
+        _cluster.getCluster().getMembers().forEach((m)->{
+            if(!m.localMember()){
+                String[] pnode = m.getStringAttribute("node").split("#");
+                log.warn("existing node->"+pnode[0]+":"+pnode[1]);
+            }
+        });
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
