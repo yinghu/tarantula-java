@@ -68,6 +68,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         jsonObject.addProperty("nodeName",nodeName);
         jsonObject.addProperty("nodeId",nodeId);
         jsonObject.addProperty("memberId",memberId);
+        jsonObject.addProperty("startTime",startTime);
         return jsonObject;
     }
 
