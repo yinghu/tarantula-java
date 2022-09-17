@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClusterSummary implements ClusterProvider.Summary {
+public class ClusterSummary extends RecoverableObject implements ClusterProvider.Summary {
 
     private final String clusterName;
     private final long startTime;

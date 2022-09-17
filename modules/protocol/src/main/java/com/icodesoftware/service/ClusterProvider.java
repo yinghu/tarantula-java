@@ -1,6 +1,7 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.EventListener;
+import com.icodesoftware.Recoverable;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -60,13 +61,13 @@ public interface ClusterProvider extends Serviceable {
 
     }
 
-    interface Summary{
+    interface Summary extends Recoverable{
         String clusterName();
         long startTime();
         List<Node> clusterNodes();
     }
 
-    interface Node{
+    interface Node extends Recoverable {
 
         String bucketName();
         String nodeName();

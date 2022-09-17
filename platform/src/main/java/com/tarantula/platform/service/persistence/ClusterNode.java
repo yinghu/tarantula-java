@@ -1,10 +1,13 @@
 package com.tarantula.platform.service.persistence;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
 
 
-public class ClusterNode implements ClusterProvider.Node {
+public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
 
     public String bucketName;
     public String nodeName;
@@ -49,6 +52,21 @@ public class ClusterNode implements ClusterProvider.Node {
     @Override
     public long startTime() {
         return 0;
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+
+        return jsonObject;
+    }
+
+    public byte[] toBinary(){
+        return toJson().toString().getBytes();
+    }
+    public void fromBinary(byte[] payload){
+        JsonObject jsonObject = JsonUtil.parse(payload);
+
     }
 
 }

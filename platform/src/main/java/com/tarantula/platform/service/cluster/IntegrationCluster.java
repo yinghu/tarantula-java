@@ -60,8 +60,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
-    //private ConcurrentHashMap<String,CountDownLatch> pendingNode = new ConcurrentHashMap<>();
-    private CountDownLatch pendingNode = new CountDownLatch(1);
+
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.tarantulaContext = tcx;
@@ -321,12 +320,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this.summary;
     }
 
-    public void registerNode(Node node) throws Exception{
-
-        _cluster.getCluster().getLocalMember().setStringAttribute("nodeName",node.nodeName());
+    public void registerNode(Node node){
+        byte[] ret = this.createIfAbsent(node.nodeId().getBytes(),node.toBinary());
+        if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
+        _cluster.getCluster().getLocalMember().setStringAttribute(node.nodeName(),node.nodeId());
     }
-    public void onNodeRegistered(MemberAttributeServiceEvent memberAttributeServiceEvent){
-        log.warn("Member->"+memberAttributeServiceEvent.getMember().getUuid()+">>>"+memberAttributeServiceEvent.getValue());
+    public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
+        log.warn("Member->"+mEvent.getMember().getUuid()+">>>"+mEvent.getKey()+">>>>>"+mEvent.getValue());
     }
 
+    public void onNodeRemoved(){
+
+    }
 }
