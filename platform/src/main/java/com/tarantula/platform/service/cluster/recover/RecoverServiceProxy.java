@@ -6,8 +6,6 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
@@ -21,7 +19,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
     private String objectName;
 
-    private static TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
 
     private MetricsListener metricsListener;
     private MetricsListener metricsListenerHook;
@@ -110,7 +107,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     if(expected==0) break;
                 } catch (Exception e) {
                     future.cancel(true);
-                    logger.error("replicate error on node->"+m.getAddress(),e);
                     //goes to next node if failed
                 }
             }
