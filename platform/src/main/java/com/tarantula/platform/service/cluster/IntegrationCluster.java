@@ -12,6 +12,7 @@ import com.icodesoftware.service.*;
 
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaMain;
@@ -21,6 +22,7 @@ import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -320,7 +322,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
+        cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
+        cnode.address = _cluster.getCluster().getLocalMember().getAddress().toString();
         byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
@@ -340,12 +344,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         String memberId = mEvent.getMember().getUuid();
-        String nodeName = mEvent.getMember().getStringAttribute("node");
-        log.warn("Member ["+memberId+"] left from node ["+nodeName+"]");
-        byte[] nodeId = this.vMap.get(memberId.getBytes());
-        if(nodeId!=null){
-            this.vMap.remove(nodeId);
-        }
-        this.vMap.remove(mEvent.getMember().getUuid().getBytes());
+        String[] node = mEvent.getMember().getStringAttribute("node").split("#");
+        log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
+        this.summary.unregister(new ClusterNode(node[0],node[1]));
+        this.vMap.remove(node[1].getBytes());//remove nodeId = > node
+        this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
 }

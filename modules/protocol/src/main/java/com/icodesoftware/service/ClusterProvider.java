@@ -74,6 +74,7 @@ public interface ClusterProvider extends Serviceable {
         String bucketId();
         String nodeId();
         String memberId();
+        String address();
         long startTime();
 
     }

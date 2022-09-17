@@ -15,6 +15,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String bucketId;
     public String nodeId;
     public String memberId;
+    public String address;
     public long startTime;
 
     public ClusterNode(String bucketName, String nodeName){
@@ -56,6 +57,11 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     }
 
     @Override
+    public String address(){
+        return address;
+    }
+
+    @Override
     public long startTime() {
         return startTime;
     }
@@ -68,6 +74,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         jsonObject.addProperty("nodeName",nodeName);
         jsonObject.addProperty("nodeId",nodeId);
         jsonObject.addProperty("memberId",memberId);
+        jsonObject.addProperty("address",address);
         jsonObject.addProperty("startTime",startTime);
         return jsonObject;
     }
@@ -82,8 +89,8 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.nodeName = jsonObject.get("nodeName").getAsString();
         this.nodeId = jsonObject.get("nodeId").getAsString();
         this.memberId = jsonObject.get("memberId").getAsString();
+        this.address = jsonObject.get("address").getAsString();
         this.startTime = jsonObject.get("startTime").getAsLong();
-
     }
 
 }
