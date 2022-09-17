@@ -220,7 +220,7 @@ public class SudoRoleModule implements Module {
             jsonObject.addProperty("cluster",summary.clusterName());
             jsonObject.addProperty("startTime", TimeUtil.fromUTCMilliseconds(summary.startTime()).format(DateTimeFormatter.ISO_DATE_TIME));
             JsonArray nodes = new JsonArray();
-            
+
             jsonObject.add("nodes",nodes);
             session.write(jsonObject.toString().getBytes());
         }
