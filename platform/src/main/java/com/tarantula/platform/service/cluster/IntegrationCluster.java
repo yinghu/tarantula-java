@@ -326,7 +326,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         cnode.startTime = _cluster.getCluster().getClusterTime();
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
-        for(int i=0;i<3;i++){
+        for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
@@ -337,7 +337,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
                 break;
             }catch (Exception ex){
-                if(i == 2) throw new RuntimeException(ex);
+                if(i == 9) throw new RuntimeException(ex);
                 log.warn("Waiting pending registering nodes ...");
                 try { Thread.sleep(5000); }catch (Exception ignore){}
             }
