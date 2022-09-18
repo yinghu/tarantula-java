@@ -350,7 +350,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 break;
             }catch (Exception ex){
                 if(i == 9) {
-                    log.warn("Cluster going to shutdown due to member not ready");
+                    log.warn("Cluster going to shutdown due to member not ready after 10 retries");
                     _cluster.getCluster().shutdown();
                 }else{
                     log.warn("Waiting pending registering nodes ...");

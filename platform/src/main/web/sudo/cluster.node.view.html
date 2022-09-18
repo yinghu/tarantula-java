@@ -18,7 +18,7 @@
     </div>
     <div class="w3-panel">
         <fieldset class="w3-border-blue tx-text-14">
-            <legend>Summary</legend>
+            <legend class="w3-green w3-round-xlarge w3-padding-small w3-border-blue">Summary</legend>
         <div class="w3-container w3-border-bottom w3-border-red">
             <span class="w3-left tx-margin-left-8 tx-text-12">BucketName</span>
             <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-bucket-name">BDS</span>
@@ -37,11 +37,15 @@
         </div>
         <div class="w3-container w3-border-bottom w3-border-red">
             <span class="w3-left tx-margin-left-8 tx-text-12">Address</span>
-            <span class="w3-right tx-margin-right-8 tx-text-14" id="tx-cluster-node-address">BDS</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-address">BDS</span>
         </div>
-        <div class="w3-container">
+        <div class="w3-container w3-border-bottom w3-border-red">
             <span class="w3-left tx-margin-left-8 tx-text-12">MemberId</span>
             <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-member-id">DBS/123</span>
+        </div>
+        <div class="w3-container">
+            <span class="w3-left tx-margin-left-8 tx-text-12">Start Time</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-start-time">DBS/123</span>
         </div>
         </fieldset>
     </div>
@@ -62,6 +66,7 @@
     document.querySelector('#tx-cluster-node-node-id').innerHTML = node.nodeId;
     document.querySelector('#tx-cluster-node-address').innerHTML = node.address;
     document.querySelector('#tx-cluster-node-member-id').innerHTML = node.memberId;
+    document.querySelector('#tx-cluster-node-start-time').innerHTML = node.startTime;
     document.querySelector('#tx-cluster-node-close').onclick=()=>{
         let m3 = document.querySelector("#tx-popup-api");
         m3.innerHTML="";

@@ -5,6 +5,9 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
+
+import java.time.format.DateTimeFormatter;
 
 
 public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
@@ -68,19 +71,11 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     @Override
     public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("bucketName",bucketName);
-        jsonObject.addProperty("bucketId",bucketId);
-        jsonObject.addProperty("nodeName",nodeName);
-        jsonObject.addProperty("nodeId",nodeId);
-        jsonObject.addProperty("memberId",memberId);
-        jsonObject.addProperty("address",address);
-        jsonObject.addProperty("startTime",startTime);
-        return jsonObject;
+        return _toJson(true);
     }
 
     public byte[] toBinary(){
-        return toJson().toString().getBytes();
+        return _toJson(false).toString().getBytes();
     }
     public void fromBinary(byte[] payload){
         JsonObject jsonObject = JsonUtil.parse(payload);
@@ -91,6 +86,22 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.memberId = jsonObject.get("memberId").getAsString();
         this.address = jsonObject.get("address").getAsString();
         this.startTime = jsonObject.get("startTime").getAsLong();
+    }
+    private JsonObject _toJson(boolean toWeb){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("bucketName",bucketName);
+        jsonObject.addProperty("bucketId",bucketId);
+        jsonObject.addProperty("nodeName",nodeName);
+        jsonObject.addProperty("nodeId",nodeId);
+        jsonObject.addProperty("memberId",memberId);
+        jsonObject.addProperty("address",address);
+        if(toWeb){
+            jsonObject.addProperty("startTime",TimeUtil.fromUTCMilliseconds(startTime).format(DateTimeFormatter.ISO_DATE_TIME));
+        }
+        else{
+            jsonObject.addProperty("startTime",startTime);
+        }
+        return jsonObject;
     }
 
 }
