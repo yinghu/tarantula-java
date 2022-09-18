@@ -355,6 +355,26 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
         summary.register(fromCluster(nodeId));
+        for(int i=0;i<10;i++){
+            try{
+                for(Member m : _cluster.getCluster().getMembers()){
+                    if(!m.localMember()){
+                        String[] pnode = m.getStringAttribute("node").split("#");
+                        Node exstingNode = fromCluster(pnode[1]);
+                        if(exstingNode != null) this.summary.register(fromCluster(pnode[1]));
+                    }
+                }
+                break;
+            }catch (Exception ex){
+                if(i == 9) {
+                    log.warn("Cluster going to shutdown due to member not ready");
+                    _cluster.getCluster().shutdown();
+                }else{
+                    log.warn("Waiting pending registering nodes ...");
+                    try { Thread.sleep(5000); }catch (Exception ignore){}
+                }
+            }
+        }
     }
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
