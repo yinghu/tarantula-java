@@ -276,7 +276,6 @@
 <script>
     document.querySelector('#tx-menu-close').onclick = ()=>{
         if(TARA_API.query().systemId){
-            tx_oauth_sign_out();
             TARA_API.onLogout((resp)=>{
                 document.querySelector("#tx-dash-board").style.display="none";
                 document.querySelector("#tx-dash-board").innerHTML="";

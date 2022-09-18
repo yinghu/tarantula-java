@@ -19,7 +19,7 @@
 </head>
 <body class='w3-white' onload="_ready()"> 
     <div>
-        <div class="w3-display-container w3-green  tx-content-120">
+        <div class="w3-display-container w3-green tx-content-120">
             <div class="w3-display-topright w3-padding">
                 <span id="tx-menu-open"><i class="fa fa-sign-in" style="font-size:24px"></i></span>
                 <!-- TO DO popup menu 100% width-->            
@@ -33,7 +33,7 @@
         <div class="w3-display-container w3-green w3-border-bottom w3-border-red tx-content-48">
             <div class="w3-display-bottomleft w3-padding">
                 <span><i class="fa fa-diamond" style="font-size:24px;color: red;"></i></span>
-                <span class='tx-text-24 tx-margin-left-8'>Innovative Game Integration Platform</span>
+                <span class='tx-text-24 tx-margin-left-8'>Innovative Platform</span>
             </div>
             <div class="w3-display-bottomright w3-padding">
                 <span class="tx-text-12">Powered By ICodeSoftware</span>
@@ -193,7 +193,7 @@
             </div>
         </div> 
         <div class="w3-display-container w3-white tx-content-16"></div>
-        <div class="w3-row w3-border-bottom w3-border-red">
+        <div class="w3-row">
             <div class="w3-half w3-container">
                 <div class="w3-container w3-white  ">
                     <div class="w3-container">
@@ -252,10 +252,10 @@
                 }else{
                     tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
                 }
-            }
+            };
             document.querySelector('#tx-sign-up').onclick = ()=>{    
                 tx_view({viewId:'sign.up',containerId:'#tx-popup'});  
-            }
+            };
         }
         function tx_view(setup){//set up format {viewId:"viewID",containerId:"#m1"}
             TARA_API.onView(setup.viewId,function(v){
@@ -325,142 +325,6 @@
             m3.innerHTML="";
             m3.style.display = 'none'; 
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
-        }
-        function tx_on_google_auth(){
-            //let m = document.getElementsByTagName('head')[0];
-            //let m1 = document.createElement('meta');
-            //m1.name = 'google-signin-scope';
-            //m1.content = 'profile email';
-            //m.parentNode.insertBefore(m1,m);
-            //let m2 = document.createElement('meta');
-            //m2.name = 'google-signin-client_id';
-            //m2.content = TARA_API.query().googleClientId;
-            //m.parentNode.insertBefore(m2,m);    
-            //let glib = document.createElement('script');
-            //glib.type = 'text/javascript';
-            //glib.async = true;
-            //glib.defer = true;
-            //glib.src = 'https://apis.google.com/js/platform.js';
-            //glib.onload = render_button;
-            //let t = document.getElementsByTagName("script")[0];
-            //t.parentNode.insertBefore(glib,t); 
-        }
-        function render_button() {
-            gapi.signin2.render('tx-google-button', {
-                'width': '240px',
-                'height': '48px',
-                'longtitle': true,
-                'theme': 'dark',
-                'onsuccess': on_sign_in,
-                'onfailure': function(err){console.log(err);},
-            });
-        }
-        function on_sign_in(googleUser) {
-            let uid = googleUser.getBasicProfile().getEmail();
-            console.log(googleUser.getBasicProfile().getId());       
-            let id_token = googleUser.getAuthResponse().id_token;
-            TARA_API.onToken({provider:'google',"token":id_token,command:'onToken',login:uid},function(resp){
-                console.log(resp);
-                if(resp.successful){
-                    tx_on_login();    
-                }else{
-                    document.querySelector('#tx-sign-in-message').innerHTML = resp.message;
-                }
-            }); 
-        }
-        function tx_oauth_sign_out() {
-            //if(!window.gapi) return;
-            //let auth2 = gapi.auth2.getAuthInstance();
-            //if(auth2.isSignedIn.get() == true){
-                //auth2.signOut().then(function () {
-                    //console.log('Google user signed out.');
-                //});
-            //}
-        }
-        function tx_create_uuid(){
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                let r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-        function tx_guest_play_try(){
-            let payload = {login:'',password:''};
-            if(window.localStorage){
-                let _login = localStorage.getItem('guest_try');
-                if(_login){
-                    payload.login = _login;
-                    payload.password = _login;
-                }    
-                else{
-                    payload.login = tx_create_uuid();
-                    payload.password = payload.login;
-                    localStorage.setItem('guest_try',payload.login);    
-                }
-            }
-            else{
-                payload.login = tx_create_uuid();
-                payload.password = payload.login;    
-            }
-            TARA_API.onRegister(payload,function(resp){
-                _tx_guest_login_and_setup(payload);
-            });     
-        }
-        function _tx_guest_login_and_setup(payload){
-            TARA_API.onLogin(payload,function(resp){
-                if(resp.successful){
-                    TARA_API.onGet('presence/lobby','onLobby',TARA_API.query().game,(respLobby)=>{
-                        if(respLobby.successful){
-                            _tx_guest_play(respLobby);
-                        }
-                        else{
-                            document.querySelector("#tx-play-game-message").innerHTML=respLobby.message;        
-                        }
-                    });              
-                }
-                else{
-                    document.querySelector("#tx-play-game-message").innerHTML=resp.message;
-                }
-            });  
-        }
-        function _tx_guest_play(lobby){
-            let tournamentEnabled = false;
-            lobby.lobbyList.forEach((a)=>{
-                if(a.descriptor.typeId == lobby.name+'-lobby' ){
-                    a.applications.forEach((b)=>{
-                        tournamentEnabled = b.tournamentEnabled;
-                    });
-                }
-            });
-            let _mmk = TARA_API.query().game+'/mmk';
-            let _path = TARA_API.query().game;
-            let _gameView = 'play.game.'+TARA_API.query().game;
-            TARA_API.query().gamePlayViewId = _gameView;
-            if(tournamentEnabled){
-                let tournamentView = _gameView+'.tournament';//play.{game}.tournament
-                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:true,viewId:_gameView}; 
-                TARA_API.query().payload = payload;
-                TARA_API.query().serviceTag = _path+'/tournament';
-                TARA_API.query().popup = '#tx-popup';
-                tx_view({viewId:tournamentView,containerId:'#tx-popup'});       
-            }
-            else{
-                let payload ={serviceTag:_mmk,gamePath:_path,tournamentEnabled:false}; 
-                TARA_API.onPlay(payload,(resp)=>{
-                    if(resp.successful){
-                        TARA_API.query().gamePopup = '#tx-popup-game';
-                        TARA_API.query().popup = '#tx-popup-game';//in case goes to invalid page
-                        tx_view({viewId:_gameView,containerId:'#tx-popup-game'});
-                    }
-                    else{//goes to error page
-                        TARA_API.query().popup = '#tx-popup';
-                        TARA_API.query().message = resp.message;
-                        tx_view({viewId:'error',containerId:'#tx-popup'});
-                    }
-                });
-            }         
         }
         function tx_first_upcase(word){
             return word[0].toUpperCase() + word.slice(1).toLowerCase()
