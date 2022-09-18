@@ -551,6 +551,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return false;
             }
         }
+
+        public byte[] load(byte[] key){
+            throw new UnsupportedOperationException();
+        }
+
         public void set(byte[] key,byte[] value){
             try{
                 if(!_set(key,value)){

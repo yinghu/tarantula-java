@@ -275,6 +275,21 @@ public class PartitionDataStore extends ReplicatedDataStore{
         }
     }
 
+    public byte[] load(byte[] key){
+        DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+        boolean loaded = dso.lock(key,()->{
+            RevisionObject ro = _getRevisionObject(dso,key);
+            if(ro == null || !ro.local){//get from cluster
+                byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
+                if(value==null) return false;
+                ro = RevisionObject.fromBinary(value);
+                _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
+            }
+            return true;
+        });
+        return loaded?_get(dso,key):null;
+    }
+
     @Override
     public void set(byte[] key, byte[] value) {
         try{
@@ -392,6 +407,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public void registerListener(int registerId,Listener listener){
         rMap.putIfAbsent(registerId,listener);
     }
+
     private byte[] _get(DataBaseOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);

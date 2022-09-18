@@ -63,7 +63,9 @@ public class EmptyDataStore implements DataStore {
     public <T extends Recoverable> void list(RecoverableFactory<T> recoverableFactory, Stream<T> stream) {
 
     }
-
+    public byte[] load(byte[] key){
+        throw new UnsupportedOperationException();
+    }
     @Override
     public void registerListener(int i, Listener listener) {
 

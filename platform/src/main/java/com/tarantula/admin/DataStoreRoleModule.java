@@ -54,7 +54,7 @@ public class DataStoreRoleModule implements Module {
             summary.addProperty("partitionNumber",sum.partitionNumber());
             summary.addProperty("totalRecords",sum.totalRecords());
             if(sum.dataStore()!=null&&query[1]!=null){
-                byte[] data = sum.dataStore().backup().get(query[1].getBytes());
+                byte[] data = sum.dataStore().load(query[1].getBytes());
                 if(data!=null) {
                     RevisionObject revisionObject = RevisionObject.fromBinary(data);
                     JsonObject debug = new JsonObject();

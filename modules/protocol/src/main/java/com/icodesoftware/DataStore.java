@@ -5,8 +5,6 @@ import java.util.List;
 
 public interface DataStore {
 
-    //int scope();
-
     String bucket();
 
     String node();
@@ -26,6 +24,8 @@ public interface DataStore {
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
 
     <T extends Recoverable> boolean load(T t);
+
+    byte[] load(byte[] key);
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
