@@ -63,6 +63,7 @@
             a.onclick = ()=>{
                 let ix = a.getAttribute('cluster-node-index')/1;
                 console.log("going to node view->"+ix);
+                TARA_API.query().clusterNode = TARA_API.query().platformClusterList.nodeList[ix];
                 tx_view({viewId:'cluster.node',containerId:'#tx-popup-api'}); 
             };        
         });       
