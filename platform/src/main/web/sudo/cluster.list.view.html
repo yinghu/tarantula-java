@@ -27,20 +27,9 @@
         </div>
     </div>
     <div class="w3-panel" id='tx-platform-cluster-node-list'>
-        <div class="w3-panel w3-padding w3-block w3-green">
-            <span class="w3-left tx-margin-right-8"><i class="fa fa-server" style="font-size:16px"></i></span>
-            <span class="w3-left tx-margin-left-8 tx-text-14">192.168.1.10</span>
-            <span class="w3-right tx-margin-right-8"><i class="fa fa-caret-square-o-down" style="font-size:16px"></i></span>
-        </div>
-
-        <div class="w3-panel w3-padding w3-block w3-green">
-            <span class="w3-left tx-margin-right-8"><i class="fa fa-server" style="font-size:16px"></i></span>
-            <span class="w3-left tx-margin-left-8 tx-text-14">192.168.1.12</span>
-            <span class="w3-right tx-margin-right-8"><i class="fa fa-caret-square-o-down" style="font-size:16px"></i></span>
-        </div>
             
     </div>
-    </div> 
+   
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -62,9 +51,9 @@
             tem.push('<div class=\'w3-panel w3-padding w3-block w3-green\'>');
             tem.push('<span class=\'w3-left tx-margin-right-8\'><i class=\'fa fa-server\' style=\'font-size:16px\'></i></span>');
             tem.push('<span class=\'w3-left tx-margin-left-8 tx-text-14\'>');
-            tem.push(n.address);
+            tem.push(n.nodeName+' ['+n.address+']');
             tem.push('</span>');
-            tem.push('<span class=\'w3-right tx-margin-right-8\'><i class=\'fa fa-external-link\' style=\'font-size:16px\'></i></span></div>');        
+            tem.push('<span class=\'w3-right tx-margin-right-8\'><i class=\'fa fa-gear\' style=\'font-size:16px\'></i></span></div>');        
         });
         nodeBar.innerHTML = tem.join('');       
     });
