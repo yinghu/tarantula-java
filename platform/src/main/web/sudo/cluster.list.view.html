@@ -41,21 +41,30 @@
 </div>
 <script>
     TARA_API.onGet('role/sudo','onClusterList','',(resp)=>{
+        TARA_API.query().platformClusterList = resp;
         console.log(resp);
         document.querySelector('#tx-platform-cluster-header-name').innerHTML = resp.clusterName;
         document.querySelector('#tx-platform-cluster-header-partition-number').innerHTML = resp.partitionNumber;
         let nodeBar = document.querySelector('#tx-platform-cluster-node-list');
         nodeBar.innerHTML = '';
         let tem = [];
-        resp.nodeList.forEach(n => {
-            tem.push('<div class=\'w3-panel w3-padding w3-block w3-green\'>');
+        resp.nodeList.forEach((n,i)=> {
+            tem.push('<div cluster-node-index=\'');
+            tem.push(i);
+            tem.push('\' class=\'w3-panel w3-padding w3-block w3-green tx-platform-cluster-node\'>');
             tem.push('<span class=\'w3-left tx-margin-right-8\'><i class=\'fa fa-server\' style=\'font-size:16px\'></i></span>');
             tem.push('<span class=\'w3-left tx-margin-left-8 tx-text-14\'>');
             tem.push(n.nodeName+' ['+n.address+']');
             tem.push('</span>');
             tem.push('<span class=\'w3-right tx-margin-right-8\'><i class=\'fa fa-gear\' style=\'font-size:16px\'></i></span></div>');        
         });
-        nodeBar.innerHTML = tem.join('');       
+        nodeBar.innerHTML = tem.join('');
+        document.querySelectorAll('.tx-platform-cluster-node').forEach(a=>{
+            a.onclick = ()=>{
+                let ix = a.getAttribute('cluster-node-index')/1;
+                console.log("going to node view->"+ix);
+            };        
+        });       
     });
     
     document.querySelector('#tx-cluster-list-close').onclick=()=>{
