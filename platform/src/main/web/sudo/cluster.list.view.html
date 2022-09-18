@@ -4,14 +4,43 @@
             <span id="tx-cluster-list-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
-            <span><i class="fa fa-sign-in" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Cluster View</span>
+            <span><i class="fa fa-server" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Platform View</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12"></div>
-     
+    <div class="w3-panel">
+        <div class="w3-display-container w3-border w3-border-red tx-content-64">
+            <div class="w3-display-topleft w3-padding">
+                <span class="tx-margin-left-8 tx-text-14">Cluster Name</span>
+            </div>
+            <div class="w3-display-bottomleft w3-padding">
+                <span class="tx-margin-left-8 tx-text-14" id='tx-platform-cluster-header-name'>tarantula-platfor-dev</span>
+            </div>
+            <div class="w3-display-topright w3-padding">
+                <span class="tx-margin-right-8 tx-text-14">Partition Number</span>
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-margin-right-8 tx-text-14" id='tx-platform-cluster-header-partition-number'>271</span>
+            </div>
+        </div>
+    </div>
+    <div class="w3-panel" id='tx-platform-cluster-node-list'>
+        <div class="w3-panel w3-padding w3-block w3-green">
+            <span class="w3-left tx-margin-right-8"><i class="fa fa-server" style="font-size:16px"></i></span>
+            <span class="w3-left tx-margin-left-8 tx-text-14">192.168.1.10</span>
+            <span class="w3-right tx-margin-right-8"><i class="fa fa-caret-square-o-down" style="font-size:16px"></i></span>
+        </div>
+
+        <div class="w3-panel w3-padding w3-block w3-green">
+            <span class="w3-left tx-margin-right-8"><i class="fa fa-server" style="font-size:16px"></i></span>
+            <span class="w3-left tx-margin-left-8 tx-text-14">192.168.1.12</span>
+            <span class="w3-right tx-margin-right-8"><i class="fa fa-caret-square-o-down" style="font-size:16px"></i></span>
+        </div>
+            
+    </div>
+    </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -23,7 +52,21 @@
 </div>
 <script>
     TARA_API.onGet('role/sudo','onClusterList','',(resp)=>{
-        console.log(resp);       
+        console.log(resp);
+        document.querySelector('#tx-platform-cluster-header-name').innerHTML = resp.clusterName;
+        document.querySelector('#tx-platform-cluster-header-partition-number').innerHTML = resp.partitionNumber;
+        let nodeBar = document.querySelector('#tx-platform-cluster-node-list');
+        nodeBar.innerHTML = '';
+        let tem = [];
+        resp.nodeList.forEach(n => {
+            tem.push('<div class=\'w3-panel w3-padding w3-block w3-green\'>');
+            tem.push('<span class=\'w3-left tx-margin-right-8\'><i class=\'fa fa-server\' style=\'font-size:16px\'></i></span>');
+            tem.push('<span class=\'w3-left tx-margin-left-8 tx-text-14\'>');
+            tem.push(n.address);
+            tem.push('</span>');
+            tem.push('<span class=\'w3-right tx-margin-right-8\'><i class=\'fa fa-external-link\' style=\'font-size:16px\'></i></span>');        
+        });
+        nodeBar.innerHTML = tem.join('');       
     });
     
     document.querySelector('#tx-cluster-list-close').onclick=()=>{
