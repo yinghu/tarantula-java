@@ -323,7 +323,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
-        cnode.startTime = _cluster.getCluster().getClusterTime();
+        cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
         byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
