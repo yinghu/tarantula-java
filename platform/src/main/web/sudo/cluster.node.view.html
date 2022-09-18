@@ -10,7 +10,41 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-cluster-node-message"></div> 
+    <div class="w3-container">
+        <div class='w3-bar w3-white'>
+            <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Operation</span>
+            <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Operation</span>
+        </div>            
+    </div>
+    <div class="w3-panel">
+        <fieldset class="w3-border-blue tx-text-14">
+            <legend>Summary</legend>
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class="w3-left tx-margin-left-8 tx-text-12">BucketName</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-bucket-name">BDS</span>
+        </div>
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class="w3-left tx-margin-left-8 tx-text-12">BucketId</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-bucket-id">DBS/123</span>
+        </div>
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class="w3-left tx-margin-left-8 tx-text-12">NodeName</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-node-name">BDS</span>
+        </div>
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class="w3-left tx-margin-left-8 tx-text-12">NodeId</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-node-id">DBS/123</span>
+        </div>
+        <div class="w3-container w3-border-bottom w3-border-red">
+            <span class="w3-left tx-margin-left-8 tx-text-12">Address</span>
+            <span class="w3-right tx-margin-right-8 tx-text-14" id="tx-cluster-node-address">BDS</span>
+        </div>
+        <div class="w3-container">
+            <span class="w3-left tx-margin-left-8 tx-text-12">MemberId</span>
+            <span class="w3-right tx-margin-right-8 tx-text-12" id="tx-cluster-node-member-id">DBS/123</span>
+        </div>
+        </fieldset>
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -21,7 +55,13 @@
     </div>
 </div>
 <script>
-    console.log(TARA_API.query().clusterNode);
+    let node = TARA_API.query().clusterNode;
+    document.querySelector('#tx-cluster-node-bucket-name').innerHTML = node.bucketName;
+    document.querySelector('#tx-cluster-node-bucket-id').innerHTML = node.bucketId;
+    document.querySelector('#tx-cluster-node-node-name').innerHTML = node.nodeName;
+    document.querySelector('#tx-cluster-node-node-id').innerHTML = node.nodeId;
+    document.querySelector('#tx-cluster-node-address').innerHTML = node.address;
+    document.querySelector('#tx-cluster-node-member-id').innerHTML = node.memberId;
     document.querySelector('#tx-cluster-node-close').onclick=()=>{
         let m3 = document.querySelector("#tx-popup-api");
         m3.innerHTML="";
