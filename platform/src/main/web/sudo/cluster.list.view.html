@@ -63,6 +63,7 @@
             a.onclick = ()=>{
                 let ix = a.getAttribute('cluster-node-index')/1;
                 console.log("going to node view->"+ix);
+                tx_view({viewId:'cluster.node',containerId:'#tx-popup-api'}); 
             };        
         });       
     });
