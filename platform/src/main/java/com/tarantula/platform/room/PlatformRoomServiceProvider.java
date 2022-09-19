@@ -137,6 +137,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void leave(String roomId,String systemId){
         if(type.equals(GameZone.PLAY_MODE_PVE)) {
             GameRoom gameRoom = gameRoomIndex.remove(roomId);
+            if(gameRoom==null) return;
             gameRoom.leave(systemId,room->true);
             return;
         }
