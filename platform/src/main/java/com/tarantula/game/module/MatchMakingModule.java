@@ -7,7 +7,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
-import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessControl;

@@ -24,30 +24,20 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
     public int arenaLevel =1; //level of arena
     public double arenaXp =0;  //xp of arena level
 
-    public int csw = 0; //consecutive winnings
-
 
     public Rating(){
         this.label = "Rating";
     }
 
-    public Rating update(int rankDelta,double xpDelta,double arenaXpLimit){
-        double dxp = rankDelta!=0?(1/rankDelta+xpDelta/BASE_POINTS)*BASE_POINTS:(xpDelta/BASE_POINTS)*BASE_POINTS;
-        if(rankDelta==1){
-            csw++;
-            dxp = dxp+(csw-1)*BASE_POINTS;
-        }
-        else{
-            csw=0;
-        }
+    public Rating update(double xpDelta,double arenaXpLimit){
+        double dxp = (xpDelta/BASE_POINTS)*BASE_POINTS;
         arenaXp += dxp;
         xp += dxp;
-        if(arenaXp<arenaXpLimit) return this;
+        if(arenaXp < arenaXpLimit) return this;
         //level up
         arenaLevel = arenaLevel==ARENA_LEVEL_LIMIT?1:(arenaLevel+1);
         level++;
         arenaXp = 0;
-        csw=0;
         int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
         if(_tryRank>rank) rank = _tryRank;
         return this;
@@ -59,7 +49,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
         this.properties.put("3",arenaLevel);
         this.properties.put("4",arenaXp);
         this.properties.put("5",xp);
-        this.properties.put("7",csw);
         return this.properties;
     }
     @Override
@@ -69,7 +58,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable, Por
         this.arenaLevel =((Number)properties.get("3")).intValue();
         this.arenaXp = ((Number)properties.get("4")).doubleValue();
         this.xp = ((Number)properties.get("5")).doubleValue();
-        this.csw =((Number)properties.get("7")).intValue();
     }
 
     @Override

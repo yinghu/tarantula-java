@@ -35,7 +35,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         boolean response = false;
         if(jsonObject.has("rating")){
             JsonObject delta = jsonObject.getAsJsonObject("rating");
-            stub.rating.update(delta.get("rank").getAsInt(),delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
+            stub.rating.update(delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
             if(session.name().equals("rating")) {
                 session.write(stub.rating.toJson().toString().getBytes());
                 response = true;
