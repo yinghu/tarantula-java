@@ -24,6 +24,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     public String name(){
         return zoneItem.name();
     }
+
     @Override
     public int levelMatch() {
         return 0;
