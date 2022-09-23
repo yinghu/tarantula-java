@@ -158,110 +158,28 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Asset app = new Asset();
-            if(app.configureAndValidate(JsonUtil.parse(payload))){
-                ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                Descriptor desc = gameCluster.serviceWithCategory("item");
-                app.configurableSetting(conf);
-                if(conf!=null&&gameCluster.applicationPreSetup().save(desc,app)){
-                    session.write(new AssetSerializer().serialize(app,Application.class,null).toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"failed to save asset").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
-            }
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            session.write(createAsset(payload,gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateComponent") || session.action().equals("onUpdateComponent")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Component app = new Component();
-            if(app.configureAndValidate(JsonUtil.parse(payload))){
-                ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                Descriptor desc = gameCluster.serviceWithCategory("item");
-                app.configurableSetting(conf);
-                if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
-                    session.write(new ComponentSerializer().serialize(app,Application.class,null).toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"failed to save component").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
-            }
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            session.write(createComponent(payload,gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateCommodity")||session.action().equals("onUpdateCommodity")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Commodity app = new Commodity();
-            if(app.configureAndValidate(JsonUtil.parse(payload))){
-                ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                Descriptor desc = gameCluster.serviceWithCategory("item");
-                app.configurableSetting(conf);
-                if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
-                    app.setup();
-                    Category category = app.category(desc);
-                    category.list();
-                    category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
-                    session.write(new CommoditySerializer().serialize(app,Application.class,null).toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"failed to save commodity").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
-            }
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            session.write(createCommodity(payload,gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateItem")||session.action().equals("onUpdateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();// SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Item app = new Item();
-            if(app.configureAndValidate(JsonUtil.parse(payload))){
-                ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                Descriptor desc = gameCluster.serviceWithCategory("item");
-                app.configurableSetting(conf);
-                if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
-                    app.setup();
-                    session.write(new ItemSerializer().serialize(app,Application.class,null).toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"failed to save item").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
-            }
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            session.write(createItem(payload,gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-            Application app = new Application();
-            if(app.configureAndValidate(JsonUtil.parse(payload))){
-                ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
-                app.disabled(true);
-                app.configurableSetting(conf);
-                if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
-                    app.setup();
-                    session.write(new ApplicationSerializer().serialize(app,Application.class,null).toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"failed to save application").getBytes());
-                }
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"invalid config values").getBytes());
-            }
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            session.write(createApplication(payload,gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
@@ -363,6 +281,93 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             return updates;
         }
         return updates;
+    }
+    private String createAsset(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        Asset app = new Asset();
+        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+            return JsonUtil.toSimpleResponse(false,"invalid payload");
+        }
+        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+        if(conf==null){
+            return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
+        }
+        Descriptor desc = gameCluster.serviceWithCategory("item");
+        app.configurableSetting(conf);
+        if(!gameCluster.applicationPreSetup().save(desc,app)){
+            return JsonUtil.toSimpleResponse(true,"failed to save");
+        }
+        return new AssetSerializer().serialize(app,Application.class,null).toString();
+    }
+    private String createComponent(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        Component app = new Component();
+        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+            return JsonUtil.toSimpleResponse(false,"invalid payload");
+        }
+        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+        if(conf==null){
+            return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
+        }
+        Descriptor desc = gameCluster.serviceWithCategory("item");
+        app.configurableSetting(conf);
+        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+            return JsonUtil.toSimpleResponse(true,"failed to save");
+        }
+        return new ComponentSerializer().serialize(app,Application.class,null).toString();
+    }
+    private String createCommodity(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        Commodity app = new Commodity();
+        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+            return JsonUtil.toSimpleResponse(false,"invalid payload");
+        }
+        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+        if(conf==null){
+            return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
+        }
+        Descriptor desc = gameCluster.serviceWithCategory("item");
+        app.configurableSetting(conf);
+        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+            return JsonUtil.toSimpleResponse(true,"failed to save");
+        }
+        return new CommoditySerializer().serialize(app,Application.class,null).toString();
+    }
+    private String createItem(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        Item app = new Item();
+        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+            return JsonUtil.toSimpleResponse(false,"invalid payload");
+        }
+        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+        if(conf==null){
+            return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
+        }
+        Descriptor desc = gameCluster.serviceWithCategory("item");
+        app.configurableSetting(conf);
+        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+            return JsonUtil.toSimpleResponse(true,"failed to save");
+        }
+        return new ItemSerializer().serialize(app,Application.class,null).toString();
+    }
+    public String createApplication(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        Application app = new Application();
+        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+            return JsonUtil.toSimpleResponse(false,"invalid payload");
+        }
+        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
+        if(conf==null){
+            return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
+        }
+        Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
+        app.disabled(true);
+        app.configurableSetting(conf);
+        if(!gameCluster.applicationPreSetup().save(desc,app)){
+            return JsonUtil.toSimpleResponse(true,"failed to save");
+        }
+        app.setup();
+        return new ApplicationSerializer().serialize(app,Application.class,null).toString();
     }
     @Override
     public void onCreated(GameCluster gameCluster){
