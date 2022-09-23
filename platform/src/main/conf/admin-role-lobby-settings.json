@@ -1,0 +1,76 @@
+{
+  "application-pre-setup":"com.tarantula.game.service.DynamicGameLobbySetup",
+  "room":{
+    "header": {
+      "Capacity": "1",
+      "Duration": "3",
+      "Overtime": "1",
+      "JoinsOnStart": "1"
+    },
+    "application": {},
+    "reference": [],
+    "configurationType": "component.lobby",
+    "configurationTypeId": "pve",
+    "configurationName": "room",
+    "configurationCategory": "Room",
+    "configurationVersion": "1.0"
+  },
+  "arena":{
+    "header": {
+      "Name": "arena1",
+      "Level": "1"
+    },
+    "application": {},
+    "reference": [],
+    "configurationType": "commodity.lobby",
+    "configurationTypeId": "pve",
+    "configurationName": "arena",
+    "configurationCategory": "Arena",
+    "configurationVersion": "1.0"
+  },
+  "zone":{
+    "configurationType": "item.lobby",
+    "configurationTypeId": "pve",
+    "configurationName": "zone",
+    "configurationCategory": "Zone",
+    "configurationVersion": "1.0",
+    "itemId": "BDS/8f0ca9f134824ce4afcb18c705a24ec3",
+    "disabled": false,
+    "revision": "-9223372036854775808",
+    "header": {
+      "PlayMode": 0,
+      "Name": "zone1",
+      "Rank": "1"
+    },
+    "application": {
+      "Room": [
+        "BDS/fd2d5336066148d5bd86cace9bd3d685"
+      ],
+      "ArenaSet": [
+        "BDS/16c5f72bf76641a5a2aaa532a13a3c03"
+      ]
+    },
+    "reference": [
+      "BDS/fd2d5336066148d5bd86cace9bd3d685",
+      "BDS/16c5f72bf76641a5a2aaa532a13a3c03"
+    ]
+  },
+  "lobby":{
+    "header": {
+      "Name": "lobby1"
+    },
+    "application": {
+      "ZoneSet": [
+        "BDS/8f0ca9f134824ce4afcb18c705a24ec3"
+      ]
+    },
+    "reference": [
+      "BDS/8f0ca9f134824ce4afcb18c705a24ec3"
+    ],
+    "configurationType": "application.lobby",
+    "configurationTypeId": "lobby",
+    "configurationName": "pve",
+    "configurationCategory": "Map",
+    "configurationVersion": "1.0"
+  }
+}

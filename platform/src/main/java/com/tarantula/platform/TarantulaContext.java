@@ -2,7 +2,6 @@ package com.tarantula.platform;
 
 import java.io.*;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -620,51 +619,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return null;
 
     }
-    private AuthVendorRegistry loadFacebookCredentials(){
-        try{
-            String config = this.authContext+"-facebook-auth.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new FacebookAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            return null;
-        }
-    }
-    private AuthVendorRegistry loadGoogleCredentials(){
- 	    try{
-            String config = this.authContext+"-google-auth.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new GoogleAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
- 	    }catch (Exception ex){
- 	        return null;
-        }
-    }
-    private AuthVendorRegistry loadGoogleStoreCredentials(){
-        try{
-            String config = this.authContext+"-google-store.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new GoogleStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            return null;
-        }
-    }
+
     private AuthVendorRegistry loadStripeCredentials(){
         try{
             String config = this.authContext+"-stripe-credentials.json";
@@ -681,56 +636,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
 
-    private AuthVendorRegistry loadAppleStoreCredentials(){
-        try{
-            String config = this.authContext+"-apple-iap-credentials.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new AppleStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private AuthVendorRegistry loadAmazonAwsCredentials(){
-        try{
-            String config = this.authContext+"-amazon-iam-credentials.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new AmazonAuthCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private AuthVendorRegistry loadMockStoreCredentials(){
-        try{
-            String config = this.authContext+"-mock-store-credentials.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new MockStoreCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
     //file name web/[game cluster name]/file.png etc
     public void _writeContent(String fileName,byte[] content){
         try{
