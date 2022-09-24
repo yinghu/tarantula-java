@@ -7,7 +7,6 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.room.PVPGameRoom;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
@@ -51,7 +50,7 @@ public class RoomClusterService implements ManagedService, RemoteService {
 
     public RoomJoinStub register(String serviceName, String zoneId, Rating rating){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.roomServiceProvider().onRegister(zoneId,rating);
+        return gameServiceProvider.roomServiceProvider().onRoomRegistered(zoneId,rating);
     }
 
     public void release(String serviceName,String zoneId,String roomId,String systemId){
@@ -68,14 +67,14 @@ public class RoomClusterService implements ManagedService, RemoteService {
         return gameServiceProvider.roomServiceProvider().onView(roomId);
     }
 
-    public GameRoom join(String serviceName, String ticket, String roomId, String systemId){
+    public GameRoom join(String serviceName, String roomId, String systemId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.roomServiceProvider().onJoin(ticket,roomId,systemId);
+        return gameServiceProvider.roomServiceProvider().onRoomJoined(roomId,systemId);
     }
 
     public void leave(String serviceName,String roomId,String systemId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.roomServiceProvider().onLeave(roomId,systemId);
+        gameServiceProvider.roomServiceProvider().onRoomLeft(roomId,systemId);
     }
 
     public void create(String serviceName,String zoneId,String roomId){

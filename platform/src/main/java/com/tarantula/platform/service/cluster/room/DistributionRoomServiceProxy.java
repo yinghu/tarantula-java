@@ -80,10 +80,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public GameRoom onJoinRoom(String serviceName, String ticket, String roomId, String systemId){
+    public GameRoom onJoinRoom(String serviceName,String roomId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,ticket,roomId,systemId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {

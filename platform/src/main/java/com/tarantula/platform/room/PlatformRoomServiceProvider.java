@@ -129,7 +129,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         RoomJoinStub roomRegistry = this.distributionRoomService.onRegisterRoom(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
-        GameRoom room = this.distributionRoomService.onJoinRoom(name,roomRegistry.ticket,roomRegistry.roomId,rating.systemId());
+        GameRoom room = this.distributionRoomService.onJoinRoom(name,roomRegistry.roomId,rating.systemId());
         if(room==null) return null;
         room.setup(gameZone.arena(roomRegistry.level));
         return room;
@@ -143,7 +143,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         this.distributionRoomService.onLeaveRoom(name,roomId,systemId);
     }
-    public RoomJoinStub onRegister(String gameZoneId,Rating rating){
+    public RoomJoinStub onRoomRegistered(String gameZoneId,Rating rating){
         GameZone gameZone = gameZoneIndex.get(gameZoneId).gameZone;
         Arena arena = gameZone.arena(rating.arenaLevel);
         GameRoomRegistry pending = gameZone.roomRegistryQueue().poll();
@@ -155,7 +155,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
-        return new RoomJoinStub(pending.arenaLevel,pending.instanceId(),systemValidatorProvider.hashJoinTicket(pending.instanceId(),rating.systemId()));
+        return new RoomJoinStub(pending.arenaLevel,pending.instanceId());
     }
     public void onRelease(String zoneId,String roomId,String systemId){
         GameZoneIndex indexGameZone = gameZoneIndex.get(zoneId);
@@ -192,8 +192,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         return gameRoom!=null?gameRoom.view():null;
     }
-    public GameRoom onJoin(String ticket, String roomId, String systemId){
-        if(!systemValidatorProvider.validHash(roomId,systemId,ticket)) return null;
+    public GameRoom onRoomJoined(String roomId, String systemId){
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
             GameRoom _gameRoom = this.createGameRoom(type,0);
             _gameRoom.distributionKey(roomId);
@@ -216,7 +215,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
 
     }
-    public void onLeave(String roomId,String systemId){
+    public void onRoomLeft(String roomId,String systemId){
         GameRoom gameRoom = gameRoomIndex.get(roomId);
         gameRoom.leave(systemId,room-> {
                 room.resetIfEmpty();

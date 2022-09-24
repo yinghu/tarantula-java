@@ -50,7 +50,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
             stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
             PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
             playerSavedGames.gameServiceProvider = gameServiceProvider;
-            stub.playerSavedGames = playerSavedGames;//this.gameServiceProvider.presenceServiceProvider().listSaves()
+            stub.playerSavedGames = playerSavedGames;
             return stub;
         }
         GameZone _zone = zoneIndex.get(rating.level);

@@ -10,14 +10,12 @@ import java.io.IOException;
 public class RoomJoinStub implements Portable {
     public int level;
     public String roomId;
-    public String ticket;
     public boolean joined;
 
     public RoomJoinStub(){}
-    public RoomJoinStub(int level,String roomId,String ticket){
+    public RoomJoinStub(int level,String roomId){
         this.level = level;
         this.roomId = roomId;
-        this.ticket = ticket;
         this.joined = true;
     }
     @Override
@@ -33,7 +31,6 @@ public class RoomJoinStub implements Portable {
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",roomId);
-        portableWriter.writeUTF("2",ticket);
         portableWriter.writeInt("3",level);
         portableWriter.writeBoolean("4",joined);
     }
@@ -41,12 +38,11 @@ public class RoomJoinStub implements Portable {
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         roomId = portableReader.readUTF("1");
-        ticket = portableReader.readUTF("2");
         level = portableReader.readInt("3");
         joined = portableReader.readBoolean("4");
     }
     @Override
     public String toString() {
-        return "Room["+roomId+"]["+ticket+"]["+level+"]["+joined+"]";
+        return "Room["+roomId+"]["+level+"]["+joined+"]";
     }
 }
