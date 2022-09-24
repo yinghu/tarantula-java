@@ -451,14 +451,16 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
 
         //pre-defined lobby configurations
         Configuration lobbyConfiguration = this.context.configuration("lobby");
-        JsonObject room = ((JsonElement)lobbyConfiguration.property("room")).getAsJsonObject();
-        JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
-        JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
-        JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-        this.context.log(room.toString(),OnLog.WARN);
-        this.context.log(arena.toString(),OnLog.WARN);
-        this.context.log(zone.toString(),OnLog.WARN);
-        this.context.log(lobby.toString(),OnLog.WARN);
+        JsonObject roomPayload = ((JsonElement)lobbyConfiguration.property("room")).getAsJsonObject();
+        //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
+        //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
+        //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
+        Component room = new Component();
+        createComponent(room,roomPayload,gameCluster,applicationPreSetup);
+        this.context.log(room.distributionKey(),OnLog.WARN);
+        //this.context.log(arena.toString(),OnLog.WARN);
+        //this.context.log(zone.toString(),OnLog.WARN);
+        //this.context.log(lobby.toString(),OnLog.WARN);
 
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
