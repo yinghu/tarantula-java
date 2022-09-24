@@ -83,6 +83,8 @@ public class ShardSetup {
         //}
         //metricsSnapshot.initialize();
         //long hs = TimeUtil.durationUTCInHours(_cur.minusYears(1).minusDays(0).minusHours(0).minusMinutes(59),_cur);
-        //System.out.println("Day passed->"+hs);
+        String[] sf = "asset.a.".split("\\.");
+        System.out.println("Day passed->"+sf[0]+">>>"+"asset.a".endsWith("."));
+        System.out.println("Day passed->"+sf[1]);
     }
 }

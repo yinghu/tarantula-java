@@ -32,7 +32,7 @@ public class Commodity extends ConfigurableObject{
 
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.COMMODITY_CONFIG_TYPE);
+        return super.configureAndValidate(config) && _validate();
     }
     @Override
     public boolean configureAndValidate(){
@@ -69,6 +69,14 @@ public class Commodity extends ConfigurableObject{
             }
         }
         return (T)this;
+    }
+
+    private boolean _validate(){
+        if(this.configurationType.equals(Configurable.COMMODITY_CONFIG_TYPE)) return true;
+        if(this.configurationType.endsWith(".")) return false;
+        String[] comp = this.configurationType.split("\\.");
+        if(comp.length != 2) return false; //asset.xxx
+        return comp[0].equals(Configurable.COMMODITY_CONFIG_TYPE);
     }
 
 }

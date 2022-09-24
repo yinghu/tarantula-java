@@ -35,11 +35,19 @@ public class Component extends ConfigurableObject{
     }
     @Override
     public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.COMPONENT_CONFIG_TYPE);
+        return super.configureAndValidate(config) && _validate();
     }
     @Override
     public  <T extends Configurable> T setup(){
         return (T)this;
+    }
+
+    private boolean _validate(){
+        if(this.configurationType.equals(Configurable.COMPONENT_CONFIG_TYPE)) return true;
+        if(this.configurationType.endsWith(".")) return false;
+        String[] comp = this.configurationType.split("\\.");
+        if(comp.length != 2) return false; //asset.xxx
+        return comp[0].equals(Configurable.COMPONENT_CONFIG_TYPE);
     }
 
 }

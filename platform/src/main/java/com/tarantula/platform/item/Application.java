@@ -39,10 +39,9 @@ public class Application extends ConfigurableObject implements Configurable.List
     }
 
     @Override
-    public boolean configureAndValidate(JsonObject config){
-        return super.configureAndValidate(config)&&this.configurationType.startsWith(Configurable.APPLICATION_CONFIG_TYPE);
+    public boolean configureAndValidate(JsonObject config) {
+        return super.configureAndValidate(config) && _validate();
     }
-
     @Override
     public boolean configureAndValidate(){
         if(configurationScope.endsWith(".data") || configurationScope.endsWith(".lobby")) return true;
@@ -70,5 +69,13 @@ public class Application extends ConfigurableObject implements Configurable.List
     @Override
     public void onLoaded(Commodity commodity){
         this.validated = true;
+    }
+
+    private boolean _validate(){
+        if(this.configurationType.equals(Configurable.APPLICATION_CONFIG_TYPE)) return true;
+        if(this.configurationType.endsWith(".")) return false;
+        String[] comp = this.configurationType.split("\\.");
+        if(comp.length != 2) return false; //asset.xxx
+        return comp[0].equals(Configurable.APPLICATION_CONFIG_TYPE);
     }
 }

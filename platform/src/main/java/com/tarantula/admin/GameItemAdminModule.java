@@ -159,27 +159,27 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            session.write(createAsset(payload,gameCluster,applicationPreSetup).getBytes());
+            session.write(createAsset(new Asset(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateComponent") || session.action().equals("onUpdateComponent")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            session.write(createComponent(payload,gameCluster,applicationPreSetup).getBytes());
+            session.write(createComponent(new Component(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateCommodity")||session.action().equals("onUpdateCommodity")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            session.write(createCommodity(payload,gameCluster,applicationPreSetup).getBytes());
+            session.write(createCommodity(new Commodity(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateItem")||session.action().equals("onUpdateItem")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            session.write(createItem(payload,gameCluster,applicationPreSetup).getBytes());
+            session.write(createItem(new Item(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            session.write(createApplication(payload,gameCluster,applicationPreSetup).getBytes());
+            session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
@@ -282,9 +282,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         return updates;
     }
-    private String createAsset(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        Asset app = new Asset();
-        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+    private String createAsset(Asset app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        if(!app.configureAndValidate(payload)){
             return JsonUtil.toSimpleResponse(false,"invalid payload");
         }
         ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -299,9 +298,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         return new AssetSerializer().serialize(app,Application.class,null).toString();
     }
-    private String createComponent(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        Component app = new Component();
-        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+    private String createComponent(Component app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        if(!app.configureAndValidate(payload)){
             return JsonUtil.toSimpleResponse(false,"invalid payload");
         }
         ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -316,9 +314,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         return new ComponentSerializer().serialize(app,Application.class,null).toString();
     }
-    private String createCommodity(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        Commodity app = new Commodity();
-        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+    private String createCommodity(Commodity app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        if(!app.configureAndValidate(payload)){
             return JsonUtil.toSimpleResponse(false,"invalid payload");
         }
         ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -333,9 +330,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         return new CommoditySerializer().serialize(app,Application.class,null).toString();
     }
-    private String createItem(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        Item app = new Item();
-        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+    private String createItem(Item app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        if(!app.configureAndValidate(payload)){
             return JsonUtil.toSimpleResponse(false,"invalid payload");
         }
         ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -350,9 +346,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         }
         return new ItemSerializer().serialize(app,Application.class,null).toString();
     }
-    public String createApplication(byte[] payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        Application app = new Application();
-        if(!app.configureAndValidate(JsonUtil.parse(payload))){
+    public String createApplication(Application app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        if(!app.configureAndValidate(payload)){
             return JsonUtil.toSimpleResponse(false,"invalid payload");
         }
         ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
@@ -472,22 +467,11 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 JsonArray validators = ((JsonElement)configuration.property("validators")).getAsJsonArray();
                 validators.forEach(validator->{
                     Application app = new Application();
-                    if(app.configureAndValidate(validator.getAsJsonObject())){
-                        ConfigurableCategories configurableCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
-                        ConfigurableSetting conf = configurableCategories.configurableSetting(app.configurationCategory());
-                        Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
-                        app.disabled(true);
-                        app.configurableSetting(conf);
-                        if(conf!=null && gameCluster.applicationPreSetup().save(desc,app)){
-                            this.context.log("save validator->"+app.distributionKey(), OnLog.WARN);
-                        }
-                    }
-                    else{
-                        this.context.log("validator not passed ->"+validator, OnLog.WARN);
-                    }
+                    String resp = createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
-                ex.printStackTrace();
+                this.context.log("expected error",ex,OnLog.ERROR);
             }
         }
     }
