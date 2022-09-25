@@ -451,17 +451,20 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
 
         //pre-defined lobby configurations
         //log lobby apps
+        Configuration lobbyConfiguration = this.context.configuration("lobby");
+        JsonArray rooms = ((JsonElement) lobbyConfiguration.property("rooms")).getAsJsonArray();
+        rooms.forEach((roomPayload)->{
+            Component room = new Component();
+            createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
+            this.context.log(room.distributionKey(), OnLog.WARN);
+        });
+        //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
+        //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
+        //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
         gameCluster.gameLobby.entryList().forEach(app -> {
             this.context.log(app.distributionKey(), OnLog.WARN);
-            this.context.log(app.tag(), OnLog.WARN);
-            Configuration lobbyConfiguration = this.context.configuration("lobby");
-            JsonObject roomPayload = ((JsonElement) lobbyConfiguration.property("room")).getAsJsonObject();
-            //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
-            //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
-            //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-            Component room = new Component();
-            createComponent(room, roomPayload, gameCluster, applicationPreSetup);
-            this.context.log(room.distributionKey(), OnLog.WARN);
+            this.context.log(app.tag().split("/")[1], OnLog.WARN);
+
         });
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());

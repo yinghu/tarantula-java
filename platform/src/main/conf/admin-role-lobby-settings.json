@@ -1,21 +1,73 @@
 {
   "application-pre-setup":"com.tarantula.game.service.DynamicGameLobbySetup",
+  "initialZoneCount": 10,
+  "zoneCapacityBase": 2000,
+  "zoneLimit": 10,
+  "levelMatchOffset": 100,
+  "arenaLimit": 10,
   "defaultLevelUpXpBase": 1000,
-  "room":{
-    "header": {
-      "Capacity": "1",
-      "Duration": "3",
-      "Overtime": "1",
-      "JoinsOnStart": "1"
+  "rooms":[
+    {
+      "header":{
+        "Capacity": "1",
+        "Duration": "3",
+        "Overtime": "1",
+        "JoinsOnStart": "1"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "component.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "PVERoom",
+      "configurationCategory": "Room",
+      "configurationVersion": "1.0"
     },
-    "application": {},
-    "reference": [],
-    "configurationType": "component.lobby",
-    "configurationTypeId": "pve",
-    "configurationName": "room",
-    "configurationCategory": "Room",
-    "configurationVersion": "1.0"
-  },
+    {
+      "header":{
+        "Capacity": "2",
+        "Duration": "3",
+        "Overtime": "1",
+        "JoinsOnStart": "2"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "component.lobby",
+      "configurationTypeId": "pvp",
+      "configurationName": "PVPRoom",
+      "configurationCategory": "Room",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header":{
+        "Capacity": "2",
+        "Duration": "3",
+        "Overtime": "1",
+        "JoinsOnStart": "1"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "component.lobby",
+      "configurationTypeId": "tve",
+      "configurationName": "TVERoom",
+      "configurationCategory": "Room",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header":{
+        "Capacity": "4",
+        "Duration": "3",
+        "Overtime": "1",
+        "JoinsOnStart": "2"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "component.lobby",
+      "configurationTypeId": "tvt",
+      "configurationName": "TVTRoom",
+      "configurationCategory": "Room",
+      "configurationVersion": "1.0"
+    }
+  ],
   "arena":{
     "header": {
       "Name": "arena1",
@@ -37,7 +89,6 @@
     "configurationVersion": "1.0",
     "itemId": "BDS/8f0ca9f134824ce4afcb18c705a24ec3",
     "disabled": false,
-    "revision": "-9223372036854775808",
     "header": {
       "PlayMode": 0,
       "Name": "zone1",
