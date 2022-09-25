@@ -24,9 +24,8 @@ public class SavedGameIndex extends IndexSet {
         keySet.forEach((k)->{
             SavedGame savedGame = new SavedGame();
             savedGame.distributionKey(k);
-            if(this.dataStore.load(savedGame)){
-                savedGames.add(savedGame);
-            }
+            savedGame.dataStore(this.dataStore);
+            savedGames.add(savedGame);
         });
         properties.clear();
     }
@@ -48,33 +47,35 @@ public class SavedGameIndex extends IndexSet {
     }
     public List<SavedGame> list(){
         ArrayList<SavedGame> _tem = new ArrayList<>();
-        savedGames.forEach(save-> _tem.add(save));
+        savedGames.forEach(save-> {
+            save.load();
+            _tem.add(save);
+        });
         return _tem;
     }
     public List<SavedGame> list(String deviceId,String deviceName){
         ArrayList<SavedGame> _tem = new ArrayList<>();
         int[] created = {0};
         savedGames.forEach(save->{
+            save.load();
             if(save.index().equals(deviceId) && save.owner().equals(this.distributionKey())) created[0]++;
             _tem.add(save);
         });
         if(created[0]==0){//
             SavedGame savedGame = new SavedGame(this.distributionKey(),deviceId,deviceName);
+            savedGame.dataStore(dataStore);
             this.dataStore.create(savedGame);
             addSavedGame(savedGame);
             _tem.add(savedGame);
         }
         DeviceIndex deviceIndex = new DeviceIndex(deviceId);
         this.dataStore.createIfAbsent(deviceIndex,true);
-        //System.out.println("INDEX 1"+deviceIndex.toJson());
         deviceIndex.dataStore(this.dataStore);
         deviceIndex.list().forEach(save->{
-            //System.out.println("Save->"+save.toJson());
             if(addSavedGame(save)) _tem.add(save);
         });
         deviceIndex.addKey(this.distributionKey());
         this.dataStore.update(deviceIndex);
-        //System.out.println("INDEX 2"+deviceIndex.toJson());
         return _tem;
     }
 

@@ -365,103 +365,104 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         return new ApplicationSerializer().serialize(app,Application.class,null).toString();
     }
     @Override
-    public void onCreated(GameCluster gameCluster){
+    public void onCreated(GameCluster gameCluster) {
         ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-        ConfigurableCategories assets = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableCategories items = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        assets.toCategories().forEach((c->{
+        ConfigurableCategories assets = this.configurableCategories(Configurable.ASSET_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableCategories items = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        assets.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
-            applicationPreSetup.save(gameCluster,typeIndex);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            applicationPreSetup.save(gameCluster, typeIndex);
             components.addCategory(jo);
             commodities.addCategory(jo);
             items.addCategory(jo);
             applications.addCategory(jo);
         }));
-        components.toCategories().forEach((c->{
+        components.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
-            applicationPreSetup.save(gameCluster,typeIndex);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            applicationPreSetup.save(gameCluster, typeIndex);
             commodities.addCategory(jo);
             items.addCategory(jo);
             applications.addCategory(jo);
         }));
-        commodities.toCategories().forEach((c->{
+        commodities.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
-            applicationPreSetup.save(gameCluster,typeIndex);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            applicationPreSetup.save(gameCluster, typeIndex);
             items.addCategory(jo);
             applications.addCategory(jo);
         }));
-        items.toCategories().forEach((c->{
+        items.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
-            applicationPreSetup.save(gameCluster,typeIndex);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            applicationPreSetup.save(gameCluster, typeIndex);
             applications.addCategory(jo);
         }));
-        applications.toCategories().forEach((c->{
+        applications.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),ho.get("scope").getAsString(),jo);
-            applicationPreSetup.save(gameCluster,typeIndex);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            applicationPreSetup.save(gameCluster, typeIndex);
             //applications.addCategory(jo);
         }));
-        applicationPreSetup.save(gameCluster,assets);
-        applicationPreSetup.save(gameCluster,components);
-        applicationPreSetup.save(gameCluster,commodities);
-        applicationPreSetup.save(gameCluster,items);
-        applicationPreSetup.save(gameCluster,applications);
+        applicationPreSetup.save(gameCluster, assets);
+        applicationPreSetup.save(gameCluster, components);
+        applicationPreSetup.save(gameCluster, commodities);
+        applicationPreSetup.save(gameCluster, items);
+        applicationPreSetup.save(gameCluster, applications);
 
-        ConfigurableTypes assetTypes = this.configurableTypes(Configurable.ASSET_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableTypes componentTypes = this.configurableTypes(Configurable.COMPONENT_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableTypes commodityTypes = this.configurableTypes(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableTypes itemTypes = this.configurableTypes(Configurable.ITEM_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableTypes applicationTypes = this.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        assetTypes.toTypes().forEach((t)->{
+        ConfigurableTypes assetTypes = this.configurableTypes(Configurable.ASSET_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableTypes componentTypes = this.configurableTypes(Configurable.COMPONENT_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableTypes commodityTypes = this.configurableTypes(Configurable.COMMODITY_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableTypes itemTypes = this.configurableTypes(Configurable.ITEM_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        ConfigurableTypes applicationTypes = this.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        assetTypes.toTypes().forEach((t) -> {
             componentTypes.addType(t.getAsJsonObject());
             commodityTypes.addType(t.getAsJsonObject());
             itemTypes.addType(t.getAsJsonObject());
             applicationTypes.addType(t.getAsJsonObject());
         });
-        componentTypes.toTypes().forEach((t)->{
+        componentTypes.toTypes().forEach((t) -> {
             commodityTypes.addType(t.getAsJsonObject());
             itemTypes.addType(t.getAsJsonObject());
             applicationTypes.addType(t.getAsJsonObject());
         });
-        commodityTypes.toTypes().forEach((t)->{
+        commodityTypes.toTypes().forEach((t) -> {
             itemTypes.addType(t.getAsJsonObject());
             applicationTypes.addType(t.getAsJsonObject());
         });
-        itemTypes.toTypes().forEach((t)->{
+        itemTypes.toTypes().forEach((t) -> {
             applicationTypes.addType(t.getAsJsonObject());
         });
 
-        applicationPreSetup.save(gameCluster,assetTypes);
-        applicationPreSetup.save(gameCluster,componentTypes);
-        applicationPreSetup.save(gameCluster,commodityTypes);
-        applicationPreSetup.save(gameCluster,itemTypes);
-        applicationPreSetup.save(gameCluster,applicationTypes);
+        applicationPreSetup.save(gameCluster, assetTypes);
+        applicationPreSetup.save(gameCluster, componentTypes);
+        applicationPreSetup.save(gameCluster, commodityTypes);
+        applicationPreSetup.save(gameCluster, itemTypes);
+        applicationPreSetup.save(gameCluster, applicationTypes);
 
         //pre-defined lobby configurations
-        Configuration lobbyConfiguration = this.context.configuration("lobby");
-        JsonObject roomPayload = ((JsonElement)lobbyConfiguration.property("room")).getAsJsonObject();
-        //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
-        //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
-        //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-        Component room = new Component();
-        createComponent(room,roomPayload,gameCluster,applicationPreSetup);
-        this.context.log(room.distributionKey(),OnLog.WARN);
-        //this.context.log(arena.toString(),OnLog.WARN);
-        //this.context.log(zone.toString(),OnLog.WARN);
-        //this.context.log(lobby.toString(),OnLog.WARN);
-
+        //log lobby apps
+        gameCluster.gameLobby.entryList().forEach(app -> {
+            this.context.log(app.distributionKey(), OnLog.WARN);
+            this.context.log(app.tag(), OnLog.WARN);
+            Configuration lobbyConfiguration = this.context.configuration("lobby");
+            JsonObject roomPayload = ((JsonElement) lobbyConfiguration.property("room")).getAsJsonObject();
+            //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
+            //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
+            //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
+            Component room = new Component();
+            createComponent(room, roomPayload, gameCluster, applicationPreSetup);
+            this.context.log(room.distributionKey(), OnLog.WARN);
+        });
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
         if(configuration!=null) {

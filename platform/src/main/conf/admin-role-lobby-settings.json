@@ -1,5 +1,6 @@
 {
   "application-pre-setup":"com.tarantula.game.service.DynamicGameLobbySetup",
+  "defaultLevelUpXpBase": 1000,
   "room":{
     "header": {
       "Capacity": "1",
