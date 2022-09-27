@@ -452,25 +452,33 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         //pre-defined lobby configurations
         //log lobby apps
         Configuration lobbyConfiguration = this.context.configuration("lobby");
-        JsonArray rooms = ((JsonElement) lobbyConfiguration.property("rooms")).getAsJsonArray();
-        rooms.forEach(roomPayload -> {
-            Component room = new Component();
-            createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
-            this.context.log(room.distributionKey(), OnLog.WARN);
-        });
+        String mode = (String)gameCluster.property(GameCluster.MODE);
+        JsonObject roomPayload = ((JsonElement) lobbyConfiguration.property(mode+"Room")).getAsJsonObject();
+        JsonObject zonePayload = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
+        Component room = new Component();
+        createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
+        this.context.log(room.distributionKey(), OnLog.WARN);
+        zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.distributionKey());
+        JsonArray refs = zonePayload.get("reference").getAsJsonArray();
+        refs.add(room.distributionKey());
         JsonArray arenas = ((JsonElement)lobbyConfiguration.property("arenas")).getAsJsonArray();
+        JsonArray aset = zonePayload.get("application").getAsJsonObject().get("ArenaSet").getAsJsonArray();
         arenas.forEach(arenaPayload -> {
             Commodity arena = new Commodity();
             createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
             this.context.log(arena.distributionKey(),OnLog.WARN);
+            aset.add(arena.distributionKey());
+            refs.add(arena.distributionKey());
         });
-        //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
-        //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-        gameCluster.gameLobby.entryList().forEach(app -> {
-            this.context.log(app.distributionKey(), OnLog.WARN);
-            this.context.log(app.tag().split("/")[1], OnLog.WARN);
-
-        });
+        Item zone = new Item();
+        createItem(zone,zonePayload,gameCluster,applicationPreSetup);
+        this.context.log(zone.distributionKey(),OnLog.WARN);
+        JsonObject lobbyPayload = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
+        lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionKey());
+        lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionKey());
+        Application lobby = new Application();
+        createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
+        this.context.log(lobby.distributionKey(),OnLog.WARN);
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
         if(configuration!=null) {

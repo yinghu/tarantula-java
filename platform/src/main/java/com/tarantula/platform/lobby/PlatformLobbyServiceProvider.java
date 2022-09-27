@@ -61,11 +61,13 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
+        logger.warn("register->"+t.distributionKey());
         distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
+        logger.warn("release->"+t.distributionKey());
         distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
     }
 
@@ -98,6 +100,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
+            logger.warn(a.configurationCategory()+""+a.distributionKey());
             if(!a.disabled()){
                 a.setup();
                 lobbyItems.put(gameName+"/"+a.configurationName(),a);

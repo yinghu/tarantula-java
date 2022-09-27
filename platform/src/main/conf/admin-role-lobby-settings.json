@@ -6,68 +6,66 @@
   "levelMatchOffset": 100,
   "arenaLimit": 10,
   "defaultLevelUpXpBase": 1000,
-  "rooms":[
-    {
-      "header":{
-        "Capacity": "1",
-        "Duration": "3",
-        "Overtime": "1",
-        "JoinsOnStart": "1"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "component.lobby",
-      "configurationTypeId": "pve",
-      "configurationName": "PVERoom",
-      "configurationCategory": "Room",
-      "configurationVersion": "1.0"
+  "pveRoom":{
+    "header":{
+      "Capacity": "1",
+      "Duration": "3",
+      "Overtime": "1",
+      "JoinsOnStart": "1"
     },
-    {
-      "header":{
-        "Capacity": "2",
-        "Duration": "3",
-        "Overtime": "1",
-        "JoinsOnStart": "2"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "component.lobby",
-      "configurationTypeId": "pvp",
-      "configurationName": "PVPRoom",
-      "configurationCategory": "Room",
-      "configurationVersion": "1.0"
+    "application": {},
+    "reference": [],
+    "configurationType": "component.lobby",
+    "configurationTypeId": "pve",
+    "configurationName": "PVERoom",
+    "configurationCategory": "Room",
+    "configurationVersion": "1.0"
+  },
+  "pvpRoom":{
+    "header":{
+      "Capacity": "2",
+      "Duration": "3",
+      "Overtime": "1",
+      "JoinsOnStart": "2"
     },
-    {
-      "header":{
-        "Capacity": "2",
-        "Duration": "3",
-        "Overtime": "1",
-        "JoinsOnStart": "1"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "component.lobby",
-      "configurationTypeId": "tve",
-      "configurationName": "TVERoom",
-      "configurationCategory": "Room",
-      "configurationVersion": "1.0"
+    "application": {},
+    "reference": [],
+    "configurationType": "component.lobby",
+    "configurationTypeId": "pvp",
+    "configurationName": "PVPRoom",
+    "configurationCategory": "Room",
+    "configurationVersion": "1.0"
+  },
+  "tveRoom":{
+    "header":{
+      "Capacity": "2",
+      "Duration": "3",
+      "Overtime": "1",
+      "JoinsOnStart": "1"
     },
-    {
-      "header":{
-        "Capacity": "4",
-        "Duration": "3",
-        "Overtime": "1",
-        "JoinsOnStart": "2"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "component.lobby",
-      "configurationTypeId": "tvt",
-      "configurationName": "TVTRoom",
-      "configurationCategory": "Room",
-      "configurationVersion": "1.0"
-    }
-  ],
+    "application": {},
+    "reference": [],
+    "configurationType": "component.lobby",
+    "configurationTypeId": "tve",
+    "configurationName": "TVERoom",
+    "configurationCategory": "Room",
+    "configurationVersion": "1.0"
+  },
+  "tvtRoom":{
+    "header":{
+      "Capacity": "4",
+      "Duration": "3",
+      "Overtime": "1",
+      "JoinsOnStart": "2"
+    },
+    "application": {},
+    "reference": [],
+    "configurationType": "component.lobby",
+    "configurationTypeId": "tvt",
+    "configurationName": "TVTRoom",
+    "configurationCategory": "Room",
+    "configurationVersion": "1.0"
+  },
   "arenas":[
     {
       "header": {
@@ -199,5 +197,36 @@
       "configurationCategory": "Arena",
       "configurationVersion": "1.0"
     }
-  ]
+  ],
+  "zone": {
+    "header": {
+      "PlayMode": 0,
+      "Name": "zone1",
+      "Rank": "1"
+    },
+    "application": {
+      "Room": [],
+      "ArenaSet": []
+    },
+    "reference": [],
+    "configurationType": "item.lobby",
+    "configurationTypeId": "Zone",
+    "configurationName": "rank1",
+    "configurationCategory": "Zone",
+    "configurationVersion": "1.0"
+  },
+  "lobby": {
+    "header": {
+      "Name": "lobby1"
+    },
+    "application": {
+      "ZoneSet": []
+    },
+    "reference": [],
+    "configurationType": "application.lobby",
+    "configurationTypeId": "lobby",
+    "configurationName": "rank1",
+    "configurationCategory": "Map",
+    "configurationVersion": "1.0"
+  }
 }
