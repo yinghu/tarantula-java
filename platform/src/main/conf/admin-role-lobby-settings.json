@@ -68,61 +68,136 @@
       "configurationVersion": "1.0"
     }
   ],
-  "arena":{
-    "header": {
-      "Name": "arena1",
-      "Level": "1"
+  "arenas":[
+    {
+      "header": {
+        "Name": "arena1",
+        "Level": 1
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena1",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
     },
-    "application": {},
-    "reference": [],
-    "configurationType": "commodity.lobby",
-    "configurationTypeId": "pve",
-    "configurationName": "arena",
-    "configurationCategory": "Arena",
-    "configurationVersion": "1.0"
-  },
-  "zone":{
-    "configurationType": "item.lobby",
-    "configurationTypeId": "pve",
-    "configurationName": "zone",
-    "configurationCategory": "Zone",
-    "configurationVersion": "1.0",
-    "itemId": "BDS/8f0ca9f134824ce4afcb18c705a24ec3",
-    "disabled": false,
-    "header": {
-      "PlayMode": 0,
-      "Name": "zone1",
-      "Rank": "1"
+    {
+      "header": {
+        "Name": "arena2",
+        "Level": 2
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena2",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
     },
-    "application": {
-      "Room": [
-        "BDS/fd2d5336066148d5bd86cace9bd3d685"
-      ],
-      "ArenaSet": [
-        "BDS/16c5f72bf76641a5a2aaa532a13a3c03"
-      ]
+    {
+      "header": {
+        "Name": "arena3",
+        "Level": 3
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena3",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
     },
-    "reference": [
-      "BDS/fd2d5336066148d5bd86cace9bd3d685",
-      "BDS/16c5f72bf76641a5a2aaa532a13a3c03"
-    ]
-  },
-  "lobby":{
-    "header": {
-      "Name": "lobby1"
+    {
+      "header": {
+        "Name": "arena4",
+        "Level": 4
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena4",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
     },
-    "application": {
-      "ZoneSet": [
-        "BDS/8f0ca9f134824ce4afcb18c705a24ec3"
-      ]
+    {
+      "header": {
+        "Name": "arena5",
+        "Level": 5
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena5",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
     },
-    "reference": [
-      "BDS/8f0ca9f134824ce4afcb18c705a24ec3"
-    ],
-    "configurationType": "application.lobby",
-    "configurationTypeId": "lobby",
-    "configurationName": "pve",
-    "configurationCategory": "Map",
-    "configurationVersion": "1.0"
-  }
+    {
+      "header": {
+        "Name": "arena6",
+        "Level": 6
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena6",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "Name": "arena7",
+        "Level": 7
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena7",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "Name": "arena8",
+        "Level": 8
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena8",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "Name": "arena9",
+        "Level": 9
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena9",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "Name": "arena10",
+        "Level": 10
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity.lobby",
+      "configurationTypeId": "pve",
+      "configurationName": "arena10",
+      "configurationCategory": "Arena",
+      "configurationVersion": "1.0"
+    }
+  ]
 }

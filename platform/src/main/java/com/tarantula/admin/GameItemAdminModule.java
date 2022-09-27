@@ -453,12 +453,17 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         //log lobby apps
         Configuration lobbyConfiguration = this.context.configuration("lobby");
         JsonArray rooms = ((JsonElement) lobbyConfiguration.property("rooms")).getAsJsonArray();
-        rooms.forEach((roomPayload)->{
+        rooms.forEach(roomPayload -> {
             Component room = new Component();
             createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
             this.context.log(room.distributionKey(), OnLog.WARN);
         });
-        //JsonObject arena = ((JsonElement)lobbyConfiguration.property("arena")).getAsJsonObject();
+        JsonArray arenas = ((JsonElement)lobbyConfiguration.property("arenas")).getAsJsonArray();
+        arenas.forEach(arenaPayload -> {
+            Commodity arena = new Commodity();
+            createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
+            this.context.log(arena.distributionKey(),OnLog.WARN);
+        });
         //JsonObject zone = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
         //JsonObject lobby = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
         gameCluster.gameLobby.entryList().forEach(app -> {
