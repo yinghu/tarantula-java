@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
@@ -128,7 +129,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public Arena arena(int level) {
-        return new Arena(zoneItem.room());
+        return new Arena(zoneItem.arenaList().get(0));
     }
 
     @Override
@@ -163,5 +164,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     public String toString(){
         return zoneItem.name()+">>"+zoneItem.rank()+">>"+zoneItem.playMode();
+    }
+    @Override
+    public JsonObject toJson(){
+        return this.zoneItem.toJson();
     }
 }

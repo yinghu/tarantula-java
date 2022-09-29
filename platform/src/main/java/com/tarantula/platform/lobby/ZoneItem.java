@@ -1,6 +1,7 @@
 package com.tarantula.platform.lobby;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.item.Item;
@@ -73,6 +74,10 @@ public class ZoneItem extends Item {
         return (T)this;
     }
 
+    @Override
+    public JsonObject toJson(){
+        return header;
+    }
 
 
 

@@ -40,8 +40,8 @@ public class Stub extends PlayerGameObject {
             jo.addProperty("Message","failed to join");
             return jo;
         }
-        //jo.add("zone",zone.toJson());
-        //jo.add("arena", room.arena().toJson());
+        jo.add("_zone",zone.toJson());
+        jo.add("_arena", room.arena().toJson());
         jo.add("_room",room.toJson());
         //jo.add("rating",rating.toJson());
         //if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());

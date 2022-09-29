@@ -37,7 +37,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private ServiceContext serviceContext;
     private ClusterProvider clusterProvider;
     private DistributionRoomService distributionRoomService;
-    //private SystemValidatorProvider systemValidatorProvider;
+
     private DataStore dataStore;
     private Configuration configuration;
     private int roomCapacity;
@@ -72,7 +72,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.clusterProvider = serviceContext.clusterProvider();
-        //this.systemValidatorProvider  = (SystemValidatorProvider)serviceContext.serviceProvider(SystemValidatorProvider.NAME);
         this.distributionRoomService = this.serviceContext.clusterProvider().serviceProvider(DistributionRoomService.NAME);
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();

@@ -1,6 +1,5 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
@@ -9,7 +8,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.lobby.RoomItem;
+import com.tarantula.platform.lobby.ArenaItem;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,13 +21,10 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
     public int joinsOnStart;
     public long duration;
 
-    public JsonObject payload = new JsonObject();
+    public ArenaItem arenaItem;
 
-
-    public Arena(RoomItem roomItem){
-        this.capacity = roomItem.capacity();
-        this.joinsOnStart = roomItem.joinsOnStart();
-        this.duration = roomItem.duration();
+    public Arena(ArenaItem arenaItem){
+        this.arenaItem = arenaItem;
     }
     public Arena(){
         this.label = LABEL;
@@ -43,7 +39,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.properties.put("joinsOnStart",joinsOnStart);
         this.properties.put("duration",duration);
         this.properties.put("disabled",disabled);
-        this.properties.put("payload",payload.toString());
         return this.properties;
     }
     @Override
@@ -55,7 +50,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.joinsOnStart = ((Number)properties.getOrDefault("joinsOnStart",capacity)).intValue();
         this.duration = ((Number)properties.getOrDefault("duration",0)).longValue();
         this.disabled = (boolean)properties.get("disabled");
-        this.payload = JsonUtil.parse((String) properties.getOrDefault("payload","{}"));
     }
     @Override
     public int getFactoryId() {
@@ -90,13 +84,15 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         return _cp;
     }
     public JsonObject toJson(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name",name);
-        jsonObject.addProperty("capacity",capacity);
-        jsonObject.addProperty("duration",duration/60000);
-        jsonObject.addProperty("xp",xp);
-        jsonObject.addProperty("level",level);
-        return jsonObject;
+        if(arenaItem==null) return new JsonObject();
+        return arenaItem.toJson();
+        //JsonObject jsonObject = new JsonObject();
+        //jsonObject.addProperty("name",name);
+        //jsonObject.addProperty("capacity",capacity);
+        //jsonObject.addProperty("duration",duration/60000);
+        //jsonObject.addProperty("xp",xp);
+        //jsonObject.addProperty("level",level);
+        //return jsonObject;
     }
     public boolean configureAndValidate(byte[] data){
         Map<String,Object> map = JsonUtil.toMap(data);
@@ -108,7 +104,6 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         this.capacity = ((Number)map.get("capacity")).intValue();
         this.duration = ((Number)map.get("duration")).intValue()*60000;
         this.xp = ((Number)map.get("xp")).intValue();
-        if(map.containsKey("payload")) payload = ((JsonElement)map.get("payload")).getAsJsonObject();
         return true;
     }
 }
