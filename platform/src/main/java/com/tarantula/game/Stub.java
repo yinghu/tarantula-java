@@ -17,6 +17,7 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public String roomId;
     public String ticket;
+    public String playMode;
     public Shop shop;
 
     public GameRoom room;
@@ -43,7 +44,7 @@ public class Stub extends PlayerGameObject {
         jo.add("_zone",zone.toJson());
         jo.add("_arena", room.arena().toJson());
         jo.add("_room",room.toJson());
-        //jo.add("rating",rating.toJson());
+        //jo.add("_rating",rating.toJson());
         //if(dailyLogin!=null) jo.add("dailyLogin",dailyLogin.toJson());
         if(shop!=null) jo.add("_shop",shop.toJson());
         if(tournament!=null) jo.add("tournament",tournament.toJson());
