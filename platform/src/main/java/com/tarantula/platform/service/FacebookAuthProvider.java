@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.configuration.FacebookConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
@@ -45,6 +46,10 @@ public class FacebookAuthProvider extends AuthObject{
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
+    }
+    @Override
+    public String name(){
+        return OnAccess.FACEBOOK;
     }
     @Override
     public boolean validate(Map<String,Object> params){

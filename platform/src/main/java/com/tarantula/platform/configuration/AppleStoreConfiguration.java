@@ -21,6 +21,6 @@ public class AppleStoreConfiguration extends Application {
         return header.get("IsSandbox").getAsBoolean();
     }
     public String secureKey(){
-        return header.get("SecureKey").getAsString();
+        return header.get("SecretKey").getAsString();
     }
 }

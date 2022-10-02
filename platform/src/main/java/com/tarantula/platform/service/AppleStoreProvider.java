@@ -56,6 +56,10 @@ public class AppleStoreProvider extends AuthObject{
         }
     }
     @Override
+    public String name(){
+        return OnAccess.APPLE_STORE;
+    }
+    @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         jsonParser = new JsonParser();

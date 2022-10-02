@@ -51,6 +51,11 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     }
 
     @Override
+    public String name(){
+        return OnAccess.GOOGLE_STORE;
+    }
+
+    @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
     }

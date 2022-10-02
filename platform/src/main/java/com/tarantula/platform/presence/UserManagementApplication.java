@@ -76,7 +76,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     }
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
-        this.context.log(new String(payload),OnLog.WARN);
+        //this.context.log(new String(payload),OnLog.WARN);
         OnAccess acc = builder.create().fromJson(new String(payload).trim(),OnAccess.class);
         if(session.action().equals("onIndex")){
             PresenceContext ic = new PresenceContext("onIndex");

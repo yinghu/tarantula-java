@@ -60,7 +60,10 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             throw new RuntimeException(ex);
         }
     }
-
+    @Override
+    public String name(){
+        return OnAccess.GOOGLE;
+    }
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
