@@ -157,6 +157,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return null;
     }
 
+
+
+
     @Override
     public ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue() {
         return null;
@@ -168,5 +171,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     @Override
     public JsonObject toJson(){
         return this.zoneItem.toJson();
+    }
+
+    public String distributionKey(){
+        return this.zoneItem.distributionKey();
     }
 }

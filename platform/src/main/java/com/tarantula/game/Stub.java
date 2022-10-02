@@ -53,7 +53,7 @@ public class Stub extends PlayerGameObject {
         if(playerSavedGames!=null) jo.add("_playerSavedGames", playerSavedGames.toJson());
         jo.addProperty("Tag",tag);
         jo.addProperty("TournamentEnabled",tournament!=null);
-        //jo.addProperty("Offline",offline);
+        jo.addProperty("PlayMode",playMode);
         jo.addProperty("Ticket",ticket);
         return jo;
     }

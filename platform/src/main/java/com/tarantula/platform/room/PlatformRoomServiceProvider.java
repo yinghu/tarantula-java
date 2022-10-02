@@ -13,6 +13,7 @@ import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
+import com.tarantula.game.Stub;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
@@ -132,14 +133,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.setup(gameZone.arena(roomRegistry.level));
         return room;
     }
-    public void leave(String roomId,String systemId){
-        if(type.equals(GameZone.PLAY_MODE_PVE)) {
-            GameRoom gameRoom = gameRoomIndex.remove(roomId);
+    public void leave(Stub stub){
+        if(stub.playMode.equals(GameZone.PLAY_MODE_PVE)) {
+            GameRoom gameRoom = gameRoomIndex.remove(stub.roomId);
             if(gameRoom==null) return;
-            gameRoom.leave(systemId,room->true);
+            gameRoom.leave(stub.systemId(),room->true);
             return;
         }
-        this.distributionRoomService.onLeaveRoom(name,roomId,systemId);
+        this.distributionRoomService.onLeaveRoom(name,stub.roomId,stub.systemId());
     }
     public RoomJoinStub onRoomRegistered(String gameZoneId,Rating rating){
         GameZone gameZone = gameZoneIndex.get(gameZoneId).gameZone;

@@ -136,7 +136,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         Collections.sort(zoneList,new GameZoneComparator());
         int levelEnd = application.accessRank()*levelMatchOffset;
         int levelStart = levelEnd-(levelMatchOffset-1);
-        this.context.log("game start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
+        this.context.log("default game lobby start on level match from ["+levelStart+" to "+levelEnd+"]",OnLog.WARN);
         for(GameZone gameZone : zoneList){
             if(gameZone.disabled()) continue;
             //gameZone.registerListener(this);
@@ -155,9 +155,6 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
                 zoneIndex.put(i,lastZone);
             }
         }
-        //zoneIndex.forEach((k,v)->{
-            //context.log("Level ["+k+"] registered on ["+v.levelMatch()+"]",OnLog.WARN);
-        //});
     }
 
     @Override

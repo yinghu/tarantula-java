@@ -29,7 +29,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(usingDefault) return defaultLobby.join(session,rating);
         //using configurable lobby item
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        this.context.log(stubKey.asString(),OnLog.WARN);
+        this.context.log("JOIN->"+stubKey.asString(),OnLog.WARN);
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
             stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
@@ -52,6 +52,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             return;
         }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        this.context.log("LEAVE->"+stubKey.asString(),OnLog.WARN);
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null) return;
         stub.zone.leave(stub);
@@ -101,6 +102,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public boolean timeout(String systemId,int stub) {
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
+        this.context.log("TIMEOUT->"+stubKey.asString(),OnLog.WARN);
         Stub removed = stubIndex.remove(stubKey.asString());
         removed.zone.leave(removed);
         gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
@@ -132,17 +134,17 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void onLoaded(LobbyItem lobbyItem){
-        this.context.log("lobby item loaded->"+lobbyItem.configurationName(), OnLog.WARN);
+        this.context.log("configurable lobby item loaded->"+lobbyItem.configurationName(), OnLog.WARN);
         if(configure(lobbyItem)) this.usingDefault = false;
     }
     @Override
     public void onUpdated(LobbyItem lobbyItem){
-        this.context.log("lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
+        this.context.log("configurable lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
         if(configure(lobbyItem)) this.usingDefault = false;
     }
     @Override
     public void onRemoved(LobbyItem lobbyItem){
-        this.context.log("lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
+        this.context.log("configurable lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
         this.usingDefault = true;
         zoneIndex.clear();
     }
@@ -156,13 +158,15 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             roomProxy.setup(context,this,configurableZone);
             configurableZone.roomProxy(roomProxy);
             zoneIndex.put(zoneItem.rank(),configurableZone);
+            this.gameServiceProvider.roomServiceProvider().register(configurableZone);
         });
         if(zoneIndex.isEmpty()) return false;
         fillLobby();
-        for(int i= 1;i<11;i++){
-            GameZone gameZone = zoneIndex.get(i);
-            this.context.log(gameZone.toString(),OnLog.WARN);
-        }
+        //for(int i= 1;i<11;i++){
+            //GameZone gameZone = zoneIndex.get(i);
+            //this.context.log(gameZone.toString(),OnLog.WARN);
+        //}
+        try{this.defaultLobby.shutdown();}catch (Exception ex){}
         return true;
     }
     private GameZone.RoomProxy roomProxy(String playMode){

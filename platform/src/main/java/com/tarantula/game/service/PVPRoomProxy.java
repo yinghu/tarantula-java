@@ -31,7 +31,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
             if(gameLobby.timeout(s,d)){
                 stub.joined = false;
                 this.dataStore.update(stub);
-                this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.systemId());
+                this.gameServiceProvider.roomServiceProvider().leave(stub);
             }
         });
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
@@ -47,6 +47,6 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined = false;
         this.dataStore.update(stub);
         stub.pushChannel.close();
-        this.gameServiceProvider.roomServiceProvider().leave(stub.room.roomId(),stub.systemId());
+        this.gameServiceProvider.roomServiceProvider().leave(stub);
     }
 }

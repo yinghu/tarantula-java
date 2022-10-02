@@ -29,6 +29,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.zone = gameZone;
         stub.joined = true;
         stub.offline = true;
+        stub.playMode = GameZone.PLAY_MODE_PVE;
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         stub.rating = rating;
@@ -44,7 +45,7 @@ public class PVERoomProxy extends RoomProxyHeader {
     public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
-        this.gameServiceProvider.roomServiceProvider().leave(stub.roomId,stub.systemId());
+        this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
             gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());
         }

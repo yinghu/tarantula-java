@@ -278,4 +278,7 @@ public class DynamicZone extends RecoverableObject implements GameZone {
     public ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue(){
         return roomRegistryQueue;
     }
+    public String toString(){
+        return "Dynamic zone->"+name+">>";
+    }
 }
