@@ -31,7 +31,7 @@ public class GooglePlayConfiguration extends Application {
 
     //web
     public String clientId(){
-        return header.get("WebApplicationId").getAsString();
+        return header.get("WebClientId").getAsString();
     }
     public String projectId(){
         return header.get("WebSecretKey").getAsString();
