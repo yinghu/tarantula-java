@@ -128,7 +128,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         RoomJoinStub roomRegistry = this.distributionRoomService.onRegisterRoom(name,gameZone.distributionKey(),rating);
         if(!roomRegistry.joined) return null;
-        GameRoom room = this.distributionRoomService.onJoinRoom(name,roomRegistry.roomId,rating.systemId());
+        GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),roomRegistry.roomId,rating.systemId());
         if(room==null) return null;
         room.setup(gameZone,rating);
         return room;
@@ -191,9 +191,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         return gameRoom!=null?gameRoom.view():null;
     }
-    public GameRoom onRoomJoined(String roomId, String systemId){
+    public GameRoom onRoomJoined(String zoneId,String roomId, String systemId){
+        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = this.createGameRoom(type,0);
+            GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -223,8 +224,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         );
         this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
     }
-    public void onCreate(String zoneId,String roomId){
-        GameRoom gameRoom = this.createGameRoom(this.type,roomCapacity);
+    private void onCreate(String zoneId,String roomId){
+        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
+        GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
         gameRoom.index(zoneId);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
@@ -235,7 +237,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.distributionRoomService.sync(name,gameRoom.index(),gameRoom.roomId(),gameRoom.joined());
         }));
     }
-    public void onLoad(String roomId){
+    public void onRoomLoaded(String roomId){
         GameRoom gameRoom = this.createGameRoom(type,0);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
@@ -259,7 +261,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
             pendingRoomSize[0]--;
-            distributionRoomService.load(name,r.instanceId());
+            distributionRoomService.onLoadRoom(name,r.instanceId());
             return true;
         });
         if(pendingRoomSize[0]<0) return;
@@ -268,7 +270,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             gameRoomRegistry.owner(gameZone.distributionKey());
             this.dataStore.create(gameRoomRegistry);
             gameZone.roomRegistry().put(gameRoomRegistry.instanceId(),gameRoomRegistry);
-            distributionRoomService.create(name,gameZone.distributionKey(),gameRoomRegistry.instanceId());
+            onCreate(gameZone.distributionKey(),gameRoomRegistry.instanceId());
+            //distributionRoomService.create(name,gameZone.distributionKey(),gameRoomRegistry.instanceId());
         }
     }
 
@@ -417,7 +420,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     v.localManaged = true;
                     this.dataStore.list(new GameRoomRegistryQuery(k),r->{
                         v.gameZone.roomRegistry().put(r.instanceId(),r);
-                        distributionRoomService.load(name,r.instanceId());
+                        distributionRoomService.onLoadRoom(name,r.instanceId());
                         return true;
                     });
                 }

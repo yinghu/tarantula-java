@@ -80,10 +80,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             return null;
         }
     }
-    public GameRoom onJoinRoom(String serviceName,String roomId, String systemId){
+    public GameRoom onJoinRoom(String serviceName,String zoneId,String roomId, String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,roomId,systemId);
+        RoomJoinOperation roomJoinOperation = new RoomJoinOperation(serviceName,zoneId,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomJoinOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {
@@ -106,19 +106,8 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public void create(String serviceName,String zoneId,String roomId){
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomCreateOperation roomCreateOperation = new RoomCreateOperation(serviceName,zoneId,roomId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomCreateOperation,partitionId);
-        final Future<Void> future = builder.invoke();
-        try {
-            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-        }
-    }
-    public void load(String serviceName,String roomId){
+
+    public void onLoadRoom(String serviceName,String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
         RoomLoadOperation roomLoadOperation = new RoomLoadOperation(serviceName,roomId);
