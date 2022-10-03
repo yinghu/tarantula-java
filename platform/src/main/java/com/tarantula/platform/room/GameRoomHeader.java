@@ -9,6 +9,8 @@ import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
+import com.tarantula.game.GameZone;
+import com.tarantula.game.Rating;
 import com.tarantula.game.service.GameEntryQuery;
 
 import java.io.IOException;
@@ -99,10 +101,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         });
         return joined;
     }
-    public void setup(Arena arena){
-        this.arena = arena;
-        this.capacity = arena.capacity;
-        this.duration = arena.duration;
+    public void setup(GameZone gameZone, Rating rating){
+        this.arena = gameZone.arena(rating.arenaLevel);
+        this.capacity = gameZone.capacity();
+        this.duration = gameZone.roundDuration();
     }
 
     @Override

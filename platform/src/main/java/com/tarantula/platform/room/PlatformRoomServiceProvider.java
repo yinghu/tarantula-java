@@ -122,7 +122,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             String roomId = serviceContext.bucket()+"/"+ SystemUtil.oid();
             GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
             gameRoom.join(rating.systemId(),room->true);
-            gameRoom.setup(gameZone.arena(rating.arenaLevel));
+            gameRoom.setup(gameZone,rating);
             gameRoom.distributionKey(roomId);
             return gameRoom;
         }
@@ -130,7 +130,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(!roomRegistry.joined) return null;
         GameRoom room = this.distributionRoomService.onJoinRoom(name,roomRegistry.roomId,rating.systemId());
         if(room==null) return null;
-        room.setup(gameZone.arena(roomRegistry.level));
+        room.setup(gameZone,rating);
         return room;
     }
     public void leave(Stub stub){
@@ -253,7 +253,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex clusterIndex = this.distributionRoomService.localManaged(zkey);
         clusterIndex.gameZone = gameZone;
         gameZoneIndex.put(zkey,clusterIndex);
-        if(type.equals(GameZone.PLAY_MODE_PVE)) return;
+        if(gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)) return;
         if(!clusterIndex.localManaged) return;
         int[] pendingRoomSize = new int[]{roomPoolSizePerZone};
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{

@@ -63,7 +63,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public int capacity() {
-        return 0;
+        return this.zoneItem.room().capacity();
     }
 
     @Override

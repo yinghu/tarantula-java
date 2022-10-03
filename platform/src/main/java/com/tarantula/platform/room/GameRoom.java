@@ -4,6 +4,8 @@ import com.icodesoftware.Channel;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Connection;
 import com.tarantula.game.Arena;
+import com.tarantula.game.GameZone;
+import com.tarantula.game.Rating;
 
 public interface GameRoom extends Configurable {
 
@@ -20,7 +22,7 @@ public interface GameRoom extends Configurable {
     int round();
     Arena arena();
 
-    void setup(Arena arena);
+    void setup(GameZone gameZone, Rating rating);
 
     GameRoom join(String systemId,RoomListener roomListener);
     GameRoom view();
