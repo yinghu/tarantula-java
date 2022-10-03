@@ -8,6 +8,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.room.GameRoomRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -16,9 +17,18 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     private ZoneItem zoneItem;
     private RoomProxy roomProxy;
+    private List<Arena> arenaList;
+    private ConcurrentHashMap<Integer,Arena> arenaIndex;
 
     public ConfigurableZone(ZoneItem zoneItem){
         this.zoneItem = zoneItem;
+        this.arenaList = new ArrayList<>();
+        this.arenaIndex = new ConcurrentHashMap<>();
+        this.zoneItem.arenaList().forEach(a->{
+            Arena arena = new Arena(a);
+            arenaIndex.put(a.level(),arena);
+            arenaList.add(arena);
+        });
     }
 
     @Override
@@ -63,7 +73,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public int maxJoinsPerRoom() {
-        return 0;
+        return zoneItem.room().capacity();
     }
 
     @Override
@@ -73,7 +83,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public int joinsOnStart() {
-        return 0;
+        return zoneItem.room().joinsOnStart();
     }
 
     @Override
@@ -83,7 +93,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public long roundDuration() {
-        return 0;
+        return zoneItem.room().duration();
     }
 
     @Override
@@ -98,6 +108,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public Stub join(Session session, Rating rating) {
+
         return roomProxy.join(session,rating);
     }
 
@@ -124,12 +135,12 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public List<Arena> arenas() {
-        return null;
+        return arenaList;
     }
 
     @Override
     public Arena arena(int level) {
-        return new Arena(zoneItem.arenaList().get(0));
+        return arenaIndex.get(level);
     }
 
     @Override
@@ -156,8 +167,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     public ConcurrentHashMap<String, GameRoomRegistry> roomRegistry() {
         return null;
     }
-
-
 
 
     @Override

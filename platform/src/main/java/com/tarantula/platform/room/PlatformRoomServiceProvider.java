@@ -120,7 +120,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public GameRoom join(GameZone gameZone, Rating rating){
         if(gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)){
             String roomId = serviceContext.bucket()+"/"+ SystemUtil.oid();
-            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),0));
+            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
             gameRoom.join(rating.systemId(),room->true);
             gameRoom.setup(gameZone.arena(rating.arenaLevel));
             gameRoom.distributionKey(roomId);

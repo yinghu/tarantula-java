@@ -83,6 +83,10 @@ public class Arena extends RecoverableObject implements Configurable, Portable {
         _cp.name = this.name;
         return _cp;
     }
+    public int capacity(){
+        return this.capacity;
+    }
+
     public JsonObject toJson(){
         if(arenaItem==null) return new JsonObject();
         return arenaItem.toJson();
