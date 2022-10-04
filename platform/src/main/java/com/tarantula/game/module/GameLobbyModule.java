@@ -32,12 +32,13 @@ public class GameLobbyModule implements Module{
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onLeave")){
-            session.write(toMessage("left room",true).getBytes());
-            gameLobby.leave(session);
-        }
-        else if(session.action().equals("onUpdate")){
+
+        if(session.action().equals("onUpdate")){
             this.gameLobby.update(session,payload);
+        }
+        else if(session.action().equals("onValidate")){
+            this.context.log("check game session",OnLog.WARN);
+            this.gameLobby.validate(session);
         }
         else if(session.action().equals("onList")){
             this.gameLobby.list(session);
@@ -64,6 +65,10 @@ public class GameLobbyModule implements Module{
                 throw new RuntimeException("no permission");
             }
             this.gameLobby.list(session);
+        }
+        else if(session.action().equals("onLeave")){
+            session.write(toMessage("left room",true).getBytes());
+            gameLobby.leave(session);
         }
         else{
             throw new UnsupportedOperationException(session.action());

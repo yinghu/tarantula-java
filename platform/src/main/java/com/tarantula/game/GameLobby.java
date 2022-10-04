@@ -15,6 +15,7 @@ public interface GameLobby extends Configurable, Serviceable {
     void leave(Session session);
     void update(Session session, byte[] payload);
     void list(Session session);
+    void validate(Session session);
 
     void setup(ApplicationContext applicationContext) throws Exception;
     boolean timeout(String systemId,int stub);

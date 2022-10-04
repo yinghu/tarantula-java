@@ -16,6 +16,8 @@ public class ResponseSerializer implements JsonSerializer<Response> {
         jo.addProperty("label",response.label());
         jo.addProperty("message",response.message());
         jo.addProperty("successful",response.successful());
+        jo.addProperty("Successful",response.successful());
+        jo.addProperty("Message",response.message());
         return jo;
     }
 }

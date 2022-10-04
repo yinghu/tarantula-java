@@ -84,6 +84,11 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         stub.zone.list(session,stub);
     }
 
+    public void validate(Session session){
+        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey)!=null,"").getBytes());
+    }
+
     public boolean timeout(String systemId,int stub){
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
         Stub removed = stubIndex.remove(stubKey.asString());
