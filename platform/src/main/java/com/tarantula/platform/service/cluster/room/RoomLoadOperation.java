@@ -10,18 +10,20 @@ import java.io.IOException;
 public class RoomLoadOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
+    private String zoneId;
     private String roomId;
 
     public RoomLoadOperation(){}
-    public RoomLoadOperation(String serviceName, String roomId){
+    public RoomLoadOperation(String serviceName, String zoneId,String roomId){
         this.serviceName = serviceName;
+        this.zoneId = zoneId;
         this.roomId = roomId;
     }
 
     @Override
     public void run() throws Exception {
         RoomClusterService ais = this.getService();
-        ais.load(serviceName,roomId);
+        ais.load(serviceName,zoneId,roomId);
     }
 
     @Override
@@ -33,6 +35,7 @@ public class RoomLoadOperation extends Operation implements PartitionAwareOperat
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
+        out.writeUTF(zoneId);
         out.writeUTF(roomId);
     }
 
@@ -40,6 +43,7 @@ public class RoomLoadOperation extends Operation implements PartitionAwareOperat
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
+        zoneId = in.readUTF();
         roomId = in.readUTF();
     }
 }

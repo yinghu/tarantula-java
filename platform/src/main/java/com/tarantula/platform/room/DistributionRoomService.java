@@ -11,11 +11,11 @@ public interface DistributionRoomService extends ServiceProvider {
     GameRoom onJoinRoom(String serviceName, String zoneId,String roomId, String systemId);
     void onLeaveRoom(String serviceName,String roomId,String systemId);
 
-    void onLoadRoom(String serviceName,String roomId);
+    void onLoadRoom(String serviceName,String zoneId,String roomId);
 
     void release(String serviceName,String zoneId,String roomId,String systemId);
     void sync(String serviceName,String zoneId,String roomId,String[] joined);
-    GameRoom view(String serviceName, String roomId);
+    GameRoom onRoomView(String serviceName,String zoneId, String roomId);
     GameZoneIndex localManaged(String key);
     GameChannelIndex localManaged(int channelId);
 

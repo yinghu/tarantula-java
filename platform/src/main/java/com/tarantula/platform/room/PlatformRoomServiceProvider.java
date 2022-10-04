@@ -41,7 +41,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private DataStore dataStore;
     private Configuration configuration;
-    private int roomCapacity;
+    //private int roomCapacity;
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
@@ -83,7 +83,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.configuration = serviceContext.configuration(CONFIG);
         this.type = (String) gameCluster.property(GameCluster.MODE);
         JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
-        this.roomCapacity = jsonObject.get("roomCapacity").getAsInt();
+        //this.roomCapacity = jsonObject.get("roomCapacity").getAsInt();
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
@@ -107,7 +107,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 tryOnChannel(cs);
             });
         });
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"] Mode ["+type+"]["+typeLobby+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]");
     }
 
     @Override
@@ -180,9 +180,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return true;
         });
     }
-    public GameRoom onView(String roomId){
+    public GameRoom onRoomViewed(String zoneId,String roomId){
+        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = this.createGameRoom(type,0);
+            GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),0);
             _gameRoom.distributionKey(roomId);
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
@@ -237,8 +238,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.distributionRoomService.sync(name,gameRoom.index(),gameRoom.roomId(),gameRoom.joined());
         }));
     }
-    public void onRoomLoaded(String roomId){
-        GameRoom gameRoom = this.createGameRoom(type,0);
+    public void onRoomLoaded(String zoneId,String roomId){
+        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
+        GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),0);
         gameRoom.distributionKey(roomId);
         this.dataStore.createIfAbsent(gameRoom,true);
         gameRoom.dataStore(dataStore);
@@ -261,7 +263,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.dataStore.list(new GameRoomRegistryQuery(gameZone.distributionKey()),r->{
             gameZone.roomRegistry().put(r.instanceId(),r);
             pendingRoomSize[0]--;
-            distributionRoomService.onLoadRoom(name,r.instanceId());
+            distributionRoomService.onLoadRoom(name,gameZone.distributionKey(),r.instanceId());
             return true;
         });
         if(pendingRoomSize[0]<0) return;
@@ -271,7 +273,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.dataStore.create(gameRoomRegistry);
             gameZone.roomRegistry().put(gameRoomRegistry.instanceId(),gameRoomRegistry);
             onCreate(gameZone.distributionKey(),gameRoomRegistry.instanceId());
-            //distributionRoomService.create(name,gameZone.distributionKey(),gameRoomRegistry.instanceId());
         }
     }
 
@@ -309,7 +310,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void onConnection(Connection connection) {
         ConnectionStub connectionStub = (ConnectionStub)connection;
-        connectionStub.maxCapacity = roomCapacity;
+        //connectionStub.maxCapacity = roomCapacity;
         connectionStub.init();
         pendingConnections.offer(connectionStub);
         connectionIndex.put(connection.serverId(),connectionStub);
@@ -405,24 +406,26 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void reload(int partition,boolean localMember) {
-        if(type.equals(GameZone.PLAY_MODE_PVE)) return;
+        //if(type.equals(GameZone.PLAY_MODE_PVE)) return;
         //reload local zone rooms
         gameZoneIndex.forEach((k,v)->{
-            if(v.partitionId==partition){
-                if(v.localManaged && !localMember){
-                    logger.warn("release zone ->"+k+">>"+v.gameZone.name());
-                    v.gameZone.roomRegistryQueue().clear();
-                    v.gameZone.roomRegistry().clear();
-                    v.localManaged = false;
-                }
-                else if(!v.localManaged && localMember){
-                    logger.warn("take over zone->"+k+">>"+v.gameZone.name());
-                    v.localManaged = true;
-                    this.dataStore.list(new GameRoomRegistryQuery(k),r->{
-                        v.gameZone.roomRegistry().put(r.instanceId(),r);
-                        distributionRoomService.onLoadRoom(name,r.instanceId());
-                        return true;
-                    });
+            if(!v.gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)){
+                if(v.partitionId==partition){
+                    if(v.localManaged && !localMember){
+                        logger.warn("release zone ->"+k+">>"+v.gameZone.name());
+                        v.gameZone.roomRegistryQueue().clear();
+                        v.gameZone.roomRegistry().clear();
+                        v.localManaged = false;
+                    }
+                    else if(!v.localManaged && localMember){
+                        logger.warn("take over zone->"+k+">>"+v.gameZone.name());
+                        v.localManaged = true;
+                        this.dataStore.list(new GameRoomRegistryQuery(k),r->{
+                            v.gameZone.roomRegistry().put(r.instanceId(),r);
+                            distributionRoomService.onLoadRoom(name,v.gameZone.distributionKey(),r.instanceId());
+                            return true;
+                        });
+                    }
                 }
             }
         });
@@ -444,7 +447,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }
         });
-
 
     }
 

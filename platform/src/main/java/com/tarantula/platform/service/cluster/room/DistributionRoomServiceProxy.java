@@ -67,10 +67,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
             future.cancel(true);
         }
     }
-    public GameRoom view(String serviceName, String roomId){
+    public GameRoom onRoomView(String serviceName,String zoneId, String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomViewOperation roomViewOperation = new RoomViewOperation(serviceName,roomId);
+        RoomViewOperation roomViewOperation = new RoomViewOperation(serviceName,zoneId,roomId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomViewOperation,partitionId);
         final Future<GameRoom> future = builder.invoke();
         try {
@@ -107,10 +107,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
-    public void onLoadRoom(String serviceName,String roomId){
+    public void onLoadRoom(String serviceName,String zoneId,String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomLoadOperation roomLoadOperation = new RoomLoadOperation(serviceName,roomId);
+        RoomLoadOperation roomLoadOperation = new RoomLoadOperation(serviceName,zoneId,roomId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLoadOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {
