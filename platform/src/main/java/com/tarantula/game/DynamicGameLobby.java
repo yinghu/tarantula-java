@@ -86,7 +86,7 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
 
     public void validate(Session session){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey)!=null,"").getBytes());
+        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey.asString())!=null,"").getBytes());
     }
 
     public boolean timeout(String systemId,int stub){

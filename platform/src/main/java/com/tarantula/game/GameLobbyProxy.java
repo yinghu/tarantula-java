@@ -89,7 +89,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
     public void validate(Session session){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey)!=null,"").getBytes());
+        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey.asString())!=null,"").getBytes());
     }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
