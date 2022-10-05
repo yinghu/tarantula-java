@@ -68,6 +68,7 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
     @Override
     public boolean validate(Map<String, Object> map) {
         String typeId = (String) map.remove(OnAccess.TYPE_ID);
+        System.out.println(typeId);
         if(typeId==null) return false;
         TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
         if(vendor==null) return false;
