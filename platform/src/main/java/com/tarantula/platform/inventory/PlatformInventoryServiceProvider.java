@@ -109,6 +109,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         redeemer.distributionKey(item.distributionKey());
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        logger.warn(app.category());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
         redeemer.redeem();
         return true;
