@@ -6,6 +6,7 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.SystemValidator;
 import com.tarantula.platform.configuration.GoogleStoreConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
@@ -78,6 +79,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                     .build();
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
             JsonObject payload = JsonUtil.parse(_response.body());
+            System.out.println(payload.toString());
             onMetrics(GameClusterMetrics.PAYMENT_GOOGLE_STORE_COUNT);
             return true;//(payload.has("orderId")&&payload.get("orderId").getAsString().equals(orderId));
         }catch (Exception ex){
