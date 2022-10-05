@@ -328,6 +328,9 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         if(!gameCluster.applicationPreSetup().save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
+        Category category = app.category(desc);
+        category.list();
+        category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
         return new CommoditySerializer().serialize(app,Application.class,null).toString();
     }
     private String createItem(Item app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
