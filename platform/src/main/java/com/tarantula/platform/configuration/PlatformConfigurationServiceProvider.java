@@ -123,7 +123,8 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
     }
     @Override
     public void waitForData(){
-
+        MockStoreProvider mockStoreProvider = new MockStoreProvider(typeId,"");
+        this.serviceContext.registerAuthVendor(mockStoreProvider);
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){

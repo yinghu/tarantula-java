@@ -12,10 +12,17 @@ public class MockStoreProvider extends AuthObject{
 
     private DataStore dataStore;
     private String secureKey;
-    public MockStoreProvider(String name,String key){
-        super(name,"");
+    public MockStoreProvider(String typeId,String key){
+        super(typeId,"");
         this.secureKey = key;
     }
+
+    @Override
+    public String name(){
+        return OnAccess.MOCK_STORE;
+    }
+
+
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);

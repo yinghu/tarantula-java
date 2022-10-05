@@ -79,7 +79,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                     .build();
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
             JsonObject payload = JsonUtil.parse(_response.body());
-            System.out.println(payload.toString());
+            //System.out.println(payload.toString());
             onMetrics(GameClusterMetrics.PAYMENT_GOOGLE_STORE_COUNT);
             return true;//(payload.has("orderId")&&payload.get("orderId").getAsString().equals(orderId));
         }catch (Exception ex){
