@@ -69,6 +69,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public boolean grant(String systemId,String itemId){
         ShoppingItem shoppingItem = shoppingItems.get(itemId);
         if(shoppingItem==null){
+            logger.warn("shopping item ["+itemId+"] not existed");
             return false;
         }
         return this.inventoryServiceProvider.redeem(systemId,shoppingItem);
