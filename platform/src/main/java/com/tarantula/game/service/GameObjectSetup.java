@@ -155,6 +155,10 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         return serviceContext.dataStore(configurationDataStore(gameCluster,service),serviceContext.partitionNumber());
     }
 
+    public DataStore dataStore(Descriptor descriptor){
+        return serviceContext.dataStore(serviceDataStore(descriptor),serviceContext.partitionNumber());
+    }
+
     private String configurationDataStore(GameCluster application,String suffix){
         String serviceTypeId = (String) application.property(GameCluster.GAME_SERVICE);
         return serviceTypeId.replaceAll("-","_")+"_"+suffix;

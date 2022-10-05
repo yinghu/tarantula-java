@@ -31,5 +31,7 @@ public interface ApplicationPreSetup {
     DataStore dataStore(GameCluster gameCluster);
     DataStore dataStore(GameCluster gameCluster,String service);
 
+    DataStore dataStore(Descriptor descriptor);
+
     void setup(ServiceContext serviceContext);
 }
