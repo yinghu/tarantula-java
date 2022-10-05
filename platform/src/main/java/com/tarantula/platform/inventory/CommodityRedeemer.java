@@ -15,7 +15,6 @@ public class CommodityRedeemer extends ApplicationRedeemer {
         DataStore inventoryDataStore = this.inventoryServiceProvider.inventoryDataStore();
         inventoryDataStore.createIfAbsent(inventory,true);
         inventory.dataStore(inventoryDataStore);
-        System.out.println(inventory.key().asString());
         inventory.redeem(this);
     }
 }

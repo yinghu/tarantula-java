@@ -32,14 +32,11 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
     public void redeem(ApplicationRedeemer commodity){
         InventoryItem inventoryItem = new InventoryItem(commodity);
         dataStore.create(inventoryItem);
-        System.out.println(inventoryItem.distributionKey());
-        System.out.println("REC->"+rechargeable);
         keySet.add(inventoryItem.distributionKey());
         if(this.rechargeable){
             balance += commodity.amount();
         }
         count++;
-        System.out.println("BL->"+balance);
         dataStore.update(this);
     }
     public Configurable load(String inventoryId){
