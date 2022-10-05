@@ -106,7 +106,6 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        logger.warn("<<<<<<<<<"+descriptor.category());
         List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery("category/Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
