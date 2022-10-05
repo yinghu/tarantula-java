@@ -83,6 +83,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
+        Descriptor itemApp = _gc.serviceWithCategory("item");
+        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
     }
@@ -92,6 +94,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
+        Descriptor itemApp = _gc.serviceWithCategory("item");
+        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
     }
@@ -101,6 +105,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
+        Descriptor itemApp = _gc.serviceWithCategory("item");
+        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
     }
@@ -110,6 +116,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
         GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
+        Descriptor itemApp = _gc.serviceWithCategory("item");
+        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
     }
