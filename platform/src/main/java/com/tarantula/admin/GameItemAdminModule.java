@@ -500,7 +500,12 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
 
     @Override
     public void onLoaded(GameCluster gameCluster){
-        this.context.log("game cluster loaded",OnLog.WARN);
-        //this.deploymentServiceProvider.configuration(gameCluster,"deploy");
+        ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+        Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_DEPLOY_CATEGORY_TEMPLATE);
+        JsonArray cclasses = (JsonArray)configuration.property("itemList");
+        cclasses.forEach((c)->{
+            JsonObject jc = c.getAsJsonObject().getAsJsonObject("header");
+            this.context.log("game cluster loaded->"+jc.get("scope").getAsString(),OnLog.WARN);
+        });
     }
 }

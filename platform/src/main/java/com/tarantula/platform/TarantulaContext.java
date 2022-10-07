@@ -774,21 +774,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                         || config.equals(GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE)
                         || config.equals(GameCluster.GAME_ASSET_CATEGORY_TEMPLATE)){
                     File f = new File(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config);
-                    ConfigurableTemplate itemSet = new ConfigurableTemplate();
-                    JsonArray items = new JsonArray();
-                    for(String fn : f.list()){
-                        FileInputStream fin = new FileInputStream(f.getAbsoluteFile()+"/"+fn);
-                        ConfigurableTemplate temps = JsonConfigurableTemplateParser.itemSet(fin);
-                        fin.close();
-                        itemSet.type = temps.type;
-                        itemSet.name = temps.name;
-                        itemSet.description = temps.description;
-                        itemSet.version = temps.version;
-                        itemSet.category = temps.category;
-                        items.addAll((JsonArray)temps.property("itemList"));
-                    }
-                    itemSet.property("itemList",items);
-                    return itemSet;
+                    return fromDir(f);
+                }
+                if(config.equals("deploy")){
+                    URL src = Thread.currentThread().getContextClassLoader().getResource("config-template/deploy");
+                    File fd = new File(src.getFile());
+                    return fromDir(fd);
                 }
                 FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
                 ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
@@ -870,4 +861,22 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             metricsManager.addMetrics(metrics);
         }
  	}
+
+ 	private ConfigurableTemplate fromDir(File d) throws Exception{
+        ConfigurableTemplate itemSet = new ConfigurableTemplate();
+        JsonArray items = new JsonArray();
+        for(String fn : d.list()){
+            FileInputStream fin = new FileInputStream(d.getAbsoluteFile()+"/"+fn);
+            ConfigurableTemplate temps = JsonConfigurableTemplateParser.itemSet(fin);
+            fin.close();
+            itemSet.type = temps.type;
+            itemSet.name = temps.name;
+            itemSet.description = temps.description;
+            itemSet.version = temps.version;
+            itemSet.category = temps.category;
+            items.addAll((JsonArray)temps.property("itemList"));
+        }
+        itemSet.property("itemList",items);
+        return itemSet;
+    }
 }
