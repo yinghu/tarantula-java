@@ -22,7 +22,6 @@ public class ApplicationRedeemer extends ConfigurableObject{
         this.configurationVersion = inventoryRedeemer.configurationVersion;
         this.header = inventoryRedeemer.header;
         this.application = inventoryRedeemer.application;
-        //this.payload = inventoryRedeemer.payload;
         this.reference = inventoryRedeemer.reference;
         this.inventoryServiceProvider = inventoryRedeemer.inventoryServiceProvider;
         this.distributionKey(inventoryRedeemer.distributionKey());

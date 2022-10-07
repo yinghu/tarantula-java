@@ -54,6 +54,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String TYPE_ID = "typeId";
     String PROVIDER = "provider";
 
+    String MYSQL = "mysql";
+
 
     Object property(String name);
     void property(String name,Object value);

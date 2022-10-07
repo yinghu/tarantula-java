@@ -497,4 +497,10 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
             }
         }
     }
+
+    @Override
+    public void onLoaded(GameCluster gameCluster){
+        this.context.log("game cluster loaded",OnLog.WARN);
+        //this.deploymentServiceProvider.configuration(gameCluster,"deploy");
+    }
 }

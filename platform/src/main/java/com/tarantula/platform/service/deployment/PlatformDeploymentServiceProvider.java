@@ -548,6 +548,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             register((OnLobby)configurable);
             return;
         }
+        if(configurable instanceof GameCluster){
+            oListeners.forEach((k,o)->
+                    {
+                        if(o.type.equals(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE)){
+                            o.listener.onLoaded(configurable);
+                        }
+                    }
+            );
+            return;
+        }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
             this.integrationCluster.index(connection.configurationTypeId(),connection.toBinary());
