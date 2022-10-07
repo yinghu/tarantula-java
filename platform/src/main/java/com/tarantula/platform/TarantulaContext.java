@@ -72,6 +72,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private final ConcurrentHashMap<String, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>();
 
+    public static String releaseVersion;
     public String applicationSchedulingPoolSetting;
     private ScheduledExecutorService scheduledExecutorService;
 

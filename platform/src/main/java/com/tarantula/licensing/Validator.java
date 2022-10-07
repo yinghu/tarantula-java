@@ -30,4 +30,18 @@ public class Validator {
             return false;
         }
     }
+
+    public static String version(){
+        try{
+            File sf = new File("version.txt");
+            if(!sf.exists()) throw new IllegalArgumentException("no version file found");
+            BufferedReader reader = new BufferedReader(new FileReader(sf));
+            String version = reader.readLine();
+            log.info("Release version ["+version+"]");
+            return version;
+        }catch (Exception ex){
+            log.error("error",ex);
+            throw new RuntimeException(ex);
+        }
+    }
 }

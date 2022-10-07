@@ -39,6 +39,7 @@ public class TarantulaMain {
 			if(!Validator.validate()){
 				throw new IllegalArgumentException("no license found");
 			}
+			TarantulaContext.releaseVersion = Validator.version();
 			Properties _config = new Properties();
 			_config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-default.properties"));
 			Properties _user = new Properties();

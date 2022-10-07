@@ -20,6 +20,7 @@
 			<include>bootstrap.sh</include>
 			<include>gec-agent-1.0.jar</include>
 			<include>license.txt</include>
+			<include>version.txt</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>
