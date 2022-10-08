@@ -4,7 +4,6 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
-import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.GameCluster;
@@ -14,6 +13,7 @@ import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.service.*;
+import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,10 +62,15 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()){
-                TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
-                if(a!=null){
-                    serviceContext.registerAuthVendor(vendor);
-                    registered.put(vendor.name(),vendor);
+                if(a.configurationCategory().equals("MySQLConfiguration")){
+                    MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,a));
+                }
+                else{
+                    TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
+                    if(vendor!=null){
+                        serviceContext.registerAuthVendor(vendor);
+                        registered.put(vendor.name(),vendor);
+                    }
                 }
             }
         });
@@ -92,6 +97,10 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         Descriptor app = _gc.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
+        }
+        if(configurableObject.configurationCategory().equals("MySQLConfiguration")){
+            MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,configurableObject));
+            return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
         this.serviceContext.registerAuthVendor(authVendor);

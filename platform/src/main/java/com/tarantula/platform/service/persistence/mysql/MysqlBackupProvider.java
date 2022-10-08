@@ -5,6 +5,7 @@ import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.configuration.MySQLConfiguration;
 import com.tarantula.platform.service.persistence.BackupProvider;
 import com.icodesoftware.util.JsonUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -27,6 +28,11 @@ public class MysqlBackupProvider implements BackupProvider {
 
     private BasicDataSource dataSource;
 
+    private MySQLConfiguration mySQLConfiguration;
+
+    public MysqlBackupProvider(MySQLConfiguration mySQLConfiguration){
+        this.mySQLConfiguration = mySQLConfiguration;
+    }
 
     @Override
     public void start() throws Exception {
