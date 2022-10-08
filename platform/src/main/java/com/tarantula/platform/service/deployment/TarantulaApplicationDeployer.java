@@ -2,8 +2,6 @@ package com.tarantula.platform.service.deployment;
 
 import java.io.File;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -119,7 +117,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		return blist;
 	}
 	private List<String> loadFromLocal() throws Exception{
-		List<String> dlist = this.systemDeploy();
+		List<String> dlist = new ArrayList<>();
 		File f = new File("../deploy");
 		if(f.exists()){
 			for(String s : f.list()){
@@ -130,19 +128,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 		return dlist;
 	}
-	private List<String> systemDeploy() throws Exception{
-		ArrayList<String> arrayList = new ArrayList<>();
-		JarFile file = new JarFile("../lib/gec-platform-"+context.platformVersion+".jar");
-		Enumeration e = file.entries();
-		while (e.hasMoreElements()) {
-			JarEntry je = (JarEntry) e.nextElement();
-			String name = je.getName();
-			if(name.startsWith("application")&&name.endsWith(".xml")){
-				arrayList.add(name);
-			}
-		}
-		return arrayList;
-	}
+
 	@Override
 	public  void onUpdated(OnLobby onLobby){
 		this.context.deploymentService().register(onLobby);

@@ -4,14 +4,14 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.DeploymentDescriptor;
 
+
 public class JsonServiceParser {
 
-    private static String CONFIG_DEPLOY = "deploy/";
 
-    public static DeploymentDescriptor descriptor(String templateName){
+    public static DeploymentDescriptor descriptor(String dir, String templateName){
         try{
             DeploymentDescriptor descriptor = new DeploymentDescriptor();
-            JsonObject temp = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_DEPLOY+templateName));
+            JsonObject temp = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(dir+"/"+templateName));
             descriptor.typeId(temp.get("typeId").getAsString());
             descriptor.type(temp.get("type").getAsString());
             descriptor.name(temp.get("name").getAsString());

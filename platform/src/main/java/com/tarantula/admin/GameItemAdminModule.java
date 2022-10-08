@@ -208,6 +208,32 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         this.deploymentServiceProvider.registerConfigurableListener(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE,this);
         this.context.log("Game item admin module started", OnLog.WARN);
     }
+    private String createCategory(JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
+        JsonObject header = payload.get("header").getAsJsonObject();
+        String scope = header.get("scope").getAsString();
+        TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),scope,payload);
+        if(applicationPreSetup.load(gameCluster,typeIndex)) return JsonUtil.toSimpleResponse(false,"Category already existed");
+        applicationPreSetup.save(gameCluster,typeIndex);
+        String ctype = typeIndex.index();
+        int aix = ctype.indexOf('.');
+        if(aix>0){
+            ctype = ctype.substring(0,aix);
+        }
+        List<String> updates = this.availableUpdates(ctype);
+        updates.forEach(update->{
+            ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
+            if(categories.addCategory(payload)){
+                applicationPreSetup.save(gameCluster,categories);
+                ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
+                JsonObject type = new JsonObject();
+                type.addProperty("type","category");
+                type.addProperty("name",typeIndex.name());
+                configurableTypes.addType(type);
+                applicationPreSetup.save(gameCluster,configurableTypes);
+            }
+        });
+        return JsonUtil.toSimpleResponse(true,"Category added");
+    }
     private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
         if(name.equals(Configurable.ASSET_CONFIG_TYPE))
             return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
@@ -452,6 +478,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         applicationPreSetup.save(gameCluster, itemTypes);
         applicationPreSetup.save(gameCluster, applicationTypes);
 
+        this.onLoaded(gameCluster);
         //pre-defined lobby configurations
         //log lobby apps
         Configuration lobbyConfiguration = this.context.configuration("lobby");
@@ -501,14 +528,10 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
     @Override
     public void onLoaded(GameCluster gameCluster){
         ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-        ConfigurableCategories appCategories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_DEPLOY_CATEGORY_TEMPLATE);
+        Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE);
         JsonArray cclasses = (JsonArray)configuration.property("itemList");
         cclasses.forEach((c)->{
-            JsonObject jc = c.getAsJsonObject();
-            if(jc.get("header").getAsJsonObject().get("scope").getAsString().startsWith("application")){
-                appCategories.addCategory(jc);
-            }
+            createCategory(c.getAsJsonObject(),gameCluster,applicationPreSetup);
         });
     }
 }

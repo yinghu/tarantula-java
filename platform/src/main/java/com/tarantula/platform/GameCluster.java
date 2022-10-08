@@ -56,7 +56,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 
-    public final static String GAME_DEPLOY_CATEGORY_TEMPLATE = "deploy";
+    public final static String GAME_UPGRADE_CATEGORY_TEMPLATE = "upgrade";
 
 
     protected ServiceContext serviceContext;

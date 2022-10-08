@@ -124,7 +124,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String clusterNameSuffix;
     public int clusterInitialSize;
 
-    public String platformVersion;
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
@@ -753,17 +752,31 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
     public List<Descriptor> availableServices(){
- 	    URL url = Thread.currentThread().getContextClassLoader().getResource("deploy");
+ 	    URL url = Thread.currentThread().getContextClassLoader().getResource("application/deploy");
  	    File f = new File(url.getFile());
         ArrayList<Descriptor> alist = new ArrayList<>();
  	    f.list((m,n)->{
  	        if(n.endsWith(".json")){
- 	            Descriptor app = JsonServiceParser.descriptor(n);
- 	            if(!app.disabled()) alist.add(JsonServiceParser.descriptor(n));
+ 	            Descriptor app = JsonServiceParser.descriptor("application/deploy",n);
+ 	            if(!app.disabled()) alist.add(app);
             }
  	        return false;
         });
+ 	    alist.addAll(availableServicesUpgraded());
  	    return alist;
+    }
+    public List<Descriptor> availableServicesUpgraded(){
+        URL url = Thread.currentThread().getContextClassLoader().getResource("application/upgrade");
+        File f = new File(url.getFile());
+        ArrayList<Descriptor> alist = new ArrayList<>();
+        f.list((m,n)->{
+            if(n.endsWith(".json")){
+                Descriptor app = JsonServiceParser.descriptor("application/upgrade",n);
+                if(!app.disabled()) alist.add(app);
+            }
+            return false;
+        });
+        return alist;
     }
 
     public Configuration configuration(GameCluster gameCluster,String config){
@@ -777,8 +790,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                     File f = new File(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config);
                     return fromDir(f);
                 }
-                if(config.equals("deploy")){
-                    URL src = Thread.currentThread().getContextClassLoader().getResource("config-template/deploy");
+                if(config.equals(GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE)){
+                    URL src = Thread.currentThread().getContextClassLoader().getResource("config-template/"+GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE);
                     File fd = new File(src.getFile());
                     return fromDir(fd);
                 }
