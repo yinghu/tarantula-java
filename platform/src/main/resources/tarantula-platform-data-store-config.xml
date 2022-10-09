@@ -1,22 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data-store-service>
-    <data-source name="tarantula" provider="com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider" truncated="false">
+    <data-source name="tarantula" provider="com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider" truncated="false" backup-enabled="true">
         <property name="dataPath">tarantula/data</property>
         <property name="integrationPath">tarantula/integration</property>
         <property name="backupPath">backup</property>
     </data-source>
-    <backup-provider name="integration" scope="2" provider="com.tarantula.platform.service.persistence.BackupRouter" enabled="false">
-        <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-        <property name="database">integration_data_n4</property>
-        <property name="user">tarantula</property>
-        <property name="password">tarantula</property>
-        <property name="poolSize">8</property>
-    </backup-provider>
-    <backup-provider name="data" scope="1" provider="com.tarantula.platform.service.persistence.BackupRouter" enabled="false">
-        <property name="url">jdbc:mysql://10.0.0.153:3306</property>
-        <property name="database">tarantula_data_n4</property>
-        <property name="user">tarantula</property>
-        <property name="password">tarantula</property>
-        <property name="poolSize">8</property>
-    </backup-provider>
 </data-store-service>

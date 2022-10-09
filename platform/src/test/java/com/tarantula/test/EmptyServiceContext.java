@@ -133,4 +133,7 @@ public class EmptyServiceContext implements ServiceContext {
     public void unregisterMetrics(Metrics metrics) {
 
     }
+
+    public void registerBackupProvider(BackupProvider backupProvider){}
+    public void unregisterBackupProvider(BackupProvider backupProvider){}
 }

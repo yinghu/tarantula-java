@@ -4,6 +4,7 @@ import com.icodesoftware.Recoverable;
 
 public interface Metadata extends Recoverable {
 
+     String typeId();
      String source();
      int factoryId();
      int classId();

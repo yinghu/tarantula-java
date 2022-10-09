@@ -1,12 +1,13 @@
 package com.tarantula.platform.service.persistence.mysql;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
+import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.configuration.MySQLConfiguration;
-import com.tarantula.platform.service.persistence.BackupProvider;
 import com.icodesoftware.util.JsonUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -20,8 +21,8 @@ public class MysqlBackupProvider implements BackupProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(MysqlBackupProvider.class);
 
-    private String name;
-    private int scope;
+    //private String name;
+    //private int scope;
 
     private ServiceContext serviceContext;
     private boolean enabled;
@@ -49,7 +50,7 @@ public class MysqlBackupProvider implements BackupProvider {
     }
     @Override
     public String name() {
-        return name;
+        return this.mySQLConfiguration.typeId();
     }
 
     @Override
@@ -59,15 +60,15 @@ public class MysqlBackupProvider implements BackupProvider {
 
     @Override
     public int scope() {
-        return scope;
+        return Distributable.DATA_SCOPE;
     }
 
     @Override
     public void configure(Map<String, String> properties) {
-        this.name = properties.get("name");
-        this.scope = Integer.parseInt(properties.get("scope"));
-        this.enabled = Boolean.parseBoolean(properties.get("enabled"));
-        log.warn("Backup provider scope: ["+scope+"] name :["+name+"] enabled :["+enabled+"]");
+        //this.name = properties.get("name");
+        //this.scope = Integer.parseInt(properties.get("scope"));
+        //this.enabled = Boolean.parseBoolean(properties.get("enabled"));
+        //log.warn("Backup provider scope: ["+scope+"] name :["+name+"] enabled :["+enabled+"]");
         if(!enabled) return;
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -120,10 +121,9 @@ public class MysqlBackupProvider implements BackupProvider {
         }
     }
 
-    public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t){
-        if(!enabled){
-            return t.toBinary();//SystemUtil.toJson(t.toMap());
-        }
+    public <T extends Recoverable> void create(Metadata metadata, String key, T t){
+        if(!enabled) return;
+
         try{
             Map<String,Object> data = t.toMap();
             Connection connection = dataSource.getConnection();
@@ -136,7 +136,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 preparedStatement.setInt(4,t.getFactoryId());
                 preparedStatement.execute();
                 preparedStatement.close();
-                return ret.getBytes();
+                //return ret.getBytes();
             }catch (Exception eex){
                 throw new RuntimeException(eex.getMessage());
             }
@@ -145,10 +145,10 @@ public class MysqlBackupProvider implements BackupProvider {
             }
         }catch (Exception ex){
             log.warn("error on create->"+ex.getMessage());
-            return null;
+            //return null;
         }
     }
-    @Override
+
     public <T extends Recoverable> T load(Metadata metadata,String key){
         if(!enabled){
            return null;
@@ -183,10 +183,8 @@ public class MysqlBackupProvider implements BackupProvider {
         }
     }
     @Override
-    public <T extends Recoverable> byte[] update(Metadata metadata, String key, T t){
-        if(!enabled){
-            return JsonUtil.toJson(t.toMap());
-        }
+    public <T extends Recoverable> void update(Metadata metadata, String key, T t){
+        if(!enabled) return;
         try{
             Connection connection = dataSource.getConnection();
             try{
@@ -196,7 +194,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 preparedStatement.setString(2,key);
                 preparedStatement.execute();
                 preparedStatement.close();
-                return ret.getBytes();
+                //return ret.getBytes();
             }catch (Exception eex){
                 throw new RuntimeException(eex.getMessage());
             }
@@ -205,7 +203,7 @@ public class MysqlBackupProvider implements BackupProvider {
             }
         }catch (Exception ex){
             log.warn("error on update->"+ex.getMessage());
-            return null;
+            //return null;
         }
     }
 }

@@ -64,6 +64,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
             if(!a.disabled()){
                 if(a.configurationCategory().equals("MySQLConfiguration")){
                     MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,a));
+                    this.serviceContext.registerBackupProvider(mysqlBackupProvider);
                 }
                 else{
                     TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
@@ -100,6 +101,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         }
         if(configurableObject.configurationCategory().equals("MySQLConfiguration")){
             MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,configurableObject));
+            this.serviceContext.registerBackupProvider(mysqlBackupProvider);
             return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
@@ -114,6 +116,11 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         Descriptor app = _gc.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
+        }
+        if(configurableObject.configurationCategory().equals("MySQLConfiguration")){
+            MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,configurableObject));
+            this.serviceContext.unregisterBackupProvider(mysqlBackupProvider);
+            return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
         this.serviceContext.unregisterAuthVendor(authVendor);

@@ -2,22 +2,29 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Map;
 
-public class BackupRouter implements BackupProvider{
+public class BackupRouter implements BackupProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(BackupRouter.class);
 
-    private String name;
-    private int scope;
+    private final String name;
+    private final int scope;
 
     private ServiceContext serviceContext;
+
     private boolean enabled;
 
 
+    public BackupRouter(String name,int scope,boolean enabled){
+        this.name = name;
+        this.scope = scope;
+        this.enabled = enabled;
+    }
     @Override
     public String name() {
         return name;
@@ -45,11 +52,7 @@ public class BackupRouter implements BackupProvider{
 
     @Override
     public void configure(Map<String, String> properties) {
-        this.name = properties.get("name");
-        this.scope = Integer.parseInt(properties.get("scope"));
-        this.enabled = Boolean.parseBoolean(properties.get("enabled"));
-        log.warn("Backup provider scope: ["+scope+"] name :["+name+"] enabled :["+enabled+"]");
-        //if(!enabled) return;
+
     }
 
     @Override
@@ -67,18 +70,23 @@ public class BackupRouter implements BackupProvider{
 
     }
 
+
+
     @Override
-    public <T extends Recoverable> T load(Metadata metadata, String key) {
-        return null;
+    public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
+
+
     }
 
     @Override
-    public <T extends Recoverable> byte[] update(Metadata metadata, String key, T t) {
-        return new byte[0];
+    public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
+
     }
 
-    @Override
-    public <T extends Recoverable> byte[] create(Metadata metadata, String key, T t) {
-        return new byte[0];
+    public void addBackupProvider(BackupProvider backupProvider){
+        log.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ registered on ["+name+"]");
+    }
+    public void removeBackupProvider(BackupProvider backupProvider){
+        log.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ unregistered on ["+name+"]");
     }
 }

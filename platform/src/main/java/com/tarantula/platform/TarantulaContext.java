@@ -852,6 +852,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         thirdPartyServiceProvider.releaseAuthVendor(authVendor);
     }
 
+    public void registerBackupProvider(BackupProvider backupProvider){
+        this.deploymentDataStoreProvider.addBackupProvider(backupProvider);
+    }
+    public void unregisterBackupProvider(BackupProvider backupProvider){
+ 	    this.deploymentDataStoreProvider.removeBackupProvider(backupProvider);
+    }
+
     public Metrics metrics(String name){
          return metricsManager.metrics(name);
     }

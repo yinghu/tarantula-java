@@ -33,7 +33,6 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
     private int accessIndexPartitionNumber;
     private String dataStoreDailyBackup;
 
-    private BackupProvider backupProvider;
 
     private TarantulaContext tarantulaContext;
     public DataStoreConfigurationXMLParser(String dconfig,TarantulaContext tx){
@@ -58,12 +57,6 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
             properties.clear();
         }
-        else if(qname.equals("backup-provider")){
-            this.backupProvider.configure(properties);
-            _start(this.backupProvider);
-            this.tarantulaContext.deploymentDataStoreProvider.addBackupProvider(this.backupProvider);
-            properties.clear();
-        }
         else if(qname.equals("property")){
             properties.put(currentProperty, value);
         }
@@ -77,11 +70,13 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
         if(qname.equals("data-source")){
             String name = (attributes.getValue("name"));
             if(!name.equals(DeploymentServiceProvider.DEPLOY_DATA_STORE)) throw new RuntimeException("master data store name must be->"+DeploymentServiceProvider.DEPLOY_DATA_STORE);
-            String provider = (attributes.getValue("provider"));
-            String trimming = (attributes.getValue("truncated"));
+            String provider = attributes.getValue("provider");
+            String trimming = attributes.getValue("truncated");
+            String backupEnabled = attributes.getValue("backup-enabled");
             this.tarantulaContext.deploymentDataStoreProvider = this.dataStoreProvider(provider.trim());
             properties.put("name",name.trim());
             properties.put("truncated",trimming);
+            properties.put("backupEnabled",backupEnabled.trim());
             properties.put("bucket",this.dataBucketGroup);
             properties.put("node",this.dataBucketNode);
             properties.put("partitionNumber",this.partitionNumber+"");
@@ -89,13 +84,6 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
             properties.put("dailyBackup",dataStoreDailyBackup);
             this.currentLoad = name.trim();
-        }
-        else if(qname.equals("backup-provider")){
-            properties.clear();
-            this.backupProvider = this.backupProvider(attributes.getValue("provider"));
-            properties.put("name",attributes.getValue("name"));
-            properties.put("scope",attributes.getValue("scope"));
-            properties.put("enabled",attributes.getValue("enabled"));
         }
         else if(qname.equals("property")){
             currentProperty = attributes.getValue("name").trim();
@@ -112,25 +100,12 @@ public class DataStoreConfigurationXMLParser extends DefaultHandler implements S
             throw new RuntimeException(ex);
         }
     }
-    BackupProvider backupProvider(String provider){
-        try {
-            return (BackupProvider)Class.forName(provider).getConstructor().newInstance();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
+
     void _start(DataStoreProvider ds){
         try{
             ds.start();
             ds.setup(this.tarantulaContext);
             if(ds.name().equals(DeploymentServiceProvider.NAME)) this.tarantulaContext.deploymentDataStoreProvider = ds;
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
-    void _start(BackupProvider ds){
-        try{
-            ds.start();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

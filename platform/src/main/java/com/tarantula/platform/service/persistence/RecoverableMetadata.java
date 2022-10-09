@@ -14,6 +14,7 @@ import java.io.IOException;
 
 public class RecoverableMetadata extends RecoverableObject implements Metadata, Portable {
 
+    private String typeId;
     private String source;
     private int factoryId;
     private int classId;
@@ -26,11 +27,9 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.source = source;
         this.partition = partition;
         this.scope = scope;
+        //int ix = source.indexOf("_");
     }
-    public RecoverableMetadata(int factoryId,int classId){
-        this.factoryId = factoryId;
-        this.classId = classId;
-    }
+
 
     @Override
     public int getFactoryId() {
@@ -66,9 +65,10 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     }
     @Override
     public String toString(){
-        return "Metadata ["+source+"/"+factoryId+"/"+classId+"/"+scope+"/"+partition+"/"+timestamp+"/"+onEdge+"/"+index+"]";
+        return "Metadata ["+typeId+"/"+source+"/"+factoryId+"/"+classId+"/"+scope+"/"+partition+"/"+timestamp+"/"+onEdge+"/"+index+"]";
     }
     //METADATA CONTRACT METHODS
+    public String typeId(){ return this.typeId;}
     public int factoryId(){
         return this.factoryId;
     }

@@ -4,10 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.Metadata;
-import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TimeUtil;
 import com.sleepycat.je.*;
@@ -52,6 +49,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
+    private boolean backupEnabled;
     private int replicationNodeNumber = 3;
 
     private ClusterNode node;
@@ -63,8 +61,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private Environment integrationEnvironment;
 
 
-    private BackupProvider iBackupProvider;
-    private BackupProvider dBackupProvider;
+    private BackupRouter iBackupProvider;
+    private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
 
     private MetricsListener metricsListener = (k,v)->{};
@@ -73,7 +71,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void configure(Map<String, String> properties) {
         this.database = properties.get("name");
         this.trimming = Boolean.parseBoolean(properties.get("truncated"));
-        //dataPath, integrationPath, activePath, backupPath
+        this.backupEnabled = Boolean.parseBoolean(properties.get("backupEnabled"));
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
@@ -82,13 +80,23 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
         this.node = new ClusterNode(properties.get("bucket"),properties.get("node"));
         this.replicationPoolSetting = properties.get("poolSetting");
+        this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE,backupEnabled);
+        this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE,backupEnabled);
     }
-    public void addBackupProvider(BackupProvider backProvider){
-        if(backProvider.scope()== Distributable.INTEGRATION_SCOPE){
-            iBackupProvider = backProvider;
+    public void addBackupProvider(BackupProvider backupProvider){
+        if(backupProvider.scope()== Distributable.INTEGRATION_SCOPE){
+            iBackupProvider.addBackupProvider(backupProvider);
         }
-        else if(backProvider.scope()==Distributable.DATA_SCOPE){
-            dBackupProvider = backProvider;
+        else if(backupProvider.scope()==Distributable.DATA_SCOPE){
+            dBackupProvider.addBackupProvider(backupProvider);
+        }
+    }
+    public void removeBackupProvider(BackupProvider backupProvider){
+        if(backupProvider.scope()== Distributable.INTEGRATION_SCOPE){
+            iBackupProvider.removeBackupProvider(backupProvider);
+        }
+        else if(backupProvider.scope()==Distributable.DATA_SCOPE){
+            dBackupProvider.removeBackupProvider(backupProvider);
         }
     }
     public ClusterNode node(){
@@ -244,7 +252,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.replicationPool = pool;
             this.workSize = poolSize;
         });
-        log.info("Tarantula data store started on ["+node.toString()+"]");
+        log.info("Tarantula data store started on ["+node.toString()+"] with backup enabled ["+backupEnabled+"]");
     }
 
     @Override
