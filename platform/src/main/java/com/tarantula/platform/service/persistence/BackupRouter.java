@@ -1,24 +1,26 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class BackupRouter implements BackupProvider {
 
-    private static JDKLogger log = JDKLogger.getLogger(BackupRouter.class);
+    private TarantulaLogger logger;
 
     private final String name;
     private final int scope;
 
-    private ServiceContext serviceContext;
-
     private boolean enabled;
 
+    private ConcurrentHashMap<String,BackupProvider> bMap = new ConcurrentHashMap();
+    private CopyOnWriteArraySet<String> pendingSource = new CopyOnWriteArraySet<>();
 
     public BackupRouter(String name,int scope,boolean enabled){
         this.name = name;
@@ -57,24 +59,22 @@ public class BackupRouter implements BackupProvider {
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
+        this.logger = serviceContext.logger(BackupRouter.class);
     }
 
     @Override
     public void registerDataStore(String name) {
-
+        pendingSource.add(name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-
+        pendingSource.add(name);
     }
-
 
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-
 
     }
 
@@ -84,9 +84,16 @@ public class BackupRouter implements BackupProvider {
     }
 
     public void addBackupProvider(BackupProvider backupProvider){
-        log.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ registered on ["+name+"]");
+        logger.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ registered on ["+name+"]");
+        bMap.put(backupProvider.name(),backupProvider);
+        pendingSource.forEach((src)->{
+            //if(src.startsWith(backupProvider.name())){
+                logger.warn(src);
+            //}
+        });
     }
     public void removeBackupProvider(BackupProvider backupProvider){
-        log.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ unregistered on ["+name+"]");
+        logger.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ unregistered on ["+name+"]");
+        bMap.remove(backupProvider.name());
     }
 }

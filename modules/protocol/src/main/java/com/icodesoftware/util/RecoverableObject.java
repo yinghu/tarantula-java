@@ -100,7 +100,7 @@ public class RecoverableObject implements Recoverable {
         fromMap(JsonUtil.toMap(payload));
     }
     public boolean backup(){
-        return false;
+        return true;
     }
 
     public boolean disabled() {

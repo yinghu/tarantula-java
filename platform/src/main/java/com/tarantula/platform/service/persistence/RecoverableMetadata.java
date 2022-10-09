@@ -27,7 +27,13 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.source = source;
         this.partition = partition;
         this.scope = scope;
-        //int ix = source.indexOf("_");
+        int ix = source.indexOf("_");
+        if(ix<=0){
+            typeId = source;
+        }
+        else{
+            typeId = source.substring(0,ix);
+        }
     }
 
 

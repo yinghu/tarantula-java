@@ -118,10 +118,10 @@ public class ServiceContextProxy implements ServiceContext {
     }
 
     public void registerBackupProvider(BackupProvider backupProvider){
-        this.unregisterBackupProvider(backupProvider);
+        this.tarantulaContext.registerBackupProvider(backupProvider);
     }
     public void unregisterBackupProvider(BackupProvider backupProvider){
-        this.tarantulaContext.registerBackupProvider(backupProvider);
+        this.tarantulaContext.unregisterBackupProvider(backupProvider);
     }
 
 }
