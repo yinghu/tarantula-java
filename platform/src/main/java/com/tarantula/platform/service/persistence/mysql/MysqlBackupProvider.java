@@ -29,6 +29,10 @@ public class MysqlBackupProvider implements BackupProvider {
 
     private MySQLConfiguration mySQLConfiguration;
 
+    public MysqlBackupProvider(){
+
+    }
+
     public MysqlBackupProvider(MySQLConfiguration mySQLConfiguration){
         this.mySQLConfiguration = mySQLConfiguration;
     }
@@ -50,6 +54,9 @@ public class MysqlBackupProvider implements BackupProvider {
         dataSource.getConnection();
     }
 
+    public void configure(Map<String,Object> properties){
+
+    }
     @Override
     public void shutdown() throws Exception {
         if(!enabled) return;

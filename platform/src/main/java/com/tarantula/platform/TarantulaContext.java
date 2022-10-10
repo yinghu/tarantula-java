@@ -26,7 +26,7 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
-import com.tarantula.platform.service.persistence.DataStoreConfigurationXMLParser;
+import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.*;
 
@@ -161,7 +161,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
-        DataStoreConfigurationXMLParser sparser = new DataStoreConfigurationXMLParser("tarantula-platform-data-store-config.xml",this);
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this);
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);

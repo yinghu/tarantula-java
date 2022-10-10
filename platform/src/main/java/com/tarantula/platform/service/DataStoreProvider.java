@@ -15,7 +15,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     //int CONCURRENCY_ACCESS_LIMIT = 17;
 
-    void configure(Map<String,String> properties);
+    void configure(Map<String,Object> properties);
     void addBackupProvider(BackupProvider shardingProvider);
     void removeBackupProvider(BackupProvider shardingProvider);
 

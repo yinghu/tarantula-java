@@ -5,4 +5,18 @@
         <property name="integrationPath">tarantula/integration</property>
         <property name="backupPath">backup</property>
     </data-source>
+    <backup-router name="integration" scope="2" provider="com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider" enabled="false">
+        <property name="url">jdbc:mysql://127.0.0.1:3306</property>
+        <property name="database">integration</property>
+        <property name="user">root</property>
+        <property name="password">root</property>
+        <property name="poolSize">8</property>
+    </backup-router>
+    <backup-router name="data" scope="1" provider="com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider" enabled="false">
+        <property name="url">jdbc:mysql://127.0.0.1:3306</property>
+        <property name="database">tarantula</property>
+        <property name="user">root</property>
+        <property name="password">root</property>
+        <property name="poolSize">8</property>
+    </backup-router>
 </data-store-service>

@@ -1,0 +1,96 @@
+package com.tarantula.platform.service.persistence;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.Serviceable;
+import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.DataStoreProvider;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
+
+public class DataStoreConfigurationJsonParser implements Serviceable {
+
+
+    HashMap<String,Object> properties = new HashMap();
+
+    private String dataBucketGroup;
+    private String dataBucketNode;
+
+    private String dataStoreProviderConfiguration;
+    private String dataDir;
+
+    private int partitionNumber;
+    private int accessIndexPartitionNumber;
+    private String dataStoreDailyBackup;
+
+
+    private TarantulaContext tarantulaContext;
+
+    public DataStoreConfigurationJsonParser(String dconfig, TarantulaContext tx){
+        this.dataStoreProviderConfiguration = dconfig;
+        this.dataBucketGroup = tx.dataBucketGroup;
+        this.dataBucketNode = tx.dataBucketNode;
+        this.partitionNumber = tx.partitionNumber();
+        this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
+        this.dataDir = tx.dataStoreDir;
+        this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
+        this.tarantulaContext = tx;
+    }
+    private void parse(InputStream json) throws Exception{
+        JsonObject config = JsonUtil.parse(json);
+        JsonObject ds = config.get("data-source").getAsJsonObject();
+        String name = (ds.get("name").getAsString());
+        if(!name.equals(DeploymentServiceProvider.DEPLOY_DATA_STORE)) throw new RuntimeException("master data store name must be->"+DeploymentServiceProvider.DEPLOY_DATA_STORE);
+        String provider = ds.get("provider").getAsString();
+        properties.put("name",name.trim());
+        properties.put("backupEnabled","true");
+        properties.put("bucket",this.dataBucketGroup);
+        properties.put("node",this.dataBucketNode);
+        properties.put("partitionNumber",this.partitionNumber+"");
+        properties.put("dir",this.dataDir);
+        properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
+        properties.put("dailyBackup",dataStoreDailyBackup);
+
+        this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());
+        JsonArray props = ds.get("properties").getAsJsonArray();
+        props.forEach(e->{
+            JsonObject kv = e.getAsJsonObject();
+            kv.entrySet().forEach((v)->{
+                properties.put(v.getKey(),v.getValue().getAsString());
+            });
+        });
+        this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
+        this.tarantulaContext.deploymentDataStoreProvider.start();
+        this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
+    }
+
+
+    DataStoreProvider dataStoreProvider(String provider){
+        try {
+            return (DataStoreProvider)Class.forName(provider).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+
+    public void start() throws Exception {
+        try{
+            File f = new File("/etc/tarantula/"+this.dataStoreProviderConfiguration);
+            InputStream in = new FileInputStream(f);
+            this.parse(in);
+        }catch (Exception ex){
+            this.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(this.dataStoreProviderConfiguration));
+        }
+    }
+
+
+    public void shutdown() throws Exception {
+
+    }
+}

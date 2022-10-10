@@ -7,6 +7,7 @@ import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -57,7 +58,9 @@ public class BackupRouter implements BackupProvider {
         return scope;
     }
 
+    public void configure(Map<String,Object> properties){
 
+    }
 
     @Override
     public void setup(ServiceContext serviceContext) {

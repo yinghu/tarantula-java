@@ -1,0 +1,36 @@
+{
+    "data-source": {
+        "name" : "tarantula",
+        "provider" : "com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider",
+        "properties": [
+            {"truncated": "false"},
+            {"dataPath":"tarantula/data"},
+            {"integrationPath":"tarantula/integration"},
+            {"backupPath":"backup"}
+        ]
+    },
+    "integration-backup-router": {
+        "enabled": "false",
+        "backup-provider":{
+            "properties": [
+                {"name": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider"},
+                {"url": "jdbc:mysql://127.0.0.1:3306"},
+                {"user":"root"},
+                {"password": "root"},
+                {"poolSize": "8"}
+            ]
+        }
+    },
+    "data-backup-router": {
+        "enabled": "false",
+        "backup-provider":{
+            "name": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
+            "properties": [
+                {"url": "jdbc:mysql://127.0.0.1:3306"},
+                {"user":"root"},
+                {"password": "root"},
+                {"poolSize": "8"}
+            ]
+        }
+    }
+}

@@ -68,18 +68,18 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private MetricsListener metricsListener = (k,v)->{};
 
     @Override
-    public void configure(Map<String, String> properties) {
-        this.database = properties.get("name");
-        this.trimming = Boolean.parseBoolean(properties.get("truncated"));
-        this.backupEnabled = Boolean.parseBoolean(properties.get("backupEnabled"));
+    public void configure(Map<String, Object> properties) {
+        this.database = (String)properties.get("name");
+        this.trimming = Boolean.parseBoolean((String) properties.get("truncated"));
+        this.backupEnabled = Boolean.parseBoolean((String) properties.get("backupEnabled"));
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
-        this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean(properties.get("dailyBackup")):false;
-        this.partitionNumber = Integer.parseInt(properties.get("partitionNumber"));
-        this.node = new ClusterNode(properties.get("bucket"),properties.get("node"));
-        this.replicationPoolSetting = properties.get("poolSetting");
+        this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean((String) properties.get("dailyBackup")):false;
+        this.partitionNumber = Integer.parseInt((String) properties.get("partitionNumber"));
+        this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
+        this.replicationPoolSetting = (String) properties.get("poolSetting");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE,backupEnabled);
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE,backupEnabled);
     }
