@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DataStoreConfigurationJsonParser implements Serviceable {
 
@@ -26,7 +27,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
     private int partitionNumber;
     private int accessIndexPartitionNumber;
-    private String dataStoreDailyBackup;
+    private boolean dataStoreDailyBackup;
 
 
     private TarantulaContext tarantulaContext;
@@ -38,7 +39,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.partitionNumber = tx.partitionNumber();
         this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
-        this.dataStoreDailyBackup = tx.dataStoreDailyBackup?"true":"false";
+        this.dataStoreDailyBackup = tx.dataStoreDailyBackup;
         this.tarantulaContext = tx;
     }
     private void parse(InputStream json) throws Exception{
@@ -48,10 +49,10 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         if(!name.equals(DeploymentServiceProvider.DEPLOY_DATA_STORE)) throw new RuntimeException("master data store name must be->"+DeploymentServiceProvider.DEPLOY_DATA_STORE);
         String provider = ds.get("provider").getAsString();
         properties.put("name",name.trim());
-        properties.put("backupEnabled","true");
+        //properties.put("backupEnabled","true");
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
-        properties.put("partitionNumber",this.partitionNumber+"");
+        properties.put("partitionNumber",this.partitionNumber);
         properties.put("dir",this.dataDir);
         properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
         properties.put("dailyBackup",dataStoreDailyBackup);
@@ -64,6 +65,18 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
                 properties.put(v.getKey(),v.getValue().getAsString());
             });
         });
+        Map<String,Object> _intrgration = new HashMap<>();
+        JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
+        _intrgration.put("enabled",_iconfig.get("enabled").getAsBoolean());
+        _intrgration.put("backup-provider",_iconfig.get("backup-provider").getAsJsonObject());
+
+        Map<String,Object> _data = new HashMap<>();
+        JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
+        _data.put("enabled",_dconfig.get("enabled").getAsBoolean());
+        _data.put("backup-provider",_dconfig.get("backup-provider").getAsJsonObject());
+
+        properties.put("integrationRouter",_intrgration);
+        properties.put("dataRouter",_data);
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
         this.tarantulaContext.deploymentDataStoreProvider.start();
         this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);

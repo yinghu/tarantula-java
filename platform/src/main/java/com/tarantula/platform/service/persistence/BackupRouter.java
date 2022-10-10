@@ -1,19 +1,21 @@
 package com.tarantula.platform.service.persistence;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
+
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.service.ServiceContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class BackupRouter implements BackupProvider {
 
-    private TarantulaLogger logger;
+    private JDKLogger logger = JDKLogger.getLogger(BackupRouter.class);
 
     private final String name;
     private final int scope;
@@ -23,10 +25,11 @@ public class BackupRouter implements BackupProvider {
     private ConcurrentHashMap<String,BackupProvider> bMap = new ConcurrentHashMap();
     private CopyOnWriteArraySet<BackupSource> pendingSource = new CopyOnWriteArraySet<>();
 
-    public BackupRouter(String name,int scope,boolean enabled){
+    private BackupProvider systemBackupProvider;
+
+    public BackupRouter(String name,int scope){
         this.name = name;
         this.scope = scope;
-        this.enabled = enabled;
     }
     @Override
     public String name() {
@@ -59,13 +62,27 @@ public class BackupRouter implements BackupProvider {
     }
 
     public void configure(Map<String,Object> properties){
+        this.enabled = (Boolean)properties.get("enabled");
+        JsonObject provider = (JsonObject)properties.get("backup-provider");
+        String name = provider.get("name").getAsString();
+        try{
+            this.systemBackupProvider = (BackupProvider)Class.forName(name.trim()).getConstructor().newInstance();
+            this.systemBackupProvider.enabled(this.enabled);
+            Map<String,Object> props = new HashMap<>();
+            provider.get("properties").getAsJsonArray().forEach((e)->{
+                JsonObject kv = e.getAsJsonObject();
+                kv.entrySet().forEach((v)->{
+                    props.put(v.getKey(),v.getValue());
+                });
+            });
+            this.systemBackupProvider.configure(props);
 
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        logger.warn("Backup router ["+name+"] enabled ["+enabled+"]");
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext) {
-        this.logger = serviceContext.logger(BackupRouter.class);
-    }
 
     @Override
     public void registerDataStore(String storeName) {

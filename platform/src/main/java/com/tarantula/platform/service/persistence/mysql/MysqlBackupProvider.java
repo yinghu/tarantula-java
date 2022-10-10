@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.persistence.mysql;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
@@ -55,7 +57,28 @@ public class MysqlBackupProvider implements BackupProvider {
     }
 
     public void configure(Map<String,Object> properties){
-
+       if(!enabled) return;
+        dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        String url = ((JsonElement)properties.get("url")).getAsString();
+        String db = ((JsonElement)properties.get("database")).getAsString();
+        String user = ((JsonElement)properties.get("user")).getAsString();
+        String password = ((JsonElement)properties.get("password")).getAsString();
+        int poolSize = ((JsonElement)properties.get("poolSize")).getAsInt();
+        dataSource.setUrl(url+ Recoverable.PATH_SEPARATOR+db);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        // Connection pooling properties
+        dataSource.setInitialSize(poolSize);
+        dataSource.setMaxIdle(poolSize);
+        dataSource.setMaxTotal(poolSize);
+        dataSource.setMinIdle(poolSize);
+        try {
+            dataSource.getConnection();
+        }catch (Exception ex){
+            log.error("error on configure",ex);
+            this.enabled = false;
+        }
     }
     @Override
     public void shutdown() throws Exception {
@@ -203,4 +226,5 @@ public class MysqlBackupProvider implements BackupProvider {
             log.error("error on update->",ex);
         }
     }
+
 }

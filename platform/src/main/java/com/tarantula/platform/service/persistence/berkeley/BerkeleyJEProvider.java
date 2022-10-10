@@ -49,7 +49,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
-    private boolean backupEnabled;
+    //private boolean backupEnabled;
     private int replicationNodeNumber = 3;
 
     private ClusterNode node;
@@ -71,17 +71,21 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
         this.trimming = Boolean.parseBoolean((String) properties.get("truncated"));
-        this.backupEnabled = Boolean.parseBoolean((String) properties.get("backupEnabled"));
+        //this.backupEnabled = Boolean.parseBoolean((String) properties.get("backupEnabled"));
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
-        this.dailyBackup = properties.get("dailyBackup")!=null?Boolean.parseBoolean((String) properties.get("dailyBackup")):false;
-        this.partitionNumber = Integer.parseInt((String) properties.get("partitionNumber"));
+        this.dailyBackup = (Boolean)properties.get("dailyBackup");
+        this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
         this.replicationPoolSetting = (String) properties.get("poolSetting");
-        this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE,backupEnabled);
-        this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE,backupEnabled);
+
+        this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
+        this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
+
+        this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
+        this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
     }
     public void addBackupProvider(BackupProvider backupProvider){
         if(backupProvider.scope()== Distributable.INTEGRATION_SCOPE){
@@ -252,7 +256,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.replicationPool = pool;
             this.workSize = poolSize;
         });
-        log.info("Tarantula data store started on ["+node.toString()+"] with backup enabled ["+backupEnabled+"]");
+        log.info("Tarantula data store started on ["+node.toString()+"]");
     }
 
     @Override
