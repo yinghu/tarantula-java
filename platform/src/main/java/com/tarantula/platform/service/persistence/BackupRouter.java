@@ -7,7 +7,6 @@ import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -73,17 +72,26 @@ public class BackupRouter implements BackupProvider {
     @Override
     public void registerDataStore(String storeNamePrefix, int partition) {
         pendingSource.add(new BackupSource(storeNamePrefix,Distributable.DATA_SCOPE,partition));
+        BackupProvider backupProvider = bMap.get(_type(storeNamePrefix));
+        if(backupProvider == null) return;
+        backupProvider.registerDataStore(storeNamePrefix,partition);
     }
 
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
         if(!enabled) return;
+        BackupProvider backupProvider = bMap.get(metadata.typeId());
+        if(backupProvider == null ) return;
+        backupProvider.update(metadata,key,t);
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
         if(!enabled) return;
+        BackupProvider backupProvider = bMap.get(metadata.typeId());
+        if(backupProvider == null ) return;
+        backupProvider.create(metadata,key,t);
     }
 
     public void addBackupProvider(BackupProvider backupProvider){
@@ -110,5 +118,14 @@ public class BackupRouter implements BackupProvider {
     public void removeBackupProvider(BackupProvider backupProvider){
         logger.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ unregistered on ["+name+"]");
         bMap.remove(backupProvider.name());
+    }
+    private String _type(String source){
+        int ix = source.indexOf("_");
+        if(ix<=0){
+            return source;
+        }
+        else{
+            return source.substring(0,ix);
+        }
     }
 }

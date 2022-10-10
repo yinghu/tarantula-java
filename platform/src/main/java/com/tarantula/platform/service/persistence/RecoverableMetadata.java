@@ -27,6 +27,10 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.source = source;
         this.partition = partition;
         this.scope = scope;
+        _type();
+    }
+
+    private void _type(){
         int ix = source.indexOf("_");
         if(ix<=0){
             typeId = source;
@@ -35,7 +39,6 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
             typeId = source.substring(0,ix);
         }
     }
-
 
     @Override
     public int getFactoryId() {
@@ -68,6 +71,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.onEdge = in.readBoolean("6");
         this.scope = in.readInt("7");
         this.source = in.readUTF("8");
+        _type();
     }
     @Override
     public String toString(){

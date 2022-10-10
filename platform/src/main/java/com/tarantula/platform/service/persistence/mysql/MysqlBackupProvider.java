@@ -103,13 +103,7 @@ public class MysqlBackupProvider implements BackupProvider {
         try{
             Connection con = dataSource.getConnection();
             Statement cmd = con.createStatement();
-            for(int i=0;i<partition;i++){
-                try{
-                    cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
-                }catch (Exception ignore){
-                    log.warn("Error on register data store"+prefix+i+"->"+ignore.getMessage());
-                }
-            }
+            cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+" (k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
             cmd.close();
             con.close();
         }catch (Exception ex){
@@ -140,7 +134,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 connection.close();
             }
         }catch (Exception ex){
-            log.warn("error on create->"+ex.getMessage());
+            log.error("error on create-",ex);
             //return null;
         }
     }
@@ -174,7 +168,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 connection.close();
             }
         }catch (Exception ex){
-            log.warn("error on load->"+ex.getMessage());
+            log.error("error on load-",ex);
             return null;
         }
     }
@@ -199,8 +193,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 connection.close();
             }
         }catch (Exception ex){
-            log.warn("error on update->"+ex.getMessage());
-            //return null;
+            log.error("error on update->",ex);
         }
     }
 }
