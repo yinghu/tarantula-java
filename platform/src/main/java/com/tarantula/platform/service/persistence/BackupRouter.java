@@ -92,7 +92,8 @@ public class BackupRouter implements BackupProvider {
         try{
             backupProvider.start();
         }catch (Exception ex){
-            throw new RuntimeException(ex);
+            logger.error("error on start, disable backup provider",ex);
+            backupProvider.enabled(false);
         }
         bMap.put(backupProvider.name(),backupProvider);
         pendingSource.forEach((src)->{

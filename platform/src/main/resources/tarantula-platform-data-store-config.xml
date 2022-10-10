@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data-store-service>
-    <data-source name="tarantula" provider="com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider" truncated="false" backup-enabled="false">
+    <data-source name="tarantula" provider="com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider" truncated="false" backup-enabled="true">
         <property name="dataPath">tarantula/data</property>
         <property name="integrationPath">tarantula/integration</property>
         <property name="backupPath">backup</property>

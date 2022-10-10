@@ -35,10 +35,7 @@ public class MysqlBackupProvider implements BackupProvider {
 
     @Override
     public void start() throws Exception {
-        if(!enabled) {
-            log.warn("Backup disabled");
-            return;
-        }
+        if(!enabled) return;
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl(mySQLConfiguration.url()+ Recoverable.PATH_SEPARATOR+mySQLConfiguration.database());
@@ -50,6 +47,7 @@ public class MysqlBackupProvider implements BackupProvider {
         dataSource.setMaxIdle(poolSize);
         dataSource.setMaxTotal(poolSize);
         dataSource.setMinIdle(poolSize);
+        dataSource.getConnection();
     }
 
     @Override
@@ -98,14 +96,14 @@ public class MysqlBackupProvider implements BackupProvider {
         }
     }
     @Override
-    public  void registerDataStore(String prefix,int partitions){
+    public  void registerDataStore(String prefix,int partition){
         if(!enabled){
             return;
         }
         try{
             Connection con = dataSource.getConnection();
             Statement cmd = con.createStatement();
-            for(int i=0;i<partitions;i++){
+            for(int i=0;i<partition;i++){
                 try{
                     cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+"_"+i+"(k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
                 }catch (Exception ignore){
@@ -180,6 +178,7 @@ public class MysqlBackupProvider implements BackupProvider {
             return null;
         }
     }
+
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t){
         if(!enabled) return;
