@@ -21,8 +21,6 @@ public class MysqlBackupProvider implements BackupProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(MysqlBackupProvider.class);
 
-    //private String name;
-    //private int scope;
 
     private ServiceContext serviceContext;
     private boolean enabled;
@@ -37,7 +35,21 @@ public class MysqlBackupProvider implements BackupProvider {
 
     @Override
     public void start() throws Exception {
-        if(!enabled) return;
+        if(!enabled) {
+            log.warn("Backup disabled");
+            return;
+        }
+        dataSource = new BasicDataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl(mySQLConfiguration.url()+ Recoverable.PATH_SEPARATOR+mySQLConfiguration.database());
+        dataSource.setUsername(mySQLConfiguration.user());
+        dataSource.setPassword(mySQLConfiguration.password());
+        // Connection pooling properties
+        int poolSize = mySQLConfiguration.poolSize();
+        dataSource.setInitialSize(poolSize);
+        dataSource.setMaxIdle(poolSize);
+        dataSource.setMaxTotal(poolSize);
+        dataSource.setMinIdle(poolSize);
     }
 
     @Override
@@ -47,6 +59,11 @@ public class MysqlBackupProvider implements BackupProvider {
     }
     public boolean enabled(){
         return this.enabled;
+    }
+
+    @Override
+    public void enabled(boolean enabled){
+        this.enabled = enabled;
     }
     @Override
     public String name() {
@@ -63,25 +80,6 @@ public class MysqlBackupProvider implements BackupProvider {
         return Distributable.DATA_SCOPE;
     }
 
-    @Override
-    public void configure(Map<String, String> properties) {
-        //this.name = properties.get("name");
-        //this.scope = Integer.parseInt(properties.get("scope"));
-        //this.enabled = Boolean.parseBoolean(properties.get("enabled"));
-        //log.warn("Backup provider scope: ["+scope+"] name :["+name+"] enabled :["+enabled+"]");
-        if(!enabled) return;
-        dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl(properties.get("url")+ Recoverable.PATH_SEPARATOR+properties.get("database"));
-        dataSource.setUsername(properties.get("user"));
-        dataSource.setPassword(properties.get("password"));
-        // Connection pooling properties
-        int poolSize = Integer.parseInt(properties.get("poolSize"));
-        dataSource.setInitialSize(poolSize);
-        dataSource.setMaxIdle(poolSize);
-        dataSource.setMaxTotal(poolSize);
-        dataSource.setMinIdle(poolSize);
-    }
 
     @Override
 
