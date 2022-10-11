@@ -10,7 +10,7 @@ public class PerformanceMetrics extends AbstractMetrics {
         this.name = Metrics.PERFORMANCE;
         this.performanceIncluded = true;
         this.logger = serviceContext.logger(PerformanceMetrics.class);
-        this.dataStore = serviceContext.dataStore("performance_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("tarantula_performance_metrics",serviceContext.partitionNumber());
     }
 
 }

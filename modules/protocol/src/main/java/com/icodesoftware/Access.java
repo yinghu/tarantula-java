@@ -4,7 +4,7 @@ public interface Access extends Recoverable,DataStore.Updatable {
 
     //application access level control
 
-    String DataStore = "user";
+    String DataStore = "tarantula_user";
 
     int PUBLIC_ACCESS_MODE = 10;
     int PROTECT_ACCESS_MODE = 12;

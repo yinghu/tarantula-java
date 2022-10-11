@@ -25,7 +25,6 @@ public class BackupRouter implements BackupProvider {
     private ConcurrentHashMap<String,BackupProvider> bMap = new ConcurrentHashMap();
     private CopyOnWriteArraySet<BackupSource> pendingSource = new CopyOnWriteArraySet<>();
 
-    private BackupProvider systemBackupProvider;
 
     public BackupRouter(String name,int scope){
         this.name = name;
@@ -65,9 +64,10 @@ public class BackupRouter implements BackupProvider {
         this.enabled = (Boolean)properties.get("enabled");
         JsonObject provider = (JsonObject)properties.get("backup-provider");
         String name = provider.get("name").getAsString();
+        String cname = provider.get("provider").getAsString();
         try{
-            this.systemBackupProvider = (BackupProvider)Class.forName(name.trim()).getConstructor().newInstance();
-            this.systemBackupProvider.enabled(this.enabled);
+            BackupProvider systemBackupProvider = (BackupProvider)Class.forName(cname.trim()).getConstructor().newInstance();
+            systemBackupProvider.enabled(this.enabled);
             Map<String,Object> props = new HashMap<>();
             provider.get("properties").getAsJsonArray().forEach((e)->{
                 JsonObject kv = e.getAsJsonObject();
@@ -75,8 +75,8 @@ public class BackupRouter implements BackupProvider {
                     props.put(v.getKey(),v.getValue());
                 });
             });
-            this.systemBackupProvider.configure(props);
-
+            systemBackupProvider.configure(props);
+            bMap.put(name,systemBackupProvider);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

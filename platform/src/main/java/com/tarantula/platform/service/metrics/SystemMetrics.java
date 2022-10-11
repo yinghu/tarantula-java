@@ -14,6 +14,6 @@ public class SystemMetrics extends AbstractMetrics{
         this.gameIncluded = true;
         this.paymentIncluded = true;
         this.logger = serviceContext.logger(SystemMetrics.class);
-        this.dataStore = serviceContext.dataStore("system_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("tarantula_system_metrics",serviceContext.partitionNumber());
     }
 }

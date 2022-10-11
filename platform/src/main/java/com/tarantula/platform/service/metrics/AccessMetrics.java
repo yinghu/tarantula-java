@@ -13,6 +13,6 @@ public class AccessMetrics extends AbstractMetrics{
         this.accessIncluded = true;
         this.accountIncluded = true;
         this.logger = serviceContext.logger(AccessMetrics.class);
-        this.dataStore = serviceContext.dataStore("access_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("tarantula_access_metrics",serviceContext.partitionNumber());
     }
 }

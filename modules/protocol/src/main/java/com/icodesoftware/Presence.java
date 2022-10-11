@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 public interface Presence extends Balance,DataStore.Updatable,Countable{
 
-    String DataStore = "presence";
+    String DataStore = "tarantula_presence";
 
     String LOBBY_TAG = "presence/lobby";
 

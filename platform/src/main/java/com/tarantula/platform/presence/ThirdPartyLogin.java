@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class ThirdPartyLogin extends RecoverableObject implements LoginProvider {
 
-    public static final String DataStore = "third_party_login";
 
     public ThirdPartyLogin(){
 

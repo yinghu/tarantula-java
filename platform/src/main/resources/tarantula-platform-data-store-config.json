@@ -12,7 +12,8 @@
     "integration-backup-router": {
         "enabled": true,
         "backup-provider":{
-            "name": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
+            "name": "tarantula",
+            "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
                 {"url": "jdbc:mysql://127.0.0.1:3306"},
                 {"database": "tarantula"},
@@ -25,7 +26,8 @@
     "data-backup-router": {
         "enabled": true,
         "backup-provider":{
-            "name": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
+            "name": "tarantula",
+            "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
                 {"url": "jdbc:mysql://127.0.0.1:3306"},
                 {"database": "tarantula"},

@@ -2,8 +2,8 @@ package com.icodesoftware;
 
 public interface Account extends Access {
 
-    String DataStore = "account";
-    String IndexDataStore = "account_index";
+    String DataStore = "tarantula_account";
+    String IndexDataStore = "tarantula_account_index";
 
     String UserLabel = "users";
     String GameClusterLabel = "games";

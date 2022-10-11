@@ -13,6 +13,6 @@ public class DeploymentMetrics extends AbstractMetrics{
         this.name = Metrics.DEPLOYMENT;
         this.deploymentIncluded = true;
         this.logger = serviceContext.logger(DeploymentMetrics.class);
-        this.dataStore = serviceContext.dataStore("deployment_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("tarantula_deployment_metrics",serviceContext.partitionNumber());
     }
 }

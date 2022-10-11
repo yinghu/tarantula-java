@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 public interface Subscription extends Recoverable, Countable {
 
-    String DataStore = "subscription";
+    String DataStore = "tarantula_subscription";
 
     boolean trial();
     void trial(boolean trial);
