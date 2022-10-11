@@ -63,7 +63,7 @@ public class BackupRouter implements BackupProvider {
     public void configure(Map<String,Object> properties){
         this.enabled = (Boolean)properties.get("enabled");
         JsonObject provider = (JsonObject)properties.get("backup-provider");
-        String name = provider.get("name").getAsString();
+        String bname = provider.get("name").getAsString();
         String cname = provider.get("provider").getAsString();
         try{
             BackupProvider systemBackupProvider = (BackupProvider)Class.forName(cname.trim()).getConstructor().newInstance();
@@ -76,7 +76,7 @@ public class BackupRouter implements BackupProvider {
                 });
             });
             systemBackupProvider.configure(props);
-            bMap.put(name,systemBackupProvider);
+            bMap.put(bname,systemBackupProvider);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -87,6 +87,9 @@ public class BackupRouter implements BackupProvider {
     @Override
     public void registerDataStore(String storeName) {
         pendingSource.add(new BackupSource(storeName,Distributable.INTEGRATION_SCOPE,0));
+        BackupProvider backupProvider = bMap.get(_type(storeName));
+        if(backupProvider == null) return;
+        backupProvider.registerDataStore(storeName,0);
     }
 
     @Override

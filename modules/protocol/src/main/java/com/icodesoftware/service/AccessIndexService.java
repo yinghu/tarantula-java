@@ -29,7 +29,7 @@ public interface AccessIndexService extends ServiceProvider {
     }
 
     interface AccessIndexStore{
-        String STORE_NAME_PREFIX = "p_";
+        String STORE_NAME_PREFIX = "tarantula_";
         String name();
         int partitionNumber();
         long count();
