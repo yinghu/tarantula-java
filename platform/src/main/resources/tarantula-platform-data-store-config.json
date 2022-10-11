@@ -11,7 +11,8 @@
     },
     "integration-backup-router": {
         "enabled": true,
-        "backup-provider":{
+        "backup-provider-list":[{
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -21,11 +22,12 @@
                 {"password": "root"},
                 {"poolSize": 8}
             ]
-        }
+        }]
     },
     "data-backup-router": {
         "enabled": true,
-        "backup-provider":{
+        "backup-provider-list":[{
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -35,6 +37,6 @@
                 {"password": "root"},
                 {"poolSize": 8}
             ]
-        }
+        }]
     }
 }

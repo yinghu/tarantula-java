@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.Serviceable;
@@ -68,13 +69,25 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         Map<String,Object> _intrgration = new HashMap<>();
         JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
         _intrgration.put("enabled",_iconfig.get("enabled").getAsBoolean());
-        _intrgration.put("backup-provider",_iconfig.get("backup-provider").getAsJsonObject());
-
+        JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
+        for(JsonElement je : ilist) {
+            JsonObject p = je.getAsJsonObject();
+            if(p.get("enabled").getAsBoolean()){
+                _intrgration.put("backup-provider",p);
+                break;
+            }
+        }
         Map<String,Object> _data = new HashMap<>();
         JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
         _data.put("enabled",_dconfig.get("enabled").getAsBoolean());
-        _data.put("backup-provider",_dconfig.get("backup-provider").getAsJsonObject());
-
+        JsonArray dlist = _dconfig.get("backup-provider-list").getAsJsonArray();
+        for(JsonElement je : dlist) {
+            JsonObject p = je.getAsJsonObject();
+            if(p.get("enabled").getAsBoolean()){
+                _data.put("backup-provider",p);
+                break;
+            }
+        }
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);

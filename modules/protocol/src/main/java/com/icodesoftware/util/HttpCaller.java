@@ -21,8 +21,9 @@ public class HttpCaller {
     private static String CONTENT_TYPE = "Content-type";
     private static String CONTENT_FORM = "application/x-www-form-urlencoded";
     private HttpClient client;
-    private String host;
+    protected String host;
 
+    public HttpCaller(){}
 
     public HttpCaller(String host){
         this.host = host;

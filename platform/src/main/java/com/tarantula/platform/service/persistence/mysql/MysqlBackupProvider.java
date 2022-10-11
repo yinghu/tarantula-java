@@ -223,6 +223,7 @@ public class MysqlBackupProvider implements BackupProvider {
                 connection.close();
             }
         }catch (Exception ex){
+            log.warn(metadata.toString());
             log.error("error on update->",ex);
         }
     }
