@@ -20,6 +20,8 @@ public interface RequestHandler extends EventListener, ServiceProvider {
     String USER_PATH = "/user";
     String VIEW_PATH = "/view";
 
+    String BACKUP_PATH = "/backup";
+
     //String name();
     void onRequest(OnExchange exchange) throws Exception;
     //void setup(ServiceContext tcx);

@@ -82,6 +82,10 @@ public class HttpEndpoint implements EndPoint {
 		httpGameServerHandler.resource(this.resource);
 		this.hserver.createContext(httpGameServerHandler.path(),httpGameServerHandler);
 
+		HttpBackupHandler httpBackupHandler = new HttpBackupHandler();
+		httpBackupHandler.resource(this.resource);
+		this.hserver.createContext(httpBackupHandler.path(),httpBackupHandler);
+
 		hserver.start();
         started = true;
         log.info("Tarantula HTTP Endpoint is listening on ["+ip+"]");
