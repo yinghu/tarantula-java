@@ -4,14 +4,23 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.HttpCaller;
+import com.tarantula.platform.configuration.WebHookConfiguration;
 
 import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
 
 
+    private WebHookConfiguration webHookConfiguration;
+
     public WebHookBackupProvider(){
     }
+
+    public WebHookBackupProvider(WebHookConfiguration webHookConfiguration){
+        this.webHookConfiguration = webHookConfiguration;
+    }
+
+
     @Override
     public boolean enabled() {
         return false;

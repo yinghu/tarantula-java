@@ -22,7 +22,17 @@
                 {"password": "root"},
                 {"poolSize": 8}
             ]
-        }]
+        },
+        {
+            "enabled": false,
+            "name": "tarantula",
+            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
+            "properties": [
+                {"host": "http://192.168.1.16:8090"},
+                {"accessKey": "access key"}
+            ]
+        }
+        ]
     },
     "data-backup-router": {
         "enabled": true,
@@ -37,6 +47,16 @@
                 {"password": "root"},
                 {"poolSize": 8}
             ]
-        }]
+        },
+        {
+            "enabled": false,
+            "name": "tarantula",
+            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
+            "properties": [
+                {"host": "http://192.168.1.16:8090"},
+                {"accessKey": "access key"}
+            ]
+        }
+        ]
     }
 }

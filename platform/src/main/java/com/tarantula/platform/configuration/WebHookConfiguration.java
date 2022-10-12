@@ -18,22 +18,14 @@ public class WebHookConfiguration extends Application {
     }
 
     public String name(){
-        return OnAccess.MYSQL;
+        return OnAccess.WEB_HOOK;
     }
 
-    public String url(){
-        return header.get("Url").getAsString();
+    public String host(){
+        return header.get("Host").getAsString();
     }
-    public String database(){
-        return header.get("Database").getAsString();
+    public String accessKey(){
+        return header.get("AccessKey").getAsString();
     }
-    public String user(){
-        return header.get("User").getAsString();
-    }
-    public String password(){
-        return header.get("Password").getAsString();
-    }
-    public int poolSize(){
-        return header.get("PoolSize").getAsInt();
-    }
+
 }

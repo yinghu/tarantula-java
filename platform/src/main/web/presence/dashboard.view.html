@@ -211,11 +211,15 @@
         <div id="tx-Sudo" class="w3-container tx-pane" style="display:none;">
             <div id='tx-extension-open'>
                 <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Web View Operations</span></div>
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Configuration Operations</span></div>
                     <div class='w3-bar w3-white'>
-                        <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
-                        <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
-                        <span view-id='deploy.resource' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy Resource</span>
+                        <span view-id='stop.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Stop Access Index</span>
+                        <span view-id='start.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Start Access Index</span>    
+                        <!--<span view-id='create.labeled.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create key</span>
+                        -->
+                        <span view-id='enable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Enable Presence Service</span>
+                        <span view-id='disable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Disable Presence Service</span>
+                        <span view-id='reset.cluster.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Cluster Key</span>
                     </div>            
                 </div>
                 <div class="w3-panel w3-border-bottom w3-border-red">
@@ -228,18 +232,6 @@
                         <span view-id='shutdown.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Shutdown Module</span>
                         <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload Module</span>
                         <span view-id='deploy.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy Module</span>
-                    </div>            
-                </div>
-                <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Configuration Operations</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span view-id='stop.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Stop Access Index</span>
-                        <span view-id='start.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Start Access Index</span>    
-                        <!--<span view-id='create.labeled.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Create key</span>
-                        -->
-                        <span view-id='enable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Enable Presence Service</span>
-                        <span view-id='disable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Disable Presence Service</span>
-                        <span view-id='reset.cluster.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Cluster Key</span>
                     </div>            
                 </div>
                 <div class="w3-panel w3-border-bottom w3-border-red">
@@ -258,6 +250,14 @@
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">User Management Operations</span></div>
                     <div class='w3-bar w3-white'>
                         <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find User Index</span>
+                    </div>            
+                </div>
+                <div class="w3-panel w3-border-bottom w3-border-red">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Web View Operations</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span view-id='deploy.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy View</span>
+                        <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
+                        <span view-id='deploy.resource' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy Resource</span>
                     </div>            
                 </div>
             </div>

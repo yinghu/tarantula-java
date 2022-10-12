@@ -55,6 +55,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String PROVIDER = "provider";
 
     String MYSQL = "mysql";
+    String WEB_HOOK = "webHook";
 
 
     Object property(String name);

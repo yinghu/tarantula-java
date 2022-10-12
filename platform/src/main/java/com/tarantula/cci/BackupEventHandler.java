@@ -8,6 +8,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnExchange;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 
@@ -28,12 +29,12 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
         byte[] _payload = exchange.payload();
-        String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-        if(typeId==null){
-            throw new RuntimeException("Illegal access");
-        }
+        //String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+        //if(typeId==null){
+            //throw new RuntimeException("Illegal access");
+        //}
+        exchange.onEvent(new ResponsiveEvent("","","sbv".getBytes(),true));
         metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
