@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -90,4 +91,15 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     }
     public String source(){return this.source;}
     public int partition(){return this.partition;}
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject json = new JsonObject();
+        json.addProperty("typeId",typeId);
+        json.addProperty("source",source);
+        json.addProperty("factoryId",factoryId);
+        json.addProperty("classId",classId);
+        json.addProperty("scope",scope);
+        return json;
+    }
 }

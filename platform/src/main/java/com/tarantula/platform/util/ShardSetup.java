@@ -1,12 +1,20 @@
 package com.tarantula.platform.util;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
+import com.icodesoftware.Subscription;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.Arena;
+import com.tarantula.platform.presence.Membership;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.service.metrics.MetricsHistory;
 import com.tarantula.platform.service.metrics.MetricsProperty;
 import com.tarantula.platform.service.metrics.MetricsSnapshot;
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
+import com.tarantula.platform.service.persistence.web.WebHookBackupProvider;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ShardSetup {
@@ -30,8 +39,20 @@ public class ShardSetup {
         cmd.close();
         connection.close();
     }
-
     public static void main(String[] args){
+        WebHookBackupProvider webHookBackupProvider = new WebHookBackupProvider();
+        HashMap<String,Object> config = new HashMap<>();
+        config.put("host","http://localhost:8090");
+        config.put("accessKey","BDS/592690c1e54440e2a11cfc2bccb6adee-D3A35F6940405D3D05036321510929CF28BC437F-35D3AA273137E822F9A8CD1AB0831BDA");
+        webHookBackupProvider.configure(config);
+        Metadata metadata = new RecoverableMetadata("tarantula_user",1, Distributable.DATA_SCOPE);
+        Subscription subscription = new Membership();
+        subscription.distributionKey("BDS/"+SystemUtil.oid());
+        subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        subscription.count(1);
+        webHookBackupProvider.update(metadata,subscription.distributionKey(),subscription);
+    }
+    public static void _main(String[] args){
         LocalDateTime cur = LocalDateTime.now();
         LocalDateTime hourly = cur.plusHours(1);//.minusHours(11);
         for(int i=0;i<12;i++){

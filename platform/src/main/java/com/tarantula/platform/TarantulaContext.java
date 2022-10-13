@@ -858,6 +858,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void unregisterBackupProvider(BackupProvider backupProvider){
  	    this.deploymentDataStoreProvider.removeBackupProvider(backupProvider);
     }
+    public BackupProvider backupProvider(){
+ 	    return null;
+    }
 
     public Metrics metrics(String name){
          return metricsManager.metrics(name);

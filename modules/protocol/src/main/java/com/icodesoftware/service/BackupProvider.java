@@ -18,4 +18,8 @@ public interface BackupProvider extends ServiceProvider {
     <T extends Recoverable> void update(Metadata metadata, String key, T t);
     <T extends Recoverable> void create(Metadata metadata, String key, T t);
 
+    default void update(Metadata metadata, String key, byte[] t){}
+    default void create(Metadata metadata, String key, byte[] t){}
+
+
 }

@@ -4,13 +4,10 @@ import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.OnExchange;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
-
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
 public class BackupEventHandler extends AbstractRequestHandler {
@@ -18,7 +15,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
     private static TarantulaLogger log = JDKLogger.getLogger(BackupEventHandler.class);
 
     private TokenValidatorProvider tokenValidatorProvider;
-    private DeploymentServiceProvider deploymentServiceProvider;
+    private BackupProvider backupProvider;
 
 
     public String name(){
@@ -29,18 +26,26 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
+        String key = exchange.header(Session.TARANTULA_NAME);
         byte[] _payload = exchange.payload();
-        //String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-        //if(typeId==null){
-            //throw new RuntimeException("Illegal access");
-        //}
-        exchange.onEvent(new ResponsiveEvent("","","sbv".getBytes(),true));
+        String access = this.tokenValidatorProvider.validateAccessKey(accessKey);
+        if(access==null) throw new IllegalAccessException("Invalid key");
+        exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+        log.warn(access);
+        log.warn(action);
+        log.warn(key);
+        log.warn(accessKey);
+        String[] km = key.split("#");
+        Metadata m = new RecoverableMetadata();
+        m.fromBinary(km[1].getBytes());
+        this.backupProvider.update(null,km[0],_payload);
         metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     @Override
     public void start() throws Exception {
-        //this.builder = new GsonBuilder();
+        //this.builder = new GsonBuilde
+        // r();
         //this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         //this.builder.registerTypeAdapter(ConnectionStub.class,new ConnectionDeserializer());
         //this.builder.registerTypeAdapter(ChannelStub.class,new ChannelDeserializer());
@@ -54,7 +59,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
+        this.backupProvider = tcx.backupProvider();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

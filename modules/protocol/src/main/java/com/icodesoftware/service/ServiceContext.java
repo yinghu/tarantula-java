@@ -15,6 +15,7 @@ public interface ServiceContext {
     ClusterProvider clusterProvider();
     ServiceProvider serviceProvider(String name);
     DeploymentServiceProvider deploymentServiceProvider();
+    BackupProvider backupProvider();
     AccessIndexService accessIndexService();
     TarantulaLogger logger(Class c);
     OnPartition[] partitions();
