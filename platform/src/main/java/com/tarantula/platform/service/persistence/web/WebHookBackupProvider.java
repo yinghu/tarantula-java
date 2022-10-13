@@ -1,24 +1,26 @@
 package com.tarantula.platform.service.persistence.web;
 
-import com.google.gson.JsonObject;
-import com.icodesoftware.OnSession;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.configuration.WebHookConfiguration;
+
 
 import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
 
+    private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
 
     private WebHookConfiguration webHookConfiguration;
     private String accessKey;
+    private String path;
 
+    private boolean enabled;
     public WebHookBackupProvider(){
     }
 
@@ -29,12 +31,12 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     @Override
     public boolean enabled() {
-        return false;
+        return this.enabled;
     }
 
     @Override
     public void enabled(boolean enabled) {
-
+        this.enabled = enabled;
     }
 
     @Override
@@ -44,18 +46,37 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     @Override
     public void registerDataStore(String name) {
-
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACTION,"onRegister",
+                    Session.TARANTULA_ACCESS_KEY,accessKey,
+                    Session.TARANTULA_NAME,name
+            };
+            String resp = super.get(path,headers);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACTION,"onRegister",
+                    Session.TARANTULA_ACCESS_KEY,accessKey,
+                    //Session.TARANTULA_NAME,key+"#"+metadata.toJson()
+            };
+            String resp = super.get(path,headers);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void configure(Map<String, Object> properties) {
         this.host = (String) properties.get("host");
         this.accessKey = (String) properties.get("accessKey");
+        this.path = (String) properties.get("path");
         try{super._init();}catch (Exception ex){ex.printStackTrace();}
     }
 
@@ -63,13 +84,11 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
         try {
             String[] headers = new String[]{
-                    Session.TARANTULA_TAG,"presence/lobby",
                     Session.TARANTULA_ACTION,"onUpdate",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_NAME,key+"#"+metadata.toJson()
             };
-            String resp = super.post("backup",t.toBinary(),headers);
-            System.out.println(resp);
+            String resp = super.post(path,t.toBinary(),headers);
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -77,17 +96,29 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACTION,"onCreate",
+                    Session.TARANTULA_ACCESS_KEY,accessKey,
+                    Session.TARANTULA_NAME,key+"#"+metadata.toJson()
+            };
+            String resp = super.post(path,t.toBinary(),headers);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public String name() {
-        return null;
+        return OnAccess.WEB_HOOK;
     }
 
     @Override
     public void start() throws Exception {
-
+        this.host = webHookConfiguration.host();
+        this.accessKey = webHookConfiguration.accessKey();
+        this.path = webHookConfiguration.path();
+        super._init();
     }
 
     @Override

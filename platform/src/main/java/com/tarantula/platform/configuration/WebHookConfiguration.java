@@ -27,5 +27,8 @@ public class WebHookConfiguration extends Application {
     public String accessKey(){
         return header.get("AccessKey").getAsString();
     }
+    public String path(){
+        return header.get("Path").getAsString();
+    }
 
 }

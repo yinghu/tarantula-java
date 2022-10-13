@@ -29,6 +29,13 @@
             "reference": "String",
             "nullable": false,
             "downloadable": false
+          },
+          {
+            "name": "Path",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
           }
         ]
       }

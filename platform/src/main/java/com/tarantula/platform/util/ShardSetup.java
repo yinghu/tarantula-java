@@ -44,6 +44,7 @@ public class ShardSetup {
         HashMap<String,Object> config = new HashMap<>();
         config.put("host","http://localhost:8090");
         config.put("accessKey","BDS/592690c1e54440e2a11cfc2bccb6adee-D3A35F6940405D3D05036321510929CF28BC437F-35D3AA273137E822F9A8CD1AB0831BDA");
+        config.put("path","backup");
         webHookBackupProvider.configure(config);
         Metadata metadata = new RecoverableMetadata("tarantula_user",1, Distributable.DATA_SCOPE);
         Subscription subscription = new Membership();

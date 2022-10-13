@@ -136,4 +136,8 @@ public class EmptyServiceContext implements ServiceContext {
 
     public void registerBackupProvider(BackupProvider backupProvider){}
     public void unregisterBackupProvider(BackupProvider backupProvider){}
+
+    public BackupProvider backupProvider(){
+        return null;
+    }
 }

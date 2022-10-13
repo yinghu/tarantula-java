@@ -5,6 +5,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
@@ -23,15 +24,35 @@ public class BackupEventHandler extends AbstractRequestHandler {
     }
 
     public void onRequest(OnExchange exchange) throws Exception{
-
+        String path = exchange.path();
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
         String key = exchange.header(Session.TARANTULA_NAME);
         byte[] _payload = exchange.payload();
-        String access = this.tokenValidatorProvider.validateAccessKey(accessKey);
-        if(access==null) throw new IllegalAccessException("Invalid key");
+        if(path.equals("/backup/system")){
+            String access = this.tokenValidatorProvider.validateAccessKey(accessKey);
+            if(access==null) throw new IllegalAccessException("Invalid key");
+        }
+        else if(path.equals("/backup/game")){
+            GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+            if(gameCluster==null) throw new IllegalAccessException("Invalid key");
+        }
+        else{
+            throw new IllegalAccessException("Invalid path ["+path+"]");
+        }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
-        log.warn(access);
+        if(action.equals("onUpdate")){
+
+        }
+        else if(action.equals("onCreate")){
+
+        }
+        else if(action.equals("onRegister")){
+
+        }
+        else{
+            throw new UnsupportedOperationException("Invalid operation ["+action+"]");
+        }
         log.warn(action);
         log.warn(key);
         log.warn(accessKey);
