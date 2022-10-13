@@ -93,6 +93,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
         this.tarantulaContext.deploymentDataStoreProvider.start();
         this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
+        this.tarantulaContext._initMirrorClusterBackup();
     }
 
 

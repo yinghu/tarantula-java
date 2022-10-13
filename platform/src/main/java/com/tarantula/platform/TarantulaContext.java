@@ -29,6 +29,7 @@ import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.BackupRouter;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
+import com.tarantula.platform.service.persistence.MirrorClusterBackupProvider;
 import com.tarantula.platform.util.*;
 
 
@@ -136,7 +137,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
 
-    private BackupRouter backupRouter;
+    private BackupProvider mirrorBackupProvider;
 
 
  	private TarantulaContext(){
@@ -200,8 +201,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-    public ApplicationProvider applicationManager(String applicationId){
-       return this.availableApplicationManagers.get(applicationId);
+    //public ApplicationProvider applicationManager(String applicationId){
+       //return this.availableApplicationManagers.get(applicationId);
+    //}
+
+    public void _initMirrorClusterBackup(){
+         this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
@@ -862,7 +867,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.deploymentDataStoreProvider.removeBackupProvider(backupProvider);
     }
     public BackupProvider backupProvider(){
- 	    return null;
+ 	    return this.mirrorBackupProvider;
     }
 
     public Metrics metrics(String name){

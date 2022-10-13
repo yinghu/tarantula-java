@@ -65,11 +65,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
     @Override
     public void start() throws Exception {
-        //this.builder = new GsonBuilde
-        // r();
-        //this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        //this.builder.registerTypeAdapter(ConnectionStub.class,new ConnectionDeserializer());
-        //this.builder.registerTypeAdapter(ChannelStub.class,new ChannelDeserializer());
         log.info("Backup event handler started");
     }
 
