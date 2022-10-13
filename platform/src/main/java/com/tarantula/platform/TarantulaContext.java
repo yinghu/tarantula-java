@@ -26,6 +26,7 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
+import com.tarantula.platform.service.persistence.BackupRouter;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.*;
@@ -134,6 +135,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String authContext = "localhost";
 
     public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
+
+    private BackupRouter backupRouter;
 
 
  	private TarantulaContext(){
