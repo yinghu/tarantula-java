@@ -49,22 +49,22 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-
+        logger.warn("register 3->"+key);
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-
+        logger.warn("register 4->"+key);
     }
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
-
+        logger.warn("register 5->"+key);
     }
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
-
+        logger.warn("register 6->"+key);
     }
 
     @Override

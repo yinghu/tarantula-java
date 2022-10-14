@@ -1,5 +1,6 @@
 package com.tarantula.cci;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
@@ -42,24 +43,35 @@ public class BackupEventHandler extends AbstractRequestHandler {
         }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
         if(action.equals("onUpdate")){
-
+            String[] km = key.split("#");
+            Metadata m = new RecoverableMetadata();
+            m.fromBinary(km[1].getBytes());
+            this.backupProvider.update(null,km[0],_payload);
         }
         else if(action.equals("onCreate")){
+            String[] km = key.split("#");
+            Metadata m = new RecoverableMetadata();
+            m.fromBinary(km[1].getBytes());
+            this.backupProvider.create(null,km[0],_payload);
 
         }
         else if(action.equals("onRegister")){
-
+            String[] km = key.split("#");
+            int scope = Integer.parseInt(km[0]);
+            if(scope== Distributable.INTEGRATION_SCOPE){
+                this.backupProvider.registerDataStore(km[1]);
+            }
+            else if(scope==Distributable.DATA_SCOPE){
+                int partitions = Integer.parseInt(km[2]);
+                this.backupProvider.registerDataStore(km[1],partitions);
+            }
+            else{
+                throw new IllegalArgumentException("scope ["+scope+"] not supported");
+            }
         }
         else{
             throw new UnsupportedOperationException("Invalid operation ["+action+"]");
         }
-        log.warn(action);
-        log.warn(key);
-        log.warn(accessKey);
-        String[] km = key.split("#");
-        Metadata m = new RecoverableMetadata();
-        m.fromBinary(km[1].getBytes());
-        this.backupProvider.update(null,km[0],_payload);
         metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 

@@ -2,10 +2,10 @@ package com.tarantula.platform.presence;
 
 
 import com.icodesoftware.Access;
-import com.tarantula.platform.BackupObject;
+import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
 
-public class User extends BackupObject implements Access {
+public class User extends RecoverableObject implements Access {
 
     protected String login;
     protected String password;//hash of the password

@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.persistence.web;
 
+import com.google.gson.JsonElement;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
@@ -8,13 +10,14 @@ import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.configuration.WebHookConfiguration;
+import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
 import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
 
-    private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
+    //private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
 
     private WebHookConfiguration webHookConfiguration;
     private String accessKey;
@@ -50,9 +53,9 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             String[] headers = new String[]{
                     Session.TARANTULA_ACTION,"onRegister",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME,name
+                    Session.TARANTULA_NAME, Distributable.INTEGRATION_SCOPE+"#"+name+"#0",
             };
-            String resp = super.get(path,headers);
+            super.get(path,headers);
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -64,9 +67,9 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             String[] headers = new String[]{
                     Session.TARANTULA_ACTION,"onRegister",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    //Session.TARANTULA_NAME,key+"#"+metadata.toJson()
+                    Session.TARANTULA_NAME,Distributable.DATA_SCOPE+"#"+prefix+"#"+partitions,
             };
-            String resp = super.get(path,headers);
+            super.get(path,headers);
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -74,9 +77,9 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     @Override
     public void configure(Map<String, Object> properties) {
-        this.host = (String) properties.get("host");
-        this.accessKey = (String) properties.get("accessKey");
-        this.path = (String) properties.get("path");
+        this.host = ((JsonElement) properties.get("host")).getAsString();
+        this.accessKey = ((JsonElement) properties.get("accessKey")).getAsString();
+        this.path = ((JsonElement) properties.get("path")).getAsString();
         try{super._init();}catch (Exception ex){ex.printStackTrace();}
     }
 

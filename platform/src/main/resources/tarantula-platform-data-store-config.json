@@ -12,7 +12,7 @@
     "integration-backup-router": {
         "enabled": true,
         "backup-provider-list":[{
-            "enabled": false,
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -24,12 +24,13 @@
             ]
         },
         {
-            "enabled": true,
+            "enabled": false,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [
                 {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "access key"}
+                {"accessKey": "access key"},
+                {"path": "backup/system"}
             ]
         }
         ]
@@ -37,7 +38,7 @@
     "data-backup-router": {
         "enabled": true,
         "backup-provider-list":[{
-            "enabled": false,
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -49,12 +50,13 @@
             ]
         },
         {
-            "enabled": true,
+            "enabled": false,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [
                 {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "access key"}
+                {"accessKey": "access key"},
+                {"path": "backup/system"}
             ]
         }
         ]
