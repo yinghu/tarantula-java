@@ -40,7 +40,7 @@ public class Main {
         }
         if(host==null){
             //host = "10.0.0.29:8090";
-            host = "10.0.0.234:8090";
+            host = "192.168.1.16:8090";
             secured = false;
         }
         System.out.println("Load test on ["+host+"] with batch/pool/prefix size ["+batch+"/"+psize+"/"+prefix+"]");

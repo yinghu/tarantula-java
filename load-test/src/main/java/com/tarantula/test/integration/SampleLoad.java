@@ -109,32 +109,9 @@ public class SampleLoad {
 
     }
     public static void main(String[] args) throws Exception{
-        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.16:8090",null,10000);
+        SampleLoad sampleLoad = new SampleLoad("http://192.168.1.16:8090",null,1000);
         sampleLoad._init();
         sampleLoad.register();
-        //BDS/baf7f6189ba0423f8b87940260083668/history_userCreationCount_hourly_2022_253
-        //PresenceFetcher presenceFetcher  =new PresenceFetcher("http://192.168.1.5:8090");
-        //presenceFetcher._init();
-        //OnSession onSession = presenceFetcher.login("mop","mop");
-        //System.out.println(onSession.token());
-        //PresenceFetcher presenceFetcher1  =new PresenceFetcher("http://192.168.1.9:8090");
-        //presenceFetcher1._init();
-        //presenceFetcher1.play(onSession.token());
-        //LocalDateTime t11 = LocalDateTime.now().plusHours(11);
-        //System.out.println(t11);
-        //System.out.println(t11.getDayOfYear());
-        //long dur = TimeUtil.durationToNextHour(t11);
-        //LocalDateTime n1 = t11.plusSeconds(dur/1000);
-        //System.out.println(n1);
-        //System.out.println(n1.getHour());
-        //System.out.println(n1.getHour());
-        //LocalDateTime end = LocalDate.parse("2022-01-01").atTime(LocalTime.MIDNIGHT);//Sun
-        //System.out.println(end.getDayOfYear());
-        //System.out.println(end.getYear());
-        //System.out.println(end.getHour());
-        //System.out.println(end.minusHours(1).getYear());
-        //System.out.println(end.minusHours(1).getDayOfYear());
-        //System.out.println(end.minusHours(1).getHour());
     }
 
 }
