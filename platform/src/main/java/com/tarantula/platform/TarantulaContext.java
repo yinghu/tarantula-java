@@ -763,7 +763,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    URL url = Thread.currentThread().getContextClassLoader().getResource("application/deploy");
  	    File f = new File(url.getFile());
         ArrayList<Descriptor> alist = new ArrayList<>();
- 	    f.list((m,n)->{
+ 	    if(!f.exists()) return alist;
+        f.list((m,n)->{
  	        if(n.endsWith(".json")){
  	            Descriptor app = JsonServiceParser.descriptor("application/deploy",n);
  	            if(!app.disabled()) alist.add(app);
@@ -777,6 +778,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         URL url = Thread.currentThread().getContextClassLoader().getResource("application/upgrade");
         File f = new File(url.getFile());
         ArrayList<Descriptor> alist = new ArrayList<>();
+        if(!f.exists()) return alist;
         f.list((m,n)->{
             if(n.endsWith(".json")){
                 Descriptor app = JsonServiceParser.descriptor("application/upgrade",n);
