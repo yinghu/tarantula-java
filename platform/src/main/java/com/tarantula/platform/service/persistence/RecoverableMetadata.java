@@ -25,12 +25,23 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     private int partition;
 
     public RecoverableMetadata(){}
+
     public RecoverableMetadata(String source,int partition,int scope){
         this.source = source;
         this.partition = partition;
         this.scope = scope;
         _type();
     }
+
+    public RecoverableMetadata(Metadata original,long revision){
+        this.source = original.source();
+        this.scope = original.scope();
+        this.factoryId = original.factoryId();
+        this.classId = original.classId();
+        this.revision = revision;
+        _type();
+    }
+
 
     private void _type(){
         int ix = source.indexOf("_");
@@ -101,6 +112,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         json.addProperty("factoryId",factoryId);
         json.addProperty("classId",classId);
         json.addProperty("scope",scope);
+        json.addProperty("revision",revision);
         return json;
     }
 
@@ -115,5 +127,10 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.factoryId = jsonObject.get("factoryId").getAsInt();
         this.classId = jsonObject.get("classId").getAsInt();
         this.scope = jsonObject.get("scope").getAsInt();
+        this.revision = jsonObject.get("revision").getAsInt();
+    }
+
+    public Metadata fromRevision(long revision){
+        return new RecoverableMetadata(this,revision);
     }
 }
