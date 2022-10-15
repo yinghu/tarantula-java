@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
+import com.google.gson.JsonElement;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
@@ -71,7 +72,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
         this.trimming = Boolean.parseBoolean((String) properties.get("truncated"));
-        //this.backupEnabled = Boolean.parseBoolean((String) properties.get("backupEnabled"));
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
@@ -80,7 +80,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
         this.replicationPoolSetting = (String) properties.get("poolSetting");
-
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
 
