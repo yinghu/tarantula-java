@@ -71,7 +71,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
-        this.trimming = Boolean.parseBoolean((String) properties.get("truncated"));
+        this.trimming =((JsonElement) properties.get("truncated")).getAsBoolean();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
