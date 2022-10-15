@@ -207,6 +207,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public void _initMirrorClusterBackup(){
          this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
+         this.mirrorBackupProvider.setup(this);
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{

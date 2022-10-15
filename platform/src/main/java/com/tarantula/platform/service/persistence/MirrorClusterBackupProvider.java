@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
@@ -14,6 +15,7 @@ public class MirrorClusterBackupProvider implements BackupProvider {
     private JDKLogger logger = JDKLogger.getLogger(MirrorClusterBackupProvider.class);
     private DataStoreProvider dataStoreProvider;
     private boolean enabled;
+    private ServiceContext serviceContext;
 
     public MirrorClusterBackupProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
@@ -36,14 +38,14 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void registerDataStore(String name) {
-        //this.dataStoreProvider.create(name);
-        logger.warn("create data->"+name);
+        this.dataStoreProvider.create(name);
+        //logger.warn("create data->"+name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-        //this.dataStoreProvider.create(prefix,partitions);
-        logger.warn("create data->"+prefix+"//"+partitions);
+        this.dataStoreProvider.create(prefix,partitions);
+        //logger.warn("create data->"+prefix+"//"+partitions);
     }
 
     @Override
@@ -63,12 +65,26 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
-        logger.warn("update->"+key);
+        if(metadata.scope()== Distributable.DATA_SCOPE){
+            this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
+            return;
+        }
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
+            return;
+        }
     }
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
-        logger.warn("create->"+key);
+        if(metadata.scope()== Distributable.DATA_SCOPE){
+            this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
+            return;
+        }
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
+            return;
+        }
     }
 
     @Override
@@ -87,6 +103,6 @@ public class MirrorClusterBackupProvider implements BackupProvider {
     }
 
     public void setup(ServiceContext serviceContext){
-
+        this.serviceContext = serviceContext;
     }
 }
