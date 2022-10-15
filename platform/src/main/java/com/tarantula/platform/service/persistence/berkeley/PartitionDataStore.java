@@ -262,7 +262,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 if(ro == null || !ro.local){//get from cluster
                     byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
                     if(value==null && ro==null) return false;
-                    ro = RevisionObject.fromBinary(value);
+                    if(value!=null) ro = RevisionObject.fromBinary(value);
                     _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
                 }
                 t.fromBinary(ro.data);
@@ -282,7 +282,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(ro == null || !ro.local){//get from cluster
                 byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
                 if(value==null && ro==null) return false;
-                ro = RevisionObject.fromBinary(value);
+                if(value!=null) ro = RevisionObject.fromBinary(value);
                 _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
             }
             return true;
