@@ -91,7 +91,7 @@ public class BackupRouter implements BackupProvider {
         pendingSource.add(new BackupSource(storeName,Distributable.INTEGRATION_SCOPE,0));
         BackupProvider backupProvider = bMap.get(_type(storeName));
         if(backupProvider == null) return;
-        backupProvider.registerDataStore(storeName,0);
+        backupProvider.registerDataStore(storeName);
     }
 
     @Override
