@@ -65,6 +65,7 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
+        logger.warn(metadata.toString());
         if(metadata.scope()== Distributable.DATA_SCOPE){
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
             return;
@@ -77,6 +78,7 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
+        logger.warn(metadata.toString());
         if(metadata.scope()== Distributable.DATA_SCOPE){
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
             return;
