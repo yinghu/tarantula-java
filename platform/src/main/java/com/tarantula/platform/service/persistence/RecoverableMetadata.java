@@ -112,7 +112,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         json.addProperty("factoryId",factoryId);
         json.addProperty("classId",classId);
         json.addProperty("scope",scope);
-        json.addProperty("revision",revision);
+        json.addProperty("revision",String.valueOf(revision));
         return json;
     }
 
@@ -127,7 +127,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.factoryId = jsonObject.get("factoryId").getAsInt();
         this.classId = jsonObject.get("classId").getAsInt();
         this.scope = jsonObject.get("scope").getAsInt();
-        this.revision = jsonObject.get("revision").getAsInt();
+        this.revision = Long.parseLong(jsonObject.get("revision").getAsString());
     }
 
     public Metadata fromRevision(long revision){
