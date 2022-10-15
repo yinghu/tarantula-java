@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -101,5 +102,18 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         json.addProperty("classId",classId);
         json.addProperty("scope",scope);
         return json;
+    }
+
+    public byte[] toBinary(){
+        return toJson().toString().getBytes();
+    }
+
+    public void fromBinary(byte[] payload){
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        this.typeId = jsonObject.get("typeId").getAsString();
+        this.source = jsonObject.get("source").getAsString();
+        this.factoryId = jsonObject.get("factoryId").getAsInt();
+        this.classId = jsonObject.get("classId").getAsInt();
+        this.scope = jsonObject.get("scope").getAsInt();
     }
 }

@@ -13,18 +13,20 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     private JDKLogger logger = JDKLogger.getLogger(MirrorClusterBackupProvider.class);
     private DataStoreProvider dataStoreProvider;
+    private boolean enabled;
 
     public MirrorClusterBackupProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
     }
+
     @Override
     public boolean enabled() {
-        return false;
+        return enabled;
     }
 
     @Override
     public void enabled(boolean enabled) {
-
+        this.enabled = enabled;
     }
 
     @Override
@@ -34,12 +36,14 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void registerDataStore(String name) {
-        this.dataStoreProvider.create(name);
+        //this.dataStoreProvider.create(name);
+        logger.warn("create data->"+name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-        this.dataStoreProvider.create(prefix,partitions);
+        //this.dataStoreProvider.create(prefix,partitions);
+        logger.warn("create data->"+prefix+"//"+partitions);
     }
 
     @Override
@@ -49,27 +53,27 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-        logger.warn("register 3->"+key);
+
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-        logger.warn("register 4->"+key);
+
     }
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
-        logger.warn("register 5->"+key);
+        logger.warn("update->"+key);
     }
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
-        logger.warn("register 6->"+key);
+        logger.warn("create->"+key);
     }
 
     @Override
     public String name() {
-        return null;
+        return "MirrorClusterBackup";
     }
 
     @Override
