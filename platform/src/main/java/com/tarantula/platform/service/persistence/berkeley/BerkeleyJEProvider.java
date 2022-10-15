@@ -72,10 +72,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
         this.trimming =((JsonElement) properties.get("truncated")).getAsBoolean();
-        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
-        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
-        this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
-        this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
+        String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
+        String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
+        String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
+
+        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
+        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
+        this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
+        this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_integrationPath;
+
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
