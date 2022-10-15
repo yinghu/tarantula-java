@@ -2,7 +2,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 public class MirrorClusterBackupProvider implements BackupProvider {
 
-    private JDKLogger logger = JDKLogger.getLogger(MirrorClusterBackupProvider.class);
     private DataStoreProvider dataStoreProvider;
     private boolean enabled;
     private ServiceContext serviceContext;
@@ -38,13 +36,11 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void registerDataStore(String name) {
-        logger.warn("register->"+name);
         this.dataStoreProvider.create(name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-        logger.warn("register->"+prefix);
         this.dataStoreProvider.create(prefix,serviceContext.partitionNumber());
     }
 
@@ -65,7 +61,6 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
-        logger.warn(metadata.toString());
         if(metadata.scope()== Distributable.DATA_SCOPE){
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
             return;
@@ -78,7 +73,6 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
-        logger.warn(metadata.toString());
         if(metadata.scope()== Distributable.DATA_SCOPE){
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),t);
             return;
