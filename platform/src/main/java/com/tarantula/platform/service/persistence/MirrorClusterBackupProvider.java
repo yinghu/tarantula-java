@@ -39,13 +39,11 @@ public class MirrorClusterBackupProvider implements BackupProvider {
     @Override
     public void registerDataStore(String name) {
         this.dataStoreProvider.create(name);
-        //logger.warn("create data->"+name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-        this.dataStoreProvider.create(prefix,partitions);
-        //logger.warn("create data->"+prefix+"//"+partitions);
+        this.dataStoreProvider.create(prefix,serviceContext.partitionNumber());
     }
 
     @Override
