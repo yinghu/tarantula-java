@@ -10,9 +10,9 @@
         ]
     },
     "integration-backup-router": {
-        "enabled": true,
+        "enabled": false,
         "backup-provider-list":[{
-            "enabled": true,
+            "enabled": false,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -24,7 +24,7 @@
             ]
         },
         {
-            "enabled": false,
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [
@@ -36,9 +36,9 @@
         ]
     },
     "data-backup-router": {
-        "enabled": true,
+        "enabled": false,
         "backup-provider-list":[{
-            "enabled": true,
+            "enabled": false,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
             "properties": [
@@ -50,7 +50,7 @@
             ]
         },
         {
-            "enabled": false,
+            "enabled": true,
             "name": "tarantula",
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [

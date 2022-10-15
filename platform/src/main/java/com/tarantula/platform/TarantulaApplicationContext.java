@@ -176,4 +176,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public Metrics metrics(String name){
         return this.tarantulaContext.metrics(name);
     }
+
+    public String clusterNameSuffix(){
+        return this.tarantulaContext.clusterNameSuffix();
+    }
 }

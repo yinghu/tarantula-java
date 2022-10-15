@@ -43,4 +43,6 @@ public interface ApplicationContext {
     ClusterProvider clusterProvider();
 
     Metrics metrics(String name);
+
+    String clusterNameSuffix();
 }
