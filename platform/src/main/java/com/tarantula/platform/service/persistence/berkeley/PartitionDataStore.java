@@ -261,7 +261,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 RevisionObject ro = _getRevisionObject(dso,key);
                 if(ro == null || !ro.local){//get from cluster
                     byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
-                    if(value==null) return false;
+                    if(value==null && ro==null) return false;
                     ro = RevisionObject.fromBinary(value);
                     _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
                 }
