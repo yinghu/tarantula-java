@@ -76,6 +76,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
                 String _n = p.get("name").getAsString();
+                if(exconfig==null) break;
                 Object ref = exconfig.property(_n);
                 if(ref==null){
                     _intrgration.put("enabled",false);
@@ -96,6 +97,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
                 String _n = p.get("name").getAsString();
+                if(exconfig==null) break;
                 Object ref = exconfig.property(_n);
                 if(ref==null){
                     _data.put("enabled",false);
