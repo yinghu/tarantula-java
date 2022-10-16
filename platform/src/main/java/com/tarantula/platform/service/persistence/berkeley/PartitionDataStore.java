@@ -301,7 +301,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                    return true;
                 }
                 if(rd.revision <= ro.revision) return false;
-                _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,false));
+                _put(dso,key,RevisionObject.toBinary(rd.revision,rd.data,false));
                 return true;
             });
         }

@@ -29,7 +29,7 @@
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [
                 {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "BDS/f2981df1b4b24ad186fec3da8502550b-79EBA6A87BC5833BAD561B9242C6D1CF281A3521-5AAF1C7E41973F13383ABAA479BF4289"},
+                {"accessKey": "BDS/6029b732527b44509a8118d9c5807aa7-407E744859CA703C7AA06E647052E8881F2364B8-E0879B3A80D981B944B046958668F695"},
                 {"path": "backup/system"}
             ]
         }
@@ -55,7 +55,7 @@
             "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
             "properties": [
                 {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "BDS/f2981df1b4b24ad186fec3da8502550b-79EBA6A87BC5833BAD561B9242C6D1CF281A3521-5AAF1C7E41973F13383ABAA479BF4289"},
+                {"accessKey": "BDS/6029b732527b44509a8118d9c5807aa7-407E744859CA703C7AA06E647052E8881F2364B8-E0879B3A80D981B944B046958668F695"},
                 {"path": "backup/system"}
             ]
         }
