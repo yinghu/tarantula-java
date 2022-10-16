@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.service.persistence.ClusterNode;
 
@@ -15,8 +16,8 @@ public interface DataStoreProvider extends ServiceProvider {
     //int CONCURRENCY_ACCESS_LIMIT = 17;
 
     void configure(Map<String,Object> properties);
-    //void addBackupProvider(BackupProvider shardingProvider);
-    //void removeBackupProvider(BackupProvider shardingProvider);
+
+    void registerBackupProvider(int scope, BackupProvider mapStoreListener);
 
     ClusterNode node();
     //create none-partitioned integration scope data store

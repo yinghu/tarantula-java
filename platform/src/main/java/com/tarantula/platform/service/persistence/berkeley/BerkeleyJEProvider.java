@@ -50,7 +50,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
-    //private boolean backupEnabled;
+
     private int replicationNodeNumber = 3;
 
     private ClusterNode node;
@@ -95,11 +95,23 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public ClusterNode node(){
         return this.node;
     }
+
+    @Override
+    public void registerBackupProvider(int scope,BackupProvider mapStoreListener){
+        if(scope == Distributable.INTEGRATION_SCOPE){
+            iBackupProvider.registerBackupProvider(mapStoreListener);
+        }
+        else if(scope == Distributable.DATA_SCOPE){
+            dBackupProvider.registerBackupProvider(mapStoreListener);
+        }
+
+    }
+
     @Override
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
-            this.iBackupProvider.registerDataStore(name);
+            replicationPendingQueue.offer(()-> this.iBackupProvider.registerDataStore(name));
             //this.accessIndexStoreList.add(name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
@@ -131,7 +143,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
-            this.dBackupProvider.registerDataStore(name,partition);
+            replicationPendingQueue.offer(()-> this.dBackupProvider.registerDataStore(name,partition));
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }

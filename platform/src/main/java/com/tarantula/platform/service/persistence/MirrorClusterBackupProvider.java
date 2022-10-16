@@ -2,6 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
@@ -10,24 +11,27 @@ import com.tarantula.platform.service.DataStoreProvider;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MirrorClusterBackupProvider implements BackupProvider {
+public class MirrorClusterBackupProvider implements BackupProvider{
+
+    private JDKLogger log = JDKLogger.getLogger(MirrorClusterBackupProvider.class);
 
     private DataStoreProvider dataStoreProvider;
-    private boolean enabled;
+    private boolean runAsMirror;
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
+
     public MirrorClusterBackupProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
     }
 
     @Override
     public boolean enabled() {
-        return enabled;
+        return runAsMirror;
     }
 
     @Override
     public void enabled(boolean enabled) {
-        this.enabled = enabled;
+        this.runAsMirror = enabled;
     }
 
     @Override
@@ -37,12 +41,21 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     @Override
     public void registerDataStore(String name) {
-        this.dataStoreProvider.create(name);
+        if(runAsMirror){
+            this.dataStoreProvider.create(name);
+        }else {
+            log.warn("run on master node->"+name);
+        }
+
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
-        this.dataStoreProvider.create(prefix,serviceContext.partitionNumber());
+        if(runAsMirror) {
+            this.dataStoreProvider.create(prefix, serviceContext.partitionNumber());
+        }else{
+            log.warn("run on master node->"+prefix+">>"+partitions);
+        }
     }
 
     @Override
@@ -112,14 +125,4 @@ public class MirrorClusterBackupProvider implements BackupProvider {
     public void removeBackupProvider(BackupProvider backupProvider){
         bMap.remove(backupProvider.name());
     }
-
-     private String _type(String source){
-         int ix = source.indexOf("_");
-         if(ix<=0){
-            return source;
-         }
-         else{
-            return source.substring(0,ix);
-         }
-     }
 }
