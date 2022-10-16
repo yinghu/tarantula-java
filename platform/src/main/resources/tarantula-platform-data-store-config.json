@@ -13,25 +13,13 @@
         "enabled": true,
         "backup-provider-list":[{
             "enabled": false,
-            "name": "tarantula",
-            "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
-            "properties": [
-                {"url": "jdbc:mysql://127.0.0.1:3306"},
-                {"database": "tarantula_index_backup"},
-                {"user":"root"},
-                {"password": "root"},
-                {"poolSize": 8}
-            ]
+            "name": "rabbitmq",
+            "provider": "com.tarantula.platform.service.persistence.messaging.RabbitMQBackupProvider"
         },
         {
             "enabled": true,
-            "name": "tarantula",
-            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
-            "properties": [
-                {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "BDS/6029b732527b44509a8118d9c5807aa7-407E744859CA703C7AA06E647052E8881F2364B8-E0879B3A80D981B944B046958668F695"},
-                {"path": "backup/system"}
-            ]
+            "name": "webhook",
+            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
         }
         ]
     },
@@ -39,25 +27,13 @@
         "enabled": true,
         "backup-provider-list":[{
             "enabled": false,
-            "name": "tarantula",
-            "provider": "com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider",
-            "properties": [
-                {"url": "jdbc:mysql://127.0.0.1:3306"},
-                {"database": "tarantula_backup"},
-                {"user":"root"},
-                {"password": "root"},
-                {"poolSize": 8}
-            ]
+            "name": "rabbitmq",
+            "provider": "com.tarantula.platform.service.persistence.messaging.RabbitMQBackupProvider"
         },
         {
             "enabled": true,
-            "name": "tarantula",
-            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider",
-            "properties": [
-                {"host": "http://192.168.1.16:8090"},
-                {"accessKey": "BDS/6029b732527b44509a8118d9c5807aa7-407E744859CA703C7AA06E647052E8881F2364B8-E0879B3A80D981B944B046958668F695"},
-                {"path": "backup/system"}
-            ]
+            "name": "webhook",
+            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
         }
         ]
     }

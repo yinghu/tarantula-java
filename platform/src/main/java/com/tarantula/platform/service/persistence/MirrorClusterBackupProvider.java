@@ -8,13 +8,14 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.DataStoreProvider;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MirrorClusterBackupProvider implements BackupProvider {
 
     private DataStoreProvider dataStoreProvider;
     private boolean enabled;
     private ServiceContext serviceContext;
-
+    private ConcurrentHashMap<String,BackupProvider> bMap;
     public MirrorClusterBackupProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
     }
@@ -102,5 +103,23 @@ public class MirrorClusterBackupProvider implements BackupProvider {
 
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+        this.bMap = new ConcurrentHashMap<>();
     }
+
+    public void addBackupProvider(BackupProvider backupProvider){
+        bMap.put(backupProvider.name(),backupProvider);
+    }
+    public void removeBackupProvider(BackupProvider backupProvider){
+        bMap.remove(backupProvider.name());
+    }
+
+     private String _type(String source){
+         int ix = source.indexOf("_");
+         if(ix<=0){
+            return source;
+         }
+         else{
+            return source.substring(0,ix);
+         }
+     }
 }

@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
@@ -70,9 +71,19 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
         _intrgration.put("enabled",tarantulaContext.runAsMirror? false : _iconfig.get("enabled").getAsBoolean());
         JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
+        Configuration exconfig = this.tarantulaContext.configuration("tarantula-backup-router");
         for(JsonElement je : ilist) {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
+                String _n = p.get("name").getAsString();
+                Object ref = exconfig.property(_n);
+                if(ref==null){
+                    _intrgration.put("enabled",false);
+                }
+                else{
+                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
+                    p.add("properties",pts);
+                }
                 _intrgration.put("backup-provider",p);
                 break;
             }
@@ -84,6 +95,15 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         for(JsonElement je : dlist) {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
+                String _n = p.get("name").getAsString();
+                Object ref = exconfig.property(_n);
+                if(ref==null){
+                    _data.put("enabled",false);
+                }
+                else{
+                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
+                    p.add("properties",pts);
+                }
                 _data.put("backup-provider",p);
                 break;
             }

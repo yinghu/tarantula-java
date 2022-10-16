@@ -138,7 +138,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
 
     public boolean runAsMirror;
-    private BackupProvider mirrorBackupProvider;
+    private MirrorClusterBackupProvider mirrorBackupProvider;
 
 
 
@@ -870,10 +870,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public void registerBackupProvider(BackupProvider backupProvider){
-        this.deploymentDataStoreProvider.addBackupProvider(backupProvider);
-    }
+ 	    this.mirrorBackupProvider.addBackupProvider(backupProvider);
+ 	}
     public void unregisterBackupProvider(BackupProvider backupProvider){
- 	    this.deploymentDataStoreProvider.removeBackupProvider(backupProvider);
+ 	    this.mirrorBackupProvider.removeBackupProvider(backupProvider);
     }
     public BackupProvider backupProvider(){
  	    return this.mirrorBackupProvider;
