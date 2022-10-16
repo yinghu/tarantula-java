@@ -500,7 +500,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _setup() throws Exception{
 
         this.node = this.dataStoreProvider().node();
-        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
+        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
