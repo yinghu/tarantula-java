@@ -43,19 +43,22 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     public void registerDataStore(String name) {
         if(runAsMirror){
             this.dataStoreProvider.create(name);
-        }else {
-            log.warn("run on master node->"+_type(name));
+            return;
         }
-
+        BackupProvider backupProvider = bMap.get(_type(name));
+        if(backupProvider == null) return;
+        backupProvider.registerDataStore(name);
     }
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
         if(runAsMirror) {
             this.dataStoreProvider.create(prefix, serviceContext.partitionNumber());
-        }else{
-            log.warn("run on master node->"+_type(prefix)+">>"+partitions);
+            return;
         }
+        BackupProvider backupProvider = bMap.get(_type(prefix));
+        if(backupProvider == null) return;
+        backupProvider.registerDataStore(prefix,partitions);
     }
 
     @Override
@@ -65,22 +68,29 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-
+        if(runAsMirror) return;
+        BackupProvider backupProvider = bMap.get(metadata.typeId());
+        if(backupProvider == null) return;
+        backupProvider.update(metadata,key,t);
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-
+        if(runAsMirror) return;
+        BackupProvider backupProvider = bMap.get(metadata.typeId());
+        if(backupProvider == null) return;
+        backupProvider.create(metadata,key,t);
     }
 
     @Override
     public void update(Metadata metadata, String key, byte[] t) {
-        if(metadata.scope()== Distributable.DATA_SCOPE){
+        if(!runAsMirror) return;
+        if(metadata.scope() == Distributable.DATA_SCOPE){
             byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),r);
             return;
         }
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope() == Distributable.INTEGRATION_SCOPE){
             this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
             return;
         }
@@ -88,12 +98,13 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public  void create(Metadata metadata, String key, byte[] t) {
-        if(metadata.scope()== Distributable.DATA_SCOPE){
+        if(!runAsMirror) return;
+        if(metadata.scope() == Distributable.DATA_SCOPE){
             byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
             this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),r);
             return;
         }
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope() == Distributable.INTEGRATION_SCOPE){
             this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
             return;
         }
@@ -117,6 +128,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
         this.bMap = new ConcurrentHashMap<>();
+        log.warn("Run mirror backup provider ["+runAsMirror+"]");
     }
 
     public void addBackupProvider(BackupProvider backupProvider){
