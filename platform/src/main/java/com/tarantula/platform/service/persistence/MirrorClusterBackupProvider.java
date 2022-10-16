@@ -44,7 +44,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         if(runAsMirror){
             this.dataStoreProvider.create(name);
         }else {
-            log.warn("run on master node->"+name);
+            log.warn("run on master node->"+_type(name));
         }
 
     }
@@ -54,7 +54,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         if(runAsMirror) {
             this.dataStoreProvider.create(prefix, serviceContext.partitionNumber());
         }else{
-            log.warn("run on master node->"+prefix+">>"+partitions);
+            log.warn("run on master node->"+_type(prefix)+">>"+partitions);
         }
     }
 
@@ -124,5 +124,15 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     }
     public void removeBackupProvider(BackupProvider backupProvider){
         bMap.remove(backupProvider.name());
+    }
+
+    private String _type(String source){
+        int ix = source.indexOf("_");
+        if(ix<=0){
+            return source;
+        }
+        else{
+            return source.substring(0,ix);
+        }
     }
 }
