@@ -14,9 +14,10 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        //Player caller = new Player(false,"localhost:8090",new CountDownLatch(1),UUID.randomUUID().toString(),new DemoSync(),jsonObject -> System.out.println(jsonObject));
-        //caller.run();
-        runSimulation(args);
+        Player caller = new Player("http://192.168.1.16:8090",new CountDownLatch(1),UUID.randomUUID().toString(),1);
+        caller._init();
+        caller.run();
+        //runSimulation(args);
     }
     private static void runSimulation(String[] args) throws Exception{
         long st = System.currentTimeMillis();
@@ -51,7 +52,7 @@ public class Main {
             for(int x=0;x<psize;x++){
                 String uname = prefix!=null?(prefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Player simulator = new Player(secured,host,waiting,uname,new DemoSync(),jsonObject -> round.incrementAndGet());
+                Player simulator = new Player(host,waiting,uname,x);
                 pool.execute(simulator);
                 Thread.sleep(4);
             }

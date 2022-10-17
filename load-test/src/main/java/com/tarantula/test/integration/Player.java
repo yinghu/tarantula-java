@@ -2,124 +2,98 @@ package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
-import com.tarantula.test.HTTPCaller;
+import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.util.JsonUtil;
 
-import java.util.HashMap;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Base64;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 
-public class Player implements Runnable{
+public class Player extends HttpCaller implements Runnable{
 
-    private boolean secure;
-    private String host;
     private CountDownLatch counter;
-    private HashMap<String,String> _headers = new HashMap<>();
     private String userName;
-    private OnPayload done;
-    private boolean[] continuing = {false};
+    private String deviceName;
+    private String clientId;
+    private String token;
+    private String ticket;
+
+    private byte[] serverKey;
+
+    private DatagramSocket udp;
+    //private OnPayload done;
+    //private boolean[] continuing = {true};
     private JsonObject presence;
     private JsonObject connection;
 
     private CountDownLatch waiting;
 
-    private OnGame onGame;
+
     private long start;
     private JsonObject gameLobby;
     private StringBuilder dataBuffer;
     CompletableFuture<?> accumulatedMessage;
-    public Player(boolean secure, String host, CountDownLatch counter, String userName, OnGame onGame, OnPayload done){
-        this.secure = secure;
-        this.host = host;
+    public Player(String host, CountDownLatch counter, String userName,int sequence){
+        super(host);
         this.counter = counter;
         this.userName = userName;
-        this.onGame = onGame;
-        this.done = done;
+        this.deviceName = "test-"+sequence;
+        this.clientId = UUID.randomUUID().toString();
+        //this.done = done;
         waiting = new CountDownLatch(1);
         this.dataBuffer = new StringBuilder();
         this.accumulatedMessage = new CompletableFuture<>();
     }
-    private boolean isContinue(JsonObject json){
-         continuing[0]= json.get("successful").getAsBoolean();
-         if(!continuing[0]){
-             json.addProperty("duration",(System.currentTimeMillis()-start));
-             done.on(json);
-         }
-         this.onGame.onMessage(json.toString());
-         return continuing[0];
+    public void _init(){
+        try{
+            super._init();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+    private boolean isContinue(String payload,OnPayload onPayload){
+        JsonObject json = JsonUtil.parse(payload);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) return false;
+        onPayload.on(json);
+        return true;
     }
     public void run() {
         start = System.currentTimeMillis();
         try{
-            HTTPCaller caller = new HTTPCaller(secure,host);
-            _headers.put(Session.TARANTULA_TAG,"index/lobby");
-            caller.doAction("user/index","onIndex",_headers,null,(json -> {
-                isContinue(json);
-                json.getAsJsonArray("lobbyList").forEach(lb->{
-                    if(lb.getAsJsonObject().get("descriptor").getAsJsonObject().get("typeId").getAsString().equals(onGame.typeId())){
-                        gameLobby = lb.getAsJsonObject().get("descriptor").getAsJsonObject();
-                    }
-                });
-            }));
-            if(continuing[0]){
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("nickname","Player");
-                jsonObject.addProperty("password","password");
-                jsonObject.addProperty("login",userName);
-                _headers.clear();
-                _headers.put(Session.TARANTULA_TAG,"index/user");
-                _headers.put(Session.TARANTULA_MAGIC_KEY,jsonObject.get("login").getAsString());
-                caller.doAction("user/action","onRegister",_headers,jsonObject.toString().getBytes(),json -> {
-                    isContinue(json);
-                });
+            String[] headers = new String[]{
+                    Session.TARANTULA_TAG,"index/user",
+                    Session.TARANTULA_ACTION,"onRegister",
+                    Session.TARANTULA_MAGIC_KEY,userName
+            };
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("login",userName);
+            jsonObject.addProperty("password","password");
+            String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+            if(isContinue(resp,json->{
+                token = json.get("Token").getAsString();
+                ticket = json.get("Ticket").getAsString();
+            })){
+                headers = new String[]{
+                        Session.TARANTULA_TAG,"robotquest/lobby",
+                        Session.TARANTULA_ACTION,"onPlay",
+                        Session.TARANTULA_TOKEN,token,
+                        Session.TARANTULA_NAME,deviceName,
+                        Session.TARANTULA_CLIENT_ID,clientId,
+                        Session.TARANTULA_TOURNAMENT_ID,"n/a"
+                };
+                resp = super.get("service/action",headers);
+                if(isContinue(resp,json->{
+                    JsonObject _channel = json.get("_pushChannel").getAsJsonObject();
+                    try{onPlay(_channel);}catch (Exception exx){}
+                }));
             }
-            if(continuing[0]){
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("password","password");
-                jsonObject.addProperty("login",userName);
-                _headers.clear();
-                _headers.put(Session.TARANTULA_TAG,"index/user");
-                _headers.put(Session.TARANTULA_MAGIC_KEY,jsonObject.get("login").getAsString());
-                caller.doAction("user/action","onLogin",_headers,jsonObject.toString().getBytes(),json -> {
-                    if(isContinue(json)){
-                        presence = json.get("presence").getAsJsonObject();
-                    }
-                });
-            }
-            if(continuing[0]){
-                _headers.clear();
-                _headers.put(Session.TARANTULA_TAG,"presence/lobby");
-                _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
-                caller.doAction("service/action","onPresence",_headers,"{}".getBytes(),json -> {
-                    if(isContinue(json)){
-                        connection = json.get("connection").getAsJsonObject();
-                    }
-                });
-            }
-            if(continuing[0]){
-                //onGame and play
-                onPlay(caller);
-                //onProfile();
-                waiting.countDown();
-            }
-            if(continuing[0]){
-                waiting.await();
-                _headers.clear();
-                _headers.put(Session.TARANTULA_TAG,"presence/lobby");
-                _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
-                caller.doAction("service/action","onAbsence",_headers,"{}".getBytes(),json -> {
-                    JsonObject end = new JsonObject();
-                    end.addProperty("message","onAbsence");
-                    end.addProperty("successful",false);
-                    isContinue(end);//end on logout
-                });
 
-            }
         }catch (Exception ex){
-            JsonObject jex = new JsonObject();
-            jex.addProperty("message",ex.getMessage());
-            jex.addProperty("successful",false);
-            isContinue(jex);
             ex.printStackTrace();
         }
         finally {
@@ -129,30 +103,16 @@ public class Player implements Runnable{
 
 
 
-    private void onPlay(HTTPCaller caller){
-        _headers.put(Session.TARANTULA_TAG,gameLobby.get("tag").getAsString());
-        _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
-        JsonObject payload = new JsonObject();
-        payload.addProperty("typeId",onGame.typeId());
-        ConcurrentLinkedDeque<JsonObject> aQueue = new ConcurrentLinkedDeque<>();
-        caller.doAction("service/action","onLobby",_headers,payload.toString().getBytes(),json->{
-            json.get("gameList").getAsJsonArray().forEach(a->{
-                aQueue.offer(a.getAsJsonObject());
-            });
-        });
-        JsonObject game;
-        do{
-            game = aQueue.poll();
-            if(game!=null){
-                String appId = game.get("applicationId").getAsString();
-                _headers.put(Session.TARANTULA_TAG,"presence/lobby");
-                _headers.put(Session.TARANTULA_TOKEN,presence.get("token").getAsString());
-                payload.addProperty("applicationId",appId);
-                payload.addProperty("accessMode",Session.FAST_PLAY_MODE);
-                caller.doAction("service/action","onPlay",_headers,payload.toString().getBytes(),jo->{
-                    jo.addProperty("applicationId",appId);
-                });
-            }
-        }while (game!=null);
+    private void onPlay(JsonObject json) throws Exception{
+        this.serverKey = Base64.getDecoder().decode(json.get("ServerKey").getAsString());
+        udp = new DatagramSocket();
+        int channelId = json.get("ChannelId").getAsInt();
+        int sessionId = json.get("SessionId").getAsInt();
+        JsonObject _conn = json.get("_connection").getAsJsonObject();
+        String host = _conn.get("Host").getAsString();
+        int port = _conn.get("Port").getAsInt();
+        System.out.println(json);
+        InetAddress addr = InetAddress.getByName(host);
+        udp.connect(addr,port);
     }
 }
