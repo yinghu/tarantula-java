@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
 
-    //private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
+    private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
 
     private WebHookConfiguration webHookConfiguration;
     private String accessKey;
@@ -57,7 +57,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             };
             super.get(path,headers);
         }catch (Exception ex){
-            ex.printStackTrace();
+           log.error("error on register data store",ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             };
             super.get(path,headers);
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("error on register data store",ex);
         }
     }
 
@@ -93,7 +93,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             };
             String resp = super.post(path,t.toBinary(),headers);
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("error on update",ex);
         }
     }
 
@@ -107,7 +107,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             };
             String resp = super.post(path,t.toBinary(),headers);
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("error on create",ex);
         }
     }
 

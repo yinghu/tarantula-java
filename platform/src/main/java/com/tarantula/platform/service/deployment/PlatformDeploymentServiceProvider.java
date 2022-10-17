@@ -469,7 +469,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         rMap.remove(onView.moduleResourceFile());
         vMap.put(onView.viewId(),onView);
-        //log.warn("View deployed->"+onView.toString());
     }
     public OnView view(String viewId){
         return (OnView)vMap.get(viewId);

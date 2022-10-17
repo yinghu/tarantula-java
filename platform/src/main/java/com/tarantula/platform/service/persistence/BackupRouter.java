@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.logging.JDKLogger;
@@ -10,8 +9,6 @@ import com.icodesoftware.service.Metadata;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 public class BackupRouter implements BackupProvider {
 
@@ -22,9 +19,9 @@ public class BackupRouter implements BackupProvider {
 
     private boolean enabled;
 
-    private ConcurrentHashMap<String,BackupProvider> bMap = new ConcurrentHashMap();
-    private CopyOnWriteArraySet<BackupSource> pendingSource = new CopyOnWriteArraySet<>();
 
+    private BackupProvider router;
+    private BackupProvider listener;
 
     public BackupRouter(String name,int scope){
         this.name = name;
@@ -62,6 +59,10 @@ public class BackupRouter implements BackupProvider {
 
     public void configure(Map<String,Object> properties){
         this.enabled = (Boolean)properties.get("enabled");
+        if(!this.enabled) {
+            logger.warn("Backup router enabled ["+name+"/"+this.enabled+"]");
+            return;
+        }
         JsonObject provider = (JsonObject)properties.get("backup-provider");
         String bname = provider.get("name").getAsString();
         String cname = provider.get("provider").getAsString();
@@ -76,79 +77,49 @@ public class BackupRouter implements BackupProvider {
                 });
             });
             systemBackupProvider.configure(props);
-            bMap.put(bname,systemBackupProvider);
+            this.router = systemBackupProvider;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        logger.warn("Backup router ["+name+"] enabled ["+enabled+"]");
+        logger.warn("Backup router ["+name+"/"+bname+"] enabled ["+enabled+"]");
     }
 
 
     @Override
     public void registerDataStore(String storeName) {
-        pendingSource.add(new BackupSource(storeName,Distributable.INTEGRATION_SCOPE,0));
-        BackupProvider backupProvider = bMap.get(_type(storeName));
-        if(backupProvider == null) return;
-        backupProvider.registerDataStore(storeName,0);
+        if(!this.enabled) return;
+        router.registerDataStore(storeName);
+        if(listener==null) return;
+        listener.registerDataStore(storeName);
+
     }
 
     @Override
     public void registerDataStore(String storeNamePrefix, int partition) {
-        pendingSource.add(new BackupSource(storeNamePrefix,Distributable.DATA_SCOPE,partition));
-        BackupProvider backupProvider = bMap.get(_type(storeNamePrefix));
-        if(backupProvider == null) return;
-        backupProvider.registerDataStore(storeNamePrefix,partition);
+        if(!this.enabled) return;
+        router.registerDataStore(storeNamePrefix,partition);
+        if(listener==null) return;
+        listener.registerDataStore(storeNamePrefix,partition);
     }
 
 
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
         if(!enabled) return;
-        BackupProvider backupProvider = bMap.get(metadata.typeId());
-        if(backupProvider == null ) return;
-        backupProvider.update(metadata,key,t);
+        router.update(metadata,key,t);
+        if(listener==null) return;
+        listener.update(metadata,key,t);
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
         if(!enabled) return;
-        BackupProvider backupProvider = bMap.get(metadata.typeId());
-        if(backupProvider == null ) return;
-        backupProvider.create(metadata,key,t);
+        router.create(metadata,key,t);
+        if(listener==null) return;
+        listener.create(metadata,key,t);
     }
 
-    public void addBackupProvider(BackupProvider backupProvider){
-        logger.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ registered on ["+name+"]");
-        backupProvider.enabled(this.enabled);
-        try{
-            backupProvider.start();
-        }catch (Exception ex){
-            logger.error("error on start, disable backup provider",ex);
-            backupProvider.enabled(false);
-        }
-        bMap.put(backupProvider.name(),backupProvider);
-        pendingSource.forEach((src)->{
-            if(src.name.startsWith(backupProvider.name())){
-                if(backupProvider.scope() == Distributable.DATA_SCOPE){
-                    backupProvider.registerDataStore(src.name,src.partition);
-                }
-                else if(backupProvider.scope() == Distributable.INTEGRATION_SCOPE){
-                    backupProvider.registerDataStore(src.name);
-                }
-            }
-        });
-    }
-    public void removeBackupProvider(BackupProvider backupProvider){
-        logger.warn(backupProvider.name()+"/"+backupProvider.scope()+"/ unregistered on ["+name+"]");
-        bMap.remove(backupProvider.name());
-    }
-    private String _type(String source){
-        int ix = source.indexOf("_");
-        if(ix<=0){
-            return source;
-        }
-        else{
-            return source.substring(0,ix);
-        }
+    public void registerBackupProvider(BackupProvider backupProvider){
+        this.listener = backupProvider;
     }
 }

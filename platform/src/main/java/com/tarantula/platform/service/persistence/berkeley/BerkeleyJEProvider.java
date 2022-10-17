@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
+import com.google.gson.JsonElement;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
@@ -49,7 +50,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
     private boolean dailyBackup;
-    //private boolean backupEnabled;
+
     private int replicationNodeNumber = 3;
 
     private ClusterNode node;
@@ -70,47 +71,47 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
-        this.trimming = Boolean.parseBoolean((String) properties.get("truncated"));
-        //this.backupEnabled = Boolean.parseBoolean((String) properties.get("backupEnabled"));
-        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("dataPath");
-        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
-        this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("dataPath");
-        this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+properties.get("backupPath")+FileSystems.getDefault().getSeparator()+properties.get("integrationPath");
+        this.trimming =((JsonElement) properties.get("truncated")).getAsBoolean();
+        String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
+        String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
+        String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
+
+        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
+        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
+        this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
+        this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_integrationPath;
+
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
         this.replicationPoolSetting = (String) properties.get("poolSetting");
-
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
 
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
     }
-    public void addBackupProvider(BackupProvider backupProvider){
-        if(backupProvider.scope()== Distributable.INTEGRATION_SCOPE){
-            iBackupProvider.addBackupProvider(backupProvider);
-        }
-        else if(backupProvider.scope()==Distributable.DATA_SCOPE){
-            dBackupProvider.addBackupProvider(backupProvider);
-        }
-    }
-    public void removeBackupProvider(BackupProvider backupProvider){
-        if(backupProvider.scope()== Distributable.INTEGRATION_SCOPE){
-            iBackupProvider.removeBackupProvider(backupProvider);
-        }
-        else if(backupProvider.scope()==Distributable.DATA_SCOPE){
-            dBackupProvider.removeBackupProvider(backupProvider);
-        }
-    }
+
     public ClusterNode node(){
         return this.node;
     }
+
+    @Override
+    public void registerBackupProvider(int scope,BackupProvider mapStoreListener){
+        if(scope == Distributable.INTEGRATION_SCOPE){
+            iBackupProvider.registerBackupProvider(mapStoreListener);
+        }
+        else if(scope == Distributable.DATA_SCOPE){
+            dBackupProvider.registerBackupProvider(mapStoreListener);
+        }
+
+    }
+
     @Override
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
-            this.iBackupProvider.registerDataStore(name);
+            replicationPendingQueue.offer(()-> this.iBackupProvider.registerDataStore(name));
             //this.accessIndexStoreList.add(name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
@@ -142,7 +143,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
-            this.dBackupProvider.registerDataStore(name,partition);
+            replicationPendingQueue.offer(()-> this.dBackupProvider.registerDataStore(name,partition));
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }

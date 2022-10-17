@@ -15,8 +15,8 @@ public interface BackupProvider extends ServiceProvider {
 
     void configure(Map<String,Object> properties);
 
-    <T extends Recoverable> void update(Metadata metadata, String key, T t);
-    <T extends Recoverable> void create(Metadata metadata, String key, T t);
+    default <T extends Recoverable> void update(Metadata metadata, String key, T t){}
+    default <T extends Recoverable> void create(Metadata metadata, String key, T t){}
 
     default void update(Metadata metadata, String key, byte[] t){}
     default void create(Metadata metadata, String key, byte[] t){}

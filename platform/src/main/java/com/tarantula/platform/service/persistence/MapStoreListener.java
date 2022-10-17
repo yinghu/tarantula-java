@@ -13,4 +13,5 @@ public interface MapStoreListener {
     //dispatch cluster operations
     void onDistributing(Metadata metadata,byte[] key, byte[] value);
     byte[] onRecovering(Metadata metadata,byte[] key);
+
 }

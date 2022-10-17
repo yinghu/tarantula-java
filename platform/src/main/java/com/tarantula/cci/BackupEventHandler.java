@@ -46,13 +46,13 @@ public class BackupEventHandler extends AbstractRequestHandler {
             String[] km = key.split("#");
             Metadata m = new RecoverableMetadata();
             m.fromBinary(km[1].getBytes());
-            this.backupProvider.update(null,km[0],_payload);
+            this.backupProvider.update(m,km[0],_payload);
         }
         else if(action.equals("onCreate")){
             String[] km = key.split("#");
             Metadata m = new RecoverableMetadata();
             m.fromBinary(km[1].getBytes());
-            this.backupProvider.create(null,km[0],_payload);
+            this.backupProvider.create(m,km[0],_payload);
 
         }
         else if(action.equals("onRegister")){

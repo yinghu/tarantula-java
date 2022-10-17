@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -24,12 +25,23 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     private int partition;
 
     public RecoverableMetadata(){}
+
     public RecoverableMetadata(String source,int partition,int scope){
         this.source = source;
         this.partition = partition;
         this.scope = scope;
         _type();
     }
+
+    public RecoverableMetadata(Metadata original,long revision){
+        this.source = original.source();
+        this.scope = original.scope();
+        this.factoryId = original.factoryId();
+        this.classId = original.classId();
+        this.revision = revision;
+        _type();
+    }
+
 
     private void _type(){
         int ix = source.indexOf("_");
@@ -100,6 +112,25 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         json.addProperty("factoryId",factoryId);
         json.addProperty("classId",classId);
         json.addProperty("scope",scope);
+        json.addProperty("revision",String.valueOf(revision));
         return json;
+    }
+
+    public byte[] toBinary(){
+        return toJson().toString().getBytes();
+    }
+
+    public void fromBinary(byte[] payload){
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        this.typeId = jsonObject.get("typeId").getAsString();
+        this.source = jsonObject.get("source").getAsString();
+        this.factoryId = jsonObject.get("factoryId").getAsInt();
+        this.classId = jsonObject.get("classId").getAsInt();
+        this.scope = jsonObject.get("scope").getAsInt();
+        this.revision = Long.parseLong(jsonObject.get("revision").getAsString());
+    }
+
+    public Metadata fromRevision(long revision){
+        return new RecoverableMetadata(this,revision);
     }
 }

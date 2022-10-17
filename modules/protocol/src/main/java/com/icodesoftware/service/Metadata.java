@@ -9,4 +9,6 @@ public interface Metadata extends Recoverable {
      int factoryId();
      int classId();
      int partition();
+
+     Metadata fromRevision(long revision);
 }

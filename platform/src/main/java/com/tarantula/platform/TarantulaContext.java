@@ -137,7 +137,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
 
-    private BackupProvider mirrorBackupProvider;
+    public boolean runAsMirror;
+    public boolean backupEnabled;
+
+    private MirrorClusterBackupProvider mirrorBackupProvider;
+
 
 
  	private TarantulaContext(){
@@ -206,7 +210,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     //}
 
     public void _initMirrorClusterBackup(){
-         this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
+ 	    this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
+ 	    this.mirrorBackupProvider.enabled(runAsMirror);
+ 	    this.mirrorBackupProvider.setup(this);
+        this.deploymentDataStoreProvider.registerBackupProvider(Distributable.DATA_SCOPE,this.mirrorBackupProvider);
+        this.deploymentDataStoreProvider.registerBackupProvider(Distributable.INTEGRATION_SCOPE,this.mirrorBackupProvider);
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
@@ -497,7 +505,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _setup() throws Exception{
 
         this.node = this.dataStoreProvider().node();
-        AccessIndex bid = this.accessIndexService().setIfAbsent(node.bucketName,0);
+        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
@@ -867,10 +875,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public void registerBackupProvider(BackupProvider backupProvider){
-        this.deploymentDataStoreProvider.addBackupProvider(backupProvider);
-    }
+ 	    this.mirrorBackupProvider.addBackupProvider(backupProvider);
+ 	}
     public void unregisterBackupProvider(BackupProvider backupProvider){
- 	    this.deploymentDataStoreProvider.removeBackupProvider(backupProvider);
+ 	    this.mirrorBackupProvider.removeBackupProvider(backupProvider);
     }
     public BackupProvider backupProvider(){
  	    return this.mirrorBackupProvider;

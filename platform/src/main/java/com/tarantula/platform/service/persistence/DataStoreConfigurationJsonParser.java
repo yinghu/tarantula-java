@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
@@ -50,7 +51,6 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         if(!name.equals(DeploymentServiceProvider.DEPLOY_DATA_STORE)) throw new RuntimeException("master data store name must be->"+DeploymentServiceProvider.DEPLOY_DATA_STORE);
         String provider = ds.get("provider").getAsString();
         properties.put("name",name.trim());
-        //properties.put("backupEnabled","true");
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
         properties.put("partitionNumber",this.partitionNumber);
@@ -63,27 +63,49 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         props.forEach(e->{
             JsonObject kv = e.getAsJsonObject();
             kv.entrySet().forEach((v)->{
-                properties.put(v.getKey(),v.getValue().getAsString());
+                properties.put(v.getKey(),v.getValue());
             });
         });
+
         Map<String,Object> _intrgration = new HashMap<>();
         JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
-        _intrgration.put("enabled",_iconfig.get("enabled").getAsBoolean());
+        _intrgration.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
         JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
+        Configuration exconfig = this.tarantulaContext.configuration("tarantula-backup-router");
         for(JsonElement je : ilist) {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
+                String _n = p.get("name").getAsString();
+                if(exconfig==null) break;
+                Object ref = exconfig.property(_n);
+                if(ref==null){
+                    _intrgration.put("enabled",false);
+                }
+                else{
+                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
+                    p.add("properties",pts);
+                }
                 _intrgration.put("backup-provider",p);
                 break;
             }
         }
         Map<String,Object> _data = new HashMap<>();
         JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
-        _data.put("enabled",_dconfig.get("enabled").getAsBoolean());
+        _data.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
         JsonArray dlist = _dconfig.get("backup-provider-list").getAsJsonArray();
         for(JsonElement je : dlist) {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
+                String _n = p.get("name").getAsString();
+                if(exconfig==null) break;
+                Object ref = exconfig.property(_n);
+                if(ref==null){
+                    _data.put("enabled",false);
+                }
+                else{
+                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
+                    p.add("properties",pts);
+                }
                 _data.put("backup-provider",p);
                 break;
             }
