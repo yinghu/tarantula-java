@@ -74,6 +74,10 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.nodeId();
     }
 
+    public ClusterProvider.Node node(){
+        return this.tarantulaContext.node();
+    }
+
     @Override
     public RecoverableRegistry recoverableRegistry(int registryId) {
         return this.tarantulaContext.recoverableRegistry(registryId);

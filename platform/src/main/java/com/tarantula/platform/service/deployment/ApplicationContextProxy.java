@@ -106,7 +106,8 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.metrics(name);
     }
 
-    public String clusterNameSuffix(){
-        return this.tarantulaApplicationContext.clusterNameSuffix();
+
+    public ClusterProvider.Node node(){
+        return this.tarantulaApplicationContext.node();
     }
 }

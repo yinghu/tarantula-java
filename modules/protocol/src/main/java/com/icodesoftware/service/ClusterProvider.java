@@ -77,6 +77,12 @@ public interface ClusterProvider extends Serviceable {
         String address();
         long startTime();
 
+        String deploymentId();
+
+        int partitionNumber();
+
+        String clusterNameSuffix();
+
     }
 
 }

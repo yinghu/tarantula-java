@@ -26,6 +26,8 @@ public interface ServiceContext {
     String bucketId();
     String nodeId();
 
+    ClusterProvider.Node node();
+
     String servicePushAddress();
 
     String deployDirectory();

@@ -47,7 +47,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         //this.roleList = this.tokenValidatorProvider.list();
         this.onLobbyIndex = new ConcurrentHashMap<>();
         //this.gameList = new CopyOnWriteArrayList<>();
-        String root = this.context.clusterNameSuffix()+"/"+(String)configuration.property("root");
+        String root = this.context.node().clusterNameSuffix()+"/"+(String)configuration.property("root");
         String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);

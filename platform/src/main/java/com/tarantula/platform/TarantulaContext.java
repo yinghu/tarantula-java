@@ -26,7 +26,6 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
-import com.tarantula.platform.service.persistence.BackupRouter;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.MirrorClusterBackupProvider;
@@ -505,6 +504,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _setup() throws Exception{
 
         this.node = this.dataStoreProvider().node();
+        this.node.clusterNameSuffix = this.clusterNameSuffix;
+        this.node.partitionNumber = this.platformRoutingNumber;
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
@@ -594,6 +595,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return node.nodeId;
     }
 
+    public ClusterProvider.Node node(){
+         return this.node;
+    }
 
     public static MemberDiscovery memberDiscovery(int scope){
  	    memberDiscovery.scope(scope);

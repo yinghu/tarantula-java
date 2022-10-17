@@ -21,6 +21,10 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String address;
     public long startTime;
 
+    public String deploymentId;
+    public String clusterNameSuffix;
+    public int partitionNumber;
+
     public ClusterNode(String bucketName, String nodeName){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
@@ -69,6 +73,17 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return startTime;
     }
 
+    public String deploymentId(){
+        return this.deploymentId;
+    }
+
+    public int partitionNumber(){
+        return partitionNumber;
+    }
+
+    public String clusterNameSuffix(){
+        return this.clusterNameSuffix;
+    }
     @Override
     public JsonObject toJson(){
         return _toJson(true);
@@ -86,6 +101,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.memberId = jsonObject.get("memberId").getAsString();
         this.address = jsonObject.get("address").getAsString();
         this.startTime = jsonObject.get("startTime").getAsLong();
+        this.clusterNameSuffix = jsonObject.get("clusterNameSuffix").getAsString();
+        this.partitionNumber = jsonObject.get("partitionNumber").getAsInt();
+        this.deploymentId = jsonObject.get("deploymentId").getAsString();
     }
     private JsonObject _toJson(boolean toWeb){
         JsonObject jsonObject = new JsonObject();
@@ -95,6 +113,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         jsonObject.addProperty("nodeId",nodeId);
         jsonObject.addProperty("memberId",memberId);
         jsonObject.addProperty("address",address);
+        jsonObject.addProperty("clusterNameSuffix",clusterNameSuffix);
+        jsonObject.addProperty("partitionNumber",partitionNumber);
+        jsonObject.addProperty("deploymentId",deploymentId);
         if(toWeb){
             jsonObject.addProperty("startTime",TimeUtil.fromUTCMilliseconds(startTime).format(DateTimeFormatter.ISO_DATE_TIME));
         }

@@ -140,4 +140,8 @@ public class EmptyServiceContext implements ServiceContext {
     public BackupProvider backupProvider(){
         return null;
     }
+
+    public ClusterProvider.Node node(){
+        return null;
+    }
 }
