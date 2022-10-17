@@ -69,7 +69,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
         Map<String,Object> _intrgration = new HashMap<>();
         JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
-        _intrgration.put("enabled",tarantulaContext.runAsMirror? false : _iconfig.get("enabled").getAsBoolean());
+        _intrgration.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
         JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
         Configuration exconfig = this.tarantulaContext.configuration("tarantula-backup-router");
         for(JsonElement je : ilist) {
@@ -91,7 +91,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }
         Map<String,Object> _data = new HashMap<>();
         JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
-        _data.put("enabled",tarantulaContext.runAsMirror? false : _dconfig.get("enabled").getAsBoolean());
+        _data.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
         JsonArray dlist = _dconfig.get("backup-provider-list").getAsJsonArray();
         for(JsonElement je : dlist) {
             JsonObject p = je.getAsJsonObject();

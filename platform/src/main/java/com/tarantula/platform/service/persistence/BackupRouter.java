@@ -59,7 +59,10 @@ public class BackupRouter implements BackupProvider {
 
     public void configure(Map<String,Object> properties){
         this.enabled = (Boolean)properties.get("enabled");
-        if(!this.enabled) return;
+        if(!this.enabled) {
+            logger.warn("Backup router enabled ["+name+"/"+this.enabled+"]");
+            return;
+        }
         JsonObject provider = (JsonObject)properties.get("backup-provider");
         String bname = provider.get("name").getAsString();
         String cname = provider.get("provider").getAsString();
