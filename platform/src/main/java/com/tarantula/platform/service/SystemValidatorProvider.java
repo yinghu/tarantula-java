@@ -99,7 +99,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public byte[] clusterKey(String clusterNameSuffix){
-        if(!clusterNameSuffix.equals(this.serviceContext.clusterNameSuffix())) return null;
+        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
         return presenceKey.key;
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
@@ -148,7 +148,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String clusterNameSuffix(){
-        return this.serviceContext.clusterNameSuffix();
+        return this.serviceContext.node().clusterNameSuffix();
     }
     public byte[] encrypt(byte[] data){
         try{
@@ -354,12 +354,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.deploymentServiceProvider = serviceContext.deploymentServiceProvider();
-        this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.partitionNumber());
-        this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.partitionNumber());
-        this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.partitionNumber());
-        this.idataStore = this.serviceContext.dataStore(Account.IndexDataStore,this.serviceContext.partitionNumber());
-        this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.partitionNumber());
-        this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.partitionNumber());
+        this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.node().partitionNumber());
+        this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.node().partitionNumber());
+        this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.node().partitionNumber());
+        this.idataStore = this.serviceContext.dataStore(Account.IndexDataStore,this.serviceContext.node().partitionNumber());
+        this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.node().partitionNumber());
+        this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.node().partitionNumber());
         oMap = new ConcurrentHashMap<>();
         fMap = new ConcurrentHashMap<>();
         AuthVendorRegistry google = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.GOOGLE);
@@ -416,7 +416,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void waitForData() {
         try{
             PresenceKey pKey = new PresenceKey();
-            pKey.distributionKey(serviceContext.bucketId());
+            pKey.distributionKey(serviceContext.node().bucketId());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
                 pKey.key = clusterKey;
@@ -432,7 +432,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.warn("System validator provider started ["+serviceContext.nodeId()+"]["+serviceContext.bucketId()+"]");
+        log.warn("System validator provider started ["+serviceContext.node().nodeId()+"]["+serviceContext.node().bucketId()+"]");
     }
 
     @Override

@@ -446,17 +446,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public DataStore dataStore(String name,int partition){
         return this.deploymentDataStoreProvider.create(name,partition);
     }
-    public int partitionNumber(){
- 	    return this.platformRoutingNumber;
-    }
 
-    public String clusterNameSuffix(){
-         return this.clusterNameSuffix;
-    }
-
-    public String servicePushAddress(){
-         return servicePushAddress;
-    }
 
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
@@ -480,7 +470,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public DataStore masterDataStore(){
-        return this.deploymentDataStoreProvider.create(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.partitionNumber());
+        return this.deploymentDataStoreProvider.create(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.node.partitionNumber());
     }
     public RecoverableRegistry recoverableRegistry(int registryId){
  	    return fMap.get(registryId);
@@ -506,6 +496,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node = this.dataStoreProvider().node();
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.partitionNumber = this.platformRoutingNumber;
+        this.node.deployDirectory = this.deployDir;
+        this.node.servicePushAddress = this.servicePushAddress;
+        this.node.deploymentId = "deploymentId";
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
@@ -856,10 +849,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
         }
         return _vlist;
-    }
-
-    public String deployDirectory(){
-         return deployDir;
     }
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){

@@ -22,7 +22,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         int joinsOnStart = ((Number)configuration.property("defaultJoinsOnStart")).intValue();
         long duration = ((Number)configuration.property("defaultRoundDuration")).longValue();
         int levelUpXpBase = ((Number)configuration.property("defaultLevelUpXpBase")).intValue();
-        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
+        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
         int levelEnd = application.accessRank()*levelMatchOffset;
         int levelStart = levelEnd-(levelMatchOffset-1);
         for(int i=1;i<=initialZoneCount;i++){
@@ -36,7 +36,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
 
     @Override
     public <T extends Configurable> T load(Descriptor application) {
-        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.partitionNumber());
+        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
         if(!dataStore.load(gameLobby)) throw new RuntimeException("no lobby data for key->"+application.distributionKey());

@@ -55,24 +55,9 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.partitions();
     }
 
-    @Override
-    public int partitionNumber() {
-        return this.tarantulaContext.partitionNumber();
-    }
 
-    public String clusterNameSuffix(){
-        return this.tarantulaContext.clusterNameSuffix();
-    }
-    @Override
-    public String bucket() {
-        return this.tarantulaContext.bucket();
-    }
-    public String bucketId(){
-        return this.tarantulaContext.bucketId();
-    }
-    public String nodeId(){
-        return this.tarantulaContext.nodeId();
-    }
+
+
 
     public ClusterProvider.Node node(){
         return this.tarantulaContext.node();
@@ -96,13 +81,7 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.availableServices();
     }
 
-    public String deployDirectory(){
-        return this.tarantulaContext.deployDirectory();
-    }
 
-    public String servicePushAddress(){
-        return tarantulaContext.servicePushAddress();
-    }
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         this.tarantulaContext.registerAuthVendor(authVendor);

@@ -51,10 +51,10 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
 
     public byte[] load(String source,byte[] key){
-        return this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().get(key);
+        return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
     }
     public void replicate(String source,byte[] key,byte[] value){
-        this.tarantulaContext.dataStore(source,tarantulaContext.partitionNumber()).backup().set(key,value);
+        this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().set(key,value);
     }
     public int syncStart(String memberId,String source,String syncKey){
         RecoverService recoverService = tarantulaContext.integrationCluster().recoverService();
@@ -65,7 +65,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                this.tarantulaContext.dataStore(source,this.tarantulaContext.partitionNumber()).backup().list((k,v)->{
+                this.tarantulaContext.dataStore(source,this.tarantulaContext.node().partitionNumber()).backup().list((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
                         recoverService.onSync(batch[0],keys,values,memberId,source);
                         batch[0] = 0;
@@ -82,7 +82,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
             recoverService.onEndSync(memberId,syncKey);
             //log.warn("Total records ["+total[0]+"] from ["+source+"] synced to ["+memberId+"] timed (seconds) ["+((System.currentTimeMillis()-st)/1000)+"]");
         }).start();
-        return this.tarantulaContext.partitionNumber();
+        return this.tarantulaContext.node().partitionNumber();
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){

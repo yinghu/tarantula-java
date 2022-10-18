@@ -2,12 +2,20 @@ package com.tarantula.test;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 public class EmptyServiceContext implements ServiceContext {
+
+    ClusterNode node = new ClusterNode();
+
+    public EmptyServiceContext(){
+        node.bucketId = "BSD01/"+ SystemUtil.oid();
+        node.nodeId ="BSD01/"+ SystemUtil.oid();
+    }
     @Override
     public DataStore dataStore(String s, int i) {
         return new EmptyDataStore();
@@ -54,40 +62,8 @@ public class EmptyServiceContext implements ServiceContext {
         return new OnPartition[0];
     }
 
-    @Override
-    public int partitionNumber() {
-        return 0;
-    }
 
-    @Override
-    public String clusterNameSuffix() {
-        return null;
-    }
 
-    @Override
-    public String bucket() {
-        return null;
-    }
-
-    @Override
-    public String bucketId() {
-        return "BSD01/"+ SystemUtil.oid();
-    }
-
-    @Override
-    public String nodeId() {
-        return "BSD01/"+ SystemUtil.oid();
-    }
-
-    @Override
-    public String servicePushAddress() {
-        return null;
-    }
-
-    @Override
-    public String deployDirectory() {
-        return null;
-    }
 
     @Override
     public RecoverableRegistry recoverableRegistry(int i) {
@@ -142,6 +118,7 @@ public class EmptyServiceContext implements ServiceContext {
     }
 
     public ClusterProvider.Node node(){
-        return null;
+        node.partitionNumber = 17;
+        return node;
     }
 }

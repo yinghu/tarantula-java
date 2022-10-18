@@ -41,7 +41,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     @Override
     public void setup(ServiceContext serviceContext) {
         this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.partitionNumber());//typeId_service
+        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.node().partitionNumber());//typeId_service
         this.publisher = serviceContext.eventService();
         integrationCluster = serviceContext.clusterProvider();
         integrationCluster.subscribe(name,(e)->{

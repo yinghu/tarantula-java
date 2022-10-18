@@ -249,7 +249,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         this.deploymentServiceProvider.registerAccessIndexListener(this);
         this.accessIndexService = tcx.accessIndexService();
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.bucket = tcx.bucket();
+        this.bucket = tcx.node().bucket();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

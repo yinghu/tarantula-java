@@ -84,6 +84,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = new ClusterNode((String) properties.get("bucket"),(String) properties.get("node"));
+        this.node.partitionNumber = partitionNumber;
         this.replicationPoolSetting = (String) properties.get("poolSetting");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));

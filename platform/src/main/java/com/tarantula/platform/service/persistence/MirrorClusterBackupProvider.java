@@ -53,7 +53,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     @Override
     public void registerDataStore(String prefix, int partitions) {
         if(runAsMirror) {
-            this.dataStoreProvider.create(prefix, serviceContext.partitionNumber());
+            this.dataStoreProvider.create(prefix, serviceContext.node().partitionNumber());
             return;
         }
         BackupProvider backupProvider = bMap.get(_type(prefix));
@@ -87,7 +87,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         if(!runAsMirror) return;
         if(metadata.scope() == Distributable.DATA_SCOPE){
             byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
-            this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),r);
+            this.dataStoreProvider.create(metadata.source(),serviceContext.node().partitionNumber()).backup().set(key.getBytes(),r);
             return;
         }
         if(metadata.scope() == Distributable.INTEGRATION_SCOPE){
@@ -101,7 +101,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         if(!runAsMirror) return;
         if(metadata.scope() == Distributable.DATA_SCOPE){
             byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
-            this.dataStoreProvider.create(metadata.source(),serviceContext.partitionNumber()).backup().set(key.getBytes(),r);
+            this.dataStoreProvider.create(metadata.source(),serviceContext.node().partitionNumber()).backup().set(key.getBytes(),r);
             return;
         }
         if(metadata.scope() == Distributable.INTEGRATION_SCOPE){

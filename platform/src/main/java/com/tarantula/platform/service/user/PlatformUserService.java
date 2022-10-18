@@ -222,12 +222,12 @@ public class PlatformUserService implements UserService {
     public void setup(ServiceContext serviceContext){
         logger = serviceContext.logger(PlatformUserService.class);
         tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
-        userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.partitionNumber());
-        presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.partitionNumber());
-        accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.partitionNumber());
-        accountIndexDataStore = serviceContext.dataStore(Account.IndexDataStore,serviceContext.partitionNumber());
-        membershipDataStore = serviceContext.dataStore(Subscription.DataStore,serviceContext.partitionNumber());
-        loginProviderDataStore = serviceContext.dataStore(LoginProvider.DataStore,serviceContext.partitionNumber());
+        userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.node().partitionNumber());
+        presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.node().partitionNumber());
+        accountDataStore = serviceContext.dataStore(Account.DataStore,serviceContext.node().partitionNumber());
+        accountIndexDataStore = serviceContext.dataStore(Account.IndexDataStore,serviceContext.node().partitionNumber());
+        membershipDataStore = serviceContext.dataStore(Subscription.DataStore,serviceContext.node().partitionNumber());
+        loginProviderDataStore = serviceContext.dataStore(LoginProvider.DataStore,serviceContext.node().partitionNumber());
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();
         subscribedMaxUsersPerAccount = ((Number)configuration.property("subscribedMaxUserCount")).intValue();

@@ -15,6 +15,6 @@ public class GameClusterMetrics extends AbstractMetrics{
         this.paymentIncluded = true;
         this.accessIncluded = true;
         this.logger = serviceContext.logger(GameClusterMetrics.class);
-        this.dataStore = serviceContext.dataStore(name.replaceAll("-","_")+"_game_cluster_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(name.replaceAll("-","_")+"_game_cluster_metrics",serviceContext.node().partitionNumber());
     }
 }

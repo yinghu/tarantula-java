@@ -130,7 +130,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public void setup(ServiceContext serviceContext){
         try{
             this.serviceContext = serviceContext;
-            String deployDir = serviceContext.deployDirectory();
+            String deployDir = serviceContext.node().deployDirectory();
             //GameCluster gameCluster = this;//configuration;
             Path _config_game = Paths.get(deployDir+"/conf/"+this.property(GameCluster.NAME));
             if(!Files.exists(_config_game)){

@@ -142,7 +142,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
             }
             recoverService.onEndSync(memberId,syncKey);
         }).start();
-        return this.tarantulaContext.partitionNumber();
+        return this.tarantulaContext.node().partitionNumber();
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch) {

@@ -19,18 +19,10 @@ public interface ServiceContext {
     AccessIndexService accessIndexService();
     TarantulaLogger logger(Class c);
     OnPartition[] partitions();
-    int partitionNumber();
 
-    String clusterNameSuffix();
-    String bucket();
-    String bucketId();
-    String nodeId();
 
     ClusterProvider.Node node();
 
-    String servicePushAddress();
-
-    String deployDirectory();
 
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);

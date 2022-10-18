@@ -51,7 +51,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
         connection.secured(true);
-        connection.host(serviceContext.servicePushAddress());
+        connection.host(serviceContext.node().servicePushAddress());
         udpEndpointServiceProvider.daemon(true);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
@@ -61,7 +61,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         for(int i=0;i<sessionPoolSize;i++){
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
         }
-        logger.warn("UDP Endpoint running as a daemon with session pool size ->"+sessionPoolSize+" on ["+serviceContext.servicePushAddress()+"]");
+        logger.warn("UDP Endpoint running as a daemon with session pool size ->"+sessionPoolSize+" on ["+serviceContext.node().servicePushAddress()+"]");
     }
 
     @Override

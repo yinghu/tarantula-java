@@ -12,7 +12,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.*;
@@ -160,7 +159,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     }
 
     public byte[] onClusterKey() {
-        return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.clusterNameSuffix());
+        return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.node().clusterNameSuffix());
     }
 
     public void onResetClusterKey() {

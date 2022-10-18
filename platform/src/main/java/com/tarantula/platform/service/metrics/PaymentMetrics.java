@@ -12,6 +12,6 @@ public class PaymentMetrics extends AbstractMetrics{
         this.name = Metrics.PAYMENT;
         this.paymentIncluded = true;
         this.logger = serviceContext.logger(PaymentMetrics.class);
-        this.dataStore = serviceContext.dataStore("tarantula_payment_metrics",serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore("tarantula_payment_metrics",serviceContext.node().partitionNumber());
     }
 }

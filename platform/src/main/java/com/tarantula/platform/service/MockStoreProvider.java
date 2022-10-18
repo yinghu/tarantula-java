@@ -27,7 +27,7 @@ public class MockStoreProvider extends AuthObject{
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         String ds = typeId.replaceAll("-","_")+"_mock_store_transaction";
-        dataStore = serviceContext.dataStore(ds,serviceContext.partitionNumber());
+        dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
     }
     @Override
     public boolean validate(Map<String,Object> params){

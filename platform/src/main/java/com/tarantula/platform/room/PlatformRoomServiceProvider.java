@@ -74,7 +74,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.serviceContext = serviceContext;
         this.clusterProvider = serviceContext.clusterProvider();
         this.distributionRoomService = this.serviceContext.clusterProvider().serviceProvider(DistributionRoomService.NAME);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
+        this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.node().partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
         this.gameChannelIndex = new ConcurrentHashMap<>();
@@ -119,7 +119,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public GameRoom join(GameZone gameZone, Rating rating){
         if(gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)){
-            String roomId = serviceContext.bucket()+"/"+ SystemUtil.oid();
+            String roomId = serviceContext.node().bucket()+"/"+ SystemUtil.oid();
             GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
             gameRoom.join(rating.systemId(),room->true);
             gameRoom.setup(gameZone,rating);

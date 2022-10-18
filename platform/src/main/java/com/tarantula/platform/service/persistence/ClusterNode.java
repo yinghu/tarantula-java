@@ -25,6 +25,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String clusterNameSuffix;
     public int partitionNumber;
 
+    public String deployDirectory;
+    public String servicePushAddress;
+
     public ClusterNode(String bucketName, String nodeName){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
@@ -83,6 +86,13 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public String clusterNameSuffix(){
         return this.clusterNameSuffix;
+    }
+
+    public String deployDirectory(){
+        return deployDirectory;
+    }
+    public String servicePushAddress(){
+        return servicePushAddress;
     }
     @Override
     public JsonObject toJson(){

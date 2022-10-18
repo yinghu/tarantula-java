@@ -150,7 +150,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             registerCategory(GAME_TIMEOUT_COUNT);
         }
         //this.serviceContext = serviceContext;
-        String nodeId = serviceContext.nodeId();
+        String nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();
         this.statistics.distributionKey(nodeId);

@@ -83,6 +83,10 @@ public interface ClusterProvider extends Serviceable {
 
         String clusterNameSuffix();
 
+        String deployDirectory();
+
+        String servicePushAddress();
+
     }
 
 }

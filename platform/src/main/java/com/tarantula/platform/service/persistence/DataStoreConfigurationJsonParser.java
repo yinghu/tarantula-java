@@ -38,7 +38,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
-        this.partitionNumber = tx.partitionNumber();
+        this.partitionNumber = tx.platformRoutingNumber;
         this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup;

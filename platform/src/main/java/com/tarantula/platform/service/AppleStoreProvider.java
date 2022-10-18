@@ -64,7 +64,7 @@ public class AppleStoreProvider extends AuthObject{
         super.setup(serviceContext);
         jsonParser = new JsonParser();
         String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
-        dataStore = serviceContext.dataStore(ds,serviceContext.partitionNumber());
+        dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
 
     }
     @Override
