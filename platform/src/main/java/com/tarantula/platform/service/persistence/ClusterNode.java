@@ -28,9 +28,10 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String deployDirectory;
     public String servicePushAddress;
 
-    public ClusterNode(String bucketName, String nodeName){
+    public ClusterNode(String bucketName, String nodeName,int partitionNumber){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
+        this.partitionNumber = partitionNumber;
     }
 
     public ClusterNode(){

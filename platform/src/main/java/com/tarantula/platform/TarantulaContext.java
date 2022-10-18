@@ -495,7 +495,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         this.node = this.dataStoreProvider().node();
         this.node.clusterNameSuffix = this.clusterNameSuffix;
-        this.node.partitionNumber = this.platformRoutingNumber;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
         this.node.deploymentId = "deploymentId";
