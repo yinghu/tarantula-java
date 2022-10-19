@@ -112,6 +112,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
+        boolean backupEnabled = (boolean)_intrgration.get("enabled") || (boolean)_data.get("enabled");
+        properties.put("backupEnabled",backupEnabled);
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
         this.tarantulaContext.deploymentDataStoreProvider.start();
         this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);

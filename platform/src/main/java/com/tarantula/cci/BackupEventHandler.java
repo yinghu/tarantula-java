@@ -38,6 +38,12 @@ public class BackupEventHandler extends AbstractRequestHandler {
             GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
             if(gameCluster==null) throw new IllegalAccessException("Invalid key");
         }
+        else if(path.equals("/backup/deployment")){
+            GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+            if(gameCluster==null) throw new IllegalAccessException("Invalid key");
+            exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+            return;
+        }
         else{
             throw new IllegalAccessException("Invalid path ["+path+"]");
         }
