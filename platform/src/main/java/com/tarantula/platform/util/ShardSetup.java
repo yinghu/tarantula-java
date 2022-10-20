@@ -1,31 +1,16 @@
 package com.tarantula.platform.util;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
-import com.icodesoftware.Subscription;
-import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.Arena;
-import com.tarantula.platform.presence.Membership;
-import com.tarantula.platform.presence.User;
 import com.tarantula.platform.service.metrics.AccessMetrics;
-import com.tarantula.platform.service.metrics.MetricsHistory;
 import com.tarantula.platform.service.metrics.MetricsProperty;
 import com.tarantula.platform.service.metrics.MetricsSnapshot;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
-import com.tarantula.platform.service.persistence.web.WebHookBackupProvider;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ShardSetup {
@@ -42,23 +27,10 @@ public class ShardSetup {
         connection.close();
     }
     public static void main(String[] args){
-        WebHookBackupProvider webHookBackupProvider = new WebHookBackupProvider();
-        HashMap<String,Object> config = new HashMap<>();
-        JsonObject _h = new JsonObject();
-        _h.addProperty("host","http://localhost:8090");
-        _h.addProperty("accessKey","BDS/592690c1e54440e2a11cfc2bccb6adee-D3A35F6940405D3D05036321510929CF28BC437F-35D3AA273137E822F9A8CD1AB0831BDA");
-        _h.addProperty("path","backup/system");
-        config.put("host",_h.get("host"));
-        config.put("accessKey",_h.get("accessKey"));
-        config.put("path",_h.get("path"));
-        webHookBackupProvider.configure(config);
-        Metadata metadata = new RecoverableMetadata("tarantula_user",1, Distributable.DATA_SCOPE);
-        Subscription subscription = new Membership();
-        subscription.distributionKey("BDS/"+SystemUtil.oid());
-        subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        subscription.count(1);
-        webHookBackupProvider.create(metadata,subscription.distributionKey(),subscription);
-        webHookBackupProvider.registerDataStore("tarantula_user");
+       DeploymentIdFetcher developmentIdFetcher = new DeploymentIdFetcher("http://localhost:8090");
+
+       String devid = developmentIdFetcher.deploymentId("BDS/663645a2424b46cbae71b1b9b5274f92-88701F4CF0C086777287BEDF9DA3C4135F05DD4D-D980B8136E6123624F13B67133143202");
+       System.out.println(devid);
     }
     public static void _main(String[] args){
         LocalDateTime cur = LocalDateTime.now();

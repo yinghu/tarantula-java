@@ -6,6 +6,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
@@ -18,6 +19,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
     private TokenValidatorProvider tokenValidatorProvider;
     private BackupProvider backupProvider;
+    private ServiceContext serviceContext;
 
 
     public String name(){
@@ -30,6 +32,12 @@ public class BackupEventHandler extends AbstractRequestHandler {
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
         String key = exchange.header(Session.TARANTULA_NAME);
         byte[] _payload = exchange.payload();
+        if(path.equals("/backup/deployment")){
+            String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+            if(typeId==null) throw new IllegalAccessException("Invalid key");
+            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(true,serviceContext.node().deploymentId()).getBytes(),true));
+            return;
+        }
         if(path.equals("/backup/system")){
             String access = this.tokenValidatorProvider.validateAccessKey(accessKey);
             if(access==null) throw new IllegalAccessException("Invalid key");
@@ -37,12 +45,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
         else if(path.equals("/backup/game")){
             GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
             if(gameCluster==null) throw new IllegalAccessException("Invalid key");
-        }
-        else if(path.equals("/backup/deployment")){
-            GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-            if(gameCluster==null) throw new IllegalAccessException("Invalid key");
-            exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
-            return;
         }
         else{
             throw new IllegalAccessException("Invalid path ["+path+"]");
@@ -94,6 +96,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
     public void setup(ServiceContext tcx){
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.backupProvider = tcx.backupProvider();
+        this.serviceContext = tcx;
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");

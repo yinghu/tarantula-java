@@ -138,6 +138,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public boolean runAsMirror;
     public boolean backupEnabled;
+    public String backupUrl;
+    public String backupAccessKey;
 
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
@@ -497,17 +499,22 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
-        this.node.deploymentId = "deploymentId";
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
-        if(bid==null | nid==null) throw new RuntimeException("Need to restart the server again");
+        AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",0);
+        node.deploymentId = did.distributionKey();
+        if(backupEnabled){//override backup deployment id from backup cluster.
+            node.deploymentId = new DeploymentIdFetcher(this.backupUrl).deploymentId(this.backupAccessKey);
+        }
+        if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
 
         integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
         //
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
+        log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
         initMetricsProvider();
 
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup

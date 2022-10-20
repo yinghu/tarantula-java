@@ -65,6 +65,8 @@ public class TarantulaMain {
 			TarantulaContext.lobbySubscriptionEnabled  = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
 			btx.runAsMirror = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.run.as.mirror",_user,_config));
 			btx.backupEnabled = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.backup.enabled",_user,_config));
+			btx.backupUrl = override(overriding,"tarantula.platform.cluster.backup.url",_user,_config);
+			btx.backupAccessKey = override(overriding,"tarantula.platform.cluster.backup.access.key",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
 			btx.clusterInitialSize = Integer.parseInt(override(overriding,"tarantula.platform.cluster.initial.size",_user,_config));
