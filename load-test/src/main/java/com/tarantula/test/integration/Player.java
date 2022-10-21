@@ -15,7 +15,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
 public class Player extends HttpCaller implements Runnable{
@@ -27,49 +26,35 @@ public class Player extends HttpCaller implements Runnable{
     private String token;
     private String ticket;
 
-    //private byte[] serverKey;
     private Cipher encryper;
     private DatagramSocket udp;
-    //private OnPayload done;
-    //private boolean[] continuing = {true};
-    private JsonObject presence;
-    private JsonObject connection;
+    private MessageBuffer messageBuffer;
+    private MessageBuffer.MessageHeader messageHeader;
 
-    private CountDownLatch waiting;
+    private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
+    private long duration = 10000; //total running time
 
-
-    private long start;
-    private JsonObject gameLobby;
-    private StringBuilder dataBuffer;
-    CompletableFuture<?> accumulatedMessage;
+    private boolean joined;
     public Player(String host, CountDownLatch counter, String userName,int sequence){
         super(host);
         this.counter = counter;
         this.userName = userName;
         this.deviceName = "test-"+sequence;
         this.clientId = UUID.randomUUID().toString();
-        //this.done = done;
-        waiting = new CountDownLatch(1);
-        this.dataBuffer = new StringBuilder();
-        this.accumulatedMessage = new CompletableFuture<>();
     }
-    public void _init(){
-        try{
-            super._init();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-    private boolean isContinue(String payload,OnPayload onPayload){
+
+    private boolean onPresence(String payload){
         JsonObject json = JsonUtil.parse(payload);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
-        onPayload.on(json);
+        token = json.get("Token").getAsString();
+        ticket = json.get("Ticket").getAsString();
         return true;
     }
-    public void run() {
-        start = System.currentTimeMillis();
+    private void join() {
+        if(joined) return;
         try{
+            _init();
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"index/user",
                     Session.TARANTULA_ACTION,"onRegister",
@@ -79,56 +64,75 @@ public class Player extends HttpCaller implements Runnable{
             jsonObject.addProperty("login",userName);
             jsonObject.addProperty("password","password");
             String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
-            if(isContinue(resp,json->{
-                token = json.get("Token").getAsString();
-                ticket = json.get("Ticket").getAsString();
-            })){
-                headers = new String[]{
-                        Session.TARANTULA_TAG,"robotquest/lobby",
-                        Session.TARANTULA_ACTION,"onPlay",
-                        Session.TARANTULA_TOKEN,token,
-                        Session.TARANTULA_NAME,deviceName,
-                        Session.TARANTULA_CLIENT_ID,clientId,
-                        Session.TARANTULA_TOURNAMENT_ID,"n/a"
-                };
-                resp = super.get("service/action",headers);
-                if(isContinue(resp,json->{
-                    JsonObject _channel = json.get("_pushChannel").getAsJsonObject();
-                    try{onPlay(_channel);}catch (Exception exx){
-                        exx.printStackTrace();
-                    }
-                }));
+            if(!onPresence(resp)) {
+                LoadResult.totalFailurePresence.incrementAndGet();
+                throw new RuntimeException("failed");
             }
-
+            LoadResult.totalSuccessPresence.incrementAndGet();
+            headers = new String[]{
+                    Session.TARANTULA_TAG,"robotquest/lobby",
+                    Session.TARANTULA_ACTION,"onPlay",
+                    Session.TARANTULA_TOKEN,token,
+                    Session.TARANTULA_NAME,deviceName,
+                    Session.TARANTULA_CLIENT_ID,clientId,
+                    Session.TARANTULA_TOURNAMENT_ID,"n/a"
+            };
+            resp = super.get("service/action",headers);
+            onJoin(resp);
+            joined = true;
         }catch (Exception ex){
             ex.printStackTrace();
-        }
-        finally {
+            String error = ex.getMessage();
+            if(!error.equals("failed")){
+                LoadResult.totalFailureOther.incrementAndGet();
+            }
+            duration = 0;
             counter.countDown();
+            joined = false;
         }
     }
 
+    public void run(){
+        join();
+        try{
+            while (duration>0){
+                Thread.sleep(5000);
+                duration -= 5000;
+            }
+            LoadResult.totalRounds.incrementAndGet();
+            counter.countDown();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
 
-
-    private void onPlay(JsonObject json) throws Exception{
-        byte[] serverKey = Base64.getDecoder().decode(json.get("ServerKey").getAsString());
+    private void onJoin(String resp) throws Exception{
+        JsonObject joinPayload = JsonUtil.parse(resp);
+        boolean suc = joinPayload.get("Successful").getAsBoolean();
+        if(!suc){
+            LoadResult.totalFailureJoin.incrementAndGet();
+            throw new RuntimeException("failed");
+        }
+        LoadResult.totalSuccessJoin.incrementAndGet();
+        JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
+        byte[] serverKey = Base64.getDecoder().decode(channel.get("ServerKey").getAsString());
         this.encryper = CipherUtil.encrypt(serverKey);
         udp = new DatagramSocket();
-        int channelId = json.get("ChannelId").getAsInt();
-        int sessionId = json.get("SessionId").getAsInt();
-        JsonObject _conn = json.get("_connection").getAsJsonObject();
+        udp.setSoTimeout(udpReceiveTimeout);
+        int channelId = channel.get("ChannelId").getAsInt();
+        int sessionId = channel.get("SessionId").getAsInt();
+        JsonObject _conn = channel.get("_connection").getAsJsonObject();
         String host = _conn.get("Host").getAsString();
         int port = _conn.get("Port").getAsInt();
-        System.out.println(json);
         InetAddress addr = InetAddress.getByName(host);
         udp.connect(new InetSocketAddress(addr,port));
-        MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
-        header.channelId = channelId;
-        header.sessionId = sessionId;
-        header.commandId = Messenger.JOIN;
-        header.encrypted = true;
-        MessageBuffer messageBuffer = new MessageBuffer();
-        messageBuffer.writeHeader(header);
+        messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.channelId = channelId;
+        messageHeader.sessionId = sessionId;
+        messageHeader.commandId = Messenger.JOIN;
+        messageHeader.encrypted = true;
+        messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(sessionId);
         messageBuffer.writeUTF8(token);
         messageBuffer.writeUTF8(ticket);
@@ -136,25 +140,25 @@ public class Player extends HttpCaller implements Runnable{
         messageBuffer.readHeader();
         byte[] payload = this.encryper.doFinal(messageBuffer.readPayload());
         messageBuffer.reset();
-        messageBuffer.writeHeader(header);
+        messageBuffer.writeHeader(messageHeader);
         messageBuffer.writePayload(payload);
         messageBuffer.flip();
-        byte[] out = messageBuffer.toArray();
-        //messageBuffer.reset();
-        //MessageBuffer moo = new MessageBuffer();
-
-        //System.out.println("Connected->"+udp.isConnected());
-        udp.send(new DatagramPacket(out,0,out.length));
-        //System.out.println("UDP-send-"+out.length);
+        byte[] outbound = messageBuffer.toArray();
+        udp.send(new DatagramPacket(outbound,0,outbound.length));
+        LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
         DatagramPacket rec = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
         udp.receive(rec);
-        System.out.println("UDP-received");
-        messageBuffer.reset(rec.getData());
+        byte[] inbound = rec.getData();
+        LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
+        messageBuffer.reset(inbound);
         messageBuffer.flip();
         MessageBuffer.MessageHeader h = messageBuffer.readHeader();
-        System.out.println(messageBuffer.readInt());
-        System.out.println(messageBuffer.readLong());
-        System.out.println(h.commandId);
-
+        int returnSessionId = messageBuffer.readInt();
+        if(h.commandId == Messenger.ON_JOIN && returnSessionId == sessionId ){
+            LoadResult.totalSuccessPlay.incrementAndGet();
+            return;
+        }
+        LoadResult.totalFailurePlay.incrementAndGet();
+        throw new RuntimeException("failed");
     }
 }
