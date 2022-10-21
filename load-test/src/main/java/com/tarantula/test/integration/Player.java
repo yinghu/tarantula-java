@@ -26,6 +26,8 @@ public class Player extends HttpCaller implements Runnable{
     private String token;
     private String ticket;
 
+    private String tag;
+
     private Cipher encryper;
     private DatagramSocket udp;
     private MessageBuffer messageBuffer;
@@ -35,6 +37,9 @@ public class Player extends HttpCaller implements Runnable{
     private long duration = 10000; //total running time
 
     private boolean joined;
+
+    static short STATISTICS_QUERY = 1;
+    static short STATISTICS_COMMIT = 2;
     public Player(String host, CountDownLatch counter, String userName,int sequence){
         super(host);
         this.counter = counter;
@@ -47,6 +52,7 @@ public class Player extends HttpCaller implements Runnable{
         JsonObject json = JsonUtil.parse(payload);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
+        tag = json.get("Tag").getAsString();
         token = json.get("Token").getAsString();
         ticket = json.get("Ticket").getAsString();
         return true;
@@ -92,17 +98,60 @@ public class Player extends HttpCaller implements Runnable{
         }
     }
 
+    private void leave() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,tag,
+                Session.TARANTULA_ACTION,"onLeave",
+                Session.TARANTULA_TOKEN,token
+        };
+        super.get("service/action",headers);
+    }
+
     public void run(){
         join();
         try{
             while (duration>0){
-                Thread.sleep(5000);
+                messageHeader.commandId = Messenger.REQUEST;
+                messageHeader.encrypted = false;
+                messageBuffer.reset();
+                messageBuffer.writeHeader(messageHeader);
+                messageBuffer.writeShort(STATISTICS_COMMIT);
+                messageBuffer.writeUTF8("");
+                messageBuffer.writeDouble(1);
+                messageBuffer.flip();
+                byte[] outbound = messageBuffer.toArray();
+                udp.send(new DatagramPacket(outbound,outbound.length));
+                LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                Thread.sleep(1000);
+                messageHeader.commandId = Messenger.REQUEST;
+                messageBuffer.reset();
+                messageBuffer.writeHeader(messageHeader);
+                messageBuffer.writeShort(STATISTICS_QUERY);
+                messageBuffer.flip();
+                outbound = messageBuffer.toArray();
+                udp.send(new DatagramPacket(outbound,outbound.length));
+                LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                while (true){
+                    DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+                    udp.receive(d);
+                    byte[] inbound = d.getData();
+                    messageBuffer.reset(inbound);
+                    messageBuffer.flip();
+                    MessageBuffer.MessageHeader h = messageBuffer.readHeader();
+                    LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
+                    if(h.batch == h.batchSize){
+                        break;
+                    }
+                }
+                Thread.sleep(4000);
                 duration -= 5000;
             }
+            leave();
             LoadResult.totalRounds.incrementAndGet();
             counter.countDown();
         }catch (Exception ex){
             ex.printStackTrace();
+            counter.countDown();
         }
     }
 
@@ -158,6 +207,7 @@ public class Player extends HttpCaller implements Runnable{
             LoadResult.totalSuccessPlay.incrementAndGet();
             return;
         }
+        leave();
         LoadResult.totalFailurePlay.incrementAndGet();
         throw new RuntimeException("failed");
     }

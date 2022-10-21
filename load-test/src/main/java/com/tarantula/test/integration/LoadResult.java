@@ -26,6 +26,7 @@ public class LoadResult {
 
     static AtomicInteger totalRounds = new AtomicInteger(0);
 
+
     static int batch;
     static int poolSize;
 
@@ -35,19 +36,28 @@ public class LoadResult {
     static LocalDateTime startTime;
 
 
-
     public static void print(){
         try{
             LocalDateTime localDateTime = LocalDateTime.now();
             FileOutputStream fos = new FileOutputStream(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+".txt");
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+            bw.write("Server Host ["+host+"]\n");
+            bw.write("Batch Size ["+batch+"]\n");
+            bw.write("Pool Size ["+poolSize+"]\n");
+            bw.write("Player Prefix ["+playerPrefix+"]\n");
             bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
             bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
             bw.write("Total Rounds ["+totalRounds.get()+"]\n");
-            bw.write("Total Success Presence ["+totalSuccessJoin.get()+"]\n");
+            bw.write("Total Failure Other ["+totalFailureOther.get()+"]\n");
+            bw.write("Total Success Presence ["+totalSuccessPresence.get()+"]\n");
             bw.write("Total Failure Presence ["+totalFailurePresence.get()+"]\n");
+            bw.write("Total Success Join ["+totalSuccessJoin.get()+"]\n");
+            bw.write("Total Failure Join ["+totalFailureJoin.get()+"]\n");
+            bw.write("Total Success Play ["+totalSuccessPlay.get()+"]\n");
+            bw.write("Total Failure Play ["+totalFailurePlay.get()+"]\n");
+            bw.write("Total Bytes UDP Sent ["+totalUDPBytesSent.get()+"]\n");
+            bw.write("Total Bytes UDP Received["+totalUDPBytesReceived.get()+"]\n");
             bw.close();
-
         }catch (Exception ex){
             ex.printStackTrace();
         }

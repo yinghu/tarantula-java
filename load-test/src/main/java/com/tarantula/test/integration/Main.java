@@ -16,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception{
         LoadResult.startTime = LocalDateTime.now();
-        Player player = new Player("https://gameclustering.com",new CountDownLatch(1),UUID.randomUUID().toString(),1);
+        Player player = new Player("https://gameclustering.com",new CountDownLatch(1),"test_1000",1000);
         player.run();
         LoadResult.print();
         //runSimulation(args);
