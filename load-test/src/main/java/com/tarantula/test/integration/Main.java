@@ -14,7 +14,7 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        Player caller = new Player("http://192.168.1.16:8090",new CountDownLatch(1),UUID.randomUUID().toString(),1);
+        Player caller = new Player("https://gameclustering.com",new CountDownLatch(1),UUID.randomUUID().toString(),1);
         caller._init();
         caller.run();
         //runSimulation(args);

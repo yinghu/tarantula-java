@@ -2,9 +2,14 @@ package com.tarantula.test.integration;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
+import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.protocol.Messenger;
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 
+import javax.crypto.Cipher;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -22,8 +27,8 @@ public class Player extends HttpCaller implements Runnable{
     private String token;
     private String ticket;
 
-    private byte[] serverKey;
-
+    //private byte[] serverKey;
+    private Cipher encryper;
     private DatagramSocket udp;
     //private OnPayload done;
     //private boolean[] continuing = {true};
@@ -89,7 +94,9 @@ public class Player extends HttpCaller implements Runnable{
                 resp = super.get("service/action",headers);
                 if(isContinue(resp,json->{
                     JsonObject _channel = json.get("_pushChannel").getAsJsonObject();
-                    try{onPlay(_channel);}catch (Exception exx){}
+                    try{onPlay(_channel);}catch (Exception exx){
+                        exx.printStackTrace();
+                    }
                 }));
             }
 
@@ -104,7 +111,8 @@ public class Player extends HttpCaller implements Runnable{
 
 
     private void onPlay(JsonObject json) throws Exception{
-        this.serverKey = Base64.getDecoder().decode(json.get("ServerKey").getAsString());
+        byte[] serverKey = Base64.getDecoder().decode(json.get("ServerKey").getAsString());
+        this.encryper = CipherUtil.encrypt(serverKey);
         udp = new DatagramSocket();
         int channelId = json.get("ChannelId").getAsInt();
         int sessionId = json.get("SessionId").getAsInt();
@@ -113,6 +121,40 @@ public class Player extends HttpCaller implements Runnable{
         int port = _conn.get("Port").getAsInt();
         System.out.println(json);
         InetAddress addr = InetAddress.getByName(host);
-        udp.connect(addr,port);
+        udp.connect(new InetSocketAddress(addr,port));
+        MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
+        header.channelId = channelId;
+        header.sessionId = sessionId;
+        header.commandId = Messenger.JOIN;
+        header.encrypted = true;
+        MessageBuffer messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(header);
+        messageBuffer.writeInt(sessionId);
+        messageBuffer.writeUTF8(token);
+        messageBuffer.writeUTF8(ticket);
+        messageBuffer.flip();
+        messageBuffer.readHeader();
+        byte[] payload = this.encryper.doFinal(messageBuffer.readPayload());
+        messageBuffer.reset();
+        messageBuffer.writeHeader(header);
+        messageBuffer.writePayload(payload);
+        messageBuffer.flip();
+        byte[] out = messageBuffer.toArray();
+        //messageBuffer.reset();
+        //MessageBuffer moo = new MessageBuffer();
+
+        //System.out.println("Connected->"+udp.isConnected());
+        udp.send(new DatagramPacket(out,0,out.length));
+        //System.out.println("UDP-send-"+out.length);
+        DatagramPacket rec = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+        udp.receive(rec);
+        System.out.println("UDP-received");
+        messageBuffer.reset(rec.getData());
+        messageBuffer.flip();
+        MessageBuffer.MessageHeader h = messageBuffer.readHeader();
+        System.out.println(messageBuffer.readInt());
+        System.out.println(messageBuffer.readLong());
+        System.out.println(h.commandId);
+
     }
 }

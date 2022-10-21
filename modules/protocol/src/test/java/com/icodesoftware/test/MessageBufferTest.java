@@ -1,11 +1,15 @@
 package com.icodesoftware.test;
 
 import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.util.CipherUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.crypto.Cipher;
 import java.lang.reflect.AnnotatedArrayType;
+import java.security.Key;
+import java.security.SecureRandom;
 
 
 public class MessageBufferTest {
@@ -147,5 +151,42 @@ public class MessageBufferTest {
         Assert.assertEquals(false,_h.ack);
         Assert.assertEquals(false,_h.encrypted);
         Assert.assertEquals(false,_h.broadcasting);
+    }
+
+    @Test(groups = { "message buffer" })
+    public void messageHeaderTestCipher(){
+        try {
+            byte[] key = new byte[16];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(key);
+            Cipher en = CipherUtil.encrypt(key);
+            Cipher de = CipherUtil.decrypt(key);
+            MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+            messageHeader.encrypted = true;
+            messageHeader.ack = false;
+            messageHeader.broadcasting = false;
+            MessageBuffer messageBuffer = new MessageBuffer();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writeUTF8("test1");
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            byte[] out = en.doFinal(messageBuffer.readPayload());
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(out);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            byte[] ex = de.doFinal(messageBuffer.readPayload());
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(ex);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            String op = messageBuffer.readUTF8();
+            Assert.assertEquals("test1",op);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            Assert.assertEquals(1,2);
+        }
     }
 }
