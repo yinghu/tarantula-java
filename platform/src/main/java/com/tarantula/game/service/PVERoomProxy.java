@@ -45,6 +45,7 @@ public class PVERoomProxy extends RoomProxyHeader {
     public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
+        //stub.pushChannel.timeout();
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
             gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());

@@ -1,9 +1,10 @@
 package com.tarantula.test.integration;
 
 import com.icodesoftware.util.TarantulaThreadFactory;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Updated by yinghu lu on 8/31/2019.
@@ -14,42 +15,43 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception{
-        Player caller = new Player("http://192.168.1.16:8090",new CountDownLatch(1),UUID.randomUUID().toString(),1);
-        caller._init();
-        caller.run();
+        LoadResult.startTime = LocalDateTime.now();
+        Player player = new Player("https://gameclustering.com",new CountDownLatch(1),"test_1000",1000);
+        player.run();
+        LoadResult.print();
         //runSimulation(args);
     }
     private static void runSimulation(String[] args) throws Exception{
-        long st = System.currentTimeMillis();
-        AtomicInteger round = new AtomicInteger(0);
+        LoadResult.startTime = LocalDateTime.now();
         int batch;
-        int psize;
+        int poolSize;
         String host;
         String prefix =null;
-        boolean secured =false;
+
         try{
             batch = Integer.parseInt(args[0]);
-            psize = Integer.parseInt(args[1]);
+            poolSize = Integer.parseInt(args[1]);
             host = args[2];
             prefix = args[3];
         }catch (Exception ex){
-            //ex.printStackTrace();
             batch = 10;
-            psize = 100;
+            poolSize = 10;
             host = null;
-            ///prefix = "test";
+            //prefix = "test";
         }
         if(host==null){
-            //host = "10.0.0.29:8090";
-            host = "192.168.1.16:8090";
-            secured = false;
+            host = "https://gameclustering.com";
         }
-        System.out.println("Load test on ["+host+"] with batch/pool/prefix size ["+batch+"/"+psize+"/"+prefix+"]");
-        pool = Executors.newFixedThreadPool(psize,new TarantulaThreadFactory("test-load"));
+        LoadResult.batch = batch;
+        LoadResult.poolSize = poolSize;
+        LoadResult.host = host;
+        LoadResult.playerPrefix = prefix!=null?prefix:"random";
+
+        pool = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("test-load"));
         int ix = 0;
         for(int i = 0;i<batch;i++){
-            CountDownLatch waiting = new CountDownLatch(psize);
-            for(int x=0;x<psize;x++){
+            CountDownLatch waiting = new CountDownLatch(poolSize);
+            for(int x=0;x<poolSize;x++){
                 String uname = prefix!=null?(prefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
                 Player simulator = new Player(host,waiting,uname,x);
@@ -58,10 +60,7 @@ public class Main {
             }
             waiting.await();
         }
-        System.out.println("Total rounds ["+round.get()+"] timed ["+(System.currentTimeMillis()-st)+"]");
         pool.shutdown();
+        LoadResult.print();
     }
-
-
-
 }
