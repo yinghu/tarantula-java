@@ -169,7 +169,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         //update app desc via typeId
         boolean[] suc ={false};
         DataStore dataStore = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),descriptor.typeId());
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),descriptor.typeId());
         if(!dataStore.load(lobbyTypeIdIndex)){
             if(descriptor.index()!=null){
                 IndexSet indexSet = new IndexSet();
@@ -297,7 +297,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return response;
         }
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),descriptor.typeId());
         if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
             response.successful(false);
             response.message("module already existed");
@@ -330,7 +330,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public boolean createApplication(Descriptor descriptor, String postSetup,String configName,boolean launching){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),descriptor.typeId());
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),descriptor.typeId());
         if(!ds.load(query)){
             return false;
         }
@@ -494,7 +494,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return response;
         }
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),onView.owner());
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),onView.owner());
         if(!ds.load(query)){
             return new ResponseHeader("create/update view","cannot create view",false);
         }
@@ -638,7 +638,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
                     gameCluster.dataLobby  = _lobby;
                 }
-                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.bucketId(),configuration.descriptor.typeId());
+                LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),configuration.descriptor.typeId());
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
@@ -712,7 +712,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public Lobby lobby(String typeId){
         DataStore mds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.bucketId(),typeId);
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),typeId);
         if(!mds.load(lobbyTypeIdIndex)) return null;
         LobbyDescriptor lb = new LobbyDescriptor();
         lb.distributionKey(lobbyTypeIdIndex.index());
@@ -829,7 +829,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     boolean enableLobby(String typeId){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),typeId);
         if(!ds.load(query)){
             return false;
         }
@@ -845,7 +845,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     boolean disableLobby(String typeId){
         DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.bucketId(),typeId);
+        LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),typeId);
         if(!ds.load(query)){
             return false;
         }

@@ -234,7 +234,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 	public OnLobby configure(LobbyConfiguration conf) throws Exception{
 		DefaultLobby lb = this.setLobby(conf.descriptor);
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.bucketId(),lb.descriptor().typeId());
+        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.node.deploymentId(),lb.descriptor().typeId());
         if(!masterDataStore().load(lobbyTypeIdIndex)) throw new RuntimeException("no lobby config data");
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode==DeployCode.USER_GAME_CLUSTER){
@@ -302,7 +302,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->_setOnLobby(c,listener));
         IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(this.bucketId());
+        indexSet.distributionKey(this.node.deploymentId());
         indexSet.label(Account.GameClusterLabel);
         indexSet.keySet.add(gameCluster.distributionKey());
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
@@ -354,7 +354,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }catch (Exception ex){ex.printStackTrace();}
         });
         IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(this.bucketId());
+        indexSet.distributionKey(this.node.deploymentId
+                ());
         indexSet.label(Account.ModuleLabel);
         indexSet.keySet.add(publishingId);
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
@@ -506,6 +507,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",0);
         node.deploymentId = did.distributionKey();
         if(backupEnabled){//override backup deployment id from backup cluster.
+            log.warn("Overriding local deployment id with remote backup deployment id");
             node.deploymentId = new DeploymentIdFetcher(this.backupUrl).deploymentId(this.backupAccessKey);
         }
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
@@ -587,9 +589,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String bucket(){
  	    return this.dataBucketGroup;
     }
-    public String bucketId(){
- 	    return node.bucketId;
-    }
+    //public String bucketId(){
+ 	    //return node.bucketId;
+    //}
     public String nodeId(){
         return node.nodeId;
     }
