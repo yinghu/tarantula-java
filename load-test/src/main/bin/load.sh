@@ -10,6 +10,6 @@ done < lib.txt
 rm -f lib.txt
 JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx1024m -server"
 echo "16384 65535" > /proc/sys/net/ipv4/ip_local_port_range
-java $JAVA_OPTS -classpath $CP com.tarantula.test.integration.Main $1 $2 $3 $4
+java $JAVA_OPTS -classpath $CP com.tarantula.test.integration.Main
 
 

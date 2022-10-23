@@ -32,6 +32,9 @@ public class LoadResult {
 
     static String host;
 
+    static boolean udpTested;
+    static int udpReceiveTimeout;
+    static long udpTestDuration;
     static String playerPrefix;
     static LocalDateTime startTime;
 
@@ -45,6 +48,9 @@ public class LoadResult {
             bw.write("Batch Size ["+batch+"]\n");
             bw.write("Pool Size ["+poolSize+"]\n");
             bw.write("Player Prefix ["+playerPrefix+"]\n");
+            bw.write("Test UDP Enabled ["+udpTested+"]\n");
+            bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
+            bw.write("Test UDP Duration ["+udpTestDuration+"]\n");
             bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
             bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
             bw.write("Total Rounds ["+totalRounds.get()+"]\n");

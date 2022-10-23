@@ -38,27 +38,31 @@ public class Player extends HttpCaller implements Runnable{
 
     private boolean joined;
 
+    private boolean udpTested;
+
     static short STATISTICS_QUERY = 1;
     static short STATISTICS_COMMIT = 2;
-    public Player(String host, CountDownLatch counter, String userName,int sequence){
+    public Player(String host, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,long duration){
         super(host);
         this.counter = counter;
         this.userName = userName;
         this.deviceName = "test-"+sequence;
         this.clientId = UUID.randomUUID().toString();
+        this.udpTested = udpTested;
+        this.udpReceiveTimeout = udpReceiveTimeout;
+        this.duration = duration;
     }
 
     private boolean onPresence(String payload){
+        System.out.println(payload);
         JsonObject json = JsonUtil.parse(payload);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
-        tag = json.get("Tag").getAsString();
         token = json.get("Token").getAsString();
         ticket = json.get("Ticket").getAsString();
         return true;
     }
     private void join() {
-        if(joined) return;
         try{
             _init();
             String[] headers = new String[]{
@@ -85,7 +89,6 @@ public class Player extends HttpCaller implements Runnable{
             };
             resp = super.get("service/action",headers);
             onJoin(resp);
-            joined = true;
         }catch (Exception ex){
             ex.printStackTrace();
             String error = ex.getMessage();
@@ -99,6 +102,7 @@ public class Player extends HttpCaller implements Runnable{
     }
 
     private void leave() throws Exception{
+        if(!joined) return;
         String[] headers = new String[]{
                 Session.TARANTULA_TAG,tag,
                 Session.TARANTULA_ACTION,"onLeave",
@@ -110,41 +114,43 @@ public class Player extends HttpCaller implements Runnable{
     public void run(){
         join();
         try{
-            while (duration>0){
-                messageHeader.commandId = Messenger.REQUEST;
-                messageHeader.encrypted = false;
-                messageBuffer.reset();
-                messageBuffer.writeHeader(messageHeader);
-                messageBuffer.writeShort(STATISTICS_COMMIT);
-                messageBuffer.writeUTF8("");
-                messageBuffer.writeDouble(1);
-                messageBuffer.flip();
-                byte[] outbound = messageBuffer.toArray();
-                udp.send(new DatagramPacket(outbound,outbound.length));
-                LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                Thread.sleep(1000);
-                messageHeader.commandId = Messenger.REQUEST;
-                messageBuffer.reset();
-                messageBuffer.writeHeader(messageHeader);
-                messageBuffer.writeShort(STATISTICS_QUERY);
-                messageBuffer.flip();
-                outbound = messageBuffer.toArray();
-                udp.send(new DatagramPacket(outbound,outbound.length));
-                LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                while (true){
-                    DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
-                    udp.receive(d);
-                    byte[] inbound = d.getData();
-                    messageBuffer.reset(inbound);
+            if(joined && udpTested){
+                while (duration>0){
+                    messageHeader.commandId = Messenger.REQUEST;
+                    messageHeader.encrypted = false;
+                    messageBuffer.reset();
+                    messageBuffer.writeHeader(messageHeader);
+                    messageBuffer.writeShort(STATISTICS_COMMIT);
+                    messageBuffer.writeUTF8("");
+                    messageBuffer.writeDouble(1);
                     messageBuffer.flip();
-                    MessageBuffer.MessageHeader h = messageBuffer.readHeader();
-                    LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
-                    if(h.batch == h.batchSize){
-                        break;
+                    byte[] outbound = messageBuffer.toArray();
+                    udp.send(new DatagramPacket(outbound,outbound.length));
+                    LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                    Thread.sleep(1000);
+                    messageHeader.commandId = Messenger.REQUEST;
+                    messageBuffer.reset();
+                    messageBuffer.writeHeader(messageHeader);
+                    messageBuffer.writeShort(STATISTICS_QUERY);
+                    messageBuffer.flip();
+                    outbound = messageBuffer.toArray();
+                    udp.send(new DatagramPacket(outbound,outbound.length));
+                    LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                    while (true){
+                        DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+                        udp.receive(d);
+                        byte[] inbound = d.getData();
+                        messageBuffer.reset(inbound);
+                        messageBuffer.flip();
+                        MessageBuffer.MessageHeader h = messageBuffer.readHeader();
+                        LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
+                        if(h.batch == h.batchSize){
+                            break;
+                        }
                     }
+                    Thread.sleep(4000);
+                    duration -= 5000;
                 }
-                Thread.sleep(4000);
-                duration -= 5000;
             }
             leave();
             LoadResult.totalRounds.incrementAndGet();
@@ -163,6 +169,9 @@ public class Player extends HttpCaller implements Runnable{
             throw new RuntimeException("failed");
         }
         LoadResult.totalSuccessJoin.incrementAndGet();
+        joined = true;
+        tag = joinPayload.get("Tag").getAsString();
+        if(!udpTested) return;
         JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
         byte[] serverKey = Base64.getDecoder().decode(channel.get("ServerKey").getAsString());
         this.encryper = CipherUtil.encrypt(serverKey);
