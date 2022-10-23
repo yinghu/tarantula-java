@@ -73,12 +73,29 @@ public class Player extends HttpCaller implements Runnable{
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("login",userName);
             jsonObject.addProperty("password","password");
+            long requestStart = System.currentTimeMillis();
             String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            LoadResult.totalHttpRequestCount.incrementAndGet();
             if(!onPresence(resp)) {
-                LoadResult.totalFailurePresence.incrementAndGet();
-                throw new RuntimeException("failed");
+                LoadResult.totalFailureRegister.incrementAndGet();
+                headers = new String[]{
+                        Session.TARANTULA_TAG,"index/user",
+                        Session.TARANTULA_ACTION,"onLogin",
+                        Session.TARANTULA_MAGIC_KEY,userName
+                };
+                requestStart = System.currentTimeMillis();
+                resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+                LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+                LoadResult.totalHttpRequestCount.incrementAndGet();
+                if(!onPresence(resp)){
+                    LoadResult.totalFailureLogin.incrementAndGet();
+                    throw new RuntimeException("failed");
+                }
+                LoadResult.totalSuccessLogin.incrementAndGet();
+            }else{
+                LoadResult.totalSuccessRegister.incrementAndGet();
             }
-            LoadResult.totalSuccessPresence.incrementAndGet();
             headers = new String[]{
                     Session.TARANTULA_TAG,"robotquest/lobby",
                     Session.TARANTULA_ACTION,"onPlay",
@@ -87,7 +104,10 @@ public class Player extends HttpCaller implements Runnable{
                     Session.TARANTULA_CLIENT_ID,clientId,
                     Session.TARANTULA_TOURNAMENT_ID,"n/a"
             };
+            requestStart = System.currentTimeMillis();
             resp = super.get("service/action",headers);
+            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            LoadResult.totalHttpRequestCount.incrementAndGet();
             onJoin(resp);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -108,7 +128,18 @@ public class Player extends HttpCaller implements Runnable{
                 Session.TARANTULA_ACTION,"onLeave",
                 Session.TARANTULA_TOKEN,token
         };
-        super.get("service/action",headers);
+        long requestStart = System.currentTimeMillis();
+        String resp = super.get("service/action",headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(suc){
+            LoadResult.totalSuccessLeave.incrementAndGet();
+        }
+        else {
+            LoadResult.totalFailureLeave.incrementAndGet();
+        }
     }
 
     public void run(){

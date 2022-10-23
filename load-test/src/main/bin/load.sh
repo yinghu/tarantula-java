@@ -8,7 +8,7 @@ V=`echo "${line}"`
 CP=${CP}:$V
 done < lib.txt
 rm -f lib.txt
-JAVA_OPTS="$JAVA_OPTS -Xms512m -Xmx1024m -server"
+JAVA_OPTS="$JAVA_OPTS -Xms2048m -Xmx4096m -XX:MaxDirectMemorySize=4096M -server"
 echo "16384 65535" > /proc/sys/net/ipv4/ip_local_port_range
 java $JAVA_OPTS -classpath $CP com.tarantula.test.integration.Main
 

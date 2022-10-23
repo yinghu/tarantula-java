@@ -22,11 +22,12 @@ public class Main {
         String host = properties.getProperty("host");
         int batch = Integer.parseInt(properties.getProperty("batch"));
         int poolSize = Integer.parseInt(properties.getProperty("pool.size"));
+        boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
         int udpReceiveTimeout = Integer.parseInt(properties.getProperty("udp.receive.timeout"));
         long udpTestDuration = Long.parseLong(properties.getProperty("udp.test.duration"));
-        LoadResult.playerPrefix = playerPrefix;
+        LoadResult.playerPrefix = usePlayerPrefix?playerPrefix:"random";
         LoadResult.host = host;
         LoadResult.poolSize = poolSize;
         LoadResult.batch = batch;
@@ -34,10 +35,7 @@ public class Main {
         LoadResult.udpTested = udpTested;
         LoadResult.udpReceiveTimeout = udpReceiveTimeout;
         LoadResult.udpTestDuration = udpTestDuration;
-        //Player player = new Player("https://gameclustering.com",new CountDownLatch(1),"test_1000",1000);
-        //player.run();
-        //LoadResult.print();
-        runSimulation(host,playerPrefix,batch,poolSize,udpTested,udpReceiveTimeout,udpTestDuration);
+        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestDuration);
     }
     private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,long duration) throws Exception{
         pool = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("test-load"));
