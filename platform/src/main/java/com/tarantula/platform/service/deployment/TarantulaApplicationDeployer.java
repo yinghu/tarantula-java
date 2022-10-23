@@ -25,7 +25,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	public void start() throws Exception {
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
-		String bucketId = this.context.bucketId();
+		String bucketId = this.context.node().bucketId();
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
@@ -45,8 +45,9 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
+		String deploymentId = this.context.node().deploymentId();
 		IndexSet indexSet = new IndexSet();
-		indexSet.distributionKey(this.context.bucketId());
+		indexSet.distributionKey(deploymentId);
 		indexSet.label(Account.GameClusterLabel);
 		if(datastore.load(indexSet)){
 			indexSet.keySet().forEach((gc)->{
@@ -54,7 +55,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			});
 		}
 		IndexSet moduleIndex = new IndexSet();
-		moduleIndex.distributionKey(this.context.bucketId());
+		moduleIndex.distributionKey(deploymentId);
 		moduleIndex.label(Account.ModuleLabel);
 		if(datastore.load(moduleIndex)){
 			moduleIndex.keySet().forEach((pc)->{
