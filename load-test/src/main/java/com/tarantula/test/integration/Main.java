@@ -1,5 +1,6 @@
 package com.tarantula.test.integration;
 
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
 import java.io.FileInputStream;
@@ -38,6 +39,8 @@ public class Main {
         runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestDuration);
     }
     private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,long duration) throws Exception{
+        HttpCaller httpCaller = new HttpCaller(host);
+        httpCaller._init();
         pool = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("test-load"));
         int ix = 0;
         for(int i = 0;i<batch;i++){
@@ -45,7 +48,7 @@ public class Main {
             for(int x=0;x<poolSize;x++){
                 String uname = playerPrefix!=null?(playerPrefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Player simulator = new Player(host,waiting,uname,x,udpTested,timeout,duration);
+                Player simulator = new Player(httpCaller,waiting,uname,x,udpTested,timeout,duration);
                 pool.execute(simulator);
                 Thread.sleep(4);
             }

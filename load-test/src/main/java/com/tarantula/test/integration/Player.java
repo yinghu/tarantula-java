@@ -17,7 +17,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-public class Player extends HttpCaller implements Runnable{
+public class Player implements Runnable{
 
     private CountDownLatch counter;
     private String userName;
@@ -42,8 +42,10 @@ public class Player extends HttpCaller implements Runnable{
 
     static short STATISTICS_QUERY = 1;
     static short STATISTICS_COMMIT = 2;
-    public Player(String host, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,long duration){
-        super(host);
+
+    private HttpCaller httpCaller;
+    public Player(HttpCaller httpCaller, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,long duration){
+        this.httpCaller = httpCaller;
         this.counter = counter;
         this.userName = userName;
         this.deviceName = "test-"+sequence;
@@ -54,7 +56,6 @@ public class Player extends HttpCaller implements Runnable{
     }
 
     private boolean onPresence(String payload){
-        System.out.println(payload);
         JsonObject json = JsonUtil.parse(payload);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
@@ -64,7 +65,6 @@ public class Player extends HttpCaller implements Runnable{
     }
     private void join() {
         try{
-            _init();
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"index/user",
                     Session.TARANTULA_ACTION,"onRegister",
@@ -74,7 +74,7 @@ public class Player extends HttpCaller implements Runnable{
             jsonObject.addProperty("login",userName);
             jsonObject.addProperty("password","password");
             long requestStart = System.currentTimeMillis();
-            String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+            String resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
             if(!onPresence(resp)) {
@@ -85,7 +85,7 @@ public class Player extends HttpCaller implements Runnable{
                         Session.TARANTULA_MAGIC_KEY,userName
                 };
                 requestStart = System.currentTimeMillis();
-                resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+                resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
                 LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
                 LoadResult.totalHttpRequestCount.incrementAndGet();
                 if(!onPresence(resp)){
@@ -105,14 +105,14 @@ public class Player extends HttpCaller implements Runnable{
                     Session.TARANTULA_TOURNAMENT_ID,"n/a"
             };
             requestStart = System.currentTimeMillis();
-            resp = super.get("service/action",headers);
+            resp = httpCaller.get("service/action",headers);
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
             onJoin(resp);
         }catch (Exception ex){
             ex.printStackTrace();
             String error = ex.getMessage();
-            if(!error.equals("failed")){
+            if(error==null || !error.equals("failed")){
                 LoadResult.totalFailureOther.incrementAndGet();
             }
             duration = 0;
@@ -129,7 +129,7 @@ public class Player extends HttpCaller implements Runnable{
                 Session.TARANTULA_TOKEN,token
         };
         long requestStart = System.currentTimeMillis();
-        String resp = super.get("service/action",headers);
+        String resp = httpCaller.get("service/action",headers);
         LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
         LoadResult.totalHttpRequestCount.incrementAndGet();
         JsonObject json = JsonUtil.parse(resp);
@@ -158,6 +158,7 @@ public class Player extends HttpCaller implements Runnable{
                     byte[] outbound = messageBuffer.toArray();
                     udp.send(new DatagramPacket(outbound,outbound.length));
                     LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                    LoadResult.totalSuccessUDPSent.incrementAndGet();
                     Thread.sleep(1000);
                     messageHeader.commandId = Messenger.REQUEST;
                     messageBuffer.reset();
@@ -167,9 +168,15 @@ public class Player extends HttpCaller implements Runnable{
                     outbound = messageBuffer.toArray();
                     udp.send(new DatagramPacket(outbound,outbound.length));
                     LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                    while (true){
+                    LoadResult.totalSuccessUDPReceived.incrementAndGet();
+                    for(int i=0; i<5; i++){
                         DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
-                        udp.receive(d);
+                        try{
+                            udp.receive(d);
+                        }catch (Exception udpEx){
+                            LoadResult.totalUDPReceiveTimeout.incrementAndGet();
+                        }
+                        LoadResult.totalSuccessUDPReceived.incrementAndGet();
                         byte[] inbound = d.getData();
                         messageBuffer.reset(inbound);
                         messageBuffer.flip();
@@ -235,8 +242,10 @@ public class Player extends HttpCaller implements Runnable{
         byte[] outbound = messageBuffer.toArray();
         udp.send(new DatagramPacket(outbound,0,outbound.length));
         LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+        LoadResult.totalSuccessUDPSent.incrementAndGet();
         DatagramPacket rec = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
         udp.receive(rec);
+        LoadResult.totalSuccessUDPReceived.incrementAndGet();
         byte[] inbound = rec.getData();
         LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
         messageBuffer.reset(inbound);
