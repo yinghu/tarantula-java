@@ -245,7 +245,14 @@ public class Player implements Runnable{
         LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
         LoadResult.totalSuccessUDPSent.incrementAndGet();
         DatagramPacket rec = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
-        udp.receive(rec);
+        try {
+            udp.receive(rec);
+        }catch (Exception rex){
+            LoadResult.totalUDPReceiveTimeout.incrementAndGet();
+            LoadResult.totalFailurePlay.incrementAndGet();
+            leave();
+            throw new RuntimeException("failed");
+        }
         LoadResult.totalSuccessUDPReceived.incrementAndGet();
         byte[] inbound = rec.getData();
         LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
