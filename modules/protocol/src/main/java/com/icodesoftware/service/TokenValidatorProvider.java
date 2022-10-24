@@ -12,9 +12,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
 
     TokenValidator tokenValidator();
 
-    String hashJoinTicket(String roomId,String systemId);
-    boolean validHash(String roomId,String systemId,String hash);
-
     byte[] clusterKey(String clusterNameSuffix);
     boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost);
     void disablePresenceService(String clusterNameSuffix);

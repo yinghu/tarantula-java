@@ -210,13 +210,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         ck.disabled(true);
         deployDataStore.update(ck);
     }
-    public String hashJoinTicket(String roomId,String systemId){
-        return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId);
-    }
-    public boolean validHash(String roomId,String systemId,String hash){
-        return SystemUtil.hashPassword(messageDigest(),roomId+"_"+systemId).equals(hash);
-    }
-
     public <T extends OnAccess> T validateGameClusterAccessKey(String accessKey){
         String[] sp = accessKey.split("-");
         AccessKey akey = new AccessKey();
