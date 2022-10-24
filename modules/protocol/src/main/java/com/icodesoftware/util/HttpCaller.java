@@ -15,7 +15,7 @@ import java.time.Duration;
 
 public class HttpCaller {
 
-    private static int TIME_OUT = 5;
+    private static int TIME_OUT = 10;
     private static String ACCEPT = "Accept";
     private static String ACCEPT_JSON = "application/json";
     private static String CONTENT_TYPE = "Content-type";

@@ -152,14 +152,20 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public byte[] encrypt(byte[] data){
         try{
-            return encrypt.doFinal(data);
+            synchronized (encrypt){
+                return encrypt.doFinal(data);
+            }
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
     }
     public byte[] encrypt(Presence presence,byte[] data){
         try{
-            return fMap.get(presence.index()).encrypt.doFinal(data);
+            Cipher cipher = fMap.get(presence.index()).encrypt;
+            synchronized (cipher){
+                return cipher.doFinal(data);
+            }
+            //return fMap.get(presence.index()).encrypt.doFinal(data);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
