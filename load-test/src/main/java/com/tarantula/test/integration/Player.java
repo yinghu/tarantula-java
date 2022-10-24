@@ -34,6 +34,7 @@ public class Player implements Runnable{
     private MessageBuffer.MessageHeader messageHeader;
 
     private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
+
     private long duration = 10000; //total running time
 
     private boolean joined;
@@ -186,8 +187,8 @@ public class Player implements Runnable{
                             break;
                         }
                     }
-                    Thread.sleep(4000);
-                    duration -= 5000;
+                    Thread.sleep(1000);
+                    duration -= 2000;
                 }
             }
             leave();

@@ -50,7 +50,7 @@ public class Main {
                 ix++;
                 Player simulator = new Player(httpCaller,waiting,uname,x,udpTested,timeout,duration);
                 pool.execute(simulator);
-                Thread.sleep(4);
+                Thread.sleep(5);
             }
             waiting.await();
         }
