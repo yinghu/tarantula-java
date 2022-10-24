@@ -69,11 +69,7 @@ public class SystemValidator{
             String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
             byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
             byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encrypt(ptx,data);
-            boolean suc = SystemUtil.toHexString(mark).equals(waterMark);
-            if(!suc) {
-                System.out.println(waterMark+"<>"+SystemUtil.toHexString(mark)+"<>"+ptx.label()+"<>"+session.stub());
-            }
-            return suc;
+            return SystemUtil.toHexString(mark).equals(waterMark);
         }
 
         @Override
