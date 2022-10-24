@@ -206,9 +206,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-    //public ApplicationProvider applicationManager(String applicationId){
-       //return this.availableApplicationManagers.get(applicationId);
-    //}
+
 
     public void _initMirrorClusterBackup(){
  	    this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
@@ -589,9 +587,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public TarantulaLogger logger(String target){
         return JDKLogger.getLogger(target);
     }
-    public String bucket(){
- 	    return this.dataBucketGroup;
-    }
+
 
     public ClusterProvider.Node node(){
          return this.node;

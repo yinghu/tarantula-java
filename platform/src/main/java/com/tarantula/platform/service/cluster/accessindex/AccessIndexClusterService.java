@@ -37,7 +37,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
-        this.bucket = this.tarantulaContext.bucket();
+        this.bucket = this.tarantulaContext.dataBucketGroup;
         this.nodeEngine = nodeEngine;
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){

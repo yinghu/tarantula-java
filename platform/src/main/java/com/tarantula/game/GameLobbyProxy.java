@@ -29,7 +29,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(usingDefault) return defaultLobby.join(session,rating);
         //using configurable lobby item
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        this.context.log("JOIN->"+stubKey.asString(),OnLog.WARN);
+        //this.context.log("JOIN->"+stubKey.asString(),OnLog.WARN);
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
             stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
@@ -52,7 +52,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             return;
         }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        this.context.log("LEAVE->"+stubKey.asString(),OnLog.WARN);
+        //this.context.log("LEAVE->"+stubKey.asString(),OnLog.WARN);
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null) return;
         stub.zone.leave(stub);
