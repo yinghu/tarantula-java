@@ -27,7 +27,7 @@ public class Main {
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
         int udpReceiveTimeout = Integer.parseInt(properties.getProperty("udp.receive.timeout"));
-        long udpTestDuration = Long.parseLong(properties.getProperty("udp.test.duration"));
+        int udpTestRounds = Integer.parseInt(properties.getProperty("udp.test.rounds"));
         LoadResult.playerPrefix = usePlayerPrefix?playerPrefix:"random";
         LoadResult.host = host;
         LoadResult.poolSize = poolSize;
@@ -35,10 +35,10 @@ public class Main {
         LoadResult.startTime = LocalDateTime.now();
         LoadResult.udpTested = udpTested;
         LoadResult.udpReceiveTimeout = udpReceiveTimeout;
-        LoadResult.udpTestDuration = udpTestDuration;
-        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestDuration);
+        LoadResult.udpTestRounds = udpTestRounds;
+        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds);
     }
-    private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,long duration) throws Exception{
+    private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration) throws Exception{
         HttpCaller httpCaller = new HttpCaller(host);
         httpCaller._init();
         pool = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("test-load"));

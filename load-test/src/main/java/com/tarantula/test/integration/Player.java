@@ -35,7 +35,7 @@ public class Player implements Runnable{
 
     private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
 
-    private long duration = 10000; //total running time
+    private int udpRounds = 10; //total udp rounds
 
     private boolean joined;
 
@@ -45,7 +45,7 @@ public class Player implements Runnable{
     static short STATISTICS_COMMIT = 2;
 
     private HttpCaller httpCaller;
-    public Player(HttpCaller httpCaller, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,long duration){
+    public Player(HttpCaller httpCaller, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,int udpRounds){
         this.httpCaller = httpCaller;
         this.counter = counter;
         this.userName = userName;
@@ -53,7 +53,7 @@ public class Player implements Runnable{
         this.clientId = UUID.randomUUID().toString();
         this.udpTested = udpTested;
         this.udpReceiveTimeout = udpReceiveTimeout;
-        this.duration = duration;
+        this.udpRounds = udpRounds;
     }
 
     private boolean onPresence(String payload){
@@ -116,7 +116,7 @@ public class Player implements Runnable{
             if(error==null || !error.equals("failed")){
                 LoadResult.totalFailureOther.incrementAndGet();
             }
-            duration = 0;
+            udpRounds = 0;
             counter.countDown();
             joined = false;
         }
@@ -147,20 +147,24 @@ public class Player implements Runnable{
         join();
         try{
             if(joined && udpTested){
-                while (duration>0){
+                while (udpRounds>0){
                     messageHeader.commandId = Messenger.REQUEST;
                     messageHeader.encrypted = false;
                     messageBuffer.reset();
                     messageBuffer.writeHeader(messageHeader);
                     messageBuffer.writeShort(STATISTICS_COMMIT);
-                    messageBuffer.writeUTF8("");
+                    messageBuffer.writeUTF8("kills");
                     messageBuffer.writeDouble(1);
                     messageBuffer.flip();
                     byte[] outbound = messageBuffer.toArray();
-                    udp.send(new DatagramPacket(outbound,outbound.length));
-                    LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                    LoadResult.totalSuccessUDPSent.incrementAndGet();
-                    Thread.sleep(1000);
+                    for (int i=0;i<10;i++){
+                        long udpStart = System.currentTimeMillis();
+                        udp.send(new DatagramPacket(outbound,outbound.length));
+                        LoadResult.totalUDPSentTime.addAndGet(System.currentTimeMillis()-udpStart);
+                        LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+                        LoadResult.totalSuccessUDPSent.incrementAndGet();
+                        Thread.sleep(1);
+                    }
                     messageHeader.commandId = Messenger.REQUEST;
                     messageBuffer.reset();
                     messageBuffer.writeHeader(messageHeader);
@@ -172,12 +176,14 @@ public class Player implements Runnable{
                     LoadResult.totalSuccessUDPReceived.incrementAndGet();
                     for(int i=0; i<5; i++){
                         DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+                        long udpStart = System.currentTimeMillis();
                         try{
                             udp.receive(d);
                         }catch (Exception udpEx){
                             LoadResult.totalUDPReceiveTimeout.incrementAndGet();
                         }
                         LoadResult.totalSuccessUDPReceived.incrementAndGet();
+                        LoadResult.totalUDPReceiveTime.addAndGet(System.currentTimeMillis()-udpStart);
                         byte[] inbound = d.getData();
                         messageBuffer.reset(inbound);
                         messageBuffer.flip();
@@ -187,8 +193,8 @@ public class Player implements Runnable{
                             break;
                         }
                     }
-                    Thread.sleep(1000);
-                    duration -= 2000;
+                    Thread.sleep(10);
+                    udpRounds--;
                 }
             }
             leave();
