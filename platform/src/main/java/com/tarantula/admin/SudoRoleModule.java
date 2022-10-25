@@ -207,12 +207,12 @@ public class SudoRoleModule implements Module {
             m.add("metrics",ms);
             session.write(m.toString().getBytes());
         }
-        else if(session.action().equals("onEnableJVMMetrics")){
-            Metrics metrics = context.metrics(Metrics.PERFORMANCE);
-            long rt = (Integer.parseInt(session.name())*60000)/JVMMonitor.timerInternal;
-            JVMMonitor jvmMonitor = new JVMMonitor(this.context,metrics,rt);
-            this.context.schedule(jvmMonitor);
-            session.write(JsonUtil.toSimpleResponse(true,"scheduled with total checks ["+rt+"]").getBytes());
+        else if(session.action().equals("onEnableServiceView")){
+            //Metrics metrics = context.metrics(Metrics.PERFORMANCE);
+            //long rt = (Integer.parseInt(session.name())*60000)/JVMMonitor.timerInternal;
+            //JVMMonitor jvmMonitor = new JVMMonitor(this.context,metrics,rt);
+            //this.context.schedule(jvmMonitor);
+            session.write(JsonUtil.toSimpleResponse(true,"scheduled with total checks").getBytes());
         }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();

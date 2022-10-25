@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">ENABLE JVM METRICS</span>
+            <span class="tx-margin-left-8 tx-text-24">ENABLE SERVICE VIEW</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -17,7 +17,7 @@
             <input id ="tx-metrics-tracking-time" class="w3-input w3-round w3-border" type="number"/>
         </div>
         <div class="w3-panel">
-            <span id="tx-enable-jvm-metrics" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Enable JVM Metrics</span>
+            <span id="tx-enable-jvm-metrics" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Enable Service View</span>
         </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -32,7 +32,7 @@
 <script>
     document.querySelector('#tx-enable-jvm-metrics').onclick=()=>{
         let _tc = document.querySelector('#tx-metrics-tracking-time').value/1;
-        TARA_API.onGet('role/sudo','onEnableJVMMetrics',_tc==0?10:_tc,(resp)=>{
+        TARA_API.onGet('role/sudo','onEnableServiceView',_tc==0?10:_tc,(resp)=>{
             console.log(resp);
             document.querySelector('#tx-enable-jvm-metrics-message').innerHTML = resp.message;
         });
