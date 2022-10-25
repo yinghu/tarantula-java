@@ -26,6 +26,7 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
+import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.MirrorClusterBackupProvider;
@@ -143,11 +144,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
-
+    private ServiceView serviceView;
 
  	private TarantulaContext(){
- 	    this.endpointService = new EndpointService(this);
- 	    this.metricsManager = new MetricsManager(this);
+         this.endpointService = new EndpointService(this);
+ 	     this.metricsManager = new MetricsManager(this);
+         this.serviceView = new ServiceView();
     }
 
 	public static TarantulaContext getInstance(){
@@ -887,6 +889,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void unregisterMetrics(Metrics metrics){
         metricsManager.removeMetrics(metrics);
+    }
+
+    public ServiceProvider.Summary serviceSummary(){
+
+         return this.serviceView;
     }
 
     private void initMetricsProvider() throws Exception{

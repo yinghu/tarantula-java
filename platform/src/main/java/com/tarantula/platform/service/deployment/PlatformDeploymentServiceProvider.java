@@ -12,6 +12,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
+import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -786,6 +787,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public ClusterProvider.Summary clusterSummary(){
         return integrationCluster.summary();
+    }
+    public ServiceProvider.Summary serviceSummary(){
+        return this.serviceSummary();
     }
     public List<String> listClusterMember(){
         ArrayList<String> mlist = new ArrayList<>();
