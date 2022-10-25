@@ -35,6 +35,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     private MetricsListener metricsListener;
 
+    private static final String PENDING_SESSION_SIZE = "pendingUdpSessionSize";
+    private static final String GAME_SESSION_SIZE = "gameUdpSessionSize";
+
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -171,5 +174,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
+    }
+
+    @Override
+    public void updateSummary(Summary summary){
+        summary.update(PENDING_SESSION_SIZE,pendingQueue.size());
+        summary.update(GAME_SESSION_SIZE,channels.size());
     }
 }
