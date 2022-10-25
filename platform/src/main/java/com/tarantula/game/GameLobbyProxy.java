@@ -29,7 +29,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(usingDefault) return defaultLobby.join(session,rating);
         //using configurable lobby item
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        //this.context.log("JOIN->"+stubKey.asString(),OnLog.WARN);
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
             stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
@@ -52,10 +51,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             return;
         }
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.get(stubKey.asString());
+        Stub stub = stubIndex.remove(stubKey.asString());
         if(stub==null) return;
+        stub.zone.leave(stub);
         stub.pushChannel.close();
-        //stub.zone.leave(stub);
     }
 
     @Override
@@ -105,11 +104,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public boolean timeout(String systemId,int stub) {
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
-        //this.context.log("TIMEOUT->"+stubKey.asString(),OnLog.WARN);
         Stub removed = stubIndex.remove(stubKey.asString());
+        if(removed==null) return false;
         removed.zone.leave(removed);
         gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
-        return  removed!=null;
+        return  true;
     }
 
 

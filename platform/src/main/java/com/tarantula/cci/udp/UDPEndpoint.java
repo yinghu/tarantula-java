@@ -109,10 +109,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onTimeout(int channelId, int sessionId) {
         UDPChannel removed = channels.remove(sessionId);
-        if(removed != null) {
-            pendingQueue.offer(removed);
-            removed.kickoff();
-        }
+        if(removed == null) return;
+        pendingQueue.offer(removed);
+        removed.kickoff();
     }
 
     @Override

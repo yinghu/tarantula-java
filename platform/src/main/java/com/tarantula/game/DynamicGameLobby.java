@@ -61,9 +61,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
 
     public void leave(Session session){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.get(stubKey.asString());
+        Stub stub = stubIndex.remove(stubKey.asString());
         if(stub==null) return;
         stub.zone.leave(stub);
+        stub.pushChannel.close();
     }
     public void update(Session session, byte[] payload){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
@@ -92,9 +93,10 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
     public boolean timeout(String systemId,int stub){
         StubKey stubKey = new StubKey(systemId,application.tag(),stub);
         Stub removed = stubIndex.remove(stubKey.asString());
+        if(removed==null) return false;
         removed.zone.leave(removed);
         gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
-        return  removed!=null;
+        return  true;
     }
 
     @Override
