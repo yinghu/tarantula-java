@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.service.ServiceProvider;
 
@@ -8,17 +9,16 @@ public class ServiceViewMonitor implements SchedulingTask {
 
     private ApplicationContext applicationContext;
     private String serviceName;
-    //private long timerInternal;
     private long timerCountDown = 100;
     public final static long timerInternal = 10000;
 
     private ServiceView serviceView;
 
-    public ServiceViewMonitor(ApplicationContext context,String serviceName,long timerCountDown){
+    public ServiceViewMonitor(ApplicationContext context,String serviceName,long timerCountDown,ServiceView serviceView){
         this.applicationContext = context;
         this.serviceName = serviceName;
         this.timerCountDown = timerCountDown;
-        this.serviceView = new ServiceView();
+        this.serviceView = serviceView;
     }
     @Override
     public boolean oneTime() {
@@ -40,6 +40,12 @@ public class ServiceViewMonitor implements SchedulingTask {
         ServiceProvider serviceProvider = applicationContext.serviceProvider(serviceName);
         if(serviceProvider==null) return;
         serviceProvider.updateSummary(serviceView);
-
+        this.applicationContext.log(serviceView.toJson().toString(),OnLog.WARN);
+        timerCountDown--;
+        if(timerCountDown <= 0){
+            this.applicationContext.log("Service view monitoring has stopped", OnLog.WARN);
+            return;
+        }
+        applicationContext.schedule(this);
     }
 }
