@@ -28,7 +28,7 @@ wget http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3
    once you build successfully you can go to \target\release\tarantula-platform-1.0-bin\tarantula-platform-1.0\bin then run following command
    tarantula.bat on Windows tarantula.sh on Linux or MacOS
 
-
+7.  apt-
 INTEGRATION DEVELOPMENT TOOLS : IntelliJ IDE (JAVA), Brackets (JAVASCRIPT)
 
 ###############################################
@@ -106,6 +106,8 @@ restart nginx
 CHECK JAVA PROCESS TCP STATUSll
 netstat -apn | grep java
 ######################################################
+
+sed -i -e 's/\r$//' tarantula.sh
 
 ####################################################################
 NODE JS SETUP
