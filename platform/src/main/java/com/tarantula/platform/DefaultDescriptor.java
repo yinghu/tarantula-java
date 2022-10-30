@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.util.JsonUtil;
@@ -218,5 +219,14 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     }
     public void tournamentEnabled(boolean tournamentEnabled){
         this.tournamentEnabled = tournamentEnabled;
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",name);
+        jsonObject.addProperty("tag",tag);
+        jsonObject.addProperty("typeId",typeId);
+        return jsonObject;
     }
 }

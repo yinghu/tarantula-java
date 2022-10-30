@@ -135,7 +135,7 @@ public class AdminRoleModule implements Module{
             }
         }
         else if(session.action().equals("availableGameServiceList")){
-            List<ExposedGameService> alist = this.deploymentServiceProvider.gameServiceList();
+            List<Descriptor> alist = this.deploymentServiceProvider.gameServiceList();
             session.write(toJson(alist));
         }
         else if(session.action().equals("onAddService")){
@@ -155,7 +155,7 @@ public class AdminRoleModule implements Module{
             if(_existed[0]){
                 _existed[0]=false;
             }else {
-                ExposedGameService exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
+                Descriptor exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
                 if(exposedGameService!=null){
                     DeploymentDescriptor desc = new DeploymentDescriptor();
                     desc.typeId(typeId);
@@ -163,14 +163,14 @@ public class AdminRoleModule implements Module{
                     desc.name(_serviceName);
                     desc.category("service");
                     desc.tag(name.toLowerCase() + "/"+_serviceName);
-                    desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
-                    desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
-                    desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
-                    desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
-                    desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
-                    desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
-                    desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
-                    desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
+                    //desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
+                    //desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
+                    //desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
+                    //desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
+                    //desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
+                    //desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
+                    //desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
+                    //desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
                     desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
                     _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, null,true);
                 }
@@ -221,14 +221,12 @@ public class AdminRoleModule implements Module{
     private Access _user(String systemId){
         return this.userService.loadUser(systemId);
     }
-    private byte[] toJson(List<ExposedGameService> exposedGameServices){
+    private byte[] toJson(List<Descriptor> exposedGameServices){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
         JsonArray array = new JsonArray();
         exposedGameServices.forEach((es)->{
-            JsonObject jes = new JsonObject();
-            jes.addProperty("name",es.name());
-            jes.addProperty("description",es.property("description").toString());
-            array.add(jes);
+            array.add(es.toJson());
         });
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();

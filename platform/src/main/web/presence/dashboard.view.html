@@ -126,7 +126,8 @@
                     <span id='game-name-0' class='w3-left tx-text-16'>GAME TITLE NAME</span>
                     <span id='game-shutdown-id-0' tx-game-cluster-id='' view-id='game.cluster.shutdown' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>ShutDown</span>   
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
-                    <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update</span>
+                    <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
+                    <span id='game-edit-service-0' tx-game-cluster-id='' view-id='game.service.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-metrics-0' tx-game-cluster-id='' view-id='game.cluster.metrics' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
                 </div>
                 <div class="w3-container w3-padding">
@@ -368,6 +369,8 @@
                     lnc.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let gcl = document.querySelector('#game-edit-lobby-'+i);
                     gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    let gsl = document.querySelector('#game-edit-service-'+i);
+                    gsl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     document.querySelector('#game-metrics-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     if(disabled == true){
                         shd.style.display='none';

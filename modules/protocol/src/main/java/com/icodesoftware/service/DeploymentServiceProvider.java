@@ -64,8 +64,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(String key);
-    <T extends OnAccess> List<T> gameServiceList();
-    <T extends OnAccess> T gameService(String name);
+    List<Descriptor> gameServiceList();
+    Descriptor gameService(String name);
     <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config);
     Lobby lobby(String typeId);
     //END OF CLUSTER

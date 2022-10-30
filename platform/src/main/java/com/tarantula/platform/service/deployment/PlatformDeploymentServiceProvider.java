@@ -252,15 +252,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return response;
     }
-    public <T extends OnAccess> List<T> gameServiceList(){
-        ArrayList<T> arrayList = new ArrayList<>();
-        eMap.forEach((k,es)->{
-            arrayList.add((T)es);
-        });
-        return arrayList;
+    public List<Descriptor> gameServiceList(){
+        return this.tarantulaContext.availableServices();
+        //ArrayList<T> arrayList = new ArrayList<>();
+        //ExposedGameService exposedGameService = new ExposedGameService();
+
+        //eMap.forEach((k,es)->{
+            //arrayList.add((T)es);
+        //});
+        //return arrayList;
     }
-    public <T extends OnAccess> T gameService(String name){
-        return (T)eMap.get(name);
+    public Descriptor gameService(String name){
+        return null;
+        //return (T)eMap.get(name);
     }
     public Response deployModule(String contextUrl,String resourceName){
         Response checked =  this.tarantulaContext.checkModule(contextUrl,resourceName);
