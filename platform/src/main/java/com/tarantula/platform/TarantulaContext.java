@@ -167,6 +167,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
         _access_index_syc_finished = new CountDownLatch(1);
+        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
+        this.node.clusterNameSuffix = this.clusterNameSuffix;
+        this.node.deployDirectory = this.deployDir;
+        this.node.servicePushAddress = this.servicePushAddress;
+        if(backupEnabled){//using backup deployment id
+            node.deploymentId = new DeploymentIdFetcher(this.backupUrl).deploymentId(this.backupAccessKey);
+            log.warn("Using backup deployment id ["+node.deploymentId+"]");
+        }
         node_started = new AtomicBoolean(false);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -499,19 +507,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _setup() throws Exception{
 
-        this.node = this.dataStoreProvider().node();
-        this.node.clusterNameSuffix = this.clusterNameSuffix;
-        this.node.deployDirectory = this.deployDir;
-        this.node.servicePushAddress = this.servicePushAddress;
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
         node.nodeId = nid.distributionKey();
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",0);
-        node.deploymentId = did.distributionKey();
-        if(backupEnabled){//override backup deployment id from backup cluster.
-            log.warn("Overriding local deployment id with remote backup deployment id");
-            node.deploymentId = new DeploymentIdFetcher(this.backupUrl).deploymentId(this.backupAccessKey);
+        if(!backupEnabled){//using local deployment id
+            node.deploymentId = did.distributionKey();
+            log.warn("Using local deployment id ["+node.deploymentId+"]");
         }
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
 

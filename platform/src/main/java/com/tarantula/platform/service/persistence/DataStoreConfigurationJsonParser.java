@@ -28,7 +28,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private String dataDir;
 
     private int partitionNumber;
-    private int accessIndexPartitionNumber;
+    //private int accessIndexPartitionNumber;
     private boolean dataStoreDailyBackup;
 
 
@@ -39,7 +39,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
         this.partitionNumber = tx.platformRoutingNumber;
-        this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
+        //this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup;
         this.tarantulaContext = tx;
@@ -57,7 +57,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("dir",this.dataDir);
         properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
         properties.put("dailyBackup",dataStoreDailyBackup);
-
+        properties.put("node",tarantulaContext.node());
         this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());
         JsonArray props = ds.get("properties").getAsJsonArray();
         props.forEach(e->{
@@ -112,8 +112,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
-        boolean backupEnabled = (boolean)_intrgration.get("enabled") || (boolean)_data.get("enabled");
-        properties.put("backupEnabled",backupEnabled);
+        //boolean backupEnabled = (boolean)_intrgration.get("enabled") || (boolean)_data.get("enabled");
+        //properties.put("backupEnabled",backupEnabled);
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
         this.tarantulaContext.deploymentDataStoreProvider.start();
         this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);

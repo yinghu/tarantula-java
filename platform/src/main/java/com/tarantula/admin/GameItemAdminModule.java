@@ -487,7 +487,7 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         JsonObject zonePayload = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
         Component room = new Component();
         createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
-        this.context.log(room.distributionKey(), OnLog.WARN);
+        //this.context.log(room.distributionKey(), OnLog.WARN);
         zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.distributionKey());
         JsonArray refs = zonePayload.get("reference").getAsJsonArray();
         refs.add(room.distributionKey());
@@ -496,19 +496,19 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
         arenas.forEach(arenaPayload -> {
             Commodity arena = new Commodity();
             createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
-            this.context.log(arena.distributionKey(),OnLog.WARN);
+            //this.context.log(arena.distributionKey(),OnLog.WARN);
             aset.add(arena.distributionKey());
             refs.add(arena.distributionKey());
         });
         Item zone = new Item();
         createItem(zone,zonePayload,gameCluster,applicationPreSetup);
-        this.context.log(zone.distributionKey(),OnLog.WARN);
+        //this.context.log(zone.distributionKey(),OnLog.WARN);
         JsonObject lobbyPayload = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
         lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionKey());
         lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionKey());
         Application lobby = new Application();
         createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
-        this.context.log(lobby.distributionKey(),OnLog.WARN);
+        //this.context.log(lobby.distributionKey(),OnLog.WARN);
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
         if(configuration!=null) {
@@ -516,8 +516,8 @@ public class GameItemAdminModule implements Module,Configurable.Listener<GameClu
                 JsonArray validators = ((JsonElement)configuration.property("validators")).getAsJsonArray();
                 validators.forEach(validator->{
                     Application app = new Application();
-                    String resp = createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
-                    this.context.log(resp,OnLog.WARN);
+                    createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("expected error",ex,OnLog.ERROR);

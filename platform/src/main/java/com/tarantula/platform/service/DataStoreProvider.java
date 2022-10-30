@@ -19,7 +19,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     void registerBackupProvider(int scope, BackupProvider mapStoreListener);
 
-    ClusterNode node();
+    //ClusterNode node();
     //create none-partitioned integration scope data store
     DataStore create(String name);
 
