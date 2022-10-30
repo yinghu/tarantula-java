@@ -36,7 +36,7 @@ public class AvatarModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.context.log("Friend list module started", OnLog.WARN);
+        this.context.log("Avatar module started", OnLog.WARN);
     }
     @Override
     public void clear(){

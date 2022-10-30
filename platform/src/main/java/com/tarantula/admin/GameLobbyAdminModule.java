@@ -6,7 +6,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
 
@@ -28,26 +27,7 @@ public class GameLobbyAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby data ["+session.name()+"]").getBytes());
             }
         }
-        else if(session.action().equals("onGameServiceList")){
-            GameServiceContext gsc = new GameServiceContext();
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
-                gsc.lobby= gc.serviceLobby;
-                session.write(gsc.toJson().toString().getBytes());
-            }else{
-                session.write(JsonUtil.toSimpleResponse(false,"no service data ["+session.name()+"]").getBytes());
-            }
-        }
-        else if(session.action().equals("onGameDataList")){
-            GameServiceContext gsc = new GameServiceContext();
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
-                gsc.lobby= gc.dataLobby;
-                session.write(gsc.toJson().toString().getBytes());
-            }else{
-                session.write(JsonUtil.toSimpleResponse(false,"no game data ["+session.name()+"]").getBytes());
-            }
-        }
+
         else if (session.action().equals("onAddLobby")){
             String[] query = session.name().split("#");
             String gameClusterId = query[0];

@@ -13,7 +13,6 @@
     {"type":"create.enum","moduleResourceFile":"admin/create.enum.view.html"},
     {"type":"create.primitive","moduleResourceFile":"admin/create.primitive.view.html"},
     {"type":"game.service.edit","moduleResourceFile":"admin/game.service.edit.view.html"},
-    {"type":"game.data.list","moduleResourceFile":"admin/game.data.list.view.html"},
     {"type":"game.cluster.launch","moduleResourceFile":"admin/game.cluster.launch.view.html"},
     {"type":"game.cluster.shutdown","moduleResourceFile":"admin/game.cluster.shutdown.view.html"},
     {"type":"game.cluster.edit","moduleResourceFile":"admin/game.cluster.edit.view.html"},

@@ -15,13 +15,16 @@ import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
-import com.tarantula.platform.service.metrics.StatisticsSerializer;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AdminRoleModule implements Module{
 
@@ -33,6 +36,8 @@ public class AdminRoleModule implements Module{
 
     private UserService userService;
     private int maxGameClusterCount;
+
+    private ConcurrentHashMap<String,Descriptor> pendingGameServices;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -135,47 +140,28 @@ public class AdminRoleModule implements Module{
             }
         }
         else if(session.action().equals("availableGameServiceList")){
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(session.name());
+            Map<String,Descriptor> lmap = new HashMap<>();
+            gameCluster.serviceLobby.entryList().forEach(a->lmap.put(a.name(),a));
             List<Descriptor> alist = this.deploymentServiceProvider.gameServiceList();
-            session.write(toJson(alist));
+            session.write(toJson(lmap,alist));
         }
         else if(session.action().equals("onAddService")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster gameCluster = deploymentServiceProvider.gameCluster(accessId);
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
+            Descriptor pendingService = pendingGameServices.get(query[1]);
             String name = (String)gameCluster.property(GameCluster.NAME);
             String typeId = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-            Lobby _lobby = this.deploymentServiceProvider.lobby(typeId);
-            boolean[] _existed = {false};
-            String _serviceName = onAccess.property("serviceName").toString();
-            _lobby.entryList().forEach((e)->{
-                if(e.tag().equals(name+"/"+_serviceName)){
-                    _existed[0] = true;
-                }
-            });
-            if(_existed[0]){
-                _existed[0]=false;
-            }else {
-                Descriptor exposedGameService = this.deploymentServiceProvider.gameService(_serviceName);
-                if(exposedGameService!=null){
-                    DeploymentDescriptor desc = new DeploymentDescriptor();
-                    desc.typeId(typeId);
-                    desc.type("application");
-                    desc.name(_serviceName);
-                    desc.category("service");
-                    desc.tag(name.toLowerCase() + "/"+_serviceName);
-                    //desc.moduleId(exposedGameService.property(ExposedGameService.MODULE_ID).toString());
-                    //desc.index(exposedGameService.property(ExposedGameService.MODULE_INDEX).toString());
-                    //desc.codebase(exposedGameService.property(ExposedGameService.MODULE_CODE_BASE).toString());
-                    //desc.moduleArtifact(exposedGameService.property(ExposedGameService.MODULE_ARTIFACT).toString());
-                    //desc.moduleVersion(exposedGameService.property(ExposedGameService.MODULE_VERSION).toString());
-                    //desc.moduleName(exposedGameService.property(ExposedGameService.MODULE_NAME).toString());
-                    //desc.deployPriority((Integer)exposedGameService.property(ExposedGameService.DEPLOY_PRIORITY));
-                    //desc.accessControl((Integer)exposedGameService.property(ExposedGameService.ACCESS_CONTROL));
-                    desc.applicationClassName("com.tarantula.platform.service.deployment.SingletonModuleApplication");
-                    _existed[0] = this.deploymentServiceProvider.createApplication(desc,null, null,true);
-                }
+            if(pendingService!=null){
+                Descriptor desc = pendingService.copy();
+                desc.typeId(typeId);//replaced with named type id
+                desc.moduleId(typeId);
+                desc.tag(desc.tag().replaceFirst("game",name.toLowerCase()));
+                boolean suc = this.deploymentServiceProvider.createApplication(desc,null,null,true);
+                session.write(JsonUtil.toSimpleResponse(suc,suc?"service ["+desc.name()+"] Added":"service ["+desc.name()+"] Not Added").getBytes());
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"game service not existed").getBytes());
             }
-            session.write(JsonUtil.toSimpleResponse(_existed[0],_existed[0]?"created":"failed").getBytes());
         }
         else if(session.action().equals("onLaunchGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
@@ -215,18 +201,25 @@ public class AdminRoleModule implements Module{
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.maxGameClusterCount = ((Number)this.context.configuration("cluster").property("maxGameClusterCount")).intValue();
+        this.pendingGameServices = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 
     private Access _user(String systemId){
         return this.userService.loadUser(systemId);
     }
-    private byte[] toJson(List<Descriptor> exposedGameServices){
+    private byte[] toJson(Map<String,Descriptor> existed,List<Descriptor> exposedGameServices){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
         JsonArray array = new JsonArray();
-        exposedGameServices.forEach((es)->{
-            array.add(es.toJson());
+        exposedGameServices.forEach((a)->{
+            if(!existed.containsKey(a.name())){
+                JsonObject js = a.toJson();
+                String applicationId = SystemUtil.oid();
+                js.addProperty("applicationId", applicationId);
+                pendingGameServices.put(applicationId,a);
+                array.add(js);
+            }
         });
         jsonObject.add("gameServiceList",array);
         return jsonObject.toString().getBytes();

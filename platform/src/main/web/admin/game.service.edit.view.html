@@ -11,7 +11,8 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-game-service-list-message"></div>
-   
+    <div class='w3-panel' id="tx-game-service-list">
+    </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -22,19 +23,46 @@
     </div>
 </div>
 <script>
+    let serviceBar = document.querySelector('#tx-game-service-list');
     document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
     TARA_API.onGet('role/admin','availableGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
-        console.log(resp);
-        if(resp.successful){
-            
-        }
-        else{
-            document.querySelector('#tx-game-service-list-message').innerHTML=resp.message;
-        }       
+        tx_service_bar_reset(resp);       
     });
     document.querySelector('#tx-game-service-list-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     }; 
+    function tx_service_bar_reset(resp){
+        if(resp.successful){
+            resp.gameServiceList.forEach((gi)=>{
+                let tem = [];
+                tem.push('<div class=\'w3-container w3-border-bottom w3-border-red\'>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
+                tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
+                tem.push(gi.name);
+                tem.push('</span><span tx-application-id=\''+gi.applicationId+'\'');
+                tem.push(' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-game-service-close-action\'>');
+                tem.push('Add');
+                tem.push('</span></div>'); 
+                serviceBar.innerHTML += tem.join('');  
+            });
+            document.querySelectorAll('.tx-game-service-close-action').forEach(a=>{
+                a.onclick=()=>{
+                    let applicationId = a.getAttribute('tx-application-id');
+                    TARA_API.onGet('role/admin','onAddService',TARA_API.query().gameClusterId+'#'+applicationId,(resp)=>{
+                        console.log(resp);
+                        //gameEditMessage.innerHTML = resp.message;
+                        //TARA_API.query().callback(); 
+                        //if(resp.successful){
+                            //tx_list_game_lobby_update();
+                        //}        
+                    });
+                };
+            });
+        }
+        else{
+            document.querySelector('#tx-game-service-list-message').innerHTML=resp.message;
+        }
+    }
 </script>
