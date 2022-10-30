@@ -23,6 +23,7 @@ public class Main {
         String host = properties.getProperty("host");
         int batch = Integer.parseInt(properties.getProperty("batch"));
         int poolSize = Integer.parseInt(properties.getProperty("pool.size"));
+        long httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
         boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
@@ -36,9 +37,9 @@ public class Main {
         LoadResult.udpTested = udpTested;
         LoadResult.udpReceiveTimeout = udpReceiveTimeout;
         LoadResult.udpTestRounds = udpTestRounds;
-        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds);
+        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds,httpRequestInterval);
     }
-    private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration) throws Exception{
+    private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration,long requestWaiting) throws Exception{
         HttpCaller httpCaller = new HttpCaller(host);
         httpCaller._init();
         pool = Executors.newFixedThreadPool(poolSize,new TarantulaThreadFactory("test-load"));
@@ -50,7 +51,7 @@ public class Main {
                 ix++;
                 Player simulator = new Player(httpCaller,waiting,uname,x,udpTested,timeout,duration);
                 pool.execute(simulator);
-                Thread.sleep(5);
+                Thread.sleep(requestWaiting);
             }
             waiting.await();
         }
