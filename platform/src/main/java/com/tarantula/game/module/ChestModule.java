@@ -36,7 +36,7 @@ public class ChestModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
-        this.context.log("Chest module started", OnLog.WARN);
+        this.context.log("Collection module started", OnLog.WARN);
     }
     @Override
     public void clear(){
