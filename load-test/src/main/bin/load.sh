@@ -1,15 +1,8 @@
 #!/bin/bash
 echo "Starting Tarantula Distribution System Load Test ..."
-find ../lib -name *.jar > lib.txt
-CP="../conf:../deploy:../../../../test-classes"
-while read line
-do
-V=`echo "${line}"`
-CP=${CP}:$V
-done < lib.txt
-rm -f lib.txt
-JAVA_OPTS="$JAVA_OPTS -Xms2048m -Xmx4096m -XX:MaxDirectMemorySize=4096M -server"
-echo "16384 65535" > /proc/sys/net/ipv4/ip_local_port_range
+CP="../lib/*"
+JAVA_OPTS="$JAVA_OPTS -Xms1024M -Xmx2048M -XX:MaxDirectMemorySize=512M -server"
+#echo "16384 65535" > /proc/sys/net/ipv4/ip_local_port_range
 java $JAVA_OPTS -classpath $CP com.tarantula.test.integration.Main
 
 
