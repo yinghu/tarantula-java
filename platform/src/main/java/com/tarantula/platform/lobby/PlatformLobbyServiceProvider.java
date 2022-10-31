@@ -7,6 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -19,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
+    public static final String NAME = "lobby";
+
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
     private GameCluster gameCluster;
@@ -28,7 +31,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     private DistributionItemService distributionItemService;
     private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
-    public PlatformLobbyServiceProvider(GameCluster gameCluster){
+    public PlatformLobbyServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameCluster = gameCluster;
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameName = ((String)gameCluster.property(GameCluster.NAME)).toLowerCase();
@@ -45,7 +48,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String name() {
-        return "lobby";
+        return NAME;
     }
 
     @Override

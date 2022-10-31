@@ -3,6 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -19,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
 
     private static final String CONFIG = "game-tournament-settings";
+
+    public static final String NAME = "tournament";
 
     private TarantulaLogger logger;
     private ServiceContext serviceContext;
@@ -45,10 +48,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ClusterProvider.ClusterStore clusterStore;
 
-    public PlatformTournamentServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
+    public PlatformTournamentServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
-        this.inventoryServiceProvider = inventoryServiceProvider;
+        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
     @Override
@@ -104,7 +107,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return _tms;
     }
     public String name(){
-        return "tournament";
+        return NAME;
     }
     @Override
     public void setup(ServiceContext serviceContext) {

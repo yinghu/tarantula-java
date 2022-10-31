@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Rating;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
@@ -22,6 +23,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+
+    public static final String NAME = "presence";
+
     private TarantulaLogger logger;
     private final String gameServiceName;
     private final GameCluster gameCluster;
@@ -41,15 +45,15 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private PlatformInventoryServiceProvider inventoryServiceProvider;
     private DistributionItemService distributionItemService;
 
-    public PlatformPresenceServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
+    public PlatformPresenceServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
-        this.inventoryServiceProvider = inventoryServiceProvider;
+        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
     @Override
     public String name() {
-        return "presence";
+        return NAME;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.tarantula.platform.inbox;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -12,6 +13,8 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformInboxServiceProvider implements ServiceProvider {
+
+    public static final String NAME = "inbox";
 
     private TarantulaLogger logger;
     private final String gameServiceName;
@@ -23,14 +26,14 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
-    public PlatformInboxServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
+    public PlatformInboxServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
-        this.inventoryServiceProvider = inventoryServiceProvider;
+        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override
     public String name() {
-        return "inbox";
+        return NAME;
     }
 
     @Override

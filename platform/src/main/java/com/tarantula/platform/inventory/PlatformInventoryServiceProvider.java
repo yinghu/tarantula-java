@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
@@ -17,6 +18,9 @@ import java.util.List;
 
 
 public class PlatformInventoryServiceProvider implements ServiceProvider {
+
+    public static final String NAME = "inventory";
+
     private TarantulaLogger logger;
 
     private final String gameServiceName;
@@ -24,14 +28,15 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     private ServiceContext serviceContext;
     private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
-    public PlatformInventoryServiceProvider(GameCluster gameCluster){
+
+    public PlatformInventoryServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameCluster = gameCluster;
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
     }
 
     @Override
     public String name() {
-        return "inventory";
+        return NAME;
     }
 
     @Override

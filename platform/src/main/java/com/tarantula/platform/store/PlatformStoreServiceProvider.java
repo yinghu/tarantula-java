@@ -3,6 +3,7 @@ package com.tarantula.platform.store;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
@@ -15,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
+    public static final String NAME = "store";
+
     private TarantulaLogger logger;
     private final String gameServiceName;
     private final GameCluster gameCluster;
@@ -26,14 +29,14 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
-    public PlatformStoreServiceProvider(GameCluster gameCluster, PlatformInventoryServiceProvider inventoryServiceProvider){
+    public PlatformStoreServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
-        this.inventoryServiceProvider = inventoryServiceProvider;
+        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override
     public String name() {
-        return "store";
+        return NAME;
     }
 
     @Override

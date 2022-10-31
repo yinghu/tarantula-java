@@ -14,6 +14,7 @@ import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
@@ -31,6 +32,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
+
+    public static final String NAME = "RoomService";
 
     private TarantulaLogger logger;
     private final String name;
@@ -56,14 +59,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private ScheduledFuture scheduledFuture;
     ArrayList<String> kickoff = new ArrayList<>();
 
-    public PlatformRoomServiceProvider(GameCluster gameCluster){
+    public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
 
     @Override
     public String name() {
-        return "RoomService";
+        return NAME;
     }
     @Override
     public void waitForData(){

@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.service.deployment.TypedListener;
@@ -13,6 +14,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+
+    public static final String NAME = "item";
+
     private TarantulaLogger logger;
     private ConcurrentHashMap<String, TypedListener> rListeners = new ConcurrentHashMap<>();
     private ServiceContext serviceContext;
@@ -23,7 +27,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
-    public PlatformItemServiceProvider(GameCluster gameCluster){
+    public PlatformItemServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
     }
@@ -62,7 +66,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public String name() {
-        return "item";
+        return NAME;
     }
 
     @Override

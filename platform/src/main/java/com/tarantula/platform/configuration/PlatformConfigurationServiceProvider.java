@@ -6,6 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
 
+    public static final String NAME = "configuration";
 
     private GameCluster gameCluster;
     private TarantulaLogger logger;
@@ -34,7 +36,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
 
-    public PlatformConfigurationServiceProvider(GameCluster gameCluster){
+    public PlatformConfigurationServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.typeId = gameServiceName.replace("-service","");
         this.gameCluster = gameCluster;
@@ -42,7 +44,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     @Override
     public String name() {
-        return "configuration";
+        return NAME;
     }
 
     @Override
