@@ -72,7 +72,6 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         achievementProgress.dataStore(this.dataStore);
         if(achievementProgress.onProgress(delta)){
             Achievement achievement = achievements.get(achievementProgress.name());
-
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);
                 this.dataStore.update(achievementProgress);

@@ -10,14 +10,11 @@
 ### END INIT INFO
 start(){
 	echo "Starting Tarantula Distribution System  ..."
-	mount /dev/sdb /mnt
-	cd /root/release/bin
 	./tarantula.sh &
 }
 stop(){
 	echo "Stopping Tarantula Distribution System  ..."
-	cd /root/release/bin
-    kill -TERM `cat tarantula.pid`
+	kill -TERM `cat tarantula.pid`
 }
 case $1 in 
         start)
