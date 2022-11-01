@@ -95,6 +95,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
+
     }
 
 
