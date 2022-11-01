@@ -1,18 +1,22 @@
 package com.tarantula.platform.leaderboard;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard.Listener {
+
+
+    public static final String NAME = "leaderboard";
 
     private TarantulaLogger logger;
     private final String name;
@@ -25,8 +29,8 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
-    public PlatformLeaderBoardProvider(String name){
-        this.name = name;
+    public PlatformLeaderBoardProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+        this.name = gameServiceProvider.name();
     }
     public LeaderBoardSync leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
@@ -56,7 +60,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public String name() {
-        return name;
+        return NAME;
     }
 
     @Override

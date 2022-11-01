@@ -33,8 +33,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private ServiceContext serviceContext;
 
 
-    private PlatformLeaderBoardProvider leaderBoardProvider;
-
     private Configuration configuration;
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -98,11 +96,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
 
-
-        this.leaderBoardProvider = new PlatformLeaderBoardProvider(NAME);
-        this.leaderBoardProvider.setup(serviceContext);
-        this.leaderBoardProvider.waitForData();
-
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
@@ -112,13 +105,11 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     }
     @Override
     public void atMidnight(){
-        leaderBoardProvider.atMidnight();
+        leaderBoardProvider().atMidnight();
         tournamentServiceProvider().atMidnight();
     }
     @Override
     public void start() throws Exception {
-        this.leaderBoardProvider.start();
-
         gameServiceProviders.forEach((k,sp)->{
             try {
                 sp.start();
@@ -128,8 +119,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     @Override
     public void shutdown() throws Exception {
-
-        this.leaderBoardProvider.shutdown();
 
         gameServiceProviders.forEach((k,sp)->{
             try {
@@ -143,9 +132,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return this.serviceDataStore;
     }
 
-    //room service provider hool calls
+    //room service provider hook calls
     public PlatformRoomServiceProvider roomServiceProvider(){
-        return  (PlatformRoomServiceProvider) gameServiceProviders.get(PlatformRoomServiceProvider.NAME);
+        return serviceProvider(PlatformRoomServiceProvider.NAME);
     }
 
     //player data service provider hook calls
@@ -153,51 +142,57 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return presenceServiceProvider().rating(systemId);
     }
     public Statistics statistics(String systemId){
-        return presenceServiceProvider().statistics(systemId,leaderBoardProvider);
+        return presenceServiceProvider().statistics(systemId,serviceProvider(PlatformLeaderBoardProvider.NAME));
     }
     public DailyLoginTrack dailyLogin(String systemId){
         return presenceServiceProvider().checkDailyLogin(systemId);
     }
 
     public PlatformLobbyServiceProvider lobbyServiceProvider() {
-        return (PlatformLobbyServiceProvider) gameServiceProviders.get(PlatformLobbyServiceProvider.NAME);
+        return serviceProvider(PlatformLobbyServiceProvider.NAME);
     }
 
     public PlatformPresenceServiceProvider presenceServiceProvider(){
-        return (PlatformPresenceServiceProvider) gameServiceProviders.get(PlatformPresenceServiceProvider.NAME);
+        return serviceProvider(PlatformPresenceServiceProvider.NAME);
     }
     public PlatformInventoryServiceProvider inventoryServiceProvider(){
-        return (PlatformInventoryServiceProvider) gameServiceProviders.get(PlatformInventoryServiceProvider.NAME);
+        return serviceProvider(PlatformInventoryServiceProvider.NAME);
     }
     public PlatformStoreServiceProvider storeServiceProvider(){
-        return (PlatformStoreServiceProvider) gameServiceProviders.get(PlatformStoreServiceProvider.NAME);
+        return serviceProvider(PlatformStoreServiceProvider.NAME);
     }
     public PlatformInboxServiceProvider inboxServiceProvider() {
-        return (PlatformInboxServiceProvider) gameServiceProviders.get(PlatformInboxServiceProvider.NAME);
+        return serviceProvider(PlatformInboxServiceProvider.NAME);
+    }
+    public PlatformLeaderBoardProvider leaderBoardProvider() {
+        return serviceProvider(PlatformLeaderBoardProvider.NAME);
     }
     //leader service provider hook calls
     public LeaderBoard leaderBoard(String category){
-        return leaderBoardProvider.leaderBoard(category);
+        return leaderBoardProvider().leaderBoard(category);
     }
 
     //configuration service provider hood calls
     public PlatformItemServiceProvider itemServiceProvider(){
-        return  (PlatformItemServiceProvider) gameServiceProviders.get(PlatformItemServiceProvider.NAME);
+        return  serviceProvider(PlatformItemServiceProvider.NAME);
     }
 
     //Achievement service provider
     public PlatformAchievementServiceProvider achievementServiceProvider(){
-        return (PlatformAchievementServiceProvider) gameServiceProviders.get(PlatformAchievementServiceProvider.NAME);
+        return serviceProvider(PlatformAchievementServiceProvider.NAME);
     }
     //tournament service provider hook calls
     public PlatformTournamentServiceProvider tournamentServiceProvider(){
-        return (PlatformTournamentServiceProvider) gameServiceProviders.get(PlatformTournamentServiceProvider.NAME);
+        return serviceProvider(PlatformTournamentServiceProvider.NAME);
     }
 
     public PlatformConfigurationServiceProvider configurationServiceProvider(){
-        return (PlatformConfigurationServiceProvider) gameServiceProviders.get(PlatformConfigurationServiceProvider.NAME);
+        return serviceProvider(PlatformConfigurationServiceProvider.NAME);
     }
 
+    public <T extends ServiceProvider> T serviceProvider(String name){
+        return (T)gameServiceProviders.get(name);
+    }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(PlatformItemServiceProvider.NAME)){
