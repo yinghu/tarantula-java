@@ -16,7 +16,7 @@
       	<outputDirectory>bin</outputDirectory>
       	<includes>
         	<include>tarantula.sh</include>
-			<include>tarantula_dev.sh</include>
+			<include>dev_tarantula.sh</include>
 			<include>tarantula.bat</include>
 			<include>bootstrap.sh</include>
 			<include>gec-agent-1.0.jar</include>
