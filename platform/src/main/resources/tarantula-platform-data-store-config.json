@@ -6,7 +6,8 @@
             {"truncated": false},
             {"dataPath":"tarantula/data"},
             {"integrationPath":"tarantula/integration"},
-            {"backupPath":"backup"}
+            {"backupPath":"backup"},
+            {"replicationNumber": 3}
         ]
     },
     "integration-backup-router": {

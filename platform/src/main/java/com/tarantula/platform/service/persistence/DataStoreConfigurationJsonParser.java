@@ -19,7 +19,7 @@ import java.util.Map;
 public class DataStoreConfigurationJsonParser implements Serviceable {
 
 
-    HashMap<String,Object> properties = new HashMap();
+    //HashMap<String,Object> properties = new HashMap();
 
     private String dataBucketGroup;
     private String dataBucketNode;
@@ -28,7 +28,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private String dataDir;
 
     private int partitionNumber;
-    //private int accessIndexPartitionNumber;
+
     private boolean dataStoreDailyBackup;
 
 
@@ -39,12 +39,12 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
         this.partitionNumber = tx.platformRoutingNumber;
-        //this.accessIndexPartitionNumber = tx.accessIndexRoutingNumber;
         this.dataDir = tx.dataStoreDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup;
         this.tarantulaContext = tx;
     }
     private void parse(InputStream json) throws Exception{
+        HashMap<String,Object> properties = new HashMap();
         JsonObject config = JsonUtil.parse(json);
         JsonObject ds = config.get("data-source").getAsJsonObject();
         String name = (ds.get("name").getAsString());
@@ -117,6 +117,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
         this.tarantulaContext.deploymentDataStoreProvider.start();
         this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
+        this.tarantulaContext.deployServiceProvider(this.tarantulaContext.deploymentDataStoreProvider);
         this.tarantulaContext._initMirrorClusterBackup();
     }
 

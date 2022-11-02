@@ -363,7 +363,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             lock.lock();
             _run();
             LocalDateTime end = end();
-            logger.warn("Running hourly task at->"+end);
+            //logger.warn("Running hourly task at->"+end);
             categories.forEach(category->{
                 SystemStatisticsEntry entry = (SystemStatisticsEntry)statistics.entry(category);
                 double hourly = entry.hourly();

@@ -75,7 +75,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
-
+        this.replicationNodeNumber = ((JsonElement)properties.get("replicationNumber")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
@@ -297,10 +297,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
-        if(metadata.scope()==Distributable.DATA_SCOPE){
+        if(metadata.scope()==Distributable.DATA_SCOPE && replicationNodeNumber>0){
             replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().onReplicate(metadata.source(),key,value,replicationNodeNumber));
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
             replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
         }
         onMetrics();
@@ -466,6 +466,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
+    }
+    @Override
+    public void updateSummary(Summary summary){
+        summary.update(PENDING_REPLICATION_POOL_SIZE,replicationPendingQueue.size());
+        summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

@@ -4,7 +4,6 @@ package com.tarantula.platform.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.platform.service.persistence.ClusterNode;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
@@ -13,13 +12,15 @@ import java.util.Map;
 
 public interface DataStoreProvider extends ServiceProvider {
 
-    //int CONCURRENCY_ACCESS_LIMIT = 17;
+    String NAME = "tarantula";
+
+    String PENDING_REPLICATION_POOL_SIZE = "pendingReplicationPoolSize";
+    String REPLICATION_NODE_NUMBER = "replicationNodeNumber";
 
     void configure(Map<String,Object> properties);
 
     void registerBackupProvider(int scope, BackupProvider mapStoreListener);
 
-    //ClusterNode node();
     //create none-partitioned integration scope data store
     DataStore create(String name);
 
