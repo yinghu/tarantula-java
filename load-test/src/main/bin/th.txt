@@ -1,0 +1,1361 @@
+2022-11-03 01:52:19
+Full thread dump OpenJDK 64-Bit Server VM (17.0.4+8-Debian-1deb11u1 mixed mode, sharing):
+
+Threads class SMR info:
+_java_thread_list=0x0000ffff34013b50, length=96, elements={
+0x0000ffff98ddb160, 0x0000ffff98ddc5d0, 0x0000ffff98de2f20, 0x0000ffff98de4360,
+0x0000ffff98de5790, 0x0000ffff98de70f0, 0x0000ffff98de8640, 0x0000ffff98de9ad0,
+0x0000ffff98dfd7d0, 0x0000ffff98e334c0, 0x0000ffff0c1a5520, 0x0000ffff0c1a73d0,
+0x0000ffff0c1f9150, 0x0000ffff0c1fa2d0, 0x0000ffff98012410, 0x0000ffff0c269e90,
+0x0000ffff0c26aeb0, 0x0000ffff0c26f670, 0x0000ffff0c270750, 0x0000ffff0c27b6b0,
+0x0000ffff0c27f780, 0x0000ffff0c280870, 0x0000ffff0c281640, 0x0000ffff0c2683f0,
+0x0000ffff0c2391d0, 0x0000ffff0c284790, 0x0000ffff0c2855b0, 0x0000ffff0c28c900,
+0x0000ffff0c28e710, 0x0000ffff0c28f840, 0x0000ffff0c290980, 0x0000ffff0c291ac0,
+0x0000ffff0c293150, 0x0000ffff0c2942a0, 0x0000ffff0c2957f0, 0x0000ffff08001f90,
+0x0000ffff08002f40, 0x0000ffff080040b0, 0x0000ffff08005220, 0x0000ffff080063a0,
+0x0000ffff08007520, 0x0000ffff08008aa0, 0x0000ffff08009c30, 0x0000ffff08136c50,
+0x0000ffff08132cb0, 0x0000ffff08133730, 0x0000ffff08157e30, 0x0000ffff08158f30,
+0x0000ffff0815b5a0, 0x0000ffff0815e000, 0x0000ffff085f31e0, 0x0000ffff08606980,
+0x0000ffff08608ec0, 0x0000ffff08608310, 0x0000ffff0860a880, 0x0000ffff0860b890,
+0x0000ffff0860caa0, 0x0000ffff0860dab0, 0x0000ffff0860ecd0, 0x0000ffff08610350,
+0x0000ffff08611970, 0x0000ffff08612fa0, 0x0000ffff0861ecc0, 0x0000ffff08624120,
+0x0000ffff08629390, 0x0000ffff0862e8f0, 0x0000ffff08633b90, 0x0000ffff08639220,
+0x0000ffff0863b2b0, 0x0000ffff0863d6b0, 0x0000ffff24548310, 0x0000ffff380025d0,
+0x0000ffff246f28e0, 0x0000ffff380032f0, 0x0000fffef8056bf0, 0x0000fffef805af10,
+0x0000fffef8a660d0, 0x0000fffef8a651b0, 0x0000fffef8a673c0, 0x0000fffef8a69cf0,
+0x0000fffef8a6d3a0, 0x0000fffee80be740, 0x0000ffff6008aba0, 0x0000ffff60060f00,
+0x0000ffff60046bb0, 0x0000ffff60063920, 0x0000ffff60064180, 0x0000ffff600654f0,
+0x0000ffff60066680, 0x0000ffff60067ce0, 0x0000ffff3c010200, 0x0000ffff3c020000,
+0x0000ffff3c0178e0, 0x0000ffff3c00c490, 0x0000ffff3c015540, 0x0000ffff34024210
+}
+
+"Reference Handler" #2 daemon prio=10 os_prio=0 cpu=23.85ms elapsed=20965.00s tid=0x0000ffff98ddb160 nid=0x2a8 waiting on condition  [0x0000ffff54508000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@17.0.4/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@17.0.4/Reference.java:253)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@17.0.4/Reference.java:215)
+
+   Locked ownable synchronizers:
+	- None
+
+"Finalizer" #3 daemon prio=8 os_prio=0 cpu=0.65ms elapsed=20965.00s tid=0x0000ffff98ddc5d0 nid=0x2a9 in Object.wait()  [0x0000ffff54308000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.ref.ReferenceQueue.remove(java.base@17.0.4/ReferenceQueue.java:155)
+	- locked <0x00000005000037a0> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(java.base@17.0.4/ReferenceQueue.java:176)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@17.0.4/Finalizer.java:172)
+
+   Locked ownable synchronizers:
+	- None
+
+"Signal Dispatcher" #4 daemon prio=9 os_prio=0 cpu=0.26ms elapsed=20964.98s tid=0x0000ffff98de2f20 nid=0x2aa waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Service Thread" #5 daemon prio=9 os_prio=0 cpu=33.56ms elapsed=20964.98s tid=0x0000ffff98de4360 nid=0x2ab runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Monitor Deflation Thread" #6 daemon prio=9 os_prio=0 cpu=442.77ms elapsed=20964.98s tid=0x0000ffff98de5790 nid=0x2ac runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"C2 CompilerThread0" #7 daemon prio=9 os_prio=0 cpu=56739.80ms elapsed=20964.98s tid=0x0000ffff98de70f0 nid=0x2ad waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"C1 CompilerThread0" #9 daemon prio=9 os_prio=0 cpu=4263.15ms elapsed=20964.98s tid=0x0000ffff98de8640 nid=0x2ae waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"Sweeper thread" #10 daemon prio=9 os_prio=0 cpu=433.32ms elapsed=20964.98s tid=0x0000ffff98de9ad0 nid=0x2af runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Common-Cleaner" #11 daemon prio=8 os_prio=0 cpu=12.35ms elapsed=20964.95s tid=0x0000ffff98dfd7d0 nid=0x2b0 in Object.wait()  [0x0000ffff4ea8b000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.ref.ReferenceQueue.remove(java.base@17.0.4/ReferenceQueue.java:155)
+	- locked <0x0000000500000490> (a java.lang.ref.ReferenceQueue$Lock)
+	at jdk.internal.ref.CleanerImpl.run(java.base@17.0.4/CleanerImpl.java:140)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at jdk.internal.misc.InnocuousThread.run(java.base@17.0.4/InnocuousThread.java:162)
+
+   Locked ownable synchronizers:
+	- None
+
+"Notification Thread" #12 daemon prio=9 os_prio=0 cpu=0.13ms elapsed=20964.93s tid=0x0000ffff98e334c0 nid=0x2b1 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"FileSystemWatchService" #15 daemon prio=10 os_prio=0 cpu=5631.40ms elapsed=20963.98s tid=0x0000ffff0c1a5520 nid=0x2b5 runnable  [0x0000ffff4d7fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.fs.LinuxWatchService.poll(java.base@17.0.4/Native Method)
+	at sun.nio.fs.LinuxWatchService$Poller.run(java.base@17.0.4/LinuxWatchService.java:314)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"FileDeletionDetector" #16 daemon prio=10 os_prio=0 cpu=1266.61ms elapsed=20963.97s tid=0x0000ffff0c1a73d0 nid=0x2b6 in Object.wait()  [0x0000ffff4d5fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000500000650> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"LogFlusher" #18 daemon prio=10 os_prio=0 cpu=157.35ms elapsed=20963.90s tid=0x0000ffff0c1f9150 nid=0x2b8 in Object.wait()  [0x0000ffff4d1fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000500001748> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"DataCorruptionVerifier" #20 daemon prio=10 os_prio=0 cpu=3371.65ms elapsed=20963.90s tid=0x0000ffff0c1fa2d0 nid=0x2ba sleeping [0x0000ffff4cdfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.sleepycat.je.util.DbVerifyLog.verify(DbVerifyLog.java:224)
+	at com.sleepycat.je.util.DbVerifyLog.verifyAll(DbVerifyLog.java:143)
+	at com.sleepycat.je.util.verify.DataVerifier$VerifyTask.run(DataVerifier.java:289)
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:566)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"DestroyJavaVM" #23 prio=5 os_prio=0 cpu=685.83ms elapsed=20963.88s tid=0x0000ffff98012410 nid=0x2a1 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"INCompressor" #24 daemon prio=10 os_prio=0 cpu=687.98ms elapsed=20963.77s tid=0x0000ffff0c269e90 nid=0x2bc in Object.wait()  [0x0000ffff4c9fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:168)
+	- locked <0x0000000500001918> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"Cleaner-1" #25 daemon prio=10 os_prio=0 cpu=10489142.30ms elapsed=20963.77s tid=0x0000ffff0c26aeb0 nid=0x2bd runnable  [0x0000ffff4c7fd000]
+   java.lang.Thread.State: RUNNABLE
+	at com.sleepycat.je.tree.IN.incFetchStats(IN.java:3008)
+	at com.sleepycat.je.tree.IN.fetchINWithNoLatch(IN.java:2556)
+	at com.sleepycat.je.tree.IN.fetchINWithNoLatch(IN.java:2276)
+	at com.sleepycat.je.tree.Tree.search(Tree.java:2263)
+	at com.sleepycat.je.tree.Tree.search(Tree.java:2172)
+	at com.sleepycat.je.tree.Tree.getParentBINForChildLN(Tree.java:1471)
+	at com.sleepycat.je.cleaner.FileProcessor.processLN(FileProcessor.java:1140)
+	at com.sleepycat.je.cleaner.FileProcessor.processFile(FileProcessor.java:995)
+	at com.sleepycat.je.cleaner.FileProcessor.doClean(FileProcessor.java:489)
+	- locked <0x0000000500001c88> (a com.sleepycat.je.cleaner.FileProcessor)
+	at com.sleepycat.je.cleaner.FileProcessor.onWakeup(FileProcessor.java:293)
+	- locked <0x0000000500001c88> (a com.sleepycat.je.cleaner.FileProcessor)
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:154)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"Checkpointer" #26 daemon prio=10 os_prio=0 cpu=11966013.76ms elapsed=20963.77s tid=0x0000ffff0c26f670 nid=0x2be runnable  [0x0000ffff4c5fd000]
+   java.lang.Thread.State: RUNNABLE
+	at com.sleepycat.je.tree.IN.serialize(IN.java:5867)
+	at com.sleepycat.je.tree.IN.writeToLog(IN.java:5791)
+	at com.sleepycat.je.log.entry.INLogEntry.writeEntry(INLogEntry.java:347)
+	at com.sleepycat.je.log.LogManager.marshallIntoBuffer(LogManager.java:761)
+	at com.sleepycat.je.log.LogManager.log(LogManager.java:337)
+	at com.sleepycat.je.tree.IN.logInternal(IN.java:5525)
+	at com.sleepycat.je.tree.IN.log(IN.java:5349)
+	at com.sleepycat.je.recovery.Checkpointer.logDirtyIN(Checkpointer.java:1457)
+	at com.sleepycat.je.recovery.Checkpointer.flushIN(Checkpointer.java:1325)
+	at com.sleepycat.je.recovery.Checkpointer.flushIN(Checkpointer.java:1393)
+	at com.sleepycat.je.recovery.Checkpointer.flushDirtyNodes(Checkpointer.java:1063)
+	at com.sleepycat.je.recovery.Checkpointer.doCheckpoint(Checkpointer.java:819)
+	- locked <0x0000000500001ba8> (a com.sleepycat.je.recovery.Checkpointer)
+	at com.sleepycat.je.recovery.Checkpointer.onWakeup(Checkpointer.java:560)
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:154)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000552260c68> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+	- <0x000000063b4364c0> (a java.util.concurrent.locks.ReentrantReadWriteLock$NonfairSync)
+
+"StatCapture" #27 daemon prio=10 os_prio=0 cpu=403.37ms elapsed=20963.77s tid=0x0000ffff0c270750 nid=0x2bf in Object.wait()  [0x0000ffff4c3fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:168)
+	- locked <0x0000000500001e98> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"FileSystemWatchService" #28 daemon prio=10 os_prio=0 cpu=0.43ms elapsed=20963.76s tid=0x0000ffff0c27b6b0 nid=0x2c0 runnable  [0x0000ffff4c1fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.fs.LinuxWatchService.poll(java.base@17.0.4/Native Method)
+	at sun.nio.fs.LinuxWatchService$Poller.run(java.base@17.0.4/LinuxWatchService.java:314)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"FileDeletionDetector" #29 daemon prio=10 os_prio=0 cpu=1110.70ms elapsed=20963.76s tid=0x0000ffff0c27f780 nid=0x2c1 in Object.wait()  [0x0000fffee3ffe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000500002080> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"LogFlusher" #30 daemon prio=10 os_prio=0 cpu=155.84ms elapsed=20963.76s tid=0x0000ffff0c280870 nid=0x2c2 in Object.wait()  [0x0000fffee3dfe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000500001c60> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"DataCorruptionVerifier" #31 daemon prio=10 os_prio=0 cpu=737.70ms elapsed=20963.76s tid=0x0000ffff0c281640 nid=0x2c3 in Object.wait()  [0x0000fffee3bfe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000500002248> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"INCompressor" #32 daemon prio=10 os_prio=0 cpu=128.43ms elapsed=20963.74s tid=0x0000ffff0c2683f0 nid=0x2c4 in Object.wait()  [0x0000fffee39fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:168)
+	- locked <0x0000000500002410> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"Cleaner-1" #33 daemon prio=10 os_prio=0 cpu=393.45ms elapsed=20963.74s tid=0x0000ffff0c2391d0 nid=0x2c5 in Object.wait()  [0x0000fffee37fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:168)
+	- locked <0x0000000500002938> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"Checkpointer" #34 daemon prio=10 os_prio=0 cpu=2.61ms elapsed=20963.74s tid=0x0000ffff0c284790 nid=0x2c6 in Object.wait()  [0x0000fffee35fe000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.lang.Object.wait(java.base@17.0.4/Object.java:338)
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:166)
+	- locked <0x0000000500002b58> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"StatCapture" #35 daemon prio=10 os_prio=0 cpu=379.41ms elapsed=20963.74s tid=0x0000ffff0c2855b0 nid=0x2c7 in Object.wait()  [0x0000fffee33fe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at com.sleepycat.je.utilint.DaemonThread.run(DaemonThread.java:168)
+	- locked <0x0000000500003180> (a java.lang.Object)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-data-replication-1" #36 prio=10 os_prio=0 cpu=66209.33ms elapsed=20963.70s tid=0x0000ffff0c28c900 nid=0x2c8 sleeping [0x0000fffee31fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500c1b0e0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-2" #37 prio=10 os_prio=0 cpu=66369.37ms elapsed=20963.70s tid=0x0000ffff0c28e710 nid=0x2c9 sleeping [0x0000fffee2ffe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500c1b070> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-3" #38 prio=10 os_prio=0 cpu=66031.46ms elapsed=20963.70s tid=0x0000ffff0c28f840 nid=0x2ca sleeping [0x0000fffee2dfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003720> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-4" #39 prio=10 os_prio=0 cpu=66154.14ms elapsed=20963.70s tid=0x0000ffff0c290980 nid=0x2cb sleeping [0x0000fffee2bfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003af0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-5" #40 prio=10 os_prio=0 cpu=66316.35ms elapsed=20963.70s tid=0x0000ffff0c291ac0 nid=0x2cc sleeping [0x0000fffee29fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500000ca0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-6" #41 prio=10 os_prio=0 cpu=66109.76ms elapsed=20963.70s tid=0x0000ffff0c293150 nid=0x2cd sleeping [0x0000fffee27fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003ca0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-7" #42 prio=10 os_prio=0 cpu=66466.57ms elapsed=20963.70s tid=0x0000ffff0c2942a0 nid=0x2ce sleeping [0x0000fffee25fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003e50> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-data-replication-8" #43 prio=10 os_prio=0 cpu=66213.19ms elapsed=20963.70s tid=0x0000ffff0c2957f0 nid=0x2cf sleeping [0x0000fffee23fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider.lambda$setup$5(BerkeleyJEProvider.java:179)
+	at com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider$$Lambda$141/0x0000000800dbb7d0.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003e90> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-1" #44 prio=10 os_prio=0 cpu=66200.17ms elapsed=20963.70s tid=0x0000ffff08001f90 nid=0x2d0 sleeping [0x0000ffff4e289000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x00000005000049a0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-2" #45 prio=10 os_prio=0 cpu=66169.09ms elapsed=20963.70s tid=0x0000ffff08002f40 nid=0x2d1 sleeping [0x0000fffee21fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500003ee0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-3" #46 prio=10 os_prio=0 cpu=66455.58ms elapsed=20963.70s tid=0x0000ffff080040b0 nid=0x2d2 sleeping [0x0000fffee1ffe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x00000005000047f8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-4" #47 prio=10 os_prio=0 cpu=66184.39ms elapsed=20963.70s tid=0x0000ffff08005220 nid=0x2d3 sleeping [0x0000fffee1dfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500007e00> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-5" #48 prio=10 os_prio=0 cpu=66752.96ms elapsed=20963.70s tid=0x0000ffff080063a0 nid=0x2d4 sleeping [0x0000fffee1bfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500007fc0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-6" #49 prio=10 os_prio=0 cpu=66119.32ms elapsed=20963.70s tid=0x0000ffff08007520 nid=0x2d5 sleeping [0x0000fffee19fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500000e80> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-7" #50 prio=10 os_prio=0 cpu=66346.97ms elapsed=20963.70s tid=0x0000ffff08008aa0 nid=0x2d6 sleeping [0x0000fffee17fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500008180> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-integration-event-8" #51 prio=10 os_prio=0 cpu=66788.39ms elapsed=20963.70s tid=0x0000ffff08009c30 nid=0x2d7 sleeping [0x0000fffee15fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.tarantula.platform.service.cluster.EventSubscriptionWorker.run(EventSubscriptionWorker.java:43)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000500008340> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"hz._hzInstance_1_tarantula-integration-pdg.scheduled.thread-" #53 prio=5 os_prio=0 cpu=12145.37ms elapsed=20963.21s tid=0x0000ffff08136c50 nid=0x2d8 runnable  [0x0000ffff4e489000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500001028> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1182)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.event-1" #64 prio=10 os_prio=0 cpu=17136.19ms elapsed=20963.18s tid=0x0000ffff08132cb0 nid=0x2d9 waiting on condition  [0x0000fffee0bfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x00000005000011b0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.util.executor.StripedExecutor$Worker.run(StripedExecutor.java:226)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.event-2" #65 prio=10 os_prio=0 cpu=1865.75ms elapsed=20963.18s tid=0x0000ffff08133730 nid=0x2da waiting on condition  [0x0000fffee09fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500001288> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.util.executor.StripedExecutor$Worker.run(StripedExecutor.java:226)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.event-3" #66 prio=10 os_prio=0 cpu=3633.76ms elapsed=20963.18s tid=0x0000ffff08157e30 nid=0x2db waiting on condition  [0x0000fffee07fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500017c68> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.util.executor.StripedExecutor$Worker.run(StripedExecutor.java:226)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.event-4" #67 prio=10 os_prio=0 cpu=2199.31ms elapsed=20963.18s tid=0x0000ffff08158f30 nid=0x2dc waiting on condition  [0x0000fffee05fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500261180> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.util.executor.StripedExecutor$Worker.run(StripedExecutor.java:226)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.event-5" #68 prio=10 os_prio=0 cpu=2718.97ms elapsed=20963.18s tid=0x0000ffff0815b5a0 nid=0x2dd waiting on condition  [0x0000fffee03fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500260e48> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.util.executor.StripedExecutor$Worker.run(StripedExecutor.java:226)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.operation-parker" #69 prio=5 os_prio=0 cpu=578.65ms elapsed=20963.17s tid=0x0000ffff0815e000 nid=0x2de runnable  [0x0000fffee01fd000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500261588> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.DelayQueue.poll(java.base@17.0.4/DelayQueue.java:265)
+	at com.hazelcast.spi.impl.operationparker.impl.OperationParkerImpl$ExpirationTask.doRun(OperationParkerImpl.java:224)
+	at com.hazelcast.spi.impl.operationparker.impl.OperationParkerImpl$ExpirationTask.run(OperationParkerImpl.java:207)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@17.0.4/Executors.java:539)
+	at java.util.concurrent.FutureTask.run(java.base@17.0.4/FutureTask.java:264)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- <0x0000000500263a00> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"hz._hzInstance_1_tarantula-integration-pdg.migration" #70 prio=10 os_prio=0 cpu=715.45ms elapsed=20962.54s tid=0x0000ffff085f31e0 nid=0x2f6 runnable  [0x0000fffedc7fe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501208118> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.LinkedBlockingQueue.poll(java.base@17.0.4/LinkedBlockingQueue.java:460)
+	at com.hazelcast.internal.partition.impl.MigrationQueue.poll(MigrationQueue.java:48)
+	at com.hazelcast.internal.partition.impl.MigrationThread.doRun(MigrationThread.java:92)
+	at com.hazelcast.internal.partition.impl.MigrationThread.run(MigrationThread.java:67)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.InvocationMonitorThread" #74 prio=10 os_prio=0 cpu=967.95ms elapsed=20962.53s tid=0x0000ffff08606980 nid=0x2fa runnable  [0x0000fffedbffe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x00000005002d3ba0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1182)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.partition-operation.thread-0" #56 prio=10 os_prio=0 cpu=6746.14ms elapsed=20962.53s tid=0x0000ffff08608ec0 nid=0x2fb waiting on condition  [0x0000fffedbdfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.partition-operation.thread-1" #57 prio=10 os_prio=0 cpu=6538.93ms elapsed=20962.53s tid=0x0000ffff08608310 nid=0x2fc waiting on condition  [0x0000fffedbbfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.partition-operation.thread-2" #58 prio=10 os_prio=0 cpu=6475.05ms elapsed=20962.53s tid=0x0000ffff0860a880 nid=0x2fd waiting on condition  [0x0000fffedb9fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.partition-operation.thread-3" #59 prio=10 os_prio=0 cpu=6812.22ms elapsed=20962.52s tid=0x0000ffff0860b890 nid=0x2fe waiting on condition  [0x0000fffedb7fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.priority-generic-operation.thread-0" #60 prio=10 os_prio=0 cpu=612.98ms elapsed=20962.52s tid=0x0000ffff0860caa0 nid=0x2ff waiting on condition  [0x0000fffedb5fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500281f88> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:76)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.generic-operation.thread-0" #61 prio=10 os_prio=0 cpu=499343.43ms elapsed=20962.52s tid=0x0000ffff0860dab0 nid=0x300 waiting on condition  [0x0000fffedb3fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500281920> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.generic-operation.thread-1" #62 prio=10 os_prio=0 cpu=499390.73ms elapsed=20962.52s tid=0x0000ffff0860ecd0 nid=0x301 waiting on condition  [0x0000fffedb1fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500281920> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.LinkedBlockingQueue.take(java.base@17.0.4/LinkedBlockingQueue.java:435)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationQueueImpl.take(OperationQueueImpl.java:85)
+	at com.hazelcast.spi.impl.operationexecutor.impl.OperationThread.run(OperationThread.java:105)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.response-0" #54 prio=10 os_prio=0 cpu=210125.85ms elapsed=20962.52s tid=0x0000ffff08610350 nid=0x302 waiting on condition  [0x0000fffedaffe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationservice.impl.InboundResponseHandlerSupplier$ResponseThread.doRun(InboundResponseHandlerSupplier.java:283)
+	at com.hazelcast.spi.impl.operationservice.impl.InboundResponseHandlerSupplier$ResponseThread.run(InboundResponseHandlerSupplier.java:272)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.response-1" #55 prio=10 os_prio=0 cpu=210812.25ms elapsed=20962.52s tid=0x0000ffff08611970 nid=0x303 waiting on condition  [0x0000fffedadfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.takeAll(MPSCQueue.java:231)
+	at com.hazelcast.internal.util.concurrent.MPSCQueue.take(MPSCQueue.java:153)
+	at com.hazelcast.spi.impl.operationservice.impl.InboundResponseHandlerSupplier$ResponseThread.doRun(InboundResponseHandlerSupplier.java:283)
+	at com.hazelcast.spi.impl.operationservice.impl.InboundResponseHandlerSupplier$ResponseThread.run(InboundResponseHandlerSupplier.java:272)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.SlowOperationDetectorThread" #63 prio=10 os_prio=0 cpu=677.96ms elapsed=20962.52s tid=0x0000ffff08612fa0 nid=0x304 sleeping [0x0000fffedabfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at java.lang.Thread.sleep(java.base@17.0.4/Thread.java:337)
+	at java.util.concurrent.TimeUnit.sleep(java.base@17.0.4/TimeUnit.java:446)
+	at com.hazelcast.spi.impl.operationexecutor.slowoperationdetector.SlowOperationDetector$DetectorThread.sleepInterval(SlowOperationDetector.java:290)
+	at com.hazelcast.spi.impl.operationexecutor.slowoperationdetector.SlowOperationDetector$DetectorThread.run(SlowOperationDetector.java:154)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-in-0" #77 prio=10 os_prio=0 cpu=378039.42ms elapsed=20962.51s tid=0x0000ffff0861ecc0 nid=0x307 runnable  [0x0000fffeda5fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501209400> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x00000005012093b0> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-in-1" #78 prio=10 os_prio=0 cpu=548546.36ms elapsed=20962.51s tid=0x0000ffff08624120 nid=0x308 runnable  [0x0000fffeda3fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x00000005012079d8> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x0000000501207988> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-in-2" #79 prio=10 os_prio=0 cpu=110.64ms elapsed=20962.51s tid=0x0000ffff08629390 nid=0x309 runnable  [0x0000fffeda1fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501207c08> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x0000000501207bb8> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-out-0" #80 prio=10 os_prio=0 cpu=385789.56ms elapsed=20962.51s tid=0x0000ffff0862e8f0 nid=0x30a runnable  [0x0000fffed9ffe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501208418> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x00000005012083c8> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-out-1" #81 prio=10 os_prio=0 cpu=369529.82ms elapsed=20962.51s tid=0x0000ffff08633b90 nid=0x30b runnable  [0x0000fffed9dfe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501207e38> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x0000000501207de8> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-out-2" #82 prio=10 os_prio=0 cpu=104.66ms elapsed=20962.51s tid=0x0000ffff08639220 nid=0x30c runnable  [0x0000fffed9bfe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501207ea0> (a com.hazelcast.internal.networking.nio.SelectorOptimizer$SelectionKeysSet)
+	- locked <0x0000000501207e50> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at com.hazelcast.internal.networking.nio.NioThread.selectLoop(NioThread.java:278)
+	at com.hazelcast.internal.networking.nio.NioThread.run(NioThread.java:235)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.BalancerThread" #83 prio=10 os_prio=0 cpu=67.06ms elapsed=20962.51s tid=0x0000ffff0863b2b0 nid=0x30d waiting on condition  [0x0000fffed99fe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501208ae0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.LinkedBlockingQueue.poll(java.base@17.0.4/LinkedBlockingQueue.java:460)
+	at com.hazelcast.internal.networking.nio.iobalancer.IOBalancerThread.run(IOBalancerThread.java:65)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.IO.thread-Acceptor" #84 prio=10 os_prio=0 cpu=1.02ms elapsed=20962.51s tid=0x0000ffff0863d6b0 nid=0x30e runnable  [0x0000fffed97fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501208670> (a sun.nio.ch.Util$2)
+	- locked <0x0000000501208620> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:146)
+	at com.hazelcast.nio.tcp.TcpIpAcceptor$AcceptorIOThread.acceptLoop(TcpIpAcceptor.java:177)
+	at com.hazelcast.nio.tcp.TcpIpAcceptor$AcceptorIOThread.run(TcpIpAcceptor.java:163)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-scheduler-1" #93 prio=10 os_prio=0 cpu=13769.37ms elapsed=20955.15s tid=0x0000ffff24548310 nid=0x317 waiting on condition  [0x0000fffedc5fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500336358> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1177)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-scheduler-2" #94 prio=10 os_prio=0 cpu=976.35ms elapsed=20955.14s tid=0x0000ffff380025d0 nid=0x318 waiting on condition  [0x0000ffff4d3fe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500336358> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(java.base@17.0.4/AbstractQueuedSynchronizer.java:1672)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1182)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-scheduler-3" #95 prio=10 os_prio=0 cpu=938.19ms elapsed=20955.02s tid=0x0000ffff246f28e0 nid=0x319 waiting on condition  [0x0000fffed8ffe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500336358> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1177)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-scheduler-4" #96 prio=10 os_prio=0 cpu=934.55ms elapsed=20955.02s tid=0x0000ffff380032f0 nid=0x31a waiting on condition  [0x0000fffed8dfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000500336358> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:1177)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(java.base@17.0.4/ScheduledThreadPoolExecutor.java:899)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"server-timer" #101 daemon prio=10 os_prio=0 cpu=88.08ms elapsed=20954.25s tid=0x0000fffef8056bf0 nid=0x31f in Object.wait()  [0x0000ffff4cffe000]
+   java.lang.Thread.State: TIMED_WAITING (on object monitor)
+	at java.lang.Object.wait(java.base@17.0.4/Native Method)
+	- waiting on <no object reference available>
+	at java.util.TimerThread.mainLoop(java.base@17.0.4/Timer.java:563)
+	- locked <0x0000000501a30908> (a java.util.TaskQueue)
+	at java.util.TimerThread.run(java.base@17.0.4/Timer.java:516)
+
+   Locked ownable synchronizers:
+	- None
+
+"HTTP-Dispatcher" #102 prio=10 os_prio=0 cpu=64255.47ms elapsed=20954.24s tid=0x0000fffef805af10 nid=0x320 runnable  [0x0000fffed85fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501a3d4d0> (a sun.nio.ch.Util$2)
+	- locked <0x0000000501a3d480> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at sun.net.httpserver.ServerImpl$Dispatcher.run(jdk.httpserver@17.0.4/ServerImpl.java:370)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-udp-messaging-1" #103 prio=10 os_prio=0 cpu=297834.48ms elapsed=20954.21s tid=0x0000fffef8a660d0 nid=0x321 sleeping [0x0000fffed83fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.icodesoftware.protocol.UDPEndpointService.lambda$start$2(UDPEndpointService.java:81)
+	at com.icodesoftware.protocol.UDPEndpointService$$Lambda$207/0x0000000801099b28.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000501a23fa8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-udp-messaging-2" #104 prio=10 os_prio=0 cpu=297904.97ms elapsed=20954.21s tid=0x0000fffef8a651b0 nid=0x322 sleeping [0x0000fffed81fe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.icodesoftware.protocol.UDPEndpointService.lambda$start$2(UDPEndpointService.java:81)
+	at com.icodesoftware.protocol.UDPEndpointService$$Lambda$207/0x0000000801099b28.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000501a0a7c8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-udp-messaging-3" #105 prio=10 os_prio=0 cpu=8447.55ms elapsed=20954.21s tid=0x0000fffef8a673c0 nid=0x323 sleeping [0x0000fffed7ffe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.icodesoftware.protocol.UDPEndpointService.lambda$start$7(UDPEndpointService.java:97)
+	at com.icodesoftware.protocol.UDPEndpointService$$Lambda$208/0x0000000801099d50.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000501a30b90> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-udp-messaging-4" #106 prio=10 os_prio=0 cpu=118848.17ms elapsed=20954.21s tid=0x0000fffef8a69cf0 nid=0x324 sleeping [0x0000fffed7dfe000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(java.base@17.0.4/Native Method)
+	at com.icodesoftware.protocol.UDPEndpointService.lambda$start$8(UDPEndpointService.java:132)
+	at com.icodesoftware.protocol.UDPEndpointService$$Lambda$209/0x0000000801099f78.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000501a30dc8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"tarantula-udp-messaging-5" #107 prio=10 os_prio=0 cpu=215289.42ms elapsed=20954.20s tid=0x0000fffef8a6d3a0 nid=0x325 runnable  [0x0000fffed7bfe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.Net.poll(java.base@17.0.4/Native Method)
+	at sun.nio.ch.SelChImpl.park(java.base@17.0.4/SelChImpl.java:92)
+	at sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(java.base@17.0.4/DatagramChannelImpl.java:705)
+	at sun.nio.ch.DatagramChannelImpl.blockingReceive(java.base@17.0.4/DatagramChannelImpl.java:633)
+	at sun.nio.ch.DatagramSocketAdaptor.receive(java.base@17.0.4/DatagramSocketAdaptor.java:240)
+	at java.net.DatagramSocket.receive(java.base@17.0.4/DatagramSocket.java:700)
+	at com.icodesoftware.protocol.UDPEndpointService.run(UDPEndpointService.java:158)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- <0x0000000501a31078> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+	- <0x000000050208c178> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"HttpClient-1-SelectorManager" #111 daemon prio=10 os_prio=0 cpu=324.53ms elapsed=20861.80s tid=0x0000fffee80be740 nid=0x32e runnable  [0x0000fffed89fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.EPoll.wait(java.base@17.0.4/Native Method)
+	at sun.nio.ch.EPollSelectorImpl.doSelect(java.base@17.0.4/EPollSelectorImpl.java:118)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(java.base@17.0.4/SelectorImpl.java:129)
+	- locked <0x0000000501a31288> (a sun.nio.ch.Util$2)
+	- locked <0x0000000501a31238> (a sun.nio.ch.EPollSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(java.base@17.0.4/SelectorImpl.java:141)
+	at jdk.internal.net.http.HttpClientImpl$SelectorManager.run(java.net.http@17.0.4/HttpClientImpl.java:889)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-1" #113 prio=10 os_prio=0 cpu=9226.76ms elapsed=20764.53s tid=0x0000ffff6008aba0 nid=0x340 waiting on condition  [0x0000fffeda7fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-2" #114 prio=10 os_prio=0 cpu=9198.66ms elapsed=20763.15s tid=0x0000ffff60060f00 nid=0x341 waiting on condition  [0x0000fffed91fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-3" #120 prio=10 os_prio=0 cpu=9208.12ms elapsed=20098.55s tid=0x0000ffff60046bb0 nid=0x3a1 waiting on condition  [0x0000fffeda9fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-4" #121 prio=10 os_prio=0 cpu=9202.22ms elapsed=20098.55s tid=0x0000ffff60063920 nid=0x3a2 waiting on condition  [0x0000fffed8bfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-5" #122 prio=10 os_prio=0 cpu=9208.54ms elapsed=20098.55s tid=0x0000ffff60064180 nid=0x3a3 waiting on condition  [0x0000fffed95fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-6" #123 prio=10 os_prio=0 cpu=9236.40ms elapsed=20098.55s tid=0x0000ffff600654f0 nid=0x3a4 waiting on condition  [0x0000ffff4cbfe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-7" #124 prio=10 os_prio=0 cpu=9189.81ms elapsed=20098.51s tid=0x0000ffff60066680 nid=0x3a5 waiting on condition  [0x0000fffed79fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"tarantula-http-inbound-8" #125 prio=10 os_prio=0 cpu=9189.84ms elapsed=20098.51s tid=0x0000ffff60067ce0 nid=0x3a6 waiting on condition  [0x0000fffed6ffe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x0000000501a24148> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(java.base@17.0.4/LockSupport.java:341)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(java.base@17.0.4/AbstractQueuedSynchronizer.java:506)
+	at java.util.concurrent.ForkJoinPool.unmanagedBlock(java.base@17.0.4/ForkJoinPool.java:3463)
+	at java.util.concurrent.ForkJoinPool.managedBlock(java.base@17.0.4/ForkJoinPool.java:3434)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@17.0.4/AbstractQueuedSynchronizer.java:1623)
+	at java.util.concurrent.ArrayBlockingQueue.take(java.base@17.0.4/ArrayBlockingQueue.java:420)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1062)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.cached.thread-2" #317 prio=5 os_prio=0 cpu=110.49ms elapsed=742.53s tid=0x0000ffff3c010200 nid=0xb63 waiting on condition  [0x0000fffed87fe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x000000050024d170> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(java.base@17.0.4/SynchronousQueue.java:401)
+	at java.util.concurrent.SynchronousQueue.poll(java.base@17.0.4/SynchronousQueue.java:903)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1061)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.cached.thread-4" #320 prio=5 os_prio=0 cpu=104.48ms elapsed=382.53s tid=0x0000ffff3c020000 nid=0xb7f waiting on condition  [0x0000fffed6dfe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x000000050024d170> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(java.base@17.0.4/SynchronousQueue.java:401)
+	at java.util.concurrent.SynchronousQueue.poll(java.base@17.0.4/SynchronousQueue.java:903)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1061)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.cached.thread-6" #323 prio=5 os_prio=0 cpu=16.04ms elapsed=67.53s tid=0x0000ffff3c0178e0 nid=0xba2 waiting on condition  [0x0000fffed6bfe000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x000000050024d170> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(java.base@17.0.4/SynchronousQueue.java:401)
+	at java.util.concurrent.SynchronousQueue.poll(java.base@17.0.4/SynchronousQueue.java:903)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1061)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.cached.thread-9" #324 prio=5 os_prio=0 cpu=7.58ms elapsed=67.53s tid=0x0000ffff3c00c490 nid=0xba3 waiting on condition  [0x0000fffed59f4000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x000000050024d170> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(java.base@17.0.4/SynchronousQueue.java:401)
+	at java.util.concurrent.SynchronousQueue.poll(java.base@17.0.4/SynchronousQueue.java:903)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1061)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"hz._hzInstance_1_tarantula-integration-pdg.cached.thread-7" #325 prio=5 os_prio=0 cpu=22.26ms elapsed=67.53s tid=0x0000ffff3c015540 nid=0xba4 waiting on condition  [0x0000fffed5ff4000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.4/Native Method)
+	- parking to wait for  <0x000000050024d170> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@17.0.4/LockSupport.java:252)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(java.base@17.0.4/SynchronousQueue.java:401)
+	at java.util.concurrent.SynchronousQueue.poll(java.base@17.0.4/SynchronousQueue.java:903)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(java.base@17.0.4/ThreadPoolExecutor.java:1061)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@17.0.4/ThreadPoolExecutor.java:1122)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@17.0.4/ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(java.base@17.0.4/Thread.java:833)
+	at com.hazelcast.util.executor.HazelcastManagedThread.executeRun(HazelcastManagedThread.java:64)
+	at com.hazelcast.util.executor.HazelcastManagedThread.run(HazelcastManagedThread.java:80)
+
+   Locked ownable synchronizers:
+	- None
+
+"Attach Listener" #326 daemon prio=9 os_prio=0 cpu=0.30ms elapsed=1.35s tid=0x0000ffff34024210 nid=0xbdd waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"VM Thread" os_prio=0 cpu=2704.46ms elapsed=20965.01s tid=0x0000ffff98dd70f0 nid=0x2a7 runnable  
+
+"GC Thread#0" os_prio=0 cpu=7614.35ms elapsed=20965.14s tid=0x0000ffff9803fdc0 nid=0x2a2 runnable  
+
+"GC Thread#1" os_prio=0 cpu=7399.40ms elapsed=20963.10s tid=0x0000ffff4400a040 nid=0x2df runnable  
+
+"GC Thread#2" os_prio=0 cpu=7586.93ms elapsed=20963.10s tid=0x0000ffff4400aa80 nid=0x2e0 runnable  
+
+"GC Thread#3" os_prio=0 cpu=7554.50ms elapsed=20963.10s tid=0x0000ffff4400b4c0 nid=0x2e1 runnable  
+
+"GC Thread#4" os_prio=0 cpu=7499.53ms elapsed=20963.10s tid=0x0000ffff4400bf00 nid=0x2e2 runnable  
+
+"GC Thread#5" os_prio=0 cpu=7431.39ms elapsed=20963.10s tid=0x0000ffff4400c940 nid=0x2e3 runnable  
+
+"GC Thread#6" os_prio=0 cpu=7604.53ms elapsed=20963.10s tid=0x0000ffff4400d380 nid=0x2e4 runnable  
+
+"GC Thread#7" os_prio=0 cpu=7699.77ms elapsed=20963.10s tid=0x0000ffff4400ddc0 nid=0x2e5 runnable  
+
+"GC Thread#8" os_prio=0 cpu=7860.60ms elapsed=20963.10s tid=0x0000ffff4400ebf0 nid=0x2e6 runnable  
+
+"GC Thread#9" os_prio=0 cpu=7514.17ms elapsed=20963.10s tid=0x0000ffff4400fa20 nid=0x2e7 runnable  
+
+"GC Thread#10" os_prio=0 cpu=7473.28ms elapsed=20963.10s tid=0x0000ffff44010850 nid=0x2e8 runnable  
+
+"GC Thread#11" os_prio=0 cpu=7689.48ms elapsed=20963.10s tid=0x0000ffff44011680 nid=0x2e9 runnable  
+
+"GC Thread#12" os_prio=0 cpu=7684.15ms elapsed=20963.10s tid=0x0000ffff440124b0 nid=0x2ea runnable  
+
+"GC Thread#13" os_prio=0 cpu=7738.42ms elapsed=20963.10s tid=0x0000ffff440132e0 nid=0x2eb runnable  
+
+"GC Thread#14" os_prio=0 cpu=7755.18ms elapsed=20963.10s tid=0x0000ffff44014110 nid=0x2ec runnable  
+
+"GC Thread#15" os_prio=0 cpu=7627.56ms elapsed=20963.10s tid=0x0000ffff44014f40 nid=0x2ed runnable  
+
+"GC Thread#16" os_prio=0 cpu=7680.81ms elapsed=20963.10s tid=0x0000ffff44015d70 nid=0x2ee runnable  
+
+"GC Thread#17" os_prio=0 cpu=7701.87ms elapsed=20963.10s tid=0x0000ffff44016ba0 nid=0x2ef runnable  
+
+"GC Thread#18" os_prio=0 cpu=7832.82ms elapsed=20963.10s tid=0x0000ffff440179d0 nid=0x2f0 runnable  
+
+"GC Thread#19" os_prio=0 cpu=7762.17ms elapsed=20963.10s tid=0x0000ffff44018800 nid=0x2f1 runnable  
+
+"G1 Main Marker" os_prio=0 cpu=8.62ms elapsed=20965.14s tid=0x0000ffff9804d2c0 nid=0x2a3 runnable  
+
+"G1 Conc#0" os_prio=0 cpu=27.93ms elapsed=20965.14s tid=0x0000ffff9804e240 nid=0x2a4 runnable  
+
+"G1 Conc#1" os_prio=0 cpu=19.50ms elapsed=20963.09s tid=0x0000ffff58001210 nid=0x2f2 runnable  
+
+"G1 Conc#2" os_prio=0 cpu=12.47ms elapsed=20963.09s tid=0x0000ffff58002050 nid=0x2f3 runnable  
+
+"G1 Conc#3" os_prio=0 cpu=18.48ms elapsed=20963.09s tid=0x0000ffff58002ec0 nid=0x2f4 runnable  
+
+"G1 Conc#4" os_prio=0 cpu=11.17ms elapsed=20963.09s tid=0x0000ffff58003d30 nid=0x2f5 runnable  
+
+"G1 Refine#0" os_prio=0 cpu=7477.41ms elapsed=20965.12s tid=0x0000ffff98dab540 nid=0x2a5 runnable  
+
+"G1 Refine#1" os_prio=0 cpu=54.00ms elapsed=19790.20s tid=0x0000ffff50010f30 nid=0x3c9 runnable  
+
+"G1 Refine#2" os_prio=0 cpu=33.22ms elapsed=19790.20s tid=0x0000ffff99501f40 nid=0x3ca runnable  
+
+"G1 Refine#3" os_prio=0 cpu=14.05ms elapsed=19790.20s tid=0x0000aaab0bedbb90 nid=0x3cb runnable  
+
+"G1 Refine#4" os_prio=0 cpu=6.43ms elapsed=19529.96s tid=0x0000fffee8777930 nid=0x3e0 runnable  
+
+"G1 Refine#5" os_prio=0 cpu=0.41ms elapsed=19493.98s tid=0x0000fffeec11f410 nid=0x422 runnable  
+
+"G1 Service" os_prio=0 cpu=5343.02ms elapsed=20965.12s tid=0x0000ffff98dac440 nid=0x2a6 runnable  
+
+"VM Periodic Task Thread" os_prio=0 cpu=6782.68ms elapsed=20964.93s tid=0x0000ffff98e34e90 nid=0x2b2 waiting on condition  
+
+JNI global refs: 30, weak refs: 0
+
