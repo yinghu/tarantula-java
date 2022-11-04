@@ -16,6 +16,8 @@ public interface DataStoreProvider extends ServiceProvider {
 
     String PENDING_REPLICATION_POOL_SIZE = "pendingReplicationPoolSize";
     String REPLICATION_NODE_NUMBER = "replicationNodeNumber";
+    String CACHE_MISS_NUMBER = "cacheMissNumber";
+
 
     void configure(Map<String,Object> properties);
 

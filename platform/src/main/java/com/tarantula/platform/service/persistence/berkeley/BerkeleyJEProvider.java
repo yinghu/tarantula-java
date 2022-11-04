@@ -475,7 +475,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void updateSummary(Summary summary){
         summary.update(PENDING_REPLICATION_POOL_SIZE,replicationPendingQueue.size());
         summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
-        summary.update("",environment.getStats(null).getNCacheMiss());
+        summary.update(CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
+        summary.update(CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
