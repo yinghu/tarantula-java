@@ -25,10 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
@@ -228,9 +225,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             fo.close();
         }
         this.dataStoreList = new CopyOnWriteArrayList<>();
-        EnvironmentConfig envConfig = new EnvironmentConfig();
+        Properties props = new Properties();
+        props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("je.properties"));
+        EnvironmentConfig envConfig = new EnvironmentConfig(props);
         envConfig.setAllowCreate(true);
-        envConfig.setSharedCache(true);
         this.environment = new Environment(new File(dataPath),envConfig);
         if(trimming){
             log.warn("Database ["+this.database+"] configured as trimming mode");
@@ -268,8 +266,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         iBackupProvider.shutdown();
         dBackupProvider.shutdown();
         dMap.forEach((k,v)->{
-            v.close();
+            try{
+                v.close();
+            }catch (Exception ex){
+                log.warn(k+" store error on close>"+ex.getMessage());
+            }
         });
+        this.environment.cleanLog();
+        this.integrationEnvironment.cleanLog();
         this.environment.close();
         this.integrationEnvironment.close();
         log.info("Berkeley JE data store shut down on ["+node.toString()+"]");
@@ -471,6 +475,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void updateSummary(Summary summary){
         summary.update(PENDING_REPLICATION_POOL_SIZE,replicationPendingQueue.size());
         summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        summary.update("",environment.getStats(null).getNCacheMiss());
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

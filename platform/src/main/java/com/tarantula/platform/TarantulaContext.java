@@ -203,6 +203,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.scheduledExecutorService.shutdown();
         this.endpointService.shutdown();
         this.integrationCluster.shutdown();
+        serviceProviders.remove(DataStoreProvider.NAME);
         for(ServiceProvider ds : serviceProviders.values()){
             ds.shutdown();
         }
