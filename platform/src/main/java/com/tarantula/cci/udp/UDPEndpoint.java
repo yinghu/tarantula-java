@@ -37,7 +37,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private static final String PENDING_SESSION_SIZE = "pendingUdpSessionSize";
     private static final String GAME_SESSION_SIZE = "gameUdpSessionSize";
-
+    private Thread receiverDaemon;
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -55,10 +55,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.type(Connection.UDP);
         connection.secured(true);
         connection.host(serviceContext.node().servicePushAddress());
-        udpEndpointServiceProvider.daemon(true);
+        udpEndpointServiceProvider.daemon(false);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.registerPingListener(this);
+        receiverDaemon = new Thread(udpEndpointServiceProvider,"tarantula-udp-receiver");
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
@@ -70,6 +71,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void start() throws Exception {
         udpEndpointServiceProvider.start();
+        receiverDaemon.start();
         this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
     }
 

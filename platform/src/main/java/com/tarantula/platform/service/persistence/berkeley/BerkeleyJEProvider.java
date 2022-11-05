@@ -63,6 +63,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
 
+
+
     private MetricsListener metricsListener = (k,v)->{};
 
     @Override
@@ -173,7 +175,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                             runnable.run();
                         }
                         else{
-                            Thread.sleep(100);
+                            Thread.sleep(1);
+                            //environment.sync();
+                            //environment.cleanLog();
+                            ///integrationEnvironment.sync();
+                            //integrationEnvironment.cleanLog();
                         }
                     }catch (Exception ex){
 
@@ -228,7 +234,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         Properties props = new Properties();
         props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("je.properties"));
         EnvironmentConfig envConfig = new EnvironmentConfig(props);
-        envConfig.setAllowCreate(true);
         this.environment = new Environment(new File(dataPath),envConfig);
         if(trimming){
             log.warn("Database ["+this.database+"] configured as trimming mode");

@@ -49,6 +49,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private PingListener pingListener  = ()->{};
 
+    private boolean running = true;
+
     public void start() throws Exception{
         if(inboundThreadPoolSetting!=null){
             TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
@@ -145,6 +147,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public void shutdown() throws Exception{
         log.warn("UDP endpoint service is going down");
+        running = false;
         this.executorService.shutdownNow();
         this.datagramChannel.close();
     }
@@ -152,7 +155,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     @Override
     public void run() {
         log.warn("UDP endpoint service is ready on ["+host+":"+port+"] on ["+(daemon?"daemon thread":"main thread")+"]");
-        while (true){
+        while (running){
             try{
                 DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
                 this.datagramChannel.receive(buffer);
@@ -163,6 +166,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
             }
         }
+        log.warn("UDP receiver daemon is shutting down");
     }
 
     public void send(byte[] data,SocketAddress destination){
