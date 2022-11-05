@@ -46,6 +46,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
     public final static String PERFORMANCE_CLUSTER_INBOUND_MESSAGE_COUNT = "clusterInboundMessageCount";
     public final static String PERFORMANCE_CLUSTER_OUTBOUND_MESSAGE_COUNT = "clusterOutboundMessageCount";
     public final static String PERFORMANCE_HTTP_REQUEST_COUNT = "httpRequestCount";
+    public final static String PERFORMANCE_HTTP_REQUEST_ERROR_COUNT = "httpRequestErrorCount";
+
     public final static String PERFORMANCE_UDP_REQUEST_COUNT = "udpRequestCount";
     public final static String PERFORMANCE_VM_CPU_USAGE_COUNT = "vmCPUUsageCount";
     public final static String PERFORMANCE_VM_MEMORY_COUNT = "vmMemoryCount";
@@ -127,6 +129,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
             registerCategory(PERFORMANCE_CLUSTER_INBOUND_MESSAGE_COUNT);
             registerCategory(PERFORMANCE_CLUSTER_OUTBOUND_MESSAGE_COUNT);
             registerCategory(PERFORMANCE_HTTP_REQUEST_COUNT);
+            registerCategory(PERFORMANCE_HTTP_REQUEST_ERROR_COUNT);
             registerCategory(PERFORMANCE_UDP_REQUEST_COUNT);
             registerCategory(PERFORMANCE_VM_CPU_USAGE_COUNT);
             registerCategory(PERFORMANCE_VM_MEMORY_COUNT);

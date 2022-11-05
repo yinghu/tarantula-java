@@ -9,7 +9,6 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
@@ -80,7 +79,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
         else{
             throw new UnsupportedOperationException("Invalid operation ["+action+"]");
         }
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     @Override

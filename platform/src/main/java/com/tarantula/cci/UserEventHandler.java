@@ -7,7 +7,6 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.UUID;
@@ -37,7 +36,6 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
     }
     public void onRequest(OnExchange onExchange) throws Exception {
 
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
         String path = onExchange.path();
         String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
         String name = onExchange.header(Session.TARANTULA_NAME);

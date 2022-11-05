@@ -10,7 +10,6 @@ import com.icodesoftware.service.OnExchange;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.util.OnViewSerializer;
 
 
@@ -35,7 +34,6 @@ public class ViewEventHandler extends AbstractRequestHandler {
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
         exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
     @Override
     public void start() throws Exception {

@@ -5,7 +5,6 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.event.ServiceActionEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,8 +65,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         else{
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
         }
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
-    }
+     }
 
     @Override
     public void start() throws Exception {

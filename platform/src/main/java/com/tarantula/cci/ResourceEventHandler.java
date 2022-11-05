@@ -5,7 +5,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 
 public class ResourceEventHandler extends AbstractRequestHandler{
@@ -25,8 +24,7 @@ public class ResourceEventHandler extends AbstractRequestHandler{
         //load js API in resources/web, public access
         Content _load = this.deploymentServiceProvider.resource(path.substring(1));
         exchange.onEvent(new ResponsiveEvent("","",_load.data(),0,_load.type(),true));
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
-    }
+     }
     @Override
     public void start() throws Exception {
         log.info("Resource content handler started");

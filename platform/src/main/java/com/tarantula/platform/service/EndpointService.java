@@ -84,9 +84,9 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
 
         for(EndPoint endPoint : endPointList){
             endPoint.resource(this);
+            endPoint.registerMetricsListener(this.tarantulaContext.metrics(Metrics.PERFORMANCE));
             this.tarantulaContext.deployServiceProvider(endPoint);
             endPoint.start();
-            endPoint.registerMetricsListener(this.tarantulaContext.metrics(Metrics.PERFORMANCE));
             this.tarantulaContext.node_started.set(true);
         }
     }

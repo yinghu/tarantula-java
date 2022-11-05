@@ -4,7 +4,6 @@ import com.icodesoftware.Event;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 public class RootContentHandler extends AbstractRequestHandler {
 
@@ -22,7 +21,6 @@ public class RootContentHandler extends AbstractRequestHandler {
         Content content = this.deploymentServiceProvider.resource("root"+path);
         byte[] _load = content.data();
         exchange.onEvent(new ResponsiveEvent("","",_load,0,content.type(),true));
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
     }
 
     public void setup(ServiceContext tcx){

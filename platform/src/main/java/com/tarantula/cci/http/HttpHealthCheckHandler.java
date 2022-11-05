@@ -2,6 +2,7 @@ package com.tarantula.cci.http;
 
 import com.icodesoftware.Session;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.RequestHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.tarantula.cci.HttpDispatcher;
@@ -11,6 +12,10 @@ import java.io.IOException;
 public class HttpHealthCheckHandler extends HttpDispatcher {
 
     private byte[] hc = "hc".getBytes();
+
+    public HttpHealthCheckHandler(MetricsListener metricsListener){
+        super(metricsListener);
+    }
 
     @Override
     public void resource(EndPoint.Resource resource) {
