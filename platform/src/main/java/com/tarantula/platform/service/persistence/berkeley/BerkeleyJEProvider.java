@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
@@ -58,12 +59,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private Environment environment;
     private Environment integrationEnvironment;
 
-
     private BackupRouter iBackupProvider;
     private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
 
-
+    private AtomicInteger totalUpdated = new AtomicInteger(0);
 
     private MetricsListener metricsListener = (k,v)->{};
 
@@ -173,13 +173,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     try {
                         if(runnable!=null){
                             runnable.run();
+                            //totalUpdated.decrementAndGet();
                         }
                         else{
                             Thread.sleep(1);
-                            //environment.sync();
-                            //environment.cleanLog();
-                            ///integrationEnvironment.sync();
-                            //integrationEnvironment.cleanLog();
+                            if(totalUpdated.getAndSet(0)>0) {
+                                environment.sync();
+                                environment.cleanLog();
+                                integrationEnvironment.sync();
+                                integrationEnvironment.cleanLog();
+                            }
                         }
                     }catch (Exception ex){
 
@@ -234,6 +237,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         Properties props = new Properties();
         props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("je.properties"));
         EnvironmentConfig envConfig = new EnvironmentConfig(props);
+        envConfig.setAllowCreate(true);
         this.environment = new Environment(new File(dataPath),envConfig);
         if(trimming){
             log.warn("Database ["+this.database+"] configured as trimming mode");
@@ -302,6 +306,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
             replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
         }
+        totalUpdated.incrementAndGet();
     }
 
     @Override
