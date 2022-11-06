@@ -62,6 +62,10 @@
         case 'tournament':
             tx_live_tournament_setup();
             break;
+        case 'inbox':
+            tx_live_inbox_setup();
+            break;
+
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -205,6 +209,12 @@
     function tx_live_statistics_setup(){
         console.log(TARA_API.query()); 
         TARA_API.onGet(TARA_API.query().serviceTag,'onStatistics',"",(resp)=>{
+            editor.set(resp);
+        });   
+    }
+    function tx_live_inbox_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
             editor.set(resp);
         });   
     }
