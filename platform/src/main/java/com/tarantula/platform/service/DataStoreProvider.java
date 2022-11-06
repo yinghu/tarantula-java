@@ -13,8 +13,8 @@ import java.util.Map;
 public interface DataStoreProvider extends ServiceProvider {
 
     String NAME = "tarantula";
-
-    String PENDING_REPLICATION_POOL_SIZE = "pendingReplicationPoolSize";
+    String PENDING_UPDATE_SIZE = "pendingUpdateSize";
+    String PENDING_REPLICATION_SIZE = "pendingReplicationSize";
     String REPLICATION_NODE_NUMBER = "replicationNodeNumber";
     String CACHE_MISS_NUMBER = "cacheMissNumber";
 

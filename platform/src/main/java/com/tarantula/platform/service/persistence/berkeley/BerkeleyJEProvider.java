@@ -1,10 +1,7 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
 import com.google.gson.JsonElement;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TimeUtil;
@@ -67,6 +64,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private MetricsListener metricsListener = (k,v)->{};
 
+    private boolean running = true;
+    private ServiceContext serviceContext;
+    private DiskSynchronizer diskSynchronizer;
+    private int updateThreshold;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
@@ -75,6 +77,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
         this.replicationNodeNumber = ((JsonElement)properties.get("replicationNumber")).getAsInt();
+        long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
+        this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
@@ -85,16 +89,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.node = (ClusterNode) properties.get("node");
         this.replicationPoolSetting = (String) properties.get("poolSetting");
 
-        //boolean backupEnabled = (boolean)properties.get("backupEnabled");
-        //if(backupEnabled){
-            //node.deploymentId = "get it from backup cluster";
-        //}
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
 
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
-
+        this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
     }
 
 
@@ -165,10 +165,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void setup(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
         for(int i=0;i<workSize;i++){
             replicationPool.execute(()->{
-                while (true){
+                while (running){
                     Runnable runnable = replicationPendingQueue.poll();
                     try {
                         if(runnable!=null){
@@ -176,13 +177,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                             //totalUpdated.decrementAndGet();
                         }
                         else{
-                            Thread.sleep(1);
-                            if(totalUpdated.getAndSet(0)>0) {
-                                environment.sync();
-                                environment.cleanLog();
-                                integrationEnvironment.sync();
-                                integrationEnvironment.cleanLog();
-                            }
+                            Thread.sleep(10);
                         }
                     }catch (Exception ex){
 
@@ -192,6 +187,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.iBackupProvider.setup(serviceContext);
         this.dBackupProvider.setup(serviceContext);
+        this.serviceContext.schedule(this.diskSynchronizer);
     }
     @Override
     public void waitForData() {
@@ -269,9 +265,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         });
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
-
+    public void _sync(){
+        if(totalUpdated.get()>updateThreshold){
+            log.warn("Disk synchronizing with total updates ["+totalUpdated.getAndSet(0)+"]");
+            environment.sync();
+            environment.cleanLog();
+            integrationEnvironment.sync();
+            integrationEnvironment.cleanLog();
+        }
+        this.serviceContext.schedule(this.diskSynchronizer);
+    }
     @Override
     public void shutdown() throws Exception {
+        running = false;
         iBackupProvider.shutdown();
         dBackupProvider.shutdown();
         dMap.forEach((k,v)->{
@@ -306,7 +312,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
             replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
         }
-        totalUpdated.incrementAndGet();
     }
 
     @Override
@@ -317,6 +322,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
             replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
         }
+        totalUpdated.incrementAndGet();
         onMetrics();
     }
     @Override
@@ -483,7 +489,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     @Override
     public void updateSummary(Summary summary){
-        summary.update(PENDING_REPLICATION_POOL_SIZE,replicationPendingQueue.size());
+        summary.update(PENDING_UPDATE_SIZE,totalUpdated.get());
+        summary.update(PENDING_REPLICATION_SIZE,replicationPendingQueue.size());
         summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
         summary.update(CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
         summary.update(CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());

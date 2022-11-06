@@ -530,6 +530,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             v.setup(this);
             v.waitForData();//block for global data sync
         });
+ 	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         //bootstrap user service providers
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);

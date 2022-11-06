@@ -7,7 +7,9 @@
             {"dataPath":"tarantula/data"},
             {"integrationPath":"tarantula/integration"},
             {"backupPath":"backup"},
-            {"replicationNumber": 3}
+            {"replicationNumber": 3},
+            {"diskSyncIntervalSeconds": 60},
+            {"syncUpdateThreshold": 10000}
         ]
     },
     "integration-backup-router": {
