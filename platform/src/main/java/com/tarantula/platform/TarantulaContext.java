@@ -157,7 +157,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 	}
 
 	public void start() throws Exception {
-        this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
+ 	    this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
  	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);
