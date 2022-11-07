@@ -10,7 +10,6 @@ import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.configuration.WebHookConfiguration;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
 
 
 import java.util.Map;

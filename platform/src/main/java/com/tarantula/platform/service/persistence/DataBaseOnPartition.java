@@ -19,7 +19,6 @@ public class DataBaseOnPartition {
         this.partition = partition;
         this.name = dataStore.getDatabaseName();
         this.database = dataStore;
-        //this.metadata = new RecoverableMetadata(name,partition, Distributable.DATA_SCOPE);
     }
 
     public boolean lock(byte[] key, Callable<Boolean> runnable){

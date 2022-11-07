@@ -45,7 +45,7 @@
         let _p = document.querySelector('#tx-password-r').value;
         let _m = document.querySelector('#tx-email-r').value;
         
-        TARA_API.onRegister({login:_n,password:_p,emailAddress:_m},function(resp){
+        TARA_API.onRegister({login:_n,password:_p,emailAddress:_m,typeId:'robotquest'},function(resp){
             if(resp.successful){
                 tx_on_login();                
             }

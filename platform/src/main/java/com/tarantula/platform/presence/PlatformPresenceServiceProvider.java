@@ -96,7 +96,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         playList.playListIndex.push(friendSystemId);
         this.presenceDataStore.update(playList);
     }
-    public void onPlay(String systemId){
+    public void onPlay(String systemId){//blocked
         this.recentlyPlayList.playListIndex.push(systemId);
         this.recentlyPlayList.update();
     }
