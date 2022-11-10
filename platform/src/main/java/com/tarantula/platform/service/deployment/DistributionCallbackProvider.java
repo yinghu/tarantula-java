@@ -50,10 +50,10 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
             log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
             return;
         }
-        this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
         onModuleShutdown((String)gameCluster.property(GameCluster.GAME_DATA));
         onModuleShutdown((String)gameCluster.property(GameCluster.GAME_LOBBY));
         onModuleShutdown((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.tarantulaContext.releaseServiceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
     }
 
     @Override

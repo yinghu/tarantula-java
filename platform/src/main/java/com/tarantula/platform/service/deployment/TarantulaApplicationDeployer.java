@@ -75,6 +75,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployGameCluster(String gameClusterId){
 		try {
+			logger.warn("GC->"+gameClusterId);
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
 			if(!this.context.masterDataStore().load(gameCluster)) return;
