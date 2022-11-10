@@ -63,6 +63,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
+    private LinkedList<String> roundRobinQueue = new LinkedList<>();
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -109,6 +110,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.tarantulaContext.serviceProvider(accessIndexService);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
+        this.recoverService.setup(this.tarantulaContext);
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._accessIndexServiceStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
     }
@@ -272,6 +274,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener == null) return;
         this.metricsListener = metricsListener;
+        this.recoverService.registerMetricsListener(this.metricsListener);
     }
 
     @Override
@@ -362,11 +365,26 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         String memberId = mEvent.getMember().getUuid();
+        synchronized (roundRobinQueue){
+            roundRobinQueue.remove(memberId);
+        }
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
         this.summary.unregister(new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber));
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
+    }
+    public void onNodeAdded(String memberId){
+        synchronized (roundRobinQueue){
+            roundRobinQueue.offer(memberId);
+        }
+    }
+    public String roundRobinMember(){
+        synchronized (roundRobinQueue){
+            String memberId = roundRobinQueue.poll();
+            if(memberId!=null) roundRobinQueue.offer(memberId);
+            return memberId;
+        }
     }
     private Node fromCluster(String nodeId){
         Node n = new ClusterNode();

@@ -11,7 +11,9 @@ import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterRecoverService implements ManagedService, RemoteService {
@@ -22,11 +24,35 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private TarantulaContext tarantulaContext;
     private int scope;
     private AtomicInteger _total = new AtomicInteger(0);
+    private Thread replicationWriter;
+    private ArrayList<ReplicationData> pendingUpdates;
+    private boolean running = true;
+    private ArrayList<ReplicationData> updates;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.scope = Integer.parseInt(properties.getProperty("tarantula-scope"));
         tarantulaContext = TarantulaContext.getInstance();
+        pendingUpdates = new ArrayList<>();
+        updates = new ArrayList<>();
+        replicationWriter = new Thread(()->{
+            while (running){
+                try{
+                    synchronized (pendingUpdates){
+                        pendingUpdates.removeAll(updates);
+                    }
+                    updates.forEach(r->{
+                        this.tarantulaContext.dataStore(r.source,tarantulaContext.node().partitionNumber()).backup().set(r.key,r.value);
+                    });
+                    updates.clear();
+                    Thread.sleep(10);
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+            log.warn("Stopping replication thread");
+        },"tarantula-replication-writer");
+        replicationWriter.start();
         log.warn("Cluster Recover Service Started on scope ["+scope+"]");
     }
 
@@ -37,7 +63,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     @Override
     public void shutdown(boolean b) {
-
+        log.warn("Cluster is shutting down");
+        running = false;
     }
 
     @Override
@@ -54,7 +81,10 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
     }
     public void replicate(String source,byte[] key,byte[] value){
-        this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().set(key,value);
+        synchronized (pendingUpdates){
+            pendingUpdates.add(new ReplicationData(source,key,value));
+        }
+        //this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().set(key,value);
     }
     public int syncStart(String memberId,String source,String syncKey){
         RecoverService recoverService = tarantulaContext.integrationCluster().recoverService();
@@ -103,5 +133,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     public byte[] onLoadModuleJarFile(String fileName){
         return this.tarantulaContext._readContent(fileName);
     }
+
 
 }

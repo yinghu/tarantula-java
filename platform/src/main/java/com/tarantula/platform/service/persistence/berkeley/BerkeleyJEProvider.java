@@ -76,7 +76,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
-        this.replicationNodeNumber = ((JsonElement)properties.get("replicationNumber")).getAsInt();
+        this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
@@ -270,10 +270,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             log.warn("Disk synchronizing with total updates ["+totalUpdated.getAndSet(0)+"]");
             environment.sync();
             environment.cleanLog();
-            environment.evictMemory();
+            //environment.evictMemory();
             integrationEnvironment.sync();
             integrationEnvironment.cleanLog();
-            integrationEnvironment.evictMemory();
+            //integrationEnvironment.evictMemory();
         }
         this.serviceContext.schedule(this.diskSynchronizer);
     }

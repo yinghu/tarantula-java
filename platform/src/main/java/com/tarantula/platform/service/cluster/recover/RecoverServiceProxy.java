@@ -6,11 +6,13 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
-import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
+import com.icodesoftware.util.JvmRNG;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.IntegrationCluster;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -21,14 +23,12 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
 
     private MetricsListener metricsListener;
-    private MetricsListener metricsListenerHook;
+    private ServiceContext serviceContext;
 
     public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService clusterRecoverService){
         super(nodeEngine,clusterRecoverService);
         this.objectName = objectName;
-        this.metricsListener = (k,v)->{
-            if(metricsListenerHook != null) metricsListenerHook.onUpdated(k,v);
-        };
+        this.metricsListener = (k,v)->{};
     }
 
 
@@ -49,7 +49,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
     @Override
     public void setup(ServiceContext serviceContext) {
-
+        this.serviceContext = serviceContext;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                     }
                 } catch (Exception e) {
                     future.cancel(true);
-                    metricsListener.onUpdated("1",1);
+                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
                     //goes to next node if failed
                 }
             }
@@ -94,21 +94,23 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public int onReplicate(String source,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = nodeNumber;
-        for(Member m :mlist){
-            if(!m.localMember()){
-                ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-                final Future<Void> future = builder.invoke();
-                try {
-                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    expected--;
-                    if(expected==0) break;
-                } catch (Exception e) {
-                    future.cancel(true);
-                    //goes to next node if failed
-                }
+        int cz = nodeEngine.getClusterService().getSize();
+        if(cz==1) return nodeNumber;
+        int expected = cz>nodeNumber? nodeNumber : cz-1;
+        for(int i=0;i<expected;i++){
+            String roundRobinMember = this.serviceContext.clusterProvider().roundRobinMember();
+            if(roundRobinMember==null) break;
+            Member m = nodeEngine.getClusterService().getMember(roundRobinMember);
+            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
             }
         }
         return expected;
@@ -172,10 +174,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
 
     public void registerMetricsListener(MetricsListener metricsListener){
-        this.metricsListenerHook = metricsListener;
+        this.metricsListener = metricsListener;
     }
     public void releaseMetricsListener(){
-        this.metricsListenerHook = null;
+        this.metricsListener = (k,v)->{};
     }
 
 
