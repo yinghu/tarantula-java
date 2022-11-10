@@ -7,12 +7,8 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JvmRNG;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.IntegrationCluster;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
-
-import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -101,6 +97,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             String roundRobinMember = this.serviceContext.clusterProvider().roundRobinMember();
             if(roundRobinMember==null) break;
             Member m = nodeEngine.getClusterService().getMember(roundRobinMember);
+            System.out.println("TO MEMBER->"+m.getAddress().toString());
             ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
