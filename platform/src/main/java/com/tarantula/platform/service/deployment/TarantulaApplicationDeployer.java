@@ -49,6 +49,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		IndexSet indexSet = new IndexSet();
 		indexSet.distributionKey(deploymentId);
 		indexSet.label(Account.GameClusterLabel);
+		logger.warn("GC KEY->"+indexSet.key().asString());
 		if(datastore.load(indexSet)){
 			indexSet.keySet().forEach((gc)->{
 				deployGameCluster(gc);
@@ -75,7 +76,6 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	}
 	private void deployGameCluster(String gameClusterId){
 		try {
-			logger.warn("GC->"+gameClusterId);
 			GameCluster gameCluster = new GameCluster();
 			gameCluster.distributionKey(gameClusterId);
 			if(!this.context.masterDataStore().load(gameCluster)) return;
