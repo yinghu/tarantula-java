@@ -96,10 +96,33 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         if(cz==1) return nodeNumber;
         int expected = cz>nodeNumber? nodeNumber : cz-1;
         for(int i=0;i<expected;i++){
-            String roundRobinMember = this.serviceContext.clusterProvider().roundRobinMember();
-            if(roundRobinMember==null) break;
-            Member m = nodeEngine.getClusterService().getMember(roundRobinMember);
+            ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
+            if(roundRobinNode==null) break;
+            Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
             ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
+            }
+        }
+        return expected;
+    }
+    public int onReplicate(OnReplication[] batch,int nodeNumber){
+        NodeEngine nodeEngine = getNodeEngine();
+        int cz = nodeEngine.getClusterService().getSize();
+        if(cz==1) return nodeNumber;
+        int expected = cz>nodeNumber? nodeNumber : cz-1;
+        for(int i=0;i<expected;i++){
+            ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
+            if(roundRobinNode==null) break;
+            Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
+            BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {

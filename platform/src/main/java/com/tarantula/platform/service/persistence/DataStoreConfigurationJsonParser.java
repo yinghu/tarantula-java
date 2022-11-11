@@ -55,7 +55,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("node",this.dataBucketNode);
         properties.put("partitionNumber",this.partitionNumber);
         properties.put("dir",this.dataDir);
-        properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
+        //properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",tarantulaContext.node());
         this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());

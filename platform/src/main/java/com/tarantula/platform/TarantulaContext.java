@@ -113,7 +113,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String dataBucketGroup;
     public String dataBucketNode;
     private ClusterNode node;
-    public String dataReplicationThreadPoolSetting;
+    //public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
 

@@ -6,6 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
@@ -13,7 +14,6 @@ import com.tarantula.platform.TarantulaContext;
 
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterRecoverService implements ManagedService, RemoteService {
@@ -25,7 +25,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private int scope;
     private AtomicInteger _total = new AtomicInteger(0);
     private Thread replicationWriter;
-    private ArrayList<ReplicationData> pendingUpdates;
+    private ArrayList<OnReplication> pendingUpdates;
     private boolean running = true;
     private ArrayList<ReplicationData> updates;
     @Override
@@ -79,6 +79,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     public byte[] load(String source,byte[] key){
         return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
+    }
+    public void replicate(OnReplication[] onReplications){
+
     }
     public void replicate(String source,byte[] key,byte[] value){
         synchronized (pendingUpdates){

@@ -8,6 +8,7 @@ public interface RecoverService extends ServiceProvider{
 
     byte[] onRecover(String source,byte[] key);
     int onReplicate(String source,byte[] key,byte[] value,int nodeNumber);
+    int onReplicate(OnReplication[] batch,int nodeNumber);
 
     //operates on master node
     int onStartSync(String source,String syncKey);

@@ -3,13 +3,13 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.google.gson.JsonElement;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TimeUtil;
 import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
 
@@ -39,10 +39,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private boolean trimming;
     private int partitionNumber;
 
-    private String replicationPoolSetting;
-    private ExecutorService replicationPool;
-    private int workSize;
+    //private String replicationPoolSetting;
+    //private ExecutorService replicationPool;
+    //private int workSize;
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
+
+
 
     private boolean dailyBackup;
 
@@ -52,6 +54,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
+
+    private ConcurrentLinkedDeque<OnReplication> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<OnReplication> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
 
     private Environment environment;
     private Environment integrationEnvironment;
@@ -64,10 +69,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private MetricsListener metricsListener = (k,v)->{};
 
-    private boolean running = true;
+    //private boolean running = true;
     private ServiceContext serviceContext;
     private DiskSynchronizer diskSynchronizer;
+    private ReplicationSynchronizer replicationSynchronizer;
+    private BackupSynchronizer backupSynchronizer;
     private int updateThreshold;
+    private int replicationBatchSize;
+    private int backupBatchSize;
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -77,7 +86,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
         this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
+        this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
+        this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
+        long nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
+        long nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
@@ -87,7 +100,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = (ClusterNode) properties.get("node");
-        this.replicationPoolSetting = (String) properties.get("poolSetting");
+        //this.replicationPoolSetting = (String) properties.get("poolSetting");
 
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
@@ -95,6 +108,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
         this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
+        this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval);
+        this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval);
     }
 
 
@@ -167,6 +182,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
+        /**
         for(int i=0;i<workSize;i++){
             replicationPool.execute(()->{
                 while (running){
@@ -184,10 +200,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     }
                 }
             });
-        }
+        }**/
         this.iBackupProvider.setup(serviceContext);
         this.dBackupProvider.setup(serviceContext);
         this.serviceContext.schedule(this.diskSynchronizer);
+        this.serviceContext.schedule(this.replicationSynchronizer);
+        this.serviceContext.schedule(this.backupSynchronizer);
     }
     @Override
     public void waitForData() {
@@ -259,10 +277,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             ds.count();
         }
         this.create(this.database,this.partitionNumber);
-        TarantulaExecutorServiceFactory.createExecutorService("data-"+this.replicationPoolSetting,(pool, poolSize, rh)->{
-            this.replicationPool = pool;
-            this.workSize = poolSize;
-        });
+        //TarantulaExecutorServiceFactory.createExecutorService("data-"+this.replicationPoolSetting,(pool, poolSize, rh)->{
+            //this.replicationPool = pool;
+            //this.workSize = poolSize;
+        //});
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
     public void _sync(){
@@ -277,9 +295,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(this.diskSynchronizer);
     }
+    public void _replicate(){
+        log.warn("Replication sync->"+replicationBatchSize+">>"+pendingReplicationDataQueue.size());
+        log.warn("Replication sync->"+replicationBatchSize+">>"+pendingReplicationIntegrationQueue.size());
+        this.serviceContext.schedule(this.replicationSynchronizer);
+    }
+    public void _backup(){
+        log.warn("Backup sync->"+backupBatchSize);
+        this.serviceContext.schedule(this.backupSynchronizer);
+    }
+
     @Override
     public void shutdown() throws Exception {
-        running = false;
+        //running = false;
         iBackupProvider.shutdown();
         dBackupProvider.shutdown();
         dMap.forEach((k,v)->{
@@ -300,29 +328,31 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public <T extends Recoverable> void onCreating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> dBackupProvider.create(metadata,key,t));
+            //replicationPendingQueue.offer(()-> dBackupProvider.create(metadata,key,t));
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()-> iBackupProvider.create(metadata,key,t));
+            //replicationPendingQueue.offer(()-> iBackupProvider.create(metadata,key,t));
         }
     }
     @Override
     public <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t){
         if(t.scope()==Distributable.DATA_SCOPE){
-            replicationPendingQueue.offer(()-> dBackupProvider.update(metadata,key,t));
+            //replicationPendingQueue.offer(()-> dBackupProvider.update(metadata,key,t));
         }
         else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
+            //replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
         }
     }
 
     @Override
     public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
         if(metadata.scope()==Distributable.DATA_SCOPE && replicationNodeNumber>0){
-            replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().onReplicate(metadata.source(),key,value,replicationNodeNumber));
+            pendingReplicationDataQueue.offer(new ReplicationData(metadata.source(),key,value));
+            //replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().onReplicate(metadata.source(),key,value,replicationNodeNumber));
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
-            replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
+            pendingReplicationIntegrationQueue.offer(new ReplicationData(metadata.source(),key,value));
+            //replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
         }
         totalUpdated.incrementAndGet();
         onMetrics();

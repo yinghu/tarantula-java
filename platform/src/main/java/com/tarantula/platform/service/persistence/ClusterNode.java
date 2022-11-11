@@ -6,6 +6,7 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.AssociateKey;
 
 import java.time.format.DateTimeFormatter;
 
@@ -37,6 +38,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public ClusterNode(){
     }
 
+    public ClusterNode(String memberId){
+        this.memberId = memberId;
+    }
 
     public String toString(){
         return "Bucket ["+bucketName+"] On Node ["+nodeName+"]";
@@ -134,6 +138,16 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
             jsonObject.addProperty("startTime",startTime);
         }
         return jsonObject;
+    }
+
+    @Override
+    public int hashCode(){
+        return this.memberId.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj){
+        ClusterNode r = (ClusterNode)obj;
+        return this.memberId.equals(r.memberId());
     }
 
 }

@@ -41,7 +41,7 @@ public interface ClusterProvider extends Serviceable {
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
 
-    String roundRobinMember();
+    Node roundRobinMember();
 
     Summary summary();
 

@@ -63,7 +63,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
-    private LinkedList<String> roundRobinQueue = new LinkedList<>();
+    private LinkedList<Node> roundRobinQueue = new LinkedList<>();
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -366,7 +366,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         String memberId = mEvent.getMember().getUuid();
         synchronized (roundRobinQueue){
-            roundRobinQueue.remove(memberId);
+            roundRobinQueue.remove(new ClusterNode(memberId));
         }
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
@@ -376,14 +376,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void onNodeAdded(String memberId){
         synchronized (roundRobinQueue){
-            roundRobinQueue.offer(memberId);
+            roundRobinQueue.offer(new ClusterNode(memberId));
         }
     }
-    public String roundRobinMember(){
+    public Node roundRobinMember(){
         synchronized (roundRobinQueue){
-            String memberId = roundRobinQueue.poll();
-            if(memberId!=null) roundRobinQueue.offer(memberId);
-            return memberId;
+            Node node = roundRobinQueue.poll();
+            if(node!=null) roundRobinQueue.offer(node);
+            return node;
         }
     }
     private Node fromCluster(String nodeId){
