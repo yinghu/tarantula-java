@@ -88,23 +88,24 @@ public class PartitionDataStore extends ReplicatedDataStore{
             }
             final String okey = akey;
             byte[] key = okey.getBytes();
+            byte[] value = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()->{
                 if(_get(dso,key) != null) return false;
-                byte[] value = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
                 if(!_put(dso,key,value)) return false;
                 //do backup and replication
                 t.revision(Long.MIN_VALUE);
-                if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
-                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
-                Listener listener = rMap.get(t.getFactoryId());
-                if(listener!=null) listener.onCreated(t,okey,key,value);
                 return true;
             });
-            if(suc && t.onEdge() && t.owner() != null && t.label() !=null){
+            if(!suc) return false;
+            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+            Listener listener = rMap.get(t.getFactoryId());
+            if(listener!=null) listener.onCreated(t,okey,key,value);
+            if(t.onEdge() && t.owner() != null && t.label() !=null){
                 onEdge(t,okey);
             }
-            return suc;
+            return true;
         }catch (Exception ex){
             log.error("Error on create",ex);
             return false;
@@ -117,7 +118,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
         indexSet.revision(Long.MIN_VALUE);
         byte[] _kn = indexSet.key().asString().getBytes();
         DataBaseOnPartition dso = this.partitions[SystemUtil.partition(_kn,partition)];
-        return dso.lock(_kn,()->{
+        boolean suc = dso.lock(_kn,()->{
             RevisionObject ro = _getRevisionObject(dso,_kn);//from local
             if(ro != null && ro.local){
                 indexSet.fromBinary(ro.data);
@@ -134,19 +135,19 @@ public class PartitionDataStore extends ReplicatedDataStore{
             indexSet.addKey(okey);
             indexSet.revision(indexSet.revision()+1);
             byte[] _vn = RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true);
-            if(!_put(dso,_kn,_vn)) return false;
-            //do backup and replication
-            if(t.backup()){
-                if(indexSet.revision() > Long.MIN_VALUE){
-                    this.mapStoreListener.onUpdating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
-                }
-                else{
-                    this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
-                }
-            }
-            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,_kn,_vn);
-            return true;
+            return _put(dso,_kn,_vn);
         });
+        if(!suc) return false;
+        if(t.backup()){
+            if(indexSet.revision() > Long.MIN_VALUE){
+                this.mapStoreListener.onUpdating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
+            }
+            else{
+                this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
+            }
+        }
+        if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,_kn,RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true));
+        return suc;
     }
 
     @Override

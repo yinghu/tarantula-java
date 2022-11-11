@@ -20,7 +20,6 @@ public class DataBaseOnPartition {
         this.name = dataStore.getDatabaseName();
         this.database = dataStore;
     }
-
     public boolean lock(byte[] key, Callable<Boolean> runnable){
         boolean[] ret = {false};
         locks.compute(key,(k,v)->{
@@ -33,4 +32,6 @@ public class DataBaseOnPartition {
         });
         return ret[0];
     }
+
+
 }

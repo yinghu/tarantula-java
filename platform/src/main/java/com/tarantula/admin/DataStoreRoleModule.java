@@ -58,6 +58,7 @@ public class DataStoreRoleModule implements Module {
                 if(data!=null) {
                     RevisionObject revisionObject = RevisionObject.fromBinary(data);
                     JsonObject debug = new JsonObject();
+                    debug.addProperty("local",revisionObject.local);
                     debug.addProperty("revision",Long.toString(revisionObject.revision));
                     debug.add("payload",JsonUtil.parse(revisionObject.data));
                     summary.add("debug",debug);

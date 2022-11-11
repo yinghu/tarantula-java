@@ -6,6 +6,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.service.metrics.MetricsProperty;
 import com.tarantula.platform.service.metrics.MetricsSnapshot;
+import com.tarantula.platform.service.persistence.DataBaseOnPartition;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,10 +28,10 @@ public class ShardSetup {
         connection.close();
     }
     public static void main(String[] args){
-       DeploymentIdFetcher developmentIdFetcher = new DeploymentIdFetcher("http://localhost:8090");
+        DeploymentIdFetcher developmentIdFetcher = new DeploymentIdFetcher("http://localhost:8090");
+        String devid = developmentIdFetcher.deploymentId("BDS/663645a2424b46cbae71b1b9b5274f92-88701F4CF0C086777287BEDF9DA3C4135F05DD4D-D980B8136E6123624F13B67133143202");
+        System.out.println(devid);
 
-       String devid = developmentIdFetcher.deploymentId("BDS/663645a2424b46cbae71b1b9b5274f92-88701F4CF0C086777287BEDF9DA3C4135F05DD4D-D980B8136E6123624F13B67133143202");
-       System.out.println(devid);
     }
     public static void _main(String[] args){
         LocalDateTime cur = LocalDateTime.now();
