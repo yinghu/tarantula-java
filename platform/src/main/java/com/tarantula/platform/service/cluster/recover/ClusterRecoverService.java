@@ -41,11 +41,13 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     synchronized (pendingUpdates){
                         pendingUpdates.removeAll(updates);
                     }
-                    log.warn("Total data pending size->"+updates.size());
-                    updates.forEach(r->{
-                        this.tarantulaContext.dataStore(r.source,tarantulaContext.node().partitionNumber()).backup().set(r.key,r.value);
-                    });
-                    updates.clear();
+                    if(updates.size()>0){
+                        log.warn("Total data pending size->"+updates.size());
+                        updates.forEach(r->{
+                            this.tarantulaContext.dataStore(r.source,tarantulaContext.node().partitionNumber()).backup().set(r.key,r.value);
+                        });
+                        updates.clear();
+                    }
                     Thread.sleep(10);
                 }catch (Exception ex){
                     //ignore
