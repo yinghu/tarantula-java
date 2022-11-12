@@ -84,6 +84,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
     }
     public void replicate(OnReplication[] onReplications){
+        log.warn("Pending size->"+onReplications.length);
         synchronized (pendingUpdates){
             for(OnReplication onReplication : onReplications){
                 pendingUpdates.add(onReplication);
