@@ -290,7 +290,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             }
             String integrationId = pendingReplicationIntegrationQueue.poll();
             if(integrationId!=null){
-                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
+                OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
                 integration[i]=onReplication;
                 integrationSize++;
             }

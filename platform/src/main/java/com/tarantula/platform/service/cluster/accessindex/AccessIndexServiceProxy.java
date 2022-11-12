@@ -129,7 +129,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return expected==0;
     }
     public int onReplicate(OnReplication[] batch, int size, int nodeNumber){
-
+        try{
         NodeEngine nodeEngine = getNodeEngine();
         int cz = nodeEngine.getClusterService().getSize();
         if(cz==1) return nodeNumber;
@@ -151,6 +151,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             }
         }
         return expected;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return nodeNumber;
+        }
     }
     public int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
