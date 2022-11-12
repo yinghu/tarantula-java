@@ -41,7 +41,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int partitionNumber;
 
 
-    private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
+    //private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
 
 
@@ -135,8 +135,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
-            replicationPendingQueue.offer(()-> this.iBackupProvider.registerDataStore(name));
-            //this.accessIndexStoreList.add(name);
+            this.iBackupProvider.registerDataStore(name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
     }
@@ -167,7 +166,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
-            replicationPendingQueue.offer(()-> this.dBackupProvider.registerDataStore(name,partition));
+            this.dBackupProvider.registerDataStore(name,partition);
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }
@@ -548,7 +547,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void updateSummary(Summary summary){
         summary.update(PENDING_UPDATE_SIZE,totalUpdated.get());
-        summary.update(PENDING_REPLICATION_SIZE,replicationPendingQueue.size());
+        summary.update(PENDING_REPLICATION_SIZE,pendingReplicationIndex.size());
         summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
         summary.update(CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
         summary.update(CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
