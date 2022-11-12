@@ -38,7 +38,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     private Thread replicationWriter;
     private ArrayList<OnReplication> pendingUpdates;
     private boolean running = true;
-    private ArrayList<ReplicationData> updates;
+    private ArrayList<OnReplication> updates;
 
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
@@ -55,7 +55,8 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
             while (running){
                 try{
                     synchronized (pendingUpdates){
-                        pendingUpdates.removeAll(updates);
+                        pendingUpdates.forEach(c->updates.add(c));
+                        pendingUpdates.clear();
                     }
                     if(updates.size()>0){
                         log.warn("Total access index pending size->"+updates.size());

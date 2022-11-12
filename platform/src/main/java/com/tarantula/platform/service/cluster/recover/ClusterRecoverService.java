@@ -27,7 +27,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     private Thread replicationWriter;
     private ArrayList<OnReplication> pendingUpdates;
     private boolean running = true;
-    private ArrayList<ReplicationData> updates;
+    private ArrayList<OnReplication> updates;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
@@ -39,12 +39,13 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
             while (running){
                 try{
                     synchronized (pendingUpdates){
-                        pendingUpdates.removeAll(updates);
+                        pendingUpdates.forEach(c->updates.add(c));
+                        pendingUpdates.clear();
                     }
                     if(updates.size()>0){
                         log.warn("Total data pending size->"+updates.size());
                         updates.forEach(r->{
-                            this.tarantulaContext.dataStore(r.source,tarantulaContext.node().partitionNumber()).backup().set(r.key,r.value);
+                            this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
                         });
                         updates.clear();
                     }
