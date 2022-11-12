@@ -57,6 +57,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     synchronized (pendingUpdates){
                         pendingUpdates.removeAll(updates);
                     }
+                    log.warn("Total access index pending size->"+updates.size());
                     updates.forEach(r->{
                         this.dataStoreOnPartitions[r.partition()].dataStore.backup().set(r.key(),r.value());
                     });
