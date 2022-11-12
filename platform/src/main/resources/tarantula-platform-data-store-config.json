@@ -8,6 +8,7 @@
             {"integrationPath":"tarantula/integration"},
             {"backupPath":"backup"},
             {"maxReplicationNumber": 3},
+            {"maxTimerLoop": 3},
             {"replicationBatchSize": 10},
             {"backupBatchSize": 10},
             {"replicationSyncIntervalSeconds": 10},

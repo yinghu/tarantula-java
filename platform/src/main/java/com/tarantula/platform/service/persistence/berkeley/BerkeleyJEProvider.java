@@ -74,11 +74,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private ServiceContext serviceContext;
     private DiskSynchronizer diskSynchronizer;
     private ReplicationSynchronizer replicationSynchronizer;
+    private ReplicationSynchronizer integrationReplicationSynchronizer;
+
     private BackupSynchronizer backupSynchronizer;
 
     private int updateThreshold;
     private int replicationBatchSize;
     private int backupBatchSize;
+    private int maxTimerLoop;
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -89,6 +92,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
         this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
         this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
+        this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
         this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
         long nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
@@ -110,7 +114,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
         this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
-        this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval);
+        this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
+        this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
         this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval);
     }
 
@@ -189,6 +194,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dBackupProvider.setup(serviceContext);
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.replicationSynchronizer);
+        this.serviceContext.schedule(this.integrationReplicationSynchronizer);
         this.serviceContext.schedule(this.backupSynchronizer);
     }
     @Override
@@ -276,27 +282,36 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(this.diskSynchronizer);
     }
-    public void _replicate(){
-        OnReplication[] data = new OnReplication[replicationBatchSize];
-        int dataSize =0;
+    public void _replicateOnIntegrationScope(){
         OnReplication[] integration = new OnReplication[replicationBatchSize];
         int integrationSize = 0;
-        for(int i=0;i<replicationBatchSize;i++){
-            String dataId = pendingReplicationDataQueue.poll();
-            if(dataId!=null){
-                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
-                data[i]=onReplication;
-                dataSize++;
-            }
-            String integrationId = pendingReplicationIntegrationQueue.poll();
-            if(integrationId!=null){
+        for(int loop =0;loop<maxTimerLoop;loop++) {
+            for (int i = 0; i < replicationBatchSize; i++) {
+                String integrationId = pendingReplicationIntegrationQueue.poll();
+                if (integrationId == null) break;
                 OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
-                integration[i]=onReplication;
+                integration[i] = onReplication;
                 integrationSize++;
             }
+            if (integrationSize > 0) this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
+            integrationSize = 0;
         }
-        if(dataSize>0) this.serviceContext.clusterProvider().recoverService().onReplicate(data,dataSize,replicationNodeNumber);
-        if(integrationSize>0)this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration,integrationSize,replicationNodeNumber);
+        this.serviceContext.schedule(this.integrationReplicationSynchronizer);
+    }
+    public void _replicateOnDataScope(){
+        int dataSize = 0;
+        OnReplication[] data = new OnReplication[replicationBatchSize];
+        for(int loop =0;loop<maxTimerLoop;loop++) {
+            for (int i = 0; i < replicationBatchSize; i++) {
+                String dataId = pendingReplicationDataQueue.poll();
+                if(dataId==null) break;
+                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
+                data[i] = onReplication;
+                dataSize++;
+            }
+            if (dataSize > 0) this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
+            dataSize = 0;
+        }
         this.serviceContext.schedule(this.replicationSynchronizer);
     }
     public void _backup(){
