@@ -114,6 +114,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         return expected;
     }
     public int onReplicate(OnReplication[] batch,int size,int nodeNumber){
+        try{
         NodeEngine nodeEngine = getNodeEngine();
         int cz = nodeEngine.getClusterService().getSize();
         if(cz==1) return nodeNumber;
@@ -135,6 +136,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
         return expected;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return nodeNumber;
+        }
     }
     public int onStartSync(String source,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
