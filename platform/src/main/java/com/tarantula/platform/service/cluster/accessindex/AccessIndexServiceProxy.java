@@ -130,27 +130,27 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
     public int onReplicate(OnReplication[] batch, int size, int nodeNumber){
         try{
-        NodeEngine nodeEngine = getNodeEngine();
-        int cz = nodeEngine.getClusterService().getSize();
-        if(cz==1) return nodeNumber;
-        int expected = cz>nodeNumber? nodeNumber : cz-1;
-        for(int i=0;i<expected;i++){
-            ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
-            if(roundRobinNode==null) break;
-            Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
-            BatchReplicateOnIntegrationScopeOperation operation = new BatchReplicateOnIntegrationScopeOperation(batch,size);
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
+            NodeEngine nodeEngine = getNodeEngine();
+            int cz = nodeEngine.getClusterService().getSize();
+            if(cz==1) return nodeNumber;
+            int expected = cz>nodeNumber? nodeNumber : cz-1;
+            for(int i=0;i<expected;i++){
+                ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
+                if(roundRobinNode==null) break;
+                Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
+                BatchReplicateOnIntegrationScopeOperation operation = new BatchReplicateOnIntegrationScopeOperation(batch,size);
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+                final Future<Void> future = builder.invoke();
+                try {
+                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                    expected--;
+                } catch (Exception e) {
+                    future.cancel(true);
+                    //goes to next node if failed
+                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
+                }
             }
-        }
-        return expected;
+            return expected;
         }catch (Exception ex){
             ex.printStackTrace();
             return nodeNumber;

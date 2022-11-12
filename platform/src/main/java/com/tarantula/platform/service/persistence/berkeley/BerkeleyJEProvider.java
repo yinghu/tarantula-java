@@ -295,9 +295,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 integrationSize++;
             }
         }
-        log.warn("Data size->"+dataSize);
-        log.warn("Integration size->"+integrationSize);
-        log.warn("Replication node number->"+replicationNodeNumber);
         if(dataSize>0) this.serviceContext.clusterProvider().recoverService().onReplicate(data,dataSize,replicationNodeNumber);
         if(integrationSize>0)this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration,integrationSize,replicationNodeNumber);
         this.serviceContext.schedule(this.replicationSynchronizer);
