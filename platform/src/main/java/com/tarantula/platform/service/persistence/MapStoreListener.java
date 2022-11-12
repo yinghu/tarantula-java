@@ -11,7 +11,7 @@ public interface MapStoreListener {
     <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t);
 
     //dispatch cluster operations
-    void onDistributing(Metadata metadata,byte[] key, byte[] value);
+    void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
     byte[] onRecovering(Metadata metadata,byte[] key);
 
 }

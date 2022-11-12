@@ -10,6 +10,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.OnReplication;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
@@ -18,6 +19,7 @@ import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 
@@ -33,6 +35,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     private DeploymentServiceProvider deploymentServiceProvider;
     private String bucket;
 
+    private Thread replicationWriter;
+    private ArrayList<OnReplication> pendingUpdates;
+    private boolean running = true;
+    private ArrayList<ReplicationData> updates;
 
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
@@ -43,6 +49,26 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
             this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX +i);
         }
+        pendingUpdates = new ArrayList<>();
+        updates = new ArrayList<>();
+        replicationWriter = new Thread(()->{
+            while (running){
+                try{
+                    synchronized (pendingUpdates){
+                        pendingUpdates.removeAll(updates);
+                    }
+                    updates.forEach(r->{
+                        this.dataStoreOnPartitions[r.partition()].dataStore.backup().set(r.key(),r.value());
+                    });
+                    updates.clear();
+                    Thread.sleep(10);
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+            log.warn("Stopping access index replication thread");
+        },"tarantula-access-index-replication-writer");
+        replicationWriter.start();
         new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new AccessIndexServiceBootstrap(this),"access-index-service",true).start();
     }
 
@@ -53,6 +79,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     @Override
     public void shutdown(boolean b) {
+        this.running = false;
         log.warn("Shutting down access index cluster service");
     }
 
@@ -113,7 +140,16 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
     public void replicate(int partition,byte[] key,byte[] value){
-        this.dataStoreOnPartitions[partition].dataStore.backup().set(key,value);
+        synchronized (pendingUpdates){
+            pendingUpdates.add(new ReplicationData(partition,key,value));
+        }
+    }
+    public void replicate(OnReplication[] onReplications){
+        synchronized (pendingUpdates){
+            for(OnReplication onReplication : onReplications){
+                pendingUpdates.add(onReplication);
+            }
+        }
     }
 
     public byte[] recover(int partition,byte[] key){
@@ -144,9 +180,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }).start();
         return this.tarantulaContext.node().partitionNumber();
     }
-    public void replicateAsBatch(ReplicationData[] batch){
-        for(ReplicationData d : batch) {
-            replicate(d.partition, d.key, d.value);
+    public void replicateAsBatch(OnReplication[] batch){
+        for(OnReplication d : batch) {
+            replicate(d.partition(), d.key(), d.value());
         }
     }
     public void syncEnd(String syncKey){

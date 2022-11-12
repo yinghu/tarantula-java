@@ -99,7 +99,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             });
             if(!suc) return false;
             if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
-            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
             Listener listener = rMap.get(t.getFactoryId());
             if(listener!=null) listener.onCreated(t,okey,key,value);
             if(t.onEdge() && t.owner() != null && t.label() !=null){
@@ -146,7 +146,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
             }
         }
-        if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,_kn,RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true));
+        if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,indexSet.key().asString(),_kn,RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true));
         return suc;
     }
 
@@ -185,7 +185,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                         this.mapStoreListener.onUpdating(dso.metadata.fromRevision(t.revision()), akey, t);
                     }
                 }
-                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,key,value);
+                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
 
                 Listener listener = rMap.get(t.getFactoryId());
 
@@ -233,7 +233,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 t.revision(Long.MIN_VALUE);
                 if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
 
-                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, key,vx);
+                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,okey,key,vx);
 
                 Listener listener = rMap.get(t.getFactoryId());
                 if(listener!=null) listener.onCreated(t,okey,key,vx);

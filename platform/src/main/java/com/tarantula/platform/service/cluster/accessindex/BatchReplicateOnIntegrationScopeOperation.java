@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.cluster.recover;
+package com.tarantula.platform.service.cluster.accessindex;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -8,23 +8,24 @@ import com.tarantula.platform.service.ReplicationData;
 
 import java.io.IOException;
 
-public class BatchReplicateOnDataScopeOperation extends Operation {
+public class BatchReplicateOnIntegrationScopeOperation extends Operation {
 
 
     private OnReplication[] onReplications;
     private int size;
-    public BatchReplicateOnDataScopeOperation() {
+
+    public BatchReplicateOnIntegrationScopeOperation() {
     }
 
 
-    public BatchReplicateOnDataScopeOperation(OnReplication[] onReplications,int size) {
+    public BatchReplicateOnIntegrationScopeOperation(OnReplication[] onReplications,int size) {
         this.onReplications = onReplications;
         this.size = size;
     }
 
     @Override
     public void run() throws Exception {
-        ClusterRecoverService cis = this.getService();
+        AccessIndexClusterService cis = this.getService();
         cis.replicate(onReplications);
     }
 
@@ -39,7 +40,7 @@ public class BatchReplicateOnDataScopeOperation extends Operation {
         out.writeInt(size);
         for(int i=0;i<size;i++){
             OnReplication onReplication = onReplications[i];
-            out.writeUTF(onReplication.source());
+            out.writeInt(onReplication.partition());
             out.writeByteArray(onReplication.key());
             out.writeByteArray(onReplication.value());
         }
@@ -49,12 +50,12 @@ public class BatchReplicateOnDataScopeOperation extends Operation {
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         int sz = in.readInt();
-        this.onReplications = new OnReplication[sz];
+        onReplications = new OnReplication[sz];
         for(int i=0;i<sz;i++){
-            String source = in.readUTF();
+            int  partition = in.readInt();
             byte[] key = in.readByteArray();
             byte[] value = in.readByteArray();
-            this.onReplications[i]=new ReplicationData(source,key,value);
+            onReplications[i] = new ReplicationData(partition,key,value);
         }
     }
 }

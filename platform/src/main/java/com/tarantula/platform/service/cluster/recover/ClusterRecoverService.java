@@ -50,8 +50,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     //ignore
                 }
             }
-            log.warn("Stopping replication thread");
-        },"tarantula-replication-writer");
+            log.warn("Stopping data replication thread");
+        },"tarantula-data-replication-writer");
         replicationWriter.start();
         log.warn("Cluster Recover Service Started on scope ["+scope+"]");
     }
@@ -81,7 +81,11 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
     }
     public void replicate(OnReplication[] onReplications){
-
+        synchronized (pendingUpdates){
+            for(OnReplication onReplication : onReplications){
+                pendingUpdates.add(onReplication);
+            }
+        }
     }
     public void replicate(String source,byte[] key,byte[] value){
         synchronized (pendingUpdates){

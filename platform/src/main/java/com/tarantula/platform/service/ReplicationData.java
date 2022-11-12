@@ -7,6 +7,7 @@ public class ReplicationData implements OnReplication {
     public int partition;
     public byte[] key;
     public byte[] value;
+
     public ReplicationData(String source,byte[] key, byte[] value){
         this.source = source;
         this.key = key;
@@ -37,4 +38,5 @@ public class ReplicationData implements OnReplication {
     public byte[] value() {
         return value;
     }
+
 }

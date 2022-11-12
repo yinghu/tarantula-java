@@ -113,7 +113,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
-    public int onReplicate(OnReplication[] batch,int nodeNumber){
+    public int onReplicate(OnReplication[] batch,int size,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         int cz = nodeEngine.getClusterService().getSize();
         if(cz==1) return nodeNumber;
@@ -122,7 +122,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
             if(roundRobinNode==null) break;
             Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
-            BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch);
+            BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch,size);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             final Future<Void> future = builder.invoke();
             try {

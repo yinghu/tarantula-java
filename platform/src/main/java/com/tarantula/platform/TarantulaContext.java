@@ -477,7 +477,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     @Override
     public AccessIndexService accessIndexService(){
-        return (AccessIndexService)this.serviceProviders.get(AccessIndexService.NAME);
+        return this.integrationCluster.accessIndexService();//(AccessIndexService)this.serviceProviders.get(AccessIndexService.NAME);
     }
     @Override
     public DeploymentServiceProvider deploymentServiceProvider(){
@@ -531,7 +531,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             v.waitForData();//block for global data sync
         });
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
-        //bootstrap user service providers
+        this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
 

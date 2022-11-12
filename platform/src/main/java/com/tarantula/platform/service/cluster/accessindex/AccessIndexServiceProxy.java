@@ -7,14 +7,14 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.AccessIndex;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.recover.DataStoreSyncBatchOperation;
 import com.tarantula.platform.service.cluster.recover.DataStoreSyncEndOperation;
 import com.tarantula.platform.service.cluster.recover.DataStoreSyncStartOperation;
+import com.tarantula.platform.service.cluster.recover.ReplicateOnDataScopeOperation;
+import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -24,10 +24,13 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
 
     private final String objectName;//unique proxy name
+    private ServiceContext serviceContext;
+    private MetricsListener metricsListener;
 
     public AccessIndexServiceProxy(String objectName, NodeEngine nodeEngine,AccessIndexClusterService accessIndexService){
         super(nodeEngine,accessIndexService);
         this.objectName = objectName;
+        this.metricsListener = (k,v)->{};
     }
 
     @Override
@@ -70,7 +73,9 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
     }
     @Override
-    public void setup(ServiceContext serviceContext){}
+    public void setup(ServiceContext serviceContext){
+        this.serviceContext = serviceContext;
+    }
     public void waitForData(){}
     @Override
     public AccessIndex get(String accessKey) {
@@ -123,7 +128,30 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected==0;
     }
+    public int onReplicate(OnReplication[] batch, int size, int nodeNumber){
 
+        NodeEngine nodeEngine = getNodeEngine();
+        int cz = nodeEngine.getClusterService().getSize();
+        if(cz==1) return nodeNumber;
+        int expected = cz>nodeNumber? nodeNumber : cz-1;
+        for(int i=0;i<expected;i++){
+            ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
+            if(roundRobinNode==null) break;
+            Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
+            BatchReplicateOnIntegrationScopeOperation operation = new BatchReplicateOnIntegrationScopeOperation(batch,size);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                expected--;
+            } catch (Exception e) {
+                future.cancel(true);
+                //goes to next node if failed
+                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
+            }
+        }
+        return expected;
+    }
     public int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -217,5 +245,11 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return this.objectName;
     }
 
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
+    }
 
 }

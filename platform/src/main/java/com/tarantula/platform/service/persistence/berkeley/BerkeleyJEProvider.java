@@ -12,6 +12,7 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -39,9 +40,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private boolean trimming;
     private int partitionNumber;
 
-    //private String replicationPoolSetting;
-    //private ExecutorService replicationPool;
-    //private int workSize;
+
     private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
 
 
@@ -55,8 +54,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
-    private ConcurrentLinkedDeque<OnReplication> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
-    private ConcurrentLinkedDeque<OnReplication> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<String> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
+
+    private ConcurrentHashMap<String,OnReplication> pendingReplicationIndex = new ConcurrentHashMap<>();
 
     private Environment environment;
     private Environment integrationEnvironment;
@@ -74,6 +75,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private DiskSynchronizer diskSynchronizer;
     private ReplicationSynchronizer replicationSynchronizer;
     private BackupSynchronizer backupSynchronizer;
+
     private int updateThreshold;
     private int replicationBatchSize;
     private int backupBatchSize;
@@ -182,25 +184,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
-        /**
-        for(int i=0;i<workSize;i++){
-            replicationPool.execute(()->{
-                while (running){
-                    Runnable runnable = replicationPendingQueue.poll();
-                    try {
-                        if(runnable!=null){
-                            runnable.run();
-                            //totalUpdated.decrementAndGet();
-                        }
-                        else{
-                            Thread.sleep(10);
-                        }
-                    }catch (Exception ex){
 
-                    }
-                }
-            });
-        }**/
         this.iBackupProvider.setup(serviceContext);
         this.dBackupProvider.setup(serviceContext);
         this.serviceContext.schedule(this.diskSynchronizer);
@@ -277,10 +261,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             ds.count();
         }
         this.create(this.database,this.partitionNumber);
-        //TarantulaExecutorServiceFactory.createExecutorService("data-"+this.replicationPoolSetting,(pool, poolSize, rh)->{
-            //this.replicationPool = pool;
-            //this.workSize = poolSize;
-        //});
+
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
     public void _sync(){
@@ -296,12 +277,30 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext.schedule(this.diskSynchronizer);
     }
     public void _replicate(){
-        log.warn("Replication sync->"+replicationBatchSize+">>"+pendingReplicationDataQueue.size());
-        log.warn("Replication sync->"+replicationBatchSize+">>"+pendingReplicationIntegrationQueue.size());
+        OnReplication[] data = new OnReplication[replicationBatchSize];
+        int dataSize =0;
+        OnReplication[] integration = new OnReplication[replicationBatchSize];
+        int integrationSize = 0;
+        for(int i=0;i<replicationBatchSize;i++){
+            String dataId = pendingReplicationDataQueue.poll();
+            if(dataId!=null){
+                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
+                data[i]=onReplication;
+                dataSize++;
+            }
+            String integrationId = pendingReplicationIntegrationQueue.poll();
+            if(integrationId!=null){
+                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
+                integration[i]=onReplication;
+                integrationSize++;
+            }
+        }
+        this.serviceContext.clusterProvider().recoverService().onReplicate(data,dataSize,replicationNodeNumber);
+        this.serviceContext.accessIndexService().onReplicate(integration,integrationSize,replicationNodeNumber);
         this.serviceContext.schedule(this.replicationSynchronizer);
     }
     public void _backup(){
-        log.warn("Backup sync->"+backupBatchSize);
+        //log.warn("Backup sync->"+backupBatchSize);
         this.serviceContext.schedule(this.backupSynchronizer);
     }
 
@@ -345,14 +344,26 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
     @Override
-    public void onDistributing(Metadata metadata, byte[] key, byte[] value) {
+    public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         if(metadata.scope()==Distributable.DATA_SCOPE && replicationNodeNumber>0){
-            pendingReplicationDataQueue.offer(new ReplicationData(metadata.source(),key,value));
-            //replicationPendingQueue.offer(()-> this.integrationCluster.recoverService().onReplicate(metadata.source(),key,value,replicationNodeNumber));
+            String pendingId = metadata.source()+"#"+stringKey;
+            pendingReplicationIndex.compute(pendingId,(k,v)->{
+                if(v==null){
+                    v = new ReplicationData(metadata.source(),key,value);
+                    pendingReplicationDataQueue.offer(pendingId);
+                }
+                return v;
+            });
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
-            pendingReplicationIntegrationQueue.offer(new ReplicationData(metadata.source(),key,value));
-            //replicationPendingQueue.offer(()->this.integrationCluster.accessIndexService().onReplicate(metadata.partition(),key,value,replicationNodeNumber));
+            String pendingId = metadata.source()+"#"+stringKey;
+            pendingReplicationIndex.compute(pendingId,(k,v)->{
+                if(v==null){
+                    v = new ReplicationData(metadata.partition(),key,value);
+                    pendingReplicationIntegrationQueue.offer(pendingId);
+                }
+                return v;
+            });
         }
         totalUpdated.incrementAndGet();
         onMetrics();
@@ -598,7 +609,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 }
                 v = t.toBinary();
                 if(!_set(k,v)) return false;
-                mapStoreListener.onDistributing(metadata1,k,v);//set cluster
+                mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
                 if(t.backup()) mapStoreListener.onCreating(metadata1,akey,t);
                 return true;
             }catch (Exception ex){
