@@ -272,7 +272,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     public void _sync(){
         if(totalUpdated.get()>updateThreshold){
-            log.warn("Disk synchronizing with total updates ["+totalUpdated.getAndSet(0)+"]");
+            //log.warn("Disk synchronizing with total updates ["+totalUpdated.getAndSet(0)+"]");
             environment.sync();
             environment.cleanLog();
             //environment.evictMemory();
