@@ -45,10 +45,10 @@ public class PlatformUserService implements UserService {
             acc.owner(onAccess.owner());
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
-        if(!userDataStore.create(acc)) throw new RuntimeException("Failed to create user");
+        if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
         PresenceIndex px = new PresenceIndex((Double)onAccess.property(OnAccess.BALANCE));
         px.distributionKey(acc.distributionKey());
-        presenceDataStore.create(px);
+        presenceDataStore.createIfAbsent(px,false);
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return acc;
     }
@@ -61,7 +61,7 @@ public class PlatformUserService implements UserService {
         if(account.userCount(0)> maxUsersPerAccount) throw new RuntimeException("over max user count");
         account.userCount(1);
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        accountDataStore.update(account);
+        accountDataStore.updateOrCreate(account);
         access.owner(accountId);
         Access user = createUser(access);
         IndexSet idx = new IndexSet();
@@ -101,12 +101,12 @@ public class PlatformUserService implements UserService {
         subscription.distributionKey(access.distributionKey());
         subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         subscription.count(1);
-        membershipDataStore.update(subscription);
+        membershipDataStore.updateOrCreate(subscription);
         UserAccount account = new UserAccount();
         account.distributionKey(access.distributionKey());
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        accountDataStore.update(account);
+        accountDataStore.updateOrCreate(account);
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
         return account;
     }
@@ -131,7 +131,7 @@ public class PlatformUserService implements UserService {
         membership.endTimestamp(TimeUtil.toUTCMilliseconds(end.plusMonths(durationMonth)));
         membership.count(1);
         membership.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        membershipDataStore.update(membership);
+        membershipDataStore.updateOrCreate(membership);
         accountDataStore.update(account);
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_SUBSCRIPTION_COUNT,1);
         return membership;

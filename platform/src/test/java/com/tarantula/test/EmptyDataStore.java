@@ -45,6 +45,11 @@ public class EmptyDataStore implements DataStore {
     }
 
     @Override
+    public <T extends Recoverable> boolean updateOrCreate(T t) {
+        return false;
+    }
+
+    @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean b) {
         return false;
     }
@@ -66,10 +71,7 @@ public class EmptyDataStore implements DataStore {
     public byte[] load(byte[] key){
         throw new UnsupportedOperationException();
     }
-    @Override
-    public void registerListener(int i, Listener listener) {
 
-    }
 
     @Override
     public Backup backup() {

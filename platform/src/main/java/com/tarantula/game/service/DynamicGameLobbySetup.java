@@ -31,7 +31,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
             gameLobby.addKey(zone.distributionKey());
         }
         gameLobby.levelMatchOffset(levelMatchOffset);
-        dataStore.create(gameLobby);
+        dataStore.createIfAbsent(gameLobby,true);
     }
 
     @Override

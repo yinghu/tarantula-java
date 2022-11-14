@@ -654,7 +654,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 mds.create(descriptor);
                 lobbyTypeIdIndex.index(descriptor.distributionKey());
                 lobbyTypeIdIndex.owner(gameCluster.distributionKey());
-                mds.create(lobbyTypeIdIndex);
+                mds.createIfAbsent(lobbyTypeIdIndex,false);
                 configuration.applications.forEach((a)->{
                     a.owner(descriptor.distributionKey());
                     a.label(ApplicationProvider.LABEL);

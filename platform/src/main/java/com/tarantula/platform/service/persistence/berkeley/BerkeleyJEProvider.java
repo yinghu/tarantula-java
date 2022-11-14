@@ -12,7 +12,6 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -605,7 +604,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public <T extends Recoverable> boolean update(T t) {
             throw new UnsupportedOperationException();
         }
-
+        public <T extends Recoverable> boolean updateOrCreate(T t){
+            throw new UnsupportedOperationException();
+        }
         @Override
         public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
             try{
@@ -657,21 +658,21 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             throw new UnsupportedOperationException();
         }
 
-        public void set(byte[] key,byte[] value){
+        public boolean set(byte[] key,byte[] value){
             try{
-                if(!_set(key,value)){
-                    log.warn("failed to se key/value->"+new String(key));
-                }
+
+                return _set(key,value);
             }
             catch (Exception ex){
-                log.error("error on set",ex);
+                log.error("error on backup set",ex);
+                return false;
             }
         }
         public byte[] get(byte[] key){
             try{
                 return _get(key);
             }catch (Exception ex){
-                log.error("error on get",ex);
+                log.error("error on backup get",ex);
                 return null;
             }
 
@@ -687,7 +688,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     }
                 }
             } catch (Exception ex) {
-                log.error("",ex);
+                log.error("error on backup list",ex);
             } finally {
                 cursor.close();
             }
@@ -705,9 +706,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public Backup backup(){
             return this;
         }
-        public void registerListener(int registerId,Listener listener){
 
-        }
         public void close(){
             this.berkeleyStore.close();
         }

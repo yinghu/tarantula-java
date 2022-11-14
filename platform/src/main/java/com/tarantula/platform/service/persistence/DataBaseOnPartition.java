@@ -20,8 +20,8 @@ public class DataBaseOnPartition {
         this.name = dataStore.getDatabaseName();
         this.database = dataStore;
     }
-    public boolean lock(byte[] key, Callable<Boolean> runnable){
-        boolean[] ret = {false};
+    public RevisionObject lock(byte[] key, Callable<RevisionObject> runnable){
+        RevisionObject[] ret = {null};
         locks.compute(key,(k,v)->{
             try{
                 ret[0] = runnable.call();

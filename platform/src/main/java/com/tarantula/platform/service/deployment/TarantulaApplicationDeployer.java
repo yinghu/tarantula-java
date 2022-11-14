@@ -49,7 +49,6 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		IndexSet indexSet = new IndexSet();
 		indexSet.distributionKey(deploymentId);
 		indexSet.label(Account.GameClusterLabel);
-		logger.warn("GC KEY->"+indexSet.key().asString());
 		if(datastore.load(indexSet)){
 			indexSet.keySet().forEach((gc)->{
 				deployGameCluster(gc);
@@ -104,7 +103,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			c.descriptor.onEdge(true);
 			c.descriptor.owner(query.distributionKey());
 			dataStore.create(c.descriptor);
-			dataStore.create(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.distributionKey(),""));
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.distributionKey(),""),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.owner(c.descriptor.distributionKey());

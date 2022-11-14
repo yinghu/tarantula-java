@@ -13,7 +13,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class PartitionDataStore extends ReplicatedDataStore{
@@ -25,7 +24,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
     private final String prefix;
 
     private final MapStoreListener mapStoreListener;
-    private ConcurrentHashMap<Integer,Listener> rMap = new ConcurrentHashMap<>();
 
     private static TarantulaLogger log = JDKLogger.getLogger(PartitionDataStore.class);
 
@@ -80,30 +78,20 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean create(T t) {
         try {
             String akey = t.key().asString();
-            if (akey == null) {
-                //use bucket/oid as the key
-                t.bucket(this.bucket);
-                t.oid(SystemUtil.oid());
-                akey = t.key().asString();
-            }
-            final String okey = akey;
-            byte[] key = okey.getBytes();
+            if (akey != null) throw new IllegalArgumentException("Key must be assigned later");
+            t.bucket(this.bucket);
+            t.oid(SystemUtil.oid());
+            akey = t.key().asString();
+            byte[] key = akey.getBytes();
             byte[] value = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            boolean suc = dso.lock(key,()->{
-                if(_get(dso,key) != null) return false;
-                if(!_put(dso,key,value)) return false;
-                //do backup and replication
-                t.revision(Long.MIN_VALUE);
-                return true;
-            });
+            boolean suc = dso.lock(key,()-> _put(dso,key,value)? RevisionObject.TRUE : RevisionObject.FALSE).successful;
             if(!suc) return false;
-            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
+            t.revision(Long.MIN_VALUE);
+            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),akey,t);
             if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
-            Listener listener = rMap.get(t.getFactoryId());
-            if(listener!=null) listener.onCreated(t,okey,key,value);
             if(t.onEdge() && t.owner() != null && t.label() !=null){
-                onEdge(t,okey);
+                onEdge(t,akey);
             }
             return true;
         }catch (Exception ex){
@@ -116,133 +104,158 @@ public class PartitionDataStore extends ReplicatedDataStore{
         indexSet.distributionKey(t.owner());
         indexSet.label(t.label());
         indexSet.revision(Long.MIN_VALUE);
-        byte[] _kn = indexSet.key().asString().getBytes();
-        DataBaseOnPartition dso = this.partitions[SystemUtil.partition(_kn,partition)];
-        boolean suc = dso.lock(_kn,()->{
-            RevisionObject ro = _getRevisionObject(dso,_kn);//from local
-            if(ro != null && ro.local){
-                indexSet.fromBinary(ro.data);
-                indexSet.revision(ro.revision);
-            }
-            else{
-                byte[] data = mapStoreListener.onRecovering(dso.metadata,_kn);//from cluster
-                if( data != null) {
-                    RevisionObject rd = RevisionObject.fromBinary(data);
-                    indexSet.fromBinary(rd.data);
-                    indexSet.revision(rd.revision);
+        String akey = indexSet.key().asString();
+        byte[] key = akey.getBytes();
+        DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
+        RevisionObject pendingData = dso.lock(key,()->_getRevisionObject(dso,key));
+        if(!pendingData.successful || !pendingData.local){
+            byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+            if(data != null){
+                RevisionObject remoteData = RevisionObject.fromBinary(data);
+                if(!pendingData.successful || remoteData.revision >= pendingData.revision){
+                    pendingData = remoteData; //use remote data
                 }
+            }
+        }
+        if(pendingData.successful){
+            indexSet.fromBinary(pendingData.data);
+            indexSet.revision(pendingData.revision);
+        }
+        RevisionObject suc = dso.lock(key,()->{
+            RevisionObject localData = _getRevisionObject(dso,key);//reload to check if there are newer updates existing
+            if(localData.successful && localData.revision > indexSet.revision()){
+                indexSet.fromBinary(localData.data);
+                indexSet.revision(localData.revision);
             }
             indexSet.addKey(okey);
             indexSet.revision(indexSet.revision()+1);
-            byte[] _vn = RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true);
-            return _put(dso,_kn,_vn);
+            byte[] pendingUpdate = RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true);
+            return (_put(dso,key,pendingUpdate)) ? RevisionObject.fromUpdate(indexSet.revision(),pendingUpdate) : RevisionObject.FALSE;
         });
-        if(!suc) return false;
-        if(t.backup()){
-            if(indexSet.revision() > Long.MIN_VALUE){
-                this.mapStoreListener.onUpdating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
+        if(suc.successful){
+            if(t.backup()){
+                if(indexSet.revision() > Long.MIN_VALUE){
+                    this.mapStoreListener.onUpdating(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
+                }
+                else{
+                    this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
+                }
             }
-            else{
-                this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),indexSet.key().asString(),indexSet);
-            }
+            if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key ,suc.data);
         }
-        if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,indexSet.key().asString(),_kn,RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true));
-        return suc;
+        return suc.successful;
     }
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null) return false;
+            if(akey==null) throw new IllegalArgumentException("Key must be assigned");
             byte[] key = akey.getBytes();
+            byte[] pendingUpdate = RevisionObject.toBinary(t.revision()+1,t.toBinary(),true);
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            return dso.lock(key,()->{
-                RevisionObject ro = _getRevisionObject(dso,key);
-                boolean creating = ro==null;
-                if(creating){
-                    t.revision(Long.MIN_VALUE);
-                }
-                else{
-                    if(ro.local && ro.revision != t.revision()) return false;
-                    if(!ro.local){
-                        byte[] data = this.mapStoreListener.onRecovering(dso.metadata,key);
-                        if(data != null){
-                            RevisionObject rd = RevisionObject.fromBinary(data);
-                            _put(dso,key,RevisionObject.toBinary(rd.revision,rd.data,true));
-                            if(rd.revision != t.revision()) return false;
-                        }
+            RevisionObject suc = dso.lock(key,()->{//local update
+                RevisionObject localData = _getRevisionObject(dso,key);
+                if(localData.successful && localData.local && localData.revision == t.revision()){
+                    if(_put(dso,key,pendingUpdate)){
+                        t.revision(t.revision()+1);
+                        return RevisionObject.fromUpdate(t.revision()+1,pendingUpdate);
                     }
+                    return RevisionObject.FALSE;
                 }
-                t.revision(t.revision()+1);
-                byte[] value = RevisionObject.toBinary(t.revision(),t.toBinary(),true);
-                if(!_put(dso,key,value)) return false;
-
-                if(t.backup()) {
-                    if(creating){
-                        this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),akey,t);
-                    }else{
-                        this.mapStoreListener.onUpdating(dso.metadata.fromRevision(t.revision()), akey, t);
-                    }
-                }
-                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
-
-                Listener listener = rMap.get(t.getFactoryId());
-
-                if(listener!=null) listener.onUpdated(t,akey,key,value);
-
-                return true;
+                return RevisionObject.FALSE;
             });
+            if(!suc.successful){//remote recovery
+                byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+                if(data != null){
+                    RevisionObject remoteData = RevisionObject.fromBinary(data);
+                    suc = dso.lock(key,()->{
+                        RevisionObject localData = _getRevisionObject(dso,key);
+                        if(!localData.successful || !localData.local || localData.revision <= remoteData.revision ){
+                            byte[] remoteValue = RevisionObject.toBinary(remoteData.revision+1,remoteData.data,true);
+                            if(_put(dso,key,remoteValue)){
+                                return RevisionObject.fromUpdate(remoteData.revision+1,remoteValue);
+                            }
+                            return RevisionObject.FALSE;
+                        }
+                        return RevisionObject.FALSE;
+                    });
+                    if(suc.successful){
+                        t.fromBinary(remoteData.data);
+                        t.revision(remoteData.revision+1);
+                    }
+                }
+            }
+            if(suc.successful){
+               if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata.fromRevision(t.revision()), akey, t);
+               if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,suc.data);
+            }
+            return suc.successful;
 
         }catch (Exception ex){
             log.error("Error on update",ex);
             return false;
         }
     }
-
+    public <T extends Recoverable> boolean updateOrCreate(T t){
+        if(update(t)) return true;
+        return createIfAbsent(t,true);
+    }
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
         try{
             String akey = t.key().asString();
-            if(akey==null){
-                t.bucket(this.bucket);
-                t.oid(SystemUtil.oid());
-                akey = t.key().asString();
-            }
+            if(akey==null) throw new IllegalArgumentException("Key must be assigned first");
+
             byte[] key = akey.getBytes();
             final String okey = akey;
+            byte[] pendingValue = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
+            boolean[] created = {false};
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
-            boolean suc = dso.lock(key,()->{
-                RevisionObject ro = _getRevisionObject(dso,key);//from local
-                if(ro==null){
-                    byte[] data = mapStoreListener.onRecovering(dso.metadata,key);//from cluster
-                    if(data != null) {
-                        ro = RevisionObject.fromBinary(data);
-                        _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));//set local data from remote
-                    }
+            RevisionObject suc = dso.lock(key,()->{
+                RevisionObject localData = _getRevisionObject(dso,key);
+                if(localData.successful){
+                    return localData;
                 }
-                if(ro != null){//existed no creation
-                    if(loading) {
-                        t.fromBinary(ro.data);
-                        t.revision(ro.revision);
-                    }
-                    return false;
-                }
-                byte[] vx = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
-                if(!_put(dso,key,vx)) return false;
-                t.revision(Long.MIN_VALUE);
-                if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),okey,t);
-
-                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,okey,key,vx);
-
-                Listener listener = rMap.get(t.getFactoryId());
-                if(listener!=null) listener.onCreated(t,okey,key,vx);
-                return true;
+                return RevisionObject.FALSE;
             });
-            if(suc && t.onEdge() && t.owner() != null && t.label() !=null){
+            if(!suc.successful){//remote recovery
+               byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+               if(data != null){
+                   RevisionObject remoteData = RevisionObject.fromBinary(data);
+                   suc = dso.lock(key,()->{
+                       RevisionObject localData = _getRevisionObject(dso,key);
+                       if(!localData.successful || localData.revision <= remoteData.revision){
+                           return _put(dso,key,data)? remoteData : localData;
+                       }
+                       return localData;
+                   });
+               }
+               else{
+                   suc = dso.lock(key,()->{
+                       RevisionObject localData = _getRevisionObject(dso,key);
+                       if(!localData.successful){
+                           created[0] = _put(dso,key,pendingValue);
+                           return RevisionObject.FALSE;
+                       }
+                       return localData;
+                   });
+               }
+
+            }
+            if(!created[0] && suc.successful && loading){
+                t.fromBinary(suc.data);
+                t.revision(suc.revision);
+            }
+            if(created[0]) {
+                if (t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()), okey, t);
+
+                if (t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, okey, key,pendingValue);
+            }
+            if(created[0] && t.onEdge() && t.owner() != null && t.label() !=null){
                 onEdge(t,okey);
             }
-            return suc;
+            return created[0];
 
         }catch (Exception ex){
             log.error("Error on createIfAbsent",ex);
@@ -254,21 +267,32 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean load(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null) return false;
+            if(akey==null) throw new IllegalArgumentException("key must be assigned first");
             byte[] key = akey.getBytes();
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            return dso.lock(key,()->{
-                RevisionObject ro = _getRevisionObject(dso,key);
-                if(ro == null || !ro.local){//get from cluster
-                    byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
-                    if(value==null && ro==null) return false;
-                    if(value!=null) ro = RevisionObject.fromBinary(value);
-                    _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
-                }
-                t.fromBinary(ro.data);
-                t.revision(ro.revision);
+            RevisionObject pendingData = dso.lock(key,()-> _getRevisionObject(dso,key));
+            if(pendingData.successful && pendingData.local){
+                t.fromBinary(pendingData.data);
+                t.revision(pendingData.revision);
                 return true;
+            }
+            byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+            if(data==null) return false;
+            RevisionObject remoteData = RevisionObject.fromBinary(data);
+            pendingData = dso.lock(key,()->{
+                RevisionObject localData = _getRevisionObject(dso,key);
+                if(!localData.successful || !localData.local || remoteData.revision >= localData.revision){
+                    if(_put(dso,key,data)){
+                        return remoteData;
+                    }
+                    return localData;
+                }
+                return localData;
             });
+            if(!pendingData.successful) return false;
+            t.fromBinary(pendingData.data);
+            t.revision(pendingData.revision);
+            return true;
         }catch (Exception ex){
             log.error("Error on load",ex);
             return false;
@@ -277,108 +301,56 @@ public class PartitionDataStore extends ReplicatedDataStore{
 
     public byte[] load(byte[] key){
         DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-        boolean loaded = dso.lock(key,()->{
-            RevisionObject ro = _getRevisionObject(dso,key);
-            if(ro == null || !ro.local){//get from cluster
-                byte[] value = mapStoreListener.onRecovering(dso.metadata,key);
-                if(value==null && ro==null) return false;
-                if(value!=null) ro = RevisionObject.fromBinary(value);
-                _put(dso,key,RevisionObject.toBinary(ro.revision,ro.data,true));
+        RevisionObject pendingData = dso.lock(key,()->_getRevisionObject(dso,key));
+        if(pendingData.successful && pendingData.local){
+            return RevisionObject.toBinary(pendingData.revision,pendingData.data,pendingData.local);
+        }
+        byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+        if(data==null) return null;
+        RevisionObject remoteData = RevisionObject.fromBinary(data);
+        pendingData = dso.lock(key,()->{
+            RevisionObject localData = _getRevisionObject(dso,key);
+            if(!localData.successful || !localData.local || remoteData.revision >= localData.revision){
+                return _put(dso,key,data)? remoteData : localData;
             }
-            return true;
+            return localData;
         });
-        return loaded?_get(dso,key):null;
+        if(!pendingData.successful) return null;
+        return RevisionObject.toBinary(pendingData.revision,pendingData.data,true);
     }
 
-    @Override
-    public void set(byte[] key, byte[] value) {
-        try{
-            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            dso.lock(key,()->{
-                RevisionObject ro = _getRevisionObject(dso,key);
-                RevisionObject rd = RevisionObject.fromBinary(value);
-                if(ro == null){
-                    _put(dso,key,RevisionObject.toBinary(rd.revision,rd.data,false));
-                   return true;
-                }
-                if(rd.revision <= ro.revision) return false;
-                _put(dso,key,RevisionObject.toBinary(rd.revision,rd.data,false));
-                return true;
-            });
-        }
-        catch (Exception ex){
-            log.error("Error on set",ex);
-        }
-    }
-    public byte[] get(byte[] key){
-        try{
-            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-            RevisionObject[] ros = new RevisionObject[1];
-            boolean suc = dso.lock(key,()->{
-                RevisionObject ro = _getRevisionObject(dso,key);
-                if(ro == null || !ro.local) return false;
-                ros[0] = ro;
-                return true;
-            });
-            if(!suc) return null;
-            return RevisionObject.toBinary(ros[0].revision,ros[0].data,ros[0].local);
-        }catch (Exception ex){
-            log.error("error on get",ex);
-            return null;
-        }
-    }
-    public void list(Binary binary){
-        for(DataBaseOnPartition dso : partitions){
-            Cursor cursor = dso.database.openCursor(null,null);
-            DatabaseEntry _key = new DatabaseEntry();
-            DatabaseEntry _value = new DatabaseEntry();
-            try{
-                while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-                    RevisionObject ro = RevisionObject.fromBinary(_value.getData());
-                    if(ro.local){
-                        if(!binary.on(_key.getData(),RevisionObject.toBinary(ro.revision,ro.data,true))) break;
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("",ex);
-            } finally {
-                cursor.close();
-            }
-        }
-    }
     public  <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> binary){
         try {
             String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
             DataBaseOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
-            RevisionObject ro = _getRevisionObject(dso,owner);
-            if(ro==null|| !ro.local){
+            RevisionObject pendingData = _getRevisionObject(dso,owner);
+            if(!pendingData.successful || !pendingData.local){
                 //recovering from remote
                 byte[] data = mapStoreListener.onRecovering(dso.metadata,owner);
                 if(data!=null){
-                    ro = RevisionObject.fromBinary(data);
-                    _put(dso,owner,RevisionObject.toBinary(ro.revision,ro.data,true));
+                    RevisionObject remoteData = RevisionObject.fromBinary(data);
+                    pendingData = dso.lock(owner,()->{
+                        RevisionObject localData = _getRevisionObject(dso,owner);
+                        if(!localData.successful || remoteData.revision >= localData.revision ){
+                            return _put(dso,owner,RevisionObject.toBinary(remoteData.revision,remoteData.data,true))? remoteData: RevisionObject.FALSE;
+                        }
+                        return RevisionObject.FALSE;
+                    });
                 }
             }
-            if(ro==null) return;
+            if(!pendingData.successful) return;
             IndexSet indexSet = new IndexSet();
-            indexSet.fromBinary(ro.data);
-            for(String b: indexSet.keySet()){
-                RevisionObject v;
-                byte[] ka = b.getBytes();
-                DataBaseOnPartition dwso = partitions[SystemUtil.partition(ka,partition)];
-                if((v =_getRevisionObject(dwso,ka)) == null){//from local
-                    byte[] data = mapStoreListener.onRecovering(dwso.metadata,ka);
-                    if(data!=null){
-                        v = RevisionObject.fromBinary(data);
-                        _put(dwso,ka,RevisionObject.toBinary(v.revision,v.data,false));
-                    }
-                }
-                if(v!=null){
+            indexSet.fromBinary(pendingData.data);
+            for(String k : indexSet.keySet()){
+                byte[] key = k.getBytes();
+                byte[] data = load(key);
+                if(data != null){
+                    RevisionObject revisionObject = RevisionObject.fromBinary(data);
                     T t = query.create();
-                    t.fromBinary(v.data);
-                    t.revision(v.revision);
-                    t.distributionKey(b);
+                    t.fromBinary(revisionObject.data);
+                    t.revision(revisionObject.revision);
+                    t.distributionKey(k);
                     if(!binary.on(t)) break;
                 }
             }
@@ -396,16 +368,67 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return alist;
     }
 
+    /**
+     * Backup implementation
+     * */
     public Backup backup(){
         return this;
     }
 
+    @Override
+    public boolean set(byte[] key, byte[] value) {
+        try{
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            return dso.lock(key,()->{
+                RevisionObject localData = _getRevisionObject(dso,key);
+                RevisionObject remoteData = RevisionObject.fromBinary(value);
+                if(!localData.successful || localData.revision < remoteData.revision){
+                    _put(dso,key,RevisionObject.toBinary(remoteData.revision,remoteData.data,false));
+                    return RevisionObject.TRUE;
+                }
+                return RevisionObject.FALSE;
+            }).successful;
+        }
+        catch (Exception ex){
+            log.error("Error on backup set",ex);
+            return false;
+        }
+    }
+    public byte[] get(byte[] key){
+        try{
+            DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+            RevisionObject localData = dso.lock(key,()->_getRevisionObject(dso,key));
+            if(!localData.successful || !localData.local) return null;
+            return RevisionObject.toBinary(localData.revision,localData.data,localData.local);
+        }catch (Exception ex){
+            log.error("error on backup get",ex);
+            return null;
+        }
+    }
+    public void list(Binary binary){
+        for(DataBaseOnPartition dso : partitions){
+            Cursor cursor = dso.database.openCursor(null,null);
+            DatabaseEntry _key = new DatabaseEntry();
+            DatabaseEntry _value = new DatabaseEntry();
+            try{
+                while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                    RevisionObject localData = RevisionObject.fromBinary(_value.getData());
+                    if(localData.successful){
+                        if(!binary.on(_key.getData(),RevisionObject.toBinary(localData.revision,localData.data,localData.local))) break;
+                    }
+                }
+            } catch (Exception ex) {
+                log.error("error on backup list",ex);
+            } finally {
+                cursor.close();
+            }
+        }
+    }
+    // End of Backup implementation
+
+    //Berkeley data base helper methods
     private boolean _put(DataBaseOnPartition dso,byte[] key,byte[] value){
         return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
-    }
-
-    public void registerListener(int registerId,Listener listener){
-        rMap.putIfAbsent(registerId,listener);
     }
 
     private byte[] _get(DataBaseOnPartition dso,byte[] key){
@@ -417,6 +440,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
     private RevisionObject _getRevisionObject(DataBaseOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
-        return status==OperationStatus.SUCCESS?RevisionObject.fromBinary(ve.getData()):null;
+        return status==OperationStatus.SUCCESS?RevisionObject.fromBinary(ve.getData()):RevisionObject.FALSE;
     }
 }

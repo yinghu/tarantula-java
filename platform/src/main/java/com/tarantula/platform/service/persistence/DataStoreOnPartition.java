@@ -2,7 +2,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Metadata;
-import com.sleepycat.je.Database;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
