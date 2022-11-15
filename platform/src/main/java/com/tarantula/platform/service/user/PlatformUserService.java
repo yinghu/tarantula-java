@@ -42,6 +42,7 @@ public class PlatformUserService implements UserService {
         acc.activated((Boolean)onAccess.property(OnAccess.ACTIVATED));
         acc.primary((Boolean)onAccess.property(OnAccess.PRIMARY_USER));
         if(!acc.primary()){
+            if(onAccess.owner()==null) throw new IllegalArgumentException("No owner for sub user");
             acc.owner(onAccess.owner());
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
@@ -61,7 +62,7 @@ public class PlatformUserService implements UserService {
         if(account.userCount(0)> maxUsersPerAccount) throw new RuntimeException("over max user count");
         account.userCount(1);
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        accountDataStore.updateOrCreate(account);
+        accountDataStore.update(account);
         access.owner(accountId);
         Access user = createUser(access);
         IndexSet idx = new IndexSet();
@@ -101,12 +102,16 @@ public class PlatformUserService implements UserService {
         subscription.distributionKey(access.distributionKey());
         subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         subscription.count(1);
-        membershipDataStore.updateOrCreate(subscription);
+        if(!membershipDataStore.createIfAbsent(subscription,false)){
+            throw new RuntimeException("Subscription already existed");
+        }
         UserAccount account = new UserAccount();
         account.distributionKey(access.distributionKey());
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        accountDataStore.updateOrCreate(account);
+        if(!accountDataStore.createIfAbsent(account,false)){
+            throw new RuntimeException("Account already existed");
+        }
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
         return account;
     }
@@ -126,12 +131,13 @@ public class PlatformUserService implements UserService {
         account.subscribed(true);
         Membership membership = new Membership();
         membership.distributionKey(account.distributionKey());
-        membershipDataStore.load(membership);
+        if(!membershipDataStore.load(membership)){
+            throw new RuntimeException("no subscription existed");
+        }
         LocalDateTime end = TimeUtil.fromUTCMilliseconds(membership.endTimestamp());
         membership.endTimestamp(TimeUtil.toUTCMilliseconds(end.plusMonths(durationMonth)));
         membership.count(1);
         membership.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        membershipDataStore.updateOrCreate(membership);
         accountDataStore.update(account);
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_SUBSCRIPTION_COUNT,1);
         return membership;

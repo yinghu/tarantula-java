@@ -604,9 +604,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public <T extends Recoverable> boolean update(T t) {
             throw new UnsupportedOperationException();
         }
-        public <T extends Recoverable> boolean updateOrCreate(T t){
-            throw new UnsupportedOperationException();
-        }
+
         @Override
         public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
             try{

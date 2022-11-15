@@ -78,7 +78,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean create(T t) {
         try {
             String akey = t.key().asString();
-            if (akey != null) throw new IllegalArgumentException("Key must be assigned later");
+            if (akey != null) return false;
             t.bucket(this.bucket);
             t.oid(SystemUtil.oid());
             akey = t.key().asString();
@@ -150,7 +150,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean update(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null) throw new IllegalArgumentException("Key must be assigned");
+            if(akey==null) return false;
             byte[] key = akey.getBytes();
             byte[] pendingUpdate = RevisionObject.toBinary(t.revision()+1,t.toBinary(),true);
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
@@ -197,16 +197,12 @@ public class PartitionDataStore extends ReplicatedDataStore{
             return false;
         }
     }
-    public <T extends Recoverable> boolean updateOrCreate(T t){
-        if(update(t)) return true;
-        return createIfAbsent(t,true);
-    }
+
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
         try{
             String akey = t.key().asString();
             if(akey==null) throw new IllegalArgumentException("Key must be assigned first");
-
             byte[] key = akey.getBytes();
             final String okey = akey;
             byte[] pendingValue = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
@@ -267,7 +263,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
     public <T extends Recoverable> boolean load(T t) {
         try{
             String akey = t.key().asString();
-            if(akey==null) throw new IllegalArgumentException("key must be assigned first");
+            if(akey==null) return false;
             byte[] key = akey.getBytes();
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             RevisionObject pendingData = dso.lock(key,()-> _getRevisionObject(dso,key));

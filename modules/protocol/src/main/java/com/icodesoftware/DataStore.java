@@ -21,8 +21,6 @@ public interface DataStore {
 
     <T extends Recoverable> boolean update(T t);
 
-    <T extends Recoverable> boolean updateOrCreate(T t);
-
 
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
 

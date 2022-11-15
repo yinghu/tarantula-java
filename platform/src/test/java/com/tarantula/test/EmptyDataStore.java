@@ -44,10 +44,6 @@ public class EmptyDataStore implements DataStore {
         return false;
     }
 
-    @Override
-    public <T extends Recoverable> boolean updateOrCreate(T t) {
-        return false;
-    }
 
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean b) {
