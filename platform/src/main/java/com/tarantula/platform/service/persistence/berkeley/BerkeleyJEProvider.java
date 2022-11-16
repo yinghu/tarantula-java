@@ -386,19 +386,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
     // map store listener methods
-    @Override
-    public <T extends Recoverable> void onCreating(Metadata metadata,String key,T t){
-        //if(t.scope()==Distributable.DATA_SCOPE){
-        //}
-        //else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-        //}
-    }
-    @Override
-    public <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t){
-        //if(t.scope()==Distributable.DATA_SCOPE){
-        //}
-        //else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-        //}
+
+    public <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t){
+
     }
 
     @Override
@@ -684,7 +674,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 v = t.toBinary();
                 if(!_set(k,v)) return false;
                 mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
-                if(t.backup()) mapStoreListener.onCreating(metadata1,akey,t);
+                if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
                 return true;
             }catch (Exception ex){
                 log.error("error on createIfAbsent",ex);

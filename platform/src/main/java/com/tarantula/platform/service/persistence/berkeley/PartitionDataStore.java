@@ -88,7 +88,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()-> _put(dso,key,value)? RevisionObject.TRUE : RevisionObject.FALSE).successful;
             if(!suc) return false;
-            if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),akey,t);
+            if(t.backup()) this.mapStoreListener.onBackingUp(dso.metadata.fromRevision(t.revision()),akey,t);
             if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
             if(t.onEdge() && t.owner() != null && t.label() !=null){
                 onEdge(t,akey);
@@ -133,14 +133,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
             return (_put(dso,key,pendingUpdate)) ? RevisionObject.fromUpdate(indexSet.revision(),pendingUpdate) : RevisionObject.FALSE;
         });
         if(suc.successful){
-            if(t.backup()){
-                if(indexSet.revision() > Long.MIN_VALUE){
-                    this.mapStoreListener.onUpdating(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
-                }
-                else{
-                    this.mapStoreListener.onCreating(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
-                }
-            }
+            if(t.backup())this.mapStoreListener.onBackingUp(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
             if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key ,suc.data);
         }
         return suc.successful;
@@ -187,7 +180,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 }
             }
             if(suc.successful){
-               if(t.backup()) this.mapStoreListener.onUpdating(dso.metadata.fromRevision(t.revision()), akey, t);
+               if(t.backup()) this.mapStoreListener.onBackingUp(dso.metadata.fromRevision(t.revision()), akey, t);
                if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,suc.data);
             }
             return suc.successful;
@@ -245,7 +238,7 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 t.revision(suc.revision);
             }
             if(created[0]) {
-                if (t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()), okey, t);
+                if (t.backup()) this.mapStoreListener.onBackingUp(dso.metadata.fromRevision(t.revision()), okey, t);
 
                 if (t.distributable()) this.mapStoreListener.onDistributing(dso.metadata, okey, key,pendingValue);
             }
