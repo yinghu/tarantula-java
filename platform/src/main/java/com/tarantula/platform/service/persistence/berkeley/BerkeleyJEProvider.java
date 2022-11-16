@@ -40,10 +40,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int partitionNumber;
 
 
-    //private final ConcurrentLinkedQueue<Runnable> replicationPendingQueue = new ConcurrentLinkedQueue();
-
-
-
     private boolean dailyBackup;
 
     private int replicationNodeNumber = 3;
@@ -74,6 +70,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private DiskSynchronizer diskSynchronizer;
     private ReplicationSynchronizer replicationSynchronizer;
     private ReplicationSynchronizer integrationReplicationSynchronizer;
+    private CacheSynchronizer cacheSynchronizer;
 
     private BackupSynchronizer backupSynchronizer;
 
@@ -96,6 +93,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
         long nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
         long nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
+        long nextEvictInterval = 1000*60*((JsonElement)properties.get("cacheSyncIntervalMinutes")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
@@ -105,7 +103,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = (ClusterNode) properties.get("node");
-        //this.replicationPoolSetting = (String) properties.get("poolSetting");
 
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
@@ -116,6 +113,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
         this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
         this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval);
+        this.cacheSynchronizer = new CacheSynchronizer(this,nextEvictInterval);
     }
 
 
@@ -194,6 +192,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext.schedule(this.replicationSynchronizer);
         this.serviceContext.schedule(this.integrationReplicationSynchronizer);
         this.serviceContext.schedule(this.backupSynchronizer);
+        this.serviceContext.schedule(this.cacheSynchronizer);
     }
     @Override
     public void waitForData() {
@@ -270,15 +269,17 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     public void _sync(){
         if(totalUpdated.get()>updateThreshold){
-            //log.warn("Disk synchronizing with total updates ["+totalUpdated.getAndSet(0)+"]");
             environment.sync();
             environment.cleanLog();
-            //environment.evictMemory();
             integrationEnvironment.sync();
             integrationEnvironment.cleanLog();
-            //integrationEnvironment.evictMemory();
         }
         this.serviceContext.schedule(this.diskSynchronizer);
+    }
+    public void _evict(){
+        environment.evictMemory();
+        integrationEnvironment.evictMemory();
+        this.serviceContext.schedule(this.cacheSynchronizer);
     }
     public void _replicateOnIntegrationScope(){
         OnReplication[] integration = new OnReplication[replicationBatchSize];
@@ -604,6 +605,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public <T extends Recoverable> boolean update(T t) {
             throw new UnsupportedOperationException();
         }
+
 
         @Override
         public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
