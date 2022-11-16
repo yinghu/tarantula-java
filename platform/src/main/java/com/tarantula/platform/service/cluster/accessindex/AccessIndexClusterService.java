@@ -101,7 +101,8 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex set(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket, SystemUtil.oid(),referenceId);
-        boolean suc = dso.lock(accessKey,()->
+        byte[] key = accessKey.getBytes();
+        boolean suc = dso.lock(key,()->
             dso.dataStore.createIfAbsent(accessIndex,false)
         );
         return suc?accessIndex:null;
@@ -109,13 +110,15 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex setIfAbsent(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket,SystemUtil.oid(),referenceId);
-        dso.lock(accessKey,()-> dso.dataStore.createIfAbsent(accessIndex,true));
+        byte[] key = accessKey.getBytes();
+        dso.lock(key,()-> dso.dataStore.createIfAbsent(accessIndex,true));
         return accessIndex;
     }
     public AccessIndex get(String accessKey){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey);
-        boolean loaded = dso.lock(accessKey,()-> dso.dataStore.load(accessIndex));
+        byte[] key = accessKey.getBytes();
+        boolean loaded = dso.lock(key,()-> dso.dataStore.load(accessIndex));
         if(!loaded) return null;
         return accessIndex;
     }

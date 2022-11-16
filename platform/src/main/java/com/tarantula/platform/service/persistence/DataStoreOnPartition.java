@@ -13,14 +13,14 @@ public class DataStoreOnPartition {
 
     public Metadata metadata;
 
-    private ConcurrentHashMap<String,Boolean> locks = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<byte[],Boolean> locks = new ConcurrentHashMap<>();
     public DataStoreOnPartition(int partition,String name){
         this.partition = partition;
         this.name = name;
     }
 
 
-    public boolean lock(String key, Callable<Boolean> runnable){
+    public boolean lock(byte[] key, Callable<Boolean> runnable){
         boolean[] ret = {false};
         locks.compute(key,(k,v)->{
             try{
