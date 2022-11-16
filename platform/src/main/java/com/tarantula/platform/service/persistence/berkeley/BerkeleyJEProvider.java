@@ -61,7 +61,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
 
-    private AtomicInteger totalUpdated = new AtomicInteger(0);
+    private OperationSummary operationSummary = new OperationSummary();
 
     private MetricsListener metricsListener = (k,v)->{};
 
@@ -78,6 +78,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int replicationBatchSize;
     private int backupBatchSize;
     private int maxTimerLoop;
+    private int maxBytesPerBatch;
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -89,6 +90,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
         this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
         this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
+        this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
         this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
         long nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
@@ -268,7 +270,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
     public void _sync(){
-        if(totalUpdated.get()>updateThreshold){
+        long updates = operationSummary.dailyTotalDataUpdates.get();
+        long delta = updates-operationSummary.lastSyncUpdates.get();
+        if(delta>updateThreshold){
+            operationSummary.lastSyncUpdates.set(updates);
             environment.sync();
             environment.cleanLog();
             integrationEnvironment.sync();
@@ -282,34 +287,52 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext.schedule(this.cacheSynchronizer);
     }
     public void _replicateOnIntegrationScope(){
-        OnReplication[] integration = new OnReplication[replicationBatchSize];
         int integrationSize = 0;
+        long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
+        long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
+        long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
+        int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
+        operationSummary.lastIntegrationBatchSize.set(bsize);
+        OnReplication[] integration = new OnReplication[bsize];
         for(int loop =0;loop<maxTimerLoop;loop++) {
-            for (int i = 0; i < replicationBatchSize; i++) {
+            for (int i = 0; i < bsize; i++) {
                 String integrationId = pendingReplicationIntegrationQueue.poll();
                 if (integrationId == null) break;
                 OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
                 integration[i] = onReplication;
                 integrationSize++;
             }
-            if (integrationSize > 0) this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
+            if (integrationSize > 0) {
+                this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
+                operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
+            }
             integrationSize = 0;
         }
         this.serviceContext.schedule(this.integrationReplicationSynchronizer);
     }
     public void _replicateOnDataScope(){
+        try{
         int dataSize = 0;
-        OnReplication[] data = new OnReplication[replicationBatchSize];
+        long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
+        long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
+        long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
+        int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
+        operationSummary.lastDataBatchSize.set(bsize);
+        OnReplication[] data = new OnReplication[bsize];
         for(int loop =0;loop<maxTimerLoop;loop++) {
-            for (int i = 0; i < replicationBatchSize; i++) {
+            for (int i = 0; i < bsize; i++) {
                 String dataId = pendingReplicationDataQueue.poll();
                 if(dataId==null) break;
                 OnReplication onReplication = pendingReplicationIndex.remove(dataId);
                 data[i] = onReplication;
                 dataSize++;
             }
-            if (dataSize > 0) this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
-            dataSize = 0;
+            if (dataSize > 0) {
+                this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
+                operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
+            }dataSize = 0;
+        }}catch (Exception ex){
+            log.error("error",ex);
         }
         this.serviceContext.schedule(this.replicationSynchronizer);
     }
@@ -359,27 +382,32 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
+        int keySize = key.length;
+        int valueSize = value.length;
         if(metadata.scope()==Distributable.DATA_SCOPE && replicationNodeNumber>0){
             String pendingId = metadata.source()+"#"+stringKey;
+            operationSummary.dailyTotalDataUpdates.incrementAndGet();
+            operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
             pendingReplicationIndex.compute(pendingId,(k,v)->{
                 if(v==null){
-                    v = new ReplicationData(metadata.source(),key,value);
                     pendingReplicationDataQueue.offer(pendingId);
+                    operationSummary.pendingUpdates.incrementAndGet();
                 }
-                return v;
+                return new ReplicationData(metadata.source(),key,value);
             });
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
             String pendingId = metadata.source()+"#"+stringKey;
+            operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
+            operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
             pendingReplicationIndex.compute(pendingId,(k,v)->{
                 if(v==null){
-                    v = new ReplicationData(metadata.partition(),key,value);
                     pendingReplicationIntegrationQueue.offer(pendingId);
+                    operationSummary.pendingUpdates.incrementAndGet();
                 }
-                return v;
+                return new ReplicationData(metadata.partition(),key,value);
             });
         }
-        totalUpdated.incrementAndGet();
         onMetrics();
     }
     @Override
@@ -536,6 +564,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             backup(Distributable.DATA_SCOPE);//daily incremental backup
             backup(Distributable.INTEGRATION_SCOPE);
         }
+        operationSummary.dailyTotalDataBytesUpdated.set(0);
+        operationSummary.dailyTotalDataUpdates.set(0);
+        operationSummary.dailyTotalIntegrationBytesUpdated.set(0);
+        operationSummary.dailyTotalIntegrationUpdates.set(0);
     }
     private void onMetrics(){
         this.metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_DATA_STORE_COUNT,1);
@@ -546,11 +578,17 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     @Override
     public void updateSummary(Summary summary){
-        summary.update(PENDING_UPDATE_SIZE,totalUpdated.get());
-        summary.update(PENDING_REPLICATION_SIZE,pendingReplicationIndex.size());
-        summary.update(REPLICATION_NODE_NUMBER,replicationNodeNumber);
-        summary.update(CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
-        summary.update(CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
+        summary.update(OperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
+        summary.update(OperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
+        long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
+        summary.update(OperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
+        summary.update(OperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
+        summary.update(OperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
+        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
+        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
+        summary.update(OperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
+        summary.update(OperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
