@@ -52,6 +52,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
     private ConcurrentLinkedDeque<String> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
 
+    private ConcurrentLinkedDeque<String> pendingBackupDataQueue = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<String> pendingBackupIntegrationQueue = new ConcurrentLinkedDeque<>();
+
+
     private ConcurrentHashMap<String,OnReplication> pendingReplicationIndex = new ConcurrentHashMap<>();
 
     private Environment environment;
@@ -75,6 +79,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupSynchronizer backupSynchronizer;
 
     private int updateThreshold;
+    private int cacheUpdateThreshold;
+
     private int replicationBatchSize;
     private int backupBatchSize;
     private int maxTimerLoop;
@@ -97,6 +103,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         long nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
         long nextEvictInterval = 1000*60*((JsonElement)properties.get("cacheSyncIntervalMinutes")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
+        this.cacheUpdateThreshold =  ((JsonElement)properties.get("cacheUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
@@ -270,69 +277,87 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
     public void _sync(){
-        long updates = operationSummary.dailyTotalDataUpdates.get();
-        long delta = updates-operationSummary.lastSyncUpdates.get();
-        if(delta>updateThreshold){
-            operationSummary.lastSyncUpdates.set(updates);
-            environment.sync();
-            environment.cleanLog();
-            integrationEnvironment.sync();
-            integrationEnvironment.cleanLog();
+        try {
+            long updates = operationSummary.dailyTotalDataUpdates.get();
+            long delta = updates-operationSummary.lastSyncUpdates.get();
+            if(delta>updateThreshold){
+                operationSummary.lastSyncUpdates.set(updates);
+                environment.sync();
+                environment.cleanLog();
+                integrationEnvironment.sync();
+                integrationEnvironment.cleanLog();
+            }
+        }catch (Exception ex){
+            log.error("_sync",ex);
         }
         this.serviceContext.schedule(this.diskSynchronizer);
     }
     public void _evict(){
-        environment.evictMemory();
-        integrationEnvironment.evictMemory();
+        try{
+            long updates = operationSummary.dailyTotalDataUpdates.get();
+            long delta = updates-operationSummary.lastEvictUpdates.get();
+            if(delta>cacheUpdateThreshold){
+                operationSummary.lastEvictUpdates.set(updates);
+                environment.evictMemory();
+                integrationEnvironment.evictMemory();
+            }
+        }catch (Exception ex){
+            log.error("_evict",ex);
+        }
         this.serviceContext.schedule(this.cacheSynchronizer);
     }
     public void _replicateOnIntegrationScope(){
-        int integrationSize = 0;
-        long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
-        long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
-        long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-        int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
-        operationSummary.lastIntegrationBatchSize.set(bsize);
-        OnReplication[] integration = new OnReplication[bsize];
-        for(int loop =0;loop<maxTimerLoop;loop++) {
-            for (int i = 0; i < bsize; i++) {
-                String integrationId = pendingReplicationIntegrationQueue.poll();
-                if (integrationId == null) break;
-                OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
-                integration[i] = onReplication;
-                integrationSize++;
+        try{
+            int integrationSize = 0;
+            long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
+            long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
+            long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
+            int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
+            operationSummary.lastIntegrationBatchSize.set(bsize);
+            OnReplication[] integration = new OnReplication[bsize];
+            for(int loop =0;loop<maxTimerLoop;loop++) {
+                for (int i = 0; i < bsize; i++) {
+                    String integrationId = pendingReplicationIntegrationQueue.poll();
+                    if (integrationId == null) break;
+                    OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
+                    integration[i] = onReplication;
+                    integrationSize++;
+                }
+                if (integrationSize > 0) {
+                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
+                    operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
+                }
+                integrationSize = 0;
             }
-            if (integrationSize > 0) {
-                this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
-                operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
-            }
-            integrationSize = 0;
+        } catch (Exception ex){
+            log.error("_replicationOnIntegrationScope",ex);
         }
         this.serviceContext.schedule(this.integrationReplicationSynchronizer);
     }
     public void _replicateOnDataScope(){
         try{
-        int dataSize = 0;
-        long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
-        long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
-        long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-        int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
-        operationSummary.lastDataBatchSize.set(bsize);
-        OnReplication[] data = new OnReplication[bsize];
-        for(int loop =0;loop<maxTimerLoop;loop++) {
-            for (int i = 0; i < bsize; i++) {
-                String dataId = pendingReplicationDataQueue.poll();
-                if(dataId==null) break;
-                OnReplication onReplication = pendingReplicationIndex.remove(dataId);
-                data[i] = onReplication;
-                dataSize++;
+            int dataSize = 0;
+            long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
+            long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
+            long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
+            int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
+            operationSummary.lastDataBatchSize.set(bsize);
+            OnReplication[] data = new OnReplication[bsize];
+            for(int loop =0;loop<maxTimerLoop;loop++) {
+                for (int i = 0; i < bsize; i++) {
+                    String dataId = pendingReplicationDataQueue.poll();
+                    if(dataId==null) break;
+                    OnReplication onReplication = pendingReplicationIndex.remove(dataId);
+                    data[i] = onReplication;
+                    dataSize++;
+                }
+                if (dataSize > 0) {
+                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
+                    operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
+                }dataSize = 0;
             }
-            if (dataSize > 0) {
-                this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
-                operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
-            }dataSize = 0;
-        }}catch (Exception ex){
-            log.error("error",ex);
+        }catch (Exception ex){
+            log.error("_replicationOnDataScope",ex);
         }
         this.serviceContext.schedule(this.replicationSynchronizer);
     }
@@ -363,21 +388,17 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     // map store listener methods
     @Override
     public <T extends Recoverable> void onCreating(Metadata metadata,String key,T t){
-        if(t.scope()==Distributable.DATA_SCOPE){
-            //replicationPendingQueue.offer(()-> dBackupProvider.create(metadata,key,t));
-        }
-        else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            //replicationPendingQueue.offer(()-> iBackupProvider.create(metadata,key,t));
-        }
+        //if(t.scope()==Distributable.DATA_SCOPE){
+        //}
+        //else if(t.scope()==Distributable.INTEGRATION_SCOPE){
+        //}
     }
     @Override
     public <T extends Recoverable> void onUpdating(Metadata metadata,String key,T t){
-        if(t.scope()==Distributable.DATA_SCOPE){
-            //replicationPendingQueue.offer(()-> dBackupProvider.update(metadata,key,t));
-        }
-        else if(t.scope()==Distributable.INTEGRATION_SCOPE){
-            //replicationPendingQueue.offer(()-> iBackupProvider.update(metadata,key,t));
-        }
+        //if(t.scope()==Distributable.DATA_SCOPE){
+        //}
+        //else if(t.scope()==Distributable.INTEGRATION_SCOPE){
+        //}
     }
 
     @Override

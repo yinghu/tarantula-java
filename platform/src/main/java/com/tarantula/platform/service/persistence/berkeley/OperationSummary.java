@@ -6,8 +6,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class OperationSummary {
 
     public static final String PENDING_UPDATE_SIZE = "pendingUpdateSize";
-    //public static final String PENDING_QUEUE_SIZE = "pendingQueueSize";
-    //public static final String PENDING_INDEX_SIZE = "pendingIndexSize";
 
     public static final String LAST_DATA_BATCH_SIZE = "lastDataBatchSize";
     public static final String LAST_INTEGRATION_BATCH_SIZE = "lastIntegrationBatchSize";
@@ -30,7 +28,7 @@ public class OperationSummary {
     public AtomicInteger lastDataBatchSize = new AtomicInteger(0);
     public AtomicInteger lastIntegrationBatchSize = new AtomicInteger(0);
     public AtomicLong lastSyncUpdates = new AtomicLong(0);
-
+    public AtomicLong lastEvictUpdates = new AtomicLong(0);
 
     public AtomicInteger pendingUpdates = new AtomicInteger(0);
 

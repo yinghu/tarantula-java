@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.OnReplication;
 
 public class ReplicationData implements OnReplication {
@@ -7,6 +8,9 @@ public class ReplicationData implements OnReplication {
     public int partition;
     public byte[] key;
     public byte[] value;
+
+    public String keyAsString;
+    public Recoverable recoverable;
 
     public ReplicationData(String source,byte[] key, byte[] value){
         this.source = source;
@@ -17,6 +21,12 @@ public class ReplicationData implements OnReplication {
         this.partition = partition;
         this.key = key;
         this.value = value;
+    }
+
+    public ReplicationData(String source,String key,Recoverable value){
+        this.source = source;
+        this.keyAsString = key;
+        this.recoverable = value;
     }
 
     @Override
@@ -37,6 +47,13 @@ public class ReplicationData implements OnReplication {
     @Override
     public byte[] value() {
         return value;
+    }
+
+    public String keyAsString(){
+        return keyAsString;
+    }
+    public Recoverable recoverable(){
+        return recoverable;
     }
 
 }
