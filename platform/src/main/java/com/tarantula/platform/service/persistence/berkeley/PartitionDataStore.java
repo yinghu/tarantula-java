@@ -83,11 +83,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
             t.oid(SystemUtil.oid());
             akey = t.key().asString();
             byte[] key = akey.getBytes();
-            byte[] value = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
+            t.revision(Long.MIN_VALUE);
+            byte[] value = RevisionObject.toBinary(t.revision(),t.toBinary(),true);
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()-> _put(dso,key,value)? RevisionObject.TRUE : RevisionObject.FALSE).successful;
             if(!suc) return false;
-            t.revision(Long.MIN_VALUE);
             if(t.backup()) this.mapStoreListener.onCreating(dso.metadata.fromRevision(t.revision()),akey,t);
             if(t.distributable()) this.mapStoreListener.onDistributing(dso.metadata,akey,key,value);
             if(t.onEdge() && t.owner() != null && t.label() !=null){
@@ -205,7 +205,8 @@ public class PartitionDataStore extends ReplicatedDataStore{
             if(akey==null) throw new IllegalArgumentException("Key must be assigned first");
             byte[] key = akey.getBytes();
             final String okey = akey;
-            byte[] pendingValue = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
+            t.revision(Long.MIN_VALUE);
+            byte[] pendingValue = RevisionObject.toBinary(t.revision(),t.toBinary(),true);
             boolean[] created = {false};
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             RevisionObject suc = dso.lock(key,()->{

@@ -421,10 +421,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 pKey.key = clusterKey;
             }
             else{
-                if(!deployDataStore.load(pKey)){
-                    pKey.key = CipherUtil.key();
-                    deployDataStore.update(pKey);
-                }
+                pKey.key = CipherUtil.key();
+                deployDataStore.createIfAbsent(pKey,true);
             }
             encrypt = CipherUtil.encrypt(pKey.key);
             this.presenceKey = pKey;
