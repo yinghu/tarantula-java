@@ -7,6 +7,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.configuration.MySQLConfiguration;
@@ -140,7 +141,9 @@ public class MysqlBackupProvider implements BackupProvider {
             throw new RuntimeException(ex);
         }
     }
+    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
 
+    }
     public <T extends Recoverable> void create(Metadata metadata, String key, T t){
         if(!enabled) return;
 

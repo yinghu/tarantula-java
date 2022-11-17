@@ -15,7 +15,7 @@
             {"replicationSyncIntervalSeconds": 3},
             {"cacheSyncIntervalMinutes": 60},
             {"cacheUpdateThreshold": 10000},
-            {"backupSyncIntervalSeconds": 10},
+            {"backupSyncIntervalSeconds": 3},
             {"diskSyncIntervalSeconds": 60},
             {"syncUpdateThreshold": 10000}
         ]

@@ -6,6 +6,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +103,11 @@ public class BackupRouter implements BackupProvider {
         listener.registerDataStore(storeNamePrefix,partition);
     }
 
-
+    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
+        //for(int i=0;i<size;i++){
+        //logger.warn(onReplications.length+"<>"+size);
+        //}
+    }
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
         if(!enabled) return;

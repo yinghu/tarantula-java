@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.DataStoreProvider;
 
@@ -109,7 +110,9 @@ public class MirrorClusterBackupProvider implements BackupProvider{
             return;
         }
     }
+    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
 
+    }
     @Override
     public String name() {
         return "MirrorClusterBackup";

@@ -8,6 +8,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.configuration.WebHookConfiguration;
 
@@ -109,7 +110,9 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             log.error("error on create",ex);
         }
     }
+    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
 
+    }
     @Override
     public String name() {
         return OnAccess.WEB_HOOK;

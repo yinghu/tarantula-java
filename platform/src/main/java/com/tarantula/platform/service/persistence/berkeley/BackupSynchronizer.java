@@ -1,14 +1,17 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.SchedulingTask;
 
 public class BackupSynchronizer implements SchedulingTask {
 
     private final BerkeleyJEProvider berkeleyJEProvider;
     private final long nextSyncInterval;
-    public BackupSynchronizer(BerkeleyJEProvider berkeleyJEProvider, long nextSyncInterval){
+    private final int scope;
+    public BackupSynchronizer(BerkeleyJEProvider berkeleyJEProvider, long nextSyncInterval,int scope){
         this.berkeleyJEProvider = berkeleyJEProvider;
         this.nextSyncInterval = nextSyncInterval;
+        this.scope = scope;
     }
     @Override
     public boolean oneTime() {
@@ -27,6 +30,11 @@ public class BackupSynchronizer implements SchedulingTask {
 
     @Override
     public void run() {
-        berkeleyJEProvider._backup();
+        if(scope == Distributable.DATA_SCOPE){
+            berkeleyJEProvider._backupOnDataScope();
+        }
+        else if(scope==Distributable.INTEGRATION_SCOPE){
+            berkeleyJEProvider._backupOnIntegrationScope();
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence.messaging;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 
 import java.util.Map;
 
@@ -50,7 +51,9 @@ public class RabbitMQBackupProvider implements BackupProvider {
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
 
     }
+    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
 
+    }
     @Override
     public String name() {
         return null;
