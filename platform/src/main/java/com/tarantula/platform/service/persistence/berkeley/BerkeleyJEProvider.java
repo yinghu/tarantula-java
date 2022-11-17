@@ -371,7 +371,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
             long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
             int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):backupBatchSize;
-            log.warn("Backup sync 1->"+bsize);
+            //log.warn("Backup sync 1->"+bsize);
             int dataSize = 0;
             OnReplication[] data = new OnReplication[bsize];
             for(int loop =0;loop<maxTimerLoop;loop++) {
@@ -399,7 +399,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
         long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
         int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):backupBatchSize;
-        log.warn("Backup sync 2->"+bsize);
+        //log.warn("Backup sync 2->"+bsize);
         OnReplication[] integration = new OnReplication[bsize];
         int integrationSize = 0;
         for(int loop =0;loop<maxTimerLoop;loop++) {
