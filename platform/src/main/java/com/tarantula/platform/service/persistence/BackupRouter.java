@@ -98,6 +98,7 @@ public class BackupRouter implements BackupProvider {
     }
 
     public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
+        if(!this.enabled) return;
         router.backup(onReplications,size);
     }
     @Override
