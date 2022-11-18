@@ -22,7 +22,6 @@ public class BackupRouter implements BackupProvider {
 
 
     private BackupProvider router;
-    private BackupProvider listener;
 
     public BackupRouter(String name,int scope){
         this.name = name;
@@ -90,41 +89,26 @@ public class BackupRouter implements BackupProvider {
     public void registerDataStore(String storeName) {
         if(!this.enabled) return;
         router.registerDataStore(storeName);
-        if(listener==null) return;
-        listener.registerDataStore(storeName);
-
     }
 
     @Override
     public void registerDataStore(String storeNamePrefix, int partition) {
         if(!this.enabled) return;
         router.registerDataStore(storeNamePrefix,partition);
-        if(listener==null) return;
-        listener.registerDataStore(storeNamePrefix,partition);
     }
 
     public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
-        //for(int i=0;i<size;i++){
-        //logger.warn(onReplications.length+"<>"+size);
-        //}
+        router.backup(onReplications,size);
     }
     @Override
     public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
         if(!enabled) return;
         router.update(metadata,key,t);
-        if(listener==null) return;
-        listener.update(metadata,key,t);
     }
 
     @Override
     public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
         if(!enabled) return;
         router.create(metadata,key,t);
-        if(listener==null) return;
-        listener.create(metadata,key,t);
-    }
-
-    public void registerBackupProvider(BackupProvider backupProvider){
-        this.listener = backupProvider;
     }
 }

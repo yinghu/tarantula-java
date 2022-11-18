@@ -80,7 +80,12 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         this.host = ((JsonElement) properties.get("host")).getAsString();
         this.accessKey = ((JsonElement) properties.get("accessKey")).getAsString();
         this.path = ((JsonElement) properties.get("path")).getAsString();
-        try{super._init();}catch (Exception ex){ex.printStackTrace();}
+        try{
+            super._init();
+        }catch (Exception ex){
+            log.error("configure",ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -111,7 +116,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         }
     }
     public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
-
+        log.warn("web hook backup provider");
     }
     @Override
     public String name() {

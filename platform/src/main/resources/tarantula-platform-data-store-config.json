@@ -22,30 +22,22 @@
     },
     "integration-backup-router": {
         "enabled": true,
-        "backup-provider-list":[{
-            "enabled": false,
-            "name": "rabbitmq",
-            "provider": "com.tarantula.platform.service.persistence.messaging.RabbitMQBackupProvider"
-        },
-        {
-            "enabled": true,
-            "name": "webhook",
-            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
-        }
+        "backup-provider-list":[
+            {
+                "enabled": true,
+                "name": "webhook",
+                "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
+            }
         ]
     },
     "data-backup-router": {
         "enabled": true,
-        "backup-provider-list":[{
-            "enabled": false,
-            "name": "rabbitmq",
-            "provider": "com.tarantula.platform.service.persistence.messaging.RabbitMQBackupProvider"
-        },
-        {
-            "enabled": true,
-            "name": "webhook",
-            "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
-        }
+        "backup-provider-list":[
+            {
+                "enabled": true,
+                "name": "webhook",
+                "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
+            }
         ]
     }
 }

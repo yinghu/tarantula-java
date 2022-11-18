@@ -2,7 +2,7 @@ package com.tarantula.platform.service;
 
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.BackupProvider;
+
 import com.icodesoftware.service.ServiceProvider;
 
 import java.nio.channels.ReadableByteChannel;
@@ -17,7 +17,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     void configure(Map<String,Object> properties);
 
-    void registerBackupProvider(int scope, BackupProvider mapStoreListener);
+    //void registerBackupProvider(int scope, BackupProvider mapStoreListener);
 
     //create none-partitioned integration scope data store
     DataStore create(String name);

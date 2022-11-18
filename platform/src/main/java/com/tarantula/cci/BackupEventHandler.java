@@ -49,6 +49,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
             throw new IllegalAccessException("Invalid path ["+path+"]");
         }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+
         if(action.equals("onUpdate")){
             String[] km = key.split("#");
             Metadata m = new RecoverableMetadata();
@@ -75,6 +76,9 @@ public class BackupEventHandler extends AbstractRequestHandler {
             else{
                 throw new IllegalArgumentException("scope ["+scope+"] not supported");
             }
+        }
+        else if(action.equals("onBatch")){
+            this.backupProvider.backup(new OnReplication[0],10);
         }
         else{
             throw new UnsupportedOperationException("Invalid operation ["+action+"]");

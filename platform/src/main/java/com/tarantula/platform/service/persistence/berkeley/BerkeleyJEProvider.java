@@ -129,16 +129,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
 
-    @Override
-    public void registerBackupProvider(int scope,BackupProvider backupListener){
-        if(scope == Distributable.INTEGRATION_SCOPE){
-            iBackupProvider.registerBackupProvider(backupListener);
-        }
-        else if(scope == Distributable.DATA_SCOPE){
-            dBackupProvider.registerBackupProvider(backupListener);
-        }
+    //public void registerBackupProvider(int scope,BackupProvider backupListener){
+        //if(scope == Distributable.INTEGRATION_SCOPE){
+            //iBackupProvider.registerBackupProvider(backupListener);
+        //}
+        //else if(scope == Distributable.DATA_SCOPE){
+            //dBackupProvider.registerBackupProvider(backupListener);
+        //}
 
-    }
+    //}
 
     @Override
     public DataStore create(String name) {

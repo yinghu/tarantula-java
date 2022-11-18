@@ -111,7 +111,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         }
     }
     public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
-
+        log.warn("Mirror back provider ->"+size);
     }
     @Override
     public String name() {

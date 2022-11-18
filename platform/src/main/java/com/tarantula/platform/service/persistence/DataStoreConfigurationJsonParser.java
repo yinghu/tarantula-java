@@ -18,9 +18,6 @@ import java.util.Map;
 
 public class DataStoreConfigurationJsonParser implements Serviceable {
 
-
-    //HashMap<String,Object> properties = new HashMap();
-
     private String dataBucketGroup;
     private String dataBucketNode;
 
