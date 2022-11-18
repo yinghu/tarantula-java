@@ -421,12 +421,6 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return dso.database.put(null, new DatabaseEntry(key), new DatabaseEntry(value)) == OperationStatus.SUCCESS;
     }
 
-    private byte[] _get(DataBaseOnPartition dso,byte[] key){
-        DatabaseEntry ve = new DatabaseEntry();
-        OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
-        return status==OperationStatus.SUCCESS?ve.getData():null;
-    }
-
     private RevisionObject _getRevisionObject(DataBaseOnPartition dso,byte[] key){
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
