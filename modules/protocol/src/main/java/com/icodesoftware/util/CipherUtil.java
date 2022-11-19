@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 public class CipherUtil {
 
@@ -30,5 +31,15 @@ public class CipherUtil {
         byte[] _key = new byte[DeploymentServiceProvider.KEY_SIZE];
         secureRandom.nextBytes(_key);
         return _key;
+    }
+
+    public static String toBase64Key(){
+        return Base64.getEncoder().encodeToString(key());
+    }
+    public static String toBase64Key(byte[] key){
+        return Base64.getEncoder().encodeToString(key);
+    }
+    public static byte[] fromBase64Key(String base64Key){
+        return Base64.getDecoder().decode(base64Key);
     }
 }

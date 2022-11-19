@@ -126,7 +126,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public boolean resetClusterKey(){
         try{
-            presenceKey.fromBinary(CipherUtil.key());
+            presenceKey.base64key(CipherUtil.toBase64Key());
             this.deployDataStore.update(presenceKey);
             this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
             return true;
@@ -140,7 +140,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             byte[] key = this.serviceContext.clusterProvider().get(presenceKey.distributionKey().getBytes());
             if(key==null) return;
-            presenceKey.fromBinary(key);
+            presenceKey.base64key(CipherUtil.toBase64Key(key));
             encrypt = CipherUtil.encrypt(presenceKey.toKey());
             log.warn("Cluster key has set!");
         }catch (Exception ex){
@@ -419,10 +419,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pKey.distributionKey(serviceContext.node().bucketId());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
-                pKey.fromBinary(clusterKey);
+                pKey.base64key(CipherUtil.toBase64Key(clusterKey));
             }
             else{
-                pKey.fromBinary(CipherUtil.key());
+                pKey.base64key(CipherUtil.toBase64Key());
                 deployDataStore.createIfAbsent(pKey,true);
             }
             encrypt = CipherUtil.encrypt(pKey.toKey());

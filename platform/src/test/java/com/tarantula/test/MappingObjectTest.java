@@ -10,7 +10,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.Base64;
 
 public class MappingObjectTest {
 
@@ -31,11 +30,14 @@ public class MappingObjectTest {
     }
     @Test(groups = { "MappingObejct" })
     public void presenceKeyTest() {
-        byte[] key = CipherUtil.key();
+        String bkey = CipherUtil.toBase64Key();
+        byte[] key = CipherUtil.fromBase64Key(bkey);
         PresenceKey mappingObject = new PresenceKey();
-        mappingObject.fromBinary(key);
-        //JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
-        byte[] akey = mappingObject.toKey();//Base64.getDecoder().decode(json.get("_key").getAsString());
+        mappingObject.base64key(bkey);
+        JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
+        PresenceKey presenceKey = new PresenceKey();
+        presenceKey.fromBinary(json.toString().getBytes());
+        byte[] akey = presenceKey.toKey();//Base64.getDecoder().decode(json.get("_key").getAsString());
         Assert.assertEquals(true,Arrays.equals(key,akey));
     }
 }

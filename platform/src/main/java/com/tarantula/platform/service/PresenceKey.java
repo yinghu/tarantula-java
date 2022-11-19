@@ -1,10 +1,10 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.util.Base64;
 
 public class PresenceKey extends RecoverableObject {
 
@@ -25,23 +25,18 @@ public class PresenceKey extends RecoverableObject {
     }
 
 
-    @Override
-    public byte[] toBinary() {
-        return ((String)properties.get(_KEY)).getBytes();
-    }
-
-    @Override
-    public void fromBinary(byte[] payload) {
-        properties.put(_KEY,Base64.getEncoder().encodeToString(payload));
-    }
 
     @Override
     public Key key(){
         return new AssociateKey(this.bucket,this.oid, "presenceKey");
     }
 
-    public byte[] toKey(){
-        return Base64.getDecoder().decode(toBinary());
+    public void base64key(String base64Key){
+        properties.put(_KEY,base64Key);
     }
+    public byte[] toKey(){
+        return CipherUtil.fromBase64Key((String)properties.get(_KEY));
+    }
+
 
 }
