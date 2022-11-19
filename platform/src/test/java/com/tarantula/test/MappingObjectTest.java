@@ -34,8 +34,8 @@ public class MappingObjectTest {
         byte[] key = CipherUtil.key();
         PresenceKey mappingObject = new PresenceKey();
         mappingObject.fromBinary(key);
-        JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
-        byte[] akey = Base64.getDecoder().decode(json.get("_key").getAsString());
+        //JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
+        byte[] akey = mappingObject.toKey();//Base64.getDecoder().decode(json.get("_key").getAsString());
         Assert.assertEquals(true,Arrays.equals(key,akey));
     }
 }

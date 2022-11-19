@@ -101,7 +101,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public byte[] clusterKey(String clusterNameSuffix){
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return toKey(presenceKey);
+        return presenceKey.toKey();
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
         try {
@@ -128,7 +128,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             presenceKey.fromBinary(CipherUtil.key());
             this.deployDataStore.update(presenceKey);
-            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),toKey(presenceKey));
+            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -141,7 +141,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             byte[] key = this.serviceContext.clusterProvider().get(presenceKey.distributionKey().getBytes());
             if(key==null) return;
             presenceKey.fromBinary(key);
-            encrypt = CipherUtil.encrypt(toKey(presenceKey));
+            encrypt = CipherUtil.encrypt(presenceKey.toKey());
             log.warn("Cluster key has set!");
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -425,7 +425,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 pKey.fromBinary(CipherUtil.key());
                 deployDataStore.createIfAbsent(pKey,true);
             }
-            encrypt = CipherUtil.encrypt(toKey(pKey));
+            encrypt = CipherUtil.encrypt(pKey.toKey());
             this.presenceKey = pKey;
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -527,7 +527,4 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         aMap.get(provider).registerAuthVendor(authVendor);
     }
 
-    private byte[] toKey(PresenceKey presenceKey){
-        return Base64.getDecoder().decode(presenceKey.toBinary());
-    }
 }

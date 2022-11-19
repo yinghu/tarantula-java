@@ -40,4 +40,8 @@ public class PresenceKey extends RecoverableObject {
         return new AssociateKey(this.bucket,this.oid, "presenceKey");
     }
 
+    public byte[] toKey(){
+        return Base64.getDecoder().decode(toBinary());
+    }
+
 }
