@@ -30,7 +30,7 @@ public class InventoryItem extends ConfigurableObject {
     public void fromMap(Map<String,Object> properties){
         this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
         this.configurationName = (String) properties.get(NAME_KEY);
-        this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
+        this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;

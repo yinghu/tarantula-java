@@ -9,34 +9,10 @@ import java.util.Map;
 
 public class JsonUtil {
     public static byte[] toJson(Map<String,Object> kv){
-        JsonObject json = new JsonObject();
-        kv.forEach((k,v)->{
-            if(v!=null&& (v instanceof String)){
-                json.addProperty(k,(String)v);
-            }
-            else if(v!=null&& (v instanceof Boolean)){
-                json.addProperty(k,(Boolean)v);
-            }
-            else if(v!=null&& (v instanceof Number)){
-                json.addProperty(k,(Number)v);
-            }
-        });
-        return json.toString().getBytes(Charset.forName("UTF-8"));
+        return toJsonObject(kv).toString().getBytes(Charset.forName("UTF-8"));
     }
     public static String toJsonString(Map<String,Object> kv){
-        JsonObject json = new JsonObject();
-        kv.forEach((k,v)->{
-            if(v!=null&& (v instanceof String)){
-                json.addProperty(k,(String)v);
-            }
-            else if(v!=null&& (v instanceof Boolean)){
-                json.addProperty(k,(Boolean)v);
-            }
-            else if(v!=null&& (v instanceof Number)){
-                json.addProperty(k,(Number)v);
-            }
-        });
-        return json.toString();//.getBytes(Charset.forName("UTF-8"));
+        return toJsonObject(kv).toString();
     }
     public static JsonObject toJsonObject(Map<String,Object> kv){
         JsonObject json = new JsonObject();
@@ -50,36 +26,15 @@ public class JsonUtil {
             else if(v!=null&& (v instanceof Number)){
                 json.addProperty(k,(Number)v);
             }
-            else if(v!=null&&(v instanceof byte[])){
-                json.add(k,fromBytes((byte[])v));
+            else if(v!=null && v instanceof JsonElement){
+                json.add(k,(JsonElement)v);
             }
         });
         return json;
     }
     public static Map<String,Object> toMap(byte[] json){
-        JsonParser jp = new JsonParser();
-        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
-        JsonElement j = jp.parse(inr);
-        Map<String,Object> _mv = new HashMap<>();
-        j.getAsJsonObject().entrySet().forEach((e)->{
-            JsonElement je = e.getValue();
-            if(je.isJsonPrimitive()){
-                JsonPrimitive m = je.getAsJsonPrimitive();
-                if(m.isString()){
-                    _mv.put(e.getKey(),m.getAsString());
-                }
-                else if(m.isNumber()){
-                    _mv.put(e.getKey(),m.getAsNumber());
-                }
-                else if(m.isBoolean()){
-                    _mv.put(e.getKey(),m.getAsBoolean());
-                }
-            }
-            else if(!je.isJsonNull()){
-                _mv.put(e.getKey(),je);
-            }
-        });
-        return _mv;
+        return toMap(new ByteArrayInputStream(json));
+
     }
     public static String toSimpleResponse(boolean successful,String message){
         JsonObject resp = new JsonObject();
@@ -87,21 +42,22 @@ public class JsonUtil {
         resp.addProperty("message",message);
         resp.addProperty("Successful",successful);
         resp.addProperty("Message",message);
-
         return resp.toString();
+    }
+    public static JsonElement parseAsJsonElement(byte[] json){
+        return new JsonParser().parse(new InputStreamReader(new ByteArrayInputStream(json)));
+    }
+    public static JsonArray parseAsJsonArray(String json){
+        JsonParser jp = new JsonParser();
+        return jp.parse(json).getAsJsonArray();
     }
     public static JsonObject parse(String json){
         JsonParser jp = new JsonParser();
         return jp.parse(json).getAsJsonObject();
     }
-    public static JsonArray parseAsArray(String json){
-        JsonParser jp = new JsonParser();
-        return jp.parse(json).getAsJsonArray();
-    }
+
     public static JsonObject parse(byte[] json){
-        JsonParser jp = new JsonParser();
-        InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(json));
-        return jp.parse(inr).getAsJsonObject();
+        return parse(new ByteArrayInputStream(json));
     }
     public static JsonObject parse(InputStream jsonInput){
         JsonParser jp = new JsonParser();
@@ -133,17 +89,5 @@ public class JsonUtil {
         });
         return _mv;
     }
-    private static JsonElement fromBytes(byte[] bytes){
-        try{
-            InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(bytes));
-            JsonElement je = new JsonParser().parse(inr);
-            return je;
-        }catch (Exception ex){
-            JsonArray arr = new JsonArray();
-            for(byte b : bytes){
-                arr.add(b);
-            }
-            return arr;
-        }
-    }
+
 }

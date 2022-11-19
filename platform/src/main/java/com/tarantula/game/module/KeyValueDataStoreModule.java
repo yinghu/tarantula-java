@@ -27,7 +27,7 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
                 MappingObject mo = new MappingObject();
                 mo.distributionKey(query[0]);
                 mo.label(query[1]);
-                mo.fromBinary(payload);
+                mo.value(payload);
                 boolean suc = dataStore.update(mo);
                 session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
             }
@@ -41,7 +41,7 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
             mo.label(query[1]);
             byte[] v = null;
             if(dataStore.load(mo)){
-                v = mo.toBinary();
+                v = mo.value();
             }
             session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
         }

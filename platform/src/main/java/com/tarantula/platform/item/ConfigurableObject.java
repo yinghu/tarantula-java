@@ -147,7 +147,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.disabled = (boolean)properties.getOrDefault(DISABLED_KEY,false);
         this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
-        this.reference = JsonUtil.parseAsArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
+        this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
         this._configurableSetting = JsonUtil.parse((String) properties.getOrDefault(SETTINGS_KEY, "{}"));
         this.configurationScope = (String) properties.get(SCOPE_KEY);
     }

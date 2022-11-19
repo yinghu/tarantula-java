@@ -51,9 +51,11 @@ public class BackupEventHandler extends AbstractRequestHandler {
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
 
         if(action.equals("onBatch")){
-            JsonObject updates = JsonUtil.parse(_payload);
-            log.warn("SCOPE->"+scope);
-            log.warn(updates.toString());
+            try {
+                JsonObject updates = JsonUtil.parse(_payload);
+            }catch (Exception ex){
+                log.error("invalid json",ex);
+            }
             this.backupProvider.batch(new OnReplication[0],10);
         }
         else{

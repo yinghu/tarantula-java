@@ -1,6 +1,8 @@
 package com.tarantula.test;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MappingObject;
@@ -19,14 +21,14 @@ public class MappingObjectTest {
 
     @Test(groups = { "MappingObejct" })
     public void mappingObjectTest() {
+        byte[] jsonArray = "[1,2,3]".getBytes();
         MappingObject mappingObject = new MappingObject();
-        String jsonArray = "[1,2,1,3]";
-        mappingObject.fromBinary(jsonArray.getBytes());
-        JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
+        mappingObject.value(jsonArray);
+
         MappingObject copy = new MappingObject();
-        copy.fromBinary(json.get("_key").getAsJsonArray().toString().getBytes());
-        String jcopy = new String(copy.toBinary());
-        Assert.assertEquals(true,jcopy.equals(jsonArray));
+        copy.fromBinary(mappingObject.toBinary());
+
+        Assert.assertEquals(true,Arrays.equals(mappingObject.value(),copy.value()));
     }
     @Test(groups = { "MappingObejct" })
     public void presenceKeyTest() {
