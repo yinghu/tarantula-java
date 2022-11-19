@@ -50,6 +50,9 @@ public class JsonUtil {
             else if(v!=null&& (v instanceof Number)){
                 json.addProperty(k,(Number)v);
             }
+            else if(v!=null&&(v instanceof byte[])){
+                json.add(k,fromBytes((byte[])v));
+            }
         });
         return json;
     }
@@ -129,5 +132,18 @@ public class JsonUtil {
             }
         });
         return _mv;
+    }
+    private static JsonElement fromBytes(byte[] bytes){
+        try{
+            InputStreamReader inr = new InputStreamReader(new ByteArrayInputStream(bytes));
+            JsonElement je = new JsonParser().parse(inr);
+            return je;
+        }catch (Exception ex){
+            JsonArray arr = new JsonArray();
+            for(byte b : bytes){
+                arr.add(b);
+            }
+            return arr;
+        }
     }
 }

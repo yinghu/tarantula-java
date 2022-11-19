@@ -104,6 +104,8 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
     public String source(){return this.source;}
     public int partition(){return this.partition;}
 
+
+
     @Override
     public JsonObject toJson(){
         JsonObject json = new JsonObject();

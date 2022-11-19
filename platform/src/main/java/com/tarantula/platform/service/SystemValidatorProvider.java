@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,7 +101,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public byte[] clusterKey(String clusterNameSuffix){
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.key;
+        return toKey(presenceKey);
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
         try {
@@ -125,9 +126,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public boolean resetClusterKey(){
         try{
-            presenceKey.key = CipherUtil.key();
+            presenceKey.fromBinary(CipherUtil.key());
             this.deployDataStore.update(presenceKey);
-            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),presenceKey.key);
+            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),toKey(presenceKey));
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -139,8 +140,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             byte[] key = this.serviceContext.clusterProvider().get(presenceKey.distributionKey().getBytes());
             if(key==null) return;
-            presenceKey.key = key;
-            encrypt = CipherUtil.encrypt(presenceKey.key);
+            presenceKey.fromBinary(key);
+            encrypt = CipherUtil.encrypt(toKey(presenceKey));
             log.warn("Cluster key has set!");
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -418,13 +419,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pKey.distributionKey(serviceContext.node().bucketId());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
-                pKey.key = clusterKey;
+                pKey.fromBinary(clusterKey);
             }
             else{
-                pKey.key = CipherUtil.key();
+                pKey.fromBinary(CipherUtil.key());
                 deployDataStore.createIfAbsent(pKey,true);
             }
-            encrypt = CipherUtil.encrypt(pKey.key);
+            encrypt = CipherUtil.encrypt(toKey(pKey));
             this.presenceKey = pKey;
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -524,5 +525,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public void releaseAuthVendor(String provider,AuthVendor authVendor){
         aMap.get(provider).registerAuthVendor(authVendor);
+    }
+
+    private byte[] toKey(PresenceKey presenceKey){
+        return Base64.getDecoder().decode(presenceKey.toBinary());
     }
 }

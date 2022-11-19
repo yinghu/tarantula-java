@@ -4,6 +4,8 @@ import com.icodesoftware.Recoverable;
 
 public interface OnReplication {
     int scope();
+    int factoryId();
+    int classId();
     String source();
     int partition();
     byte[] key();

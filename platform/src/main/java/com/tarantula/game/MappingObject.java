@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.tarantula.platform.AssociateKey;
 import com.icodesoftware.util.RecoverableObject;
 
+
 public class MappingObject extends RecoverableObject {
 
     private final static String _KEY = "_key";

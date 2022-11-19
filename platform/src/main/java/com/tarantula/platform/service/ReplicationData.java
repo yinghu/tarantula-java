@@ -9,7 +9,8 @@ public class ReplicationData implements OnReplication {
     public int partition;
     public byte[] key;
     public byte[] value;
-
+    public int factoryId;
+    public int classId;
     public String keyAsString;
     public Recoverable recoverable;
 
@@ -42,6 +43,13 @@ public class ReplicationData implements OnReplication {
     @Override
     public int partition() {
         return partition;
+    }
+
+    public int factoryId(){
+        return factoryId;
+    }
+    public int classId(){
+        return classId;
     }
 
     @Override

@@ -95,7 +95,6 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
 
     public void batch(OnReplication[] onReplications,int size){
-        //log.warn("web hook backup provider");
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACTION,"onBatch",
@@ -105,11 +104,16 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             JsonObject payload = new JsonObject();
             JsonArray updates = new JsonArray();
             for(int i=0;i<size;i++){
+                Recoverable ref = onReplications[i].recoverable();
                 JsonObject update = new JsonObject();
                 update.addProperty("key",onReplications[i].keyAsString());
-                update.add("payload",JsonUtil.toJsonObject(onReplications[i].recoverable().toMap()));
+                update.addProperty("factoryId",ref.getFactoryId());
+                update.addProperty("classId",ref.getClassId());
+                update.addProperty("revision",ref.revision());
+                //update.add("payload",);
                 updates.add(update);
             }
+            payload.add("updates",updates);
             String resp = super.post(path, payload.toString().getBytes(),headers);
         }catch (Exception ex){
             log.error("error on back",ex);

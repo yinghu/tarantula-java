@@ -16,15 +16,14 @@ public class DeploymentIdFetcher extends HttpCaller {
         try{
             _init();
             String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY, accessKey
+                Session.TARANTULA_ACCESS_KEY, accessKey,Session.TARANTULA_NAME,"1"
             };
             String resp = super.get("backup/deployment",headers);
             JsonObject json = JsonUtil.parse(resp);
             if(!json.get("successful").getAsBoolean()) return null;
             return json.get("message").getAsString();
         }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
+            throw new RuntimeException(ex);
         }
     }
 }
