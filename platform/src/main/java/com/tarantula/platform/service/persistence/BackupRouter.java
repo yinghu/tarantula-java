@@ -5,7 +5,6 @@ import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
-import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.OnReplication;
 
 import java.util.HashMap;
@@ -76,6 +75,7 @@ public class BackupRouter implements BackupProvider {
                     props.put(v.getKey(),v.getValue());
                 });
             });
+            props.put("scope",scope);
             systemBackupProvider.configure(props);
             this.router = systemBackupProvider;
         }catch (Exception ex){
@@ -97,19 +97,9 @@ public class BackupRouter implements BackupProvider {
         router.registerDataStore(storeNamePrefix,partition);
     }
 
-    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
+    public void batch(OnReplication[] onReplications,int size){
         if(!this.enabled) return;
-        router.backup(onReplications,size);
-    }
-    @Override
-    public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-        if(!enabled) return;
-        router.update(metadata,key,t);
+        router.batch(onReplications,size);
     }
 
-    @Override
-    public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-        if(!enabled) return;
-        router.create(metadata,key,t);
-    }
 }

@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.persistence.mysql;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
@@ -141,7 +140,7 @@ public class MysqlBackupProvider implements BackupProvider {
             throw new RuntimeException(ex);
         }
     }
-    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
+    public void batch(OnReplication[] onReplications,int size){
 
     }
     public <T extends Recoverable> void create(Metadata metadata, String key, T t){
@@ -206,7 +205,7 @@ public class MysqlBackupProvider implements BackupProvider {
         }
     }
 
-    @Override
+
     public <T extends Recoverable> void update(Metadata metadata, String key, T t){
         if(!enabled) return;
         try{

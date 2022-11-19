@@ -4,6 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.OnReplication;
 
 public class ReplicationData implements OnReplication {
+    public int scope;
     public String source;
     public int partition;
     public byte[] key;
@@ -29,6 +30,10 @@ public class ReplicationData implements OnReplication {
         this.recoverable = value;
     }
 
+    @Override
+    public int scope(){
+        return this.scope;
+    }
     @Override
     public String source() {
         return source;

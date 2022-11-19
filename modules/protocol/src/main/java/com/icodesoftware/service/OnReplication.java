@@ -3,6 +3,7 @@ package com.icodesoftware.service;
 import com.icodesoftware.Recoverable;
 
 public interface OnReplication {
+    int scope();
     String source();
     int partition();
     byte[] key();

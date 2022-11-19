@@ -1,6 +1,6 @@
 package com.tarantula.cci;
 
-import com.icodesoftware.Distributable;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
@@ -9,7 +9,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
+
 
 
 public class BackupEventHandler extends AbstractRequestHandler {
@@ -29,7 +29,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
         String path = exchange.path();
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        String key = exchange.header(Session.TARANTULA_NAME);
+        int scope = Integer.parseInt(exchange.header(Session.TARANTULA_NAME));
         byte[] _payload = exchange.payload();
         if(path.equals("/backup/deployment")){
             String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
@@ -50,35 +50,11 @@ public class BackupEventHandler extends AbstractRequestHandler {
         }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
 
-        if(action.equals("onUpdate")){
-            String[] km = key.split("#");
-            Metadata m = new RecoverableMetadata();
-            m.fromBinary(km[1].getBytes());
-            this.backupProvider.update(m,km[0],_payload);
-        }
-        else if(action.equals("onCreate")){
-            String[] km = key.split("#");
-            Metadata m = new RecoverableMetadata();
-            m.fromBinary(km[1].getBytes());
-            this.backupProvider.create(m,km[0],_payload);
-
-        }
-        else if(action.equals("onRegister")){
-            String[] km = key.split("#");
-            int scope = Integer.parseInt(km[0]);
-            if(scope== Distributable.INTEGRATION_SCOPE){
-                this.backupProvider.registerDataStore(km[1]);
-            }
-            else if(scope==Distributable.DATA_SCOPE){
-                int partitions = Integer.parseInt(km[2]);
-                this.backupProvider.registerDataStore(km[1],partitions);
-            }
-            else{
-                throw new IllegalArgumentException("scope ["+scope+"] not supported");
-            }
-        }
-        else if(action.equals("onBatch")){
-            this.backupProvider.backup(new OnReplication[0],10);
+        if(action.equals("onBatch")){
+            JsonObject updates = JsonUtil.parse(_payload);
+            log.warn("SCOPE->"+scope);
+            log.warn(updates.toString());
+            this.backupProvider.batch(new OnReplication[0],10);
         }
         else{
             throw new UnsupportedOperationException("Invalid operation ["+action+"]");

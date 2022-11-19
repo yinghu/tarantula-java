@@ -42,16 +42,8 @@ public class RabbitMQBackupProvider implements BackupProvider {
 
     }
 
-    @Override
-    public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
 
-    }
-
-    @Override
-    public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-
-    }
-    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
+    public void batch(OnReplication[] onReplications,int size){
 
     }
     @Override

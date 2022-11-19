@@ -382,7 +382,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     dataSize++;
                 }
                 if (dataSize > 0) {
-                    this.dBackupProvider.backup(data,dataSize);
+                    this.dBackupProvider.batch(data,dataSize);
                     operationSummary.pendingBackups.addAndGet((-1)*dataSize);
                 }
                 dataSize = 0;
@@ -410,7 +410,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 integrationSize++;
             }
             if (integrationSize > 0) {
-                this.iBackupProvider.backup(integration,integrationSize);
+                this.iBackupProvider.batch(integration,integrationSize);
                 operationSummary.pendingBackups.addAndGet((-1)*integrationSize);
              }
             integrationSize = 0;

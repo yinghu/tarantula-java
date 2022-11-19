@@ -1,18 +1,21 @@
 package com.tarantula.platform.service.persistence.web;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
-import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.WebHookConfiguration;
 
 
+import java.awt.*;
 import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
@@ -24,6 +27,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
     private String path;
 
     private boolean enabled;
+    private int scope;
     public WebHookBackupProvider(){
     }
 
@@ -44,7 +48,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     @Override
     public int scope() {
-        return 0;
+        return scope;
     }
 
     @Override
@@ -80,6 +84,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         this.host = ((JsonElement) properties.get("host")).getAsString();
         this.accessKey = ((JsonElement) properties.get("accessKey")).getAsString();
         this.path = ((JsonElement) properties.get("path")).getAsString();
+        this.scope = (Integer)properties.get("scope");
         try{
             super._init();
         }catch (Exception ex){
@@ -88,35 +93,27 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         }
     }
 
-    @Override
-    public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-        try {
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onUpdate",
-                    Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME,key+"#"+metadata.toJson()
-            };
-            String resp = super.post(path,t.toBinary(),headers);
-        }catch (Exception ex){
-            log.error("error on update",ex);
-        }
-    }
 
-    @Override
-    public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
+    public void batch(OnReplication[] onReplications,int size){
+        //log.warn("web hook backup provider");
         try {
             String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onCreate",
+                    Session.TARANTULA_ACTION,"onBatch",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME,key+"#"+metadata.toJson()
+                    Session.TARANTULA_NAME,""+scope
             };
-            String resp = super.post(path,t.toBinary(),headers);
+            JsonObject payload = new JsonObject();
+            JsonArray updates = new JsonArray();
+            for(int i=0;i<size;i++){
+                JsonObject update = new JsonObject();
+                update.addProperty("key",onReplications[i].keyAsString());
+                update.add("payload",JsonUtil.toJsonObject(onReplications[i].recoverable().toMap()));
+                updates.add(update);
+            }
+            String resp = super.post(path, payload.toString().getBytes(),headers);
         }catch (Exception ex){
-            log.error("error on create",ex);
+            log.error("error on back",ex);
         }
-    }
-    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
-        log.warn("web hook backup provider");
     }
     @Override
     public String name() {

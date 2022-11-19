@@ -28,6 +28,7 @@ public interface DataStore {
 
     byte[] load(byte[] key);
 
+
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
 

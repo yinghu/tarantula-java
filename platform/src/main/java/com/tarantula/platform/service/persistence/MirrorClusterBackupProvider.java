@@ -1,10 +1,8 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
-import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.DataStoreProvider;
@@ -67,51 +65,12 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     }
 
-    @Override
-    public <T extends Recoverable> void update(Metadata metadata, String key, T t) {
-        if(runAsMirror) return;
-        BackupProvider backupProvider = bMap.get(metadata.typeId());
-        if(backupProvider == null) return;
-        backupProvider.update(metadata,key,t);
-    }
 
-    @Override
-    public <T extends Recoverable> void create(Metadata metadata, String key, T t) {
-        if(runAsMirror) return;
-        BackupProvider backupProvider = bMap.get(metadata.typeId());
-        if(backupProvider == null) return;
-        backupProvider.create(metadata,key,t);
-    }
+    public void batch(OnReplication[] onReplications,int size){
+        //log.warn("Mirror back provider ->"+size);
+        //for (OnReplication onReplication : onReplications){
 
-    @Override
-    public void update(Metadata metadata, String key, byte[] t) {
-        if(!runAsMirror) return;
-        if(metadata.scope() == Distributable.DATA_SCOPE){
-            byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
-            this.dataStoreProvider.create(metadata.source(),serviceContext.node().partitionNumber()).backup().set(key.getBytes(),r);
-            return;
-        }
-        if(metadata.scope() == Distributable.INTEGRATION_SCOPE){
-            this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
-            return;
-        }
-    }
-
-    @Override
-    public  void create(Metadata metadata, String key, byte[] t) {
-        if(!runAsMirror) return;
-        if(metadata.scope() == Distributable.DATA_SCOPE){
-            byte[] r = RevisionObject.toBinary(metadata.revision(),t,true);
-            this.dataStoreProvider.create(metadata.source(),serviceContext.node().partitionNumber()).backup().set(key.getBytes(),r);
-            return;
-        }
-        if(metadata.scope() == Distributable.INTEGRATION_SCOPE){
-            this.dataStoreProvider.create(metadata.source()).backup().set(key.getBytes(),t);
-            return;
-        }
-    }
-    public <T extends Recoverable> void backup(OnReplication[] onReplications,int size){
-        log.warn("Mirror back provider ->"+size);
+        //}
     }
     @Override
     public String name() {
