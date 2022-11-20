@@ -110,8 +110,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
         this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
-        this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
         this.tarantulaContext.deploymentDataStoreProvider.start();
+        this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
         this.tarantulaContext._initMirrorClusterBackup();
     }
 
