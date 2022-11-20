@@ -7,11 +7,11 @@ import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 public class RecoverableMetadata extends RecoverableObject implements Metadata, Portable {
@@ -117,7 +117,27 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         json.addProperty("revision",String.valueOf(revision));
         return json;
     }
+    @Override
+    public Map<String,Object> toMap(){
+        properties.put("1",this.typeId);
+        properties.put("2",this.source);
+        properties.put("3",this.factoryId);
+        properties.put("4",this.classId);
+        properties.put("5",this.scope);
+        properties.put("6",this.revision);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.typeId = (String) properties.get("1");
+        this.source = (String) properties.get("2");
+        this.factoryId = ((Number) properties.get("3")).intValue();
+        this.classId = ((Number) properties.get("4")).intValue();
+        this.scope = ((Number) properties.get("5")).intValue();
+        this.revision = ((Number) properties.get("6")).longValue();
+    }
 
+    /**
     public byte[] toBinary(){
         return toJson().toString().getBytes();
     }
@@ -131,7 +151,7 @@ public class RecoverableMetadata extends RecoverableObject implements Metadata, 
         this.scope = jsonObject.get("scope").getAsInt();
         this.revision = Long.parseLong(jsonObject.get("revision").getAsString());
     }
-
+    **/
     public Metadata fromRevision(long revision){
         return new RecoverableMetadata(this,revision);
     }

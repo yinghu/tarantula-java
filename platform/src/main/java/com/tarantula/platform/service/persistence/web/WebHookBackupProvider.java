@@ -56,7 +56,7 @@ public class WebHookBackupProvider implements BackupProvider {
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_NAME, Distributable.INTEGRATION_SCOPE+"#"+name+"#0",
             };
-            serviceContext.httpClientProvider().get(host,path,headers);
+            //serviceContext.httpClientProvider().get(host,path,headers);
         }catch (Exception ex){
            log.error("error on register data store",ex);
         }
@@ -70,7 +70,7 @@ public class WebHookBackupProvider implements BackupProvider {
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_NAME,Distributable.DATA_SCOPE+"#"+prefix+"#"+partitions,
             };
-            serviceContext.httpClientProvider().get(host,path,headers);
+            //serviceContext.httpClientProvider().get(host,path,headers);
         }catch (Exception ex){
             log.error("error on register data store",ex);
         }

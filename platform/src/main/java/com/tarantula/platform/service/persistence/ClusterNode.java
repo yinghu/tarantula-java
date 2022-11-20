@@ -8,6 +8,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 
 public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
@@ -103,6 +104,35 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return _toJson(true);
     }
 
+    @Override
+    public Map<String,Object> toMap(){
+        properties.put("bucketName",this.bucketName);
+        properties.put("bucketId",this.bucketId);
+        properties.put("nodeName",this.nodeName);
+        properties.put("nodeId",this.nodeId);
+        properties.put("memberId",this.memberId);
+        properties.put("address",this.address);
+        properties.put("startTime",this.startTime);
+        properties.put("clusterNameSuffix",this.clusterNameSuffix);
+        properties.put("partitionNumber",this.partitionNumber);
+        properties.put("deploymentId",this.deploymentId);
+        return this.properties;
+    }
+    @Override
+    public void fromMap(Map<String,Object> properties){
+        this.bucketName = (String) properties.get("bucketName");
+        this.bucketId = (String) properties.get("bucketId");
+        this.nodeName = (String) properties.get("nodeName");
+        this.nodeId = (String)properties.get("nodeId");
+        this.memberId = (String)properties.get("memberId");
+        this.address = (String)properties.get("address");
+        this.startTime = ((Number)properties.getOrDefault("startTime",0)).longValue();
+        this.clusterNameSuffix = (String)properties.get("clusterNameSuffix");
+        this.partitionNumber = ((Number)properties.getOrDefault("partitionNumber",0)).intValue();
+        this.deploymentId = (String)properties.get("deploymentId");
+    }
+
+    /**
     public byte[] toBinary(){
         return _toJson(false).toString().getBytes();
     }
@@ -118,7 +148,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.clusterNameSuffix = jsonObject.get("clusterNameSuffix").getAsString();
         this.partitionNumber = jsonObject.get("partitionNumber").getAsInt();
         this.deploymentId = jsonObject.get("deploymentId").getAsString();
-    }
+    }**/
     private JsonObject _toJson(boolean toWeb){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("bucketName",bucketName);
