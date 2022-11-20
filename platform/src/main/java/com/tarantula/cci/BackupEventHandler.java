@@ -1,5 +1,6 @@
 package com.tarantula.cci;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
@@ -10,7 +11,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
-
+import com.tarantula.platform.service.ReplicationData;
 
 
 public class BackupEventHandler extends AbstractRequestHandler {
@@ -50,26 +51,14 @@ public class BackupEventHandler extends AbstractRequestHandler {
         }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
         if(action.equals("onBatch")){
-            try {
-                JsonObject updates = JsonUtil.parse(_payload);
-
-            }catch (Exception ex){
-                log.error("invalid json",ex);
-            }
-            this.backupProvider.batch(new OnReplication[0],10);
+            OnReplication[] onReplications = new OnReplication[1];
+            onReplications[0] = new ReplicationData(_payload);
+            this.backupProvider.batch(onReplications,1);
         }
         else if(action.equals("onDataStore")){
             JsonObject config = JsonUtil.parse(_payload);
             int scope = config.get("scope").getAsInt();
-            if(scope == Distributable.DATA_SCOPE){
-                this.backupProvider.registerDataStore(config.get("name").getAsString(),config.get("partition").getAsInt());
-            }
-            else if(scope == Distributable.INTEGRATION_SCOPE){
-                this.backupProvider.registerDataStore(config.get("name").getAsString());
-            }
-            else{
-                log.warn("Scope ["+scope+"] not supported");
-            }
+            this.backupProvider.registerDataStore(scope,config.get("name").getAsString());
         }
 
         else{

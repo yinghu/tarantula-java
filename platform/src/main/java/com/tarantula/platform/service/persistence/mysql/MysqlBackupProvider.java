@@ -110,8 +110,7 @@ public class MysqlBackupProvider implements BackupProvider {
 
 
     @Override
-
-    public void registerDataStore(String name){
+    public void registerDataStore(int scope,String name){
         if(!enabled){
             return;
         }
@@ -125,21 +124,7 @@ public class MysqlBackupProvider implements BackupProvider {
             throw new RuntimeException(ex);
         }
     }
-    @Override
-    public  void registerDataStore(String prefix,int partition){
-        if(!enabled){
-            return;
-        }
-        try{
-            Connection con = dataSource.getConnection();
-            Statement cmd = con.createStatement();
-            cmd.execute("CREATE TABLE IF NOT EXISTS "+prefix+" (k VARCHAR(100) NOT NULL PRIMARY KEY,v JSON,c INT NOT NULL,f INT NOT NULL, INDEX ix_c(c),INDEX ix_f(f))");
-            cmd.close();
-            con.close();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
+
     public void batch(OnReplication[] onReplications,int size){
 
     }

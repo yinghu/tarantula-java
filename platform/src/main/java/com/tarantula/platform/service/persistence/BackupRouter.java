@@ -87,16 +87,16 @@ public class BackupRouter implements BackupProvider {
 
 
     @Override
-    public void registerDataStore(String storeName) {
+    public void registerDataStore(int scope,String storeName) {
         if(!this.enabled || router==null) return;
-        router.registerDataStore(storeName);
+        router.registerDataStore(scope,storeName);
     }
 
-    @Override
-    public void registerDataStore(String storeNamePrefix, int partition) {
-        if(!this.enabled || router==null) return;
-        router.registerDataStore(storeNamePrefix,partition);
-    }
+    //@Override
+    //public void registerDataStore(String storeNamePrefix, int partition) {
+        //if(!this.enabled || router==null) return;
+        //router.registerDataStore(storeNamePrefix,partition);
+    //}
 
     public void batch(OnReplication[] onReplications,int size){
         if(!this.enabled || router==null) return;

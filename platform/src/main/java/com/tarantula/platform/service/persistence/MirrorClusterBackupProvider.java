@@ -1,10 +1,15 @@
 package com.tarantula.platform.service.persistence;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.service.DataStoreProvider;
 
 import java.util.Map;
@@ -39,25 +44,20 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     }
 
     @Override
-    public void registerDataStore(String name) {
+    public void registerDataStore(int scope,String name) {
         if(runAsMirror){
+            if(scope==Distributable.DATA_SCOPE){
+                this.dataStoreProvider.create(name,serviceContext.node().partitionNumber());
+            }
+            else if(scope==Distributable.INTEGRATION_SCOPE){
+                this.dataStoreProvider.create(name);
+            }
             this.dataStoreProvider.create(name);
             return;
         }
         BackupProvider backupProvider = bMap.get(_type(name));
         if(backupProvider == null) return;
-        backupProvider.registerDataStore(name);
-    }
-
-    @Override
-    public void registerDataStore(String prefix, int partitions) {
-        if(runAsMirror) {
-            this.dataStoreProvider.create(prefix,partitions);
-            return;
-        }
-        BackupProvider backupProvider = bMap.get(_type(prefix));
-        if(backupProvider == null) return;
-        backupProvider.registerDataStore(prefix,partitions);
+        //backupProvider.registerDataStore(name);
     }
 
     @Override
@@ -67,10 +67,32 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
 
     public void batch(OnReplication[] onReplications,int size){
-        //log.warn("Mirror back provider ->"+size);
-        //for (OnReplication onReplication : onReplications){
+        JsonObject updates = JsonUtil.parse(onReplications[0].value());
+        log.warn(updates.toString());
+        int scope = updates.get("scope").getAsInt();
+        JsonArray batch = updates.getAsJsonArray("updates");
+        batch.forEach(e->{
+            JsonObject data = e.getAsJsonObject();
+            String key = data.get("key").getAsString();
+            String source = data.get("source").getAsString();
+            int factoryId = data.get("factoryId").getAsInt();
+            int classId = data.get("classId").getAsInt();
+            long revision = data.get("revision").getAsLong();
+            JsonObject payload = data.get("payload").getAsJsonObject();
+            RecoverableRegistry registry = this.serviceContext.recoverableRegistry(factoryId);
+            if(registry!=null){
+                Recoverable t = registry.create(classId);
+                if(t!=null){
+                    t.fromBinary(payload.toString().getBytes());
+                    t.distributionKey(key);
+                    t.revision(revision);
+                    if(scope == Distributable.DATA_SCOPE){
 
-        //}
+                    }
+
+                }
+            }
+        });
     }
     @Override
     public String name() {

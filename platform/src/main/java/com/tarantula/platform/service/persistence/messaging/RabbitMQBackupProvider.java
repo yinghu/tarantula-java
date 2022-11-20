@@ -28,14 +28,11 @@ public class RabbitMQBackupProvider implements BackupProvider {
     }
 
     @Override
-    public void registerDataStore(String name) {
+    public void registerDataStore(int scope,String name) {
 
     }
 
-    @Override
-    public void registerDataStore(String prefix, int partitions) {
 
-    }
 
     @Override
     public void configure(Map<String, Object> properties) {

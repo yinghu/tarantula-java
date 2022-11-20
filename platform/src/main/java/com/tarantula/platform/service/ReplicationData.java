@@ -30,6 +30,9 @@ public class ReplicationData implements OnReplication {
         this.keyAsString = key;
         this.recoverable = value;
     }
+    public ReplicationData(byte[] payload){
+        this.value = payload;
+    }
 
     @Override
     public int scope(){

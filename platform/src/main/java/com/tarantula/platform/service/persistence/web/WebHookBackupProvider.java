@@ -10,7 +10,7 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.WebHookConfiguration;
-import com.tarantula.platform.presence.PresencePortableRegistry;
+
 
 import java.util.Map;
 
@@ -49,35 +49,18 @@ public class WebHookBackupProvider implements BackupProvider {
     }
 
     @Override
-    public void registerDataStore(String name) {
+    public void registerDataStore(int scope,String name) {
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACTION,"onDataStore",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
             };
             JsonObject config = new JsonObject();
-            config.addProperty("scope",Distributable.INTEGRATION_SCOPE);
+            config.addProperty("scope",scope);
             config.addProperty("name",name);
             serviceContext.httpClientProvider().post(host,path,headers,config.toString().getBytes());
         }catch (Exception ex){
            log.error("error on register data store",ex);
-        }
-    }
-
-    @Override
-    public void registerDataStore(String prefix, int partitions) {
-        try {
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onDataStore",
-                    Session.TARANTULA_ACCESS_KEY,accessKey,
-            };
-            JsonObject config = new JsonObject();
-            config.addProperty("scope",Distributable.DATA_SCOPE);
-            config.addProperty("name",prefix);
-            config.addProperty("partition",partitions);
-            serviceContext.httpClientProvider().post(host,path,headers,config.toString().getBytes());
-        }catch (Exception ex){
-            log.error("error on register data store",ex);
         }
     }
 
@@ -103,20 +86,12 @@ public class WebHookBackupProvider implements BackupProvider {
                 Recoverable ref = onReplications[i].recoverable();
                 JsonObject update = new JsonObject();
                 update.addProperty("key",onReplications[i].keyAsString());
+                update.addProperty("source",onReplications[i].source());
                 update.addProperty("factoryId",ref.getFactoryId());
                 update.addProperty("classId",ref.getClassId());
                 update.addProperty("revision",ref.revision());
                 update.add("payload",JsonUtil.toJsonObject(ref.toMap()));
                 updates.add(update);
-                //if(ref.getFactoryId()== PresencePortableRegistry.OID && ref.getClassId() == PresencePortableRegistry.PRESENCE_CID){
-                    //log.warn(update.toString());
-                    //log.warn(new String(ref.toBinary()));
-                    //log.warn(JsonUtil.toJsonString(ref.toMap()));
-                    //RecoverableRegistry registry = serviceContext.recoverableRegistry(PresencePortableRegistry.OID);
-                    //Recoverable t = registry.create(ref.getClassId());
-                    //t.fromBinary(update.get("payload").getAsJsonObject().toString().getBytes());
-                    //log.warn(JsonUtil.toJsonString(t.toMap()));
-                //}
             }
             payload.add("updates",updates);
             String resp = serviceContext.httpClientProvider().post(host,path,headers,payload.toString().getBytes());

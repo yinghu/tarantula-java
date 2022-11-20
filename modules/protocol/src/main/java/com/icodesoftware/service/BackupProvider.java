@@ -9,8 +9,7 @@ public interface BackupProvider extends ServiceProvider {
     void enabled(boolean enabled);
     int scope();
 
-    void registerDataStore(String name);
-    void registerDataStore(String prefix,int partitions);
+    void registerDataStore(int scope,String name);
 
     void configure(Map<String,Object> properties);
 

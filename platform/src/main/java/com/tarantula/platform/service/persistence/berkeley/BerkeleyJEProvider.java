@@ -134,7 +134,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public DataStore create(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
-            this.iBackupProvider.registerDataStore(name);
+            this.iBackupProvider.registerDataStore(Distributable.INTEGRATION_SCOPE,name);
             return  new AccessIndexDataStore(this.node,db,this);
         });
     }
@@ -165,7 +165,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             for(int i=0;i<partition;i++){
                 shards[i]=createDatabase(name+"_"+i,Distributable.DATA_SCOPE);
             }
-            this.dBackupProvider.registerDataStore(name,partition);
+            this.dBackupProvider.registerDataStore(Distributable.DATA_SCOPE,name);
             return new PartitionDataStore(partition,this.node.bucketName,this.node.nodeName,name,shards,this);
         });
     }
