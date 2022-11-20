@@ -105,6 +105,7 @@ public class BackupRouter implements BackupProvider {
         router.batch(onReplications,size);
     }
     public void setup(ServiceContext tcx){
+        if(router==null) return;
         router.setup(tcx);
     }
 
