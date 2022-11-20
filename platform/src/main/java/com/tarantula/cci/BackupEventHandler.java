@@ -1,6 +1,7 @@
 package com.tarantula.cci;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
@@ -48,7 +49,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
             throw new IllegalAccessException("Invalid path ["+path+"]");
         }
         exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
-
         if(action.equals("onBatch")){
             try {
                 JsonObject updates = JsonUtil.parse(_payload);
@@ -58,6 +58,20 @@ public class BackupEventHandler extends AbstractRequestHandler {
             }
             this.backupProvider.batch(new OnReplication[0],10);
         }
+        else if(action.equals("onDataStore")){
+            JsonObject config = JsonUtil.parse(_payload);
+            int scope = config.get("scope").getAsInt();
+            if(scope == Distributable.DATA_SCOPE){
+                this.backupProvider.registerDataStore(config.get("name").getAsString(),config.get("partition").getAsInt());
+            }
+            else if(scope == Distributable.INTEGRATION_SCOPE){
+                this.backupProvider.registerDataStore(config.get("name").getAsString());
+            }
+            else{
+                log.warn("Scope ["+scope+"] not supported");
+            }
+        }
+
         else{
             throw new UnsupportedOperationException("Invalid operation ["+action+"]");
         }

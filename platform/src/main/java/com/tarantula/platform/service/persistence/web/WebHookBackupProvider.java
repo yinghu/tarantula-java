@@ -52,11 +52,13 @@ public class WebHookBackupProvider implements BackupProvider {
     public void registerDataStore(String name) {
         try {
             String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onRegister",
+                    Session.TARANTULA_ACTION,"onDataStore",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME, Distributable.INTEGRATION_SCOPE+"#"+name+"#0",
             };
-            //serviceContext.httpClientProvider().get(host,path,headers);
+            JsonObject config = new JsonObject();
+            config.addProperty("scope",Distributable.INTEGRATION_SCOPE);
+            config.addProperty("name",name);
+            serviceContext.httpClientProvider().post(host,path,headers,config.toString().getBytes());
         }catch (Exception ex){
            log.error("error on register data store",ex);
         }
@@ -66,11 +68,14 @@ public class WebHookBackupProvider implements BackupProvider {
     public void registerDataStore(String prefix, int partitions) {
         try {
             String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onRegister",
+                    Session.TARANTULA_ACTION,"onDataStore",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME,Distributable.DATA_SCOPE+"#"+prefix+"#"+partitions,
             };
-            //serviceContext.httpClientProvider().get(host,path,headers);
+            JsonObject config = new JsonObject();
+            config.addProperty("scope",Distributable.DATA_SCOPE);
+            config.addProperty("name",prefix);
+            config.addProperty("partition",partitions);
+            serviceContext.httpClientProvider().post(host,path,headers,config.toString().getBytes());
         }catch (Exception ex){
             log.error("error on register data store",ex);
         }
@@ -103,15 +108,15 @@ public class WebHookBackupProvider implements BackupProvider {
                 update.addProperty("revision",ref.revision());
                 update.add("payload",JsonUtil.toJsonObject(ref.toMap()));
                 updates.add(update);
-                if(ref.getFactoryId()== PresencePortableRegistry.OID && ref.getClassId() == PresencePortableRegistry.PRESENCE_CID){
-                    log.warn(update.toString());
-                    log.warn(new String(ref.toBinary()));
-                    log.warn(JsonUtil.toJsonString(ref.toMap()));
-                    RecoverableRegistry registry = serviceContext.recoverableRegistry(PresencePortableRegistry.OID);
-                    Recoverable t = registry.create(ref.getClassId());
-                    t.fromBinary(update.get("payload").getAsJsonObject().toString().getBytes());
-                    log.warn(JsonUtil.toJsonString(t.toMap()));
-                }
+                //if(ref.getFactoryId()== PresencePortableRegistry.OID && ref.getClassId() == PresencePortableRegistry.PRESENCE_CID){
+                    //log.warn(update.toString());
+                    //log.warn(new String(ref.toBinary()));
+                    //log.warn(JsonUtil.toJsonString(ref.toMap()));
+                    //RecoverableRegistry registry = serviceContext.recoverableRegistry(PresencePortableRegistry.OID);
+                    //Recoverable t = registry.create(ref.getClassId());
+                    //t.fromBinary(update.get("payload").getAsJsonObject().toString().getBytes());
+                    //log.warn(JsonUtil.toJsonString(t.toMap()));
+                //}
             }
             payload.add("updates",updates);
             String resp = serviceContext.httpClientProvider().post(host,path,headers,payload.toString().getBytes());

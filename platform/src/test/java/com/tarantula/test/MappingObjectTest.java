@@ -1,8 +1,6 @@
 package com.tarantula.test;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MappingObject;

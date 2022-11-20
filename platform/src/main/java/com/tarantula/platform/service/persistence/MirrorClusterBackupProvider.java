@@ -40,6 +40,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public void registerDataStore(String name) {
+        log.warn("Create ds ->"+name);
         if(runAsMirror){
             this.dataStoreProvider.create(name);
             return;
@@ -51,8 +52,9 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public void registerDataStore(String prefix, int partitions) {
+        log.warn("Create ds ->"+prefix+"//"+partitions);
         if(runAsMirror) {
-            this.dataStoreProvider.create(prefix, serviceContext.node().partitionNumber());
+            this.dataStoreProvider.create(prefix,partitions);
             return;
         }
         BackupProvider backupProvider = bMap.get(_type(prefix));
