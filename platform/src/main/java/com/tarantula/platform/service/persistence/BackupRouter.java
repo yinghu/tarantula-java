@@ -6,6 +6,8 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
+import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +79,7 @@ public class BackupRouter implements BackupProvider {
             });
             props.put("scope",scope);
             systemBackupProvider.configure(props);
+            //systemBackupProvider.setup();
             this.router = systemBackupProvider;
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -100,6 +103,9 @@ public class BackupRouter implements BackupProvider {
     public void batch(OnReplication[] onReplications,int size){
         if(!this.enabled) return;
         router.batch(onReplications,size);
+    }
+    public void setup(ServiceContext tcx){
+        router.setup(tcx);
     }
 
 }

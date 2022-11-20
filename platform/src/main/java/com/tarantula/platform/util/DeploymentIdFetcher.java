@@ -16,7 +16,7 @@ public class DeploymentIdFetcher extends HttpCaller {
         try{
             _init();
             String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY, accessKey,Session.TARANTULA_NAME,"1"
+                Session.TARANTULA_ACCESS_KEY, accessKey
             };
             String resp = super.get("backup/deployment",headers);
             JsonObject json = JsonUtil.parse(resp);

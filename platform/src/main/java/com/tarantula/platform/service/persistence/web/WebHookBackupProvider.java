@@ -3,19 +3,17 @@ package com.tarantula.platform.service.persistence.web;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.OnAccess;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
+import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.WebHookConfiguration;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
-
-import java.awt.*;
 import java.util.Map;
 
 public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
@@ -28,6 +26,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
 
     private boolean enabled;
     private int scope;
+    private ServiceContext serviceContext;
     public WebHookBackupProvider(){
     }
 
@@ -99,9 +98,9 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
             String[] headers = new String[]{
                     Session.TARANTULA_ACTION,"onBatch",
                     Session.TARANTULA_ACCESS_KEY,accessKey,
-                    Session.TARANTULA_NAME,""+scope
             };
             JsonObject payload = new JsonObject();
+            payload.addProperty("scope",scope);
             JsonArray updates = new JsonArray();
             for(int i=0;i<size;i++){
                 Recoverable ref = onReplications[i].recoverable();
@@ -110,14 +109,27 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
                 update.addProperty("factoryId",ref.getFactoryId());
                 update.addProperty("classId",ref.getClassId());
                 update.addProperty("revision",ref.revision());
-                //update.add("payload",);
+                update.add("payload",JsonUtil.toJsonObject(ref.toMap()));
                 updates.add(update);
+                if(ref.getFactoryId()== PresencePortableRegistry.OID && ref.getClassId() == PresencePortableRegistry.PRESENCE_CID){
+                    log.warn(update.toString());
+                    log.warn(new String(ref.toBinary()));
+                    log.warn(JsonUtil.toJsonString(ref.toMap()));
+                    RecoverableRegistry registry = serviceContext.recoverableRegistry(PresencePortableRegistry.OID);
+                    Recoverable t = registry.create(ref.getClassId());
+                    t.fromBinary(update.get("payload").getAsJsonObject().toString().getBytes());
+                    log.warn(JsonUtil.toJsonString(t.toMap()));
+                }
             }
             payload.add("updates",updates);
             String resp = super.post(path, payload.toString().getBytes(),headers);
         }catch (Exception ex){
             log.error("error on back",ex);
         }
+    }
+    public void setup(ServiceContext tcx){
+        this.serviceContext = tcx;
+        log.warn("Web hook backup provider started");
     }
     @Override
     public String name() {

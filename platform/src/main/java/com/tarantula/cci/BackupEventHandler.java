@@ -29,7 +29,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
         String path = exchange.path();
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
-        int scope = Integer.parseInt(exchange.header(Session.TARANTULA_NAME));
         byte[] _payload = exchange.payload();
         if(path.equals("/backup/deployment")){
             String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
@@ -53,6 +52,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
         if(action.equals("onBatch")){
             try {
                 JsonObject updates = JsonUtil.parse(_payload);
+
             }catch (Exception ex){
                 log.error("invalid json",ex);
             }
