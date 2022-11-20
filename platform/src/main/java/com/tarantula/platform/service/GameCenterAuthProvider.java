@@ -3,19 +3,15 @@ package com.tarantula.platform.service;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.HttpCaller;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -24,7 +20,7 @@ import java.util.Map;
 
 public class GameCenterAuthProvider extends AuthObject{
 
-    private HttpClient client;
+    //private HttpClient client;
 
     public GameCenterAuthProvider(String typeId, MetricsListener metricsListener){
         super(typeId,"");
@@ -39,13 +35,13 @@ public class GameCenterAuthProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        try{
-            SSLContext sct = SSLContext.getInstance("TLS");
-            sct.init(null,new TrustManager[]{new GameCenterAuthProvider._X509TrustManager()},null);
-            client = HttpClient.newBuilder().sslContext(sct).build();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+        //try{
+            //SSLContext sct = SSLContext.getInstance("TLS");
+            //sct.init(null,new TrustManager[]{new GameCenterAuthProvider._X509TrustManager()},null);
+            //client = HttpClient.newBuilder().sslContext(sct).build();
+        //}catch (Exception ex){
+            //throw new RuntimeException(ex);
+        //}
     }
     @Override
     public boolean validate(Map<String,Object> params){
@@ -67,43 +63,21 @@ public class GameCenterAuthProvider extends AuthObject{
                 .timeout(Duration.ofSeconds(TIMEOUT))
                 .GET()
                 .build();
-        HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        if(response.statusCode()!=200) return false;
+        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            responseData.dataAsBytes = response.body();
+            return response.statusCode();
+        });
+        if(code!=200) return false;
         byte[] _signature_bytes = Base64.getDecoder().decode(_signature);
         byte[] _hash = Base64.getDecoder().decode(_token);
         CertificateFactory cf =   CertificateFactory.getInstance("X509");
-        X509Certificate c = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(response.body()));
+        X509Certificate c = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(responseData.dataAsBytes));
         PublicKey key = c.getPublicKey();
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initVerify(key);
         signature.update(_hash);
         return signature.verify(_signature_bytes);
-    }
-
-
-
-    private class _X509TrustManager implements X509TrustManager {
-        private X509Certificate[] certificate;
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on server
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on client to check if certificate is valid
-            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
-            //throw new CertificateException("Invalid certificate");
-            //}
-            certificate = chain;
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return this.certificate;
-        }
-
-
-
     }
 }

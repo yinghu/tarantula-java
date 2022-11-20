@@ -1,13 +1,12 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Recoverable;
+
 
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,22 +89,22 @@ public class BackupRouter implements BackupProvider {
 
     @Override
     public void registerDataStore(String storeName) {
-        if(!this.enabled) return;
+        if(!this.enabled || router==null) return;
         router.registerDataStore(storeName);
     }
 
     @Override
     public void registerDataStore(String storeNamePrefix, int partition) {
-        if(!this.enabled) return;
+        if(!this.enabled || router==null) return;
         router.registerDataStore(storeNamePrefix,partition);
     }
 
     public void batch(OnReplication[] onReplications,int size){
-        if(!this.enabled) return;
+        if(!this.enabled || router==null) return;
         router.batch(onReplications,size);
     }
     public void setup(ServiceContext tcx){
-        if(router==null) return;
+        if(!this.enabled || router==null) return;
         router.setup(tcx);
     }
 

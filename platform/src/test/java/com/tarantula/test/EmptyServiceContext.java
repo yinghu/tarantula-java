@@ -121,4 +121,7 @@ public class EmptyServiceContext implements ServiceContext {
         node.partitionNumber = 17;
         return node;
     }
+    public HttpClientProvider httpClientProvider(){
+        return null;
+    }
 }

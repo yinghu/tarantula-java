@@ -110,4 +110,8 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.backupProvider();
     }
 
+    public HttpClientProvider httpClientProvider(){
+        return this.tarantulaContext.httpClientProvider();
+    }
+
 }

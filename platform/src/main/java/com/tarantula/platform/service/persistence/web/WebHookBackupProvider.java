@@ -8,22 +8,20 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.WebHookConfiguration;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
 
-public class WebHookBackupProvider extends HttpCaller implements BackupProvider {
+public class WebHookBackupProvider implements BackupProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
 
     private WebHookConfiguration webHookConfiguration;
     private String accessKey;
     private String path;
-
+    private String host;
     private boolean enabled;
     private int scope;
     private ServiceContext serviceContext;
@@ -58,7 +56,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_NAME, Distributable.INTEGRATION_SCOPE+"#"+name+"#0",
             };
-            super.get(path,headers);
+            serviceContext.httpClientProvider().get(host,path,headers);
         }catch (Exception ex){
            log.error("error on register data store",ex);
         }
@@ -72,7 +70,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
                     Session.TARANTULA_ACCESS_KEY,accessKey,
                     Session.TARANTULA_NAME,Distributable.DATA_SCOPE+"#"+prefix+"#"+partitions,
             };
-            super.get(path,headers);
+            serviceContext.httpClientProvider().get(host,path,headers);
         }catch (Exception ex){
             log.error("error on register data store",ex);
         }
@@ -84,12 +82,6 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         this.accessKey = ((JsonElement) properties.get("accessKey")).getAsString();
         this.path = ((JsonElement) properties.get("path")).getAsString();
         this.scope = (Integer)properties.get("scope");
-        try{
-            super._init();
-        }catch (Exception ex){
-            log.error("configure",ex);
-            throw new RuntimeException(ex);
-        }
     }
 
 
@@ -122,7 +114,7 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
                 }
             }
             payload.add("updates",updates);
-            String resp = super.post(path, payload.toString().getBytes(),headers);
+            String resp = serviceContext.httpClientProvider().post(host,path,headers,payload.toString().getBytes());
         }catch (Exception ex){
             log.error("error on back",ex);
         }
@@ -141,7 +133,6 @@ public class WebHookBackupProvider extends HttpCaller implements BackupProvider 
         this.host = webHookConfiguration.host();
         this.accessKey = webHookConfiguration.accessKey();
         this.path = webHookConfiguration.path();
-        super._init();
     }
 
     @Override

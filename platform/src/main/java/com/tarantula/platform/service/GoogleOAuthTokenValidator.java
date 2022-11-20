@@ -8,19 +8,14 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.GooglePlayConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Map;
 
@@ -33,7 +28,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private final static String VERIFY_URI = "https://games.googleapis.com/games/v1/applications/";
 
 
-    private HttpClient client;
+    //private HttpClient client;
     private NetHttpTransport transport;
     private JacksonFactory jsonFactory;
     private String accessKey;
@@ -52,13 +47,13 @@ public class GoogleOAuthTokenValidator extends AuthObject {
         this.secureKey = secureKey;
         transport = new NetHttpTransport();
         jsonFactory = JacksonFactory.getDefaultInstance();
-        try{
-            SSLContext sct = SSLContext.getInstance("TLS");
-            sct.init(null,new TrustManager[]{new GoogleOAuthTokenValidator._X509TrustManager()},null);
-            client = HttpClient.newBuilder().sslContext(sct).build();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+        //try{
+            //SSLContext sct = SSLContext.getInstance("TLS");
+            //sct.init(null,new TrustManager[]{new GoogleOAuthTokenValidator._X509TrustManager()},null);
+            //client = HttpClient.newBuilder().sslContext(sct).build();
+        //}catch (Exception ex){
+            //throw new RuntimeException(ex);
+        //}
     }
     @Override
     public String name(){
@@ -94,8 +89,14 @@ public class GoogleOAuthTokenValidator extends AuthObject {
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();
-            HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
-            JsonObject payload = JsonUtil.parse(_response.body());
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = _response.body();
+                return _response.statusCode();
+            });
+            if(code!=200) return false;
+            JsonObject payload = JsonUtil.parse(responseData.dataAsString);
             if(!payload.has("player_id")) return false;
             String pendingPlayerId = (String) params.get(OnAccess.LOGIN);
             return pendingPlayerId.endsWith(payload.get("player_id").getAsString());
@@ -105,26 +106,4 @@ public class GoogleOAuthTokenValidator extends AuthObject {
         }
     }
 
-    private class _X509TrustManager implements X509TrustManager {
-        private X509Certificate[] certificate;
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on server
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on client to check if certificate is valid
-            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
-            //throw new CertificateException("Invalid certificate");
-            //}
-            certificate = chain;
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return this.certificate;
-        }
-
-    }
 }

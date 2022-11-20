@@ -7,15 +7,9 @@ import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.configuration.FacebookConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Map;
 
@@ -26,7 +20,7 @@ public class FacebookAuthProvider extends AuthObject{
     private final static String ME_URI = "https://graph.facebook.com/me";
     private final static String GRAPH_URI = "https://graph.facebook.com";
 
-    private HttpClient client;
+    //private HttpClient client;
     private String accessToken;
     private String secureKey;
 
@@ -38,10 +32,8 @@ public class FacebookAuthProvider extends AuthObject{
     public FacebookAuthProvider(String typeId,String clientId, String secureKey) {
         super(typeId, clientId);
         this.secureKey = secureKey;
+
         try{
-            SSLContext sct = SSLContext.getInstance("TLS");
-            sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
-            client = HttpClient.newBuilder().sslContext(sct).build();
             if(!serverToken()) throw new RuntimeException("invalid token");
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -68,8 +60,8 @@ public class FacebookAuthProvider extends AuthObject{
             return false;
         }
     }
-    private boolean serverToken() throws Exception{
 
+    private boolean serverToken() throws Exception{
         String query = new StringBuffer("?client_id=").append(clientId("typeId")).append("&client_secret=")
                 .append(secureKey).append("&grant_type=client_credentials").toString();
         HttpRequest request = HttpRequest.newBuilder()
@@ -78,13 +70,20 @@ public class FacebookAuthProvider extends AuthObject{
                 .header(ACCEPT, ACCEPT_JSON)
                 .GET()
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        String[] resp = new String[1];
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            resp[0]=response.body();
+            return response.statusCode();
+        });
+        if(code!=200) return false;
         JsonParser p = new JsonParser();
-        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        JsonObject j = p.parse(resp[0]).getAsJsonObject();
         if(!j.has("access_token")) return false;
         String acc = j.get("access_token").getAsString();
         int ix = acc.lastIndexOf('|');
         accessToken = acc.substring(ix+1);
+
         return true;
     }
 
@@ -98,10 +97,15 @@ public class FacebookAuthProvider extends AuthObject{
                 .header(ACCEPT, ACCEPT_JSON)
                 .GET()
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if(response.statusCode()!=200) return false;
+        String[] resp = new String[1];
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            resp[0]=response.body();
+            return response.statusCode();
+        });
+        if(code!=200) return false;
         JsonParser p = new JsonParser();
-        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        JsonObject j = p.parse(resp[0]).getAsJsonObject();
         return j.has("id") && j.get("id").getAsString().equals(uid);
     }
 
@@ -115,10 +119,15 @@ public class FacebookAuthProvider extends AuthObject{
                 .header(ACCEPT, ACCEPT_JSON)
                 .GET()
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if(response.statusCode()!= 200) return false;
+        String[] resp = new String[1];
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            resp[0]=response.body();
+            return response.statusCode();
+        });
+        if(code!= 200) return false;
         JsonParser p = new JsonParser();
-        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        JsonObject j = p.parse(resp[0]).getAsJsonObject();
         return !j.has("error");
     }
     private boolean validateUser(Map<String,Object> params) throws Exception{
@@ -131,33 +140,16 @@ public class FacebookAuthProvider extends AuthObject{
                 .header(ACCEPT, ACCEPT_JSON)
                 .GET()
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if(response.statusCode()!=200) return false;
+        String[] resp = new String[1];
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            resp[0]=response.body();
+            return response.statusCode();
+        });
+        if(code!=200) return false;
         JsonParser p = new JsonParser();
-        JsonObject j = p.parse(response.body()).getAsJsonObject();
+        JsonObject j = p.parse(resp[0]).getAsJsonObject();
         return !j.has("error");
     }
 
-    private class _X509TrustManager implements X509TrustManager {
-        private X509Certificate[] certificate;
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on server
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on client to check if certificate is valid
-            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
-                //throw new CertificateException("Invalid certificate");
-            //}
-            certificate = chain;
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return this.certificate;
-        }
-
-    }
 }

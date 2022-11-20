@@ -14,6 +14,7 @@ import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
@@ -113,7 +114,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String dataBucketGroup;
     public String dataBucketNode;
     private ClusterNode node;
-    //public String dataReplicationThreadPoolSetting;
 
     public String dataStoreDir;
 
@@ -140,11 +140,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public boolean runAsMirror;
     public boolean backupEnabled;
     public String backupUrl;
+    private static String deploymentIdPath = "backup/deployment";
     public String backupAccessKey;
 
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
     private ServiceView serviceView;
+
+    private HttpClientProvider httpClientProvider;
 
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
@@ -167,12 +170,17 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
         _access_index_syc_finished = new CountDownLatch(1);
+        this.httpClientProvider = new HttpCaller();
+        this.httpClientProvider.start();
         this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
         if(backupEnabled){//using backup deployment id
-            node.deploymentId = new DeploymentIdFetcher(this.backupUrl).deploymentId(this.backupAccessKey);
+            String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
+            JsonObject json = JsonUtil.parse(resp);
+            if(!json.get("successful").getAsBoolean()) throw new RuntimeException("failed to fetch remote deployment id");
+            node.deploymentId = json.get("message").getAsString();
             log.warn("Using backup deployment id ["+node.deploymentId+"]");
         }
         node_started = new AtomicBoolean(false);
@@ -585,6 +593,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    if(serviceProvider!=null){
  	        try{serviceProvider.shutdown();}catch (Exception ex){}//ignore exception
         }
+    }
+    public HttpClientProvider httpClientProvider(){
+ 	    return this.httpClientProvider;
     }
     public TarantulaLogger logger(Class target){
         return JDKLogger.getLogger(target);

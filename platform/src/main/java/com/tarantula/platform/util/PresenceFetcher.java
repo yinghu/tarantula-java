@@ -3,18 +3,20 @@ package com.tarantula.platform.util;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
-import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.service.HttpClientProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.OnSessionTrack;
 
 import javax.crypto.Cipher;
 
-public class PresenceFetcher extends HttpCaller {
+public class PresenceFetcher{
 
     public Cipher encrypt;
-
-    public PresenceFetcher(String host){
-        super(host);
+    private HttpClientProvider httpClientProvider;
+    private String host;
+    public PresenceFetcher(String host,HttpClientProvider httpClientProvider){
+        this.host = host;
+        this.httpClientProvider = httpClientProvider;
     }
 
 
@@ -27,7 +29,7 @@ public class PresenceFetcher extends HttpCaller {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",loginName);
         jsonObject.addProperty("password",password);
-        String resp = super.post("user/action",jsonObject.toString().getBytes(),headers);
+        String resp = httpClientProvider.post(host,"user/action",headers,jsonObject.toString().getBytes());
         JsonObject json = JsonUtil.parse(resp);
         OnSession onSession = new OnSessionTrack();
         onSession.token(json.get("Token").getAsString());
@@ -40,7 +42,7 @@ public class PresenceFetcher extends HttpCaller {
                 Session.TARANTULA_NAME,clusterNameSuffix,
                 Session.TARANTULA_TOKEN,token,
         };
-        String resp = super.get("service/action",headers);
+        String resp = httpClientProvider.get(host,"service/action",headers);
         JsonObject jsonObject = JsonUtil.parse(resp);
         if(!jsonObject.get("successful").getAsBoolean()) return null;
         String skey = jsonObject.get("accessKey").getAsString();
@@ -53,7 +55,7 @@ public class PresenceFetcher extends HttpCaller {
                     Session.TARANTULA_ACTION,"onSession",
                     Session.TARANTULA_TOKEN,token,
             };
-            String resp = super.get("service/action",headers);
+            String resp = httpClientProvider.get(host,"service/action",headers);
             JsonObject jsonObject = JsonUtil.parse(resp).get("presence").getAsJsonObject();
             OnSession presence = new OnSessionTrack();
             presence.systemId(jsonObject.get("systemId").getAsString());
@@ -75,7 +77,7 @@ public class PresenceFetcher extends HttpCaller {
                     Session.TARANTULA_CLIENT_ID,"SAMPLE-1",
                     Session.TARANTULA_NAME,"Sample111"
             };
-            String resp = super.get("service/action",headers);
+            String resp = httpClientProvider.get(host,"service/action",headers);
             System.out.println(resp);
             //JsonObject jsonObject = JsonUtil.parse(resp).get("presence").getAsJsonObject();
             //OnSession presence = new OnSessionTrack();

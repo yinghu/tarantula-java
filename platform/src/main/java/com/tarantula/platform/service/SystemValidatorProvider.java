@@ -105,8 +105,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
         try {
-            PresenceFetcher httpCaller = new PresenceFetcher(presenceServiceHost);
-            httpCaller._init();
+            PresenceFetcher httpCaller = new PresenceFetcher(presenceServiceHost,this.serviceContext.httpClientProvider());
             OnSession onSession = httpCaller.login(root,password);
             byte[] key = httpCaller.presenceKey(onSession.token(),clusterNameSuffix);
             if(key==null) return false;

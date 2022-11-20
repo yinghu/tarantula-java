@@ -1,6 +1,7 @@
 package com.icodesoftware.util;
 
 import com.icodesoftware.Session;
+import com.icodesoftware.service.HttpClientProvider;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -13,7 +14,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
-public class HttpCaller {
+final public class HttpCaller implements HttpClientProvider {
 
     private static int TIME_OUT = 10;
     private static String ACCEPT = "Accept";
@@ -65,6 +66,57 @@ public class HttpCaller {
         return response.body();
     }
 
+    @Override
+    public String post(String host, String path, String[] headers, byte[] payload) throws Exception{
+        HttpRequest request = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .uri(URI.create(host+"/"+path))
+                .timeout(Duration.ofSeconds(TIME_OUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .header(CONTENT_TYPE, CONTENT_FORM)
+                .header(Session.TARANTULA_PAYLOAD_SIZE,payload.length+"")
+                .headers(headers)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(payload))
+                .build();
+        HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    @Override
+    public String get(String host, String path, String[] headers) throws Exception{
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(host+"/"+path))
+                .timeout(Duration.ofSeconds(TIME_OUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .headers(headers)
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return (response.body());
+    }
+
+    public int request(OnRequest request) throws Exception{
+        return request.onClient(client);
+    }
+
+    @Override
+    public String name() {
+        return HttpClientProvider.NAME;
+    }
+
+    @Override
+    public void start() throws Exception {
+        _init();
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+    }
+
+    public static class ResponseData{
+        public String dataAsString;
+        public byte[] dataAsBytes;
+    }
     private class _X509TrustManager implements X509TrustManager{
         private X509Certificate[] certificate;
         @Override

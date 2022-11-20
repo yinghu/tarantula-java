@@ -8,20 +8,16 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.ValidationUtil;
+import com.icodesoftware.util.HttpCaller;
+
 import com.tarantula.platform.configuration.AppleStoreConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.Transaction;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Map;
 
@@ -31,7 +27,7 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
 
-    private HttpClient client;
+    //private HttpClient client;
     private JsonParser jsonParser;
     private DataStore dataStore;
 
@@ -47,13 +43,13 @@ public class AppleStoreProvider extends AuthObject{
         super(typeId,"");
         this.secureKey = key;
         this.isSandbox = isSandbox;
-        try{
-            SSLContext sct = SSLContext.getInstance("TLS");
-            sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
-            client = HttpClient.newBuilder().sslContext(sct).build();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+        //try{
+            //SSLContext sct = SSLContext.getInstance("TLS");
+            //sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
+            //client = HttpClient.newBuilder().sslContext(sct).build();
+        //}catch (Exception ex){
+            //throw new RuntimeException(ex);
+        //}
     }
     @Override
     public String name(){
@@ -81,9 +77,15 @@ public class AppleStoreProvider extends AuthObject{
                     .header(CONTENT_TYPE,ACCEPT_JSON)
                     .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(serviceTypeId,receipt).toString().getBytes()))
                     .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = response.body();
+                return response.statusCode();
+            });
+            if(code!=200) return false;
             onMetrics(GameClusterMetrics.PAYMENT_APPLE_STORE_AMOUNT);
-            return checkResponsePayload(response.body(),params);
+            return checkResponsePayload(responseData.dataAsString,params);
         }catch (Exception ex){
             ex.printStackTrace();
             return false;
@@ -143,26 +145,5 @@ public class AppleStoreProvider extends AuthObject{
         jsonObject.addProperty("password",secureKey);
         jsonObject.addProperty("exclude-old-transactions",true);
         return jsonObject;
-    }
-    private class _X509TrustManager implements X509TrustManager {
-        private X509Certificate[] certificate;
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on server
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            //run on client to check if certificate is valid
-            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
-            //throw new CertificateException("Invalid certificate");
-            //}
-            certificate = chain;
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return this.certificate;
-        }
     }
 }
