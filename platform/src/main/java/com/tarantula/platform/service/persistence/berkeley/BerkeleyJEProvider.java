@@ -114,12 +114,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = (ClusterNode) properties.get("node");
-
+        ServiceContext serviceContext = (ServiceContext) properties.get("serviceContext");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
         this.iBackupProvider.configure((Map<String, Object>)properties.get("integrationRouter"));
-
+        this.iBackupProvider.setup(serviceContext);
         this.dBackupProvider = new BackupRouter("data",Distributable.DATA_SCOPE);
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
+        this.dBackupProvider.setup(serviceContext);
         this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
         this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
         this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
@@ -186,8 +187,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
-        this.iBackupProvider.setup(serviceContext);
-        this.dBackupProvider.setup(serviceContext);
+        //this.iBackupProvider.setup(serviceContext);
+        //this.dBackupProvider.setup(serviceContext);
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.replicationSynchronizer);
         this.serviceContext.schedule(this.integrationReplicationSynchronizer);

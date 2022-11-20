@@ -60,7 +60,7 @@ public class BackupRouter implements BackupProvider {
     public void configure(Map<String,Object> properties){
         this.enabled = (Boolean)properties.get("enabled");
         if(!this.enabled) {
-            logger.warn("Backup router enabled ["+name+"/"+this.enabled+"]");
+            logger.warn("Backup router enabled ["+name+"/false]");
             return;
         }
         JsonObject provider = (JsonObject)properties.get("backup-provider");
@@ -78,7 +78,6 @@ public class BackupRouter implements BackupProvider {
             });
             props.put("scope",scope);
             systemBackupProvider.configure(props);
-            //systemBackupProvider.setup();
             this.router = systemBackupProvider;
         }catch (Exception ex){
             throw new RuntimeException(ex);
