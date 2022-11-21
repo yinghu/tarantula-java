@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
@@ -24,6 +22,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     private DataStoreProvider dataStoreProvider;
     private boolean runAsMirror;
     private long nextSyncInterval;
+    private int maxTimerLoop;
     private MirrorBackupSynchronizer mirrorBackupSynchronizer;
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
@@ -68,6 +67,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     @Override
     public void configure(Map<String, Object> properties) {
         nextSyncInterval = ((Number)properties.get("syncIntervalSeconds")).intValue()*1000;
+        maxTimerLoop = ((Number)properties.get("maxTimerLoop")).intValue();
     }
 
 
@@ -75,30 +75,28 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         pendingBatches.offer(onReplications[0]);
     }
     public void _batch(){
-        //log.warn("Running batch ..");
         try{
-            OnReplication onReplication = pendingBatches.poll();
-            if(onReplication!=null){
-                JsonObject updates = JsonUtil.parse(onReplication.value());
-                int scope = updates.get("scope").getAsInt();
-                JsonArray batch = updates.getAsJsonArray("updates");
-                batch.forEach(e->{
-                    JsonObject data = e.getAsJsonObject();
-                    //log.warn(data.toString());
-                    String key = data.get("key").getAsString();
-                    String source = data.get("source").getAsString();
-                    //int factoryId = data.get("factoryId").getAsInt();
-                    //int classId = data.get("classId").getAsInt();
-                    long revision = data.get("revision").getAsLong();
-                    JsonObject payload = data.get("payload").getAsJsonObject();
-                    if(scope == Distributable.DATA_SCOPE){
-                        DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
-                        ds.backup().set(key.getBytes(),RevisionObject.toBinary(revision,payload.toString().getBytes(),true));                    }
-                    else if(scope == Distributable.INTEGRATION_SCOPE){
-                        DataStore ds = this.dataStoreProvider.create(source);
-                        ds.backup().set(key.getBytes(),payload.toString().getBytes());
-                    }
-                });
+            for(int i=0;i<maxTimerLoop;i++){
+                OnReplication onReplication = pendingBatches.poll();
+                if(onReplication!=null){
+                    JsonObject updates = JsonUtil.parse(onReplication.value());
+                    int scope = updates.get("scope").getAsInt();
+                    JsonArray batch = updates.getAsJsonArray("updates");
+                    batch.forEach(e->{
+                        JsonObject data = e.getAsJsonObject();
+                        String key = data.get("key").getAsString();
+                        String source = data.get("source").getAsString();
+                        long revision = data.get("revision").getAsLong();
+                        JsonObject payload = data.get("payload").getAsJsonObject();
+                        if(scope == Distributable.DATA_SCOPE){
+                            DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
+                            ds.backup().set(key.getBytes(),RevisionObject.toBinary(revision,payload.toString().getBytes(),true));                    }
+                        else if(scope == Distributable.INTEGRATION_SCOPE){
+                            DataStore ds = this.dataStoreProvider.create(source);
+                            ds.backup().set(key.getBytes(),payload.toString().getBytes());
+                        }
+                    });
+                }
             }
         }
         catch (Exception ex){
@@ -136,6 +134,11 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     }
     public void removeBackupProvider(BackupProvider backupProvider){
         bMap.remove(backupProvider.name());
+    }
+
+    @Override
+    public void updateSummary(Summary summary){
+
     }
 
     private String _type(String source){

@@ -542,6 +542,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         });
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
+        this.serviceProviders.put(mirrorBackupProvider.name(),mirrorBackupProvider);
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
 
