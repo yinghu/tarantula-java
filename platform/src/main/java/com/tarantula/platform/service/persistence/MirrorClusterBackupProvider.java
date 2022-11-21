@@ -84,6 +84,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
                 JsonArray batch = updates.getAsJsonArray("updates");
                 batch.forEach(e->{
                     JsonObject data = e.getAsJsonObject();
+                    log.warn(data.toString());
                     String key = data.get("key").getAsString();
                     String source = data.get("source").getAsString();
                     int factoryId = data.get("factoryId").getAsInt();
