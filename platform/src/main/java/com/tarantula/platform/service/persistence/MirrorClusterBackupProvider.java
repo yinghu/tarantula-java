@@ -75,38 +75,44 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         pendingBatches.offer(onReplications[0]);
     }
     public void _batch(){
-        OnReplication onReplication = pendingBatches.poll();
-        if(onReplication!=null){
-            JsonObject updates = JsonUtil.parse(onReplication.value());
-            int scope = updates.get("scope").getAsInt();
-            JsonArray batch = updates.getAsJsonArray("updates");
-            batch.forEach(e->{
-                JsonObject data = e.getAsJsonObject();
-                String key = data.get("key").getAsString();
-                String source = data.get("source").getAsString();
-                int factoryId = data.get("factoryId").getAsInt();
-                int classId = data.get("classId").getAsInt();
-                long revision = data.get("revision").getAsLong();
-                JsonObject payload = data.get("payload").getAsJsonObject();
-                RecoverableRegistry registry = this.serviceContext.recoverableRegistry(factoryId);
-                if(registry!=null){
-                    Recoverable t = registry.create(classId);
-                    if(t!=null){
-                        t.fromBinary(payload.toString().getBytes());
-                        t.distributionKey(key);
-                        t.revision(revision);
-                        if(scope == Distributable.DATA_SCOPE){
-                            DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
-                            ds.createIfAbsent(t,false);
-                        }
-                        else if(scope == Distributable.INTEGRATION_SCOPE){
-                            DataStore ds = this.dataStoreProvider.create(source);
-                            ds.createIfAbsent(t,false);
-                        }
+        log.warn("Running batch ..");
+        try{
+            OnReplication onReplication = pendingBatches.poll();
+            if(onReplication!=null){
+                JsonObject updates = JsonUtil.parse(onReplication.value());
+                int scope = updates.get("scope").getAsInt();
+                JsonArray batch = updates.getAsJsonArray("updates");
+                batch.forEach(e->{
+                    JsonObject data = e.getAsJsonObject();
+                    String key = data.get("key").getAsString();
+                    String source = data.get("source").getAsString();
+                    int factoryId = data.get("factoryId").getAsInt();
+                    int classId = data.get("classId").getAsInt();
+                    long revision = data.get("revision").getAsLong();
+                    JsonObject payload = data.get("payload").getAsJsonObject();
+                    RecoverableRegistry registry = this.serviceContext.recoverableRegistry(factoryId);
+                    if(registry!=null){
+                        Recoverable t = registry.create(classId);
+                        if(t!=null){
+                            t.fromBinary(payload.toString().getBytes());
+                            t.distributionKey(key);
+                            t.revision(revision);
+                            if(scope == Distributable.DATA_SCOPE){
+                                DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
+                                ds.createIfAbsent(t,false);
+                            }
+                            else if(scope == Distributable.INTEGRATION_SCOPE){
+                                DataStore ds = this.dataStoreProvider.create(source);
+                                ds.createIfAbsent(t,false);
+                            }
 
+                        }
                     }
-                }
-            });
+                });
+            }
+        }
+        catch (Exception ex){
+            log.error("_batch",ex);
         }
         this.serviceContext.schedule(this.mirrorBackupSynchronizer);
     }
