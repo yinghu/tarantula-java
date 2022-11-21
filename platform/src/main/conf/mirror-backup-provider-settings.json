@@ -1,4 +1,4 @@
 {
   "syncIntervalSeconds": 3,
-  "maxTimerLoop": 3
+  "maxTimerLoop": 10
 }

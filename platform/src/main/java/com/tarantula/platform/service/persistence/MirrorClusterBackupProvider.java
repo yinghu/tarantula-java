@@ -138,7 +138,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public void updateSummary(Summary summary){
-
+        summary.update("PendingSize",pendingBatches.size());
     }
 
     private String _type(String source){
