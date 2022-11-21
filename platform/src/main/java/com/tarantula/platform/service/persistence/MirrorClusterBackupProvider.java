@@ -130,7 +130,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         log.warn("Run mirror backup provider ["+runAsMirror+"]");
         if(runAsMirror){
             for(int i=0;i<timerCount;i++){
-                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+100));
+                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+10));
             }
         }
     }

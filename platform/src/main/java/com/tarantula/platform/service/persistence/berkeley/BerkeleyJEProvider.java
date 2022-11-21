@@ -185,9 +185,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext.schedule(this.cacheSynchronizer);
         for(int i=0;i<timerCount;i++){
             this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+100,Distributable.INTEGRATION_SCOPE));
+            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+10,Distributable.INTEGRATION_SCOPE));
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE+100));
+            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE+10));
         }
 
     }
