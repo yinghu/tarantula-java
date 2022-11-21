@@ -72,12 +72,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     //private boolean running = true;
     private ServiceContext serviceContext;
     private DiskSynchronizer diskSynchronizer;
-    private ReplicationSynchronizer replicationSynchronizer;
-    private ReplicationSynchronizer integrationReplicationSynchronizer;
+    //private ReplicationSynchronizer replicationSynchronizer;
+    //private ReplicationSynchronizer integrationReplicationSynchronizer;
     private CacheSynchronizer cacheSynchronizer;
 
-    private BackupSynchronizer backupSynchronizer;
-    private BackupSynchronizer integrationBackupSynchronizer;
+    //private BackupSynchronizer backupSynchronizer;
+    //private BackupSynchronizer integrationBackupSynchronizer;
 
 
     private int updateThreshold;
@@ -87,6 +87,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int backupBatchSize;
     private int maxTimerLoop;
     private int maxBytesPerBatch;
+    private int timerCount;
+    private long nextReplicationInterval;
+    private long nextBackupInterval;
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -100,9 +103,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
         this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
         this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
+        this.timerCount = ((JsonElement)properties.get("timerCount")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
-        long nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
-        long nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
+        this.nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
+        this.nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
         long nextEvictInterval = 1000*60*((JsonElement)properties.get("cacheSyncIntervalMinutes")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.cacheUpdateThreshold =  ((JsonElement)properties.get("cacheUpdateThreshold")).getAsInt();
@@ -122,10 +126,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
         this.dBackupProvider.setup(serviceContext);
         this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
-        this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
-        this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
-        this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE);
-        this.integrationBackupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE);
+        //this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
+        //this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
+        //this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE);
+        //this.integrationBackupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE);
         this.cacheSynchronizer = new CacheSynchronizer(this,nextEvictInterval);
     }
 
@@ -188,11 +192,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
         this.serviceContext.schedule(this.diskSynchronizer);
-        this.serviceContext.schedule(this.replicationSynchronizer);
-        this.serviceContext.schedule(this.integrationReplicationSynchronizer);
-        this.serviceContext.schedule(this.backupSynchronizer);
-        this.serviceContext.schedule(this.integrationBackupSynchronizer);
         this.serviceContext.schedule(this.cacheSynchronizer);
+        for(int i=0;i<timerCount;i++){
+            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
+            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE));
+            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
+            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE));
+        }
+
     }
     @Override
     public void waitForData() {
@@ -297,7 +304,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(this.cacheSynchronizer);
     }
-    public void _replicateOnIntegrationScope(){
+    public void _replicateOnIntegrationScope(ReplicationSynchronizer caller){
         try{
             int integrationSize = 0;
             long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
@@ -323,9 +330,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         } catch (Exception ex){
             log.error("_replicationOnIntegrationScope",ex);
         }
-        this.serviceContext.schedule(this.integrationReplicationSynchronizer);
+        this.serviceContext.schedule(caller);
     }
-    public void _replicateOnDataScope(){
+    public void _replicateOnDataScope(ReplicationSynchronizer caller){
         try{
             int dataSize = 0;
             long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
@@ -351,9 +358,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }catch (Exception ex){
             log.error("_replicationOnDataScope",ex);
         }
-        this.serviceContext.schedule(this.replicationSynchronizer);
+        this.serviceContext.schedule(caller);
     }
-    public void _backupOnDataScope(){
+    public void _backupOnDataScope(BackupSynchronizer caller){
         try{
             long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
             long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
@@ -379,10 +386,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }catch (Exception ex){
             log.error("_backupOnDataScope",ex);
         }
-        this.serviceContext.schedule(this.backupSynchronizer);
+        this.serviceContext.schedule(caller);
     }
 
-    public void _backupOnIntegrationScope(){
+    public void _backupOnIntegrationScope(BackupSynchronizer caller){
         long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
         long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
         long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
@@ -404,7 +411,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
              }
             integrationSize = 0;
         }
-        this.serviceContext.schedule(this.integrationBackupSynchronizer);
+        this.serviceContext.schedule(caller);
     }
 
     @Override

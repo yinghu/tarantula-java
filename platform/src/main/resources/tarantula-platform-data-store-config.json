@@ -9,13 +9,14 @@
             {"backupPath":"backup"},
             {"maxReplicationNumber": 3},
             {"maxTimerLoop": 10},
+            {"timerCount": 3},
             {"maxBytesPerBatch": 10000},
             {"replicationBatchSize": 10},
             {"backupBatchSize": 10},
-            {"replicationSyncIntervalSeconds": 3},
+            {"replicationSyncIntervalSeconds": 1},
             {"cacheSyncIntervalMinutes": 60},
             {"cacheUpdateThreshold": 10000},
-            {"backupSyncIntervalSeconds": 3},
+            {"backupSyncIntervalSeconds": 1},
             {"diskSyncIntervalSeconds": 60},
             {"syncUpdateThreshold": 10000}
         ]
