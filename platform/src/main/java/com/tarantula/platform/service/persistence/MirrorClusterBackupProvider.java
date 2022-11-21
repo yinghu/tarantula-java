@@ -23,7 +23,8 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     private boolean runAsMirror;
     private long nextSyncInterval;
     private int maxTimerLoop;
-    private MirrorBackupSynchronizer mirrorBackupSynchronizer;
+    private int timerCount;
+    //private MirrorBackupSynchronizer mirrorBackupSynchronizer;
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
 
@@ -68,13 +69,14 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     public void configure(Map<String, Object> properties) {
         nextSyncInterval = ((Number)properties.get("syncIntervalSeconds")).intValue()*1000;
         maxTimerLoop = ((Number)properties.get("maxTimerLoop")).intValue();
+        timerCount = ((Number)properties.get("timerCount")).intValue();
     }
 
 
     public void batch(OnReplication[] onReplications,int size){
         pendingBatches.offer(onReplications[0]);
     }
-    public void _batch(){
+    public void _batch(MirrorBackupSynchronizer caller){
         try{
             for(int i=0;i<maxTimerLoop;i++){
                 OnReplication onReplication = pendingBatches.poll();
@@ -102,7 +104,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         catch (Exception ex){
             log.error("_batch",ex);
         }
-        this.serviceContext.schedule(this.mirrorBackupSynchronizer);
+        this.serviceContext.schedule(caller);
     }
     @Override
     public String name() {
@@ -124,8 +126,9 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         this.bMap = new ConcurrentHashMap<>();
         log.warn("Run mirror backup provider ["+runAsMirror+"]");
         if(runAsMirror){
-            this.mirrorBackupSynchronizer = new MirrorBackupSynchronizer(this,nextSyncInterval);
-            this.serviceContext.schedule(this.mirrorBackupSynchronizer);
+            for(int i=0;i<timerCount;i++){
+                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval));
+            }
         }
     }
 

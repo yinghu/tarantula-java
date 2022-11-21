@@ -28,6 +28,6 @@ public class MirrorBackupSynchronizer implements SchedulingTask {
 
     @Override
     public void run() {
-        mirrorClusterBackupProvider._batch();
+        mirrorClusterBackupProvider._batch(this);
     }
 }
