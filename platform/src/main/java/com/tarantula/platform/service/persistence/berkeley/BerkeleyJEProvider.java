@@ -187,7 +187,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
             this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+10,Distributable.INTEGRATION_SCOPE));
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE+10));
+            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
         }
 
     }
@@ -356,7 +356,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
             long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
             int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):backupBatchSize;
-            //log.warn("Backup sync 1->"+bsize);
             int dataSize = 0;
             OnReplication[] data = new OnReplication[bsize];
             for(int loop =0;loop<maxTimerLoop;loop++) {
@@ -398,7 +397,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             if (integrationSize > 0) {
                 this.iBackupProvider.batch(integration,integrationSize);
                 operationSummary.pendingBackups.addAndGet((-1)*integrationSize);
-             }
+            }
             integrationSize = 0;
         }
         this.serviceContext.schedule(caller);
