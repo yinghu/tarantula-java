@@ -10,6 +10,7 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +25,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     private long nextSyncInterval;
     private int maxTimerLoop;
     private int timerCount;
-    //private MirrorBackupSynchronizer mirrorBackupSynchronizer;
+    private OperationSummary operationSummary = new OperationSummary();
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
 
@@ -75,12 +76,14 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     public void batch(OnReplication[] onReplications,int size){
         pendingBatches.offer(onReplications[0]);
+        operationSummary.pendingBackups.incrementAndGet();
     }
     public void _batch(MirrorBackupSynchronizer caller){
         try{
             for(int i=0;i<maxTimerLoop;i++){
                 OnReplication onReplication = pendingBatches.poll();
                 if(onReplication!=null){
+                    operationSummary.pendingBackups.decrementAndGet();
                     JsonObject updates = JsonUtil.parse(onReplication.value());
                     int scope = updates.get("scope").getAsInt();
                     JsonArray batch = updates.getAsJsonArray("updates");
@@ -127,7 +130,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         log.warn("Run mirror backup provider ["+runAsMirror+"]");
         if(runAsMirror){
             for(int i=0;i<timerCount;i++){
-                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval));
+                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+10));
             }
         }
     }
@@ -141,7 +144,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public void updateSummary(Summary summary){
-        summary.update("PendingSize",pendingBatches.size());
+        summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
     }
 
     private String _type(String source){
