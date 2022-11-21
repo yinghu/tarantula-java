@@ -145,14 +145,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
-    private ServiceView serviceView;
+    //private ServiceView serviceView;
 
     private HttpClientProvider httpClientProvider;
 
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
-         this.serviceView = new ServiceView();
+         //this.serviceView = new ServiceView();
     }
 
 	public static TarantulaContext getInstance(){
@@ -910,10 +910,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         metricsManager.removeMetrics(metrics);
     }
 
-    public ServiceProvider.Summary serviceSummary(){
-
-         return this.serviceView;
-    }
 
     private void initMetricsProvider() throws Exception{
  	    JsonObject json = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-metrics-provider.json"));

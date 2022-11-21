@@ -1,5 +1,8 @@
 package com.tarantula.platform.service.persistence.berkeley;
 
+import com.icodesoftware.Property;
+import com.icodesoftware.util.FIFOBuffer;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,5 +38,6 @@ public class OperationSummary {
     public AtomicInteger pendingUpdates = new AtomicInteger(0);
     public AtomicInteger pendingBackups = new AtomicInteger(0);
 
+    public FIFOBuffer<Property> metrics = new FIFOBuffer<>(20,new Property[20]);
 
 }
