@@ -229,6 +229,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public void _initMirrorClusterBackup(){
  	    this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
+ 	    Configuration config = this.configuration("mirror-backup-provider-settings");
+ 	    Map<String,Object> map = new HashMap<>();
+ 	    config.properties().forEach(p-> map.put(p.name(),p.value()));
+ 	    this.mirrorBackupProvider.configure(map);
  	    this.mirrorBackupProvider.enabled(runAsMirror);
  	    this.mirrorBackupProvider.setup(this);
     }

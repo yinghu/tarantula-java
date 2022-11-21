@@ -187,8 +187,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
-        //this.iBackupProvider.setup(serviceContext);
-        //this.dBackupProvider.setup(serviceContext);
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.replicationSynchronizer);
         this.serviceContext.schedule(this.integrationReplicationSynchronizer);

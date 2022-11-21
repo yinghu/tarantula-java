@@ -2,6 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
@@ -14,6 +15,7 @@ import com.tarantula.platform.service.DataStoreProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MirrorClusterBackupProvider implements BackupProvider{
 
@@ -21,8 +23,12 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     private DataStoreProvider dataStoreProvider;
     private boolean runAsMirror;
+    private long nextSyncInterval;
+    private MirrorBackupSynchronizer mirrorBackupSynchronizer;
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
+
+    private ConcurrentLinkedDeque<OnReplication> pendingBatches = new ConcurrentLinkedDeque<>();
 
     public MirrorClusterBackupProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
@@ -52,47 +58,57 @@ public class MirrorClusterBackupProvider implements BackupProvider{
             else if(scope==Distributable.INTEGRATION_SCOPE){
                 this.dataStoreProvider.create(name);
             }
-            this.dataStoreProvider.create(name);
             return;
         }
         BackupProvider backupProvider = bMap.get(_type(name));
         if(backupProvider == null) return;
-        //backupProvider.registerDataStore(name);
+        backupProvider.registerDataStore(scope,name);
     }
 
     @Override
     public void configure(Map<String, Object> properties) {
-
+        nextSyncInterval = ((Number)properties.get("syncIntervalSeconds")).intValue()*1000;
     }
 
 
     public void batch(OnReplication[] onReplications,int size){
-        JsonObject updates = JsonUtil.parse(onReplications[0].value());
-        log.warn(updates.toString());
-        int scope = updates.get("scope").getAsInt();
-        JsonArray batch = updates.getAsJsonArray("updates");
-        batch.forEach(e->{
-            JsonObject data = e.getAsJsonObject();
-            String key = data.get("key").getAsString();
-            String source = data.get("source").getAsString();
-            int factoryId = data.get("factoryId").getAsInt();
-            int classId = data.get("classId").getAsInt();
-            long revision = data.get("revision").getAsLong();
-            JsonObject payload = data.get("payload").getAsJsonObject();
-            RecoverableRegistry registry = this.serviceContext.recoverableRegistry(factoryId);
-            if(registry!=null){
-                Recoverable t = registry.create(classId);
-                if(t!=null){
-                    t.fromBinary(payload.toString().getBytes());
-                    t.distributionKey(key);
-                    t.revision(revision);
-                    if(scope == Distributable.DATA_SCOPE){
+        pendingBatches.offer(onReplications[0]);
+    }
+    public void _batch(){
+        OnReplication onReplication = pendingBatches.poll();
+        if(onReplication!=null){
+            JsonObject updates = JsonUtil.parse(onReplication.value());
+            int scope = updates.get("scope").getAsInt();
+            JsonArray batch = updates.getAsJsonArray("updates");
+            batch.forEach(e->{
+                JsonObject data = e.getAsJsonObject();
+                String key = data.get("key").getAsString();
+                String source = data.get("source").getAsString();
+                int factoryId = data.get("factoryId").getAsInt();
+                int classId = data.get("classId").getAsInt();
+                long revision = data.get("revision").getAsLong();
+                JsonObject payload = data.get("payload").getAsJsonObject();
+                RecoverableRegistry registry = this.serviceContext.recoverableRegistry(factoryId);
+                if(registry!=null){
+                    Recoverable t = registry.create(classId);
+                    if(t!=null){
+                        t.fromBinary(payload.toString().getBytes());
+                        t.distributionKey(key);
+                        t.revision(revision);
+                        if(scope == Distributable.DATA_SCOPE){
+                            DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
+                            ds.createIfAbsent(t,false);
+                        }
+                        else if(scope == Distributable.INTEGRATION_SCOPE){
+                            DataStore ds = this.dataStoreProvider.create(source);
+                            ds.createIfAbsent(t,false);
+                        }
 
                     }
-
                 }
-            }
-        });
+            });
+        }
+        this.serviceContext.schedule(this.mirrorBackupSynchronizer);
     }
     @Override
     public String name() {
@@ -113,6 +129,10 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         this.serviceContext = serviceContext;
         this.bMap = new ConcurrentHashMap<>();
         log.warn("Run mirror backup provider ["+runAsMirror+"]");
+        if(runAsMirror){
+            this.mirrorBackupSynchronizer = new MirrorBackupSynchronizer(this,nextSyncInterval);
+            this.serviceContext.schedule(this.mirrorBackupSynchronizer);
+        }
     }
 
     public void addBackupProvider(BackupProvider backupProvider){
