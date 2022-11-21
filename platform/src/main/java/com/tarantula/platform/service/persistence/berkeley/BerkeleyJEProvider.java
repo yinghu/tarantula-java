@@ -72,13 +72,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     //private boolean running = true;
     private ServiceContext serviceContext;
     private DiskSynchronizer diskSynchronizer;
-    //private ReplicationSynchronizer replicationSynchronizer;
-    //private ReplicationSynchronizer integrationReplicationSynchronizer;
     private CacheSynchronizer cacheSynchronizer;
-
-    //private BackupSynchronizer backupSynchronizer;
-    //private BackupSynchronizer integrationBackupSynchronizer;
-
 
     private int updateThreshold;
     private int cacheUpdateThreshold;
@@ -126,10 +120,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.dBackupProvider.configure((Map<String, Object>)properties.get("dataRouter"));
         this.dBackupProvider.setup(serviceContext);
         this.diskSynchronizer = new DiskSynchronizer(this,nextSyncInterval);
-        //this.replicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE);
-        //this.integrationReplicationSynchronizer = new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE);
-        //this.backupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE);
-        //this.integrationBackupSynchronizer = new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE);
         this.cacheSynchronizer = new CacheSynchronizer(this,nextEvictInterval);
     }
 
@@ -195,9 +185,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.serviceContext.schedule(this.cacheSynchronizer);
         for(int i=0;i<timerCount;i++){
             this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.INTEGRATION_SCOPE));
+            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+100,Distributable.INTEGRATION_SCOPE));
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE));
+            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.INTEGRATION_SCOPE+100));
         }
 
     }

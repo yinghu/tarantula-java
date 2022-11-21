@@ -130,7 +130,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
         log.warn("Run mirror backup provider ["+runAsMirror+"]");
         if(runAsMirror){
             for(int i=0;i<timerCount;i++){
-                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+10));
+                this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+100));
             }
         }
     }
@@ -145,8 +145,6 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     @Override
     public void updateSummary(Summary summary){
         summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        summary.update("pendingBatches",pendingBatches.size());
-
     }
 
     private String _type(String source){
