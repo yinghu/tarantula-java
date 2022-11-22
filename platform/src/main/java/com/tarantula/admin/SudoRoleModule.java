@@ -216,8 +216,8 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onEnableServiceView")){
             viewMap.computeIfAbsent(session.name(),k->{
-                ServiceView view = new ServiceView(session.name(),20,()->viewMap.remove(session.name()));
-                ServiceViewMonitor monitor = new ServiceViewMonitor(context,session.name(),200,view);
+                ServiceView view = new ServiceView(session.name(),100,()->viewMap.remove(session.name()));
+                ServiceViewMonitor monitor = new ServiceViewMonitor(context,session.name(),1000,view);
                 context.schedule(monitor);
                 return view;
             });

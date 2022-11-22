@@ -42,6 +42,7 @@
             label:_serviceSelected,
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
+            cubicInterpolationMode: 'monotone',
             data: [],
         }]
     };
@@ -69,9 +70,7 @@
     };
     document.querySelector('#tx-enable-jvm-metrics').onclick=()=>{
         TARA_API.onGet('role/sudo','onEnableServiceView',_serviceSelected,(resp)=>{
-            _start_service_metrics_timer();
-            //data.datasets[0].data = resp.metrics;
-            //chart.update();    
+            _start_service_metrics_timer();  
         });
     };
     document.querySelector('#tx-enable-jvm-metrics-close').onclick=()=>{
@@ -91,6 +90,6 @@
     function _start_service_metrics_timer(){
         _timer = setInterval(()=>{
             _load_service_metrics();         
-        },1000);
+        },3000);
     }
 </script>
