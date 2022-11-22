@@ -13,6 +13,7 @@ import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.metrics.ServiceViewMonitor;
+import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class SudoRoleModule implements Module {
@@ -31,6 +33,8 @@ public class SudoRoleModule implements Module {
 
     private UserService userService;
     private GsonBuilder builder;
+
+    private ConcurrentHashMap<String,ServiceView> viewMap = new ConcurrentHashMap<>();
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -211,10 +215,14 @@ public class SudoRoleModule implements Module {
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onEnableServiceView")){
-            ServiceView serviceView = new ServiceView();
-            ServiceProvider serviceProvider = this.context.serviceProvider(session.name());
-            serviceProvider.updateSummary(serviceView);
-            session.write(serviceView.toJson().toString().getBytes());
+            viewMap.computeIfAbsent(session.name(),k->{
+                ServiceView view = new ServiceView(session.name(),20,()->viewMap.remove(session.name()));
+                ServiceViewMonitor monitor = new ServiceViewMonitor(context,session.name(),200,view);
+                context.schedule(monitor);
+                return view;
+            });
+            ServiceView view = viewMap.get(session.name());
+            session.write(view.metrics(OperationSummary.PENDING_BACKUP_SIZE).toString().getBytes());
         }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();

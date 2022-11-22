@@ -9,12 +9,13 @@ public class ServiceViewMonitor implements SchedulingTask {
 
     private ApplicationContext applicationContext;
     private String serviceName;
-    private long timerCountDown = 100;
-    public final static long timerInternal = 10000;
+    private int timerCountDown;
+    public final static long timerInternal = 1000;
 
-    private ServiceView serviceView;
+    private final ServiceView serviceView;
 
-    public ServiceViewMonitor(ApplicationContext context,String serviceName,long timerCountDown,ServiceView serviceView){
+
+    public ServiceViewMonitor(ApplicationContext context,String serviceName,int timerCountDown,ServiceView serviceView){
         this.applicationContext = context;
         this.serviceName = serviceName;
         this.timerCountDown = timerCountDown;
@@ -38,12 +39,14 @@ public class ServiceViewMonitor implements SchedulingTask {
     @Override
     public void run() {
         ServiceProvider serviceProvider = applicationContext.serviceProvider(serviceName);
-        if(serviceProvider==null) return;
+        if(serviceProvider==null){
+            serviceView.stop();
+            return;
+        }
         serviceProvider.updateSummary(serviceView);
-        this.applicationContext.log(serviceView.toJson().toString(),OnLog.WARN);
         timerCountDown--;
         if(timerCountDown <= 0){
-            this.applicationContext.log("Service view monitoring has stopped", OnLog.WARN);
+            serviceView.stop();
             return;
         }
         applicationContext.schedule(this);

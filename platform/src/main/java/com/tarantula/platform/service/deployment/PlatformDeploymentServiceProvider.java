@@ -12,7 +12,6 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.util.*;
 
 import java.io.*;

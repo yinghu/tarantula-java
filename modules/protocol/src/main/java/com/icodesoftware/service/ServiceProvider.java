@@ -10,7 +10,7 @@ public interface ServiceProvider extends Serviceable {
     default void waitForData(){}
     default void registerMetricsListener(MetricsListener metricsListener){}
     default void releaseMetricsListener(){}
-    default void unregisterListener(String registerKey){}
+    //default void unregisterListener(String registerKey){}
     //midnight check
     default void atMidnight(){}
 
