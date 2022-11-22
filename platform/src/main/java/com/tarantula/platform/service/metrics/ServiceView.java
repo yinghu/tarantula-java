@@ -21,14 +21,16 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     private static String TIME_FORMAT = "HH:mm:ss";
     private final ConcurrentHashMap<String,FIFOBuffer<Property>> metricsMap = new ConcurrentHashMap<>();
     private final int metricsSize;
+    private final int chartSize;
+    private final JsonArray charts;
     private final Runnable stop;
-    private final Configuration configuration;
 
-    public ServiceView(String name, int size, Configuration configuration, Runnable stop){
+    public ServiceView(String name,Configuration configuration, Runnable stop){
         this.name = name;
-        this.metricsSize = size;
+        this.metricsSize = ((Number)configuration.property("metricsSize")).intValue();
+        this.chartSize = ((Number)configuration.property("chartSize")).intValue();
+        this.charts = ((JsonElement)configuration.property("charts")).getAsJsonArray();
         this.stop = stop;
-        this.configuration = configuration;
     }
     @Override
     public void update(String category, int value) {
@@ -47,8 +49,6 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
 
     public JsonObject toJson(){
         JsonArray list = new JsonArray();
-        int chartSize = ((Number)configuration.property("size")).intValue();
-        JsonArray charts = ((JsonElement)configuration.property("charts")).getAsJsonArray();
         int[] ix = {0};
         metricsMap.forEach((k,v)->{
             FIFOBuffer<Property> metrics = v;
@@ -60,7 +60,9 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
                 chart.addProperty("backgroundColor",ref.get("backgroundColor").getAsString());
                 chart.addProperty("borderColor",ref.get("borderColor").getAsString());
                 chart.addProperty("cubicInterpolationMode",ref.get("cubicInterpolationMode").getAsString());
-
+                chart.addProperty("borderWidth",ref.get("borderWidth").getAsInt());
+                chart.addProperty("pointBorderWidth",ref.get("pointBorderWidth").getAsInt());
+                chart.addProperty("pointRadius",ref.get("pointRadius").getAsInt());
                 JsonArray data = new JsonArray();
                 snapshot.forEach(p->{
                     JsonObject js = new JsonObject();

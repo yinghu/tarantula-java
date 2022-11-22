@@ -1,29 +1,45 @@
 {
-  "size": 5,
+  "metricsSize": 60,
+  "chartSize": 5,
   "charts": [
     {
       "backgroundColor": "rgb(102,255, 102)",
       "borderColor": "rgb(102,255, 102)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 0,
       "cubicInterpolationMode": "monotone"
     },
     {
       "backgroundColor": "rgb(0,102,255)",
       "borderColor": "rgb(0,102,255)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 0,
       "cubicInterpolationMode": "monotone"
     },
     {
       "backgroundColor": "rgb(153,0,255)",
       "borderColor": "rgb(153,0,255)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 0,
       "cubicInterpolationMode": "monotone"
     },
     {
       "backgroundColor": "rgb(255,153,0)",
       "borderColor": "rgb(255,153,0)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 0,
       "cubicInterpolationMode": "monotone"
     },
     {
       "backgroundColor": "rgb(0,51,0)",
       "borderColor": "rgb(0,51,0)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 1,
       "cubicInterpolationMode": "monotone"
     }
   ]
