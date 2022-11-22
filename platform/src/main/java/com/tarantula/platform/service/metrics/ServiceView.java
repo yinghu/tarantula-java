@@ -1,7 +1,9 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.Property;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.FIFOBuffer;
@@ -20,11 +22,13 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     private final ConcurrentHashMap<String,FIFOBuffer<Property>> metricsMap = new ConcurrentHashMap<>();
     private final int metricsSize;
     private final Runnable stop;
+    private final Configuration configuration;
 
-    public ServiceView(String name,int size,Runnable stop){
+    public ServiceView(String name, int size, Configuration configuration, Runnable stop){
         this.name = name;
         this.metricsSize = size;
         this.stop = stop;
+        this.configuration = configuration;
     }
     @Override
     public void update(String category, int value) {
@@ -41,19 +45,36 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
         _update(category,value);
     }
 
-    public JsonObject metrics(String category){
-        FIFOBuffer<Property> metrics = metricsMap.get(category);
-        if(metrics==null) return new JsonObject();
-        List<Property> data = metrics.list(new ArrayList<>());
-        JsonObject m = new JsonObject();
-        JsonArray ms = new JsonArray();
-        data.forEach(p->{
-            JsonObject js = new JsonObject();
-            js.addProperty("x",p.name());
-            js.addProperty("y",p.value().toString());
-            ms.add(js);
+    public JsonObject toJson(){
+        JsonArray list = new JsonArray();
+        int chartSize = ((Number)configuration.property("size")).intValue();
+        JsonArray charts = ((JsonElement)configuration.property("charts")).getAsJsonArray();
+        int[] ix = {0};
+        metricsMap.forEach((k,v)->{
+            FIFOBuffer<Property> metrics = v;
+            List<Property> snapshot = metrics.list(new ArrayList<>());
+            JsonObject chart = new JsonObject();
+            if(ix[0]<chartSize){
+                JsonObject ref = charts.get(ix[0]).getAsJsonObject();
+                chart.addProperty("label",k);
+                chart.addProperty("backgroundColor",ref.get("backgroundColor").getAsString());
+                chart.addProperty("borderColor",ref.get("borderColor").getAsString());
+                chart.addProperty("cubicInterpolationMode",ref.get("cubicInterpolationMode").getAsString());
+
+                JsonArray data = new JsonArray();
+                snapshot.forEach(p->{
+                    JsonObject js = new JsonObject();
+                    js.addProperty("x",p.name());
+                    js.addProperty("y",p.value().toString());
+                    data.add(js);
+                });
+                chart.add("data",data);
+                list.add(chart);
+            }
+            ix[0]++;
         });
-        m.add("metrics",ms);
+        JsonObject m = new JsonObject();
+        m.add("metrics",list);
         return m;
     }
     public void stop(){

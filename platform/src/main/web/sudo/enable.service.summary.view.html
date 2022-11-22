@@ -38,19 +38,14 @@
     let _timer;
     let _serviceSelected = 'tarantula';
     const data = {
-        datasets: [{
-            label:_serviceSelected,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            cubicInterpolationMode: 'monotone',
-            data: [],
-        }]
+        datasets: []
     };
 
     const config = {
         type: 'line',
         data: data,
         options: {
+            responsive: true,
             scales: {
             y: {
                 beginAtZero: true
@@ -83,7 +78,10 @@
     function _load_service_metrics(){
         TARA_API.onGet('role/sudo','onEnableServiceView',_serviceSelected,(resp)=>{
             console.log(resp);
-            data.datasets[0].data = resp.metrics;
+            data.datasets.splice(0,data.datasets.length);
+            resp.metrics.forEach((metrics) => {
+                data.datasets.push(metrics);
+            });
             chart.update();    
         });
     }

@@ -35,6 +35,7 @@ public class SudoRoleModule implements Module {
     private GsonBuilder builder;
 
     private ConcurrentHashMap<String,ServiceView> viewMap = new ConcurrentHashMap<>();
+    private Configuration chartConfiguration;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -216,13 +217,13 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onEnableServiceView")){
             viewMap.computeIfAbsent(session.name(),k->{
-                ServiceView view = new ServiceView(session.name(),100,()->viewMap.remove(session.name()));
+                ServiceView view = new ServiceView(session.name(),100,chartConfiguration,()->viewMap.remove(session.name()));
                 ServiceViewMonitor monitor = new ServiceViewMonitor(context,session.name(),1000,view);
                 context.schedule(monitor);
                 return view;
             });
             ServiceView view = viewMap.get(session.name());
-            session.write(view.metrics(OperationSummary.PENDING_BACKUP_SIZE).toString().getBytes());
+            session.write(view.toJson().toString().getBytes());
         }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
@@ -243,6 +244,7 @@ public class SudoRoleModule implements Module {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
