@@ -647,16 +647,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void updateSummary(Summary summary){
         summary.update(OperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
         summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        //summary.update(OperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
-        //long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
-        //long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
-        //summary.update(OperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
-        //summary.update(OperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
-        //summary.update(OperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
-        //summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
-        //summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
-        //summary.update(OperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
-        //summary.update(OperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
+        summary.update(OperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
+        long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
+        summary.update(OperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
+        summary.update(OperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
+        summary.update(OperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
+        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
+        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
+        summary.update(OperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
+        summary.update(OperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

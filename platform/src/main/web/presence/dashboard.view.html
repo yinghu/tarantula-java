@@ -7,13 +7,14 @@
             <span><i class="fa fa-cubes" style="font-size:32px"></i></span>
             <span class="tx-margin-left-8 tx-text-32">Game Cluster</span>
         </div>
-        <div class="w3-display-bottomright w3-padding"><span class='tx-text-24'>Innovative Game Integration Platform</span></div>
+        <div class="w3-display-bottomright w3-padding"><span class='tx-text-16'>Innovative Game Integration Platform</span></div>
     </div>
     <div><!-- Dash board content-->
         <div class="w3-bar w3-green">
             <span tx-pane-name='LiveGame' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">LiveGame<i id='tx-LiveGame-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Account' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Account<i id='tx-Account-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Developer' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Developer<i id='tx-Developer-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
+            <span tx-pane-name='Metrics' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Metrics<i id='tx-Metrics-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Sudo' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Sudo<i id='tx-Sudo-down' class="fa fa-caret-down" style="font-size:24px;display: none;"></i></span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -208,7 +209,28 @@
                 </div>
             </div>
         </div>
-        
+        <div id="tx-Metrics" class="w3-container tx-pane" style="display:none;">
+            <div class="w3-panel w3-border-bottom w3-border-red">
+                <div class="w3-panel w3-border w3-border-red">
+                    <div class='w3-bar w3-white tx-margin-top-8'>
+                        <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
+                        <span view-id='user.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Access</span>
+                        <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
+                        <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
+                        <span view-id='subscribe.membership' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscribe</span>
+                    </div>            
+                </div>
+            </div>
+            
+            <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-top-margin-8 tx-content-36">
+                <div class="w3-display-topleft w3-padding">
+                    <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+                </div>
+                <div class="w3-display-bottomright w3-padding">
+                    <span class="tx-text-12">Powered By ICodeSoftware</span>
+                </div>
+            </div>
+        </div>
         <div id="tx-Sudo" class="w3-container tx-pane" style="display:none;">
             <div id='tx-extension-open'>
                 <div class="w3-panel w3-border-bottom w3-border-red">
@@ -304,6 +326,9 @@
             }
             else if(_pane == 'Sudo'){
                 _tx_extension();
+            }
+            else if(_pane == 'Metrics'){
+                _tx_metrics();
             }
             document.querySelector('#tx-'+_pane).style.display='block'; 
         }; 
@@ -448,7 +473,9 @@
             }        
         });
     }
-
+    function _tx_metrics(){
+        console.log("metric setup");
+    }
     function _tx_game(){
         _tx_lobby();
     }

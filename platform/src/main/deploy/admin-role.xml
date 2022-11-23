@@ -41,8 +41,6 @@
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
             </application>
-
-
             <application>
                 <type-id>admin-role</type-id>
                 <name>Admin Role</name>
@@ -50,6 +48,17 @@
                 <category>application</category>
                 <tag>role/application</tag>
                 <module-name>com.tarantula.admin.GameApplicationAdminModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>application</category>
+                <tag>role/metrics</tag>
+                <module-name>com.tarantula.admin.MetricsViewModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
