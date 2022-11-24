@@ -70,6 +70,7 @@ public class MetricsViewModule implements Module {
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onServiceViewList")){
+            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("successful",true);
             JsonArray list = new JsonArray();
@@ -77,6 +78,7 @@ public class MetricsViewModule implements Module {
             list.add("UDPEndpoint");
             list.add("MirrorClusterBackup");
             jsonObject.add("list",list);
+            jsonObject.add("cluster",summary.toJson());
             session.write(jsonObject.toString().getBytes());
         }
         else if(session.action().equals("onEnableServiceView")){
