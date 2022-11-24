@@ -13,6 +13,7 @@ import com.tarantula.platform.DistributedProperty;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,13 +25,14 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     private final int chartSize;
     private final JsonArray charts;
     private final Runnable stop;
-
+    private final HashSet<String> categorySet;
     public ServiceView(String name,Configuration configuration, Runnable stop){
         this.name = name;
         this.metricsSize = ((Number)configuration.property("metricsSize")).intValue();
         this.chartSize = ((Number)configuration.property("chartSize")).intValue();
         this.charts = ((JsonElement)configuration.property("charts")).getAsJsonArray();
         this.stop = stop;
+        categorySet = new HashSet<>();
     }
     @Override
     public void update(String category, int value) {
@@ -47,6 +49,47 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
         _update(category,value);
     }
 
+    @Override
+    public void registerCategory(String category){
+        categorySet.add(category);
+    }
+    public JsonObject toCategoryJson(){
+        JsonObject resp = new JsonObject();
+        if(categorySet.size()==0){
+            resp.addProperty("successful",false);
+            return resp;
+        }
+        resp.addProperty("successful",true);
+        JsonArray list = new JsonArray();
+        categorySet.forEach(c-> list.add(c));
+        resp.add("list",list);
+        return resp;
+    }
+    public JsonObject toMetricsJson(String category,int chartIndex){
+        JsonObject resp = new JsonObject();
+        resp.addProperty("successful",true);
+        FIFOBuffer<Property> metrics = metricsMap.get(category);
+        List<Property> snapshot = metrics.list(new ArrayList<>());
+        JsonObject chart = new JsonObject();
+        JsonObject ref = charts.get(chartIndex).getAsJsonObject();
+        chart.addProperty("label",category);
+        chart.addProperty("backgroundColor",ref.get("backgroundColor").getAsString());
+        chart.addProperty("borderColor",ref.get("borderColor").getAsString());
+        chart.addProperty("cubicInterpolationMode",ref.get("cubicInterpolationMode").getAsString());
+        chart.addProperty("borderWidth",ref.get("borderWidth").getAsInt());
+        chart.addProperty("pointBorderWidth",ref.get("pointBorderWidth").getAsInt());
+        chart.addProperty("pointRadius",ref.get("pointRadius").getAsInt());
+        JsonArray data = new JsonArray();
+        snapshot.forEach(p->{
+            JsonObject js = new JsonObject();
+            js.addProperty("x",p.name());
+            js.addProperty("y",p.value().toString());
+            data.add(js);
+        });
+        chart.add("data",data);
+        resp.add("chart",chart);
+        return resp;
+    }
     public JsonObject toJson(){
         JsonArray list = new JsonArray();
         int[] ix = {0};

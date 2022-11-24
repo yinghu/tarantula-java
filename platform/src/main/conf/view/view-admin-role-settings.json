@@ -16,6 +16,7 @@
     {"type":"game.cluster.launch","moduleResourceFile":"admin/game.cluster.launch.view.html"},
     {"type":"game.cluster.shutdown","moduleResourceFile":"admin/game.cluster.shutdown.view.html"},
     {"type":"game.cluster.edit","moduleResourceFile":"admin/game.cluster.edit.view.html"},
-    {"type":"game.cluster.metrics","moduleResourceFile":"admin/game.cluster.metrics.view.html"}
+    {"type":"game.cluster.metrics","moduleResourceFile":"admin/game.cluster.metrics.view.html"},
+    {"type":"service.metrics","moduleResourceFile":"admin/service.metrics.view.html"}
   ]
 }

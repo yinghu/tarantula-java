@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.metrics.ServiceViewMonitor;
@@ -68,15 +69,41 @@ public class MetricsViewModule implements Module {
             m.add("metrics",ms);
             session.write(m.toString().getBytes());
         }
+        else if(session.action().equals("onServiceViewList")){
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("successful",true);
+            JsonArray list = new JsonArray();
+            list.add("tarantula");
+            list.add("UDPEndpoint");
+            list.add("MirrorClusterBackup");
+            jsonObject.add("list",list);
+            session.write(jsonObject.toString().getBytes());
+        }
         else if(session.action().equals("onEnableServiceView")){
-            viewMap.computeIfAbsent(session.name(),k->{
-                ServiceView view = new ServiceView(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
-                ServiceViewMonitor monitor = new ServiceViewMonitor(context,session.name(),1000,view);
-                context.schedule(monitor);
-                return view;
-            });
-            ServiceView view = viewMap.get(session.name());
-            session.write(view.toJson().toString().getBytes());
+            ServiceProvider serviceProvider = context.serviceProvider(session.name());
+            if(serviceProvider != null){
+                viewMap.computeIfAbsent(session.name(),k->{
+                    ServiceView view = new ServiceView(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
+                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,1000,view);
+                    context.schedule(monitor);
+                    return view;
+                });
+                ServiceView view = viewMap.get(session.name());
+                session.write(view.toCategoryJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"service provider ["+session.name()+"] not existed").getBytes());
+            }
+        }
+        else if(session.action().equals("onUpdateServiceView")){
+            String[] query = session.name().split("#");
+            ServiceView view = viewMap.get(query[0]);
+            if(view!=null){
+                session.write(view.toMetricsJson(query[1],0).toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"service view ["+session.name()+"] not existed").getBytes());
+            }
         }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();

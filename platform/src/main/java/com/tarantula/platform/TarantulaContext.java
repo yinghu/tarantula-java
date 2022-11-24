@@ -27,7 +27,6 @@ import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.MetricsManager;
-import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.MirrorClusterBackupProvider;

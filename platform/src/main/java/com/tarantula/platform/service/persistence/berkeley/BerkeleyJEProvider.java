@@ -644,6 +644,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.metricsListener = metricsListener;
     }
     @Override
+    public void registerSummary(Summary summary){
+        summary.registerCategory(OperationSummary.PENDING_UPDATE_SIZE);
+        summary.registerCategory(OperationSummary.PENDING_BACKUP_SIZE);
+    }
+    @Override
     public void updateSummary(Summary summary){
         summary.update(OperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
         summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());

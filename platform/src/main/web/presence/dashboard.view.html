@@ -129,7 +129,7 @@
                     <span id='game-launch-id-0' tx-game-cluster-id='' view-id='game.cluster.launch' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch</span>
                     <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                     <span id='game-edit-service-0' tx-game-cluster-id='' view-id='game.service.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
-                    <span id='game-metrics-0' tx-game-cluster-id='' view-id='game.cluster.metrics' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
+                    <!--<span id='game-metrics-0' tx-game-cluster-id='' view-id='game.cluster.metrics' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>-->
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
@@ -210,18 +210,42 @@
             </div>
         </div>
         <div id="tx-Metrics" class="w3-container tx-pane" style="display:none;">
-            <div class="w3-panel w3-border-bottom w3-border-red">
-                <div class="w3-panel w3-border w3-border-red">
-                    <div class='w3-bar w3-white tx-margin-top-8'>
-                        <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
-                        <span view-id='user.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Access</span>
-                        <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
-                        <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
-                        <span view-id='subscribe.membership' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscribe</span>
-                    </div>            
+            <div class="w3-panel">
+                <fieldset class="w3-border-blue tx-text-12">
+                    <legend>Metrics View Selection</legend>
+                    <div class="w3-container">
+                        <div class="w3-panel">
+                            <label class="tx-text-12 tx-margin-right-4">Game Service Providers :</label>
+                            <select id='tx-service-metrics-name' class="w3-select w3-border w3-round tx-text-12" name='mode'> 
+                            </select>
+                        </div>
+                        <div class="w3-panel" id="tx-service-metrics-category">
+                    
+                        </div>
+                        <div class="w3-panel">
+                            <span id="tx-start-service-metrics" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Start</span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-half w3-container">
+                    <canvas id="tx-service-chart-1"></canvas>
+                </div> 
+                <div class="w3-half w3-container">
+                    <canvas id="tx-service-chart-2"></canvas>
                 </div>
             </div>
-            
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-half w3-container">
+                    <canvas id="tx-service-chart-3"></canvas>
+                </div> 
+                <div class="w3-half w3-container">
+                    <canvas id="tx-service-chart-4"></canvas>
+                </div>
+            </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-top-margin-8 tx-content-36">
                 <div class="w3-display-topleft w3-padding">
                     <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -296,7 +320,65 @@
     </div>
 </div>
 <script>
+    Chart.defaults.font.family = 'Oswald';
+    const chart_data_1 = {datasets: [{label:'A',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
+    const chart_data_2 = {datasets: [{label:'B',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
+    const chart_data_3 = {datasets: [{label:'C',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
+    const chart_data_4 = {datasets: [{label:'D',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
+    const chart_options = {responsive: true,maintainAspectRatio:false,scales: {y: {beginAtZero: true}}}; 
+    const chart_1 = new Chart(document.querySelector("#tx-service-chart-1"),{type:'line',data:chart_data_1,chart_options});
+    const chart_2 = new Chart(document.querySelector("#tx-service-chart-2"),{type:'line',data:chart_data_2,chart_options});
+    const chart_3 = new Chart(document.querySelector("#tx-service-chart-3"),{type:'line',data:chart_data_3,chart_options});
+    const chart_4 = new Chart(document.querySelector("#tx-service-chart-4"),{type:'line',data:chart_data_4,chart_options});
+    let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
+    let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
+    document.querySelector('#tx-start-service-metrics').style.display = 'none';
+    let metricsSelected={name:'',categories:[]};
+    metricsSelectBar.onchange =()=>{
+        metricsSelected.name = metricsSelectBar.value;
+        TARA_API.onGet('role/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
+            console.log(resp);
+            metricsCategoryCheckBar.innerHTML ='';
+            if(!resp.successful) return;
+            let tem = [];
+            resp.list.forEach((a)=>{
+                tem.push('<label class=\'tx-text-12 tx-margin-left-4 tx-margin-right-4\'>'+a+'</label>');
+                tem.push('<input tx-category=\''+a+'\'');
+                tem.push(' class=\'w3-check tx-text-12 tx--metrics-category-picker\' type=\'checkbox\'>');        
+            });
+            metricsCategoryCheckBar.innerHTML = tem.join('');
+            document.querySelectorAll('.tx--metrics-category-picker').forEach(a=>{
+                a.onchange = ()=>{
+                    console.log("CHECKED->"+a.checked);
+                    let cat = a.getAttribute('tx-category');
+                    if(a.checked){
+                        metricsSelected.categories.push(cat);
+                    }
+                    else{
+                       let ix = metricsSelected.categories.indexOf(cat);
+                       if(ix != -1){
+                           metricsSelected.categories.splice(ix,1);   
+                       }     
+                    }
+                    console.log(metricsSelected);
+                    if(metricsSelected.categories.length>0){
+                        document.querySelector('#tx-start-service-metrics').style.display = 'block';
+                    }
+                    else{
+                        document.querySelector('#tx-start-service-metrics').style.display = 'none';
+                    }
+                };
+            });
+        });
+    };
+    document.querySelector('#tx-start-service-metrics').onclick=()=>{
+        console.log(metricsSelected);
+    };
     document.querySelector('#tx-menu-close').onclick = ()=>{
+        chart_1.destroy();
+        chart_2.destroy();
+        chart_3.destroy();
+        chart_4.destroy();
         if(TARA_API.query().systemId){
             TARA_API.onLogout((resp)=>{
                 document.querySelector("#tx-dash-board").style.display="none";
@@ -396,7 +478,7 @@
                     gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let gsl = document.querySelector('#game-edit-service-'+i);
                     gsl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-metrics-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    //document.querySelector('#game-metrics-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     if(disabled == true){
                         shd.style.display='none';
                         gcl.style.display = 'none';
@@ -445,28 +527,6 @@
                         reset_t_action_event();
                     }       
                 });
-                /**
-                let dbar = document.querySelector('#tx-game-cluster-data-bar');
-                dbar.innerHTML = '';
-                TARA_API.onGet('role/lobby','onGameDataList',_gameClusterId,(resp2)=>{
-                    console.log(resp2);
-                    if(resp2.successful){
-                        resp2.serviceList.forEach((a)=>{
-                            if(a.resetEnabled == true){
-                                let tem = [];
-                                tem.push('<span tx-game-cluster-id=\''+_gameClusterId+'\' view-id=\'');
-                                tem.push('game.asset.list\' tx-game-category=\'application\' tx-service-tag=\'role/');
-                                tem.push(a.category.toLowerCase()+'\' tx-service-category=\'');
-                                tem.push(a.category+'\'');
-                                tem.push(' class=\'w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action\'>');
-                                tem.push(a.name);
-                                tem.push('</span>');  
-                                dbar.innerHTML += tem.join('');           
-                            }
-                        });
-                        reset_t_action_event();
-                    }       
-                });**/
             } 
             else{
                 console.log(resp.message);
@@ -475,6 +535,20 @@
     }
     function _tx_metrics(){
         console.log("metric setup");
+        TARA_API.onGet('role/metrics','onServiceViewList','',(resp)=>{
+            console.log(resp);
+            if(!resp.successful) return;  
+            metricsSelectBar.innerHTML = '';
+            let tem = ['<option value=\'\' disabled selected>Choose a service</option>'];
+            resp.list.forEach(a=>{
+                tem.push('<option value=\'');
+                tem.push(a);
+                tem.push('\'>');
+                tem.push(a);
+                tem.push('</option>');
+            });
+            metricsSelectBar.innerHTML = tem.join('');
+        });
     }
     function _tx_game(){
         _tx_lobby();

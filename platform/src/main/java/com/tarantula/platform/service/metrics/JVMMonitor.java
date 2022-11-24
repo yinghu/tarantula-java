@@ -2,13 +2,13 @@ package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.OnLog;
-import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.service.Metrics;
+import com.icodesoftware.service.ServiceProvider;
 
 import java.lang.management.*;
 import java.util.concurrent.TimeUnit;
 
-public class JVMMonitor implements SchedulingTask {
+public class JVMMonitor implements ServiceProvider {
 
     private Metrics performanceMetrics;
 
@@ -26,22 +26,10 @@ public class JVMMonitor implements SchedulingTask {
         this.performanceMetrics = performanceMetrics;
         if(timerCountDown>0) this.timerCountDown = timerCountDown;
     }
-    @Override
-    public boolean oneTime() {
-        return true;
-    }
-
-    @Override
-    public long initialDelay() {
-        return timerInternal;
-    }
 
 
-    public long delay() {
-        return 0;
-    }
 
-    @Override
+    //@Override
     public void run() {
         double mused = (double)memoryMXBean.getHeapMemoryUsage().getUsed()/1073741824D;
         this.context.log(String.format("Mem used : %.2f GB",mused),OnLog.WARN);
@@ -66,6 +54,21 @@ public class JVMMonitor implements SchedulingTask {
             this.context.log("JVM metrics monitoring has stopped", OnLog.WARN);
             return;
         }
-        context.schedule(this);
+        //context.schedule(this);
+    }
+
+    @Override
+    public String name() {
+        return "JVMMonitor";
+    }
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
     }
 }
