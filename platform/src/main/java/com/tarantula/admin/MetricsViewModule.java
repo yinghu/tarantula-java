@@ -96,10 +96,10 @@ public class MetricsViewModule implements Module {
             }
         }
         else if(session.action().equals("onUpdateServiceView")){
-            String[] query = session.name().split("#");
-            ServiceView view = viewMap.get(query[0]);
-            if(view!=null){
-                session.write(view.toMetricsJson(query[1],0).toString().getBytes());
+            JsonArray categories = JsonUtil.parseAsJsonElement(payload).getAsJsonArray();
+            ServiceView view = viewMap.get(session.name());
+            if(view!=null&&categories.size()>0){
+                session.write(view.toMetricsJson(categories).toString().getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"service view ["+session.name()+"] not existed").getBytes());

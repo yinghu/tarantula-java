@@ -647,6 +647,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void registerSummary(Summary summary){
         summary.registerCategory(OperationSummary.PENDING_UPDATE_SIZE);
         summary.registerCategory(OperationSummary.PENDING_BACKUP_SIZE);
+        summary.registerCategory(OperationSummary.DAILY_TOTAL_UPDATES);
+        summary.registerCategory(OperationSummary.CACHE_MISS_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
@@ -658,8 +660,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         summary.update(OperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
         summary.update(OperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
         summary.update(OperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
-        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.DATA_SCOPE,environment.getStats(null).getNCacheMiss());
-        summary.update(OperationSummary.CACHE_MISS_NUMBER+"_"+Distributable.INTEGRATION_SCOPE,integrationEnvironment.getStats(null).getNCacheMiss());
+        long totalMissed = environment.getStats(null).getNCacheMiss()+integrationEnvironment.getStats(null).getNCacheMiss();
+        summary.update(OperationSummary.CACHE_MISS_NUMBER,totalMissed);
         summary.update(OperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
         summary.update(OperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
     }

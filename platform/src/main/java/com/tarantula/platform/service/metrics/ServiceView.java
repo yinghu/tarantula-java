@@ -60,6 +60,7 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
             return resp;
         }
         resp.addProperty("successful",true);
+        resp.addProperty("name",name);
         JsonArray list = new JsonArray();
         categorySet.forEach(c-> list.add(c));
         resp.add("list",list);
@@ -68,8 +69,33 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     public JsonObject toMetricsJson(String category,int chartIndex){
         JsonObject resp = new JsonObject();
         resp.addProperty("successful",true);
+        resp.addProperty("name",name);
         FIFOBuffer<Property> metrics = metricsMap.get(category);
         List<Property> snapshot = metrics.list(new ArrayList<>());
+        resp.add("chart",_chart(snapshot,category,chartIndex));
+        return resp;
+    }
+    public JsonObject toMetricsJson(JsonArray categories){
+        JsonArray list = new JsonArray();
+        int[] ix = {0};
+        categories.forEach((c)->{
+            FIFOBuffer<Property> metrics = metricsMap.get(c.getAsString());
+            List<Property> snapshot = metrics.list(new ArrayList<>());
+            if(ix[0]<chartSize){
+                list.add(_chart(snapshot,c.getAsString(),ix[0]));
+            }
+            ix[0]++;
+        });
+        JsonObject m = new JsonObject();
+        m.addProperty("successful",true);
+        m.addProperty("name",name);
+        m.add("list",list);
+        return m;
+    }
+    public void stop(){
+        stop.run();
+    }
+    private JsonObject _chart(List<Property> snapshot,String category,int chartIndex){
         JsonObject chart = new JsonObject();
         JsonObject ref = charts.get(chartIndex).getAsJsonObject();
         chart.addProperty("label",category);
@@ -87,43 +113,7 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
             data.add(js);
         });
         chart.add("data",data);
-        resp.add("chart",chart);
-        return resp;
-    }
-    public JsonObject toJson(){
-        JsonArray list = new JsonArray();
-        int[] ix = {0};
-        metricsMap.forEach((k,v)->{
-            FIFOBuffer<Property> metrics = v;
-            List<Property> snapshot = metrics.list(new ArrayList<>());
-            JsonObject chart = new JsonObject();
-            if(ix[0]<chartSize){
-                JsonObject ref = charts.get(ix[0]).getAsJsonObject();
-                chart.addProperty("label",k);
-                chart.addProperty("backgroundColor",ref.get("backgroundColor").getAsString());
-                chart.addProperty("borderColor",ref.get("borderColor").getAsString());
-                chart.addProperty("cubicInterpolationMode",ref.get("cubicInterpolationMode").getAsString());
-                chart.addProperty("borderWidth",ref.get("borderWidth").getAsInt());
-                chart.addProperty("pointBorderWidth",ref.get("pointBorderWidth").getAsInt());
-                chart.addProperty("pointRadius",ref.get("pointRadius").getAsInt());
-                JsonArray data = new JsonArray();
-                snapshot.forEach(p->{
-                    JsonObject js = new JsonObject();
-                    js.addProperty("x",p.name());
-                    js.addProperty("y",p.value().toString());
-                    data.add(js);
-                });
-                chart.add("data",data);
-                list.add(chart);
-            }
-            ix[0]++;
-        });
-        JsonObject m = new JsonObject();
-        m.add("metrics",list);
-        return m;
-    }
-    public void stop(){
-        stop.run();
+        return chart;
     }
     private void _update(String category,Object value){
         FIFOBuffer<Property> metrics = metricsMap.computeIfAbsent(category,k-> new FIFOBuffer<>(metricsSize,new Property[metricsSize]));

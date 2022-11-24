@@ -140,11 +140,7 @@
                         <span id='game-zone-id-0' tx-game-category='item' tx-service-category='lobby' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Zone</span>   
                         <span id='game-lobby-id-0' tx-game-category='application' tx-service-category='lobby' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Map</span>   
                     </div>
-                    <!-- Data Store bar -->
-                    <!--
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Data Management</span></div>
-                    <div id='tx-game-cluster-data-bar' class='w3-bar w3-white'>
-                    </div>-->  
+                    
                     <!-- Service bar-->
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Service Management</span></div>
                     <div id='tx-game-cluster-service-bar' class='w3-bar w3-white'>
@@ -229,20 +225,50 @@
                 </fieldset>
             </div>
             <div class="w3-row w3-border-bottom w3-border-red">
-                <div class="w3-half w3-container">
-                    <canvas id="tx-service-chart-1"></canvas>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-0"></canvas>
                 </div> 
-                <div class="w3-half w3-container">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-1"></canvas>
+                </div>
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-2"></canvas>
                 </div>
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
             <div class="w3-row w3-border-bottom w3-border-red">
-                <div class="w3-half w3-container">
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-3"></canvas>
-                </div> 
-                <div class="w3-half w3-container">
+                </div>
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-4"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-5"></canvas>
+                </div>
+            </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-6"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-7"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-8"></canvas>
+                </div>
+            </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-9"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-10"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-11"></canvas>
                 </div>
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
@@ -321,19 +347,23 @@
 </div>
 <script>
     Chart.defaults.font.family = 'Oswald';
-    const chart_data_1 = {datasets: [{label:'A',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
-    const chart_data_2 = {datasets: [{label:'B',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
-    const chart_data_3 = {datasets: [{label:'C',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
-    const chart_data_4 = {datasets: [{label:'D',backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
-    const chart_options = {responsive: true,maintainAspectRatio:false,scales: {y: {beginAtZero: true}}}; 
-    const chart_1 = new Chart(document.querySelector("#tx-service-chart-1"),{type:'line',data:chart_data_1,chart_options});
-    const chart_2 = new Chart(document.querySelector("#tx-service-chart-2"),{type:'line',data:chart_data_2,chart_options});
-    const chart_3 = new Chart(document.querySelector("#tx-service-chart-3"),{type:'line',data:chart_data_3,chart_options});
-    const chart_4 = new Chart(document.querySelector("#tx-service-chart-4"),{type:'line',data:chart_data_4,chart_options});
+    const chart_options = {responsive: true,scales: {y: {beginAtZero: true}}}; 
     let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
+    let metricPullTimer;
+    const mChartSize = 12;
     document.querySelector('#tx-start-service-metrics').style.display = 'none';
     let metricsSelected={name:'',categories:[]};
+    metricsSelected.data = [];
+    metricsSelected.charts =[];
+    for(let i=0;i<mChartSize;i++){
+        let lb = 'chart-'+i;
+        let chart_data = {datasets: [{label:lb,backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
+        metricsSelected.data.push(chart_data);
+        let chart = new Chart(document.querySelector('#tx-service-chart-'+i),{type:'line',data:chart_data,chart_options});
+        metricsSelected.charts.push(chart);
+    }
+    metricsSelected.started = false;
     metricsSelectBar.onchange =()=>{
         metricsSelected.name = metricsSelectBar.value;
         TARA_API.onGet('role/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
@@ -373,12 +403,24 @@
     };
     document.querySelector('#tx-start-service-metrics').onclick=()=>{
         console.log(metricsSelected);
+        if(metricsSelected.started){
+            clearInterval(metricPullTimer);
+            metricsSelected.started = false;
+            document.querySelector('#tx-start-service-metrics').innerHTML = 'Start';
+        }
+        else{
+            metricsSelected.started = true;
+            document.querySelector('#tx-start-service-metrics').innerHTML = 'Stop';
+            metricPullTimer = setInterval(()=>{
+                _tx_metrics_pull();       
+            },3000);
+        }
     };
     document.querySelector('#tx-menu-close').onclick = ()=>{
-        chart_1.destroy();
-        chart_2.destroy();
-        chart_3.destroy();
-        chart_4.destroy();
+        clearInterval(metricPullTimer);
+        for(let i = 0; i<mChartSize;i++){
+            metricsSelected.charts[i].destroy();
+        }
         if(TARA_API.query().systemId){
             TARA_API.onLogout((resp)=>{
                 document.querySelector("#tx-dash-board").style.display="none";
@@ -397,16 +439,20 @@
             let _pane = a.getAttribute('tx-pane-name');
             document.querySelector('#tx-'+_pane+'-down').style.display ='block';
             if(_pane == 'Account'){
+                _tx_metrics_pull_pause();
                 _tx_account();
             }
             else if(_pane == 'Developer'){
+                _tx_metrics_pull_pause();
                 _tx_game_cluster();
                 TARA_API.query().callback = _tx_game_cluster;
             }
             else if(_pane == 'LiveGame'){
+                _tx_metrics_pull_pause();
                 _tx_game();
             }
             else if(_pane == 'Sudo'){
+                _tx_metrics_pull_pause();
                 _tx_extension();
             }
             else if(_pane == 'Metrics'){
@@ -549,6 +595,24 @@
             });
             metricsSelectBar.innerHTML = tem.join('');
         });
+    }
+    function _tx_metrics_pull(){
+        TARA_API.onSet('role/metrics','onUpdateServiceView',metricsSelected.name,metricsSelected.categories,(resp)=>{
+            console.log(resp);
+            if(!resp.successful) return;
+            resp.list.forEach((a,i)=>{
+                let cdata = metricsSelected.data[i].datasets; 
+                cdata.splice(0,cdata.length);
+                cdata.push(a);
+                metricsSelected.charts[i].update();
+            });
+        });
+    }
+    function _tx_metrics_pull_pause(){
+        if(!metricsSelected.started) return;
+        clearInterval(metricPullTimer);
+        metricsSelected.started = false;
+        document.querySelector('#tx-start-service-metrics').innerHTML = 'Start';
     }
     function _tx_game(){
         _tx_lobby();
