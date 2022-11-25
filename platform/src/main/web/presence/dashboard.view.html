@@ -602,7 +602,7 @@
             resp.cluster.nodeList.forEach(a=>{
                 console.log(a);
                 tem1.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</label>');
-                tem1.push('<input tx-node-address=\''+a.address+'\'');
+                tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
                 tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');          
             });
             metricsClusterSelectBar.innerHTML = tem1.join('');  
@@ -618,7 +618,7 @@
             metricsSelectBar.innerHTML = tem.join('');
             document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
                 a.onchange = ()=>{
-                    console.log(a.getAttribute('tx-node-address'));
+                    console.log(a.getAttribute('tx-node-member-id'));
                 };
             });
         });

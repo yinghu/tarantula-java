@@ -4,5 +4,5 @@ public interface DistributionMetricsService {
 
     String NAME = "DistributionMetricsService";
 
-    String onMetrics(String remote);
+    String onMetrics(String memberId,String serviceName,String categories);
 }
