@@ -73,6 +73,10 @@
             <name>DistributionRoomService</name>
             <class-name>com.tarantula.platform.service.cluster.room.RoomClusterService</class-name>
         </service>
+        <service enabled="true">
+            <name>DistributionMetricsService</name>
+            <class-name>com.tarantula.platform.service.cluster.metrics.MetricsClusterService</class-name>
+        </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
     <map name="integration.recoverable.data.*">

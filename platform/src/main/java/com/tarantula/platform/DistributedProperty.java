@@ -35,7 +35,7 @@ public class DistributedProperty extends RecoverableObject implements Property {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.name = (String)properties.get("name");
-        this.value = (String)properties.get("value");//
+        this.value = properties.get("value");//
     }
 
     public String name(){
