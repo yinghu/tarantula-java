@@ -210,12 +210,17 @@
                 <fieldset class="w3-border-blue tx-text-12">
                     <legend>Metrics View Selection</legend>
                     <div class="w3-container">
-                        <div class="w3-container>
-                            <label class="tx-text-12 tx-margin-right-4">Game Service Providers :</label>
-                            <select id='tx-service-metrics-name' class="w3-select w3-border w3-round tx-text-12" name='mode'> 
+                        <div class="w3-container"><span class="tx-text-10">Node Selections :</span></div>
+                        <div class="w3-container w3-padding-small" id="tx-metrics-cluster-list">
+
+                        </div>
+                        <div class="w3-container w3-padding-small tx-margin-top-4">
+                            <label class="tx-text-10 tx-margin-left-4">Service Selections :</label>
+                            <select id='tx-service-metrics-name' class="w3-select w3-border w3-round tx-text-10" name='mode'> 
                             </select>
                         </div>
-                        <div class="w3-container id="tx-service-metrics-category">
+                        <div class="w3-container tx-margin-top-4"><span class="tx-text-10">Category Selections :</span></div>
+                        <div class="w3-container" id="tx-service-metrics-category">
                     
                         </div>
                         <div class="w3-container">
@@ -345,6 +350,7 @@
 <script>
     Chart.defaults.font.family = 'Oswald';
     const chart_options = {responsive: true,scales: {y: {beginAtZero: true}}}; 
+    let metricsClusterSelectBar = document.querySelector('#tx-metrics-cluster-list');
     let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
     let metricPullTimer;
@@ -365,13 +371,23 @@
         metricsSelected.name = metricsSelectBar.value;
         TARA_API.onGet('role/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
             console.log(resp);
+            while (metricsSelected.categories.length > 0) {
+                metricsSelected.categories.pop();
+            }
+            document.querySelector('#tx-start-service-metrics').style.display = 'none';
+            document.querySelector('#tx-start-service-metrics').innerHTML = 'Start';
+            if(metricsSelected.started){
+                clearInterval(metricPullTimer);
+            }
+            metricsSelected.started = false; 
+            console.log(metricsSelected);       
             metricsCategoryCheckBar.innerHTML ='';
             if(!resp.successful) return;
             let tem = [];
             resp.list.forEach((a)=>{
-                tem.push('<label class=\'tx-text-12 tx-margin-left-4 tx-margin-right-4\'>'+a+'</label>');
+                tem.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a+'</label>');
                 tem.push('<input tx-category=\''+a+'\'');
-                tem.push(' class=\'w3-check tx-text-12 tx--metrics-category-picker\' type=\'checkbox\'>');        
+                tem.push(' class=\'w3-check tx-text-10 tx--metrics-category-picker\' type=\'checkbox\'>');        
             });
             metricsCategoryCheckBar.innerHTML = tem.join('');
             document.querySelectorAll('.tx--metrics-category-picker').forEach(a=>{
@@ -580,7 +596,16 @@
         console.log("metric setup");
         TARA_API.onGet('role/metrics','onServiceViewList','',(resp)=>{
             console.log(resp);
-            if(!resp.successful) return;  
+            if(!resp.successful) return;
+            let tem1 =[];
+            metricsClusterSelectBar.innerHTML = '';
+            resp.cluster.nodeList.forEach(a=>{
+                console.log(a);
+                tem1.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</label>');
+                tem1.push('<input tx-node-address=\''+a.address+'\'');
+                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');          
+            });
+            metricsClusterSelectBar.innerHTML = tem1.join('');  
             metricsSelectBar.innerHTML = '';
             let tem = ['<option value=\'\' disabled selected>Choose a service</option>'];
             resp.list.forEach(a=>{
@@ -591,6 +616,11 @@
                 tem.push('</option>');
             });
             metricsSelectBar.innerHTML = tem.join('');
+            document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
+                a.onchange = ()=>{
+                    console.log(a.getAttribute('tx-node-address'));
+                };
+            });
         });
     }
     function _tx_metrics_pull(){

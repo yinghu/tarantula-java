@@ -144,6 +144,10 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     }
 
     @Override
+    public void registerSummary(Summary summary){
+        summary.registerCategory(OperationSummary.PENDING_BACKUP_SIZE);
+    }
+    @Override
     public void updateSummary(Summary summary){
         summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
     }

@@ -11,6 +11,7 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
+import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 
 import javax.crypto.Cipher;
 import java.util.UUID;
@@ -178,6 +179,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.metricsListener = metricsListener;
     }
 
+    @Override
+    public void registerSummary(Summary summary){
+        summary.registerCategory(PENDING_SESSION_SIZE);
+        summary.registerCategory(GAME_SESSION_SIZE);
+    }
     @Override
     public void updateSummary(Summary summary){
         summary.update(PENDING_SESSION_SIZE,pendingQueue.size());
