@@ -7,6 +7,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.metrics.ServiceViewMonitor;
 
@@ -77,6 +78,7 @@ public class MetricsViewModule implements Module {
             list.add("tarantula");
             list.add("UDPEndpoint");
             list.add("MirrorClusterBackup");
+            list.add(JVMMonitor.NAME);
             jsonObject.add("list",list);
             jsonObject.add("cluster",summary.toJson());
             session.write(jsonObject.toString().getBytes());

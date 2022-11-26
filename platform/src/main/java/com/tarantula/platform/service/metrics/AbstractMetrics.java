@@ -3,8 +3,8 @@ package com.tarantula.platform.service.metrics;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 import com.tarantula.platform.statistics.StatisticsUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-abstract public class AbstractMetrics implements Metrics, SchedulingTask, Serviceable {
+abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     //PAYMENT CATEGORY
     public final static String PAYMENT_GOOGLE_STORE_COUNT = "googleStoreCount";
@@ -497,4 +497,13 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask, Servic
         categories.add(category);
         pendingUpdates.put(category,new StatsDelta(category,0));
     }
+    @Override
+    public void registerSummary(Summary summary){
+        categories.forEach(c->summary.registerCategory(c));
+    }
+    @Override
+    public void updateSummary(Summary summary){
+
+    }
+
 }

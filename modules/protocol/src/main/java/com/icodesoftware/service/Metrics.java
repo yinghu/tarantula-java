@@ -6,7 +6,7 @@ import com.icodesoftware.Statistics;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface Metrics extends Serviceable,MetricsListener{
+public interface Metrics extends ServiceProvider,MetricsListener{
 
     String PERFORMANCE = "performance";
     String ACCESS = "access";
@@ -14,10 +14,7 @@ public interface Metrics extends Serviceable,MetricsListener{
     String DEPLOYMENT = "deployment";
     String SYSTEM ="system";
 
-    String name();
     List<String> categories();
-
-    void setup(ServiceContext serviceContext);
 
     Statistics statistics();
 
