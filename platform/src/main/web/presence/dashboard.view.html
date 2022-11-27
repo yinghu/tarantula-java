@@ -648,7 +648,7 @@
                 dataset.splice(0,dataset.length);
             }
             resp.list.forEach((m)=>{
-                let ct = metricsSelected[m.memberId];
+                    let ct = metricsSelected[m.memberId];
                     m.metrics.forEach((a)=>{
                         let ix = metricsSelected.categories.indexOf(a.label);
                         if(ix!=-1){

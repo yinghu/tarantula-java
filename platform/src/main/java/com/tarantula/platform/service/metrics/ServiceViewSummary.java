@@ -7,11 +7,14 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceViewSummary extends RecoverableObject implements ServiceProvider.Summary {
 
+    private static String TIME_FORMAT = "HH:mm:ss";
 
     private final int metricsSize;
     private final int chartSize;
@@ -70,7 +73,7 @@ public class ServiceViewSummary extends RecoverableObject implements ServiceProv
 
     public void update(JsonObject payload){
         String memberId = payload.get("memberId").getAsString();
-        String timed = payload.get("time").getAsString();
+        String timed = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_FORMAT));
         viewMap.compute(memberId,(k,v)->{
             if(v==null) v = new ServiceView(memberId,metricsSize,chartSize);
             JsonArray data = payload.get("metrics").getAsJsonArray();

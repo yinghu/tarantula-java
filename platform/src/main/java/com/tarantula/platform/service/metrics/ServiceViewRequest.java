@@ -5,12 +5,10 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class ServiceViewRequest extends RecoverableObject implements ServiceProvider.Summary{
 
-    private static String TIME_FORMAT = "HH:mm:ss";
+
 
     private final String memberId;
     private final JsonArray metrics;
@@ -44,7 +42,6 @@ public class ServiceViewRequest extends RecoverableObject implements ServiceProv
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("memberId",memberId);
-        jsonObject.addProperty("time",LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_FORMAT)));
         jsonObject.add("metrics",metrics);
         return jsonObject;
     }
