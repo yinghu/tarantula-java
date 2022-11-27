@@ -210,7 +210,7 @@
                 <fieldset class="w3-border-blue tx-text-12">
                     <legend>Metrics View Selection</legend>
                     <div class="w3-container">
-                        <div class="w3-container"><span class="tx-text-10">Node Selections :</span></div>
+                        <div class="w3-container"><span class="tx-text-10">Cluster Node List :</span></div>
                         <div class="w3-container w3-padding-small" id="tx-metrics-cluster-list">
 
                         </div>
@@ -391,10 +391,10 @@
             resp.list.forEach((a)=>{
                 tem.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a+'</label>');
                 tem.push('<input tx-category=\''+a+'\'');
-                tem.push(' class=\'w3-check tx-text-10 tx--metrics-category-picker\' type=\'checkbox\'>');        
+                tem.push(' class=\'w3-check tx-text-10 tx-metrics-category-picker\' type=\'checkbox\'>');        
             });
             metricsCategoryCheckBar.innerHTML = tem.join('');
-            document.querySelectorAll('.tx--metrics-category-picker').forEach(a=>{
+            document.querySelectorAll('.tx-metrics-category-picker').forEach(a=>{
                 a.onchange = ()=>{
                     console.log("CHECKED->"+a.checked);
                     let cat = a.getAttribute('tx-category');
@@ -603,11 +603,13 @@
             if(!resp.successful) return;
             let tem1 =[];
             metricsClusterSelectBar.innerHTML = '';
-            resp.cluster.nodeList.forEach(a=>{
+            resp.cluster.forEach(a=>{
                 console.log(a);
                 tem1.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
-                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');          
+                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');   
+                metricsSelected[a.memberId]=a.chart;
+                //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
             });
             metricsClusterSelectBar.innerHTML = tem1.join('');  
             metricsSelectBar.innerHTML = '';

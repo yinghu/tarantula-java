@@ -1,6 +1,7 @@
 package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
@@ -80,7 +81,18 @@ public class MetricsViewModule implements Module {
             list.add("MirrorClusterBackup");
             list.add(JVMMonitor.NAME);
             jsonObject.add("list",list);
-            jsonObject.add("cluster",summary.toJson());
+            JsonArray nodes = new JsonArray();
+            JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();
+            int[] i = {0};
+            summary.clusterNodes().forEach(n->{
+                JsonObject nd = new JsonObject();
+                nd.addProperty("nodeName",n.nodeName());
+                nd.addProperty("memberId",n.memberId());
+                nd.add("chart",chs.get(i[0]).getAsJsonObject());
+                nodes.add(nd);
+                i[0]++;
+            });
+            jsonObject.add("cluster",nodes);
             session.write(jsonObject.toString().getBytes());
         }
         else if(session.action().equals("onEnableServiceView")){
