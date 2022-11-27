@@ -1,7 +1,6 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Property;
@@ -23,16 +22,15 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     private final ConcurrentHashMap<String,FIFOBuffer<Property>> metricsMap = new ConcurrentHashMap<>();
     private final int metricsSize;
     private final int chartSize;
-    private final JsonArray charts;
     private final Runnable stop;
     private final HashSet<String> categorySet;
+
     public ServiceView(String name,Configuration configuration, Runnable stop){
         this.name = name;
         this.metricsSize = ((Number)configuration.property("metricsSize")).intValue();
         this.chartSize = ((Number)configuration.property("chartSize")).intValue();
-        this.charts = ((JsonElement)configuration.property("charts")).getAsJsonArray();
         this.stop = stop;
-        categorySet = new HashSet<>();
+        this.categorySet = new HashSet<>();
     }
     @Override
     public void update(String category, int value) {
@@ -66,23 +64,23 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
         resp.add("list",list);
         return resp;
     }
-    public JsonObject toMetricsJson(String category,int chartIndex){
+    public JsonObject toMetricsJson(String category){
         JsonObject resp = new JsonObject();
         resp.addProperty("successful",true);
         resp.addProperty("name",name);
         FIFOBuffer<Property> metrics = metricsMap.get(category);
         List<Property> snapshot = metrics.list(new ArrayList<>());
-        resp.add("chart",_chart(snapshot,category,chartIndex));
+        resp.add("chart",_chart(snapshot,"memberId",category));
         return resp;
     }
-    public JsonObject toMetricsJson(JsonArray categories){
+    public JsonObject toMetricsJson(JsonArray nodes,JsonArray categories){
         JsonArray list = new JsonArray();
         int[] ix = {0};
         categories.forEach((c)->{
             FIFOBuffer<Property> metrics = metricsMap.get(c.getAsString());
             List<Property> snapshot = metrics.list(new ArrayList<>());
             if(ix[0]<chartSize){
-                list.add(_chart(snapshot,c.getAsString(),ix[0]));
+                list.add(_chart(snapshot,nodes.get(0).getAsString(),c.getAsString()));
             }
             ix[0]++;
         });
@@ -95,16 +93,10 @@ public class ServiceView extends RecoverableObject implements ServiceProvider.Su
     public void stop(){
         stop.run();
     }
-    private JsonObject _chart(List<Property> snapshot,String category,int chartIndex){
+    private JsonObject _chart(List<Property> snapshot,String memberId,String category){
         JsonObject chart = new JsonObject();
-        JsonObject ref = charts.get(chartIndex).getAsJsonObject();
+        chart.addProperty("memberId",memberId);
         chart.addProperty("label",category);
-        chart.addProperty("backgroundColor",ref.get("backgroundColor").getAsString());
-        chart.addProperty("borderColor",ref.get("borderColor").getAsString());
-        chart.addProperty("cubicInterpolationMode",ref.get("cubicInterpolationMode").getAsString());
-        chart.addProperty("borderWidth",ref.get("borderWidth").getAsInt());
-        chart.addProperty("pointBorderWidth",ref.get("pointBorderWidth").getAsInt());
-        chart.addProperty("pointRadius",ref.get("pointRadius").getAsInt());
         JsonArray data = new JsonArray();
         snapshot.forEach(p->{
             JsonObject js = new JsonObject();

@@ -1,8 +1,10 @@
 package com.tarantula.platform.service.metrics;
 
-public interface DistributionMetricsService {
+import com.icodesoftware.service.ServiceProvider;
+
+public interface DistributionMetricsService extends ServiceProvider {
 
     String NAME = "DistributionMetricsService";
 
-    String onMetrics(String memberId,String serviceName,String categories);
+    String[] onMetrics(String serviceName,String[] categories);
 }

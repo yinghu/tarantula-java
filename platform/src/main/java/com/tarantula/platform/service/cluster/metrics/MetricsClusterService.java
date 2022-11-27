@@ -13,6 +13,7 @@ import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.metrics.ServiceView;
+import com.tarantula.platform.service.metrics.ServiceViewRequest;
 
 
 import java.util.Properties;
@@ -51,12 +52,10 @@ public class MetricsClusterService implements ManagedService, RemoteService {
 
     }
 
-    public JsonObject metricsPayload(String serviceName,String categories){
-        Configuration configuration = tarantulaContext.configuration("metrics-view-settings");
-        ServiceView serviceView = new ServiceView(serviceName,configuration,()->{});
+    public String metricsPayload(String serviceName,String[] categories){
+        ServiceViewRequest request = new ServiceViewRequest(nodeEngine.getLocalMember().getUuid(),categories);
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(serviceName);
-        serviceProvider.registerSummary(serviceView);
-        serviceProvider.updateSummary(serviceView);
-        return serviceView.toMetricsJson(JsonUtil.parseAsJsonArray(categories));
+        serviceProvider.updateSummary(request);
+        return request.toJson().toString();
     }
 }

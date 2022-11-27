@@ -360,7 +360,7 @@
     let metricPullTimer;
     const mChartSize = 12;
     document.querySelector('#tx-start-service-metrics').style.display = 'none';
-    let metricsSelected={name:'',categories:[]};
+    let metricsSelected={name:'',categories:[],nodes:[]};
     metricsSelected.data = [];
     metricsSelected.charts =[];
     for(let i=0;i<mChartSize;i++){
@@ -624,18 +624,35 @@
             metricsSelectBar.innerHTML = tem.join('');
             document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
                 a.onchange = ()=>{
-                    console.log(a.getAttribute('tx-node-member-id'));
+                    let memberId = a.getAttribute('tx-node-member-id');
+                    if(a.checked){
+                        metricsSelected.nodes.push(memberId);
+                    }
+                    else{
+                       let ix = metricsSelected.nodes.indexOf(memberId);
+                       if(ix != -1){
+                           metricsSelected.nodes.splice(ix,1);   
+                       }     
+                    }
                 };
             });
         });
     }
     function _tx_metrics_pull(){
-        TARA_API.onSet('role/metrics','onUpdateServiceView',metricsSelected.name,metricsSelected.categories,(resp)=>{
+        let query ={nodes:metricsSelected.nodes,categories:metricsSelected.categories};
+        TARA_API.onSet('role/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
             console.log(resp);
             if(!resp.successful) return;
             resp.list.forEach((a,i)=>{
+                let ct = metricsSelected[a.memberId];
                 let cdata = metricsSelected.data[i].datasets; 
                 cdata.splice(0,cdata.length);
+                a.backgroundColor = ct.backgroundColor;
+                a.borderColor = ct.borderColor;
+                a.borderWidth = ct.borderWidth;
+                a.pointBorderWidth = ct.pointBorderWidth;
+                a.pointRadius = ct.pointRadius;
+                a.cubicInterpolationMode = ct.cubicInterpolationMode;
                 cdata.push(a);
                 metricsSelected.charts[i].update();
             });

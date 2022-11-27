@@ -7,6 +7,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.metrics.DistributionMetricsService;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -31,17 +32,38 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
     }
 
     @Override
-    public String onMetrics(String memberId,String serviceName,String categories) {
+    public String[] onMetrics(String serviceName,String[] categories) {
         NodeEngine nodeEngine = getNodeEngine();
-        Member member = nodeEngine.getClusterService().getMember(memberId);
-        ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName,categories);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,member.getAddress());
-        final Future<String> future = builder.invoke();
-        try {
-            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            return "{}";
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        String[] ret = new String[mlist.size()];
+        int i = 0;
+        for(Member m : mlist){
+            ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName,categories);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
+            final Future<String> future = builder.invoke();
+            try {
+                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                ret[i]="{}";
+            }
+            i++;
         }
+        return ret;
+    }
+
+    @Override
+    public String name() {
+        return DistributionMetricsService.NAME;
+    }
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
     }
 }
