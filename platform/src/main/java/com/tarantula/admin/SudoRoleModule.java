@@ -208,16 +208,6 @@ public class SudoRoleModule implements Module {
             m.add("metrics",ms);
             session.write(m.toString().getBytes());
         }
-        else if(session.action().equals("onEnableServiceView")){
-            viewMap.computeIfAbsent(session.name(),k->{
-                ServiceView view = new ServiceView(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
-                ServiceViewMonitor monitor = new ServiceViewMonitor(context,context.serviceProvider(session.name()),1000,view);
-                context.schedule(monitor);
-                return view;
-            });
-            ServiceView view = viewMap.get(session.name());
-            session.write(view.toJson().toString().getBytes());
-        }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             session.write(summary.toJson().toString().getBytes());

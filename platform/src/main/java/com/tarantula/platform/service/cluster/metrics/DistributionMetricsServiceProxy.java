@@ -32,13 +32,13 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
     }
 
     @Override
-    public String[] onMetrics(String serviceName,String[] categories) {
+    public String[] onMetrics(String serviceName) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         String[] ret = new String[mlist.size()];
         int i = 0;
         for(Member m : mlist){
-            ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName,categories);
+            ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
             final Future<String> future = builder.invoke();
             try {

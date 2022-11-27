@@ -9,8 +9,8 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.JVMMonitor;
-import com.tarantula.platform.service.metrics.ServiceView;
 import com.tarantula.platform.service.metrics.ServiceViewMonitor;
+import com.tarantula.platform.service.metrics.ServiceViewSummary;
 
 
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ public class MetricsViewModule implements Module {
 
     private UserService userService;
 
-    private ConcurrentHashMap<String,ServiceView> viewMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ServiceViewSummary> viewMap = new ConcurrentHashMap<>();
     private Configuration chartConfiguration;
 
     @Override
@@ -99,12 +99,12 @@ public class MetricsViewModule implements Module {
             ServiceProvider serviceProvider = context.serviceProvider(session.name());
             if(serviceProvider != null){
                 viewMap.computeIfAbsent(session.name(),k->{
-                    ServiceView view = new ServiceView(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
+                    ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
                     ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,1000,view);
                     context.schedule(monitor);
                     return view;
                 });
-                ServiceView view = viewMap.get(session.name());
+                ServiceViewSummary view = viewMap.get(session.name());
                 session.write(view.toCategoryJson().toString().getBytes());
             }
             else{
@@ -115,7 +115,7 @@ public class MetricsViewModule implements Module {
             JsonObject query = JsonUtil.parse(payload);
             JsonArray nodes = query.get("nodes").getAsJsonArray();
             JsonArray categories = query.get("categories").getAsJsonArray();
-            ServiceView view = viewMap.get(session.name());
+            ServiceViewSummary view = viewMap.get(session.name());
             if(view!=null&&categories.size()>0){
                 session.write(view.toMetricsJson(nodes,categories).toString().getBytes());
             }

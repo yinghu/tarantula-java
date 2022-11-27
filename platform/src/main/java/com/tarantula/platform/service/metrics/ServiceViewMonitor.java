@@ -1,10 +1,11 @@
 package com.tarantula.platform.service.metrics;
 
-import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.JsonUtil;
 
 public class ServiceViewMonitor implements SchedulingTask {
 
@@ -13,11 +14,11 @@ public class ServiceViewMonitor implements SchedulingTask {
     private int timerCountDown;
     public final static long timerInternal = 1000;
 
-    private final ServiceView serviceView;
+    private final ServiceViewSummary serviceView;
 
     private final DistributionMetricsService distributionMetricsService;
 
-    public ServiceViewMonitor(ApplicationContext context,ServiceProvider serviceProvider,int timerCountDown,ServiceView serviceView){
+    public ServiceViewMonitor(ApplicationContext context,ServiceProvider serviceProvider,int timerCountDown,ServiceViewSummary serviceView){
         this.applicationContext = context;
         this.distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);
         this.serviceProvider = serviceProvider;
@@ -43,24 +44,19 @@ public class ServiceViewMonitor implements SchedulingTask {
     @Override
     public void run() {
         try{
-            JsonArray cs = serviceView.toCategoryJson().get("list").getAsJsonArray();
-            String[] list = new String[cs.size()];
-            for(int i=0;i<cs.size();i++){
-                list[i]=cs.get(i).getAsString();
-            }
-            String[] ret = distributionMetricsService.onMetrics(serviceProvider.name(),list);
+            String[] ret = distributionMetricsService.onMetrics(serviceProvider.name());
             for(String f  : ret){
-                applicationContext.log(f, OnLog.WARN);
+                serviceView.update(JsonUtil.parse(f));
             }
+            timerCountDown--;
+            if(timerCountDown <= 0){
+                serviceView.stop();
+                return;
+            }
+            applicationContext.schedule(this);
         }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        serviceProvider.updateSummary(serviceView);
-        timerCountDown--;
-        if(timerCountDown <= 0){
+            this.applicationContext.log(serviceView.name()+" stopped",ex,OnLog.ERROR);
             serviceView.stop();
-            return;
         }
-        applicationContext.schedule(this);
     }
 }

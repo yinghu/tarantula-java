@@ -643,18 +643,26 @@
         TARA_API.onSet('role/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
             console.log(resp);
             if(!resp.successful) return;
-            resp.list.forEach((a,i)=>{
-                let ct = metricsSelected[a.memberId];
-                let cdata = metricsSelected.data[i].datasets; 
-                cdata.splice(0,cdata.length);
-                a.backgroundColor = ct.backgroundColor;
-                a.borderColor = ct.borderColor;
-                a.borderWidth = ct.borderWidth;
-                a.pointBorderWidth = ct.pointBorderWidth;
-                a.pointRadius = ct.pointRadius;
-                a.cubicInterpolationMode = ct.cubicInterpolationMode;
-                cdata.push(a);
-                metricsSelected.charts[i].update();
+            for(let i=0;i<mChartSize;i++){
+                let dataset = metricsSelected.data[i].datasets; 
+                dataset.splice(0,dataset.length);
+            }
+            resp.list.forEach((m)=>{
+                let ct = metricsSelected[m.memberId];
+                    m.metrics.forEach((a)=>{
+                        let ix = metricsSelected.categories.indexOf(a.label);
+                        if(ix!=-1){
+                            let cdata = metricsSelected.data[ix].datasets; 
+                            a.backgroundColor = ct.backgroundColor;
+                            a.borderColor = ct.borderColor;
+                            a.borderWidth = ct.borderWidth;
+                            a.pointBorderWidth = ct.pointBorderWidth;
+                            a.pointRadius = ct.pointRadius;
+                            a.cubicInterpolationMode = ct.cubicInterpolationMode;
+                            cdata.push(a);
+                            metricsSelected.charts[ix].update();
+                        }
+                });
             });
         });
     }

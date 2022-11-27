@@ -52,8 +52,8 @@ public class MetricsClusterService implements ManagedService, RemoteService {
 
     }
 
-    public String metricsPayload(String serviceName,String[] categories){
-        ServiceViewRequest request = new ServiceViewRequest(nodeEngine.getLocalMember().getUuid(),categories);
+    public String metricsPayload(String serviceName){
+        ServiceViewRequest request = new ServiceViewRequest(nodeEngine.getLocalMember().getUuid());
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(serviceName);
         serviceProvider.updateSummary(request);
         return request.toJson().toString();

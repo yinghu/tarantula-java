@@ -7,21 +7,17 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 
 public class ServiceViewRequest extends RecoverableObject implements ServiceProvider.Summary{
 
     private static String TIME_FORMAT = "HH:mm:ss";
 
     private final String memberId;
-    private final HashMap<String,Object> pendingUpdates;
+    private final JsonArray metrics;
 
-    public ServiceViewRequest(String memberId, String[] categories){
+    public ServiceViewRequest(String memberId){
         this.memberId = memberId;
-        this.pendingUpdates = new HashMap<>();
-        for(String c : categories){
-            pendingUpdates.put(c,0);
-        }
+        this.metrics = new JsonArray();
     }
 
     @Override
@@ -49,19 +45,14 @@ public class ServiceViewRequest extends RecoverableObject implements ServiceProv
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("memberId",memberId);
         jsonObject.addProperty("time",LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_FORMAT)));
-        JsonArray data = new JsonArray();
-        pendingUpdates.forEach((k,v)->{
-            JsonObject m = new JsonObject();
-            m.addProperty("category",k);
-            m.addProperty("value",v.toString());
-            data.add(m);
-        });
-        jsonObject.add("metrics",data);
+        jsonObject.add("metrics",metrics);
         return jsonObject;
     }
 
     private void _update(String category, Object value){
-        if(!pendingUpdates.containsKey(category)) return;
-        pendingUpdates.replace(category,value);
+        JsonObject m = new JsonObject();
+        m.addProperty("category",category);
+        m.addProperty("value",value.toString());
+        metrics.add(m);
     }
 }

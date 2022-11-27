@@ -9,21 +9,20 @@ import java.io.IOException;
 public class ServiceViewOperation extends Operation {
 
     private String serviceName;
-    private String[] category;
+
     private String ret;
 
     public ServiceViewOperation() {
     }
 
-    public ServiceViewOperation(String serviceName, String[] category) {
+    public ServiceViewOperation(String serviceName) {
         this.serviceName = serviceName;
-        this.category = category;
     }
 
     @Override
     public void run() throws Exception {
         MetricsClusterService cis = this.getService();
-        this.ret = cis.metricsPayload(serviceName,category);
+        this.ret = cis.metricsPayload(serviceName);
     }
 
     @Override
@@ -35,13 +34,11 @@ public class ServiceViewOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(serviceName);
-        out.writeUTFArray(category);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        category = in.readUTFArray();
     }
 }

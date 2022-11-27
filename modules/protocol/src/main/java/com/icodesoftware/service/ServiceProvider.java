@@ -18,9 +18,9 @@ public interface ServiceProvider extends Serviceable {
     default void updateSummary(Summary summary){}
 
     interface Summary extends Recoverable{
-        void update(String category,int value);
-        void update(String category,long value);
-        void update(String category,double value);
-        void registerCategory(String category);
+        default void update(String category,int value){}
+        default void update(String category,long value){}
+        default void update(String category,double value){}
+        default void registerCategory(String category){}
     }
 }
