@@ -662,10 +662,13 @@
                             a.pointRadius = ct.pointRadius;
                             a.cubicInterpolationMode = ct.cubicInterpolationMode;
                             cdata.push(a);
-                            metricsSelected.charts[ix].update();
                         }
                 });
             });
+            for(let i=0;i<mChartSize;i++){
+                //metricsSelected.options[i].scales.y.max =100;
+                metricsSelected.charts[i].update();
+            }
         });
     }
     function _tx_metrics_pull_pause(){
