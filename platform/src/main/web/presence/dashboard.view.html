@@ -367,7 +367,7 @@
         let lb = 'chart-'+i;
         let chart_data = {datasets: [{label:lb,backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
         metricsSelected.data.push(chart_data);
-        let chart_options = {responsive: true,scales: {y: {min: 0, max:10}}}; 
+        let chart_options = {responsive: true,scales: {y: {beginAtZero:true}}}; 
         metricsSelected.options.push(chart_options);
         let chart = new Chart(document.querySelector('#tx-service-chart-'+i),{type:'line',data:chart_data,options:chart_options});
         metricsSelected.charts.push(chart);
