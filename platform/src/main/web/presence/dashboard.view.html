@@ -353,7 +353,6 @@
 </div>
 <script>
     Chart.defaults.font.family = 'Oswald';
-    const chart_options = {responsive: true,scales: {y: {min: 0, max:30}}}; 
     let metricsClusterSelectBar = document.querySelector('#tx-metrics-cluster-list');
     let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
@@ -363,10 +362,13 @@
     let metricsSelected={name:'',categories:[],nodes:[]};
     metricsSelected.data = [];
     metricsSelected.charts =[];
+    metricsSelected.options =[];
     for(let i=0;i<mChartSize;i++){
         let lb = 'chart-'+i;
         let chart_data = {datasets: [{label:lb,backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
         metricsSelected.data.push(chart_data);
+        let chart_options = {responsive: true,scales: {y: {min: 0, max:10}}}; 
+        metricsSelected.options.push(chart_options);
         let chart = new Chart(document.querySelector('#tx-service-chart-'+i),{type:'line',data:chart_data,options:chart_options});
         metricsSelected.charts.push(chart);
     }
