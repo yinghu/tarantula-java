@@ -93,7 +93,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.auth = tp.tokenValidator();
-        this.bucket = tcx.node().bucket();
+        this.bucket = tcx.node().bucketName();
     }
     public void onCheck(){
         //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
