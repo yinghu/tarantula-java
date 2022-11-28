@@ -127,9 +127,9 @@ final public class HttpCaller implements HttpClientProvider {
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             //run on client to check if certificate is valid
-            if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
-                throw new CertificateException("Invalid certificate");
-            }
+            //if(!chain[0].getSubjectDN().getName().equals("CN=gameclustering.com")){
+                //throw new CertificateException("Invalid certificate");
+            //}
             certificate = chain;
         }
 
