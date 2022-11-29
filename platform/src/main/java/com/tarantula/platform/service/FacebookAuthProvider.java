@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.configuration.FacebookConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
@@ -32,7 +33,10 @@ public class FacebookAuthProvider extends AuthObject{
     public FacebookAuthProvider(String typeId,String clientId, String secureKey) {
         super(typeId, clientId);
         this.secureKey = secureKey;
-
+    }
+    @Override
+    public void setup(ServiceContext serviceContext){
+        super.setup(serviceContext);
         try{
             if(!serverToken()) throw new RuntimeException("invalid token");
         }catch (Exception ex){

@@ -154,7 +154,7 @@
     let types = [];
     let pendingProps = new Map();
     TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-        //console.log(resp);
+        console.log(resp);
         types = resp.itemList;
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {

@@ -27,8 +27,6 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private final static String AUTH_PROVIDER_X509_CERT_URI = "https://www.googleapis.com/oauth2/v1/certs";
     private final static String VERIFY_URI = "https://games.googleapis.com/games/v1/applications/";
 
-
-    //private HttpClient client;
     private NetHttpTransport transport;
     private JacksonFactory jsonFactory;
     private String accessKey;
@@ -47,13 +45,6 @@ public class GoogleOAuthTokenValidator extends AuthObject {
         this.secureKey = secureKey;
         transport = new NetHttpTransport();
         jsonFactory = JacksonFactory.getDefaultInstance();
-        //try{
-            //SSLContext sct = SSLContext.getInstance("TLS");
-            //sct.init(null,new TrustManager[]{new GoogleOAuthTokenValidator._X509TrustManager()},null);
-            //client = HttpClient.newBuilder().sslContext(sct).build();
-        //}catch (Exception ex){
-            //throw new RuntimeException(ex);
-        //}
     }
     @Override
     public String name(){

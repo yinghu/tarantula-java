@@ -48,20 +48,19 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
         nameIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(nameIndex,true);
 
-        if(!dataStore.update(t)){
-            dataStore.create(t);
-            categoryIndex.addKey(t.distributionKey());
-            dataStore.update(categoryIndex);
-            typeIndex.addKey(t.distributionKey());
-            dataStore.update(typeIndex);
-            typeIdIndex.addKey(t.distributionKey());
-            dataStore.update(typeIdIndex);
-            nameIndex.addKey(t.distributionKey());
-            dataStore.update(nameIndex);
-            if(superCategoryIndex!=null){
-                superCategoryIndex.addKey(t.distributionKey());
-                dataStore.update(superCategoryIndex);
-            }
+        if(dataStore.update(t)) return true;
+        if(!dataStore.create(t)) return false;
+        categoryIndex.addKey(t.distributionKey());
+        dataStore.update(categoryIndex);
+        typeIndex.addKey(t.distributionKey());
+        dataStore.update(typeIndex);
+        typeIdIndex.addKey(t.distributionKey());
+        dataStore.update(typeIdIndex);
+        nameIndex.addKey(t.distributionKey());
+        dataStore.update(nameIndex);
+        if(superCategoryIndex!=null){
+            superCategoryIndex.addKey(t.distributionKey());
+            dataStore.update(superCategoryIndex);
         }
         return true;
     }
@@ -129,7 +128,8 @@ abstract public class GameObjectSetup implements ApplicationPreSetup {
 
     public <T extends Configurable> boolean save(GameCluster gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(configurationDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
-        return dataStore.update(t);
+        if(dataStore.update(t)) return true;
+        return dataStore.createIfAbsent(t,false);
     }
 
     public <T extends Configurable> boolean load(GameCluster gameCluster, T t){

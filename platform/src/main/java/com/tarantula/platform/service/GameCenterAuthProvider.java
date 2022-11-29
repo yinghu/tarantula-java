@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GameCenterAuthProvider extends AuthObject{
 
-    //private HttpClient client;
+
 
     public GameCenterAuthProvider(String typeId, MetricsListener metricsListener){
         super(typeId,"");
@@ -35,13 +35,6 @@ public class GameCenterAuthProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        //try{
-            //SSLContext sct = SSLContext.getInstance("TLS");
-            //sct.init(null,new TrustManager[]{new GameCenterAuthProvider._X509TrustManager()},null);
-            //client = HttpClient.newBuilder().sslContext(sct).build();
-        //}catch (Exception ex){
-            //throw new RuntimeException(ex);
-        //}
     }
     @Override
     public boolean validate(Map<String,Object> params){

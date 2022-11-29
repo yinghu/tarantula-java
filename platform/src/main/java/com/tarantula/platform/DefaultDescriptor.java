@@ -227,6 +227,8 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         jsonObject.addProperty("name",name);
         jsonObject.addProperty("tag",tag);
         jsonObject.addProperty("typeId",typeId);
+        jsonObject.addProperty("category",category);
+        jsonObject.addProperty("resetEnabled",resetEnabled);
         return jsonObject;
     }
 }

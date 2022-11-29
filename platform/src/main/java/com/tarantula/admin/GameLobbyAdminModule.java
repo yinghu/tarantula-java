@@ -8,8 +8,11 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;
@@ -27,7 +30,10 @@ public class GameLobbyAdminModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby data ["+session.name()+"]").getBytes());
             }
         }
-
+        else if(session.action().equals("onGameServiceList")){
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(session.name());
+            session.write(toJson(gameCluster.serviceLobby.entryList()));
+        }
         else if (session.action().equals("onAddLobby")){
             String[] query = session.name().split("#");
             String gameClusterId = query[0];
@@ -97,4 +103,13 @@ public class GameLobbyAdminModule implements Module {
         jsonObject.add("gameLobbyList",alist);
         return jsonObject;
     }
+    private byte[] toJson(List<Descriptor> existed){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("successful",true);
+        JsonArray array = new JsonArray();
+        existed.forEach((a)->array.add(a.toJson()));
+        jsonObject.add("serviceList",array);
+        return jsonObject.toString().getBytes();
+    }
+
 }
