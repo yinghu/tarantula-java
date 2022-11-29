@@ -368,9 +368,7 @@
         let chart_data = {datasets: [{label:lb,backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
         metricsSelected.data.push(chart_data);
         let chart_options = {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero:true}},onResize:(c,sz)=>{
-            //c.canvas.parentNode.style.height = sz.height;
-            //c.canvas.parentNode.style.width = sz.width;
-            //c.resize();
+           //resize call
         }}; 
         metricsSelected.options.push(chart_options);
         let chart = new Chart(document.querySelector('#tx-service-chart-'+i),{type:'line',data:chart_data,options:chart_options});
@@ -402,7 +400,6 @@
             metricsCategoryCheckBar.innerHTML = tem.join('');
             document.querySelectorAll('.tx-metrics-category-picker').forEach(a=>{
                 a.onchange = ()=>{
-                    console.log("CHECKED->"+a.checked);
                     let cat = a.getAttribute('tx-category');
                     if(a.checked){
                         metricsSelected.categories.push(cat);
@@ -413,7 +410,6 @@
                            metricsSelected.categories.splice(ix,1);   
                        }     
                     }
-                    console.log(metricsSelected);
                     if(metricsSelected.categories.length>0){
                         document.querySelector('#tx-start-service-metrics').style.display = 'block';
                     }
@@ -425,7 +421,7 @@
         });
     };
     document.querySelector('#tx-start-service-metrics').onclick=()=>{
-        console.log(metricsSelected);
+        //console.log(metricsSelected);
         if(metricsSelected.started){
             clearInterval(metricPullTimer);
             metricsSelected.started = false;
@@ -436,7 +432,7 @@
             document.querySelector('#tx-start-service-metrics').innerHTML = 'Stop';
             metricPullTimer = setInterval(()=>{
                 _tx_metrics_pull();       
-            },3000);
+            },5000);
         }
     };
     document.querySelector('#tx-menu-close').onclick = ()=>{
@@ -603,15 +599,14 @@
         });
     }
     function _tx_metrics(){
-        console.log("metric setup");
         TARA_API.onGet('role/metrics','onServiceViewList','',(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(!resp.successful) return;
             let tem1 =[];
             metricsClusterSelectBar.innerHTML = '';
             resp.cluster.forEach(a=>{
                 console.log(a);
-                tem1.push('<label class=\'tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</label>');
+                tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
                 tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');   
                 metricsSelected[a.memberId]=a.chart;
