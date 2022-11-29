@@ -367,7 +367,11 @@
         let lb = 'chart-'+i;
         let chart_data = {datasets: [{label:lb,backgroundColor: 'rgb(255, 99, 132)',borderColor: 'rgb(255, 99, 132)',data: []}]};
         metricsSelected.data.push(chart_data);
-        let chart_options = {responsive: true,scales: {y: {beginAtZero:true}}}; 
+        let chart_options = {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero:true}},onResize:(c,sz)=>{
+            //c.canvas.parentNode.style.height = sz.height;
+            //c.canvas.parentNode.style.width = sz.width;
+            //c.resize();
+        }}; 
         metricsSelected.options.push(chart_options);
         let chart = new Chart(document.querySelector('#tx-service-chart-'+i),{type:'line',data:chart_data,options:chart_options});
         metricsSelected.charts.push(chart);
