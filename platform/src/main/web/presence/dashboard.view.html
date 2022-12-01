@@ -14,7 +14,7 @@
             <span tx-pane-name='LiveGame' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">LiveGame<i id='tx-LiveGame-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Account' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Account<i id='tx-Account-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Developer' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Developer<i id='tx-Developer-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
-            <span tx-pane-name='Metrics' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Metrics<i id='tx-Metrics-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
+            <span tx-pane-name='Monitor' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Monitor<i id='tx-Monitor-down' class="fa fa-caret-down" style="font-size:24px; display: none;"></i></span>
             <span tx-pane-name='Sudo' class="w3-bar-item w3-green w3-tag  w3-border-red tx-text-20 tx-opt">Sudo<i id='tx-Sudo-down' class="fa fa-caret-down" style="font-size:24px;display: none;"></i></span>
         </div>
         <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -205,7 +205,7 @@
                 </div>
             </div>
         </div>
-        <div id="tx-Metrics" class="w3-container tx-pane" style="display:none;">
+        <div id="tx-Monitor" class="w3-container tx-pane" style="display:none;">
             <div class="w3-panel">
                 <fieldset class="w3-border-blue tx-text-12">
                     <legend>Metrics View Selection</legend>
@@ -239,44 +239,26 @@
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
             <div class="w3-row w3-border-bottom w3-border-red">
-                <div class="w3-half w3-container">
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-2"></canvas>
                 </div>
-                <div class="w3-half w3-container">
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-3"></canvas>
                 </div>
-            </div>
-            <div class="w3-display-container w3-white tx-content-16"></div>
-            <div class="w3-row w3-border-bottom w3-border-red">
-                <div class="w3-half w3-container">
+                <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-4"></canvas>
                 </div>
-                <div class="w3-half w3-container">
-                    <canvas id="tx-service-chart-5"></canvas>
-                </div>
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
             <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-5"></canvas>
+                </div>
                 <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-6"></canvas>
                 </div>
                 <div class="w3-third w3-container">
                     <canvas id="tx-service-chart-7"></canvas>
-                </div>
-                <div class="w3-third w3-container">
-                    <canvas id="tx-service-chart-8"></canvas>
-                </div>
-            </div>
-            <div class="w3-display-container w3-white tx-content-16"></div>
-            <div class="w3-row w3-border-bottom w3-border-red">
-                <div class="w3-third w3-container">
-                    <canvas id="tx-service-chart-9"></canvas>
-                </div>
-                <div class="w3-third w3-container">
-                    <canvas id="tx-service-chart-10"></canvas>
-                </div>
-                <div class="w3-third w3-container">
-                    <canvas id="tx-service-chart-11"></canvas>
                 </div>
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
@@ -357,7 +339,7 @@
     let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
     let metricPullTimer;
-    const mChartSize = 12;
+    const mChartSize = 8;
     document.querySelector('#tx-start-service-metrics').style.display = 'none';
     let metricsSelected={name:'',categories:[],nodes:[]};
     metricsSelected.data = [];
@@ -474,7 +456,7 @@
                 _tx_metrics_pull_pause();
                 _tx_extension();
             }
-            else if(_pane == 'Metrics'){
+            else if(_pane == 'Monitor'){
                 _tx_metrics();
             }
             document.querySelector('#tx-'+_pane).style.display='block'; 
