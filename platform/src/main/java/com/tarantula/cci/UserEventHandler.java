@@ -46,8 +46,6 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         this._hex.put(sid,onExchange);
         if(path.equals("/user/action")){
             byte[] _payload = onExchange.payload();
-            log.warn(new String(_payload));
-            log.warn("Action->"+action);
             RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);
             ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,sid,_payload);
             event.action(action);
