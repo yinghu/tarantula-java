@@ -36,7 +36,6 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
     }
     public void onRequest(OnExchange onExchange) throws Exception {
         String path = onExchange.path();
-        log.warn(path);
         String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
         String name = onExchange.header(Session.TARANTULA_NAME);
         String tag = onExchange.header(Session.TARANTULA_TAG);
@@ -47,6 +46,8 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         this._hex.put(sid,onExchange);
         if(path.equals("/user/action")){
             byte[] _payload = onExchange.payload();
+            log.warn(new String(_payload));
+            log.warn("Action->"+action);
             RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+sid),tag);
             ServiceActionEvent event = new ServiceActionEvent(this.serverTopic,sid,_payload);
             event.action(action);
