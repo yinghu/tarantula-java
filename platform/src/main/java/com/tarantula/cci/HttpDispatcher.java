@@ -34,6 +34,7 @@ abstract public class HttpDispatcher implements HttpHandler {
             requestHandler.onRequest(exchange);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
         }catch (Exception ex){
+            ex.printStackTrace();
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_ERROR_COUNT,1);
             exchange.onError(ex,ex.getMessage());
         }
