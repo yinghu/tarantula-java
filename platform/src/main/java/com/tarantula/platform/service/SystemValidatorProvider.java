@@ -196,11 +196,21 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         ck.timestamp(stmp);//property(AccessKey.TIMESTAMP,stmp);
         ck.typeId(label);//property(AccessKey.KEY_LABEL,label);
+        ck.owner(this.serviceContext.node().bucketId());
         if(deployDataStore.create(ck)){
             byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
             return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp,SystemUtil.toHexString(wmark));
         }
         return null;
+    }
+    public List<OnAccess> accessKeyList(){
+        AccessKeyQuery query = new AccessKeyQuery(this.serviceContext.node().bucketId());
+        ArrayList<OnAccess> keys = new ArrayList<>();
+        deployDataStore.list(query,accessKey -> {
+            if(!accessKey.disabled()) keys.add(accessKey);
+            return true;
+        });
+        return keys;
     }
     public void revokeAccessKey(String accessKey){
         String[] sp = accessKey.split("-");

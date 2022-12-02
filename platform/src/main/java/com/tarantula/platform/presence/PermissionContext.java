@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.OnAccess;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class PermissionContext extends ResponseHeader {
     public String accessKey;
     public boolean subscriptionExpired;
     public List<String> accessKeyList;
+
 
     public PermissionContext(int maxGameClusterCount,int currentCount,boolean subscriptionExpired){
         this.maxGameClusterCount = maxGameClusterCount;

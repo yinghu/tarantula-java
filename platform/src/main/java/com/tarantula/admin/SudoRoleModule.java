@@ -67,11 +67,20 @@ public class SudoRoleModule implements Module {
             session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){
-            this.context.log(new String(payload),OnLog.WARN);
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String key = tokenValidatorProvider.createAccessKey(acc.typeId());
             PermissionContext pc = new PermissionContext(key);
             session.write(pc.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onLabeledKeyList")){
+            List<OnAccess> keys = tokenValidatorProvider.accessKeyList();
+            session.write(new LabeledAccessKeyContext(keys).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onRevokeLabeledKey")){
+            //revoke access key
+            tokenValidatorProvider.revokeAccessKey(session.name());
+            List<OnAccess> keys = tokenValidatorProvider.accessKeyList();
+            session.write(new LabeledAccessKeyContext(keys).toJson().toString().getBytes());
         }
         else if(session.action().equals("onTestLabeledKey")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);

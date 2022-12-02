@@ -11,6 +11,7 @@
     {"type":"find.user","moduleResourceFile":"sudo/find.user.view.html"},
     {"type":"data.store.count.list","moduleResourceFile":"sudo/data.store.count.list.view.html"},
     {"type":"create.labeled.key","moduleResourceFile":"sudo/create.labeled.key.view.html"},
+    {"type":"list.labeled.key","moduleResourceFile":"sudo/list.labeled.key.view.html"},
     {"type":"stop.access.index","moduleResourceFile":"sudo/stop.access.index.view.html"},
     {"type":"start.access.index","moduleResourceFile":"sudo/start.access.index.view.html"},
     {"type":"data.store.backup","moduleResourceFile":"sudo/data.store.backup.view.html"},

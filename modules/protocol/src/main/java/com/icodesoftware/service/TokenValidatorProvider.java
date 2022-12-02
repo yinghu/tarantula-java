@@ -21,6 +21,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     //labeled access key
     String validateAccessKey(String accessKey);
     String createAccessKey(String label);
+    List<OnAccess> accessKeyList();
     void revokeAccessKey(String accessKey);
 
     String ticket(String key,int stub,int duration);
