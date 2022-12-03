@@ -88,6 +88,11 @@ public interface ClusterProvider extends Serviceable {
 
         String servicePushAddress();
 
+        boolean runAsMirror();
+        boolean backupEnabled();
+        boolean dailyBackupEnabled();
+        String dataStoreDirectory();
+
     }
 
 }

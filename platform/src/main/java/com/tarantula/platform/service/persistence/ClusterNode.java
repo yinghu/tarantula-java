@@ -3,7 +3,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
@@ -28,6 +27,11 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public String deployDirectory;
     public String servicePushAddress;
+
+    public boolean runAsMirror;
+    public boolean backupEnabled;
+    public boolean dailyBackupEnabled;
+    public String dataStoreDirectory;
 
     public ClusterNode(String bucketName, String nodeName,int partitionNumber){
         this.bucketName = bucketName;
@@ -98,6 +102,13 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     }
     public String servicePushAddress(){
         return servicePushAddress;
+    }
+
+    public boolean runAsMirror(){return runAsMirror;}
+    public boolean backupEnabled(){return backupEnabled;}
+    public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
+    public String dataStoreDirectory(){
+        return this.dataStoreDirectory;
     }
     @Override
     public JsonObject toJson(){

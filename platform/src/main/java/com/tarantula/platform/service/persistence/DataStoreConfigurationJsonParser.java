@@ -4,10 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
 
 import java.io.File;
@@ -29,18 +30,21 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private boolean dataStoreDailyBackup;
 
 
-    private TarantulaContext tarantulaContext;
+    private ServiceContext serviceContext;
     private DataStoreProvider.OnStart onStart;
+    private ClusterProvider.Node node;
 
-    public DataStoreConfigurationJsonParser(String dconfig, TarantulaContext tx,DataStoreProvider.OnStart onStart){
+    public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx, DataStoreProvider.OnStart onStart){
         this.dataStoreProviderConfiguration = dconfig;
-        this.dataBucketGroup = tx.dataBucketGroup;
-        this.dataBucketNode = tx.dataBucketNode;
-        this.partitionNumber = tx.platformRoutingNumber;
-        this.dataDir = tx.dataStoreDir;
-        this.dataStoreDailyBackup = tx.dataStoreDailyBackup;
-        this.tarantulaContext = tx;
+        this.node = tx.node();
+        this.dataBucketGroup = node.bucketName();
+        this.dataBucketNode = node.nodeName();
+        this.partitionNumber = node.partitionNumber();//tx.platformRoutingNumber;
+        this.dataDir = node.dataStoreDirectory();//tx.dataStoreDir;
+        this.dataStoreDailyBackup = node.dailyBackupEnabled();//tx.dataStoreDailyBackup;
+        this.serviceContext = tx;
         this.onStart = onStart;
+        this.node = node;
     }
     private void parse(InputStream json){
         HashMap<String,Object> properties = new HashMap();
@@ -54,10 +58,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("node",this.dataBucketNode);
         properties.put("partitionNumber",this.partitionNumber);
         properties.put("dir",this.dataDir);
-        //properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
         properties.put("dailyBackup",dataStoreDailyBackup);
-        properties.put("node",tarantulaContext.node());
-        //this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());
+        properties.put("node",this.node);
         DataStoreProvider dataStoreProvider = dataStoreProvider(provider.trim());
         JsonArray props = ds.get("properties").getAsJsonArray();
         props.forEach(e->{
@@ -69,9 +71,9 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
         Map<String,Object> _intrgration = new HashMap<>();
         JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
-        _intrgration.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
+        _intrgration.put("enabled",node.runAsMirror()? false : node.backupEnabled());
         JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
-        Configuration exconfig = this.tarantulaContext.configuration("tarantula-backup-router");
+        Configuration exconfig = this.serviceContext.configuration("tarantula-backup-router");
         for(JsonElement je : ilist) {
             JsonObject p = je.getAsJsonObject();
             if(p.get("enabled").getAsBoolean()){
@@ -91,7 +93,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }
         Map<String,Object> _data = new HashMap<>();
         JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
-        _data.put("enabled",tarantulaContext.runAsMirror? false : tarantulaContext.backupEnabled);
+        _data.put("enabled",node.runAsMirror()? false : node.backupEnabled());
         JsonArray dlist = _dconfig.get("backup-provider-list").getAsJsonArray();
         for(JsonElement je : dlist) {
             JsonObject p = je.getAsJsonObject();
@@ -112,13 +114,9 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
-        properties.put("serviceContext",this.tarantulaContext);
+        properties.put("serviceContext",this.serviceContext);
         dataStoreProvider.configure(properties);
         onStart.on(dataStoreProvider);
-        //this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
-        //this.tarantulaContext.deploymentDataStoreProvider.start();
-        //this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
-        //this.tarantulaContext._initMirrorClusterBackup();
     }
 
 

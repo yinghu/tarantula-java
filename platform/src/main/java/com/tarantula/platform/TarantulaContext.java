@@ -176,6 +176,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
+        this.node.runAsMirror = this.runAsMirror;
+        this.node.backupEnabled = this.backupEnabled;
+        this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
+        this.node.dataStoreDirectory = this.dataStoreDir;
         if(backupEnabled){//using backup deployment id
             String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
             JsonObject json = JsonUtil.parse(resp);
@@ -194,7 +198,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
                 this._initMirrorClusterBackup();
-                log.warn("data store provider started");
+                log.warn("Tarantula data store provider started");
             }catch (Exception ex){
                 throw new RuntimeException(ex);
             }
