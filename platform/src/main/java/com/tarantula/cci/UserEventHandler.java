@@ -35,7 +35,6 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         return USER_PATH;
     }
     public void onRequest(OnExchange onExchange) throws Exception {
-
         String path = onExchange.path();
         String magicKey = onExchange.header(Session.TARANTULA_MAGIC_KEY);
         String name = onExchange.header(Session.TARANTULA_NAME);
