@@ -6,7 +6,7 @@ import com.tarantula.platform.TarantulaApplicationHeader;
 
 import java.util.Collection;
 
-public class EmptyClusterProvider extends TarantulaApplicationHeader implements ClusterProvider {
+public class TestClusterProvider extends TarantulaApplicationHeader implements ClusterProvider {
     @Override
     public String name() {
         return null;
@@ -49,7 +49,7 @@ public class EmptyClusterProvider extends TarantulaApplicationHeader implements 
 
     @Override
     public RecoverService recoverService() {
-        return null;
+        return new TestRecoverService();
     }
 
     @Override

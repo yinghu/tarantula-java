@@ -4,9 +4,7 @@ package com.tarantula.test;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
 import com.icodesoftware.service.Metrics;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.metrics.MetricsProperty;
-import com.tarantula.platform.service.metrics.MetricsSnapshot;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -14,7 +12,6 @@ import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class MetricsTest {
 
@@ -24,7 +21,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
-        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-12-31").atTime(23,50,0,0);
         MockMetrics metrics = new MockMetrics(end);
         Assert.assertEquals(end.getHour()==23,true);
@@ -51,7 +48,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsMonthlyTest() {
-        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-07-31").atTime(23,50,0,0);//Mon
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -75,7 +72,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
-        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);//Mon
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -98,7 +95,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsDailyTest() {
-        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-10").atTime(23,50,0,0);//Sun
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -121,7 +118,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsHistoryTest() {
-        EmptyServiceContext serviceContext = new EmptyServiceContext();
+        TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);

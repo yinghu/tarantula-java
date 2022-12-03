@@ -2,19 +2,30 @@ package com.tarantula.test;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public class EmptyServiceContext implements ServiceContext {
+public class TestServiceContext implements ServiceContext {
 
-    ClusterNode node = new ClusterNode();
+    ClusterNode node;
 
-    public EmptyServiceContext(){
-        node.bucketId = "BSD01/"+ SystemUtil.oid();
-        node.nodeId ="BSD01/"+ SystemUtil.oid();
+
+    public TestServiceContext(){
+        this.node = new ClusterNode("BSD","TS01",31);
+        this.node.clusterNameSuffix = "test";
+        this.node.deployDirectory = "deploy";
+        this.node.servicePushAddress = "127.0.0.1";
+        this.node.runAsMirror = false;
+        this.node.backupEnabled = false;
+        this.node.dailyBackupEnabled = false;
+        this.node.dataStoreDirectory = "target/tld";
+        node.bucketId = node.bucketName()+"/"+ SystemUtil.oid();
+        node.nodeId =node.bucketName()+"/"+ SystemUtil.oid();
+
     }
     @Override
     public DataStore dataStore(String s, int i) {
@@ -33,7 +44,7 @@ public class EmptyServiceContext implements ServiceContext {
 
     @Override
     public ClusterProvider clusterProvider() {
-        return new EmptyClusterProvider();
+        return new TestClusterProvider();
     }
 
     @Override
@@ -77,7 +88,7 @@ public class EmptyServiceContext implements ServiceContext {
 
     @Override
     public Configuration configuration(String s) {
-        return null;
+        return new ApplicationConfiguration();
     }
 
     @Override
@@ -118,7 +129,6 @@ public class EmptyServiceContext implements ServiceContext {
     }
 
     public ClusterProvider.Node node(){
-        node.partitionNumber = 17;
         return node;
     }
     public HttpClientProvider httpClientProvider(){
