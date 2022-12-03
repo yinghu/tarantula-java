@@ -33,7 +33,7 @@ public class EmptyServiceContext implements ServiceContext {
 
     @Override
     public ClusterProvider clusterProvider() {
-        return null;
+        return new EmptyClusterProvider();
     }
 
     @Override

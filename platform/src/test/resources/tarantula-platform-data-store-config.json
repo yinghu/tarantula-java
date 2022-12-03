@@ -1,0 +1,44 @@
+{
+    "data-source": {
+        "name" : "tarantula",
+        "provider" : "com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider",
+        "properties": [
+            {"truncated": false},
+            {"dataPath":"tarantula/data"},
+            {"integrationPath":"tarantula/integration"},
+            {"backupPath":"backup"},
+            {"maxReplicationNumber": 3},
+            {"maxTimerLoop": 10},
+            {"timerCount": 3},
+            {"maxBytesPerBatch": 10000},
+            {"replicationBatchSize": 10},
+            {"backupBatchSize": 10},
+            {"replicationSyncIntervalSeconds": 1},
+            {"cacheSyncIntervalMinutes": 60},
+            {"cacheUpdateThreshold": 10000},
+            {"backupSyncIntervalSeconds": 1},
+            {"diskSyncIntervalSeconds": 60},
+            {"syncUpdateThreshold": 10000}
+        ]
+    },
+    "integration-backup-router": {
+        "enabled": true,
+        "backup-provider-list":[
+            {
+                "enabled": true,
+                "name": "webhook",
+                "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
+            }
+        ]
+    },
+    "data-backup-router": {
+        "enabled": true,
+        "backup-provider-list":[
+            {
+                "enabled": true,
+                "name": "webhook",
+                "provider": "com.tarantula.platform.service.persistence.web.WebHookBackupProvider"
+            }
+        ]
+    }
+}
