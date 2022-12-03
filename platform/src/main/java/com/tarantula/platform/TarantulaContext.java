@@ -188,7 +188,17 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
-        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this);
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,dataStoreProvider -> {
+            try{
+                this.deploymentDataStoreProvider = dataStoreProvider;
+                this.deploymentDataStoreProvider.start();
+                this.deploymentDataStoreProvider.setup(this);
+                this._initMirrorClusterBackup();
+                log.warn("data store provider started");
+            }catch (Exception ex){
+                throw new RuntimeException(ex);
+            }
+        });
         new ServiceBootstrap(new CountDownLatch(0),_storageInstanceStarted,sparser,"system-data-store-parser",true).start();
         Config gcfg = new ClasspathXmlConfig(Thread.currentThread().getContextClassLoader(),CONFIG_INTEGRATION);
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);

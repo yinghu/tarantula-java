@@ -41,4 +41,8 @@ public interface DataStoreProvider extends ServiceProvider {
         void on(String fName,int fSize,ReadableByteChannel in);
     }
 
+    interface OnStart{
+        void on(DataStoreProvider dataStoreProvider);
+    }
+
 }

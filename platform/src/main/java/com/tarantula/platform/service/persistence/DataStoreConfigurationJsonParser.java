@@ -30,8 +30,9 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
 
     private TarantulaContext tarantulaContext;
+    private DataStoreProvider.OnStart onStart;
 
-    public DataStoreConfigurationJsonParser(String dconfig, TarantulaContext tx){
+    public DataStoreConfigurationJsonParser(String dconfig, TarantulaContext tx,DataStoreProvider.OnStart onStart){
         this.dataStoreProviderConfiguration = dconfig;
         this.dataBucketGroup = tx.dataBucketGroup;
         this.dataBucketNode = tx.dataBucketNode;
@@ -39,8 +40,9 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataDir = tx.dataStoreDir;
         this.dataStoreDailyBackup = tx.dataStoreDailyBackup;
         this.tarantulaContext = tx;
+        this.onStart = onStart;
     }
-    private void parse(InputStream json) throws Exception{
+    private void parse(InputStream json){
         HashMap<String,Object> properties = new HashMap();
         JsonObject config = JsonUtil.parse(json);
         JsonObject ds = config.get("data-source").getAsJsonObject();
@@ -55,7 +57,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         //properties.put("poolSetting",this.tarantulaContext.dataReplicationThreadPoolSetting);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",tarantulaContext.node());
-        this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());
+        //this.tarantulaContext.deploymentDataStoreProvider = dataStoreProvider(provider.trim());
+        DataStoreProvider dataStoreProvider = dataStoreProvider(provider.trim());
         JsonArray props = ds.get("properties").getAsJsonArray();
         props.forEach(e->{
             JsonObject kv = e.getAsJsonObject();
@@ -110,10 +113,12 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("integrationRouter",_intrgration);
         properties.put("dataRouter",_data);
         properties.put("serviceContext",this.tarantulaContext);
-        this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
-        this.tarantulaContext.deploymentDataStoreProvider.start();
-        this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
-        this.tarantulaContext._initMirrorClusterBackup();
+        dataStoreProvider.configure(properties);
+        onStart.on(dataStoreProvider);
+        //this.tarantulaContext.deploymentDataStoreProvider.configure(properties);
+        //this.tarantulaContext.deploymentDataStoreProvider.start();
+        //this.tarantulaContext.deploymentDataStoreProvider.setup(tarantulaContext);
+        //this.tarantulaContext._initMirrorClusterBackup();
     }
 
 
