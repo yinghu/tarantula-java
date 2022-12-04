@@ -7,15 +7,11 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.service.metrics.ServiceView;
-import com.tarantula.platform.service.metrics.ServiceViewMonitor;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class SudoRoleModule implements Module {
 
@@ -27,8 +23,6 @@ public class SudoRoleModule implements Module {
     private UserService userService;
     private GsonBuilder builder;
 
-    private ConcurrentHashMap<String,ServiceView> viewMap = new ConcurrentHashMap<>();
-    private Configuration chartConfiguration;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -106,48 +100,6 @@ public class SudoRoleModule implements Module {
             }
         }
 
-        else if(session.action().equals("onExportModule")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            DeploymentDescriptor desc = new DeploymentDescriptor();
-            desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
-            desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
-            desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
-            Response resp = this.deploymentServiceProvider.exportModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
-        }
-        else if(session.action().equals("onAddModule")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            DeploymentDescriptor desc = new DeploymentDescriptor();
-            desc.codebase(acc.property(OnAccess.MODULE_CODE_BASE).toString());
-            desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
-            desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
-            Response resp = this.deploymentServiceProvider.createModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
-        }
-        else if(session.action().equals("onLaunchModule")){//typeId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.deploymentServiceProvider.launchModule(access.typeId());
-            session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes());
-        }
-        else if(session.action().equals("onResetModule")){//typeId or moduleId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Descriptor desc = new DeploymentDescriptor();
-            desc.typeId(access.typeId());
-            desc.moduleArtifact((String) access.property(OnAccess.MODULE_ARTIFACT));
-            desc.moduleVersion((String)access.property(OnAccess.MODULE_VERSION));
-            desc.codebase((String)access.property(OnAccess.MODULE_CODE_BASE));
-            AccessIndex index = this.accessIndexService.get(access.typeId());
-            if(index!=null){
-                desc.index(index.distributionKey());
-            }
-            boolean suc  = this.deploymentServiceProvider.resetModule(desc);
-            session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes());
-        }
-        else if(session.action().equals("onShutdownModule")){//typeId
-            OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
-            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
-        }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
@@ -173,11 +125,6 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
-        }
-        else if(session.action().equals("onDeployModule")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
@@ -236,7 +183,6 @@ public class SudoRoleModule implements Module {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 

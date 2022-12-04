@@ -42,7 +42,7 @@
         let _c = document.querySelector('#tx-add-module-codebase').value;
         let _a = document.querySelector('#tx-add-module-artifact').value;
         let _v = document.querySelector('#tx-add-module-version').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onAddModule',codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/module',command:'onAddModule',codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
             document.querySelector('#tx-add-module-message').innerHTML = resp.message;
         });
     };

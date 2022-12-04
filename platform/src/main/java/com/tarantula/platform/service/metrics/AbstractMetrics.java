@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 import com.tarantula.platform.statistics.StatisticsUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -76,7 +75,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     protected DataStore dataStore;
     private SystemStatistics statistics;
-    //private ServiceContext serviceContext;
+
     private ArrayList<String> categories;
     protected TarantulaLogger logger;
     protected String name;

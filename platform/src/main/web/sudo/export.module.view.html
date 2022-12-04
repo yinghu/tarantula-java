@@ -42,7 +42,7 @@
         let _c = document.querySelector('#tx-export-module-codebase').value;
         let _a = document.querySelector('#tx-export-module-artifact').value;
         let _v = document.querySelector('#tx-export-module-version').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onExportModule',codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/module',command:'onExportModule',codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
             //console.log(resp);
             document.querySelector('#tx-export-module-message').innerHTML = resp.message;
         });
