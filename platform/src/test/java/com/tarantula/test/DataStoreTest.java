@@ -1,9 +1,6 @@
 package com.tarantula.test;
 
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
@@ -13,6 +10,7 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
+import com.tarantula.platform.service.persistence.RevisionObject;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -82,6 +80,14 @@ public class DataStoreTest {
         Assert.assertTrue(updated.disabled());
         Assert.assertTrue(updated.revision()==updating.revision());
         Assert.assertTrue(updated.revision()>loadIf.revision());
+        byte[] raw = dataStore.load(accessKey.key().asString().getBytes());
+        Assert.assertTrue(raw!=null);
+        RevisionObject ro = RevisionObject.fromBinary(raw);
+        Assert.assertTrue(ro.revision==updating.revision());
+        Assert.assertTrue(ro.local);
+        AccessKey fromRaw = new AccessKey();
+        fromRaw.fromBinary(ro.data);
+        Assert.assertTrue(fromRaw.typeId().equals(accessKey.typeId()));
     }
 
 }
