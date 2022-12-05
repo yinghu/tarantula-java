@@ -84,7 +84,7 @@
         editor.setMode('preview');
     };
     function tx_live_store_setup(){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList','',(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList','Tami',(resp)=>{
             editor.set(resp);
             if(resp.Successful){
                 shoppingList.innerHTML ='';
