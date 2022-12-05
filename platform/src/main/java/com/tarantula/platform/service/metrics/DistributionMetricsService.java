@@ -6,5 +6,5 @@ public interface DistributionMetricsService extends ServiceProvider {
 
     String NAME = "DistributionMetricsService";
 
-    String[] onMetrics(String serviceName);
+    String[] onMonitor(String serviceName);
 }

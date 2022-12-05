@@ -32,7 +32,7 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
     }
 
     @Override
-    public String[] onMetrics(String serviceName) {
+    public String[] onMonitor(String serviceName) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         String[] ret = new String[mlist.size()];

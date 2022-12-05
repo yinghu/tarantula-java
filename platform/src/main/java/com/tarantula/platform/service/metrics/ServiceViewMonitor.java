@@ -44,7 +44,7 @@ public class ServiceViewMonitor implements SchedulingTask {
     @Override
     public void run() {
         try{
-            String[] ret = distributionMetricsService.onMetrics(serviceProvider.name());
+            String[] ret = distributionMetricsService.onMonitor(serviceProvider.name());
             for(String f  : ret){
                 serviceView.update(JsonUtil.parse(f));
             }
