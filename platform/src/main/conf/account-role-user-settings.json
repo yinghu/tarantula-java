@@ -1,4 +1,4 @@
 {
-  "trialMaxUserCount": 50,
-  "subscribedMaxUserCount": 50
+  "trialMaxUserCount": 500,
+  "subscribedMaxUserCount": 500
 }
