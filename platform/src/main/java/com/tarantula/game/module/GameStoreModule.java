@@ -25,7 +25,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            session.write(this.storeServiceProvider.shop("Tami").toJson().toString().getBytes());
+            session.write(this.storeServiceProvider.shop(session.name()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onValidate")){
             OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
