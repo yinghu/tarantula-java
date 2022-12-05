@@ -220,7 +220,7 @@
     }
     function tx_live_tournament_setup(){
         console.log(TARA_API.query()); 
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList',"",(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',"Tami",(resp)=>{
             shoppingList.innerHTML ='';
             resp.tournamentList.forEach((gi,i)=>{
                 let tem = [];
