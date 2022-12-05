@@ -21,6 +21,7 @@ public class PlayerSavedGames{
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",true);
         JsonArray saves = new JsonArray();
         savedGames.forEach(save->{
             if(save.owner().equals(systemId) && save.index().equals(deviceId)) {
