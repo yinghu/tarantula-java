@@ -1,6 +1,7 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.Property;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public interface Metrics extends ServiceProvider,MetricsListener{
     Property[] snapshot(String category, String classifier);
     History[] archive(String category,String classifier,LocalDateTime end);
 
-    interface History{
+    interface History extends Recoverable {
         Property[] hourlyGain();
         double dailyGain();
         double weeklyGain();

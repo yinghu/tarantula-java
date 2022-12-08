@@ -147,6 +147,11 @@
                 document.querySelector('#tx-select-error-message').innerHTML = 'Select end date first';    
                 return;
             }
+            if(!_tx_at_least_one_day_passed(_endDate)){
+                document.querySelector('#tx-metrics-history-enabled').checked = false;
+                document.querySelector('#tx-select-error-message').innerHTML = 'Select date passed at least one day';    
+                return;
+            }
             document.querySelector('#tx-select-error-message').innerHTML = '';  
             clearInterval(_timer);
             _request = "archive";
@@ -209,5 +214,9 @@
             }     
         },10000);
     }
-    
+    function _tx_at_least_one_day_passed(dateSelected){
+        let td = new Date();
+        let sd = new Date(dateSelected);
+        return 86400000 < td.getTime()-sd.getTime();
+    }
 </script>
