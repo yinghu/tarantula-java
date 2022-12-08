@@ -125,7 +125,7 @@ public class MetricsTest {
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
         metrics.atHourly();
-        Metrics.History history = metrics.archive(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,end,end)[0];
+        Metrics.History history = metrics.archive(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,LeaderBoard.HOURLY,end)[0];
         Property[] his = history.hourlyGain();
         String h12 = MetricsProperty.historyPropertyLabel(end);
         Property archived = null;

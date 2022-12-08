@@ -9,7 +9,9 @@
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
-    <div class="w3-panel">
+    <div class="w3-display-container w3-white tx-content-16"></div>
+    <div class="w3-row">
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Type :</label>
         <select id='tx-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
             <option value="performance" selected>Performance</option>
@@ -19,7 +21,7 @@
             <option value="deployment">Deployment</option>  
         </select>
     </div>
-    <div class="w3-panel">
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
         <select id='tx-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
             <option value="hourly" selected>Hourly</option>
@@ -29,24 +31,21 @@
             <option value="yearly">Yearyly</option>  
         </select>
     </div>
-    <div class="w3-panel">
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
         <select id='tx-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
             
         </select>
     </div>
+    </div>
     <div class="w3-panel">
         <fieldset class="w3-border-blue tx-text-12">
             <legend>Metrics Archive View</legend>
-            <div class="w3-container"><p class="tx-text-12 w3-text-red">Select start and end date before today. Then mark checkbox below</p></div>
             <div class="w3-container">
+                <div class="w3-panel w3-center w3-text-red tx-text-10" id="tx-select-error-message"></div> 
                 <div class="w3-panel">
-                    <label class="tx-text-12 tx-margin-right-4">Archived Metrics</label>
+                    <label class="tx-text-12 tx-margin-right-4 w3-text-red">Select end date and mark checkbox</label>
                     <input id='tx-metrics-history-enabled' class="w3-check tx-text-12" type="checkbox">
-                </div>
-                <div class="w3-panel">
-                    <label class="tx-text-12 tx-margin-right-4">Start Date :</label></br>
-                    <input id='tx-metrics-history-start-date' class="w3-date-local tx-text-12" type="datetime-local">
                 </div>
                 <div class="w3-panel">
                     <label class="tx-text-12 tx-margin-right-4">End Date :</label></br>
@@ -61,8 +60,8 @@
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Chart Type :</label>
         <select id='tx-chart-type' class="w3-select w3-border w3-round tx-text-12" name='chart'>
-            <option value="line" selected>Line</option>
-            <option value="bar">Bar</option>   
+            <option value="bar" selected>Bar</option>
+            <option value="line">Line</option>   
         </select>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -82,6 +81,8 @@
     let _metricsLoaded = 'loading';
     let _request = 'runtime';
     let _timer;
+    //let _startDate;
+    let _endDate;
     _start_metrics_timer();
     const data = {
         datasets: [{
@@ -93,10 +94,11 @@
     };
 
     const config = {
-        type: 'line',
+        type: 'bar',
         data: data,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
             y: {
                     beginAtZero: true
@@ -139,7 +141,13 @@
     document.querySelector('#tx-metrics-history-enabled').onchange = ()=>{
         let ched = document.querySelector('#tx-metrics-history-enabled').checked;
         if(ched){
-            console.log("history arcive checked->"+ched);
+            _endDate = document.querySelector("#tx-metrics-history-end-date").value;
+            if(_endDate ==''){
+                document.querySelector('#tx-metrics-history-enabled').checked = false;
+                document.querySelector('#tx-select-error-message').innerHTML = 'Select end date first';    
+                return;
+            }
+            document.querySelector('#tx-select-error-message').innerHTML = '';  
             clearInterval(_timer);
             _request = "archive";
             _load_metrics();
@@ -186,7 +194,7 @@
             });
         } 
         else{ //load archive
-            TARA_API.onGet('role/sudo','onMetricsArchive',_type+'#'+_category+'#'+_metrics,(resp)=>{
+            TARA_API.onGet('role/sudo','onMetricsArchive',_type+'#'+_category+'#'+_metrics+"#"+_endDate,(resp)=>{
                 console.log(resp);
                 data.datasets[0].data = resp.metrics;
                 chart.update();

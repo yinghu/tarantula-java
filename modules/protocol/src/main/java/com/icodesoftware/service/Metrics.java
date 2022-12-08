@@ -21,7 +21,7 @@ public interface Metrics extends ServiceProvider,MetricsListener{
     void atHourly();
 
     Property[] snapshot(String category, String classifier);
-    History[] archive(String category, LocalDateTime start,LocalDateTime end);
+    History[] archive(String category,String classifier,LocalDateTime end);
 
     interface History{
         Property[] hourlyGain();

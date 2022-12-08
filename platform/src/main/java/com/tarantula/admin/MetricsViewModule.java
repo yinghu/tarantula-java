@@ -62,7 +62,7 @@ public class MetricsViewModule implements Module {
             Metrics metrics = context.metrics(query[0]);
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
-            for(Property p : metrics.archive(query[2],LocalDateTime.now(),LocalDateTime.now())[0].hourlyGain()){
+            for(Property p : metrics.archive(query[2],query[1],LocalDateTime.now())[0].hourlyGain()){
                 JsonObject js = new JsonObject();
                 js.addProperty("x",p.name());
                 js.addProperty("y",p.value().toString());

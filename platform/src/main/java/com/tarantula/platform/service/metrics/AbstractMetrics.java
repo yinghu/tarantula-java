@@ -295,8 +295,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
-    public History[] archive(String category,LocalDateTime start,LocalDateTime end){
-        MetricsHistory metricsHistory = metricsHistory(category,start);
+    public History[] archive(String category,String classifier,LocalDateTime end){
+
+        MetricsHistory metricsHistory = metricsHistory(category,end);
         return new History[]{metricsHistory};
     }
 
