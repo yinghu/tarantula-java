@@ -296,7 +296,23 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         return metricsSnapshot.metrics();
     }
     public History[] archive(String category,String classifier,LocalDateTime end){
-
+        switch (classifier){
+            case LeaderBoard.HOURLY:
+                logger.warn("Hourly history");//5-6 days back  5-6 sets
+                break;
+            case LeaderBoard.DAILY:
+                logger.warn("Daily history");//24 days back 1 sets
+                break;
+            case LeaderBoard.WEEKLY:
+                logger.warn("Weekly history");//12 weeks back 1 sets
+                break;
+            case LeaderBoard.MONTHLY:
+                logger.warn("Monthly history"); //12 month back 1 sets
+                break;
+            case LeaderBoard.YEARLY:
+                logger.warn("Yearly history"); //3 years back 1 sets
+                break;
+        }
         MetricsHistory metricsHistory = metricsHistory(category,end);
         return new History[]{metricsHistory};
     }
