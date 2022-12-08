@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.metrics;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
