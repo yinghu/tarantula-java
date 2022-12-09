@@ -22,7 +22,7 @@ public interface Metrics extends ServiceProvider,MetricsListener{
     void atHourly();
 
     Property[] snapshot(String category, String classifier);
-    History[] archive(String category,String classifier,LocalDateTime end);
+    History archive(String category,LocalDateTime end);
 
     interface History extends Recoverable {
         Property[] hourlyGain();

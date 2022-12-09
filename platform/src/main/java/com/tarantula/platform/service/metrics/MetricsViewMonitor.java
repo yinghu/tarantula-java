@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +44,7 @@ public class MetricsViewMonitor implements SchedulingTask {
         try{
            listeners.forEach((k,r)->{
                r.reset();
-               String[] ret = distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
+               String[] ret = r.endTime==null?distributionMetricsService.onMetrics(r.name,r.category,r.classifier) : distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime);
                for(String f  : ret) {
                    JsonObject m = JsonUtil.parse(f);
                    r.snapshot(m);
@@ -58,8 +59,10 @@ public class MetricsViewMonitor implements SchedulingTask {
         }
     }
 
-    public void register(MetricsSnapshotRequest metricsSnapshotRequest){
+    public String register(MetricsSnapshotRequest metricsSnapshotRequest){
+        String queryId = SystemUtil.oid();
         this.listeners.put(metricsSnapshotRequest.toString(),metricsSnapshotRequest);
+        return queryId;
     }
     public JsonObject snapshot(String name,String category,String classifier){
         return listeners.get(toKey(name,category,classifier)).toJson();

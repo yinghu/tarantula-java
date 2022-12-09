@@ -127,8 +127,8 @@ public class MetricsTest {
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
         metrics.atHourly();
-        Metrics.History[] history = metrics.archive(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,LeaderBoard.HOURLY,end);
-        Property[] his = history[0].hourlyGain();
+        Metrics.History history = metrics.archive(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,end);
+        Property[] his = history.hourlyGain();
         String h12 = MetricsProperty.historyPropertyLabel(end);
         Property archived = null;
         for(Property p : his){
@@ -139,7 +139,7 @@ public class MetricsTest {
         }
         Assert.assertTrue(archived!=null);
         Assert.assertEquals(archived.value(),3.0);
-        Assert.assertEquals(history[0].dailyGain(),3.0);
+        Assert.assertEquals(history.dailyGain(),3.0);
     }
 
 

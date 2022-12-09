@@ -50,12 +50,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public final static String PERFORMANCE_HTTP_REQUEST_ERROR_COUNT = "httpRequestErrorCount";
 
     public final static String PERFORMANCE_UDP_REQUEST_COUNT = "udpRequestCount";
-    //public final static String PERFORMANCE_VM_CPU_USAGE_COUNT = "vmCPUUsageCount";
-    //public final static String PERFORMANCE_VM_MEMORY_COUNT = "vmMemoryCount";
-    //public final static String PERFORMANCE_VM_THREAD_COUNT = "vmThreadCount";
-
-
-
 
     //DEPLOYMENT CATEGORY
     public final static String DEPLOYMENT_GAME_CLUSTER_COUNT = "gameClusterCount";
@@ -133,9 +127,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             registerCategory(PERFORMANCE_HTTP_REQUEST_COUNT);
             registerCategory(PERFORMANCE_HTTP_REQUEST_ERROR_COUNT);
             registerCategory(PERFORMANCE_UDP_REQUEST_COUNT);
-            //registerCategory(PERFORMANCE_VM_CPU_USAGE_COUNT);
-            //registerCategory(PERFORMANCE_VM_MEMORY_COUNT);
-            //registerCategory(PERFORMANCE_VM_THREAD_COUNT);
         }
 
         if(deploymentIncluded){
@@ -295,27 +286,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
-    public History[] archive(String category,String classifier,LocalDateTime end){
-        switch (classifier){
-            case LeaderBoard.HOURLY:
-                logger.warn("Hourly history");//24 hours 1 sets
-                break;
-            case LeaderBoard.DAILY:
-                logger.warn("Daily history");//24 days back 1 sets
-                break;
-            case LeaderBoard.WEEKLY:
-                logger.warn("Weekly history");//12 weeks back 1 sets
-                break;
-            case LeaderBoard.MONTHLY:
-                logger.warn("Monthly history"); //6 month back 1 sets
-                break;
-            case LeaderBoard.YEARLY:
-                logger.warn("Yearly history"); //3 years back 1 sets
-                break;
-        }
-        MetricsHistory metricsHistory = metricsHistory(category,end);
-        logger.warn(metricsHistory.label());
-        return new History[]{metricsHistory};
+    public History archive(String category,LocalDateTime end){
+        return metricsHistory(category,end);
     }
 
     @Override

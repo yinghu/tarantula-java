@@ -120,6 +120,8 @@
         _register_metrics();
     };
     document.querySelector('#tx-metrics-history-enabled').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
         let ched = document.querySelector('#tx-metrics-history-enabled').checked;
         if(ched){
             let _endDate = document.querySelector("#tx-metrics-history-end-date").value;
@@ -138,8 +140,10 @@
             _request = "archive";
         }
         else{
+            delete _command['endDate'];
             _request = "runtime";
         }
+        _register_metrics();
     };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
         clearTimeout(_timer);
@@ -152,7 +156,6 @@
     function _load_metrics_categories(){
         _metricsLoaded = 'loading';
         TARA_API.onGet('role/sudo','onMetricsCategory',_command.type,(resp)=>{
-            console.log(resp);
             let tem =[];
             _metricsBar.innerHTML='';
             resp.categories.forEach((category,i) => {
@@ -168,13 +171,11 @@
             let tem1 =[];
             _nodeBar.innerHTML = '';
             resp.cluster.forEach(a=>{
-                console.log(a);
                 tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
                 tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
                 _nodeSelected[a.memberId]=a.chart;
-                _nodeSelected[a.memberId].selected = true;
-                //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
+                _nodeSelected[a.memberId].selected = true;        
             });
             _nodeBar.innerHTML = tem1.join('');
             document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
@@ -189,17 +190,16 @@
     function _register_metrics(){
         TARA_API.onSet('role/sudo','onMetricsRegister','',_command,(resp)=>{
             if(resp.successful) {
-                _metricsLoaded = '';
-                //data.datasets[0].label = _command.type+'/'+_command.classifier+'/'+_command.category;
+                _command.queryId = resp.message;
                 _tx_empty_arr(data.datasets);
                 chart.update();
+                _metricsLoaded = '';
             }
         });
     }
     function _load_metrics(){
         if(_request == 'runtime'){
             TARA_API.onSet('role/sudo','onMetrics','',_command,(resp)=>{
-                console.log(resp);
                 _tx_empty_arr(data.datasets);
                 if(resp.successful){
                     resp.metrics.forEach(a=>{
@@ -225,8 +225,8 @@
             TARA_API.onGet('role/sudo','onMetricsArchive',_command,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
-                    data.datasets[0].data = resp.metrics;
-                    chart.update();
+                    //data.datasets[0].data = resp.metrics;
+                    //chart.update();
                 }
             });        
         }

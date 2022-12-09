@@ -4,21 +4,28 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.time.LocalDateTime;
+
 
 public class MetricsSnapshotRequest extends RecoverableObject{
 
-
-    //public String memberId;
     public String name;
     public String category;
     public String classifier;
-    public JsonArray metrics;
+    public LocalDateTime endTime;
+    private JsonArray metrics;
     private boolean loaded;
 
     public MetricsSnapshotRequest(String name,String category,String classifier){
         this.name = name;
         this.category = category;
         this.classifier = classifier;
+    }
+    public MetricsSnapshotRequest(String name,String category,String classifier,LocalDateTime endTime){
+        this.name = name;
+        this.category = category;
+        this.classifier = classifier;
+        this.endTime = endTime;
     }
 
     public synchronized void reset(){

@@ -15,6 +15,7 @@ import com.tarantula.platform.service.metrics.MetricsSnapshotResponse;
 import com.tarantula.platform.service.metrics.ServiceViewRequest;
 
 
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class MetricsClusterService implements ManagedService, RemoteService {
@@ -64,4 +65,12 @@ public class MetricsClusterService implements ManagedService, RemoteService {
         response.snapshot(dat);
         return response.toJson().toString();
     }
+    public String metricsArchive(String name, String category, String classifier, LocalDateTime end){
+        Metrics m = this.tarantulaContext.metrics(name);
+        Metrics.History history = m.archive(category,end);
+        MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
+        response.snapshot(history.hourlyGain());
+        return response.toJson().toString();
+    }
+
 }

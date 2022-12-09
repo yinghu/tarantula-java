@@ -154,11 +154,19 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onMetricsRegister")){
             JsonObject query = JsonUtil.parse(payload);
-            this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(),query.get("category").getAsString(),query.get("classifier").getAsString()));
-            session.write(toMessage(session.action(),true).getBytes());
+            String queryId;
+            if(query.get("endTime")==null) {
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(), query.get("category").getAsString(), query.get("classifier").getAsString()));
+            }
+            else{
+                LocalDateTime endTime = LocalDateTime.parse(query.get("endTime").getAsString());
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(), query.get("category").getAsString(), query.get("classifier").getAsString(),endTime));
+            }
+            session.write(toMessage(queryId,true).getBytes());
         }
         else if(session.action().equals("onMetrics")){
             JsonObject query = JsonUtil.parse(payload);
+            this.context.log(query.get("queryId").getAsString(),OnLog.WARN);
             JsonObject m = this.metricsViewMonitor.snapshot(query.get("type").getAsString(),query.get("category").getAsString(),query.get("classifier").getAsString());
             session.write(m.toString().getBytes());
         }
@@ -168,7 +176,7 @@ public class SudoRoleModule implements Module {
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
             LocalDateTime end = LocalDateTime.parse(query.get("endTime").getAsString());
-            for(Property p : metrics.archive(query.get("category").getAsString(),query.get("classifier").getAsString(),end)[0].hourlyGain()){
+            for(Property p : metrics.archive(query.get("category").getAsString(),end).hourlyGain()){
                 JsonObject js = new JsonObject();
                 js.addProperty("x",p.name());
                 js.addProperty("y",p.value().toString());

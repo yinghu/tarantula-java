@@ -7,6 +7,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.metrics.DistributionMetricsService;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +59,25 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         int i = 0;
         for(Member m : mlist){
             MetricsViewOperation serviceViewOperation = new MetricsViewOperation(name,category,classifier);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
+            final Future<String> future = builder.invoke();
+            try {
+                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                ret[i]="{}";
+            }
+            i++;
+        }
+        return ret;
+    }
+    public String[] onMetricsArchive(String name, String category, String classifier, LocalDateTime end){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        String[] ret = new String[mlist.size()];
+        int i = 0;
+        for(Member m : mlist){
+            MetricsArchiveViewOperation serviceViewOperation = new MetricsArchiveViewOperation(name,category,classifier,end);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
             final Future<String> future = builder.invoke();
             try {
