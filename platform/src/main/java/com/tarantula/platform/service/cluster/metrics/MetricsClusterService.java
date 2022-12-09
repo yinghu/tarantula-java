@@ -59,7 +59,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
     public String metricsSnapshot(String name,String category,String classifier){
         Metrics m = this.tarantulaContext.metrics(name);
         Property[] dat = m.snapshot(category,classifier);
-        MetricsSnapshotRequest request = new MetricsSnapshotRequest(nodeEngine.getLocalMember().getUuid(),name,category,classifier);
+        MetricsSnapshotRequest request = new MetricsSnapshotRequest(nodeEngine.getLocalMember().getUuid());
         request.snapshot(dat);
         return request.toJson().toString();
     }

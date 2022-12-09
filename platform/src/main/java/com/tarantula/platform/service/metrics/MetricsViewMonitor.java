@@ -1,29 +1,27 @@
 package com.tarantula.platform.service.metrics;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.LeaderBoard;
-import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.service.Metrics;
+import com.icodesoftware.util.JsonUtil;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MetricsViewMonitor implements SchedulingTask {
 
     private final ApplicationContext applicationContext;
 
-    private int timerCountDown;
-    public final static long timerInternal = 10000;
+    public final static long timerInternal = 5000;
 
     private final DistributionMetricsService distributionMetricsService;
-    private final Metrics metrics;
-    private final Listener listener;
 
-    public MetricsViewMonitor(ApplicationContext context,int timerCountDown,Metrics metrics,Listener listener){
+    private final ConcurrentHashMap<String,MetricsSnapshotRequest> listeners;
+
+    public MetricsViewMonitor(ApplicationContext context){
         this.applicationContext = context;
+        this.listeners = new ConcurrentHashMap<>();
         this.distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);
-        this.timerCountDown = timerCountDown;
-        this.metrics = metrics;
-        this.listener = listener;
     }
     @Override
     public boolean oneTime() {
@@ -43,25 +41,30 @@ public class MetricsViewMonitor implements SchedulingTask {
     @Override
     public void run() {
         try{
-            String[] ret = distributionMetricsService.onMetrics(metrics.name(),PerformanceMetrics.PERFORMANCE_DATA_STORE_COUNT, LeaderBoard.HOURLY);
-            for(String f  : ret){
-                MetricsSnapshotRequest request = MetricsSnapshotRequest.parse(f);
-                listener.onSnapshot(request);
-            }
-            timerCountDown--;
-            if(timerCountDown <= 0){
-                listener.onStop();
-                return;
-            }
-            applicationContext.schedule(this);
+           listeners.forEach((k,r)->{
+                String[] ret = distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
+                for(String f  : ret) {
+                    JsonObject m = JsonUtil.parse(f);
+                    r.snapshot(m);
+                }
+           });
         }catch (Exception ex){
-            listener.onStop();
-            this.applicationContext.log(metrics.name()+" stopped",ex, OnLog.ERROR);
+
+        }
+        finally {
+            this.applicationContext.schedule(this);
         }
     }
 
-    public interface Listener{
-        void onSnapshot(MetricsSnapshotRequest request);
-        void onStop();
+    public void register(MetricsSnapshotRequest metricsSnapshotRequest){
+        this.listeners.put(metricsSnapshotRequest.toString(),metricsSnapshotRequest);
     }
+    public JsonObject metrics(String name,String category,String classifier){
+        return listeners.get(toKey(name,category,classifier)).toJson();
+    }
+    private String toKey(String name,String category,String classifier){
+        return name+"_"+category+"_"+classifier;
+    }
+
+
 }

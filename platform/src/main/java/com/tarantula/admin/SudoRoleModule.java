@@ -15,7 +15,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
+public class SudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -24,7 +24,7 @@ public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
 
     private UserService userService;
     private GsonBuilder builder;
-
+    private MetricsViewMonitor metricsViewMonitor;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -137,20 +137,15 @@ public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
             categories.forEach(category->ms.add(category));
             m.add("categories",ms);
             session.write(m.toString().getBytes());
-            this.context.schedule(new MetricsViewMonitor(this.context,100,metrics,this));
+        }
+        else if(session.action().equals("onMetricsRegister")){
+            String[] query = session.name().split("#");
+            this.metricsViewMonitor.register(new MetricsSnapshotRequest(query[0],query[2],query[1]));
+            session.write(toMessage(session.action(),true).getBytes());
         }
         else if(session.action().equals("onMetrics")){
             String[] query = session.name().split("#");
-            Metrics metrics = context.metrics(query[0]);
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            for(Property p : metrics.snapshot(query[2],query[1])){
-                JsonObject js = new JsonObject();
-                js.addProperty("x",p.name());
-                js.addProperty("y",p.value().toString());
-                ms.add(js);
-            }
-            m.add("metrics",ms);
+            JsonObject m = this.metricsViewMonitor.metrics(query[0],query[2],query[1]);
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsArchive")){
@@ -187,6 +182,8 @@ public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.metricsViewMonitor = new MetricsViewMonitor(this.context);
+        this.context.schedule(this.metricsViewMonitor);
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
@@ -195,13 +192,5 @@ public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
         return JsonUtil.toSimpleResponse(suc,msg);
     }
 
-    @Override
-    public void onSnapshot(MetricsSnapshotRequest request) {
-        //this.context.log(request.toJson().toString(),OnLog.WARN);
-    }
 
-    @Override
-    public void onStop() {
-
-    }
 }

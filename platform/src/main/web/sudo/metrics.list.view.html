@@ -28,7 +28,7 @@
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
-            <option value="yearly">Yearyly</option>  
+            <option value="yearly">Yearly</option>  
         </select>
     </div>
     <div class="w3-third w3-container">
@@ -81,7 +81,6 @@
     let _metricsLoaded = 'loading';
     let _request = 'runtime';
     let _timer;
-    //let _startDate;
     let _endDate;
     _start_metrics_timer();
     const data = {
@@ -117,26 +116,23 @@
     };
     document.querySelector('#tx-metrics-type').onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
         _type = document.querySelector('#tx-metrics-type').value;
-        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
         _load_metrics_categories();
     };
 
     document.querySelector('#tx-metrics-category').onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
         _category = document.querySelector('#tx-metrics-category').value;
-        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
-        _load_metrics();
+        _register_metrics();
     };
 
     document.querySelector('#tx-metrics-data').onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
         _metrics = document.querySelector('#tx-metrics-data').value;
-        data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        chart.update();
-        _load_metrics();
+        _register_metrics();
     };
     document.querySelector('#tx-metrics-history-enabled').onchange = ()=>{
         let ched = document.querySelector('#tx-metrics-history-enabled').checked;
@@ -153,17 +149,14 @@
                 return;
             }
             document.querySelector('#tx-select-error-message').innerHTML = '';  
-            clearInterval(_timer);
             _request = "archive";
-            _load_metrics();
         }
         else{
             _request = "runtime";
-            _start_metrics_timer();
         }
     };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
-        clearInterval(_timer);
+        clearTimeout(_timer);
         chart.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
@@ -173,7 +166,6 @@
     function _load_metrics_categories(){
         _metricsLoaded = 'loading';
         TARA_API.onGet('role/sudo','onMetricsCategory',_type,(resp)=>{
-            console.log(resp);
             let tem =[];
             _metricsBar.innerHTML='';
             resp.categories.forEach((category,i) => {
@@ -185,24 +177,36 @@
                 }
             });
             _metricsBar.innerHTML = tem.join('');
-            _load_metrics();
-            _metricsLoaded = '';
+            _register_metrics();
         }); 
     }
-
+    function _register_metrics(){
+        TARA_API.onGet('role/sudo','onMetricsRegister',_type+'#'+_category+'#'+_metrics,(resp)=>{
+            if(resp.successful) {
+                _metricsLoaded = '';
+                data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
+                chart.update();
+            }
+        });
+    }
     function _load_metrics(){
         if(_request == 'runtime'){
             TARA_API.onGet('role/sudo','onMetrics',_type+'#'+_category+'#'+_metrics,(resp)=>{
                 console.log(resp);
-                data.datasets[0].data = resp.metrics;
-                chart.update();
+                if(resp.successful){
+                    data.datasets[0].data = resp.metrics;
+                    chart.update();
+                }
             });
         } 
-        else{ //load archive
+        else if(_request == 'archive'){ //load archive
+            _request = '';//one time archive load
             TARA_API.onGet('role/sudo','onMetricsArchive',_type+'#'+_category+'#'+_metrics+"#"+_endDate,(resp)=>{
                 console.log(resp);
-                data.datasets[0].data = resp.metrics;
-                chart.update();
+                if(resp.successful){
+                    data.datasets[0].data = resp.metrics;
+                    chart.update();
+                }
             });        
         }
     }

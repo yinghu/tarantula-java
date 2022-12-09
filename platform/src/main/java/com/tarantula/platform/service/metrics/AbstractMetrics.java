@@ -50,9 +50,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public final static String PERFORMANCE_HTTP_REQUEST_ERROR_COUNT = "httpRequestErrorCount";
 
     public final static String PERFORMANCE_UDP_REQUEST_COUNT = "udpRequestCount";
-    public final static String PERFORMANCE_VM_CPU_USAGE_COUNT = "vmCPUUsageCount";
-    public final static String PERFORMANCE_VM_MEMORY_COUNT = "vmMemoryCount";
-    public final static String PERFORMANCE_VM_THREAD_COUNT = "vmThreadCount";
+    //public final static String PERFORMANCE_VM_CPU_USAGE_COUNT = "vmCPUUsageCount";
+    //public final static String PERFORMANCE_VM_MEMORY_COUNT = "vmMemoryCount";
+    //public final static String PERFORMANCE_VM_THREAD_COUNT = "vmThreadCount";
 
 
 
@@ -133,9 +133,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             registerCategory(PERFORMANCE_HTTP_REQUEST_COUNT);
             registerCategory(PERFORMANCE_HTTP_REQUEST_ERROR_COUNT);
             registerCategory(PERFORMANCE_UDP_REQUEST_COUNT);
-            registerCategory(PERFORMANCE_VM_CPU_USAGE_COUNT);
-            registerCategory(PERFORMANCE_VM_MEMORY_COUNT);
-            registerCategory(PERFORMANCE_VM_THREAD_COUNT);
+            //registerCategory(PERFORMANCE_VM_CPU_USAGE_COUNT);
+            //registerCategory(PERFORMANCE_VM_MEMORY_COUNT);
+            //registerCategory(PERFORMANCE_VM_THREAD_COUNT);
         }
 
         if(deploymentIncluded){
