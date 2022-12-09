@@ -214,17 +214,19 @@
         if(_request == 'runtime'){
             TARA_API.onSet('role/sudo','onMetrics','',_command,(resp)=>{
                 console.log(resp);
+                _tx_empty_arr(data.datasets);
                 if(resp.successful){
-                    let mid = resp.memberId;
-                    let ct = _nodeSelected[mid];
-                    let a = data.datasets[0];
-                    a.backgroundColor = ct.backgroundColor;
-                    a.borderColor = ct.borderColor;
-                    a.borderWidth = ct.borderWidth;
-                    a.pointBorderWidth = ct.pointBorderWidth;
-                    a.pointRadius = ct.pointRadius;
-                    a.cubicInterpolationMode = ct.cubicInterpolationMode;
-                    a.data = resp.metrics;
+                    resp.metrics.forEach(a=>{
+                        let mid = a.memberId;
+                        let ct = _nodeSelected[mid];
+                        a.backgroundColor = ct.backgroundColor;
+                        a.borderColor = ct.borderColor;
+                        a.borderWidth = ct.borderWidth;
+                        a.pointBorderWidth = ct.pointBorderWidth;
+                        a.pointRadius = ct.pointRadius;
+                        a.cubicInterpolationMode = ct.cubicInterpolationMode;
+                        data.datasets.push(a);
+                    });
                     chart.update();
                 }
             });
@@ -252,5 +254,10 @@
         let td = new Date();
         let sd = new Date(dateSelected);
         return 86400000 < td.getTime()-sd.getTime();
+    }
+    function _tx_empty_arr(arr){
+        while(arr.length>0){
+            arr.pop();
+        }
     }
 </script>

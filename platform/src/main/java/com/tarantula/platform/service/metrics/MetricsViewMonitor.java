@@ -42,11 +42,13 @@ public class MetricsViewMonitor implements SchedulingTask {
     public void run() {
         try{
            listeners.forEach((k,r)->{
-                String[] ret = distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
-                for(String f  : ret) {
-                    JsonObject m = JsonUtil.parse(f);
-                    r.snapshot(m);
-                }
+               r.reset();
+               String[] ret = distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
+               for(String f  : ret) {
+                   JsonObject m = JsonUtil.parse(f);
+                   r.snapshot(m);
+               }
+               r.loaded();
            });
         }catch (Exception ex){
 

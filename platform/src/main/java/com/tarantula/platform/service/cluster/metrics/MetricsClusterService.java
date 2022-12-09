@@ -11,6 +11,7 @@ import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
+import com.tarantula.platform.service.metrics.MetricsSnapshotResponse;
 import com.tarantula.platform.service.metrics.ServiceViewRequest;
 
 
@@ -59,8 +60,8 @@ public class MetricsClusterService implements ManagedService, RemoteService {
     public String metricsSnapshot(String name,String category,String classifier){
         Metrics m = this.tarantulaContext.metrics(name);
         Property[] dat = m.snapshot(category,classifier);
-        MetricsSnapshotRequest request = new MetricsSnapshotRequest(nodeEngine.getLocalMember().getUuid());
-        request.snapshot(dat);
-        return request.toJson().toString();
+        MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
+        response.snapshot(dat);
+        return response.toJson().toString();
     }
 }
