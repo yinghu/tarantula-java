@@ -59,12 +59,14 @@ public class MetricsViewMonitor implements SchedulingTask {
     public void register(MetricsSnapshotRequest metricsSnapshotRequest){
         this.listeners.put(metricsSnapshotRequest.toString(),metricsSnapshotRequest);
     }
-    public JsonObject metrics(String name,String category,String classifier){
+    public JsonObject snapshot(String name,String category,String classifier){
+        return listeners.get(toKey(name,category,classifier)).toJson();
+    }
+    public JsonObject archive(String name,String category,String classifier){
         return listeners.get(toKey(name,category,classifier)).toJson();
     }
     private String toKey(String name,String category,String classifier){
         return name+"_"+category+"_"+classifier;
     }
-
 
 }

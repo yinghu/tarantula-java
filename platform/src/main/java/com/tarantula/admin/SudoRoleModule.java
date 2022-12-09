@@ -25,6 +25,7 @@ public class SudoRoleModule implements Module {
     private UserService userService;
     private GsonBuilder builder;
     private MetricsViewMonitor metricsViewMonitor;
+    private Configuration chartConfiguration;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -130,31 +131,44 @@ public class SudoRoleModule implements Module {
             session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
+            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             Metrics metrics = context.metrics(session.name());
             List<String> categories = metrics.categories();
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
             categories.forEach(category->ms.add(category));
             m.add("categories",ms);
+            JsonArray nodes = new JsonArray();
+            JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();
+            int[] i = {0};
+            summary.clusterNodes().forEach(n->{
+                JsonObject nd = new JsonObject();
+                nd.addProperty("nodeName",n.nodeName());
+                nd.addProperty("memberId",n.memberId());
+                nd.add("chart",chs.get(i[0]).getAsJsonObject());
+                nodes.add(nd);
+                i[0]++;
+            });
+            m.add("cluster",nodes);
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsRegister")){
-            String[] query = session.name().split("#");
-            this.metricsViewMonitor.register(new MetricsSnapshotRequest(query[0],query[2],query[1]));
+            JsonObject query = JsonUtil.parse(payload);
+            this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(),query.get("category").getAsString(),query.get("classifier").getAsString()));
             session.write(toMessage(session.action(),true).getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            String[] query = session.name().split("#");
-            JsonObject m = this.metricsViewMonitor.metrics(query[0],query[2],query[1]);
+            JsonObject query = JsonUtil.parse(payload);
+            JsonObject m = this.metricsViewMonitor.snapshot(query.get("type").getAsString(),query.get("category").getAsString(),query.get("classifier").getAsString());
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsArchive")){
-            String[] query = session.name().split("#");
-            Metrics metrics = context.metrics(query[0]);
+            JsonObject query = JsonUtil.parse(payload);
+            Metrics metrics = context.metrics(query.get("type").getAsString());
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
-            LocalDateTime end = LocalDateTime.parse(query[3]);
-            for(Property p : metrics.archive(query[2],query[1],end)[0].hourlyGain()){
+            LocalDateTime end = LocalDateTime.parse(query.get("endTime").getAsString());
+            for(Property p : metrics.archive(query.get("category").getAsString(),query.get("classifier").getAsString(),end)[0].hourlyGain()){
                 JsonObject js = new JsonObject();
                 js.addProperty("x",p.name());
                 js.addProperty("y",p.value().toString());
@@ -182,6 +196,7 @@ public class SudoRoleModule implements Module {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
+        this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.metricsViewMonitor = new MetricsViewMonitor(this.context);
         this.context.schedule(this.metricsViewMonitor);
         this.context.log("Sudo setup module started", OnLog.INFO);
