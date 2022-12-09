@@ -8,11 +8,9 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.util.DescriptorSerializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameLobbyAdminModule implements Module {
     private ApplicationContext context;

@@ -85,17 +85,10 @@
     let _metricsLoaded = 'loading';
     let _request = 'runtime';
     let _timer;
-    let _nodeSelected ={nodes:[]};
-    let _command ={type:'performance',category:'',classifier:'hourly',endDate:'',nodes:[]};
+    let _nodeSelected ={};
+    let _command ={type:'performance',category:'',classifier:'hourly',endDate:''};
     _start_metrics_timer();
-    const data = {
-        datasets: [{
-            label:'',
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [],
-        }]
-    };
+    const data = {datasets: []};
     const config = {type: 'bar',data: data,options: {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero: true}}}};
     Chart.defaults.font.family = 'Oswald';
     const chart = new Chart(document.querySelector("#tchart"),config);
@@ -178,24 +171,16 @@
                 console.log(a);
                 tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
-                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');   
+                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
                 _nodeSelected[a.memberId]=a.chart;
+                _nodeSelected[a.memberId].selected = true;
                 //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
             });
             _nodeBar.innerHTML = tem1.join('');
             document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
                 a.onchange = ()=>{
                     let memberId = a.getAttribute('tx-node-member-id');
-                    console.log(_nodeSelected[memberId]);
-                    if(a.checked){
-                        _nodeSelected.nodes.push(memberId);
-                    }
-                    else{
-                       let ix = _nodeSelected.nodes.indexOf(memberId);
-                       if(ix != -1){
-                           _nodeSelected.nodes.splice(ix,1);   
-                       }     
-                    }
+                    _nodeSelected[memberId].selected = a.checked;
                 };
             });
             _register_metrics();
@@ -220,14 +205,16 @@
                     resp.metrics.forEach(a=>{
                         let mid = a.memberId;
                         let ct = _nodeSelected[mid];
-                        a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
-                        a.backgroundColor = ct.backgroundColor;
-                        a.borderColor = ct.borderColor;
-                        a.borderWidth = ct.borderWidth;
-                        a.pointBorderWidth = ct.pointBorderWidth;
-                        a.pointRadius = ct.pointRadius;
-                        a.cubicInterpolationMode = ct.cubicInterpolationMode;
-                        data.datasets.push(a);
+                        if(ct.selected){
+                            a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
+                            a.backgroundColor = ct.backgroundColor;
+                            a.borderColor = ct.borderColor;
+                            a.borderWidth = ct.borderWidth;
+                            a.pointBorderWidth = ct.pointBorderWidth;
+                            a.pointRadius = ct.pointRadius;
+                            a.cubicInterpolationMode = ct.cubicInterpolationMode;
+                            data.datasets.push(a);
+                        }
                     });
                     chart.update();
                 }
