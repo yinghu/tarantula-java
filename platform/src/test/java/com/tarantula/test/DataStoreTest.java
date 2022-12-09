@@ -5,7 +5,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.tarantula.platform.service.DataStoreProvider;
@@ -23,7 +22,6 @@ public class DataStoreTest {
     static {
         System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
     }
-    private static final TarantulaLogger log = JDKLogger.getLogger(TarantulaMain.class);
 
 
     DataStoreProvider dataStoreProvider;

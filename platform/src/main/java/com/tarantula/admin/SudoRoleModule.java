@@ -7,13 +7,15 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
+import com.tarantula.platform.service.metrics.MetricsViewMonitor;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class SudoRoleModule implements Module {
+public class SudoRoleModule implements Module, MetricsViewMonitor.Listener {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -79,24 +81,24 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onTestLabeledKey")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY))!=null;
-            session.write(toMessage(suc?"key passed":"key failed",suc).toString().getBytes());
+            session.write(toMessage(suc?"key passed":"key failed",suc).getBytes());
         }
         else if(session.action().equals("onStopAccessIndex")){
             accessIndexService.onDisable();
-            session.write(toMessage(session.action(),true).toString().getBytes());
+            session.write(toMessage(session.action(),true).getBytes());
         }
         else if(session.action().equals("onStartAccessIndex")){
             accessIndexService.onEnable();
-            session.write(toMessage(session.action(),true).toString().getBytes());
+            session.write(toMessage(session.action(),true).getBytes());
         }
         else if(session.action().equals("onFindUser")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String login = (String)acc.property(OnAccess.LOGIN);
             AccessIndex accessIndex = accessIndexService.get(login);
             if(accessIndex!=null){
-                session.write(toMessage(accessIndex.distributionKey(),true).toString().getBytes());
+                session.write(toMessage(accessIndex.distributionKey(),true).getBytes());
             }else{
-                session.write(toMessage("["+login+"] not found",false).toString().getBytes());
+                session.write(toMessage("["+login+"] not found",false).getBytes());
             }
         }
 
@@ -120,12 +122,12 @@ public class SudoRoleModule implements Module {
             }
             onView.moduleContext(moduleContext);
             Response suc = this.deploymentServiceProvider.createView(onView);
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
+            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
+            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
             Metrics metrics = context.metrics(session.name());
@@ -135,6 +137,7 @@ public class SudoRoleModule implements Module {
             categories.forEach(category->ms.add(category));
             m.add("categories",ms);
             session.write(m.toString().getBytes());
+            this.context.schedule(new MetricsViewMonitor(this.context,100,metrics,this));
         }
         else if(session.action().equals("onMetrics")){
             String[] query = session.name().split("#");
@@ -187,10 +190,18 @@ public class SudoRoleModule implements Module {
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
-    private JsonObject toMessage(String msg,boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms;
+    private String toMessage(String msg,boolean suc){
+
+        return JsonUtil.toSimpleResponse(suc,msg);
+    }
+
+    @Override
+    public void onSnapshot(MetricsSnapshotRequest request) {
+        //this.context.log(request.toJson().toString(),OnLog.WARN);
+    }
+
+    @Override
+    public void onStop() {
+
     }
 }

@@ -1,18 +1,16 @@
 package com.tarantula.platform.service.cluster.metrics;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
-import com.icodesoftware.Configuration;
+import com.icodesoftware.Property;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.metrics.ServiceView;
+import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.ServiceViewRequest;
 
 
@@ -56,6 +54,13 @@ public class MetricsClusterService implements ManagedService, RemoteService {
         ServiceViewRequest request = new ServiceViewRequest(nodeEngine.getLocalMember().getUuid());
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(serviceName);
         serviceProvider.updateSummary(request);
+        return request.toJson().toString();
+    }
+    public String metricsSnapshot(String name,String category,String classifier){
+        Metrics m = this.tarantulaContext.metrics(name);
+        Property[] dat = m.snapshot(category,classifier);
+        MetricsSnapshotRequest request = new MetricsSnapshotRequest(nodeEngine.getLocalMember().getUuid(),name,category,classifier);
+        request.snapshot(dat);
         return request.toJson().toString();
     }
 }

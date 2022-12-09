@@ -51,6 +51,25 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         }
         return ret;
     }
+    public String[] onMetrics(String name,String category,String classifier){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        String[] ret = new String[mlist.size()];
+        int i = 0;
+        for(Member m : mlist){
+            MetricsViewOperation serviceViewOperation = new MetricsViewOperation(name,category,classifier);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
+            final Future<String> future = builder.invoke();
+            try {
+                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                ret[i]="{}";
+            }
+            i++;
+        }
+        return ret;
+    }
 
     @Override
     public String name() {

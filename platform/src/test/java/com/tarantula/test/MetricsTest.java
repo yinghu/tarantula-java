@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MetricsTest {
-
+    static {
+        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
+    }
     @BeforeClass
     public void setUp() {
     }
