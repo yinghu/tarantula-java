@@ -205,7 +205,8 @@
         TARA_API.onSet('role/sudo','onMetricsRegister','',_command,(resp)=>{
             if(resp.successful) {
                 _metricsLoaded = '';
-                data.datasets[0].label = _command.type+'/'+_command.classifier+'/'+_command.category;
+                //data.datasets[0].label = _command.type+'/'+_command.classifier+'/'+_command.category;
+                _tx_empty_arr(data.datasets);
                 chart.update();
             }
         });
@@ -219,6 +220,7 @@
                     resp.metrics.forEach(a=>{
                         let mid = a.memberId;
                         let ct = _nodeSelected[mid];
+                        a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
                         a.backgroundColor = ct.backgroundColor;
                         a.borderColor = ct.borderColor;
                         a.borderWidth = ct.borderWidth;
