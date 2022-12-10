@@ -22,4 +22,15 @@ public class TimeUtilTest {
         Assert.assertEquals(mid.getDayOfYear(),LocalDateTime.now().getDayOfYear()+1);
     }
 
+    @Test(groups = { "time util" })
+    public void toMondayTest() {
+        LocalDateTime _cur = LocalDateTime.now();
+        LocalDateTime w1 = TimeUtil.toLastMonday(_cur);
+        LocalDateTime m1 = TimeUtil.toFirstDayOfLastMonth(_cur);
+        Assert.assertTrue(w1.getDayOfWeek().getValue()==1);
+        Assert.assertTrue(TimeUtil.toLastMonday(w1).getDayOfWeek().getValue()==1);
+        Assert.assertTrue(m1.getDayOfMonth()==1);
+        Assert.assertTrue(m1.getMonth().getValue()!=_cur.getMonth().getValue()+1);
+    }
+
 }

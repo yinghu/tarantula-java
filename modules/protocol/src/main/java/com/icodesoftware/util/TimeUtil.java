@@ -54,4 +54,14 @@ public class TimeUtil {
         LocalDateTime _end = start.plusHours(1).minusSeconds(start.getMinute()*60+start.getSecond());
         return Duration.between(start,_end).toMillis();
     }
+
+    public static LocalDateTime toLastMonday(LocalDateTime end){
+        return end.minusWeeks(1).plusDays(8-end.getDayOfWeek().getValue());
+    }
+    public static LocalDateTime toFirstDayOfLastMonth(LocalDateTime end){
+        return end.minusMonths(1).withDayOfMonth(1);
+    }
+    public static LocalDateTime toFirstDayOfLastYear(LocalDateTime end){
+        return end.minusYears(1).withDayOfYear(1);
+    }
 }

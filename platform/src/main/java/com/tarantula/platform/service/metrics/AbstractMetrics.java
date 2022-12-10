@@ -289,6 +289,19 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public History archive(String category,LocalDateTime end){
         return metricsHistory(category,end);
     }
+    public History archiveWeekly(String category,LocalDateTime end){
+        LocalDateTime wday = TimeUtil.toLastMonday(end);
+        return metricsHistory(category,wday);
+    }
+    public History archiveMonthly(String category,LocalDateTime end){
+        LocalDateTime mday = TimeUtil.toFirstDayOfLastMonth(end);
+        return metricsHistory(category,mday);
+    }
+    public History archiveYearly(String category,LocalDateTime end){
+        LocalDateTime yday = TimeUtil.toFirstDayOfLastYear(end);
+        return metricsHistory(category,yday);
+    }
+
 
     @Override
     public void start() throws Exception {

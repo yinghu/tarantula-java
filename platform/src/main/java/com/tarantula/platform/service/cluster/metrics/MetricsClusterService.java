@@ -4,11 +4,13 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.MetricsSnapshotResponse;
@@ -16,7 +18,9 @@ import com.tarantula.platform.service.metrics.ServiceViewRequest;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.Random;
 
 public class MetricsClusterService implements ManagedService, RemoteService {
 
@@ -67,9 +71,46 @@ public class MetricsClusterService implements ManagedService, RemoteService {
     }
     public String metricsArchive(String name, String category, String classifier, LocalDateTime end){
         Metrics m = this.tarantulaContext.metrics(name);
-        Metrics.History history = m.archive(category,end);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
-        response.snapshot(history.hourlyGain());
+        Random r = new Random();
+        switch (classifier){
+            case LeaderBoard.DAILY:
+                for(int i=23;i>=0;i--){
+                    LocalDateTime hday = end.minusDays(i);
+                    Metrics.History history = m.archive(category,hday);
+                    String tag = hday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    response.archive(tag,history.dailyGain()+r.nextInt(10000));
+                }
+                break;
+            case LeaderBoard.WEEKLY:
+                for(int i=23;i>=0;i--){
+                    LocalDateTime wday = TimeUtil.toLastMonday(end.minusDays(i*7));
+                    Metrics.History history = m.archive(category,wday);
+                    String tag = wday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    response.archive(tag,history.weeklyGain()+r.nextInt(10000));
+                }
+                break;
+            case LeaderBoard.MONTHLY:
+                for(int i=12;i>=0;i--){
+                    LocalDateTime mday = TimeUtil.toFirstDayOfLastMonth(end.minusMonths(i));
+                    Metrics.History history = m.archive(category,mday);
+                    String tag = mday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    response.archive(tag,history.monthlyGain()+r.nextInt(10000));
+                }
+                break;
+            case LeaderBoard.YEARLY:
+                for(int i=2;i>=0;i--){
+                    LocalDateTime yday = TimeUtil.toFirstDayOfLastYear(end.minusYears(i));
+                    Metrics.History history = m.archive(category,yday);
+                    String tag = yday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                    response.archive(tag,history.yearlyGain()+r.nextInt(10000));
+                }
+                break;
+            case LeaderBoard.HOURLY:
+            default:
+                Metrics.History history = m.archive(category,end);
+                response.snapshot(history.hourlyGain());
+        }
         return response.toJson().toString();
     }
 

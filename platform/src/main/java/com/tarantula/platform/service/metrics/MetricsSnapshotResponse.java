@@ -15,16 +15,22 @@ public class MetricsSnapshotResponse extends RecoverableObject{
 
     public MetricsSnapshotResponse(String memberId){
         this.memberId = memberId;
+        this.metrics = new JsonArray();
     }
 
     public void snapshot(Property[] snapshot){
-        this.metrics = new JsonArray();
         for(Property p : snapshot) {
             JsonObject m = new JsonObject();
             m.addProperty("x",p.name());
             m.addProperty("y",p.value().toString());
             metrics.add(m);
         }
+    }
+    public void archive(String name,Object value){
+        JsonObject m = new JsonObject();
+        m.addProperty("x",name);
+        m.addProperty("y",value.toString());
+        metrics.add(m);
     }
 
     @Override
