@@ -5,39 +5,68 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-group" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">GameClusterMetrics</span>
+            <span class="tx-margin-left-8 tx-text-24">Metrics List</span>
         </div>
     </div>
-    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div> 
-    <div class="w3-panel">
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-16"></div>
+    <div class="w3-container">
+        <div><span class="tx-text-12">Cluster Node List :</span></div>
+        <div class="w3-container w3-padding-small" id="tx-game-cluster-metrics-cluster-node-list">
+        </div>
+    </div>
+    <div class="w3-row">
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Type :</label>
-        <select id='tx-gc-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
-            <option value="gameCluster" selected>GameCluster</option>  
+        <select id='tx-game-cluster-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
+            <option value="performance" selected>Performance</option>
+            <option value="access">Access</option>
+            <option value="payment">Payment</option>
+            <option value="system">System</option>
+            <option value="deployment">Deployment</option>  
         </select>
-    </div>  
-    <div class="w3-panel">
+    </div>
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Category :</label>
-        <select id='tx-gc-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
+        <select id='tx-game-cluster-metrics-category' class="w3-select w3-border w3-round tx-text-12" name='metricsCategory'>
             <option value="hourly" selected>Hourly</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
-            <option value="yearly">Yearyly</option>  
+            <option value="yearly">Yearly</option>  
         </select>
     </div>
-    <div class="w3-panel">
+    <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Data :</label>
-        <select id='tx-gc-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
+        <select id='tx-game-cluster-metrics-data' class="w3-select w3-border w3-round tx-text-12" name='metricsData'>
+            
         </select>
     </div>
+    </div>
     <div class="w3-panel">
-        <canvas id="gcchart"></canvas>
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend>Metrics Archive View</legend>
+            <div class="w3-container">
+                <div class="w3-panel w3-center w3-text-red tx-text-10" id="tx-select-error-message"></div> 
+                <div class="w3-panel">
+                    <label class="tx-text-12 tx-margin-right-4 w3-text-red">Select end date and mark checkbox</label>
+                    <input id='tx-game-cluster-metrics-history-enabled' class="w3-check tx-text-12" type="checkbox">
+                </div>
+                <div class="w3-panel">
+                    <label class="tx-text-12 tx-margin-right-4">End Date :</label></br>
+                    <input id='tx-game-cluster-metrics-history-end-date' class="w3-date-local tx-text-12" type="datetime-local">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="w3-panel">
+        <canvas id="tchart"></canvas>
     </div>
     <div class="w3-panel">
         <label class="tx-text-12 tx-margin-right-4">Chart Type :</label>
-        <select id='tx-gc-chart-type' class="w3-select w3-border w3-round tx-text-12" name='chart'>
-            <option value="line" selected>Line</option>
-            <option value="bar">Bar</option>   
+        <select id='tx-chart-type' class="w3-select w3-border w3-round tx-text-12" name='chart'>
+            <option value="bar" selected>Bar</option>
+            <option value="line">Line</option>   
         </select>
     </div> 
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -50,109 +79,221 @@
     </div>
 </div>
 <script>
-    let _category = 'hourly';
-    let _metrics = 'googleLogin';
-    let _type = 'gameCluster';
-    let _metricsLoaded ='';
+   
+    let _metricsBar = document.querySelector('#tx-game-cluster-metrics-data');
+    let _nodeBar = document.querySelector('#tx-game-cluster-metrics-cluster-node-list');
+    let _archiveCheck = document.querySelector('#tx-game-cluster-metrics-history-enabled');
+    let _archiveEndTime = document.querySelector('#tx-game-cluster-metrics-history-end-date');
+    let _archiveMessage = document.querySelector('#tx-select-error-message');
+    let _metricsLoaded = 'loading';
+    let _request = 'runtime';
+    let _timer;
+    let _nodeSelected ={};
+    let _command ={type:'performance',category:'',classifier:'hourly',archive:false,endDate:''};
+    _start_metrics_timer();
+    const data = {datasets: []};
+    const config = {type: 'bar',data: data,options: {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero: true}}}};
     Chart.defaults.font.family = 'Oswald';
-    const labels = [
-        '2021 10',
-        '2021 11',
-        '2021 12',
-        '2022 01',
-        '2022 02',
-        '2022 03',
-        '2022 04',
-        '2022 05',
-        '2022 06',
-        '2022 07',
-        '2022 08',
-        '2022 09'
-    ];
-
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: _category+'/'+_metrics,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [140, 110, 50, 200, 120, 130, 445,860,3000,2990,3100,2900],
-        }]
-    };
-
-    const config = {
-        type: 'line',
-        data: data,
-        options: {
-            scales: {
-            y: {
-                beginAtZero: true
-               }
-            }
-        }
-    };
-    
-    const chart = new Chart(document.querySelector("#gcchart"),config);
-    
+    const chart = new Chart(document.querySelector("#tchart"),config);
     
 
-    document.querySelector('#tx-gc-chart-type').onchange = ()=>{
-        let chartType = document.querySelector('#tx-gc-chart-type').value;
+    document.querySelector('#tx-chart-type').onchange = ()=>{
+        let chartType = document.querySelector('#tx-chart-type').value;
         config.type = chartType;
         chart.update();
     };
-
-    document.querySelector('#tx-gc-metrics-type').onchange = ()=>{
-        _type = document.querySelector('#tx-gc-metrics-type').value;
-        //data.datasets[0].label = _type+'/'+_category+'/'+_metrics;
-        //chart.update();
-        //_load_metrics();
+    _archiveEndTime.onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        let _endDate = _archiveEndTime.value;
+        if(_endDate ==''){
+            _archiveCheck.checked = false;
+            _archiveMessage.innerHTML = 'Select end date first';    
+            _metricsLoaded = '';
+            _command.endDate='';
+            if(_command.archive){
+                _command.archive = false;
+                _request = "runtime";
+                _register_metrics();
+            }
+            return;
+        }
+        if(!_tx_at_least_one_day_passed(_endDate)){
+            _archiveEndTime.value='';
+            _archiveCheck.checked = false;
+            _archiveMessage.innerHTML = 'Select date passed at least one day';    
+            _metricsLoaded = '';
+            _command.endDate='';
+            if(_command.archive){
+                _command.archive = false;
+                _request = "runtime";
+                _register_metrics();
+            }
+            return;
+        }
+        _archiveMessage.innerHTML='';
+        _command.endDate = _endDate;
+        if(_command.archive) {
+            _request = "archive";
+            _register_metrics();
+        }
+        else{
+            _metricsLoaded = '';
+        }
     };
-    document.querySelector('#tx-gc-metrics-category').onchange = ()=>{
-        _category = document.querySelector('#tx-gc-metrics-category').value;
-        data.datasets[0].label = _category+'/'+_metrics;
-        //chart.update();
-        _load_gc_metrics();
+    document.querySelector('#tx-game-cluster-metrics-type').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        _command.type = document.querySelector('#tx-game-cluster-metrics-type').value;
+        _load_metrics_categories();
     };
 
-    document.querySelector('#tx-gc-metrics-data').onchange = ()=>{
-        _metrics = document.querySelector('#tx-gc-metrics-data').value;
-        data.datasets[0].label = _category+'/'+_metrics;
-        _load_gc_metrics();
-        //chart.update();
+    document.querySelector('#tx-game-cluster-metrics-category').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        _command.classifier= document.querySelector('#tx-game-cluster-metrics-category').value;
+        _register_metrics();
     };
 
+    document.querySelector('#tx-game-cluster-metrics-data').onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        _command.category = document.querySelector('#tx-game-cluster-metrics-data').value;
+        _register_metrics();
+    };
+    _archiveCheck.onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        let ched = _archiveCheck.checked;
+        if(ched){
+            if(_command.endDate == ''){
+                _archiveCheck.checked = false;
+                _archiveMessage.innerHTML = 'Select end date first';    
+                _metricsLoaded = '';
+                return;
+            }
+            _command.archive = true;
+            _request = "archive";
+        }
+        else{
+            _command.archive = false;
+            _request = "runtime";
+        }
+        _archiveMessage.innerHTML = '';  
+        _register_metrics();
+    };
     document.querySelector('#tx-game-cluster-metrics-list-close').onclick=()=>{
+        clearTimeout(_timer);
         chart.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    _load_gc_metrics_categories();
-    function _load_gc_metrics_categories(){
+    _load_metrics_categories();
+    function _load_metrics_categories(){
         _metricsLoaded = 'loading';
-        let _metricsBar = document.querySelector('#tx-gc-metrics-data');
-        TARA_API.onGet('role/admin','onGameClusterMetricsCategory',TARA_API.query().gameClusterId,(resp)=>{
-            console.log(resp);
+        TARA_API.onGet('role/sudo','onMetricsCategory',_command.type,(resp)=>{
             let tem =[];
             _metricsBar.innerHTML='';
             resp.categories.forEach((category,i) => {
                 if(i==0){
-                    _metrics = category;
+                    _command.category = category;
                     tem.push('<option value=\''+category+'\' selected>'+category+'</option>');
                 }else{
                     tem.push('<option value=\''+category+'\'>'+category+'</option>');
                 }
             });
             _metricsBar.innerHTML = tem.join('');
-            _load_gc_metrics();
-            _metricsLoaded = '';
+
+            let tem1 =[];
+            _nodeBar.innerHTML = '';
+            resp.cluster.forEach(a=>{
+                tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
+                tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
+                tem1.push(' class=\'w3-check tx-text-10 tx-game-cluster-metrics-node-picker\' checked type=\'checkbox\'>');   
+                _nodeSelected[a.memberId]=a.chart;
+                _nodeSelected[a.memberId].selected = true;        
+            });
+            _nodeBar.innerHTML = tem1.join('');
+            document.querySelectorAll('.tx-game-cluster-metrics-node-picker').forEach(a=>{
+                a.onchange = ()=>{
+                    let memberId = a.getAttribute('tx-node-member-id');
+                    _nodeSelected[memberId].selected = a.checked;
+                };
+            });
+            _register_metrics();
         }); 
     }
-
-    function _load_gc_metrics(){
-        TARA_API.onGet('role/admin','onGameClusterMetrics',TARA_API.query().gameClusterId,(resp)=>{
-            chart.update();                          
+    function _register_metrics(){
+        TARA_API.onSet('role/sudo','onMetricsRegister','',_command,(resp)=>{
+            console.log(resp);
+            if(resp.successful) {
+                _command.queryId = resp.message;
+                _tx_empty_arr(data.datasets);
+                chart.update();
+                _metricsLoaded = '';
+                if(_command.archive){
+                    _request = "archive";
+                }
+                else{
+                    _request = "runtime";
+                }
+            }
         });
+    }
+    function _load_metrics(){
+        if(_request == 'runtime'){
+            TARA_API.onGet('role/sudo','onMetrics',_command.queryId,(resp)=>{
+                _tx_empty_arr(data.datasets);
+                if(resp.successful){
+                    _tx_populate_metrics(resp.metrics);
+                }   
+            });
+        } 
+        else if(_request == 'archive'){ //load archive
+            //one time archive load
+            TARA_API.onGet('role/sudo','onMetricsArchive',_command.queryId,(resp)=>{
+                console.log(resp);
+                _tx_empty_arr(data.datasets);
+                if(resp.successful){
+                    _tx_populate_metrics(resp.metrics);
+                    _request = ''
+                }
+            });        
+        }
+    }
+    function _tx_populate_metrics(metrics){
+        metrics.forEach(a=>{
+            let mid = a.memberId;
+            let ct = _nodeSelected[mid];
+            if(ct.selected){
+                a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
+                a.backgroundColor = ct.backgroundColor;
+                a.borderColor = ct.borderColor;
+                a.borderWidth = ct.borderWidth;
+                a.pointBorderWidth = ct.pointBorderWidth;
+                a.pointRadius = ct.pointRadius;
+                a.cubicInterpolationMode = ct.cubicInterpolationMode;
+                data.datasets.push(a);
+            }
+        });
+        chart.update();
+    }
+    function _start_metrics_timer(){
+        _timer = setInterval(()=>{
+            if(_metricsLoaded != 'loading'){
+                _load_metrics();
+            }     
+        },10000);
+    }
+    function _tx_at_least_one_day_passed(dateSelected){
+        let td = new Date();
+        let sd = new Date(dateSelected);
+        return 86400000 < td.getTime()-sd.getTime();
+    }
+    function _tx_empty_arr(arr){
+        while(arr.length>0){
+            arr.pop();
+        }
     }
 </script>
