@@ -153,36 +153,28 @@ public class SudoRoleModule implements Module {
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsRegister")){
+            //this.context.log(new String(payload),OnLog.WARN);
             JsonObject query = JsonUtil.parse(payload);
+            boolean archived = query.get("archive").getAsBoolean();
+            String type = query.get("type").getAsString();
+            String category = query.get("category").getAsString();
+            String classifier = query.get("classifier").getAsString();
             String queryId;
-            if(query.get("endTime")==null) {
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(), query.get("category").getAsString(), query.get("classifier").getAsString()));
+            if(archived) {
+                LocalDateTime endTime = LocalDateTime.parse(query.get("endDate").getAsString());
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier,endTime));
             }
             else{
-                LocalDateTime endTime = LocalDateTime.parse(query.get("endTime").getAsString());
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(query.get("type").getAsString(), query.get("category").getAsString(), query.get("classifier").getAsString(),endTime));
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier));
             }
             session.write(toMessage(queryId,true).getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            JsonObject query = JsonUtil.parse(payload);
-            this.context.log(query.get("queryId").getAsString(),OnLog.WARN);
-            JsonObject m = this.metricsViewMonitor.snapshot(query.get("type").getAsString(),query.get("category").getAsString(),query.get("classifier").getAsString());
+            JsonObject m = this.metricsViewMonitor.snapshot(session.name());
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsArchive")){
-            JsonObject query = JsonUtil.parse(payload);
-            Metrics metrics = context.metrics(query.get("type").getAsString());
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            LocalDateTime end = LocalDateTime.parse(query.get("endTime").getAsString());
-            for(Property p : metrics.archive(query.get("category").getAsString(),end).hourlyGain()){
-                JsonObject js = new JsonObject();
-                js.addProperty("x",p.name());
-                js.addProperty("y",p.value().toString());
-                ms.add(js);
-            }
-            m.add("metrics",ms);
+            JsonObject m = this.metricsViewMonitor.archive(session.name());
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onClusterList")){

@@ -3,6 +3,7 @@ package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 
@@ -15,17 +16,20 @@ public class MetricsSnapshotRequest extends RecoverableObject{
     public LocalDateTime endTime;
     private JsonArray metrics;
     private boolean loaded;
+    public boolean archived;
 
     public MetricsSnapshotRequest(String name,String category,String classifier){
         this.name = name;
         this.category = category;
         this.classifier = classifier;
+        this.archived = false;
     }
     public MetricsSnapshotRequest(String name,String category,String classifier,LocalDateTime endTime){
         this.name = name;
         this.category = category;
         this.classifier = classifier;
         this.endTime = endTime;
+        this.archived = true;
     }
 
     public synchronized void reset(){
@@ -49,7 +53,7 @@ public class MetricsSnapshotRequest extends RecoverableObject{
     }
 
     public String toString(){
-        return name+"_"+category+"_"+classifier;
+        return archived? SystemUtil.oid() : (name+"_"+category+"_"+classifier);
     }
 
 }

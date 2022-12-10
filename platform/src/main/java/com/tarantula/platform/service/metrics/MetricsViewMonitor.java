@@ -44,7 +44,7 @@ public class MetricsViewMonitor implements SchedulingTask {
         try{
            listeners.forEach((k,r)->{
                r.reset();
-               String[] ret = r.endTime==null?distributionMetricsService.onMetrics(r.name,r.category,r.classifier) : distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime);
+               String[] ret = r.archived?distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime):distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
                for(String f  : ret) {
                    JsonObject m = JsonUtil.parse(f);
                    r.snapshot(m);
@@ -52,7 +52,7 @@ public class MetricsViewMonitor implements SchedulingTask {
                r.loaded();
            });
         }catch (Exception ex){
-
+            ex.printStackTrace();
         }
         finally {
             this.applicationContext.schedule(this);
@@ -60,18 +60,17 @@ public class MetricsViewMonitor implements SchedulingTask {
     }
 
     public String register(MetricsSnapshotRequest metricsSnapshotRequest){
-        String queryId = SystemUtil.oid();
-        this.listeners.put(metricsSnapshotRequest.toString(),metricsSnapshotRequest);
+        String queryId = metricsSnapshotRequest.toString();
+        this.listeners.put(queryId,metricsSnapshotRequest);
         return queryId;
     }
-    public JsonObject snapshot(String name,String category,String classifier){
-        return listeners.get(toKey(name,category,classifier)).toJson();
+    public JsonObject snapshot(String queryId){
+        return listeners.get(queryId).toJson();
     }
-    public JsonObject archive(String name,String category,String classifier){
-        return listeners.get(toKey(name,category,classifier)).toJson();
-    }
-    private String toKey(String name,String category,String classifier){
-        return name+"_"+category+"_"+classifier;
+    public JsonObject archive(String queryId){
+        JsonObject ret = listeners.get(queryId).toJson();
+        if(ret.get("successful").getAsBoolean()) listeners.remove(queryId);
+        return ret;
     }
 
 }

@@ -86,7 +86,7 @@
     let _request = 'runtime';
     let _timer;
     let _nodeSelected ={};
-    let _command ={type:'performance',category:'',classifier:'hourly',endDate:''};
+    let _command ={type:'performance',category:'',classifier:'hourly',archive:false};
     _start_metrics_timer();
     const data = {datasets: []};
     const config = {type: 'bar',data: data,options: {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero: true}}}};
@@ -128,21 +128,24 @@
             if(_endDate ==''){
                 document.querySelector('#tx-metrics-history-enabled').checked = false;
                 document.querySelector('#tx-select-error-message').innerHTML = 'Select end date first';    
+                _metricsLoaded = '';
                 return;
             }
             if(!_tx_at_least_one_day_passed(_endDate)){
                 document.querySelector('#tx-metrics-history-enabled').checked = false;
                 document.querySelector('#tx-select-error-message').innerHTML = 'Select date passed at least one day';    
+                _metricsLoaded = '';
                 return;
             }
             _command.endDate = _endDate;
-            document.querySelector('#tx-select-error-message').innerHTML = '';  
+            _command.archive = true;
             _request = "archive";
         }
         else{
-            delete _command['endDate'];
+            _command.archive = false;
             _request = "runtime";
         }
+        document.querySelector('#tx-select-error-message').innerHTML = '';  
         _register_metrics();
     };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
@@ -189,6 +192,7 @@
     }
     function _register_metrics(){
         TARA_API.onSet('role/sudo','onMetricsRegister','',_command,(resp)=>{
+            console.log(resp);
             if(resp.successful) {
                 _command.queryId = resp.message;
                 _tx_empty_arr(data.datasets);
@@ -199,39 +203,42 @@
     }
     function _load_metrics(){
         if(_request == 'runtime'){
-            TARA_API.onSet('role/sudo','onMetrics','',_command,(resp)=>{
+            TARA_API.onGet('role/sudo','onMetrics',_command.queryId,(resp)=>{
                 _tx_empty_arr(data.datasets);
                 if(resp.successful){
-                    resp.metrics.forEach(a=>{
-                        let mid = a.memberId;
-                        let ct = _nodeSelected[mid];
-                        if(ct.selected){
-                            a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
-                            a.backgroundColor = ct.backgroundColor;
-                            a.borderColor = ct.borderColor;
-                            a.borderWidth = ct.borderWidth;
-                            a.pointBorderWidth = ct.pointBorderWidth;
-                            a.pointRadius = ct.pointRadius;
-                            a.cubicInterpolationMode = ct.cubicInterpolationMode;
-                            data.datasets.push(a);
-                        }
-                    });
-                    chart.update();
-                }
+                    _tx_populate_metrics(resp.metrics);
+                }   
             });
         } 
         else if(_request == 'archive'){ //load archive
-            _request = '';//one time archive load
-            TARA_API.onGet('role/sudo','onMetricsArchive',_command,(resp)=>{
+            //one time archive load
+            TARA_API.onGet('role/sudo','onMetricsArchive',_command.queryId,(resp)=>{
                 console.log(resp);
+                _tx_empty_arr(data.datasets);
                 if(resp.successful){
-                    //data.datasets[0].data = resp.metrics;
-                    //chart.update();
+                    _tx_populate_metrics(resp.metrics);
+                    _request = ''
                 }
             });        
         }
     }
-
+    function _tx_populate_metrics(metrics){
+        metrics.forEach(a=>{
+            let mid = a.memberId;
+            let ct = _nodeSelected[mid];
+            if(ct.selected){
+                a.label = _command.type+"/"+_command.classifier+"/"+_command.category;
+                a.backgroundColor = ct.backgroundColor;
+                a.borderColor = ct.borderColor;
+                a.borderWidth = ct.borderWidth;
+                a.pointBorderWidth = ct.pointBorderWidth;
+                a.pointRadius = ct.pointRadius;
+                a.cubicInterpolationMode = ct.cubicInterpolationMode;
+                data.datasets.push(a);
+            }
+        });
+        chart.update();
+    }
     function _start_metrics_timer(){
         _timer = setInterval(()=>{
             if(_metricsLoaded != 'loading'){
