@@ -1,20 +1,16 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class ModuleRoleModule implements Module {
 
@@ -40,7 +36,7 @@ public class ModuleRoleModule implements Module {
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
             Response resp = this.deploymentServiceProvider.exportModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
+            session.write(this.toMessage(resp.message(),resp.successful()).getBytes());
         }
         else if(session.action().equals("onAddModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -49,12 +45,12 @@ public class ModuleRoleModule implements Module {
             desc.moduleArtifact(acc.property(OnAccess.MODULE_ARTIFACT).toString());
             desc.moduleVersion(acc.property(OnAccess.MODULE_VERSION).toString());
             Response resp = this.deploymentServiceProvider.createModule(desc);
-            session.write(this.toMessage(resp.message(),resp.successful()).toString().getBytes());
+            session.write(this.toMessage(resp.message(),resp.successful()).getBytes());
         }
         else if(session.action().equals("onLaunchModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.launchModule(access.typeId());
-            session.write(this.toMessage(suc?"module launched":"module not launched",suc).toString().getBytes());
+            session.write(this.toMessage(suc?"module launched":"module not launched",suc).getBytes());
         }
         else if(session.action().equals("onResetModule")){//typeId or moduleId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -68,12 +64,12 @@ public class ModuleRoleModule implements Module {
                 desc.index(index.distributionKey());
             }
             boolean suc  = this.deploymentServiceProvider.resetModule(desc);
-            session.write(this.toMessage(suc?"module rest":"module not reset",suc).toString().getBytes());
+            session.write(this.toMessage(suc?"module rest":"module not reset",suc).getBytes());
         }
         else if(session.action().equals("onShutdownModule")){//typeId
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
-            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).toString().getBytes());
+            session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).getBytes());
         }
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
@@ -95,17 +91,17 @@ public class ModuleRoleModule implements Module {
             }
             onView.moduleContext(moduleContext);
             Response suc = this.deploymentServiceProvider.createView(onView);
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
+            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onDeployResource")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
+            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onDeployModule")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).toString().getBytes());
+            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
@@ -125,10 +121,7 @@ public class ModuleRoleModule implements Module {
         this.context.log("Sudo module setup module started", OnLog.INFO);
     }
 
-    private JsonObject toMessage(String msg,boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms;
+    private String toMessage(String msg,boolean suc){
+        return SystemUtil.toJsonMessage(msg,suc);
     }
 }

@@ -82,11 +82,14 @@
    
     let _metricsBar = document.querySelector('#tx-metrics-data');
     let _nodeBar = document.querySelector('#tx-metrics-cluster-node-list');
+    let _archiveCheck = document.querySelector('#tx-metrics-history-enabled');
+    let _archiveEndTime = document.querySelector('#tx-metrics-history-end-date');
+    let _archiveMessage = document.querySelector('#tx-select-error-message');
     let _metricsLoaded = 'loading';
     let _request = 'runtime';
     let _timer;
     let _nodeSelected ={};
-    let _command ={type:'performance',category:'',classifier:'hourly',archive:false};
+    let _command ={type:'performance',category:'',classifier:'hourly',archive:false,endDate:''};
     _start_metrics_timer();
     const data = {datasets: []};
     const config = {type: 'bar',data: data,options: {responsive: true,maintainAspectRatio: false,scales: {y: {beginAtZero: true}}}};
@@ -98,6 +101,45 @@
         let chartType = document.querySelector('#tx-chart-type').value;
         config.type = chartType;
         chart.update();
+    };
+    _archiveEndTime.onchange = ()=>{
+        if(_metricsLoaded == 'loading') return;
+        _metricsLoaded = 'loading';
+        let _endDate = _archiveEndTime.value;
+        if(_endDate ==''){
+            _archiveCheck.checked = false;
+            _archiveMessage.innerHTML = 'Select end date first';    
+            _metricsLoaded = '';
+            _command.endDate='';
+            if(_command.archive){
+                _command.archive = false;
+                _request = "runtime";
+                _register_metrics();
+            }
+            return;
+        }
+        if(!_tx_at_least_one_day_passed(_endDate)){
+            _archiveEndTime.value='';
+            _archiveCheck.checked = false;
+            _archiveMessage.innerHTML = 'Select date passed at least one day';    
+            _metricsLoaded = '';
+            _command.endDate='';
+            if(_command.archive){
+                _command.archive = false;
+                _request = "runtime";
+                _register_metrics();
+            }
+            return;
+        }
+        _archiveMessage.innerHTML='';
+        _command.endDate = _endDate;
+        if(_command.archive) {
+            _request = "archive";
+            _register_metrics();
+        }
+        else{
+            _metricsLoaded = '';
+        }
     };
     document.querySelector('#tx-metrics-type').onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
@@ -119,25 +161,17 @@
         _command.category = document.querySelector('#tx-metrics-data').value;
         _register_metrics();
     };
-    document.querySelector('#tx-metrics-history-enabled').onchange = ()=>{
+    _archiveCheck.onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
         _metricsLoaded = 'loading';
-        let ched = document.querySelector('#tx-metrics-history-enabled').checked;
+        let ched = _archiveCheck.checked;
         if(ched){
-            let _endDate = document.querySelector("#tx-metrics-history-end-date").value;
-            if(_endDate ==''){
-                document.querySelector('#tx-metrics-history-enabled').checked = false;
-                document.querySelector('#tx-select-error-message').innerHTML = 'Select end date first';    
+            if(_command.endDate == ''){
+                _archiveCheck.checked = false;
+                _archiveMessage.innerHTML = 'Select end date first';    
                 _metricsLoaded = '';
                 return;
             }
-            if(!_tx_at_least_one_day_passed(_endDate)){
-                document.querySelector('#tx-metrics-history-enabled').checked = false;
-                document.querySelector('#tx-select-error-message').innerHTML = 'Select date passed at least one day';    
-                _metricsLoaded = '';
-                return;
-            }
-            _command.endDate = _endDate;
             _command.archive = true;
             _request = "archive";
         }
@@ -145,7 +179,7 @@
             _command.archive = false;
             _request = "runtime";
         }
-        document.querySelector('#tx-select-error-message').innerHTML = '';  
+        _archiveMessage.innerHTML = '';  
         _register_metrics();
     };
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
@@ -198,6 +232,12 @@
                 _tx_empty_arr(data.datasets);
                 chart.update();
                 _metricsLoaded = '';
+                if(_command.archive){
+                    _request = "archive";
+                }
+                else{
+                    _request = "runtime";
+                }
             }
         });
     }

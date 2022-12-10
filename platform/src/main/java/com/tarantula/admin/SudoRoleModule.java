@@ -153,7 +153,6 @@ public class SudoRoleModule implements Module {
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsRegister")){
-            //this.context.log(new String(payload),OnLog.WARN);
             JsonObject query = JsonUtil.parse(payload);
             boolean archived = query.get("archive").getAsBoolean();
             String type = query.get("type").getAsString();
@@ -203,8 +202,7 @@ public class SudoRoleModule implements Module {
     }
 
     private String toMessage(String msg,boolean suc){
-
-        return JsonUtil.toSimpleResponse(suc,msg);
+       return SystemUtil.toJsonMessage(msg,suc);
     }
 
 

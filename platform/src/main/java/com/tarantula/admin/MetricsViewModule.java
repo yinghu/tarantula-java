@@ -11,6 +11,7 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.ServiceViewMonitor;
 import com.tarantula.platform.service.metrics.ServiceViewSummary;
+import com.tarantula.platform.util.SystemUtil;
 
 
 import java.time.LocalDateTime;
@@ -108,7 +109,7 @@ public class MetricsViewModule implements Module {
                 session.write(view.toCategoryJson().toString().getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"service provider ["+session.name()+"] not existed").getBytes());
+                session.write(SystemUtil.toJsonMessage("service provider ["+session.name()+"] not existed",false).getBytes());
             }
         }
         else if(session.action().equals("onUpdateServiceView")){
@@ -120,7 +121,7 @@ public class MetricsViewModule implements Module {
                 session.write(view.toMetricsJson(nodes,categories).toString().getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"service view ["+session.name()+"] not existed").getBytes());
+                session.write(SystemUtil.toJsonMessage("service view ["+session.name()+"] not existed",false).getBytes());
             }
         }
         else if(session.action().equals("onClusterList")){

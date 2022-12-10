@@ -591,8 +591,9 @@
                 console.log(a);
                 tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
-                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' type=\'checkbox\'>');   
+                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
                 metricsSelected[a.memberId]=a.chart;
+                metricsSelected.nodes.push(a.memberId);
                 //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
             });
             metricsClusterSelectBar.innerHTML = tem1.join('');  

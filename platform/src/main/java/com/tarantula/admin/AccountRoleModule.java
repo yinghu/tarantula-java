@@ -1,14 +1,12 @@
 package com.tarantula.admin;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
-import com.icodesoftware.util.JsonUtil;
 
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -48,15 +46,15 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 Access u = userService.loadUser(uid);
                 if(u!=null){
                     if(!u.role().equals(owner.role())){
-                        session.write(JsonUtil.toSimpleResponse(this.tokenValidatorProvider.grantAccess(u,owner),"upgraded").getBytes());
+                        session.write(toMessage("upgraded",this.tokenValidatorProvider.grantAccess(u,owner)).getBytes());
                     }else{
-                        session.write(JsonUtil.toSimpleResponse(this.tokenValidatorProvider.revokeAccess(u),"revoked").getBytes());
+                        session.write(toMessage("revoked",this.tokenValidatorProvider.revokeAccess(u)).getBytes());
                     }
                 }else{
-                    session.write(toMessage("user not existed ["+uid+"]",false).toString().getBytes());
+                    session.write(toMessage("user not existed ["+uid+"]",false).getBytes());
                 }
             }else{
-                session.write(toMessage("only primary can update role",false).toString().getBytes());
+                session.write(toMessage("only primary can update role",false).getBytes());
             }
         }
         else if(session.action().equals("onAddUser")){
@@ -68,14 +66,14 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                     onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner
                     onAccess.distributionKey(query.distributionKey());
                     this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
-                    session.write(this.toMessage("add user event send",true).toString().getBytes());
+                    session.write(this.toMessage("add user event send",true).getBytes());
                 }
                 else {
-                    session.write(this.toMessage("user already existed", false).toString().getBytes());
+                    session.write(this.toMessage("user already existed", false).getBytes());
                 }
             }
             else{
-                session.write(this.toMessage("add user service not available",false).toString().getBytes());
+                session.write(this.toMessage("add user service not available",false).getBytes());
             }
         }
         else if(session.action().equals("onSubscription")){
@@ -93,10 +91,10 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             chargeParams.put("description",item.description);
             if(this.context.validator().validateToken(chargeParams)){
                 Subscription subscription = userService.subscribe(session.systemId(),12);
-                session.write(JsonUtil.toSimpleResponse(true, "on commit").getBytes());
+                session.write(toMessage( "on commit",true).getBytes());
             }
             else {
-                session.write(JsonUtil.toSimpleResponse(false, "on commit").getBytes());
+                session.write(toMessage("on commit",false).getBytes());
             }
         }
         else{
@@ -129,11 +127,8 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.context.log("Account role module started with max user count ["+trialMaxUserCount+","+subscribedMaxUserCount+"]", OnLog.INFO);
     }
 
-    private JsonObject toMessage(String msg, boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms;
+    private String toMessage(String msg, boolean suc){
+        return SystemUtil.toJsonMessage(msg,suc);
     }
 
     @Override

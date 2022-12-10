@@ -1,5 +1,6 @@
 package com.tarantula.platform.util;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.TimeUtil;
@@ -254,5 +255,12 @@ public class SystemUtil {
     }
     public static byte[] fromBase64String(String data){
         return Base64.getDecoder().decode(data);
+    }
+
+    public static String toJsonMessage(String msg, boolean suc){
+        JsonObject jms = new JsonObject();
+        jms.addProperty("successful",suc);
+        jms.addProperty("message",msg);
+        return jms.toString();
     }
 }
