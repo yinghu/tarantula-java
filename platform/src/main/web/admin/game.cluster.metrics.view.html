@@ -79,7 +79,7 @@
     </div>
 </div>
 <script>
-   
+    console.log(TARA_API.query().gameClusterId);
     let _metricsBar = document.querySelector('#tx-game-cluster-metrics-data');
     let _nodeBar = document.querySelector('#tx-game-cluster-metrics-cluster-node-list');
     let _archiveCheck = document.querySelector('#tx-game-cluster-metrics-history-enabled');
@@ -192,7 +192,7 @@
     _load_metrics_categories();
     function _load_metrics_categories(){
         _metricsLoaded = 'loading';
-        TARA_API.onGet('role/sudo','onMetricsCategory',_command.type,(resp)=>{
+        TARA_API.onGet('role/admin/metrics','onMetricsCategory',_command.type,(resp)=>{
             let tem =[];
             _metricsBar.innerHTML='';
             resp.categories.forEach((category,i) => {
@@ -225,7 +225,7 @@
         }); 
     }
     function _register_metrics(){
-        TARA_API.onSet('role/sudo','onMetricsRegister','',_command,(resp)=>{
+        TARA_API.onSet('role/admin/metrics','onMetricsRegister','',_command,(resp)=>{
             console.log(resp);
             if(resp.successful) {
                 _command.queryId = resp.message;
@@ -243,7 +243,7 @@
     }
     function _load_metrics(){
         if(_request == 'runtime'){
-            TARA_API.onGet('role/sudo','onMetrics',_command.queryId,(resp)=>{
+            TARA_API.onGet('role/admin/metrics','onMetrics',_command.queryId,(resp)=>{
                 _tx_empty_arr(data.datasets);
                 if(resp.successful){
                     _tx_populate_metrics(resp.metrics);
@@ -252,7 +252,7 @@
         } 
         else if(_request == 'archive'){ //load archive
             //one time archive load
-            TARA_API.onGet('role/sudo','onMetricsArchive',_command.queryId,(resp)=>{
+            TARA_API.onGet('role/admin/metrics','onMetricsArchive',_command.queryId,(resp)=>{
                 console.log(resp);
                 _tx_empty_arr(data.datasets);
                 if(resp.successful){

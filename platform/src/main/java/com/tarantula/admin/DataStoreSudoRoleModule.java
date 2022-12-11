@@ -16,7 +16,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import java.util.List;
 
 
-public class DataStoreRoleModule implements Module {
+public class DataStoreSudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;

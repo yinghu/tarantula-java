@@ -11,7 +11,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.util.List;
 
-public class GameApplicationAdminModule implements Module {
+public class GameApplicationAdminRoleModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     @Override

@@ -33,7 +33,7 @@
 <script>
     document.querySelector('#tx-launch-module').onclick=()=>{
         let _c = document.querySelector('#tx-launch-module-type-id').value;
-        TARA_API.onService(true,{serviceTag:'role/module',command:'onLaunchModule',typeId:_c},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo/module',command:'onLaunchModule',typeId:_c},(resp)=>{
             document.querySelector('#tx-launch-module-message').innerHTML = resp.message;
         });
     };

@@ -24,8 +24,8 @@
                <name>ModuleRole</name>
                <type>application</type>
                <category>sudo</category>
-               <tag>role/module</tag>
-               <module-name>com.tarantula.admin.ModuleRoleModule</module-name>
+               <tag>role/sudo/module</tag>
+               <module-name>com.tarantula.admin.ModuleSudoRoleModule</module-name>
                <deploy-priority>10</deploy-priority>
                <deploy-version>1</deploy-version>
                <access-control>100</access-control>
@@ -35,12 +35,23 @@
                <name>DataStoreRole</name>
                <type>application</type>
                <category>sudo</category>
-               <tag>role/datastore</tag>
-               <module-name>com.tarantula.admin.DataStoreRoleModule</module-name>
+               <tag>role/sudo/datastore</tag>
+               <module-name>com.tarantula.admin.DataStoreSudoRoleModule</module-name>
                <deploy-priority>10</deploy-priority>
                <deploy-version>1</deploy-version>
                <access-control>100</access-control>
            </application>
+            <application>
+                <type-id>sudo-role</type-id>
+                <name>MetricsRole</name>
+                <type>application</type>
+                <category>sudo</category>
+                <tag>role/sudo/metrics</tag>
+                <module-name>com.tarantula.admin.MetricsViewSudoRoleModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>100</access-control>
+            </application>
         </application-list>
     </lobby-context>
 </tarantula>

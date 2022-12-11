@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MetricsViewModule implements Module {
+public class MetricsViewAdminRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -149,7 +149,7 @@ public class MetricsViewModule implements Module {
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.metricsViewMonitor = new MetricsViewMonitor(this.context);
         this.context.schedule(this.metricsViewMonitor);
-        this.context.log("Metrics view module started", OnLog.INFO);
+        this.context.log("Metrics view admin role module started", OnLog.INFO);
     }
 
     private String toMessage(String msg,boolean suc){

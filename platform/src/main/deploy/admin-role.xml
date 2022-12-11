@@ -24,8 +24,8 @@
                 <name>Admin Role</name>
                 <type>application</type>
                 <category>lobby</category>
-                <tag>role/lobby</tag>
-                <module-name>com.tarantula.admin.GameLobbyAdminModule</module-name>
+                <tag>role/admin/lobby</tag>
+                <module-name>com.tarantula.admin.GameLobbyAdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
@@ -35,8 +35,8 @@
                 <name>Admin Role</name>
                 <type>application</type>
                 <category>item</category>
-                <tag>role/item</tag>
-                <module-name>com.tarantula.admin.GameItemAdminModule</module-name>
+                <tag>role/admin/item</tag>
+                <module-name>com.tarantula.admin.GameItemAdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
@@ -46,8 +46,8 @@
                 <name>Admin Role</name>
                 <type>application</type>
                 <category>application</category>
-                <tag>role/application</tag>
-                <module-name>com.tarantula.admin.GameApplicationAdminModule</module-name>
+                <tag>role/admin/application</tag>
+                <module-name>com.tarantula.admin.GameApplicationAdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>
@@ -57,8 +57,8 @@
                 <name>Admin Role</name>
                 <type>application</type>
                 <category>application</category>
-                <tag>role/metrics</tag>
-                <module-name>com.tarantula.admin.MetricsViewModule</module-name>
+                <tag>role/admin/metrics</tag>
+                <module-name>com.tarantula.admin.MetricsViewAdminRoleModule</module-name>
                 <deploy-priority>10</deploy-priority>
                 <deploy-version>1</deploy-version>
                 <access-control>30</access-control>

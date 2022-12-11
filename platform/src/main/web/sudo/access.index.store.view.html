@@ -30,7 +30,7 @@
     };
     let editor = new JSONEditor(document.querySelector("#jsoneditor-index-access-store"),options,{});
 
-    TARA_API.onGet('role/datastore','onAccessIndexStore','',(resp)=>{
+    TARA_API.onGet('role/sudo/datastore','onAccessIndexStore','',(resp)=>{
         editor.set(resp);                          
     });    
 

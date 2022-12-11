@@ -47,7 +47,7 @@
         let _c = document.querySelector('#tx-reset-module-codebase').value;
         let _a = document.querySelector('#tx-reset-module-artifact').value;
         let _v = document.querySelector('#tx-reset-module-version').value;
-        TARA_API.onService(true,{serviceTag:'role/module',command:'onResetModule',typeId:_t,codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo/module',command:'onResetModule',typeId:_t,codebase:_c,moduleArtifact:_a,moduleVersion:_v},(resp)=>{
             document.querySelector('#tx-reset-module-message').innerHTML = resp.message;
         });
     };

@@ -40,7 +40,7 @@
         m3.style.display = 'none';       
     };
     document.querySelector('#tx-add-game-lobby').onclick=()=>{
-        TARA_API.onGet('role/lobby','onAddLobby',TARA_API.query().gameClusterId+'#'+(lobbyIndex+1),(resp)=>{
+        TARA_API.onGet('role/admin/lobby','onAddLobby',TARA_API.query().gameClusterId+'#'+(lobbyIndex+1),(resp)=>{
             console.log(resp);
             gameEditMessage.innerHTML = resp.message;
             if(resp.successful){
@@ -51,7 +51,7 @@
     };
     tx_list_game_lobby_update();
     function tx_list_game_lobby_update(){
-        TARA_API.onGet('role/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
+        TARA_API.onGet('role/admin/lobby','onGameLobbyList',TARA_API.query().gameClusterId,(resp)=>{
             console.log(resp);
             if(resp.successful){
                 tx_access_key_bar_reset(resp);
@@ -80,7 +80,7 @@
                 let applicationId = a.getAttribute('tx-application-id');
                 console.log(applicationId);
                 let cmd = a.innerHTML == 'Open'?'onEnableLobby':'onDisableLobby';
-                TARA_API.onGet('role/lobby',cmd,TARA_API.query().gameClusterId+'#'+applicationId,(resp)=>{
+                TARA_API.onGet('role/admin/lobby',cmd,TARA_API.query().gameClusterId+'#'+applicationId,(resp)=>{
                     console.log(resp);
                     gameEditMessage.innerHTML = resp.message;
                     TARA_API.query().callback(); 

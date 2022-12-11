@@ -12,7 +12,7 @@ import com.tarantula.platform.util.DescriptorSerializer;
 import java.util.HashMap;
 import java.util.List;
 
-public class GameLobbyAdminModule implements Module {
+public class GameLobbyAdminRoleModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
     private int maxGameLobbyCount;

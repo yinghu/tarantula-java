@@ -32,7 +32,7 @@
 <script>
     document.querySelector('#tx-shutdown-module').onclick=()=>{
         let _c = document.querySelector('#tx-shutdown-module-type-id').value;
-        TARA_API.onService(true,{serviceTag:'role/module',command:'onShutdownModule',typeId:_c},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo/module',command:'onShutdownModule',typeId:_c},(resp)=>{
             document.querySelector('#tx-shutdown-module-message').innerHTML = resp.message;
         });
     };

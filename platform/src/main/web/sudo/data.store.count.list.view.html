@@ -35,7 +35,7 @@
     };
     
     let editor = new JSONEditor(document.querySelector("#jsoneditor-data-store-list"),options,{});
-    TARA_API.onService(false,{serviceTag:'role/datastore',command:'onListDataStore'},(resp)=>{
+    TARA_API.onService(false,{serviceTag:'role/sudo/datastore',command:'onListDataStore'},(resp)=>{
         editor.set(resp);  
         TARA_API.query().dataStoreList = resp;                        
     });

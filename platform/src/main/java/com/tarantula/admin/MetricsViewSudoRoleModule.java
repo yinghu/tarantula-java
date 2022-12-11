@@ -1,11 +1,14 @@
 package com.tarantula.admin;
 
-import com.google.gson.*;
-import com.icodesoftware.*;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Module;
+import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.*;
+import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.MetricsViewMonitor;
@@ -15,7 +18,7 @@ import com.tarantula.platform.util.SystemUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class SudoRoleModule implements Module {
+public class MetricsViewSudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -198,7 +201,7 @@ public class SudoRoleModule implements Module {
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.metricsViewMonitor = new MetricsViewMonitor(this.context);
         this.context.schedule(this.metricsViewMonitor);
-        this.context.log("Sudo setup module started", OnLog.INFO);
+        this.context.log("Metrics view sudo role module started", OnLog.INFO);
     }
 
     private String toMessage(String msg,boolean suc){

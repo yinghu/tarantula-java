@@ -95,7 +95,7 @@
     let payload ={};
     let types = new Map();
     let pendingProps = new Map();
-    TARA_API.onGet('role/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
+    TARA_API.onGet('role/admin/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
         console.log(resp);
         //payload = resp;
         resp.itemList.forEach(t=>{
@@ -139,7 +139,7 @@
         document.querySelector('#tx-create-enum-save').style.display ='none';
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
-        TARA_API.onSet('role/item','onUpdateEnumSettings',query,item,(resp)=>{
+        TARA_API.onSet('role/admin/item','onUpdateEnumSettings',query,item,(resp)=>{
             editor.set(resp);   
         });
     };

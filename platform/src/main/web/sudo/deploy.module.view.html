@@ -38,7 +38,7 @@
     document.querySelector('#tx-deploy-module').onclick=()=>{
         let _c = document.querySelector('#tx-module-content-url').value;
         let _n = document.querySelector('#tx-module-name').value;
-        TARA_API.onService(true,{serviceTag:'role/module',command:'onDeployModule',deployUrl:_c,resourceName:_n},(resp)=>{
+        TARA_API.onService(true,{serviceTag:'role/sudo/module',command:'onDeployModule',deployUrl:_c,resourceName:_n},(resp)=>{
             console.log(resp);
             document.querySelector('#tx-deploy-module-message').innerHTML = resp.message;
         });

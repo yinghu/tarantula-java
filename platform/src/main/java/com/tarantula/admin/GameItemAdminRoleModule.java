@@ -14,7 +14,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameItemAdminModule implements Module,Configurable.Listener<GameCluster> {
+public class GameItemAdminRoleModule implements Module,Configurable.Listener<GameCluster> {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
 

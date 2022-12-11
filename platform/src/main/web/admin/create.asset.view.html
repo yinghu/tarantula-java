@@ -305,7 +305,7 @@
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';
         let item = editor.get();   
         let cmd = toCmd(selectedItem.header.scope);
-        TARA_API.onSet('role/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
+        TARA_API.onSet('role/admin/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
             editor.set(resp);   
         });
     };
@@ -397,7 +397,7 @@
         let list = document.querySelector('#tx-list-select-'+propertyName);
         let pv = payload.category[propertyName].reference.split(':');           
         list.innerHTML='<option value="" disabled selected>Choose your option</option>';
-        TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
+        TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
             console.log(resp);
             resp.itemList.forEach(item=>{
                 list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';

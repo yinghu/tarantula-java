@@ -61,7 +61,7 @@
     document.querySelector('#tx-data-store-load').onclick=()=>{
         //let _c = document.querySelector('#tx-data-store-name').value;
         let _k = document.querySelector('#tx-data-store-key').value;
-        TARA_API.onGet('role/datastore','onLoadDataStore',dataStoreSelected+"#"+_k,(resp)=>{
+        TARA_API.onGet('role/sudo/datastore','onLoadDataStore',dataStoreSelected+"#"+_k,(resp)=>{
             editor.set(resp);                          
         });    
     };

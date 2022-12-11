@@ -360,7 +360,7 @@
     metricsSelected.started = false;
     metricsSelectBar.onchange =()=>{
         metricsSelected.name = metricsSelectBar.value;
-        TARA_API.onGet('role/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
+        TARA_API.onGet('role/admin/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
             console.log(resp);
             while (metricsSelected.categories.length > 0) {
                 metricsSelected.categories.pop();
@@ -556,7 +556,7 @@
                 if(_gameClusterId=='') return;
                 let sbar = document.querySelector('#tx-game-cluster-service-bar');
                 sbar.innerHTML = '';
-                TARA_API.onGet('role/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
+                TARA_API.onGet('role/admin/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
                     console.log(resp1);
                     if(resp1.successful){
                         resp1.serviceList.forEach((a)=>{
@@ -582,7 +582,7 @@
         });
     }
     function _tx_metrics(){
-        TARA_API.onGet('role/metrics','onServiceViewList','',(resp)=>{
+        TARA_API.onGet('role/admin/metrics','onServiceViewList','',(resp)=>{
             //console.log(resp);
             if(!resp.successful) return;
             let tem1 =[];
@@ -625,7 +625,7 @@
     }
     function _tx_metrics_pull(){
         let query ={nodes:metricsSelected.nodes,categories:metricsSelected.categories};
-        TARA_API.onSet('role/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
+        TARA_API.onSet('role/admin/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
             console.log(resp);
             if(!resp.successful) return;
             for(let i=0;i<mChartSize;i++){

@@ -291,7 +291,7 @@
         return tem.join('');    
     }
     function populateCategories(){
-        TARA_API.onGet('role/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
+        TARA_API.onGet('role/admin/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
             console.log(resp);
             TARA_API.query().itemList = resp.itemList;
             TARA_API.query().types = {};
@@ -328,7 +328,7 @@
         if(TARA_API.query().category == 'application'){
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
             let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
-            TARA_API.onGet('role/application','onList',query,(resp)=>{
+            TARA_API.onGet('role/admin/application','onList',query,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
                     serviceBar.innerHTML = '';
@@ -340,7 +340,7 @@
             });
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
          }else{
-            TARA_API.onGet('role/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
+            TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
                 console.log(resp);
                 if(resp.successful){
                     serviceBar.innerHTML = '';

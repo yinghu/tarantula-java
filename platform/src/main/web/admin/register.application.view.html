@@ -42,7 +42,7 @@
     let actionBtn = document.querySelector('#tx-register-item-register');
     actionBtn.style.display = 'none';
     let cmd = 'onRelease';
-    TARA_API.onGet('role/application','onLoad',query,(resp)=>{
+    TARA_API.onGet('role/admin/application','onLoad',query,(resp)=>{
         if(resp.hasOwnProperty('itemId')&&resp.itemId == itemTemplate.itemId){
             actionBtn.innerHTML = resp.disabled?'Register':'Release';
             cmd = resp.disabled?'onRegister':'onRelease';
@@ -52,7 +52,7 @@
     });
     actionBtn.onclick=()=>{
         actionBtn.style.display = 'none';
-        TARA_API.onGet('role/application',cmd,query,(resp)=>{
+        TARA_API.onGet('role/admin/application',cmd,query,(resp)=>{
             editor.set(resp);   
         });
     };
