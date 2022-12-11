@@ -8,9 +8,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.service.metrics.JVMMonitor;
-import com.tarantula.platform.service.metrics.ServiceViewMonitor;
-import com.tarantula.platform.service.metrics.ServiceViewSummary;
+import com.tarantula.platform.service.metrics.*;
 import com.tarantula.platform.util.SystemUtil;
 
 
@@ -28,7 +26,7 @@ public class MetricsViewModule implements Module {
 
     private ConcurrentHashMap<String, ServiceViewSummary> viewMap = new ConcurrentHashMap<>();
     private Configuration chartConfiguration;
-
+    private MetricsViewMonitor metricsViewMonitor;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
@@ -36,40 +34,49 @@ public class MetricsViewModule implements Module {
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
+            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             Metrics metrics = context.metrics(session.name());
             List<String> categories = metrics.categories();
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();
             categories.forEach(category->ms.add(category));
             m.add("categories",ms);
+            JsonArray nodes = new JsonArray();
+            JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();
+            int[] i = {0};
+            summary.clusterNodes().forEach(n->{
+                JsonObject nd = new JsonObject();
+                nd.addProperty("nodeName",n.nodeName());
+                nd.addProperty("memberId",n.memberId());
+                nd.add("chart",chs.get(i[0]).getAsJsonObject());
+                nodes.add(nd);
+                i[0]++;
+            });
+            m.add("cluster",nodes);
             session.write(m.toString().getBytes());
         }
-        else if(session.action().equals("onMetrics")){
-            String[] query = session.name().split("#");
-            Metrics metrics = context.metrics(query[0]);
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            for(Property p : metrics.snapshot(query[2],query[1])){
-                JsonObject js = new JsonObject();
-                js.addProperty("x",p.name());
-                js.addProperty("y",p.value().toString());
-                ms.add(js);
+        else if(session.action().equals("onMetricsRegister")){
+            JsonObject query = JsonUtil.parse(payload);
+            boolean archived = query.get("archive").getAsBoolean();
+            String type = query.get("type").getAsString();
+            String category = query.get("category").getAsString();
+            String classifier = query.get("classifier").getAsString();
+            String queryId;
+            if(archived) {
+                LocalDateTime endTime = LocalDateTime.parse(query.get("endDate").getAsString());
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier,endTime));
             }
-            m.add("metrics",ms);
+            else{
+                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier));
+            }
+            session.write(toMessage(queryId,true).getBytes());
+        }
+        else if(session.action().equals("onMetrics")){
+            JsonObject m = this.metricsViewMonitor.snapshot(session.name());
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onMetricsArchive")){
-            String[] query = session.name().split("#");
-            Metrics metrics = context.metrics(query[0]);
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            for(Property p : metrics.archive(query[2],LocalDateTime.now()).hourlyGain()){
-                JsonObject js = new JsonObject();
-                js.addProperty("x",p.name());
-                js.addProperty("y",p.value().toString());
-                ms.add(js);
-            }
-            m.add("metrics",ms);
+            JsonObject m = this.metricsViewMonitor.archive(session.name());
             session.write(m.toString().getBytes());
         }
         else if(session.action().equals("onServiceViewList")){
@@ -140,7 +147,13 @@ public class MetricsViewModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
+        this.metricsViewMonitor = new MetricsViewMonitor(this.context);
+        this.context.schedule(this.metricsViewMonitor);
         this.context.log("Metrics view module started", OnLog.INFO);
+    }
+
+    private String toMessage(String msg,boolean suc){
+        return SystemUtil.toJsonMessage(msg,suc);
     }
 
 }
