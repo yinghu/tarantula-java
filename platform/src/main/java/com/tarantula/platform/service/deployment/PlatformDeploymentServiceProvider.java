@@ -8,10 +8,12 @@ import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
+import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -781,9 +783,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return integrationCluster.summary();
     }
 
-    public List<String> listClusterMember(){
-        ArrayList<String> mlist = new ArrayList<>();
-        return mlist;
+    public List<String> listServiceView(){
+       return tarantulaContext.serviceViewList;
+    }
+    public List<String> listMetricsView(){
+        return this.tarantulaContext.metricsViewList;
     }
     public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
         tMap.put(topic,recoverableListener);

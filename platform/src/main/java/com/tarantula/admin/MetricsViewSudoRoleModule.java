@@ -33,6 +33,9 @@ public class MetricsViewSudoRoleModule implements Module {
             Access acc = userService.loadUser(session.systemId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
+        else if(session.action().equals("onMetricsList")){
+
+        }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             Metrics metrics = context.metrics(session.name());

@@ -84,10 +84,7 @@ public class MetricsViewAdminRoleModule implements Module {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("successful",true);
             JsonArray list = new JsonArray();
-            list.add("tarantula");
-            list.add("UDPEndpoint");
-            list.add("MirrorClusterBackup");
-            list.add(JVMMonitor.NAME);
+            this.deploymentServiceProvider.listServiceView().forEach(v->list.add(v));
             jsonObject.add("list",list);
             JsonArray nodes = new JsonArray();
             JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();

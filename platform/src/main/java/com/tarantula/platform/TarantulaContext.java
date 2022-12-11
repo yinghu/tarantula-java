@@ -145,7 +145,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
-    //private ServiceView serviceView;
+    public List<String> serviceViewList = new ArrayList<>();
+    public List<String> metricsViewList = new ArrayList<>();
+
 
     private HttpClientProvider httpClientProvider;
 
@@ -560,7 +562,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
-
+        serviceViewList.add(this.deploymentDataStoreProvider.name());
+        serviceViewList.add(JVMMonitor.NAME);
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));

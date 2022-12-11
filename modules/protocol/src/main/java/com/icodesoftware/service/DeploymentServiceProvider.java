@@ -77,7 +77,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //data store backup operation API
     void issueDataStoreBackup();
     List<String> listDataStore();
-    List<String> listClusterMember();
+    List<String> listServiceView();
+    List<String> listMetricsView();
     DataStore.Summary validDataStore(String dataStore);
     ClusterProvider.Summary clusterSummary();
 
