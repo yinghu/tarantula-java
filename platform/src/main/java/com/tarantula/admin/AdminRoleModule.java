@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
@@ -46,23 +45,6 @@ public class AdminRoleModule implements Module{
             Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onGameClusterMetricsCategory")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Metrics metrics = context.metrics((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            List<String> categories = metrics.categories();
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            categories.forEach(category->ms.add(category));
-            m.add("categories",ms);
-            session.write(m.toString().getBytes());
-        }
-        else if(session.action().equals("onGameClusterMetrics")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Metrics metrics = context.metrics((String) gameCluster.property(GameCluster.GAME_SERVICE));
-            MetricsContext metricsContext = new MetricsContext();
-            metricsContext.metrics = metrics;
-            session.write(metricsContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

@@ -131,10 +131,6 @@ public class MetricsViewAdminRoleModule implements Module {
                 session.write(SystemUtil.toJsonMessage("service view ["+session.name()+"] not existed",false).getBytes());
             }
         }
-        else if(session.action().equals("onClusterList")){
-            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            session.write(summary.toJson().toString().getBytes());
-        }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
         }

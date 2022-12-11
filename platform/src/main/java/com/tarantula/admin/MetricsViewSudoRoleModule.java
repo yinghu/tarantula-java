@@ -8,7 +8,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.MetricsViewMonitor;
@@ -22,8 +21,6 @@ public class MetricsViewSudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private TokenValidatorProvider tokenValidatorProvider;
-    private AccessIndexService accessIndexService;
 
     private UserService userService;
     private GsonBuilder builder;
@@ -35,103 +32,6 @@ public class MetricsViewSudoRoleModule implements Module {
         if(session.action().equals("onCheckPermission")){
             Access acc = userService.loadUser(session.systemId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onEnablePresenceService")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String root = (String) onAccess.property("user");
-            String password = (String) onAccess.property("password");
-            String host = (String) onAccess.property("host");
-            String suffix = (String) onAccess.property("suffix");
-            String localPassword = (String) onAccess.property("localPassword");
-            boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
-            if(suc){
-                this.context.clusterProvider().deployService().onEnablePresenceService(root,password,suffix,host);
-            }
-            session.write(JsonUtil.toSimpleResponse(suc,suc?"remote presence service enabled on ["+host+"]":"failed").getBytes());
-        }
-        else if(session.action().equals("onDisablePresenceService")){
-            this.tokenValidatorProvider.disablePresenceService(session.name());
-            this.context.clusterProvider().deployService().onDisablePresenceService(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
-        }
-        else if(session.action().equals("onResetClusterKey")){
-            boolean suc = this.tokenValidatorProvider.resetClusterKey();
-            if(suc){
-                this.context.clusterProvider().deployService().onResetClusterKey();
-            }
-            session.write(JsonUtil.toSimpleResponse(suc,suc?"Cluster reset":"failed to reset key").getBytes());
-        }
-        else if(session.action().equals("onPresenceKey")){
-            byte[] key = this.tokenValidatorProvider.clusterKey(session.name());
-            PermissionContext permissionContext = new PermissionContext(key!=null?SystemUtil.toBase64String(key):null);
-            session.write(permissionContext.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onCreateLabeledKey")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String key = tokenValidatorProvider.createAccessKey(acc.typeId());
-            PermissionContext pc = new PermissionContext(key);
-            session.write(pc.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onLabeledKeyList")){
-            List<OnAccess> keys = tokenValidatorProvider.accessKeyList();
-            session.write(new LabeledAccessKeyContext(keys).toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onRevokeLabeledKey")){
-            //revoke access key
-            tokenValidatorProvider.revokeAccessKey(session.name());
-            List<OnAccess> keys = tokenValidatorProvider.accessKeyList();
-            session.write(new LabeledAccessKeyContext(keys).toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onTestLabeledKey")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY))!=null;
-            session.write(toMessage(suc?"key passed":"key failed",suc).getBytes());
-        }
-        else if(session.action().equals("onStopAccessIndex")){
-            accessIndexService.onDisable();
-            session.write(toMessage(session.action(),true).getBytes());
-        }
-        else if(session.action().equals("onStartAccessIndex")){
-            accessIndexService.onEnable();
-            session.write(toMessage(session.action(),true).getBytes());
-        }
-        else if(session.action().equals("onFindUser")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String login = (String)acc.property(OnAccess.LOGIN);
-            AccessIndex accessIndex = accessIndexService.get(login);
-            if(accessIndex!=null){
-                session.write(toMessage(accessIndex.distributionKey(),true).getBytes());
-            }else{
-                session.write(toMessage("["+login+"] not found",false).getBytes());
-            }
-        }
-
-        else if(session.action().equals("onDeployView")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            OnView onView = new OnViewTrack();
-            onView.owner(onAccess.typeId());//associated with a lobby type Id
-            onView.viewId((String)onAccess.property("viewId"));
-            String moduleContext = onAccess.property("deployUrl")!=null?(String) onAccess.property("deployUrl"):"root";
-            if(moduleContext.startsWith("root")){
-                int tix = moduleContext.lastIndexOf('/');
-                if(tix<0){
-                    onView.moduleResourceFile((String) onAccess.property("resourceName"));
-                }
-                else{
-                    onView.moduleResourceFile(moduleContext.substring(tix+1)+"/"+onAccess.property("resourceName"));
-                }
-            }else{
-                String rname = onAccess.property("deployUrl")+"/"+onAccess.property("resourceName");
-                onView.moduleResourceFile(rname);
-            }
-            onView.moduleContext(moduleContext);
-            Response suc = this.deploymentServiceProvider.createView(onView);
-            session.write(toMessage(suc.message(),suc.successful()).getBytes());
-        }
-        else if(session.action().equals("onDeployResource")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
-            session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
@@ -179,10 +79,6 @@ public class MetricsViewSudoRoleModule implements Module {
             JsonObject m = this.metricsViewMonitor.archive(session.name());
             session.write(m.toString().getBytes());
         }
-        else if(session.action().equals("onClusterList")){
-            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            session.write(summary.toJson().toString().getBytes());
-        }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
         }
@@ -193,8 +89,6 @@ public class MetricsViewSudoRoleModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

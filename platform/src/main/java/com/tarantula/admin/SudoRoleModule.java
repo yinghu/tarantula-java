@@ -7,12 +7,10 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
-import com.tarantula.platform.service.metrics.MetricsViewMonitor;
+
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class SudoRoleModule implements Module {
@@ -24,8 +22,7 @@ public class SudoRoleModule implements Module {
 
     private UserService userService;
     private GsonBuilder builder;
-    private MetricsViewMonitor metricsViewMonitor;
-    private Configuration chartConfiguration;
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -130,52 +127,6 @@ public class SudoRoleModule implements Module {
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
-        else if(session.action().equals("onMetricsCategory")){
-            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            Metrics metrics = context.metrics(session.name());
-            List<String> categories = metrics.categories();
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            categories.forEach(category->ms.add(category));
-            m.add("categories",ms);
-            JsonArray nodes = new JsonArray();
-            JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();
-            int[] i = {0};
-            summary.clusterNodes().forEach(n->{
-                JsonObject nd = new JsonObject();
-                nd.addProperty("nodeName",n.nodeName());
-                nd.addProperty("memberId",n.memberId());
-                nd.add("chart",chs.get(i[0]).getAsJsonObject());
-                nodes.add(nd);
-                i[0]++;
-            });
-            m.add("cluster",nodes);
-            session.write(m.toString().getBytes());
-        }
-        else if(session.action().equals("onMetricsRegister")){
-            JsonObject query = JsonUtil.parse(payload);
-            boolean archived = query.get("archive").getAsBoolean();
-            String type = query.get("type").getAsString();
-            String category = query.get("category").getAsString();
-            String classifier = query.get("classifier").getAsString();
-            String queryId;
-            if(archived) {
-                LocalDateTime endTime = LocalDateTime.parse(query.get("endDate").getAsString());
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier,endTime));
-            }
-            else{
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier));
-            }
-            session.write(toMessage(queryId,true).getBytes());
-        }
-        else if(session.action().equals("onMetrics")){
-            JsonObject m = this.metricsViewMonitor.snapshot(session.name());
-            session.write(m.toString().getBytes());
-        }
-        else if(session.action().equals("onMetricsArchive")){
-            JsonObject m = this.metricsViewMonitor.archive(session.name());
-            session.write(m.toString().getBytes());
-        }
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             session.write(summary.toJson().toString().getBytes());
@@ -195,9 +146,6 @@ public class SudoRoleModule implements Module {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context);
-        this.context.schedule(this.metricsViewMonitor);
         this.context.log("Sudo setup module started", OnLog.INFO);
     }
 
