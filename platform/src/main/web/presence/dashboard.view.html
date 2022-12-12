@@ -526,15 +526,20 @@
                     gcl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     let gsl = document.querySelector('#game-edit-service-'+i);
                     gsl.setAttribute('tx-game-cluster-id',g.gameClusterId); 
-                    document.querySelector('#game-metrics-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    let gml = document.querySelector('#game-metrics-'+i); 
+                    gml.setAttribute('tx-game-cluster-id',g.gameClusterId);
                     if(disabled == true){
                         shd.style.display='none';
                         gcl.style.display = 'none';
+                        gml.style.display = 'none';
+                        gsl.style.display = 'none';
                         lnc.style.display='block';
                     }
                     else{
                         lnc.style.display='none';
                         shd.style.display='block';
+                        gml.style.display='block';
+                        gsl.style.display = 'block';
                         gcl.style.display = 'block';
                     }
                     _gameClusterId = g.gameClusterId
