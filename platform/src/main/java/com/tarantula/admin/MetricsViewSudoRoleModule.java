@@ -34,7 +34,13 @@ public class MetricsViewSudoRoleModule implements Module {
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onMetricsList")){
-
+            List<String> mlist = this.deploymentServiceProvider.listMetricsView();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("successful",true);
+            JsonArray arr = new JsonArray();
+            mlist.forEach(m->arr.add(m));
+            jsonObject.add("list",arr);
+            session.write(jsonObject.toString().getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();

@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.*;
 import com.tarantula.platform.util.SystemUtil;
@@ -32,6 +33,19 @@ public class MetricsViewAdminRoleModule implements Module {
         if(session.action().equals("onCheckPermission")){
             Access acc = userService.loadUser(session.systemId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onMetricsList")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            String serviceName = (String) gameCluster.property(GameCluster.GAME_SERVICE);
+            Metrics m = this.context.metrics(serviceName);
+            //List<String> mlist = this.deploymentServiceProvider.listMetricsView();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("successful",true);
+            JsonArray arr = new JsonArray();
+            arr.add(m.name());
+            //mlist.forEach(m->arr.add(m));
+            jsonObject.add("list",arr);
+            session.write(jsonObject.toString().getBytes());
         }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();

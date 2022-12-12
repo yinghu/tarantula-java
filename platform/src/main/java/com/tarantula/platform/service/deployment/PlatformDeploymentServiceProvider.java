@@ -787,7 +787,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
        return tarantulaContext.serviceViewList;
     }
     public List<String> listMetricsView(){
-        return this.tarantulaContext.metricsViewList;
+        return this.tarantulaContext.metricsList();
     }
     public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
         tMap.put(topic,recoverableListener);

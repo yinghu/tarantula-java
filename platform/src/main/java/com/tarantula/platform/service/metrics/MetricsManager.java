@@ -7,6 +7,8 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.TarantulaContext;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsManager implements SchedulingTask, Serviceable {
@@ -55,6 +57,12 @@ public class MetricsManager implements SchedulingTask, Serviceable {
     }
     public void removeMetrics(Metrics metrics){
         metricsMap.remove(metrics.name());
+    }
+
+    public List<String> listMestrics(){
+        ArrayList<String> list = new ArrayList<>();
+        metricsMap.forEach((k,v)->list.add(k));
+        return list;
     }
 
     @Override

@@ -19,11 +19,7 @@
     <div class="w3-third w3-container">
         <label class="tx-text-12 tx-margin-right-4">Metrics Type :</label>
         <select id='tx-metrics-type' class="w3-select w3-border w3-round tx-text-12" name='metricsType'>
-            <option value="performance" selected>Performance</option>
-            <option value="access">Access</option>
-            <option value="payment">Payment</option>
-            <option value="system">System</option>
-            <option value="deployment">Deployment</option>  
+             
         </select>
     </div>
     <div class="w3-third w3-container">
@@ -81,12 +77,13 @@
 <script>
    
     let _metricsBar = document.querySelector('#tx-metrics-data');
+    let _metricsType = document.querySelector('#tx-metrics-type');
     let _nodeBar = document.querySelector('#tx-metrics-cluster-node-list');
     let _archiveCheck = document.querySelector('#tx-metrics-history-enabled');
     let _archiveEndTime = document.querySelector('#tx-metrics-history-end-date');
     let _archiveMessage = document.querySelector('#tx-select-error-message');
     let _metricsLoaded = 'loading';
-    let _request = 'runtime';
+    let _request = '';
     let _timer;
     let _nodeSelected ={};
     let _command ={type:'performance',category:'',classifier:'hourly',archive:false,endDate:''};
@@ -141,10 +138,10 @@
             _metricsLoaded = '';
         }
     };
-    document.querySelector('#tx-metrics-type').onchange = ()=>{
+    _metricsType.onchange = ()=>{
         if(_metricsLoaded == 'loading') return;
         _metricsLoaded = 'loading';
-        _command.type = document.querySelector('#tx-metrics-type').value;
+        _command.type = _metricsType.value;
         _load_metrics_categories();
     };
 
@@ -189,7 +186,19 @@
         m3.innerHTML="";
         m3.style.display = 'none';       
     };
-    _load_metrics_categories();
+    //_load_metrics_categories();
+    TARA_API.onGet('role/sudo/metrics','onMetricsList','',(resp)=>{
+        if(resp.successful){
+            _metricsType.innerHTML ='';
+            let tem=[];
+            tem.push('<option value=\'\' disabled selected>Choose A Metrics</option>');
+            resp.list.forEach(m => {     
+                tem.push('<option value=\''+m+'\'>'+m.toUpperCase()+'</option>');
+            });
+            _metricsType.innerHTML = tem.join('');
+            _metricsLoaded = '';
+        }    
+    });
     function _load_metrics_categories(){
         _metricsLoaded = 'loading';
         TARA_API.onGet('role/sudo/metrics','onMetricsCategory',_command.type,(resp)=>{
