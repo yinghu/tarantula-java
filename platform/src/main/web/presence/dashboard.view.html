@@ -339,6 +339,7 @@
     let metricsClusterSelectBar = document.querySelector('#tx-metrics-cluster-list');
     let metricsSelectBar = document.querySelector('#tx-service-metrics-name');
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
+    let metricsStart = document.querySelector('#tx-start-service-metrics');
     let metricPullTimer;
     const mChartSize = 8;
     document.querySelector('#tx-start-service-metrics').style.display = 'none';
@@ -361,7 +362,7 @@
     metricsSelectBar.onchange =()=>{
         metricsSelected.name = metricsSelectBar.value;
         TARA_API.onGet('role/admin/metrics','onEnableServiceView',metricsSelected.name,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             while (metricsSelected.categories.length > 0) {
                 metricsSelected.categories.pop();
             }
@@ -371,7 +372,7 @@
                 clearInterval(metricPullTimer);
             }
             metricsSelected.started = false; 
-            console.log(metricsSelected);       
+            //console.log(metricsSelected);       
             metricsCategoryCheckBar.innerHTML ='';
             if(!resp.successful) return;
             let tem = [];
@@ -394,25 +395,25 @@
                        }     
                     }
                     if(metricsSelected.categories.length>0){
-                        document.querySelector('#tx-start-service-metrics').style.display = 'block';
+                        metricsStart.style.display = 'block';
                     }
                     else{
-                        document.querySelector('#tx-start-service-metrics').style.display = 'none';
+                        metricsStart.style.display = 'none';
                     }
                 };
             });
         });
     };
-    document.querySelector('#tx-start-service-metrics').onclick=()=>{
+    metricsStart.onclick=()=>{
         //console.log(metricsSelected);
         if(metricsSelected.started){
             clearInterval(metricPullTimer);
             metricsSelected.started = false;
-            document.querySelector('#tx-start-service-metrics').innerHTML = 'Start';
+            metricsStart.innerHTML = 'Start';
         }
         else{
             metricsSelected.started = true;
-            document.querySelector('#tx-start-service-metrics').innerHTML = 'Stop';
+            metricsStart.innerHTML = 'Stop';
             metricPullTimer = setInterval(()=>{
                 _tx_metrics_pull();       
             },5000);
@@ -592,8 +593,11 @@
             if(!resp.successful) return;
             let tem1 =[];
             metricsClusterSelectBar.innerHTML = '';
+            _tx_empty_arr(metricsSelected.nodes);
+            metricsCategoryCheckBar.innerHTML='';
+            metricsStart.style.display = 'none';
             resp.cluster.forEach(a=>{
-                console.log(a);
+                //console.log(a);
                 tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
                 tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
                 tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
@@ -630,8 +634,9 @@
     }
     function _tx_metrics_pull(){
         let query ={nodes:metricsSelected.nodes,categories:metricsSelected.categories};
+        //console.log(query);
         TARA_API.onSet('role/admin/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(!resp.successful) return;
             for(let i=0;i<mChartSize;i++){
                 let dataset = metricsSelected.data[i].datasets; 
@@ -663,7 +668,7 @@
         if(!metricsSelected.started) return;
         clearInterval(metricPullTimer);
         metricsSelected.started = false;
-        document.querySelector('#tx-start-service-metrics').innerHTML = 'Start';
+        metricsStart.innerHTML = 'Start';
     }
     function _tx_game(){
         _tx_lobby();
