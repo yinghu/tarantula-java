@@ -1,0 +1,7 @@
+package com.icodesoftware.protocol;
+
+public class UDPOperationSummary {
+    public static String PENDING_INBOUND_MESSAGE_NUMBER = "pendingInboundMessageNumber";
+    public static String PENDING_OUTBOUND_MESSAGE_NUMBER = "pendingOutboundMessageNumber";
+    public static String USER_CHANNEL_NUMBER = "userChannelNumber";
+}

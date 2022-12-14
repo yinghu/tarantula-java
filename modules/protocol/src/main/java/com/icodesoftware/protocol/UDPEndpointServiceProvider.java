@@ -6,6 +6,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
     int SESSION_CHECK_INTERVAL = 5000;
     int SERVER_PING_INTERVAL = 3000;
+    int RETRY_TIMEOUT = 200;
     int PENDING_ACTION_INTERVAL = 50;
     int SLEEP_TIME_OUT = 5;
 

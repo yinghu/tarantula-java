@@ -65,7 +65,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
 
-    private OperationSummary operationSummary = new OperationSummary();
+    private DataStoreOperationSummary operationSummary = new DataStoreOperationSummary();
 
     private MetricsListener metricsListener = (k,v)->{};
 
@@ -645,25 +645,25 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     @Override
     public void registerSummary(Summary summary){
-        summary.registerCategory(OperationSummary.PENDING_UPDATE_SIZE);
-        summary.registerCategory(OperationSummary.PENDING_BACKUP_SIZE);
-        summary.registerCategory(OperationSummary.DAILY_TOTAL_UPDATES);
-        summary.registerCategory(OperationSummary.CACHE_MISS_NUMBER);
+        summary.registerCategory(DataStoreOperationSummary.PENDING_UPDATE_SIZE);
+        summary.registerCategory(DataStoreOperationSummary.PENDING_BACKUP_SIZE);
+        summary.registerCategory(DataStoreOperationSummary.DAILY_TOTAL_UPDATES);
+        summary.registerCategory(DataStoreOperationSummary.CACHE_MISS_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
-        summary.update(OperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
-        summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        summary.update(OperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        summary.update(DataStoreOperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
+        summary.update(DataStoreOperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
+        summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
         long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
         long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
-        summary.update(OperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
-        summary.update(OperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
-        summary.update(OperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
+        summary.update(DataStoreOperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);
+        summary.update(DataStoreOperationSummary.DAILY_TOTAL_BYTES_UPDATED,totalBytes);
+        summary.update(DataStoreOperationSummary.AVERAGE_BYTES_PER_UPDATE,totalBytes/totalUpdates);
         long totalMissed = environment.getStats(null).getNCacheMiss()+integrationEnvironment.getStats(null).getNCacheMiss();
-        summary.update(OperationSummary.CACHE_MISS_NUMBER,totalMissed);
-        summary.update(OperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
-        summary.update(OperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
+        summary.update(DataStoreOperationSummary.CACHE_MISS_NUMBER,totalMissed);
+        summary.update(DataStoreOperationSummary.LAST_DATA_BATCH_SIZE,operationSummary.lastDataBatchSize.get());
+        summary.update(DataStoreOperationSummary.LAST_INTEGRATION_BATCH_SIZE,operationSummary.lastIntegrationBatchSize.get());
     }
 
     //partial implementation of createIfAbsent and load for access index persistence

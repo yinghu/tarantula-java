@@ -18,6 +18,7 @@ import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
@@ -564,6 +565,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         spc.start(this);
         serviceViewList.add(this.deploymentDataStoreProvider.name());
         serviceViewList.add(JVMMonitor.NAME);
+        serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));

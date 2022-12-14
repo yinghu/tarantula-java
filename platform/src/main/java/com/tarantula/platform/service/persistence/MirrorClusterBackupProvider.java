@@ -10,7 +10,7 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
+import com.tarantula.platform.service.persistence.berkeley.DataStoreOperationSummary;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +25,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     private long nextSyncInterval;
     private int maxTimerLoop;
     private int timerCount;
-    private OperationSummary operationSummary = new OperationSummary();
+    private DataStoreOperationSummary operationSummary = new DataStoreOperationSummary();
     private ServiceContext serviceContext;
     private ConcurrentHashMap<String,BackupProvider> bMap;
 
@@ -145,11 +145,11 @@ public class MirrorClusterBackupProvider implements BackupProvider{
 
     @Override
     public void registerSummary(Summary summary){
-        summary.registerCategory(OperationSummary.PENDING_BACKUP_SIZE);
+        summary.registerCategory(DataStoreOperationSummary.PENDING_BACKUP_SIZE);
     }
     @Override
     public void updateSummary(Summary summary){
-        summary.update(OperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
+        summary.update(DataStoreOperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
     }
 
     private String _type(String source){

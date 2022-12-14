@@ -37,10 +37,12 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private static final String PENDING_SESSION_SIZE = "pendingUdpSessionSize";
     private static final String GAME_SESSION_SIZE = "gameUdpSessionSize";
+
     private Thread receiverDaemon;
     private Thread outboundMessageDaemon;
 
     private ServiceContext serviceContext;
+    private boolean running = true;
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -62,7 +64,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.registerPingListener(this);
         receiverDaemon = new Thread(()->{
-            while (true){
+            while (running){
                 try {
                     if(!udpEndpointServiceProvider.onReceiveMessage()){
                         Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
@@ -73,7 +75,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             }
         },"tarantula-udp-message-receiver");
         outboundMessageDaemon = new Thread(()->{
-            while (true){
+            while (running){
                 try {
                     if(!udpEndpointServiceProvider.onOutboundMessage()){
                         Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
@@ -102,6 +104,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void shutdown() throws Exception {
+        this.running = false;
         udpEndpointServiceProvider.shutdown();
     }
 
@@ -205,11 +208,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void registerSummary(Summary summary){
+        udpEndpointServiceProvider.registerSummary(summary);
         summary.registerCategory(PENDING_SESSION_SIZE);
         summary.registerCategory(GAME_SESSION_SIZE);
     }
     @Override
     public void updateSummary(Summary summary){
+        udpEndpointServiceProvider.updateSummary(summary);
         summary.update(PENDING_SESSION_SIZE,pendingQueue.size());
         summary.update(GAME_SESSION_SIZE,channels.size());
     }
