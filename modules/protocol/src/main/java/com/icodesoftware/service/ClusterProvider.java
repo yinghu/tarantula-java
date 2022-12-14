@@ -6,7 +6,7 @@ import com.icodesoftware.Recoverable;
 import java.util.Collection;
 import java.util.List;
 
-public interface ClusterProvider extends Serviceable {
+public interface ClusterProvider extends ServiceProvider {
 
     String name();
     int scope();

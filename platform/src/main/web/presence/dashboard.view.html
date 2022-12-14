@@ -636,7 +636,7 @@
         let query ={nodes:metricsSelected.nodes,categories:metricsSelected.categories};
         //console.log(query);
         TARA_API.onSet('role/admin/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
-            //console.log(resp);
+            console.log(resp);
             if(!resp.successful) return;
             for(let i=0;i<mChartSize;i++){
                 let dataset = metricsSelected.data[i].datasets; 

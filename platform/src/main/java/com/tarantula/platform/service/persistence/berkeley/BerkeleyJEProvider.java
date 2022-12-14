@@ -12,6 +12,7 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
+import com.tarantula.platform.statistics.StatisticsUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -649,12 +650,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         summary.registerCategory(DataStoreOperationSummary.PENDING_BACKUP_SIZE);
         summary.registerCategory(DataStoreOperationSummary.DAILY_TOTAL_UPDATES);
         summary.registerCategory(DataStoreOperationSummary.CACHE_MISS_NUMBER);
+        summary.registerCategory(DataStoreOperationSummary.AVERAGE_BYTES_PER_UPDATE);
+        summary.registerCategory(DataStoreOperationSummary.DAILY_TOTAL_BYTES_UPDATED);
+        summary.registerCategory(DataStoreOperationSummary.LAST_DATA_BATCH_SIZE);
+        summary.registerCategory(DataStoreOperationSummary.LAST_INTEGRATION_BATCH_SIZE);
     }
     @Override
     public void updateSummary(Summary summary){
         summary.update(DataStoreOperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
         summary.update(DataStoreOperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        //summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
         long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
         long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
         summary.update(DataStoreOperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);

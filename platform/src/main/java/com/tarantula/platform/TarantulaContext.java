@@ -557,6 +557,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             v.setup(this);
             v.waitForData();//block for global data sync
         });
+ 	    this.serviceProviders.put(this.integrationCluster.name(),integrationCluster);
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
         this.serviceProviders.put(mirrorBackupProvider.name(),mirrorBackupProvider);
@@ -566,6 +567,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         serviceViewList.add(this.deploymentDataStoreProvider.name());
         serviceViewList.add(JVMMonitor.NAME);
         serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
+        serviceViewList.add(this.integrationCluster.name());
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));

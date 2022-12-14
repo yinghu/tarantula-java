@@ -1,6 +1,6 @@
 {
   "metricsSize": 60,
-  "chartSize": 5,
+  "chartSize": 8,
   "charts": [
     {
       "backgroundColor": "rgb(102,255, 102)",
