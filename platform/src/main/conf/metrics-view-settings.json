@@ -1,5 +1,6 @@
 {
   "metricsSize": 60,
+  "nodeSize": 5,
   "chartSize": 8,
   "charts": [
     {
