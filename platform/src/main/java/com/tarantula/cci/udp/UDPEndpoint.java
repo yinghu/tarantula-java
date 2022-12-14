@@ -11,7 +11,6 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
-import com.tarantula.platform.service.persistence.berkeley.OperationSummary;
 
 import javax.crypto.Cipher;
 import java.util.UUID;
@@ -20,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.PingListener {
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.PingListener ,SchedulingTask{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -39,6 +38,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private static final String PENDING_SESSION_SIZE = "pendingUdpSessionSize";
     private static final String GAME_SESSION_SIZE = "gameUdpSessionSize";
     private Thread receiverDaemon;
+    private Thread outboundMessageDaemon;
+
+    private ServiceContext serviceContext;
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -47,7 +49,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         sessionId = new AtomicInteger(1);
     }
     public void setup(ServiceContext serviceContext){
-        //this.serviceContext = serviceContext;
+        this.serviceContext = serviceContext;
         Configuration cfg = serviceContext.configuration(CONFIG);
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
@@ -56,11 +58,31 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.type(Connection.UDP);
         connection.secured(true);
         connection.host(serviceContext.node().servicePushAddress());
-        udpEndpointServiceProvider.daemon(false);
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.registerPingListener(this);
-        receiverDaemon = new Thread(udpEndpointServiceProvider,"tarantula-udp-receiver");
+        receiverDaemon = new Thread(()->{
+            while (true){
+                try {
+                    if(!udpEndpointServiceProvider.onReceiveMessage()){
+                        Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
+                    }
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+        },"tarantula-udp-message-receiver");
+        outboundMessageDaemon = new Thread(()->{
+            while (true){
+                try {
+                    if(!udpEndpointServiceProvider.onOutboundMessage()){
+                        Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
+                    }
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+        },"tarantula-udp-outbound-message-sender");
         pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
@@ -73,6 +95,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void start() throws Exception {
         udpEndpointServiceProvider.start();
         receiverDaemon.start();
+        outboundMessageDaemon.start();
+        serviceContext.schedule(this);
         this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
     }
 
@@ -188,5 +212,26 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void updateSummary(Summary summary){
         summary.update(PENDING_SESSION_SIZE,pendingQueue.size());
         summary.update(GAME_SESSION_SIZE,channels.size());
+    }
+
+    @Override
+    public boolean oneTime() {
+        return true;
+    }
+
+    @Override
+    public long initialDelay() {
+        return UDPEndpointServiceProvider.PENDING_ACTION_INTERVAL;
+    }
+
+    @Override
+    public long delay() {
+        return 0;
+    }
+
+    @Override
+    public void run() {
+        udpEndpointServiceProvider.onTimer();
+        this.serviceContext.schedule(this);
     }
 }

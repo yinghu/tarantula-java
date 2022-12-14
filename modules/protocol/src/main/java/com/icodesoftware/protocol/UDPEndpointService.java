@@ -22,7 +22,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private static int PORT = 11933;
     private static int MESSAGE_HANDLER_POOL_SIZE = 1;
 
-    private static int SLEEP_TIMEOUT = 5;
+    //private static int SLEEP_TIMEOUT = 5;
 
     private static int RETRY_TIMEOUT = 200;
 
@@ -41,8 +41,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
     private boolean daemon;
-    private int sessionTimeout = SESSION_CHECK_INTERVAL;
 
+    //timer counters
+    private int sessionTimeout = SESSION_CHECK_INTERVAL;
     private int retryInterval = RETRY_TIMEOUT;
     private int receiverTimeout = 0;
     private int frameRate = PENDING_ACTION_INTERVAL;
@@ -51,20 +52,28 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private boolean running = true;
 
+    long kickoffTimer;// = sessionTimeout;
+    long pingTimer = SESSION_CHECK_INTERVAL;
+    long serverPingTimer  = SERVER_PING_INTERVAL;
+    long retryTimer;// = retryInterval;
+
+
     public void start() throws Exception{
         if(inboundThreadPoolSetting!=null){
             TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
                 this.executorService = pool;
-                this.messageHandlerSize = poolSize-(daemon?3:2);
+                this.messageHandlerSize = poolSize;
             });
         }else{
-            executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE+(daemon?3:2),new TarantulaThreadFactory("udp-messaging"));
+            executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE,new TarantulaThreadFactory("udp-messaging"));
         }
         log.warn("Inbound message handler number ["+messageHandlerSize+"]");
         log.warn("Ping handler number ["+1+"]");
         log.warn("Outbound message handler number ["+1+"]");
         log.warn("Session Timeout ["+sessionTimeout+"]");
         log.warn("Receiver Timeout ["+receiverTimeout+"]");
+        kickoffTimer = sessionTimeout;
+        retryTimer = retryInterval;
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
@@ -80,7 +89,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                             if(userChannel!=null) userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
                         }
                         else{
-                            Thread.sleep(SLEEP_TIMEOUT);
+                            Thread.sleep(SLEEP_TIME_OUT);
                         }
                     }catch (Exception ex){
                         //ignore
@@ -89,61 +98,11 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 }
             });
         }
-        executorService.execute(()->{
-            long kickoffTimer = sessionTimeout;
-            long pingTimer = SESSION_CHECK_INTERVAL;
-            long serverPingTimer  = SERVER_PING_INTERVAL;
-            long retryTimer = retryInterval;
-            while (true){
-                try{
-                    Thread.sleep(frameRate);
-                    userChannelIndex.forEach((k,v)->v.onPendingAction(frameRate));//enqueue pending action data
-                    retryTimer -= frameRate;
-                    kickoffTimer -= frameRate;
-                    pingTimer -= frameRate;
-                    serverPingTimer -= frameRate;
-                    if(retryTimer<=0){
-                        userChannelIndex.forEach((k,v)->v.onRetry());//enqueue retry data
-                        retryTimer = retryInterval;
-                    }
-                    if(kickoffTimer<=0){
-                        userChannelIndex.forEach((k,v)->v.onKickoff());//remove session
-                        kickoffTimer = sessionTimeout;
-                    }
-                    if(pingTimer<=0){
-                        pingListener.onPing(); //ping game cluster server
-                        pingTimer = SESSION_CHECK_INTERVAL;
-                    }
-                    if(serverPingTimer<=0){
-                        userChannelIndex.forEach((k,v)->v.onPing());//ping clients
-                        serverPingTimer = SERVER_PING_INTERVAL;
-                    }
-                }catch (Exception ex){
-                    log.error("unexpected error",ex);
-                }
-            }
-        });
-        executorService.execute(()->{
-            while (true){
-                try{
-                    PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
-                    if(pendingOutboundMessage!=null){
-                        send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
-                    }
-                    else{
-                        Thread.sleep(SLEEP_TIMEOUT);
-                    }
-                }catch (Exception ex){
-                    log.error("unexpected error",ex);
-                }
-            }
-        });
         this.datagramChannel = new DatagramSocket(null);
         if(receiverTimeout>0) this.datagramChannel.setSoTimeout(receiverTimeout);
         InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
         if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
-        if(daemon) executorService.execute(this);
     }
     public void shutdown() throws Exception{
         log.warn("UDP endpoint service is going down");
@@ -151,7 +110,53 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         this.executorService.shutdownNow();
         this.datagramChannel.close();
     }
-
+    public void onTimer(){
+        try{
+            userChannelIndex.forEach((k,v)->v.onPendingAction(frameRate));//enqueue pending action data
+            retryTimer -= frameRate;
+            kickoffTimer -= frameRate;
+            pingTimer -= frameRate;
+            serverPingTimer -= frameRate;
+            if(retryTimer<=0){
+                userChannelIndex.forEach((k,v)->v.onRetry());//enqueue retry data
+                retryTimer = retryInterval;
+            }
+            if(kickoffTimer<=0){
+                userChannelIndex.forEach((k,v)->v.onKickoff());//remove session
+                //log.warn("K"+kickoffTimer);
+                kickoffTimer = sessionTimeout;
+            }
+            if(pingTimer<=0){
+                pingListener.onPing(); //ping game cluster server
+                //log.warn("P"+pingTimer);
+                pingTimer = SESSION_CHECK_INTERVAL;
+            }
+            if(serverPingTimer<=0){
+                userChannelIndex.forEach((k,v)->v.onPing());//ping clients
+                //log.warn("S"+serverPingTimer);
+                serverPingTimer = SERVER_PING_INTERVAL;
+            }
+        }catch (Exception ex){
+            log.error("unexpected error",ex);
+        }
+    }
+    public boolean onOutboundMessage(){
+        PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
+        if(pendingOutboundMessage==null) return false;
+        send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
+        return true;
+    }
+    public boolean onReceiveMessage(){
+        try{
+            DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
+            this.datagramChannel.receive(buffer);
+            pendingMessageQueue.offer(buffer);
+            return true;
+        }catch (Exception ex){
+            //ignore
+            return false;
+        }
+    }
     @Override
     public void run() {
         log.warn("UDP endpoint service is ready on ["+host+":"+port+"] on ["+(daemon?"daemon thread":"main thread")+"]");
@@ -162,8 +167,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pendingMessageQueue.offer(buffer);
             }catch (Exception ex){
                 //ignore
-                //log.error("unexpected error",ex);
-                try{Thread.sleep(SLEEP_TIMEOUT);}catch (Exception exx){}
+                try{Thread.sleep(SLEEP_TIME_OUT);}catch (Exception exx){}
             }
         }
         log.warn("UDP receiver daemon is shutting down");

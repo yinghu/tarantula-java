@@ -7,6 +7,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
     int SESSION_CHECK_INTERVAL = 5000;
     int SERVER_PING_INTERVAL = 3000;
     int PENDING_ACTION_INTERVAL = 50;
+    int SLEEP_TIME_OUT = 5;
 
     int CONNECTION_HEALTHY_CHECK_RETRIES = 3;
 
@@ -18,6 +19,11 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
     void registerUserChannel(UserChannel userChannel);
     UserChannel releaseUserChannel(int channelId);
     void registerPingListener(PingListener pingListener);
+
+    boolean onOutboundMessage();
+    boolean onReceiveMessage();
+
+    void onTimer();
 
     interface SessionListener{
         void onTimeout(int channelId,int sessionId);
