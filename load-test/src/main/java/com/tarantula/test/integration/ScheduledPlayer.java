@@ -37,7 +37,7 @@ public class ScheduledPlayer{
 
     private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
 
-    public int udpRounds = 10; //total udp rounds
+    public int udpRounds; //total udp rounds
 
     public boolean joined;
 
@@ -155,7 +155,7 @@ public class ScheduledPlayer{
     }
 
     public void play(ScheduledExecutorService scheduler,long udpPlayInterval){
-        if(!udpTested || (udpTested && udpRounds<=0)){
+        if(!udpTested || udpRounds<=0){
             leave();
             return;
         }
@@ -203,7 +203,11 @@ public class ScheduledPlayer{
             LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
             udpRounds--;
             LoadResult.totalRounds.incrementAndGet();
-            if(udpRounds>0) scheduler.schedule(()->this.play(scheduler,udpPlayInterval),udpPlayInterval, TimeUnit.MILLISECONDS);
+            if(udpRounds<=0){
+                leave();
+                return;
+            }
+            scheduler.schedule(()->this.play(scheduler,udpPlayInterval),udpPlayInterval, TimeUnit.MILLISECONDS);
         }catch (Exception ex){
             ex.printStackTrace();
             counter.countDown();
