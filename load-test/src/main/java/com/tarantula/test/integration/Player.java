@@ -20,6 +20,8 @@ import java.util.concurrent.CountDownLatch;
 public class Player implements Runnable{
 
     private CountDownLatch counter;
+
+    private String game;
     private String userName;
     private String deviceName;
     private String clientId;
@@ -45,9 +47,10 @@ public class Player implements Runnable{
     static short STATISTICS_COMMIT = 2;
 
     private HttpCaller httpCaller;
-    public Player(HttpCaller httpCaller, CountDownLatch counter, String userName,int sequence,boolean udpTested,int udpReceiveTimeout,int udpRounds){
+    public Player(HttpCaller httpCaller, CountDownLatch counter, String game,String userName,int sequence,boolean udpTested,int udpReceiveTimeout,int udpRounds){
         this.httpCaller = httpCaller;
         this.counter = counter;
+        this.game = game;
         this.userName = userName;
         this.deviceName = "test-"+sequence;
         this.clientId = UUID.randomUUID().toString();
@@ -98,7 +101,7 @@ public class Player implements Runnable{
                 LoadResult.totalSuccessRegister.incrementAndGet();
             }
             headers = new String[]{
-                    Session.TARANTULA_TAG,"robotquest/lobby",
+                    Session.TARANTULA_TAG,game+"/lobby",
                     Session.TARANTULA_ACTION,"onPlay",
                     Session.TARANTULA_TOKEN,token,
                     Session.TARANTULA_NAME,deviceName,

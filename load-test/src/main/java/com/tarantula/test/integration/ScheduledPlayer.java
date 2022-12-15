@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledPlayer{
 
     private CountDownLatch counter;
+
+    private String game;
     private String userName;
     private String deviceName;
     private String clientId;
@@ -47,9 +49,10 @@ public class ScheduledPlayer{
     static short STATISTICS_COMMIT = 2;
 
     private HttpCaller httpCaller;
-    public ScheduledPlayer(HttpCaller httpCaller, CountDownLatch counter, String userName, int sequence, boolean udpTested, int udpReceiveTimeout, int udpRounds){
+    public ScheduledPlayer(HttpCaller httpCaller, CountDownLatch counter,String game, String userName, int sequence, boolean udpTested, int udpReceiveTimeout, int udpRounds){
         this.httpCaller = httpCaller;
         this.counter = counter;
+        this.game = game;
         this.userName = userName;
         this.deviceName = "test-"+sequence;
         this.clientId = UUID.randomUUID().toString();
@@ -100,7 +103,7 @@ public class ScheduledPlayer{
                 LoadResult.totalSuccessRegister.incrementAndGet();
             }
             headers = new String[]{
-                    Session.TARANTULA_TAG,"robotquest/lobby",
+                    Session.TARANTULA_TAG,game+"/lobby",
                     Session.TARANTULA_ACTION,"onPlay",
                     Session.TARANTULA_TOKEN,token,
                     Session.TARANTULA_NAME,deviceName,
