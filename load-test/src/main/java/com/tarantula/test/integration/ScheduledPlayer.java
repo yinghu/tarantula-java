@@ -37,7 +37,7 @@ public class ScheduledPlayer{
 
     private int udpRounds = 10; //total udp rounds
 
-    private boolean joined;
+    public boolean joined;
 
     private boolean udpTested;
 
@@ -109,14 +109,7 @@ public class ScheduledPlayer{
             resp = httpCaller.get("service/action",headers);
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject joinPayload = JsonUtil.parse(resp);
-            boolean suc = joinPayload.get("Successful").getAsBoolean();
-            if(!suc){
-                LoadResult.totalFailureJoin.incrementAndGet();
-                throw new RuntimeException("failed");
-            }
-            counter.countDown();
-            //onJoin(resp);
+            onJoin(resp);
         }catch (Exception ex){
             ex.printStackTrace();
             String error = ex.getMessage();
@@ -129,24 +122,33 @@ public class ScheduledPlayer{
         }
     }
 
-    private void leave() throws Exception{
-        if(!joined) return;
-        String[] headers = new String[]{
-                Session.TARANTULA_TAG,tag,
-                Session.TARANTULA_ACTION,"onLeave",
-                Session.TARANTULA_TOKEN,token
-        };
-        long requestStart = System.currentTimeMillis();
-        String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-        LoadResult.totalHttpRequestCount.incrementAndGet();
-        JsonObject json = JsonUtil.parse(resp);
-        boolean suc = json.get("Successful").getAsBoolean();
-        if(suc){
-            LoadResult.totalSuccessLeave.incrementAndGet();
-        }
-        else {
-            LoadResult.totalFailureLeave.incrementAndGet();
+    public void leave(){
+        try{
+            String[] headers = new String[]{
+                    Session.TARANTULA_TAG,tag,
+                    Session.TARANTULA_ACTION,"onLeave",
+                    Session.TARANTULA_TOKEN,token
+            };
+            long requestStart = System.currentTimeMillis();
+            String resp = httpCaller.get("service/action",headers);
+            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            LoadResult.totalHttpRequestCount.incrementAndGet();
+            JsonObject json = JsonUtil.parse(resp);
+            boolean suc = json.get("Successful").getAsBoolean();
+            if(suc){
+                LoadResult.totalSuccessLeave.incrementAndGet();
+            }
+            else {
+                LoadResult.totalFailureLeave.incrementAndGet();
+            }
+            counter.countDown();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            String error = ex.getMessage();
+            if(error==null || !error.equals("failed")){
+                LoadResult.totalFailureOther.incrementAndGet();
+            }
+            counter.countDown();
         }
     }
 

@@ -71,6 +71,11 @@ public class Main {
             ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,uname,i,udpTested,timeout,duration);
             scheduler.schedule(()->{
                 simulator.join();
+                if(simulator.joined){
+                    scheduler.schedule(()->{
+                        simulator.leave();
+                    },10,TimeUnit.MILLISECONDS);
+                }
             },10,TimeUnit.MILLISECONDS);
 
 
