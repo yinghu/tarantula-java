@@ -23,11 +23,13 @@ public class Main {
         String host = properties.getProperty("host");
         int batch = Integer.parseInt(properties.getProperty("batch"));
         int poolSize = Integer.parseInt(properties.getProperty("pool.size"));
+        boolean scheduledPlay = Boolean.parseBoolean(properties.getProperty("scheduled.play"));
         long httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
         boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
         int udpReceiveTimeout = Integer.parseInt(properties.getProperty("udp.receive.timeout"));
+        long udpPlayInterval = Long.parseLong(properties.getProperty("udp.play.interval.ms"));
         int udpTestRounds = Integer.parseInt(properties.getProperty("udp.test.rounds"));
         LoadResult.playerPrefix = usePlayerPrefix?playerPrefix:"random";
         LoadResult.host = host;
@@ -37,7 +39,12 @@ public class Main {
         LoadResult.udpTested = udpTested;
         LoadResult.udpReceiveTimeout = udpReceiveTimeout;
         LoadResult.udpTestRounds = udpTestRounds;
-        runSimulationOnSchedule(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds,httpRequestInterval);
+        if(scheduledPlay) {
+            runSimulationOnSchedule(host, usePlayerPrefix ? playerPrefix : null, batch, poolSize, udpTested, udpReceiveTimeout, udpTestRounds, httpRequestInterval,udpPlayInterval);
+        }
+        else{
+            runSimulation(host, usePlayerPrefix ? playerPrefix : null, batch, poolSize, udpTested, udpReceiveTimeout, udpTestRounds, httpRequestInterval);
+        }
     }
 
     private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration,long requestWaiting) throws Exception{
@@ -60,20 +67,18 @@ public class Main {
         LoadResult.print();
     }
 
-    private static void runSimulationOnSchedule(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration,long requestWaiting) throws Exception{
+    private static void runSimulationOnSchedule(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int udpRounds,long requestWaiting,long udpPlayInterval) throws Exception{
         HttpCaller httpCaller = new HttpCaller(host);
         httpCaller._init();
         scheduler = new ScheduledThreadPoolExecutor(poolSize,new TarantulaThreadFactory("test-load"));
         CountDownLatch waiting = new CountDownLatch(batch);
         for(int i = 0;i<batch;i++){
             String uname = playerPrefix!=null?(playerPrefix+"-"+i):UUID.randomUUID().toString();
-            ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,uname,i,udpTested,timeout,duration);
+            ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,uname,i,udpTested,timeout,udpRounds);
             scheduler.schedule(()->{
                 simulator.join();
                 if(simulator.joined){
-                    scheduler.schedule(()->{
-                        simulator.leave();
-                    },requestWaiting,TimeUnit.MILLISECONDS);
+                    scheduler.schedule(()->simulator.play(scheduler,udpPlayInterval),udpPlayInterval,TimeUnit.MILLISECONDS);
                 }
             },requestWaiting,TimeUnit.MILLISECONDS);
         }

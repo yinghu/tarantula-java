@@ -16,6 +16,8 @@ import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ScheduledPlayer{
 
@@ -35,7 +37,7 @@ public class ScheduledPlayer{
 
     private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
 
-    private int udpRounds = 10; //total udp rounds
+    public int udpRounds = 10; //total udp rounds
 
     public boolean joined;
 
@@ -122,7 +124,7 @@ public class ScheduledPlayer{
         }
     }
 
-    public void leave(){
+    private void leave(){
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,tag,
@@ -152,63 +154,56 @@ public class ScheduledPlayer{
         }
     }
 
-    public void play(){
-        //join();
+    public void play(ScheduledExecutorService scheduler,long udpPlayInterval){
+        if(!udpTested || (udpTested && udpRounds<=0)){
+            leave();
+            return;
+        }
         try{
-            if(joined && udpTested){
-                while (udpRounds>0){
-                    messageHeader.commandId = Messenger.REQUEST;
-                    messageHeader.encrypted = false;
-                    messageBuffer.reset();
-                    messageBuffer.writeHeader(messageHeader);
-                    messageBuffer.writeShort(STATISTICS_COMMIT);
-                    messageBuffer.writeUTF8("kills");
-                    messageBuffer.writeDouble(1);
-                    messageBuffer.flip();
-                    byte[] outbound = messageBuffer.toArray();
-                    for (int i=0;i<10;i++){
-                        long udpStart = System.currentTimeMillis();
-                        udp.send(new DatagramPacket(outbound,outbound.length));
-                        LoadResult.totalUDPSentTime.addAndGet(System.currentTimeMillis()-udpStart);
-                        LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                        LoadResult.totalSuccessUDPSent.incrementAndGet();
-                        Thread.sleep(1);
-                    }
-                    messageHeader.commandId = Messenger.REQUEST;
-                    messageBuffer.reset();
-                    messageBuffer.writeHeader(messageHeader);
-                    messageBuffer.writeShort(STATISTICS_QUERY);
-                    messageBuffer.flip();
-                    outbound = messageBuffer.toArray();
-                    udp.send(new DatagramPacket(outbound,outbound.length));
-                    LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
-                    LoadResult.totalSuccessUDPReceived.incrementAndGet();
-                    for(int i=0; i<5; i++){
-                        DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
-                        long udpStart = System.currentTimeMillis();
-                        try{
-                            udp.receive(d);
-                        }catch (Exception udpEx){
-                            LoadResult.totalUDPReceiveTimeout.incrementAndGet();
-                        }
-                        LoadResult.totalSuccessUDPReceived.incrementAndGet();
-                        LoadResult.totalUDPReceiveTime.addAndGet(System.currentTimeMillis()-udpStart);
-                        byte[] inbound = d.getData();
-                        messageBuffer.reset(inbound);
-                        messageBuffer.flip();
-                        MessageBuffer.MessageHeader h = messageBuffer.readHeader();
-                        LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
-                        if(h.batch == h.batchSize){
-                            break;
-                        }
-                    }
-                    Thread.sleep(10);
-                    udpRounds--;
-                }
+            //one-way udp commit
+            messageHeader.commandId = Messenger.REQUEST;
+            messageHeader.encrypted = false;
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writeShort(STATISTICS_COMMIT);
+            messageBuffer.writeUTF8("kills");
+            messageBuffer.writeDouble(1);
+            messageBuffer.flip();
+            byte[] outbound = messageBuffer.toArray();
+            long udpStart = System.currentTimeMillis();
+            udp.send(new DatagramPacket(outbound,outbound.length));
+            LoadResult.totalUDPSentTime.addAndGet(System.currentTimeMillis()-udpStart);
+            LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+            LoadResult.totalSuccessUDPSent.incrementAndGet();
+
+            //two-way udp query
+            messageHeader.commandId = Messenger.REQUEST;
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writeShort(STATISTICS_QUERY);
+            messageBuffer.flip();
+            outbound = messageBuffer.toArray();
+            udp.send(new DatagramPacket(outbound,outbound.length));
+            LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
+            LoadResult.totalSuccessUDPReceived.incrementAndGet();
+
+            DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+            udpStart = System.currentTimeMillis();
+            try{
+                udp.receive(d);
+            }catch (Exception udpEx){
+                LoadResult.totalUDPReceiveTimeout.incrementAndGet();
             }
-            //leave();
+            LoadResult.totalSuccessUDPReceived.incrementAndGet();
+            LoadResult.totalUDPReceiveTime.addAndGet(System.currentTimeMillis()-udpStart);
+            byte[] inbound = d.getData();
+            messageBuffer.reset(inbound);
+            messageBuffer.flip();
+            MessageBuffer.MessageHeader h = messageBuffer.readHeader();
+            LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
+            udpRounds--;
             LoadResult.totalRounds.incrementAndGet();
-            counter.countDown();
+            if(udpRounds>0) scheduler.schedule(()->this.play(scheduler,udpPlayInterval),udpPlayInterval, TimeUnit.MILLISECONDS);
         }catch (Exception ex){
             ex.printStackTrace();
             counter.countDown();
