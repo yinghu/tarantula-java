@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 public class Main {
 
     static ExecutorService pool;
-
+    static ScheduledExecutorService scheduler;
 
     public static void main(String[] args) throws Exception{
         Properties properties = new Properties();
@@ -37,8 +37,9 @@ public class Main {
         LoadResult.udpTested = udpTested;
         LoadResult.udpReceiveTimeout = udpReceiveTimeout;
         LoadResult.udpTestRounds = udpTestRounds;
-        runSimulation(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds,httpRequestInterval);
+        runSimulationOnSchedule(host,usePlayerPrefix?playerPrefix:null,batch,poolSize,udpTested,udpReceiveTimeout,udpTestRounds,httpRequestInterval);
     }
+
     private static void runSimulation(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration,long requestWaiting) throws Exception{
         HttpCaller httpCaller = new HttpCaller(host);
         httpCaller._init();
@@ -56,6 +57,26 @@ public class Main {
             waiting.await();
         }
         pool.shutdown();
+        LoadResult.print();
+    }
+
+    private static void runSimulationOnSchedule(String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int duration,long requestWaiting) throws Exception{
+        HttpCaller httpCaller = new HttpCaller(host);
+        httpCaller._init();
+        scheduler = new ScheduledThreadPoolExecutor(poolSize,new TarantulaThreadFactory("test-load"));
+        CountDownLatch waiting = new CountDownLatch(batch);
+        for(int i = 0;i<batch;i++){
+
+            String uname = playerPrefix!=null?(playerPrefix+"-"+i):UUID.randomUUID().toString();
+            ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,uname,i,udpTested,timeout,duration);
+            scheduler.schedule(()->{
+                simulator.join();
+            },10,TimeUnit.MILLISECONDS);
+
+
+        }
+        waiting.await();
+        scheduler.shutdown();
         LoadResult.print();
     }
 }
