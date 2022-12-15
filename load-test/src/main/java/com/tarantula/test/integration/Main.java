@@ -66,7 +66,6 @@ public class Main {
         scheduler = new ScheduledThreadPoolExecutor(poolSize,new TarantulaThreadFactory("test-load"));
         CountDownLatch waiting = new CountDownLatch(batch);
         for(int i = 0;i<batch;i++){
-
             String uname = playerPrefix!=null?(playerPrefix+"-"+i):UUID.randomUUID().toString();
             ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,uname,i,udpTested,timeout,duration);
             scheduler.schedule(()->{
@@ -74,11 +73,9 @@ public class Main {
                 if(simulator.joined){
                     scheduler.schedule(()->{
                         simulator.leave();
-                    },10,TimeUnit.MILLISECONDS);
+                    },requestWaiting,TimeUnit.MILLISECONDS);
                 }
-            },10,TimeUnit.MILLISECONDS);
-
-
+            },requestWaiting,TimeUnit.MILLISECONDS);
         }
         waiting.await();
         scheduler.shutdown();
