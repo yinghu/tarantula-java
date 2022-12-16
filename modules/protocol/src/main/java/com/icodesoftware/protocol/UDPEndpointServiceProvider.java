@@ -2,7 +2,7 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.service.EndPoint;
 
-public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
+public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     int SESSION_CHECK_INTERVAL = 5000;
     int SERVER_PING_INTERVAL = 3000;
@@ -12,7 +12,6 @@ public interface UDPEndpointServiceProvider extends EndPoint,Runnable,Messenger{
 
     int CONNECTION_HEALTHY_CHECK_RETRIES = 3;
 
-    void daemon(boolean daemon);
     void sessionTimeout(int timeout);
     int sessionTimeout();
     void receiverTimeout(int timeout);

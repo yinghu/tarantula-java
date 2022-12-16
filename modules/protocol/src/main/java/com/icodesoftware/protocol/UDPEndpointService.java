@@ -151,21 +151,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             return false;
         }
     }
-    @Override
-    public void run() {
-        log.warn("UDP endpoint service is ready on ["+host+":"+port+"] on ["+(daemon?"daemon thread":"main thread")+"]");
-        while (running){
-            try{
-                DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
-                this.datagramChannel.receive(buffer);
-                pendingInboundMessageQueue.offer(buffer);
-            }catch (Exception ex){
-                //ignore
-                try{Thread.sleep(SLEEP_TIME_OUT);}catch (Exception exx){}
-            }
-        }
-        log.warn("UDP receiver daemon is shutting down");
-    }
 
     public void send(byte[] data,SocketAddress destination){
         try {

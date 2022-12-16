@@ -50,6 +50,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             Session.TARANTULA_ACTION,
             "",
     };
+
+    private Thread receiver;
+    private Thread sender;
+    private boolean running = true;
+    private Thread timer;
     public ReplicationEndpoint(JsonObject config){
         this.config = config;
     }
@@ -65,8 +70,6 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.address(config.get("binding").getAsString());
         this.udpEndpointServiceProvider.port(config.get("port").getAsInt());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
-        boolean daemon = config.get("daemon").getAsBoolean();
-        this.udpEndpointServiceProvider.daemon(daemon);
         this.udpEndpointServiceProvider.sessionTimeout(config.get("sessionTimeout").getAsInt());
         this.udpEndpointServiceProvider.registerPingListener(this);
         this.udpEndpointServiceProvider.start();
@@ -98,14 +101,48 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
             udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i,udpEndpointServiceProvider,this,this,this));
         }
+        receiver = new Thread(()->{
+                while (running){
+                    try {
+                        if(!udpEndpointServiceProvider.onReceiveMessage()){
+                            Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
+                        }
+                    }catch (Exception ex){
+                        //ignore
+                    }}
+                },"tarantula-udp-message-receiver");
+        sender = new Thread(()->{
+            while (running){
+                try {
+                    if(!udpEndpointServiceProvider.onOutboundMessage()){
+                        Thread.sleep(UDPEndpointServiceProvider.SLEEP_TIME_OUT);
+                    }
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+        },"tarantula-udp-outbound-message-sender");
+        timer = new Thread(()->{
+            while(running){
+                try{
+                    Thread.sleep(UDPEndpointServiceProvider.PENDING_ACTION_INTERVAL);
+                    udpEndpointServiceProvider.onTimer();
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+        },"tarantula-udp-message-timer");
+        receiver.start();
+        sender.start();
+        timer.start();
         logger.warn("Game server is running on ["+typeId+"] with max channels ["+maxChannelSize+"]");
-        if(!daemon) this.udpEndpointServiceProvider.run();
     }
 
     @Override
     public void shutdown() throws Exception {
         headers[5]="onStop";
         logger.warn(httpCaller.post(registerPath,connection.toString().getBytes(),headers));
+        this.running = false;
         this.udpEndpointServiceProvider.shutdown();
     }
 
