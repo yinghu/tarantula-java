@@ -72,14 +72,13 @@ public class MetricsClusterService implements ManagedService, RemoteService {
     public String metricsArchive(String name, String category, String classifier, LocalDateTime end){
         Metrics m = this.tarantulaContext.metrics(name);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
-        Random r = new Random();
         switch (classifier){
             case LeaderBoard.DAILY:
                 for(int i=23;i>=0;i--){
                     LocalDateTime hday = end.minusDays(i);
                     Metrics.History history = m.archive(category,hday);
                     String tag = hday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    response.archive(tag,history.dailyGain()+r.nextInt(10000));
+                    response.archive(tag,history.dailyGain());
                 }
                 break;
             case LeaderBoard.WEEKLY:
@@ -87,7 +86,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
                     LocalDateTime wday = TimeUtil.toLastMonday(end.minusDays(i*7));
                     Metrics.History history = m.archive(category,wday);
                     String tag = wday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    response.archive(tag,history.weeklyGain()+r.nextInt(10000));
+                    response.archive(tag,history.weeklyGain());
                 }
                 break;
             case LeaderBoard.MONTHLY:
@@ -95,7 +94,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
                     LocalDateTime mday = TimeUtil.toFirstDayOfLastMonth(end.minusMonths(i));
                     Metrics.History history = m.archive(category,mday);
                     String tag = mday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    response.archive(tag,history.monthlyGain()+r.nextInt(10000));
+                    response.archive(tag,history.monthlyGain());
                 }
                 break;
             case LeaderBoard.YEARLY:
@@ -103,7 +102,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
                     LocalDateTime yday = TimeUtil.toFirstDayOfLastYear(end.minusYears(i));
                     Metrics.History history = m.archive(category,yday);
                     String tag = yday.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                    response.archive(tag,history.yearlyGain()+r.nextInt(10000));
+                    response.archive(tag,history.yearlyGain());
                 }
                 break;
             case LeaderBoard.HOURLY:
