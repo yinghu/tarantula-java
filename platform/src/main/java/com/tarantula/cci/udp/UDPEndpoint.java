@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.protocol.UDPOperationSummary;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
@@ -35,8 +36,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     private MetricsListener metricsListener;
 
-    private static final String PENDING_SESSION_SIZE = "pendingUdpSessionSize";
-    private static final String GAME_SESSION_SIZE = "gameUdpSessionSize";
 
     private Thread receiverDaemon;
     private Thread outboundMessageDaemon;
@@ -209,14 +208,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void registerSummary(Summary summary){
         udpEndpointServiceProvider.registerSummary(summary);
-        summary.registerCategory(PENDING_SESSION_SIZE);
-        summary.registerCategory(GAME_SESSION_SIZE);
+        summary.registerCategory(UDPOperationSummary.PENDING_UDP_SESSION_SIZE);
+        summary.registerCategory(UDPOperationSummary.UDP_GAME_SESSION_SIZE);
     }
     @Override
     public void updateSummary(Summary summary){
         udpEndpointServiceProvider.updateSummary(summary);
-        summary.update(PENDING_SESSION_SIZE,pendingQueue.size());
-        summary.update(GAME_SESSION_SIZE,channels.size());
+        summary.update(UDPOperationSummary.PENDING_UDP_SESSION_SIZE,pendingQueue.size());
+        summary.update(UDPOperationSummary.UDP_GAME_SESSION_SIZE,channels.size());
     }
 
     @Override
