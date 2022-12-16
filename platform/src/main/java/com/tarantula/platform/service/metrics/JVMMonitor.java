@@ -12,7 +12,7 @@ public class JVMMonitor implements ServiceProvider {
     private static MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
     private static  com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
-    private static final String THREAD_CPU_USAGE ="ThreadCPUUsage";
+    //private static final String THREAD_CPU_USAGE ="ThreadCPUUsage";
     private static final String PROCESS_CPU_USAGE ="ProcessCPUUsage";
 
     private static final String MEMORY_USAGE= "MemoryUsage";
@@ -25,7 +25,7 @@ public class JVMMonitor implements ServiceProvider {
         totalProcessors = operatingSystemMXBean.getAvailableProcessors();
     }
 
-    private HashMap<Long,Long> ths = new HashMap<>();
+    //private HashMap<Long,Long> ths = new HashMap<>();
     @Override
     public String name() {
         return NAME;
@@ -42,7 +42,7 @@ public class JVMMonitor implements ServiceProvider {
 
     @Override
     public void registerSummary(Summary summary){
-        summary.registerCategory(THREAD_CPU_USAGE);
+        //summary.registerCategory(THREAD_CPU_USAGE);
         summary.registerCategory(PROCESS_CPU_USAGE);
         summary.registerCategory(MEMORY_USAGE);
         summary.registerCategory(THREAD_COUNT);
@@ -52,18 +52,19 @@ public class JVMMonitor implements ServiceProvider {
     @Override
     public void updateSummary(Summary summary){
 
-        long threadTimed = threadTimed();
+        //long threadTimed = threadTimed();
         long processTimed = processTimed();
         long time = System.nanoTime();
         double elapsed = (time-lastUpTime)*totalProcessors;
         lastUpTime = time;
-        double perThread = (threadTimed/elapsed)*100;
+        //double perThread = (threadTimed/elapsed)*100;
         double perProcess = (processTimed/elapsed)*100;
-        summary.update(THREAD_CPU_USAGE,Double.parseDouble(String.format("%.2f",perThread)));
+        //summary.update(THREAD_CPU_USAGE,Double.parseDouble(String.format("%.2f",perThread)));
         summary.update(PROCESS_CPU_USAGE,Double.parseDouble(String.format("%.2f",perProcess)));
         summary.update(MEMORY_USAGE,memoryMXBean.getHeapMemoryUsage().getUsed()/1000000);
         summary.update(THREAD_COUNT,threadMXBean.getThreadCount());
     }
+    /**
     private long threadTimed(){
         long[] current = {0};
         for(long tid : threadMXBean.getAllThreadIds()){
@@ -76,7 +77,7 @@ public class JVMMonitor implements ServiceProvider {
             });
         }
         return current[0];
-    }
+    }**/
     private long processTimed(){
         long cur = operatingSystemMXBean.getProcessCpuTime();
         long delta = cur-lastProcessTimed;
