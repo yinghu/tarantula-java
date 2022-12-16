@@ -37,7 +37,6 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private ExecutorService executorService;
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
-    private boolean daemon;
 
     //timer counters
     private int sessionTimeout = SESSION_CHECK_INTERVAL;
@@ -54,7 +53,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private long serverPingTimer  = SERVER_PING_INTERVAL;
     private long retryTimer;// = retryInterval;
 
-
+    private UDPOperationSummary operationSummary = new UDPOperationSummary();
     public void start() throws Exception{
         if(inboundThreadPoolSetting!=null){
             TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
@@ -78,6 +77,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                     try{
                         DatagramPacket packet = pendingInboundMessageQueue.poll();
                         if(packet!=null){
+                            operationSummary.pendingInboundMessageNumber.decrementAndGet();
                             byte[] data = Arrays.copyOf(packet.getData(),packet.getLength());
                             messageBuffer.reset(data);
                             messageBuffer.flip();
@@ -137,6 +137,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public boolean onOutboundMessage(){
         PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
         if(pendingOutboundMessage==null) return false;
+        operationSummary.pendingOutboundMessageNumber.decrementAndGet();
         send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
         return true;
     }
@@ -145,6 +146,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
             this.datagramChannel.receive(buffer);
             pendingInboundMessageQueue.offer(buffer);
+            operationSummary.pendingInboundMessageNumber.incrementAndGet();
             return true;
         }catch (Exception ex){
             //ignore
@@ -162,6 +164,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public void queue(byte[] data,SocketAddress destination){
         pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,destination));
+        operationSummary.pendingOutboundMessageNumber.incrementAndGet();
     }
     @Override
     public void address(String address) {
@@ -182,9 +185,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public String name() {
         return "UDPEndpointService";
     }
-    public void daemon(boolean daemon){
-        this.daemon = daemon;
-    }
+
     public void sessionTimeout(int timeout){
         sessionTimeout = timeout;
     }
@@ -205,19 +206,18 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     public void registerPingListener(PingListener pingListener){
-        this.pingListener = pingListener!=null?pingListener:()->{};
+        if(pingListener==null) return;
+        this.pingListener = pingListener;
     }
 
     @Override
     public void registerSummary(Summary summary){
         summary.registerCategory(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER);
-        summary.registerCategory(UDPOperationSummary.USER_CHANNEL_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
-        summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,pendingInboundMessageQueue.size());
-        summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,pendingOutboundMessageQueue.size());
-        summary.update(UDPOperationSummary.USER_CHANNEL_NUMBER,userChannelIndex.size());
+        summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,operationSummary.pendingInboundMessageNumber.get());
+        summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
     }
 }
