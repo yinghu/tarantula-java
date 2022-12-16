@@ -1,5 +1,5 @@
 {
   "sessionTimeout" : 30000,
-  "sessionPoolSize": 1000,
+  "sessionPoolSize": 5000,
   "receiverTimeout": 3000
 }
