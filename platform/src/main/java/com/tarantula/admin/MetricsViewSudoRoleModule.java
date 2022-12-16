@@ -102,7 +102,8 @@ public class MetricsViewSudoRoleModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context);
+        long timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
+        this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
         this.context.schedule(this.metricsViewMonitor);
         this.context.log("Metrics view sudo role module started", OnLog.INFO);
     }

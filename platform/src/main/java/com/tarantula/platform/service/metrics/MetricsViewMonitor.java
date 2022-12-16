@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,13 +12,14 @@ public class MetricsViewMonitor implements SchedulingTask {
 
     private final ApplicationContext applicationContext;
 
-    public final static long timerInternal = 5000;
+    public final long timerInternal;
 
     private final DistributionMetricsService distributionMetricsService;
 
     private final ConcurrentHashMap<String,MetricsSnapshotRequest> listeners;
 
-    public MetricsViewMonitor(ApplicationContext context){
+    public MetricsViewMonitor(ApplicationContext context,long timerInternal){
+        this.timerInternal = timerInternal;
         this.applicationContext = context;
         this.listeners = new ConcurrentHashMap<>();
         this.distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);

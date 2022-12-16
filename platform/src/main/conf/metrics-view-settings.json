@@ -2,6 +2,8 @@
   "metricsSize": 60,
   "nodeSize": 5,
   "chartSize": 8,
+  "timerInterval": 5000,
+  "timerLoopCount": 300,
   "charts": [
     {
       "backgroundColor": "rgb(102,255, 102)",

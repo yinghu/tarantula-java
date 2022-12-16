@@ -27,6 +27,8 @@ public class MetricsViewAdminRoleModule implements Module {
 
     private ConcurrentHashMap<String, ServiceViewSummary> viewMap = new ConcurrentHashMap<>();
     private Configuration chartConfiguration;
+    private long timerInterval;
+    private int timerLoopCount;
     private MetricsViewMonitor metricsViewMonitor;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -38,12 +40,10 @@ public class MetricsViewAdminRoleModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             String serviceName = (String) gameCluster.property(GameCluster.GAME_SERVICE);
             Metrics m = this.context.metrics(serviceName);
-            //List<String> mlist = this.deploymentServiceProvider.listMetricsView();
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("successful",true);
             JsonArray arr = new JsonArray();
             arr.add(m.name());
-            //mlist.forEach(m->arr.add(m));
             jsonObject.add("list",arr);
             session.write(jsonObject.toString().getBytes());
         }
@@ -119,7 +119,7 @@ public class MetricsViewAdminRoleModule implements Module {
             if(serviceProvider != null){
                 viewMap.computeIfAbsent(session.name(),k->{
                     ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
-                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,1000,view);
+                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,timerInterval,timerLoopCount,view);
                     context.schedule(monitor);
                     return view;
                 });
@@ -154,7 +154,9 @@ public class MetricsViewAdminRoleModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context);
+        this.timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
+        this.timerLoopCount = ((Number)this.chartConfiguration.property("timerLoopCount")).intValue();
+        this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
         this.context.schedule(this.metricsViewMonitor);
         this.context.log("Metrics view admin role module started", OnLog.INFO);
     }

@@ -11,16 +11,17 @@ public class ServiceViewMonitor implements SchedulingTask {
     private final ApplicationContext applicationContext;
     private final ServiceProvider serviceProvider;
     private int timerCountDown;
-    public final static long timerInternal = 1000;
+    public final long timerInternal;
 
     private final ServiceViewSummary serviceView;
 
     private final DistributionMetricsService distributionMetricsService;
 
-    public ServiceViewMonitor(ApplicationContext context,ServiceProvider serviceProvider,int timerCountDown,ServiceViewSummary serviceView){
+    public ServiceViewMonitor(ApplicationContext context,ServiceProvider serviceProvider,long timerInternal,int timerCountDown,ServiceViewSummary serviceView){
         this.applicationContext = context;
         this.distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);
         this.serviceProvider = serviceProvider;
+        this.timerInternal = timerInternal;
         this.timerCountDown = timerCountDown;
         this.serviceView = serviceView;
         this.serviceProvider.registerSummary(this.serviceView);
