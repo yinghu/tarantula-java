@@ -13,7 +13,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -38,7 +37,7 @@ public class ScheduledPlayer{
     private MessageBuffer messageBuffer;
     private MessageBuffer.MessageHeader messageHeader;
 
-    private int udpReceiveTimeout = 3000; //udp receive timeout 3 secs
+    private int udpReceiveTimeout; //udp receive timeout 3 secs
 
     public int udpRounds; //total udp rounds
 
@@ -208,7 +207,7 @@ public class ScheduledPlayer{
             udpRounds--;
             LoadResult.totalRounds.incrementAndGet();
             if(udpRounds<=0){
-                leave();
+                scheduler.schedule(()->this.leave(),udpPlayInterval,TimeUnit.MICROSECONDS);
                 return;
             }
             scheduler.schedule(()->this.play(scheduler,udpPlayInterval),udpPlayInterval, TimeUnit.MILLISECONDS);
