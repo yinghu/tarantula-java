@@ -504,7 +504,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     @Override
     public AccessIndexService accessIndexService(){
-        return this.integrationCluster.accessIndexService();//(AccessIndexService)this.serviceProviders.get(AccessIndexService.NAME);
+        return this.integrationCluster.accessIndexService();
     }
     @Override
     public DeploymentServiceProvider deploymentServiceProvider(){

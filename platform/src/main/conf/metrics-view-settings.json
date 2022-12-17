@@ -1,6 +1,6 @@
 {
   "metricsSize": 60,
-  "nodeSize": 5,
+  "nodeSize": 7,
   "chartSize": 8,
   "timerInterval": 5000,
   "timerLoopCount": 300,
@@ -40,6 +40,22 @@
     {
       "backgroundColor": "rgb(0,51,0)",
       "borderColor": "rgb(0,51,0)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 1,
+      "cubicInterpolationMode": "monotone"
+    },
+    {
+      "backgroundColor": "rgb(255,0,102)",
+      "borderColor": "rgb(255,0,102)",
+      "borderWidth": 2,
+      "pointBorderWidth": 0,
+      "pointRadius": 1,
+      "cubicInterpolationMode": "monotone"
+    },
+    {
+      "backgroundColor": "rgb(204,204,0)",
+      "borderColor": "rgb(204,204,0)",
       "borderWidth": 2,
       "pointBorderWidth": 0,
       "pointRadius": 1,
