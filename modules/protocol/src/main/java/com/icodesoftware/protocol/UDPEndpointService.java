@@ -131,7 +131,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 serverPingTimer = SERVER_PING_INTERVAL;
             }
         }catch (Exception ex){
-            log.error("unexpected error",ex);
+            log.error("unexpected error on timer",ex);
         }
     }
     public boolean onOutboundMessage(){
@@ -159,7 +159,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             DatagramPacket packet = new DatagramPacket(data,data.length,destination);
             this.datagramChannel.send(packet);
         }catch (Exception ex){
-            log.error("unexpected error",ex);
+            log.error("unexpected error on send",ex);
         }
     }
     public void queue(byte[] data,SocketAddress destination){

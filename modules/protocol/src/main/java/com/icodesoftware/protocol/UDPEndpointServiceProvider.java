@@ -20,9 +20,13 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     UserChannel releaseUserChannel(int channelId);
     void registerPingListener(PingListener pingListener);
 
+    //single outbound message sent out
     boolean onOutboundMessage();
+
+    //single inbound message received
     boolean onReceiveMessage();
 
+    //single timer loop
     void onTimer();
 
     interface SessionListener{
