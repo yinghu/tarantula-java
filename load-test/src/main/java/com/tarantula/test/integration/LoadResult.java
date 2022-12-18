@@ -18,11 +18,16 @@ public class LoadResult {
 
     static AtomicInteger totalSuccessLeave = new AtomicInteger(0);
     static AtomicInteger totalFailureLeave = new AtomicInteger(0);
+
     static AtomicInteger totalSuccessJoin = new AtomicInteger(0);
     static AtomicInteger totalFailureJoin = new AtomicInteger(0);
 
     static AtomicInteger totalSuccessPlay = new AtomicInteger(0);
     static AtomicInteger totalFailurePlay = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessStatistics = new AtomicInteger(0);
+    static AtomicInteger totalFailureStatistics = new AtomicInteger(0);
+
 
     static AtomicInteger totalFailureOther = new AtomicInteger(0);
 
@@ -81,6 +86,9 @@ public class LoadResult {
             bw.write("Total Failure Login Count ["+totalFailureLogin.get()+"]\n");
             bw.write("Total Success Join Count ["+totalSuccessJoin.get()+"]\n");
             bw.write("Total Failure Join Count ["+totalFailureJoin.get()+"]\n");
+            bw.write("Total Success Statistics Count ["+totalSuccessStatistics.get()+"]\n");
+            bw.write("Total Failure Statistics Count ["+totalFailureStatistics.get()+"]\n");
+
             bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
             bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
             bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");

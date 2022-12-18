@@ -126,7 +126,35 @@ public class ScheduledPlayer{
             joined = false;
         }
     }
-
+    private void statistics(){
+        try{
+            String[] headers = new String[]{
+                    Session.TARANTULA_TAG,game+"/stats",
+                    Session.TARANTULA_ACTION,"onStatistics",
+                    Session.TARANTULA_TOKEN,token
+            };
+            long requestStart = System.currentTimeMillis();
+            String resp = httpCaller.get("service/action",headers);
+            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            LoadResult.totalHttpRequestCount.incrementAndGet();
+            JsonObject json = JsonUtil.parse(resp);
+            System.out.println(json);
+            boolean suc = json.get("Successful").getAsBoolean();
+            if(suc){
+                LoadResult.totalSuccessLeave.incrementAndGet();
+            }
+            else {
+                LoadResult.totalFailureLeave.incrementAndGet();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            String error = ex.getMessage();
+            if(error==null || !error.equals("failed")){
+                LoadResult.totalFailureOther.incrementAndGet();
+            }
+            //counter.countDown();
+        }
+    }
     private void leave(){
         try{
             String[] headers = new String[]{
@@ -206,6 +234,7 @@ public class ScheduledPlayer{
             LoadResult.totalUDPBytesReceived.addAndGet(inbound.length);
             udpRounds--;
             LoadResult.totalRounds.incrementAndGet();
+            statistics();
             if(udpRounds<=0){
                 scheduler.schedule(()->this.leave(),udpPlayInterval,TimeUnit.MICROSECONDS);
                 return;
