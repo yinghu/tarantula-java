@@ -138,7 +138,7 @@ public class ScheduledPlayer{
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
             JsonObject json = JsonUtil.parse(resp);
-            System.out.println(json);
+            //System.out.println(json);
             boolean suc = json.get("Successful").getAsBoolean();
             if(suc){
                 LoadResult.totalSuccessLeave.incrementAndGet();
