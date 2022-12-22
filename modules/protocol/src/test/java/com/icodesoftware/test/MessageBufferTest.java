@@ -189,4 +189,36 @@ public class MessageBufferTest {
             Assert.assertEquals(1,2);
         }
     }
+    @Test(groups = { "message buffer" })
+    public void bufferMessageHeaderTest(){
+
+        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.encrypted = false;
+        messageHeader.ack = false;
+        messageHeader.broadcasting = false;
+        MessageBuffer messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeUTF8("test");
+        messageBuffer.writeInt(101);
+        messageBuffer.flip();
+        byte[] buffer = new byte[MessageBuffer.SIZE];
+        int len = messageBuffer.toArray(buffer);
+        MessageBuffer m = new MessageBuffer();
+        m.reset(buffer,len);
+        m.flip();
+        messageBuffer.flip();
+        MessageBuffer.MessageHeader _h = messageBuffer.readHeader();
+        MessageBuffer.MessageHeader h1 = m.readHeader();
+        Assert.assertEquals(h1.ack,_h.ack);
+        Assert.assertEquals(h1.encrypted,_h.encrypted);
+        Assert.assertEquals(h1.broadcasting,_h.broadcasting);
+        String t = m.readUTF8();
+        int f = m.readInt();
+        String r = messageBuffer.readUTF8();
+        int g = messageBuffer.readInt();
+        Assert.assertEquals("test",r);
+        Assert.assertEquals("test",t);
+        Assert.assertEquals(101,f);
+        Assert.assertEquals(101,g);
+    }
 }

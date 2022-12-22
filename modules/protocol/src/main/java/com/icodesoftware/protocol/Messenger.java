@@ -21,4 +21,6 @@ public interface Messenger {
 
     void send(byte[] data,SocketAddress destination);
     void queue(byte[] data,SocketAddress destination);
+    void queue(MessageBuffer messageBuffer,SocketAddress destination);
+    void send(MessageBuffer messageBuffer,SocketAddress destination);
 }

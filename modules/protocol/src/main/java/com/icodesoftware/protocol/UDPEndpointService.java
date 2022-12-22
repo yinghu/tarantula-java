@@ -9,7 +9,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +25,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     private DatagramSocket datagramChannel;
 
     private ConcurrentLinkedDeque<DatagramPacket> pendingInboundMessageQueue = new ConcurrentLinkedDeque();
+    private ConcurrentLinkedDeque<byte[]> pendingBufferQueue = new ConcurrentLinkedDeque();
+
 
     private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
 
@@ -78,12 +79,12 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         DatagramPacket packet = pendingInboundMessageQueue.poll();
                         if(packet!=null){
                             operationSummary.pendingInboundMessageNumber.decrementAndGet();
-                            byte[] data = Arrays.copyOf(packet.getData(),packet.getLength());
-                            messageBuffer.reset(data);
+                            messageBuffer.reset(packet.getData(),packet.getLength());
                             messageBuffer.flip();
                             MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
                             UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);
                             if(userChannel!=null) userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
+                            pendingBufferQueue.offer(packet.getData());
                         }
                         else{
                             Thread.sleep(SLEEP_TIME_OUT);
@@ -143,9 +144,10 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public boolean onReceiveMessage(){
         try{
-            DatagramPacket buffer = new DatagramPacket(new byte[BUFFER_SIZE],BUFFER_SIZE);
-            this.datagramChannel.receive(buffer);
-            pendingInboundMessageQueue.offer(buffer);
+            byte[] buffer = this.buffer();
+            DatagramPacket packet = new DatagramPacket(buffer,BUFFER_SIZE);
+            this.datagramChannel.receive(packet);
+            pendingInboundMessageQueue.offer(packet);
             operationSummary.pendingInboundMessageNumber.incrementAndGet();
             return true;
         }catch (Exception ex){
@@ -155,15 +157,22 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     public void send(byte[] data,SocketAddress destination){
-        try {
-            DatagramPacket packet = new DatagramPacket(data,data.length,destination);
-            this.datagramChannel.send(packet);
-        }catch (Exception ex){
-            log.error("unexpected error on send",ex);
-        }
+        wire(data,data.length,destination);
+    }
+    public void send(MessageBuffer messageBuffer,SocketAddress destination){
+        byte[] buffer = this.buffer();
+        int len = messageBuffer.toArray(buffer);
+        wire(buffer,len,destination);
+        pendingBufferQueue.offer(buffer);
     }
     public void queue(byte[] data,SocketAddress destination){
         pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,destination));
+        operationSummary.pendingOutboundMessageNumber.incrementAndGet();
+    }
+    public void queue(MessageBuffer messageBuffer,SocketAddress destination){
+        byte[] buffer = this.buffer();
+        int len = messageBuffer.toArray(buffer);
+        pendingOutboundMessageQueue.offer(new PendingOutboundMessage(buffer,len,destination));
         operationSummary.pendingOutboundMessageNumber.incrementAndGet();
     }
     @Override
@@ -214,10 +223,28 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void registerSummary(Summary summary){
         summary.registerCategory(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER);
+        summary.registerCategory(UDPOperationSummary.PENDING_BUFFER_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
         summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,operationSummary.pendingInboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
+        summary.update(UDPOperationSummary.PENDING_BUFFER_NUMBER,operationSummary.pendingBufferNumber.get());
+    }
+    private byte[] buffer(){
+        byte[] buffer = pendingBufferQueue.poll();
+        if(buffer==null){
+            buffer = new byte[BUFFER_SIZE];
+            operationSummary.pendingBufferNumber.incrementAndGet();
+        }
+        return buffer;
+    }
+    private void wire(byte[] buffer,int length,SocketAddress destination){
+        DatagramPacket packet = new DatagramPacket(buffer,length,destination);
+        try{
+            this.datagramChannel.send(packet);
+        }catch (Exception ex){
+            log.error("unexpected error on send",ex);
+        }
     }
 }

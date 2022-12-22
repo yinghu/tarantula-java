@@ -19,6 +19,12 @@ public class MessageBuffer {
         byteBuffer.clear();
         byteBuffer.put(data);
     }
+    public void reset(byte[] data,int offset){
+        byteBuffer.clear();
+        for(int i=0;i<offset;i++){
+            byteBuffer.put(data[i]);
+        }
+    }
     public void reset(){
         byteBuffer.clear();
     }
@@ -127,6 +133,11 @@ public class MessageBuffer {
         byte[] _payload = new byte[byteBuffer.limit()];
         byteBuffer.get(_payload);
         return _payload;
+    }
+    public int toArray(byte[] buffer){
+        int limit = byteBuffer.limit();
+        byteBuffer.get(buffer,0,limit);
+        return limit;
     }
 
     public static class MessageHeader{

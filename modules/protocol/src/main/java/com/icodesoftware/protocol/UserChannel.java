@@ -192,8 +192,8 @@ public class UserChannel {
         messageBuffer.writeHeader(ackHeader);
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
         messageBuffer.flip();
-        byte[] payload = messageBuffer.toArray();
-        messenger.send(payload,source);
+        //byte[] payload = messageBuffer.toArray();
+        messenger.send(messageBuffer,source);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
