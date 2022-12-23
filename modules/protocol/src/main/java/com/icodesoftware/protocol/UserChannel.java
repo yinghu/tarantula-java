@@ -43,6 +43,7 @@ public class UserChannel {
     public void channelId(int channelId){
         this.channelId = channelId;
     }
+
     public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
         UserSession userSession = userSessionIndex.computeIfAbsent(messageHeader.sessionId,k-> {
             if(messageHeader.commandId != Messenger.JOIN) return null;
@@ -146,7 +147,7 @@ public class UserChannel {
             buffer.writeHeader(messageHeader);
             buffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             buffer.flip();
-            messenger.queue(buffer.toArray(),v.source);
+            messenger.queue(buffer,v.source);
         });
     }
     public void queue(int sessionId,byte[] data){
@@ -192,7 +193,6 @@ public class UserChannel {
         messageBuffer.writeHeader(ackHeader);
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
         messageBuffer.flip();
-        //byte[] payload = messageBuffer.toArray();
         messenger.send(messageBuffer,source);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){

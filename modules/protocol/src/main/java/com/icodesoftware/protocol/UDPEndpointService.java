@@ -139,7 +139,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
         if(pendingOutboundMessage==null) return false;
         operationSummary.pendingOutboundMessageNumber.decrementAndGet();
-        send(pendingOutboundMessage.payload,pendingOutboundMessage.destination);
+        wire(pendingOutboundMessage.payload,pendingOutboundMessage.length,pendingOutboundMessage.destination);
         return true;
     }
     public boolean onReceiveMessage(){
@@ -208,9 +208,11 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
     @Override
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId(),userChannel);
+        this.operationSummary.userChannelNumber.incrementAndGet();
     }
     
     public UserChannel releaseUserChannel(int channelId){
+        this.operationSummary.userChannelNumber.decrementAndGet();
         return this.userChannelIndex.remove(channelId);
     }
 
@@ -221,12 +223,14 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     @Override
     public void registerSummary(Summary summary){
+        summary.registerCategory(UDPOperationSummary.USER_CHANNEL_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_BUFFER_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
+        summary.update(UDPOperationSummary.USER_CHANNEL_NUMBER,operationSummary.userChannelNumber.get());
         summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,operationSummary.pendingInboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_BUFFER_NUMBER,operationSummary.pendingBufferNumber.get());

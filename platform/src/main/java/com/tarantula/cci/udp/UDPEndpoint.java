@@ -14,6 +14,7 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -25,9 +26,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    private PushUserChannel pushUserChannel;
+    //private PushUserChannel pushUserChannel;
+    private ConcurrentLinkedDeque<PushUserChannel> pushUserChannels;
     private TokenValidatorProvider tokenValidator;
-    private final int singleChannelId = 1000;
+    //private final int singleChannelId = 1000;
     private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
@@ -42,6 +44,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private ServiceContext serviceContext;
     private boolean running = true;
+    private int channelPoolSize;
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -54,6 +57,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         Configuration cfg = serviceContext.configuration(CONFIG);
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
+        this.pushUserChannels = new ConcurrentLinkedDeque<>();
+        this.channelPoolSize = ((Number)cfg.property("channelPoolSize")).intValue();
         this.key = serviceContext.deploymentServiceProvider().serverKey("pushChannel");
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
@@ -84,10 +89,15 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 }
             }
         },"tarantula-udp-outbound-message-sender");
-        pushUserChannel = new PushUserChannel(singleChannelId,udpEndpointServiceProvider,this,this,this);
+        for(int i=1;i<=channelPoolSize;i++) {
+            PushUserChannel pushUserChannel = new PushUserChannel(i, udpEndpointServiceProvider, this, this, this);
+            pushUserChannels.offer(pushUserChannel);
+        }
         int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
         for(int i=0;i<sessionPoolSize;i++){
+            PushUserChannel pushUserChannel = pushUserChannels.poll();
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
+            pushUserChannels.offer(pushUserChannel);
         }
         logger.warn("UDP Endpoint running as a daemon with session pool size ->"+sessionPoolSize+" on ["+serviceContext.node().servicePushAddress()+"]");
     }
@@ -98,7 +108,12 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         receiverDaemon.start();
         outboundMessageDaemon.start();
         serviceContext.schedule(this);
-        this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
+        PushUserChannel pushUserChannel;
+        do{
+            pushUserChannel = pushUserChannels.poll();
+            if(pushUserChannel!=null) this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
+        }while (pushUserChannel!=null);
+        //this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
     }
 
     @Override
