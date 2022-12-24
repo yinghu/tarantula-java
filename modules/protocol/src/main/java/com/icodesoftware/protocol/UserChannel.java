@@ -127,7 +127,7 @@ public class UserChannel {
         _retried.clear();
         pendingAckMessageIndex.forEach((k,v)-> {
            userSessionIndex.forEach((uk, uu) -> {
-               messenger.queue(v.data, uu.source);
+               messenger.send(v.data,v.length,uu.source);
            });
            v.retries--;
            if(v.retries<=0){
@@ -150,8 +150,11 @@ public class UserChannel {
             messenger.queue(buffer,v.source);
         });
     }
-    public void queue(int sessionId,byte[] data){
-        messenger.queue(data,userSessionIndex.get(sessionId).source);
+    public void queue(int sessionId,MessageBuffer messageBuffer){
+        messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
+    }
+    public void send(int sessionId,MessageBuffer messageBuffer){
+        messenger.send(messageBuffer,userSessionIndex.get(sessionId).source);
     }
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
@@ -171,7 +174,7 @@ public class UserChannel {
                     byte[] data = p.data;
                     int[] pendingAck ={0};
                     userSessionIndex.forEach((k,v)->{
-                        messenger.queue(data,v.source);
+                        messenger.send(data,data.length,v.source);
                         pendingAck[0]++;
                     });
                     if(p.messageHeader.ack&&pendingAck[0]>0){
@@ -207,7 +210,7 @@ public class UserChannel {
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.data,session.source);
+            messenger.send(pendingAckMessage.data,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -225,7 +228,7 @@ public class UserChannel {
         messageBuffer.flip();
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.data,session.source);
+            messenger.send(pendingAckMessage.data,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -235,12 +238,12 @@ public class UserChannel {
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
                 if(messageHeader.sessionId!=sid){
-                    messenger.send(payload,session.source);
+                    messenger.send(payload,payload.length,session.source);
                     pendingAck[0]++;
                 }
             }
             else{
-                messenger.send(payload,session.source);
+                messenger.send(payload,payload.length,session.source);
                 pendingAck[0]++;
             }
         });
@@ -252,19 +255,23 @@ public class UserChannel {
     protected class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
         public byte[] data;
+        public int length;
         public int retries = MessageBuffer.RETRIES;
         public int pendingAck;
         public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] data){
             this.messageHeader = messageHeader;
             this.data = data;
+            this.length = data.length;
         }
     }
     protected class PendingActionMessage{
         public byte[] data;
+        public int length;
         public int pendingTime;
         public MessageBuffer.MessageHeader messageHeader;
-        public PendingActionMessage(byte[] data, int pendingTime, MessageBuffer.MessageHeader messageHeader){
+        public PendingActionMessage(byte[] data,int pendingTime, MessageBuffer.MessageHeader messageHeader){
             this.data = data;
+            this.length = data.length;
             this.pendingTime = pendingTime;
             this.messageHeader = messageHeader;
         }

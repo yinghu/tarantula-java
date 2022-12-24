@@ -139,7 +139,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         PendingOutboundMessage pendingOutboundMessage = pendingOutboundMessageQueue.poll();
         if(pendingOutboundMessage==null) return false;
         operationSummary.pendingOutboundMessageNumber.decrementAndGet();
-        wire(pendingOutboundMessage.payload,pendingOutboundMessage.length,pendingOutboundMessage.destination);
+        wire(pendingOutboundMessage.buffer,pendingOutboundMessage.length,pendingOutboundMessage.destination);
+        pendingBufferQueue.offer(pendingOutboundMessage.buffer);
         return true;
     }
     public boolean onReceiveMessage(){
@@ -156,18 +157,15 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         }
     }
 
-    public void send(byte[] data,SocketAddress destination){
-        wire(data,data.length,destination);
+    public void send(byte[] data,int length,SocketAddress destination){
+        wire(data,length,destination);
     }
+
     public void send(MessageBuffer messageBuffer,SocketAddress destination){
         byte[] buffer = this.buffer();
         int len = messageBuffer.toArray(buffer);
         wire(buffer,len,destination);
         pendingBufferQueue.offer(buffer);
-    }
-    public void queue(byte[] data,SocketAddress destination){
-        pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,destination));
-        operationSummary.pendingOutboundMessageNumber.incrementAndGet();
     }
     public void queue(MessageBuffer messageBuffer,SocketAddress destination){
         byte[] buffer = this.buffer();
@@ -235,13 +233,16 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_BUFFER_NUMBER,operationSummary.pendingBufferNumber.get());
     }
-    private byte[] buffer(){
+    public byte[] buffer(){
         byte[] buffer = pendingBufferQueue.poll();
         if(buffer==null){
             buffer = new byte[BUFFER_SIZE];
             operationSummary.pendingBufferNumber.incrementAndGet();
         }
         return buffer;
+    }
+    public void buffer(byte[] buffer){
+        pendingBufferQueue.offer(buffer);
     }
     private void wire(byte[] buffer,int length,SocketAddress destination){
         DatagramPacket packet = new DatagramPacket(buffer,length,destination);

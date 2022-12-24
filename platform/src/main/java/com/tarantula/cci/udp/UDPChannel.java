@@ -60,7 +60,7 @@ public class UDPChannel extends GameChannel {
                 messageBuffer.writeHeader(messageHeader);
                 messageBuffer.writePayload(payload,offset.offset,offset.length);
                 messageBuffer.flip();
-                userChannel.queue(messageHeader.sessionId,messageBuffer.toArray());
+                userChannel.send(messageHeader.sessionId,messageBuffer);
             }
         }
     }
@@ -77,7 +77,7 @@ public class UDPChannel extends GameChannel {
             messageBuffer.writeHeader(messageHeader);
             messageBuffer.writePayload(ret,offset.offset,offset.length);
             messageBuffer.flip();
-            userChannel.queue(messageHeader.sessionId,messageBuffer.toArray());
+            userChannel.send(messageHeader.sessionId,messageBuffer);
         }
     }
     public Connection connection(){

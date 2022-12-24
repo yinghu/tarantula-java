@@ -14,7 +14,6 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -26,14 +25,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    //private PushUserChannel pushUserChannel;
+
     private ConcurrentLinkedDeque<PushUserChannel> pushUserChannels;
     private TokenValidatorProvider tokenValidator;
-    //private final int singleChannelId = 1000;
     private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
-
+    //private Cipher decoder;
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     private MetricsListener metricsListener;
@@ -104,6 +102,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void start() throws Exception {
+        //decoder = CipherUtil.decrypt(this.key);
         udpEndpointServiceProvider.start();
         receiverDaemon.start();
         outboundMessageDaemon.start();

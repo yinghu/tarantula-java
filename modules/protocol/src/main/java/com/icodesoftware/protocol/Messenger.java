@@ -19,8 +19,10 @@ public interface Messenger {
     //SERVER PENDING ACTION
     short ON_PENDING_ACTION = 500;
 
-    void send(byte[] data,SocketAddress destination);
-    void queue(byte[] data,SocketAddress destination);
+    byte[] buffer();
+    void buffer(byte[] buffer);
+    void send(byte[] data,int length,SocketAddress destination);
+
     void queue(MessageBuffer messageBuffer,SocketAddress destination);
     void send(MessageBuffer messageBuffer,SocketAddress destination);
 }
