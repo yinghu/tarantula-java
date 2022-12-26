@@ -144,8 +144,8 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         return true;
     }
     public boolean onReceiveMessage(){
+        byte[] buffer = this.buffer();
         try{
-            byte[] buffer = this.buffer();
             DatagramPacket packet = new DatagramPacket(buffer,BUFFER_SIZE);
             this.datagramChannel.receive(packet);
             pendingInboundMessageQueue.offer(packet);
@@ -153,6 +153,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
             return true;
         }catch (Exception ex){
             //ignore
+            buffer(buffer);
             return false;
         }
     }
