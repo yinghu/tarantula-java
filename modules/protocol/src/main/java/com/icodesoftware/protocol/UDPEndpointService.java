@@ -232,6 +232,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,operationSummary.pendingInboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_BUFFER_NUMBER,operationSummary.pendingBufferNumber.get());
+        log.warn("Buffer size->"+pendingBufferQueue.size());
     }
     public byte[] buffer(){
         byte[] buffer = pendingBufferQueue.poll();

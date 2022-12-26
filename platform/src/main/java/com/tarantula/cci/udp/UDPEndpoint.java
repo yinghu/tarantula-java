@@ -31,7 +31,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
-    //private Cipher decoder;
+
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     private MetricsListener metricsListener;
