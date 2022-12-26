@@ -43,6 +43,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ServiceContext serviceContext;
     private boolean running = true;
     private int channelPoolSize;
+
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
@@ -165,7 +166,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         try{
             if(!messageHeader.encrypted) return false;
             Cipher cipher = CipherUtil.decrypt(key);
-            byte[] plain = cipher.doFinal(messageBuffer.readPayload());
+            byte[] buffer = udpEndpointServiceProvider.buffer();
+            int length = messageBuffer.readPayload(buffer);
+            byte[] plain = cipher.doFinal(buffer,0,length);
+            udpEndpointServiceProvider.buffer(buffer);
             messageBuffer.reset();
             messageBuffer.writeHeader(messageHeader);
             messageBuffer.writePayload(plain);
@@ -190,7 +194,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         if(messageHeader.encrypted){
             try{
                 Cipher cipher = CipherUtil.decrypt(key);
-                byte[] plain = cipher.doFinal(messageBuffer.readPayload());
+                byte[] buffer = udpEndpointServiceProvider.buffer();
+                int length = messageBuffer.readPayload(buffer);
+                byte[] plain = cipher.doFinal(buffer,0,length);
+                udpEndpointServiceProvider.buffer(buffer);
                 messageBuffer.reset();
                 messageBuffer.writeHeader(messageHeader);
                 messageBuffer.writePayload(plain);
