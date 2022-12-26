@@ -10,6 +10,7 @@ import javax.crypto.Cipher;
 import java.lang.reflect.AnnotatedArrayType;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 public class MessageBufferTest {
@@ -26,26 +27,31 @@ public class MessageBufferTest {
             messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         }
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE*11);
+        byte[] buffer = new byte[MessageBuffer.SIZE];
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE*11);
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE*11);
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
     }
     @Test(groups = { "message buffer" })
     public void resetMessageBufferTest(){
         MessageBuffer messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE);
-        messageBuffer.reset("123".getBytes());
+        byte[] buffer = new byte[MessageBuffer.SIZE];
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE);
+        buffer[0]='1';
+        buffer[0]='2';
+        buffer[0]='3';
+        messageBuffer.reset(buffer,0,3);
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE+3);
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE+3);
         messageBuffer.reset();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
         messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE);
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE);
 
     }
     @Test(groups = { "message buffer" })
@@ -56,7 +62,8 @@ public class MessageBufferTest {
         messageBuffer.flip();
         messageBuffer.readHeader();
         messageBuffer.rewind();
-        Assert.assertEquals(messageBuffer.toArray().length,MessageBuffer.HEADER_SIZE*2);
+        byte[] buffer = new byte[MessageBuffer.SIZE];
+        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*2);
     }
     @Test(groups = { "message buffer" })
     public void bitwiseMessageBufferTest(){
@@ -191,7 +198,6 @@ public class MessageBufferTest {
     }
     @Test(groups = { "message buffer" })
     public void bufferMessageHeaderTest(){
-
         MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
         messageHeader.encrypted = false;
         messageHeader.ack = false;
@@ -204,7 +210,7 @@ public class MessageBufferTest {
         byte[] buffer = new byte[MessageBuffer.SIZE];
         int len = messageBuffer.toArray(buffer);
         MessageBuffer m = new MessageBuffer();
-        m.reset(buffer,len);
+        m.reset(buffer,0,len);
         m.flip();
         messageBuffer.flip();
         MessageBuffer.MessageHeader _h = messageBuffer.readHeader();
@@ -220,5 +226,46 @@ public class MessageBufferTest {
         Assert.assertEquals("test",t);
         Assert.assertEquals(101,f);
         Assert.assertEquals(101,g);
+    }
+    @Test(groups = { "message buffer" })
+    public void bufferPayloadMessageTest1(){
+        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.encrypted = false;
+        messageHeader.ack = false;
+        messageHeader.broadcasting = false;
+        MessageBuffer messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(messageHeader);
+        byte[] buffer1 = new byte[MessageBuffer.SIZE];
+        for(int i=0;i<100;i++){
+            buffer1[i]='a';
+        }
+        messageBuffer.writePayload(buffer1,0,100);
+        messageBuffer.flip();
+        messageBuffer.readHeader();
+        byte[] buffer2 = messageBuffer.readPayload();
+        Assert.assertEquals(buffer2.length,100);
+        byte[] buffer3 = Arrays.copyOf(buffer1,100);
+        Assert.assertEquals(buffer2,buffer3);
+    }
+
+    @Test(groups = { "message buffer" })
+    public void bufferPayloadMessageTest2(){
+        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.encrypted = false;
+        messageHeader.ack = false;
+        messageHeader.broadcasting = false;
+        MessageBuffer messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(messageHeader);
+        byte[] buffer1 = new byte[MessageBuffer.SIZE];
+        for(int i=0;i<100;i++){
+            buffer1[i]='a';
+        }
+        messageBuffer.writePayload(buffer1,0,100);
+        messageBuffer.flip();
+        messageBuffer.readHeader();
+        byte[] buffer2 = new byte[MessageBuffer.SIZE];
+        int length = messageBuffer.readPayload(buffer2);
+        Assert.assertEquals(length,100);
+        Assert.assertEquals(Arrays.copyOf(buffer1,100),Arrays.copyOf(buffer2,100));
     }
 }

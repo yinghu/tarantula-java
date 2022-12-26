@@ -19,11 +19,12 @@ public class MessageBuffer {
         byteBuffer.clear();
         byteBuffer.put(data);
     }
-    public void reset(byte[] data,int offset){
+    public void reset(byte[] data,int offset,int length){
         byteBuffer.clear();
-        for(int i=0;i<offset;i++){
-            byteBuffer.put(data[i]);
-        }
+        byteBuffer.put(data,offset,length);
+        //for(int i=0;i<offset;i++){
+            //byteBuffer.put(data[i]);
+        //}
     }
     public void reset(){
         byteBuffer.clear();
@@ -128,6 +129,12 @@ public class MessageBuffer {
         byte[] _payload = new byte[byteBuffer.limit()-HEADER_SIZE];
         byteBuffer.get(_payload);
         return _payload;
+    }
+    public int readPayload(byte[] buffer){
+        //fill buffer after reading header
+        int length = byteBuffer.limit()-HEADER_SIZE;
+        byteBuffer.get(buffer,0,length);
+        return length;
     }
     public byte[] toArray(){
         byte[] _payload = new byte[byteBuffer.limit()];

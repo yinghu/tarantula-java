@@ -95,8 +95,7 @@ public class UserChannel {
             return;
         }
         messageBuffer.rewind();
-        byte[] payload = messageBuffer.toArray();
-        onRelay(messageHeader,payload);
+        onRelay(messageHeader,messageBuffer);
         int pendingTime = messageHeader.batchSize*Short.MAX_VALUE+messageHeader.batch;
         if(pendingTime>0){
             MessageBuffer.MessageHeader pendingHeader = messageHeader.copy();
@@ -108,7 +107,9 @@ public class UserChannel {
             messageBuffer.writeHeader(pendingHeader);
             messageBuffer.writePayload(data);
             messageBuffer.rewind();
-            pendingActionMessageQueue.offer(new PendingActionMessage(messageBuffer.toArray(),pendingTime,messageHeader));
+            byte[] buffer = messenger.buffer();
+            int length = messageBuffer.toArray(buffer);
+            pendingActionMessageQueue.offer(new PendingActionMessage(buffer,length,pendingTime,messageHeader));
         }
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
@@ -127,14 +128,17 @@ public class UserChannel {
         _retried.clear();
         pendingAckMessageIndex.forEach((k,v)-> {
            userSessionIndex.forEach((uk, uu) -> {
-               messenger.send(v.data,v.length,uu.source);
+               messenger.send(v.buffer,v.length,uu.source);
            });
            v.retries--;
            if(v.retries<=0){
                _retried.add(k);
            }
         });
-        _retried.forEach(k->pendingAckMessageIndex.remove(k));
+        _retried.forEach(k->{
+            PendingAckMessage removed = pendingAckMessageIndex.remove(k);
+            if(removed!=null) messenger.buffer(removed.buffer);
+        });
     }
     protected void onPing(){
         MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
@@ -171,14 +175,14 @@ public class UserChannel {
                     requeueList.add(p);
                 }
                 else{
-                    byte[] data = p.data;
+                    byte[] data = p.buffer;
                     int[] pendingAck ={0};
                     userSessionIndex.forEach((k,v)->{
                         messenger.send(data,data.length,v.source);
                         pendingAck[0]++;
                     });
-                    if(p.messageHeader.ack&&pendingAck[0]>0){
-                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader,data);
+                    if(p.messageHeader.ack && pendingAck[0]>0){
+                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader,data,p.length);
                         pendingAckMessage.pendingAck = pendingAck[0];
                         pendingAckMessageIndex.put(p.messageHeader.toString(),pendingAckMessage);
                     }
@@ -194,7 +198,7 @@ public class UserChannel {
         MessageBuffer.MessageHeader ackHeader = new MessageBuffer.MessageHeader();
         ackHeader.commandId = Messenger.ACK;
         messageBuffer.writeHeader(ackHeader);
-        _acks.forEach((mh)->messageBuffer.writeHeader(mh));//need to sync
+        _acks.forEach((mh)->messageBuffer.writeHeader(mh));
         messageBuffer.flip();
         messenger.send(messageBuffer,source);
     }
@@ -208,9 +212,11 @@ public class UserChannel {
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         messageBuffer.flip();
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        byte[] buffer = messenger.buffer();
+        int length = messageBuffer.toArray(buffer);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.data,pendingAckMessage.length,session.source);
+            messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -226,52 +232,57 @@ public class UserChannel {
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.flip();
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        byte[] buffer = messenger.buffer();
+        int length = messageBuffer.toArray(buffer);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.data,pendingAckMessage.length,session.source);
+            messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
-    protected void onRelay(MessageBuffer.MessageHeader messageHeader,byte[] payload){
+    protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        byte[] buffer = messenger.buffer();
+        int length = messageBuffer.toArray(buffer);
         int[] pendingAck ={0};
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
                 if(messageHeader.sessionId!=sid){
-                    messenger.send(payload,payload.length,session.source);
+                    messenger.send(buffer,length,session.source);
                     pendingAck[0]++;
                 }
             }
             else{
-                messenger.send(payload,payload.length,session.source);
+                messenger.send(buffer,length,session.source);
                 pendingAck[0]++;
             }
         });
         if(!messageHeader.ack||pendingAck[0]==0) return;
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,payload);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         pendingAckMessage.pendingAck = pendingAck[0];
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected class PendingAckMessage{
         public MessageBuffer.MessageHeader messageHeader;
-        public byte[] data;
+        public byte[] buffer;
         public int length;
         public int retries = MessageBuffer.RETRIES;
         public int pendingAck;
-        public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] data){
+        public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] buffer,int length){
             this.messageHeader = messageHeader;
-            this.data = data;
-            this.length = data.length;
+            this.buffer = buffer;
+            this.length = length;
         }
     }
     protected class PendingActionMessage{
-        public byte[] data;
+        public byte[] buffer;
         public int length;
         public int pendingTime;
         public MessageBuffer.MessageHeader messageHeader;
-        public PendingActionMessage(byte[] data,int pendingTime, MessageBuffer.MessageHeader messageHeader){
-            this.data = data;
-            this.length = data.length;
+
+        public PendingActionMessage(byte[] data,int length,int pendingTime, MessageBuffer.MessageHeader messageHeader){
+            this.buffer = data;
+            this.length = length;
             this.pendingTime = pendingTime;
             this.messageHeader = messageHeader;
         }

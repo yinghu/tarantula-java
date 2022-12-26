@@ -9,8 +9,8 @@ public class GameUserChannel extends UserChannel {
     }
 
     @Override
-    protected void onRelay(MessageBuffer.MessageHeader messageHeader, byte[] payload) {
-        super.onRelay(messageHeader,payload);
+    protected void onRelay(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        super.onRelay(messageHeader,messageBuffer);
     }
 
     @Override

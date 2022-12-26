@@ -79,7 +79,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                         DatagramPacket packet = pendingInboundMessageQueue.poll();
                         if(packet!=null){
                             operationSummary.pendingInboundMessageNumber.decrementAndGet();
-                            messageBuffer.reset(packet.getData(),packet.getLength());
+                            messageBuffer.reset(packet.getData(),0,packet.getLength());
                             messageBuffer.flip();
                             MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
                             UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);

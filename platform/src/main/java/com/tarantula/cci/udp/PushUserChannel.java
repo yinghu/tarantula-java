@@ -12,13 +12,13 @@ public class PushUserChannel extends UserChannel {
     }
 
     @Override
-    protected void onRelay(MessageBuffer.MessageHeader messageHeader, byte[] payload) {
-        //super.onRelay(messageHeader,payload);
+    protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        //skip
     }
 
     @Override
     protected void onPing(){
-
+        //skip
     }
 
     @Override
@@ -32,9 +32,11 @@ public class PushUserChannel extends UserChannel {
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         messageBuffer.flip();
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,messageBuffer.toArray());
+        byte[] buffer = messenger.buffer();
+        int length = messageBuffer.toArray(buffer);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
-        messenger.send(pendingAckMessage.data,pendingAckMessage.length,userSession.source);
+        messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
         pendingAckMessage.pendingAck=1;
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
