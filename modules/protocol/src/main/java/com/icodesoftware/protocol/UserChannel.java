@@ -24,7 +24,9 @@ public class UserChannel {
     protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
     protected UDPEndpointServiceProvider.SessionListener sessionListener;
 
-    private ArrayList<PendingActionMessage> requeueList = new ArrayList<>();
+    private ArrayList<PendingActionMessage> requeueList;
+    protected MessageBuffer.MessageHeader pingHeader;
+    protected MessageBuffer pingBuffer;
 
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
@@ -38,6 +40,11 @@ public class UserChannel {
         this._offline = new ArrayList<>();
         this._retried = new ArrayList<>();
         this.sessionListener = sessionListener!=null?sessionListener:(c,s)->{};
+        this.requeueList = new ArrayList<>();
+        this.pingHeader = new MessageBuffer.MessageHeader();
+        this.pingHeader.commandId = Messenger.PING;
+        this.pingHeader.channelId = channelId;
+        this.pingBuffer = new MessageBuffer();
     }
     public int channelId(){
         return this.channelId;
@@ -146,17 +153,13 @@ public class UserChannel {
         });
     }
     protected void onPing(){
-        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
-        messageHeader.commandId = Messenger.PING;
-        messageHeader.channelId = channelId;
-        MessageBuffer buffer = new MessageBuffer();
         userSessionIndex.forEach((k,v)->{
-            buffer.reset();
-            messageHeader.sessionId = k;
-            buffer.writeHeader(messageHeader);
-            buffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            buffer.flip();
-            messenger.queue(buffer,v.source);
+            pingBuffer.reset();
+            pingHeader.sessionId = k;
+            pingBuffer.writeHeader(pingHeader);
+            pingBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            pingBuffer.flip();
+            messenger.queue(pingBuffer,v.source);
         });
     }
     public void queue(int sessionId,MessageBuffer messageBuffer){
