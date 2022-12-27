@@ -24,6 +24,8 @@ public class UserChannel {
     protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
     protected UDPEndpointServiceProvider.SessionListener sessionListener;
 
+    private ArrayList<PendingActionMessage> requeueList = new ArrayList<>();
+
     public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         this.channelId = channelId;
         this.messenger = messenger;
@@ -76,7 +78,10 @@ public class UserChannel {
                 if(pendingAckMessageIndex.containsKey(h)){
                     PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
                     pendingAckMessage.pendingAck--;
-                    if(pendingAckMessage.pendingAck<=0) pendingAckMessageIndex.remove(h);
+                    if(pendingAckMessage.pendingAck<=0){
+                        PendingAckMessage removed = pendingAckMessageIndex.remove(h);
+                        if(removed!=null) messenger.buffer(removed.buffer);
+                    }
                 }
             }
             return;
@@ -165,7 +170,7 @@ public class UserChannel {
         sessionListener.onTimeout(channelId,sessionId);
     }
     public void onPendingAction(int frameRate){
-        ArrayList<PendingActionMessage> requeueList = new ArrayList<>();
+        requeueList.clear();
         PendingActionMessage p;
         do{
             p = pendingActionMessageQueue.poll();

@@ -22,6 +22,11 @@ public class PushUserChannel extends UserChannel {
     }
 
     @Override
+    public void onPendingAction(int frameRate){
+        //skip
+    }
+
+    @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         messageBuffer.reset();
         messageHeader.ack = true;
