@@ -1,8 +1,10 @@
 package com.icodesoftware.protocol;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class MessageBuffer {
+
     public final static int PAYLOAD_SIZE = 485;//SIZE - HEADER_SIZE
     public final static int SIZE = 508;
     public final static int PENDING_ACK_SIZE = 10;
@@ -22,9 +24,6 @@ public class MessageBuffer {
     public void reset(byte[] data,int offset,int length){
         byteBuffer.clear();
         byteBuffer.put(data,offset,length);
-        //for(int i=0;i<offset;i++){
-            //byteBuffer.put(data[i]);
-        //}
     }
     public void reset(){
         byteBuffer.clear();
@@ -161,6 +160,16 @@ public class MessageBuffer {
         @Override
         public String toString(){
             return "H_"+channelId+"_"+sessionId+"_"+objectId+"_"+sequence;
+        }
+        @Override
+        public boolean equals(Object obj){
+            if(!(obj instanceof MessageHeader)) return false;
+            MessageHeader messageHeader = (MessageHeader)obj;
+            return messageHeader.channelId == channelId && messageHeader.sessionId == sessionId && messageHeader.objectId == objectId && messageHeader.sequence == sequence;
+        }
+        @Override
+        public int hashCode(){
+            return Arrays.hashCode(new int[]{channelId,sequence,objectId,sequence});
         }
         public MessageHeader copy(){
             MessageHeader copy = new MessageHeader();

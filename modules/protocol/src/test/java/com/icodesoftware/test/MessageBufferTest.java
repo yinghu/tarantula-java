@@ -1,16 +1,16 @@
 package com.icodesoftware.test;
 
 import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.util.CipherUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.crypto.Cipher;
-import java.lang.reflect.AnnotatedArrayType;
-import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.HashSet;
 
 
 public class MessageBufferTest {
@@ -21,18 +21,23 @@ public class MessageBufferTest {
 
     @Test(groups = { "message buffer" })
     public void ackMessageBufferTest() {
+        HashSet<MessageBuffer.MessageHeader> headers = new HashSet<>();
         MessageBuffer messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
-        for(int i=0;i<10;i++){
-            messageBuffer.writeHeader(new MessageBuffer.MessageHeader());
+        for(int i=0;i<20;i++){
+            MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
+            header.sequence = (i+1)*10000;
+            Assert.assertTrue(headers.add(header));
+            messageBuffer.writeHeader(header);
         }
         messageBuffer.flip();
-        byte[] buffer = new byte[MessageBuffer.SIZE];
-        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
-        messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
-        messageBuffer.flip();
-        Assert.assertEquals(messageBuffer.toArray(buffer),MessageBuffer.HEADER_SIZE*11);
+        messageBuffer.readHeader();
+        for(int i=0;i<20;i++){
+            MessageBuffer.MessageHeader h = messageBuffer.readHeader();
+            Assert.assertEquals(h.sequence,(i+1)*10000);
+            Assert.assertTrue(headers.remove(h));
+        }
+        Assert.assertTrue(headers.isEmpty());
     }
     @Test(groups = { "message buffer" })
     public void resetMessageBufferTest(){
@@ -267,5 +272,28 @@ public class MessageBufferTest {
         int length = messageBuffer.readPayload(buffer2);
         Assert.assertEquals(length,100);
         Assert.assertEquals(Arrays.copyOf(buffer1,100),Arrays.copyOf(buffer2,100));
+    }
+
+    @Test(groups = { "message buffer" })
+    public void bufferPayloadMessageTest3(){
+        int seq = 1;
+        MessageBuffer.MessageHeader messageHeader = new MessageBuffer.MessageHeader();
+        messageHeader.sequence = seq++;
+        messageHeader.encrypted = false;
+        messageHeader.ack = false;
+        messageHeader.broadcasting = false;
+        messageHeader.batchSize = 10;
+        messageHeader.commandId = Messenger.REQUEST;
+        MessageBuffer messageBuffer = new MessageBuffer();
+        messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeInt(2).writeUTF8("kills").writeFloat(1);//4*3 +5 = 17
+        for(int i=0;i<10;i++){
+            messageBuffer.writeInt(seq++).writeUTF8("kills").writeFloat(1);
+        }
+        messageBuffer.flip();
+        messageBuffer.readHeader();
+        Assert.assertEquals(messageBuffer.readInt(),2);
+        Assert.assertEquals(messageBuffer.readUTF8(),"kills");
+        Assert.assertEquals(messageBuffer.readFloat(),1.0f);
     }
 }
