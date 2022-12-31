@@ -2,7 +2,6 @@ package com.tarantula.cci.udp;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.UDPEndpointService;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UDPOperationSummary;
 import com.icodesoftware.service.EndPoint;
@@ -20,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.PingListener ,SchedulingTask{
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener ,SchedulingTask{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -31,6 +30,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
+    private String host;
+    private String threadPoolSetting;
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
@@ -48,7 +49,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
         connection = new ClientConnection();
-        udpEndpointServiceProvider = new UDPEndpointService();
         sessionId = new AtomicInteger(1);
     }
     public void setup(ServiceContext serviceContext){
@@ -57,6 +57,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
         this.pushUserChannels = new ConcurrentLinkedDeque<>();
+        String udpProvider = (String)cfg.property("udpEndpointServiceProvider");
+        this.udpEndpointServiceProvider = createInstance(udpProvider);
+        this.udpEndpointServiceProvider.address(host);
+        this.udpEndpointServiceProvider.port(connection.port());
+        this.udpEndpointServiceProvider.inboundThreadPoolSetting(threadPoolSetting);
         this.channelPoolSize = ((Number)cfg.property("channelPoolSize")).intValue();
         this.key = serviceContext.deploymentServiceProvider().serverKey("pushChannel");
         connection.serverId(UUID.randomUUID().toString());
@@ -65,7 +70,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.host(serviceContext.node().servicePushAddress());
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
-        udpEndpointServiceProvider.registerPingListener(this);
         receiverDaemon = new Thread(()->{
             while (running){
                 try {
@@ -103,7 +107,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void start() throws Exception {
-        //decoder = CipherUtil.decrypt(this.key);
         udpEndpointServiceProvider.start();
         receiverDaemon.start();
         outboundMessageDaemon.start();
@@ -113,7 +116,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             pushUserChannel = pushUserChannels.poll();
             if(pushUserChannel!=null) this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
         }while (pushUserChannel!=null);
-        //this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
     }
 
     @Override
@@ -129,18 +131,17 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void address(String address) {
-        this.udpEndpointServiceProvider.address(address);
+        this.host = address;
     }
 
     @Override
     public void port(int port) {
-        this.udpEndpointServiceProvider.port(port);
         this.connection.port(port);
     }
 
     @Override
     public void inboundThreadPoolSetting(String poolSetting) {
-        this.udpEndpointServiceProvider.inboundThreadPoolSetting(poolSetting);
+        this.threadPoolSetting = poolSetting;
     }
 
     public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
@@ -216,10 +217,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         return null;
     }
 
-    @Override
-    public void onPing() {
 
-    }
 
     @Override
     public void registerMetricsListener(MetricsListener metricsListener){
@@ -258,5 +256,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void run() {
         udpEndpointServiceProvider.onTimer();
         this.serviceContext.schedule(this);
+    }
+
+    private UDPEndpointServiceProvider createInstance(String className){
+        try{
+            return (UDPEndpointServiceProvider) Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException("udp provider ["+className+"] not existed");
+        }
     }
 }

@@ -140,7 +140,7 @@ public class UserChannel {
         _retried.clear();
         pendingAckMessageIndex.forEach((k,v)-> {
            userSessionIndex.forEach((uk, uu) -> {
-               messenger.send(v.buffer,v.length,uu.source);
+               messenger.queue(v.buffer,v.length,uu.source);
            });
            v.retries--;
            if(v.retries<=0){
@@ -165,9 +165,9 @@ public class UserChannel {
     public void queue(int sessionId,MessageBuffer messageBuffer){
         messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
     }
-    public void send(int sessionId,MessageBuffer messageBuffer){
-        messenger.send(messageBuffer,userSessionIndex.get(sessionId).source);
-    }
+    //public void send(int sessionId,MessageBuffer messageBuffer){
+        //messenger.send(messageBuffer,userSessionIndex.get(sessionId).source);
+    //}
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
         sessionListener.onTimeout(channelId,sessionId);
@@ -186,7 +186,7 @@ public class UserChannel {
                     byte[] data = p.buffer;
                     int[] pendingAck ={0};
                     userSessionIndex.forEach((k,v)->{
-                        messenger.send(data,data.length,v.source);
+                        messenger.queue(data,data.length,v.source);
                         pendingAck[0]++;
                     });
                     if(p.messageHeader.ack && pendingAck[0]>0){
@@ -208,7 +208,7 @@ public class UserChannel {
         messageBuffer.writeHeader(ackHeader);
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));
         messageBuffer.flip();
-        messenger.send(messageBuffer,source);
+        messenger.queue(messageBuffer,source);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
@@ -224,7 +224,7 @@ public class UserChannel {
         int length = messageBuffer.toArray(buffer);
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
+            messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -244,7 +244,7 @@ public class UserChannel {
         int length = messageBuffer.toArray(buffer);
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         userSessionIndex.forEach((sid,session)->{
-            messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
+            messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
@@ -256,12 +256,12 @@ public class UserChannel {
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
                 if(messageHeader.sessionId!=sid){
-                    messenger.send(buffer,length,session.source);
+                    messenger.queue(buffer,length,session.source);
                     pendingAck[0]++;
                 }
             }
             else{
-                messenger.send(buffer,length,session.source);
+                messenger.queue(buffer,length,session.source);
                 pendingAck[0]++;
             }
         });

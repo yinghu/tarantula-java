@@ -16,8 +16,10 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     int sessionTimeout();
     void receiverTimeout(int timeout);
     void retryInterval(int interval);
+
     void registerUserChannel(UserChannel userChannel);
     UserChannel releaseUserChannel(int channelId);
+
     void registerPingListener(PingListener pingListener);
 
     //single outbound message sent out
@@ -41,7 +43,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
         byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
-    //ping game cluster server
+    //ping game cluster from udp server
     interface PingListener{
         void onPing();
     }

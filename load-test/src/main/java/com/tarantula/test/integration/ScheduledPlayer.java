@@ -218,7 +218,7 @@ public class ScheduledPlayer{
             LoadResult.totalUDPBytesSent.addAndGet(outbound.length);
             LoadResult.totalSuccessUDPReceived.incrementAndGet();
 
-            DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.PAYLOAD_SIZE],MessageBuffer.PAYLOAD_SIZE);
+            DatagramPacket d = new DatagramPacket(new byte[MessageBuffer.SIZE],MessageBuffer.SIZE);
             udpStart = System.currentTimeMillis();
             try{
                 udp.receive(d);

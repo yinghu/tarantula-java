@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class UDPEndpointService implements UDPEndpointServiceProvider {
+final public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UDPEndpointService.class);
     private static int BUFFER_SIZE = MessageBuffer.SIZE;
@@ -130,7 +130,7 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
                 pingTimer = SESSION_CHECK_INTERVAL;
             }
             if(serverPingTimer<=0){
-                userChannelIndex.forEach((k,v)->v.onPing());//ping client
+                userChannelIndex.forEach((k,v)->v.onPing());//ping client from udp server
                 serverPingTimer = SERVER_PING_INTERVAL;
             }
         }catch (Exception ex){
@@ -142,7 +142,9 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         if(pendingOutboundMessage==null) return false;
         operationSummary.pendingOutboundMessageNumber.decrementAndGet();
         wire(pendingOutboundMessage.buffer,pendingOutboundMessage.length,pendingOutboundMessage.destination);
-        pendingBufferQueue.offer(pendingOutboundMessage.buffer);
+        if(pendingOutboundMessage.buffering){
+            pendingBufferQueue.offer(pendingOutboundMessage.buffer);
+        }
         return true;
     }
     public boolean onReceiveMessage(){
@@ -160,8 +162,11 @@ public class UDPEndpointService implements UDPEndpointServiceProvider {
         }
     }
 
-    public void send(byte[] data,int length,SocketAddress destination){
-        wire(data,length,destination);
+    //public void send(byte[] data,int length,SocketAddress destination){
+        //wire(data,length,destination);
+    //}
+    public void queue(byte[] data,int length,SocketAddress destination){
+        pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,length,destination,false));
     }
 
     public void send(MessageBuffer messageBuffer,SocketAddress destination){

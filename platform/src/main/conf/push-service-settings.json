@@ -1,6 +1,7 @@
 {
+  "udpEndpointServiceProvider": "com.icodesoftware.protocol.UDPEndpointService",
   "sessionTimeout" : 30000,
-  "channelPoolSize" : 100,
+  "channelPoolSize" : 1000,
   "sessionPoolSize": 5000,
   "receiverTimeout": 3000
 }

@@ -4,6 +4,7 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PushUserChannel extends UserChannel {
 
@@ -18,7 +19,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onPing(){
-        //skip
+        //System.out.println(channelId+">>>pinging to client->"+userSessionIndex.size()+">>>"+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class PushUserChannel extends UserChannel {
         int length = messageBuffer.toArray(buffer);
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
         UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
-        messenger.send(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
+        messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
         pendingAckMessage.pendingAck=1;
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
