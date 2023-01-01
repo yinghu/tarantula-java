@@ -165,9 +165,7 @@ public class UserChannel {
     public void queue(int sessionId,MessageBuffer messageBuffer){
         messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
     }
-    //public void send(int sessionId,MessageBuffer messageBuffer){
-        //messenger.send(messageBuffer,userSessionIndex.get(sessionId).source);
-    //}
+  
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
         sessionListener.onTimeout(channelId,sessionId);

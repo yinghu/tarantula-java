@@ -1,7 +1,7 @@
 package com.icodesoftware.test;
 
 import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.util.OffHeapMap;
+import com.icodesoftware.util.OffHeapStore;
 import com.icodesoftware.util.UnsafeUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -31,16 +31,17 @@ public class UnsafeTest {
     @Test(groups = { "unsafe util" })
     public void offHeapMapTest() {
         String key = "abc";
-        OffHeapMap offHeapMap = new OffHeapMap();
+        OffHeapStore offHeapMap = new OffHeapStore();
         Assert.assertNull(offHeapMap.get(key));
-        byte[] value = "test1".getBytes();
+        byte[] value = "test12".getBytes();
         offHeapMap.set(key,value);
         byte[] cached = offHeapMap.get(key);
         Assert.assertEquals(value,cached);
-        byte[] updates = "test2".getBytes();
+        byte[] updates = "test212".getBytes();
         offHeapMap.set(key,updates);
         Assert.assertEquals(updates,offHeapMap.get(key));
         offHeapMap.clear();
+        Assert.assertNull(offHeapMap.get(key));
     }
 
 }

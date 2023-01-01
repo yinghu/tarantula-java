@@ -4,12 +4,12 @@ import sun.misc.Unsafe;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class OffHeapMap {
+public class OffHeapStore {
 
     private ConcurrentHashMap<String,OffHeapIndex> offHeapIndex = new ConcurrentHashMap<>();
     private Unsafe unsafe;
 
-    public OffHeapMap(){
+    public OffHeapStore(){
         unsafe = UnsafeUtil.useUnsafe();
     }
 
@@ -35,8 +35,9 @@ public class OffHeapMap {
                 _set(index,value);
                 return index;
             }
-            unsafe.freeMemory(index.address);
-            index.address = unsafe.allocateMemory(value.length);
+            if(value.length > index.length){
+                index.address = unsafe.reallocateMemory(index.address,value.length);
+            }
             index.length = value.length;
             index.payload = null;
             _set(index,value);

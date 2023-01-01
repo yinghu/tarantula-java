@@ -162,19 +162,11 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         }
     }
 
-    //public void send(byte[] data,int length,SocketAddress destination){
-        //wire(data,length,destination);
-    //}
     public void queue(byte[] data,int length,SocketAddress destination){
         pendingOutboundMessageQueue.offer(new PendingOutboundMessage(data,length,destination,false));
+        operationSummary.pendingOutboundMessageNumber.incrementAndGet();
     }
 
-    public void send(MessageBuffer messageBuffer,SocketAddress destination){
-        byte[] buffer = this.buffer();
-        int len = messageBuffer.toArray(buffer);
-        wire(buffer,len,destination);
-        pendingBufferQueue.offer(buffer);
-    }
     public void queue(MessageBuffer messageBuffer,SocketAddress destination){
         byte[] buffer = this.buffer();
         int len = messageBuffer.toArray(buffer);
