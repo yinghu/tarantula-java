@@ -17,6 +17,8 @@ public class TarantulaMain {
 	private static final TarantulaLogger log = JDKLogger.getLogger(TarantulaMain.class);
 
 	public static TarantulaMain._Runtime runtime;
+
+
 	public static void main(String[] args){
 		try{
 			runtime = new TarantulaMain._Runtime();
@@ -27,14 +29,16 @@ public class TarantulaMain {
 		}
 	}
 	public static  class _Runtime{
-        private ShutdownHook hook;
-		private String override(boolean overriding,String name,Properties user,Properties system){
+        private  ShutdownHook hook;
+
+        private String override(boolean overriding,String name,Properties user,Properties system){
 			String value = system.getProperty(name);
 			if(overriding&&user.getProperty(name)!=null){
 				value = user.getProperty(name);
 			}
 			return value;
 		}
+
 		public void bootstrap() throws Exception{
 			if(!Validator.validate()){
 				throw new IllegalArgumentException("no license found");
@@ -124,6 +128,11 @@ public class TarantulaMain {
 			Runtime.getRuntime().removeShutdownHook(hook);
 			hook.run();
 			bootstrap();
+		}
+		public void shutdown() throws Exception{
+			Runtime.getRuntime().removeShutdownHook(hook);
+			hook.run();
+			System.exit(1);
 		}
 	}
 	

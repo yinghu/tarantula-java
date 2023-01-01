@@ -108,7 +108,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void start() throws Exception {
         udpEndpointServiceProvider.start();
+        receiverDaemon.setPriority(8);
         receiverDaemon.start();
+        outboundMessageDaemon.setPriority(8);
         outboundMessageDaemon.start();
         serviceContext.schedule(this);
         PushUserChannel pushUserChannel;
@@ -121,6 +123,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void shutdown() throws Exception {
         this.running = false;
+        if(udpEndpointServiceProvider==null) return;
         udpEndpointServiceProvider.shutdown();
     }
 

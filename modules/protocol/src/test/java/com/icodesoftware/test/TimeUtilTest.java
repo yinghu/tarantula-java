@@ -19,7 +19,7 @@ public class TimeUtilTest {
         Assert.assertEquals(mid1.getDayOfMonth(),30);
         Assert.assertEquals(mid1.getMonthValue(),9);
         LocalDateTime mid = TimeUtil.midnight();
-        Assert.assertEquals(mid.getDayOfYear(),LocalDateTime.now().getDayOfYear()+1);
+        Assert.assertEquals(mid.getDayOfYear(),LocalDateTime.now().plusDays(1).getDayOfYear());
     }
 
     @Test(groups = { "time util" })

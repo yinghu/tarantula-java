@@ -12,8 +12,7 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-container">
         <div class='w3-bar w3-white'>
-            <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Operation</span>
-            <span class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Operation</span>
+            <span id="tx-cluster-shutdown" class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Shutdown</span>
         </div>            
     </div>
     <div class="w3-panel">
@@ -71,5 +70,10 @@
         let m3 = document.querySelector("#tx-popup-api");
         m3.innerHTML="";
         m3.style.display = 'none';       
+    };
+    document.querySelector('#tx-cluster-shutdown').onclick = ()=>{
+        TARA_API.onGet('role/sudo','onClusterShutdown','',(resp)=>{
+            console.log(resp);    
+        });
     };
 </script>

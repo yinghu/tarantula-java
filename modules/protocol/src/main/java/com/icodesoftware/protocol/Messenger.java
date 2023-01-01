@@ -24,5 +24,5 @@ public interface Messenger {
 
     void queue(byte[] data,int length,SocketAddress destination);
     void queue(MessageBuffer messageBuffer,SocketAddress destination);
-    
+
 }

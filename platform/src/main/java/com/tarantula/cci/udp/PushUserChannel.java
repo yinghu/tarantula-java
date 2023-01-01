@@ -19,7 +19,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onPing(){
-        //System.out.println(channelId+">>>pinging to client->"+userSessionIndex.size()+">>>"+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
     }
 
     @Override

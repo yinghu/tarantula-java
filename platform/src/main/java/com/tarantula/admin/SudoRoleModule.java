@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.*;
+import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.presence.PermissionContext;
 
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -130,6 +131,10 @@ public class SudoRoleModule implements Module {
         else if(session.action().equals("onClusterList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             session.write(summary.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onClusterShutdown")){
+            session.write(JsonUtil.toSimpleResponse(true,"shutdown").getBytes());
+            TarantulaMain.runtime.shutdown();
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
