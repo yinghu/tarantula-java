@@ -357,12 +357,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public long initialDelay() {
-        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL;
+        return UDPEndpointServiceProvider.GAME_SESSION_TIME_OUT;
     }
 
     @Override
     public long delay() {
-        return UDPEndpointServiceProvider.SESSION_CHECK_INTERVAL+1000;
+        return UDPEndpointServiceProvider.GAME_SESSION_TIME_OUT+1000;
     }
 
     @Override

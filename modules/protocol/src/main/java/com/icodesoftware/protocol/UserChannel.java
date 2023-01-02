@@ -61,12 +61,12 @@ public class UserChannel {
         if(userSession==null){
             return;
         }
-        if(userSession.onJoin()){
+        if(userSession.onJoin()){//first join call
             //server push onJoin 200
             onJoin(messageHeader,messageBuffer);
             return;
         }
-        if(messageHeader.commandId == Messenger.JOIN){
+        if(messageHeader.commandId == Messenger.JOIN){//rejoin call
             if(!userSessionValidator.validate(messageHeader,messageBuffer)){
                 //kickoff
                 userSessionIndex.remove(messageHeader.sessionId);
@@ -165,7 +165,7 @@ public class UserChannel {
     public void queue(int sessionId,MessageBuffer messageBuffer){
         messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
     }
-  
+
     public void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
         sessionListener.onTimeout(channelId,sessionId);

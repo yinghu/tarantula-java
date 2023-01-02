@@ -1,5 +1,9 @@
 {
   "udpEndpointServiceProvider": "com.icodesoftware.protocol.UDPEndpointService",
+  "frameRate" : 100,
+  "pingClientInterval" : 5000,
+  "pingListenerInterval" : 6000,
+  "retryInterval" : 300,
   "sessionTimeout" : 30000,
   "channelPoolSize" : 1000,
   "sessionPoolSize": 5000,

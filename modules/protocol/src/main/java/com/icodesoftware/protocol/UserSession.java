@@ -11,10 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UserSession {
     public final int sessionId;
     public SocketAddress source;
+
     private FIFOBuffer<MessageBuffer.MessageHeader> pendingAckBuffer;
     private AtomicBoolean onJoined;
     private AtomicInteger sequence;
     private int lastSequence;
+
     public UserSession(int sessionId,SocketAddress source){
         this.sessionId = sessionId;
         this.source = source;
@@ -23,6 +25,7 @@ public class UserSession {
         sequence = new AtomicInteger(1);
         lastSequence = 0;
     }
+    //check first join call
     public boolean onJoin(){
         return onJoined.getAndSet(false);
     }

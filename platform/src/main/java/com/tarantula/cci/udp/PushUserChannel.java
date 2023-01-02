@@ -4,7 +4,6 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class PushUserChannel extends UserChannel {
 

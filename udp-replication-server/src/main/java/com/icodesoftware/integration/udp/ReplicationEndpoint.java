@@ -125,8 +125,8 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         timer = new Thread(()->{
             while(running){
                 try{
-                    Thread.sleep(UDPEndpointServiceProvider.PENDING_ACTION_INTERVAL);
-                    udpEndpointServiceProvider.onTimer();
+                    Thread.sleep(UDPEndpointServiceProvider.FRAME_RATE);
+                    udpEndpointServiceProvider.onTimer(UDPEndpointServiceProvider.FRAME_RATE);
                 }catch (Exception ex){
                     //ignore
                 }

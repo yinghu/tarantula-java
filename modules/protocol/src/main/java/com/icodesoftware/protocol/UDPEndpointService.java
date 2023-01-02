@@ -19,7 +19,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     private static TarantulaLogger log = JDKLogger.getLogger(UDPEndpointService.class);
     private static int BUFFER_SIZE = MessageBuffer.SIZE;
     private static int PORT = 11933;
-    private static int MESSAGE_HANDLER_POOL_SIZE = 1;
+    private static int MESSAGE_HANDLER_POOL_SIZE = 8;
 
 
     private DatagramSocket datagramChannel;
@@ -39,20 +39,22 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     private String inboundThreadPoolSetting;
     private int messageHandlerSize = MESSAGE_HANDLER_POOL_SIZE;
 
-    //timer counters
-    private int sessionTimeout = SESSION_CHECK_INTERVAL;
-    private int retryInterval = RETRY_TIMEOUT;
-    private int receiverTimeout = 0;
-    private int frameRate = PENDING_ACTION_INTERVAL;
+
+    private int receiverTimeout = UDP_RECEIVE_TIME_OUT;
 
     private PingListener pingListener  = ()->{};
 
     private boolean running = true;
 
-    private long kickoffTimer;// = sessionTimeout;
-    private long pingTimer = SESSION_CHECK_INTERVAL;
-    private long serverPingTimer  = SERVER_PING_INTERVAL;
-    private long retryTimer;// = retryInterval;
+    private int sessionTimeout = GAME_SESSION_TIME_OUT;
+    private int retryInterval = RETRY_INTERVAL;
+    private long pingListenerInterval = PING_LISTENER_INTERVAL;
+    private long clientPingInterval = CLIENT_PING_INTERVAL;
+
+    private long kickoffTimer;
+    private long clientPingTimer;
+    private long retryTimer;
+    private long pingTimer;
 
     private UDPOperationSummary operationSummary = new UDPOperationSummary();
     public void start() throws Exception{
@@ -64,13 +66,10 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         }else{
             executorService = Executors.newFixedThreadPool(MESSAGE_HANDLER_POOL_SIZE,new TarantulaThreadFactory("udp-messaging"));
         }
-        log.warn("Inbound message handler number ["+messageHandlerSize+"]");
-        log.warn("Ping handler number ["+1+"]");
-        log.warn("Outbound message handler number ["+1+"]");
-        log.warn("Session Timeout ["+sessionTimeout+"]");
-        log.warn("Receiver Timeout ["+receiverTimeout+"]");
         kickoffTimer = sessionTimeout;
         retryTimer = retryInterval;
+        pingTimer = pingListenerInterval;
+        clientPingTimer = clientPingInterval;
         for(int i=0;i<messageHandlerSize;i++){
             executorService.execute(()->{
                 MessageBuffer messageBuffer = new MessageBuffer();
@@ -103,6 +102,14 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
         if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
+        log.warn("Inbound message handler number ["+messageHandlerSize+"]");
+        log.warn("Client Ping Interval ["+clientPingInterval+"]");
+        log.warn("Game Cluster Ping Interval ["+pingListenerInterval+"]");
+        log.warn("Retry Interval ["+retryInterval+"]");
+        log.warn("User Session Timeout ["+sessionTimeout+"]");
+        log.warn("UDP Receive Timeout ["+receiverTimeout+"]");
+        log.warn("UDP Receive Buffer Size ["+this.datagramChannel.getReceiveBufferSize()+"]");
+        log.warn("UDP Send Buffer Size ["+this.datagramChannel.getSendBufferSize()+"]");
     }
     public void shutdown() throws Exception{
         log.warn("UDP endpoint service is going down");
@@ -110,13 +117,13 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         this.executorService.shutdownNow();
         this.datagramChannel.close();
     }
-    public void onTimer(){
+    public void onTimer(int frameRate){
         try{
             userChannelIndex.forEach((k,v)->v.onPendingAction(frameRate));//enqueue pending action data
             retryTimer -= frameRate;
             kickoffTimer -= frameRate;
             pingTimer -= frameRate;
-            serverPingTimer -= frameRate;
+            clientPingTimer -= frameRate;
             if(retryTimer<=0){
                 userChannelIndex.forEach((k,v)->v.onRetry());//enqueue retry data
                 retryTimer = retryInterval;
@@ -127,11 +134,11 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
             }
             if(pingTimer<=0){
                 pingListener.onPing(); //ping game cluster server
-                pingTimer = SESSION_CHECK_INTERVAL;
+                pingTimer = pingListenerInterval;
             }
-            if(serverPingTimer<=0){
+            if(clientPingTimer<=0){
                 userChannelIndex.forEach((k,v)->v.onPing());//ping client from udp server
-                serverPingTimer = SERVER_PING_INTERVAL;
+                clientPingTimer = clientPingInterval;
             }
         }catch (Exception ex){
             log.error("unexpected error on timer",ex);
@@ -203,6 +210,12 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void receiverTimeout(int timeout){
         this.receiverTimeout = timeout;
     }
+    public void pingListenerInterval(int pingInterval){
+        this.pingListenerInterval = pingInterval;
+    }
+    public void pingClientInterval(int clientPingInterval){
+        this.clientPingInterval = clientPingInterval;
+    }
     @Override
     public void registerUserChannel(UserChannel userChannel){
         this.userChannelIndex.put(userChannel.channelId(),userChannel);
@@ -244,6 +257,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     public void buffer(byte[] buffer){
         pendingBufferQueue.offer(buffer);
     }
+
     private void wire(byte[] buffer,int length,SocketAddress destination){
         DatagramPacket packet = new DatagramPacket(buffer,length,destination);
         try{

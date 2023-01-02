@@ -44,6 +44,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ServiceContext serviceContext;
     private boolean running = true;
     private int channelPoolSize;
+    private int frameRate = UDPEndpointServiceProvider.FRAME_RATE;
 
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
@@ -68,8 +69,12 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.type(Connection.UDP);
         connection.secured(true);
         connection.host(serviceContext.node().servicePushAddress());
+        frameRate = ((Number)cfg.property("frameRate")).intValue();
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
+        udpEndpointServiceProvider.retryInterval(((Number)cfg.property("retryInterval")).intValue());
+        udpEndpointServiceProvider.pingListenerInterval(((Number)cfg.property("pingListenerInterval")).intValue());
+        udpEndpointServiceProvider.pingClientInterval(((Number)cfg.property("pingClientInterval")).intValue());
         receiverDaemon = new Thread(()->{
             while (running){
                 try {
@@ -102,7 +107,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
             pushUserChannels.offer(pushUserChannel);
         }
-        logger.warn("UDP Endpoint running as a daemon with session pool size ->"+sessionPoolSize+" on ["+serviceContext.node().servicePushAddress()+"]");
+        logger.warn("UDP Endpoint running as a daemon with session pool size ["+sessionPoolSize+"] on ["+serviceContext.node().servicePushAddress()+"]");
     }
 
     @Override
@@ -247,7 +252,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public long initialDelay() {
-        return UDPEndpointServiceProvider.PENDING_ACTION_INTERVAL;
+        return frameRate;
     }
 
     @Override
@@ -257,7 +262,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void run() {
-        udpEndpointServiceProvider.onTimer();
+        udpEndpointServiceProvider.onTimer(frameRate);
         this.serviceContext.schedule(this);
     }
 
