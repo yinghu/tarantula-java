@@ -29,7 +29,7 @@ public class UnsafeTest {
     }
 
     @Test(groups = { "unsafe util" })
-    public void offHeapMapTest() {
+    public void offHeapMapTest(){
         String key = "abc";
         OffHeapStore offHeapMap = new OffHeapStore();
         Assert.assertNull(offHeapMap.get(key));
