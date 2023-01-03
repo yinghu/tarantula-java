@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.icodesoftware.*;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -9,7 +10,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class PresenceIndex extends RecoverableObject implements Presence {
 
-    private double balance;
+    private AtomicDouble balance;
     private int counter;
 
     private boolean local = true;
@@ -17,29 +18,30 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     public PresenceIndex(double initialBalance){
         this();
-        this.balance = initialBalance;
+        this.balance.getAndAdd(initialBalance);
     }
     public PresenceIndex(int stub,double initialBalance,String index){
         this();
         this.counter = stub;
-        this.balance = initialBalance;
+        this.balance.getAndAdd(initialBalance);
         this.local = false;
         this.index = index;
     }
 
     public PresenceIndex(){
         this.label = "Presence";
+        this.balance = new AtomicDouble();
     }
     @Override
     public boolean distributable(){
         return true;
     }
-    public synchronized double balance() {
-        return this.balance;
+    public double balance() {
+        return this.balance.get();
     }
-    public synchronized boolean transact(double delta) {
-        if((balance+(delta)>=0)){
-            balance = balance+(delta);
+    public boolean transact(double delta) {
+        if((balance.get()+(delta)>=0)){
+            balance.getAndAdd((delta));
             this.update();
             return true;
         }else{
@@ -100,7 +102,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.balance = ((Number)properties.getOrDefault("1",0)).doubleValue();
+        this.balance.getAndAdd(((Number)properties.getOrDefault("1",0)).doubleValue());
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
