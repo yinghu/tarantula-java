@@ -10,7 +10,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     int CLIENT_PING_INTERVAL = 3000;//3s
 
-    int RETRY_INTERVAL = 200;//200ms
+    int RETRY_INTERVAL = 250;//250ms
 
     int FRAME_RATE = 50; //50ms
 

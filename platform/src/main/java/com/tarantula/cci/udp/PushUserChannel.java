@@ -16,13 +16,9 @@ public class PushUserChannel extends UserChannel {
         //skip
     }
 
-    @Override
-    protected void onPing(){
-
-    }
 
     @Override
-    public void onPendingAction(int frameRate){
+    protected void onPendingAction(int frameRate){
         //skip
     }
 
@@ -39,16 +35,17 @@ public class PushUserChannel extends UserChannel {
         messageBuffer.flip();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length,false);
         UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
         messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
-        pendingAckMessage.pendingAck=1;
+        pendingAckMessage.pendingAck= 1;
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
 
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        super.onLeave(messageHeader, messageBuffer);
+        userSessionIndex.remove(messageHeader.sessionId);
+        sessionListener.onTimeout(channelId,messageHeader.sessionId);
     }
 
 }

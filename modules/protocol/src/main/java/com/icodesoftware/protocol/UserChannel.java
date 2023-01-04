@@ -53,7 +53,7 @@ public class UserChannel {
         this.channelId = channelId;
     }
 
-    public void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
+    public final void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
         UserSession userSession = userSessionIndex.computeIfAbsent(messageHeader.sessionId,k-> {
             if(messageHeader.commandId != Messenger.JOIN) return null;
             return userSessionValidator.validate(messageHeader, messageBuffer) ? new UserSession(k, source) : null;
@@ -126,7 +126,7 @@ public class UserChannel {
         if(!messageHeader.ack) return;
         onAck(userSession,messageHeader,messageBuffer,source);
     }
-    public void onKickoff(){
+    public final void onKickoff(){
         userSessionIndex.forEach((k,v)->{
             if(!v.online()) _offline.add(k);
         });
@@ -136,16 +136,20 @@ public class UserChannel {
         });
         _offline.clear();
     }
-    public void onRetry(){
+    public final void onRetry(){
         _retried.clear();
-        pendingAckMessageIndex.forEach((k,v)-> {
-           userSessionIndex.forEach((uk, uu) -> {
-               messenger.queue(v.buffer,v.length,uu.source);
-           });
-           v.retries--;
-           if(v.retries<=0){
-               _retried.add(k);
-           }
+        pendingAckMessageIndex.forEach((k,v)->{
+            if(v.broadcasting){
+                userSessionIndex.forEach((uk, uu) -> messenger.queue(v.buffer,v.length,uu.source));
+            }
+            else{
+                UserSession userSession = userSessionIndex.get(v.sessionId);
+                if(userSession!=null) messenger.queue(v.buffer,v.length,userSession.source);
+            }
+            v.retries--;
+            if(v.retries<=0){
+                _retried.add(k);
+            }
         });
         _retried.forEach(k->{
             PendingAckMessage removed = pendingAckMessageIndex.remove(k);
@@ -162,15 +166,15 @@ public class UserChannel {
             messenger.queue(pingBuffer,v.source);
         });
     }
-    public void queue(int sessionId,MessageBuffer messageBuffer){
+    public final void queue(int sessionId,MessageBuffer messageBuffer){
         messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
     }
 
-    public void kickoff(int sessionId){
+    public final void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
         sessionListener.onTimeout(channelId,sessionId);
     }
-    public void onPendingAction(int frameRate){
+    protected void onPendingAction(int frameRate){
         requeueList.clear();
         PendingActionMessage p;
         do{
@@ -188,7 +192,7 @@ public class UserChannel {
                         pendingAck[0]++;
                     });
                     if(p.messageHeader.ack && pendingAck[0]>0){
-                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader,data,p.length);
+                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader.sessionId,data,p.length);
                         pendingAckMessage.pendingAck = pendingAck[0];
                         pendingAckMessageIndex.put(p.messageHeader.toString(),pendingAckMessage);
                     }
@@ -220,7 +224,7 @@ public class UserChannel {
         messageBuffer.flip();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         userSessionIndex.forEach((sid,session)->{
             messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
@@ -229,7 +233,7 @@ public class UserChannel {
     }
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
-        if(sessionListener!=null) sessionListener.onTimeout(channelId,messageHeader.sessionId);
+        sessionListener.onTimeout(channelId,messageHeader.sessionId);
         messageBuffer.reset();
         messageHeader.ack = true;
         messageHeader.encrypted = false;
@@ -240,7 +244,7 @@ public class UserChannel {
         messageBuffer.flip();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         userSessionIndex.forEach((sid,session)->{
             messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
@@ -264,20 +268,28 @@ public class UserChannel {
             }
         });
         if(!messageHeader.ack||pendingAck[0]==0) return;
-        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader,buffer,length);
+        PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         pendingAckMessage.pendingAck = pendingAck[0];
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected class PendingAckMessage{
-        public MessageBuffer.MessageHeader messageHeader;
+        public int sessionId;
         public byte[] buffer;
         public int length;
         public int retries = MessageBuffer.RETRIES;
         public int pendingAck;
-        public PendingAckMessage(MessageBuffer.MessageHeader messageHeader,byte[] buffer,int length){
-            this.messageHeader = messageHeader;
+        public boolean broadcasting;
+        public PendingAckMessage(int sessionId,byte[] buffer,int length){
+            this.sessionId = sessionId;
             this.buffer = buffer;
             this.length = length;
+            this.broadcasting = true;
+        }
+        public PendingAckMessage(int sessionId,byte[] buffer,int length,boolean broadcasting){
+            this.sessionId = sessionId;
+            this.buffer = buffer;
+            this.length = length;
+            this.broadcasting = broadcasting;
         }
     }
     protected class PendingActionMessage{
