@@ -12,18 +12,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
 
-    protected int channelId;
+    private int channelId;
+
     protected ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     protected Messenger messenger;
     protected AtomicInteger sequence;
-    protected ArrayList<Integer> _offline;
-    protected ArrayList<String> _retried;
+
     protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
     protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
 
+    private ArrayList<Integer> _offline;
+    private ArrayList<String> _retried;
     private ArrayList<PendingActionMessage> requeueList;
-    protected MessageBuffer.MessageHeader pingHeader;
-    protected MessageBuffer pingBuffer;
+    private MessageBuffer.MessageHeader pingHeader;
+    private MessageBuffer pingBuffer;
 
     public UserChannel(int channelId, Messenger messenger){
         this.channelId = channelId;

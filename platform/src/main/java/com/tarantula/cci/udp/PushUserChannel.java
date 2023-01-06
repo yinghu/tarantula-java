@@ -52,7 +52,7 @@ public class PushUserChannel extends UserChannel {
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         userSessionIndex.remove(messageHeader.sessionId);
-        sessionListener.onTimeout(channelId,messageHeader.sessionId);
+        sessionListener.onTimeout(channelId(),messageHeader.sessionId);
     }
 
     @Override
