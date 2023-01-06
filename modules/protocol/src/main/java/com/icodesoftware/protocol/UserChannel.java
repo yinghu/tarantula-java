@@ -15,31 +15,25 @@ public class UserChannel {
     protected int channelId;
     protected ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     protected Messenger messenger;
-    protected UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
-    //protected UDPEndpointServiceProvider.RequestListener requestListener;
     protected AtomicInteger sequence;
     protected ArrayList<Integer> _offline;
     protected ArrayList<String> _retried;
     protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
     protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
-    protected UDPEndpointServiceProvider.SessionListener sessionListener;
 
     private ArrayList<PendingActionMessage> requeueList;
     protected MessageBuffer.MessageHeader pingHeader;
     protected MessageBuffer pingBuffer;
 
-    public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
+    public UserChannel(int channelId, Messenger messenger){
         this.channelId = channelId;
         this.messenger = messenger;
-        this.userSessionValidator = userSessionValidator!=null?userSessionValidator:(h,m)->false;
-        //this.requestListener = requestListener!=null?requestListener:(h,m)->null;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
         this.pendingActionMessageQueue = new ConcurrentLinkedDeque<>();
         this.sequence = new AtomicInteger(0);
         this._offline = new ArrayList<>();
         this._retried = new ArrayList<>();
-        this.sessionListener = sessionListener!=null?sessionListener:(c,s)->{};
         this.requeueList = new ArrayList<>();
         this.pingHeader = new MessageBuffer.MessageHeader();
         this.pingHeader.commandId = Messenger.PING;
@@ -56,7 +50,7 @@ public class UserChannel {
     public final void onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer, SocketAddress source){
         UserSession userSession = userSessionIndex.computeIfAbsent(messageHeader.sessionId,k-> {
             if(messageHeader.commandId != Messenger.JOIN) return null;
-            return userSessionValidator.validate(messageHeader, messageBuffer) ? new UserSession(k, source) : null;
+            return this.validate(messageHeader, messageBuffer) ? new UserSession(k, source) : null;
         });
         if(userSession==null){
             return;
@@ -69,10 +63,10 @@ public class UserChannel {
             return;
         }
         if(messageHeader.commandId == Messenger.JOIN){//rejoin call
-            if(!userSessionValidator.validate(messageHeader,messageBuffer)){
+            if(!this.validate(messageHeader,messageBuffer)){
                 //kickoff
                 userSessionIndex.remove(messageHeader.sessionId);
-                sessionListener.onTimeout(channelId,messageHeader.sessionId);
+                this.onTimeout(channelId,messageHeader.sessionId);
                 return;
             }
             userSession.source = source;
@@ -137,7 +131,7 @@ public class UserChannel {
         });
         _offline.forEach((i)-> {
             userSessionIndex.remove(i);
-            sessionListener.onTimeout(channelId,i);
+            this.onTimeout(channelId,i);
         });
         _offline.clear();
     }
@@ -177,7 +171,7 @@ public class UserChannel {
 
     public final void kickoff(int sessionId){
         userSessionIndex.remove(sessionId);
-        sessionListener.onTimeout(channelId,sessionId);
+        this.onTimeout(channelId,sessionId);
     }
     protected void onPendingAction(int frameRate){
         requeueList.clear();
@@ -238,7 +232,7 @@ public class UserChannel {
     }
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
-        sessionListener.onTimeout(channelId,messageHeader.sessionId);
+        this.onTimeout(channelId,messageHeader.sessionId);
         messageBuffer.reset();
         messageHeader.ack = true;
         messageHeader.encrypted = false;
@@ -278,6 +272,12 @@ public class UserChannel {
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+
+    }
+    protected boolean validate(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        return false;
+    }
+    protected void onTimeout(int channelId,int sessionId){
 
     }
     protected class PendingAckMessage{

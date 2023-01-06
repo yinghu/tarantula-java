@@ -4,8 +4,12 @@ import com.icodesoftware.protocol.*;
 
 public class GameUserChannel extends UserChannel {
 
+    private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
+    private UDPEndpointServiceProvider.SessionListener sessionListener;
     public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
-        super(channelId,messenger,userSessionValidator,sessionListener);
+        super(channelId,messenger);
+        this.userSessionValidator = userSessionValidator;
+        this.sessionListener = sessionListener;
     }
 
     @Override
@@ -21,5 +25,15 @@ public class GameUserChannel extends UserChannel {
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         super.onLeave(messageHeader, messageBuffer);
+    }
+
+    @Override
+    protected boolean validate(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        return userSessionValidator.validate(messageHeader,messageBuffer);
+    }
+
+    @Override
+    protected void onTimeout(int channelId,int sessionId){
+        this.sessionListener.onTimeout(channelId,sessionId);
     }
 }
