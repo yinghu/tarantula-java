@@ -59,9 +59,8 @@ public class UserChannel {
         }
         if(userSession.onJoin()){//first join call
             //server push onJoin 200
+            if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
             onJoin(messageHeader,messageBuffer);
-            if(!messageHeader.ack) return;
-            onAck(userSession,messageHeader,messageBuffer,source);
             return;
         }
         if(messageHeader.commandId == Messenger.JOIN){//rejoin call
@@ -71,11 +70,10 @@ public class UserChannel {
                 this.onTimeout(channelId,messageHeader.sessionId);
                 return;
             }
+            if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
             userSession.source = source;
             userSession.onPing();
             onJoin(messageHeader,messageBuffer);
-            if(!messageHeader.ack) return;
-            onAck(userSession,messageHeader,messageBuffer,source);
             return;
         }
         if(messageHeader.commandId == Messenger.ACK){
@@ -99,14 +97,15 @@ public class UserChannel {
             return;
         }
         if(messageHeader.commandId == Messenger.REQUEST){
+            if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
             onRequest(messageHeader,messageBuffer);
-            //requestListener.onMessage(messageHeader,messageBuffer);
             return;
         }
         if(messageHeader.commandId == Messenger.LEAVE){
             onLeave(messageHeader,messageBuffer);
             return;
         }
+        if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
         messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
         int pendingTime = messageHeader.batchSize*Short.MAX_VALUE+messageHeader.batch;
@@ -124,8 +123,6 @@ public class UserChannel {
             int length = messageBuffer.toArray(buffer);
             pendingActionMessageQueue.offer(new PendingActionMessage(buffer,length,pendingTime,messageHeader));
         }
-        if(!messageHeader.ack) return;
-        onAck(userSession,messageHeader,messageBuffer,source);
     }
     public final void onKickoff(){
         userSessionIndex.forEach((k,v)->{
@@ -157,12 +154,13 @@ public class UserChannel {
             if(removed!=null) messenger.buffer(removed.buffer);
         });
     }
-    protected void onPing(){
+    public final void onPing(){
+        long timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         userSessionIndex.forEach((k,v)->{
             pingBuffer.reset();
             pingHeader.sessionId = k;
             pingBuffer.writeHeader(pingHeader);
-            pingBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            pingBuffer.writeLong(timestamp);
             pingBuffer.flip();
             messenger.queue(pingBuffer,v.source);
         });
@@ -202,9 +200,10 @@ public class UserChannel {
         }while (p != null);
         requeueList.forEach(pr->pendingActionMessageQueue.offer(pr));
     }
-    private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer,SocketAddress source){
+    private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,SocketAddress source){
         userSession.pendingAck(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAckList();
+        MessageBuffer messageBuffer = new MessageBuffer();
         messageBuffer.reset();
         MessageBuffer.MessageHeader ackHeader = new MessageBuffer.MessageHeader();
         ackHeader.commandId = Messenger.ACK;
