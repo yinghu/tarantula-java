@@ -7,8 +7,11 @@ import java.time.LocalDateTime;
 
 public class PushUserChannel extends UserChannel {
 
+    private UDPEndpointServiceProvider.RequestListener requestListener;
+
     public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
-        super(channelId,messenger,userSessionValidator,sessionListener,requestListener);
+        super(channelId,messenger,userSessionValidator,sessionListener);
+        this.requestListener = requestListener;
     }
 
     @Override
@@ -46,6 +49,10 @@ public class PushUserChannel extends UserChannel {
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         userSessionIndex.remove(messageHeader.sessionId);
         sessionListener.onTimeout(channelId,messageHeader.sessionId);
+    }
+
+    protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        requestListener.onMessage(messageHeader,messageBuffer);
     }
 
 }

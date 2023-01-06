@@ -4,8 +4,8 @@ import com.icodesoftware.protocol.*;
 
 public class GameUserChannel extends UserChannel {
 
-    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
-        super(channelId,messenger,userSessionValidator,sessionListener,requestListener);
+    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
+        super(channelId,messenger,userSessionValidator,sessionListener);
     }
 
     @Override

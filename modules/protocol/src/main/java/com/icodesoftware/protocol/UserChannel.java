@@ -16,7 +16,7 @@ public class UserChannel {
     protected ConcurrentHashMap<Integer,UserSession> userSessionIndex;
     protected Messenger messenger;
     protected UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
-    protected UDPEndpointServiceProvider.RequestListener requestListener;
+    //protected UDPEndpointServiceProvider.RequestListener requestListener;
     protected AtomicInteger sequence;
     protected ArrayList<Integer> _offline;
     protected ArrayList<String> _retried;
@@ -28,11 +28,11 @@ public class UserChannel {
     protected MessageBuffer.MessageHeader pingHeader;
     protected MessageBuffer pingBuffer;
 
-    public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
+    public UserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
         this.channelId = channelId;
         this.messenger = messenger;
         this.userSessionValidator = userSessionValidator!=null?userSessionValidator:(h,m)->false;
-        this.requestListener = requestListener!=null?requestListener:(h,m)->null;
+        //this.requestListener = requestListener!=null?requestListener:(h,m)->null;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
         this.pendingActionMessageQueue = new ConcurrentLinkedDeque<>();
@@ -64,6 +64,8 @@ public class UserChannel {
         if(userSession.onJoin()){//first join call
             //server push onJoin 200
             onJoin(messageHeader,messageBuffer);
+            if(!messageHeader.ack) return;
+            onAck(userSession,messageHeader,messageBuffer,source);
             return;
         }
         if(messageHeader.commandId == Messenger.JOIN){//rejoin call
@@ -76,6 +78,8 @@ public class UserChannel {
             userSession.source = source;
             userSession.onPing();
             onJoin(messageHeader,messageBuffer);
+            if(!messageHeader.ack) return;
+            onAck(userSession,messageHeader,messageBuffer,source);
             return;
         }
         if(messageHeader.commandId == Messenger.ACK){
@@ -99,7 +103,8 @@ public class UserChannel {
             return;
         }
         if(messageHeader.commandId == Messenger.REQUEST){
-            requestListener.onMessage(messageHeader,messageBuffer);
+            onRequest(messageHeader,messageBuffer);
+            //requestListener.onMessage(messageHeader,messageBuffer);
             return;
         }
         if(messageHeader.commandId == Messenger.LEAVE){
@@ -271,6 +276,9 @@ public class UserChannel {
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         pendingAckMessage.pendingAck = pendingAck[0];
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
+    }
+    protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+
     }
     protected class PendingAckMessage{
         public int sessionId;

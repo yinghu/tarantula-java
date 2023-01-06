@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.PingListener {
+public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener {
 
     TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
@@ -99,7 +99,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             resp = httpCaller.post(registerPath,activeChannel.payload,headers);
             jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i,udpEndpointServiceProvider,this,this,this));
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i,udpEndpointServiceProvider,this,this));
         }
         receiver = new Thread(()->{
                 while (running){
@@ -146,10 +146,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.shutdown();
     }
 
-    @Override
-    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        return null;
-    }
+
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
