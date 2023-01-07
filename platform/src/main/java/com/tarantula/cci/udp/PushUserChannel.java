@@ -69,5 +69,9 @@ public class PushUserChannel extends UserChannel {
     protected void onTimeout(int channelId,int sessionId){
         this.sessionListener.onTimeout(channelId,sessionId);
     }
+    @Override
+    protected void onPing(){
+        //super.onPing();
+    }
 
 }

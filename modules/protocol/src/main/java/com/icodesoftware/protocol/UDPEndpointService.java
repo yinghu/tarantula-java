@@ -26,6 +26,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
 
     private ConcurrentLinkedDeque<DatagramPacket> pendingInboundMessageQueue = new ConcurrentLinkedDeque();
     private ConcurrentLinkedDeque<byte[]> pendingBufferQueue = new ConcurrentLinkedDeque();
+    private ConcurrentLinkedDeque<MessageBuffer> pendingMessageBufferQueue = new ConcurrentLinkedDeque<>();
 
 
     private ConcurrentHashMap<Integer,UserChannel> userChannelIndex = new ConcurrentHashMap<>();
@@ -239,6 +240,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         summary.registerCategory(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER);
         summary.registerCategory(UDPOperationSummary.PENDING_BUFFER_NUMBER);
+        summary.registerCategory(UDPOperationSummary.PENDING_MESSAGE_BUFFER_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
@@ -246,6 +248,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         summary.update(UDPOperationSummary.PENDING_INBOUND_MESSAGE_NUMBER,operationSummary.pendingInboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_OUTBOUND_MESSAGE_NUMBER,operationSummary.pendingOutboundMessageNumber.get());
         summary.update(UDPOperationSummary.PENDING_BUFFER_NUMBER,operationSummary.pendingBufferNumber.get());
+        summary.update(UDPOperationSummary.PENDING_MESSAGE_BUFFER_NUMBER,operationSummary.pendingMessageBufferNumber.get());
     }
     public byte[] buffer(){
         byte[] buffer = pendingBufferQueue.poll();
@@ -257,6 +260,18 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public void buffer(byte[] buffer){
         pendingBufferQueue.offer(buffer);
+    }
+
+    public MessageBuffer messageBuffer(){
+        MessageBuffer messageBuffer = pendingMessageBufferQueue.poll();
+        if(messageBuffer==null){
+            messageBuffer = new MessageBuffer();
+            operationSummary.pendingMessageBufferNumber.incrementAndGet();
+        }
+        return messageBuffer;
+    }
+    public void messageBuffer(MessageBuffer messageBuffer){
+        pendingMessageBufferQueue.offer(messageBuffer);
     }
 
     private void wire(byte[] buffer,int length,SocketAddress destination){

@@ -25,7 +25,7 @@ public class UserChannel {
     private ArrayList<String> _retried;
     private ArrayList<PendingActionMessage> requeueList;
     private MessageBuffer.MessageHeader pingHeader;
-    private MessageBuffer pingBuffer;
+
 
     public UserChannel(int channelId, Messenger messenger){
         this.channelId = channelId;
@@ -40,7 +40,6 @@ public class UserChannel {
         this.pingHeader = new MessageBuffer.MessageHeader();
         this.pingHeader.commandId = Messenger.PING;
         this.pingHeader.channelId = channelId;
-        this.pingBuffer = new MessageBuffer();
     }
     public int channelId(){
         return this.channelId;
@@ -154,8 +153,9 @@ public class UserChannel {
             if(removed!=null) messenger.buffer(removed.buffer);
         });
     }
-    public final void onPing(){
+    protected void onPing(){
         long timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        MessageBuffer pingBuffer = messenger.messageBuffer();
         userSessionIndex.forEach((k,v)->{
             pingBuffer.reset();
             pingHeader.sessionId = k;
@@ -164,6 +164,7 @@ public class UserChannel {
             pingBuffer.flip();
             messenger.queue(pingBuffer,v.source);
         });
+        messenger.messageBuffer(pingBuffer);
     }
     public final void queue(int sessionId,MessageBuffer messageBuffer){
         messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
@@ -203,7 +204,7 @@ public class UserChannel {
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,SocketAddress source){
         userSession.pendingAck(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAckList();
-        MessageBuffer messageBuffer = new MessageBuffer();
+        MessageBuffer messageBuffer = this.messenger.messageBuffer();
         messageBuffer.reset();
         MessageBuffer.MessageHeader ackHeader = new MessageBuffer.MessageHeader();
         ackHeader.commandId = Messenger.ACK;
@@ -211,6 +212,7 @@ public class UserChannel {
         _acks.forEach((mh)->messageBuffer.writeHeader(mh));
         messageBuffer.flip();
         messenger.queue(messageBuffer,source);
+        messenger.messageBuffer(messageBuffer);
     }
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
