@@ -10,6 +10,8 @@ import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -19,6 +21,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     protected GameLobby gameLobby;
     protected GameZone gameZone;
     protected DataStore dataStore;
+    private ConcurrentHashMap<MessageBuffer.MessageHeader,Integer> mHolder = new ConcurrentHashMap<>();
 
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
@@ -81,7 +84,11 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     public byte[] update(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
         short cmd = messageBuffer.readShort();
-        this.context.log("Inbound UDP->"+messageHeader,OnLog.WARN);
+        int ct = mHolder.compute(messageHeader,(k,v)->{
+            if(v==null) v = 1;
+            return v;
+        });
+        if(ct>1) this.context.log("Inbound UDP->"+messageHeader+">>"+ct,OnLog.WARN);
         GameLobby.ServiceMessageListener messageListener = gameLobby.serviceMessageListener(cmd);
         return messageListener.update(stub,messageHeader,messageBuffer);
     }
