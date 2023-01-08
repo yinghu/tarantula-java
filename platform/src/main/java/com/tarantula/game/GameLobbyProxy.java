@@ -1,6 +1,10 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.service.*;
@@ -18,6 +22,8 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     private Descriptor application;
     private GameLobby defaultLobby;
     private boolean usingDefault;
+
+    private ConcurrentHashMap<Short,ServiceMessageListener> listeners = new ConcurrentHashMap<>();
 
     public GameLobbyProxy(){
         this.stubIndex = new ConcurrentHashMap<>();
@@ -93,6 +99,13 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
+        Configuration config = deploymentServiceProvider.configuration("service-listener-settings");
+        JsonArray cmds = ((JsonElement)config.property("listeners")).getAsJsonArray();
+        cmds.forEach((cmd->{
+            JsonObject cc = cmd.getAsJsonObject();
+            listeners.put(cc.get("command").getAsShort(),toServiceMessageListener(cc.get("className").getAsString()));
+        }));
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         this.defaultLobby = gameServiceProvider.lobby(this.context.descriptor());
@@ -164,10 +177,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         });
         if(zoneIndex.isEmpty()) return false;
         fillLobby();
-        //for(int i= 1;i<11;i++){
-            //GameZone gameZone = zoneIndex.get(i);
-            //this.context.log(gameZone.toString(),OnLog.WARN);
-        //}
         try{this.defaultLobby.shutdown();}catch (Exception ex){}
         return true;
     }
@@ -201,6 +210,21 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
                     }
                 }
             }
+        }
+    }
+
+    public ServiceMessageListener serviceMessageListener(short serviceId){
+        ServiceMessageListener listener = listeners.get(serviceId);
+        if(listener==null) return new ErrorCommand();
+        return listener;
+    }
+    private ServiceMessageListener toServiceMessageListener(String className){
+        try {
+            ServiceMessageListener serviceMessageListener = (ServiceMessageListener) Class.forName(className).getConstructor().newInstance();
+            serviceMessageListener.setup(this.context);
+            return serviceMessageListener;
+        }catch (Exception ex){
+            return new ErrorCommand();
         }
     }
 }

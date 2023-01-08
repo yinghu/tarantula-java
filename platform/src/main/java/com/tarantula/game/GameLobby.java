@@ -20,6 +20,8 @@ public interface GameLobby extends Configurable, Serviceable {
     void setup(ApplicationContext applicationContext) throws Exception;
     boolean timeout(String systemId,int stub);
 
+    ServiceMessageListener serviceMessageListener(short serviceId);
+
     interface ServiceMessageListener{
 
         byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);

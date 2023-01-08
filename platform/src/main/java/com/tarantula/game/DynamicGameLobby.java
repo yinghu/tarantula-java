@@ -5,6 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.ServiceCommand;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
@@ -173,5 +174,9 @@ public class DynamicGameLobby extends IndexSet implements GameLobby {
         }
     }
 
-
+    public ServiceMessageListener serviceMessageListener(short serviceId){
+        ServiceMessageListener listener = ServiceCommand.messageListener(serviceId);
+        listener.setup(this.context);
+        return listener;
+    }
 }
