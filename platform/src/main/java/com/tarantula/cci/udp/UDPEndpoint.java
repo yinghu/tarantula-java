@@ -9,10 +9,12 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -35,6 +37,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
     private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
+    private ArrayList<MessageBuffer.MessageHeader> expiredPackets;
+    private ConcurrentHashMap<MessageBuffer.MessageHeader,PacketTrack> packetTracks;
+    private long packetRemoveInterval;
+    private long packetTimeout;
+    private long packetRemoveTimer;
     private MetricsListener metricsListener;
 
 
@@ -49,12 +56,17 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
+        packetTracks = new ConcurrentHashMap<>();
+        expiredPackets = new ArrayList<>();
         connection = new ClientConnection();
         sessionId = new AtomicInteger(1);
     }
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
         Configuration cfg = serviceContext.configuration(CONFIG);
+        this.packetTimeout = ((Number)cfg.property("packetTimeoutInSeconds")).longValue();
+        this.packetRemoveInterval = ((Number)cfg.property("packetRemoveInterval")).longValue();
+        this.packetRemoveTimer = this.packetRemoveInterval;
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
         this.pushUserChannels = new ConcurrentLinkedDeque<>();
@@ -199,6 +211,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
+            if(v==null) v = new PacketTrack(packetTimeout);
+            v.count++;
+            return v;
+        });
+        if(packetTrack.count>1){
+            return null;
+        }
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         if(messageHeader.encrypted){
             try{
@@ -263,6 +283,20 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void run() {
         udpEndpointServiceProvider.onTimer(frameRate);
+        packetRemoveTimer -= frameRate;
+        if(packetRemoveTimer<=0){
+            expiredPackets.clear();
+            packetTracks.forEach((k,v)->{
+                if(TimeUtil.expired(v.creationTime)){
+                    expiredPackets.add(k);
+                }
+            });
+            if(expiredPackets.size()>0){
+                expiredPackets.forEach((h)->packetTracks.remove(h));
+                logger.warn("Total packets removed ->"+expiredPackets.size());
+            }
+            packetRemoveTimer = packetRemoveInterval;
+        }
         this.serviceContext.schedule(this);
     }
 
