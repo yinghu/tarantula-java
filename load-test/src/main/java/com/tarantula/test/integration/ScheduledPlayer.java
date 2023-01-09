@@ -47,6 +47,8 @@ public class ScheduledPlayer{
 
     static short STATISTICS_QUERY = 1;
     static short STATISTICS_COMMIT = 2;
+    private int objectId;
+    private int sequence = 0;
 
     private HttpCaller httpCaller;
     public ScheduledPlayer(HttpCaller httpCaller, CountDownLatch counter,String game, String userName, int sequence, boolean udpTested, int udpReceiveTimeout, int udpRounds){
@@ -54,7 +56,8 @@ public class ScheduledPlayer{
         this.counter = counter;
         this.game = game;
         this.userName = userName;
-        this.deviceName = "test-"+sequence;
+        this.objectId = sequence;
+        this.deviceName = "test-"+objectId;
         this.clientId = UUID.randomUUID().toString();
         this.udpTested = udpTested;
         this.udpReceiveTimeout = udpReceiveTimeout;
@@ -193,6 +196,7 @@ public class ScheduledPlayer{
         try{
             //one-way udp commit
             messageHeader.commandId = Messenger.REQUEST;
+            messageHeader.sequence = sequence++;
             messageHeader.encrypted = false;
             messageBuffer.reset();
             messageBuffer.writeHeader(messageHeader);
@@ -209,6 +213,7 @@ public class ScheduledPlayer{
 
             //two-way udp query
             messageHeader.commandId = Messenger.REQUEST;
+            messageHeader.sequence = sequence++;
             messageBuffer.reset();
             messageBuffer.writeHeader(messageHeader);
             messageBuffer.writeShort(STATISTICS_QUERY);
@@ -272,6 +277,8 @@ public class ScheduledPlayer{
         messageHeader = new MessageBuffer.MessageHeader();
         messageHeader.channelId = channelId;
         messageHeader.sessionId = sessionId;
+        messageHeader.objectId = objectId;
+        messageHeader.sequence = sequence++;
         messageHeader.commandId = Messenger.JOIN;
         messageHeader.encrypted = true;
         messageBuffer = new MessageBuffer();

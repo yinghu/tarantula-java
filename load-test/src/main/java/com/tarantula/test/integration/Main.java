@@ -75,7 +75,7 @@ public class Main {
         CountDownLatch waiting = new CountDownLatch(batch);
         for(int i = 0;i<batch;i++){
             String uname = playerPrefix!=null?(playerPrefix+"-"+i):UUID.randomUUID().toString();
-            ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,game,uname,i,udpTested,timeout,udpRounds);
+            ScheduledPlayer simulator = new ScheduledPlayer(httpCaller,waiting,game,uname,i+1,udpTested,timeout,udpRounds);
             scheduler.schedule(()->{
                 simulator.join();
                 if(simulator.joined){

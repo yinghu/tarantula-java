@@ -211,6 +211,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        logger.warn("Message header->"+messageHeader.toString());
         PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
             if(v==null) v = new PacketTrack(packetTimeout);
             v.count++;
