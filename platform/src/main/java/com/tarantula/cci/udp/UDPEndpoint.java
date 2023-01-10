@@ -125,9 +125,9 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void start() throws Exception {
         udpEndpointServiceProvider.start();
-        receiverDaemon.setPriority(8);
+        receiverDaemon.setPriority(UDPEndpointServiceProvider.RECEIVER_THREAD_PRIORITY);
         receiverDaemon.start();
-        outboundMessageDaemon.setPriority(8);
+        outboundMessageDaemon.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         outboundMessageDaemon.start();
         serviceContext.schedule(this);
         PushUserChannel pushUserChannel;
@@ -211,7 +211,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        logger.warn("Message header->"+messageHeader.toString());
+        //logger.warn("Message header->"+messageHeader.toString());
         PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
             if(v==null) v = new PacketTrack(packetTimeout);
             v.count++;
@@ -294,7 +294,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             });
             if(expiredPackets.size()>0){
                 expiredPackets.forEach((h)->packetTracks.remove(h));
-                logger.warn("Total packets removed ->"+expiredPackets.size());
+                //logger.warn("Total packets removed ->"+expiredPackets.size());
             }
             packetRemoveTimer = packetRemoveInterval;
         }

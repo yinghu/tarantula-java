@@ -20,6 +20,9 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     int CONNECTION_HEALTHY_CHECK_RETRIES = 3;
 
+    int RECEIVER_THREAD_PRIORITY = 8;
+    int SENDER_THREAD_PRIORITY = 8;
+
     void sessionTimeout(int timeout);
     int sessionTimeout();
 

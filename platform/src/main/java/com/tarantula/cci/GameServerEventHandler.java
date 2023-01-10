@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.CipherUtil;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.room.ChannelStub;
@@ -37,10 +38,10 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
         String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
         byte[] _payload = exchange.payload();
-        String typeId = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
-        if(typeId==null){
-            throw new RuntimeException("Illegal access");
-        }
+        GameCluster gameCluster = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+        if(gameCluster==null) throw new RuntimeException("Illegal access");
+
+        String typeId = ((String)gameCluster.property(GameCluster.GAME_SERVICE)).replace("-service","");
         if(action.equals("onStart")){//start game server
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);

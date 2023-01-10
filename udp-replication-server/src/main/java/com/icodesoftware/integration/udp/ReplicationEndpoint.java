@@ -85,6 +85,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         headers[5]="onStart";
         connection.addProperty("serverId",serverId);
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
+        logger.warn(resp);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
@@ -132,7 +133,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
                 }
             }
         },"tarantula-udp-message-timer");
+        receiver.setPriority(UDPEndpointServiceProvider.RECEIVER_THREAD_PRIORITY);
         receiver.start();
+        sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         timer.start();
         logger.warn("Game server is running on ["+typeId+"] with max channels ["+maxChannelSize+"]");
