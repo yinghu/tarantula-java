@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener {
 
-    TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private byte[] serverKey;
