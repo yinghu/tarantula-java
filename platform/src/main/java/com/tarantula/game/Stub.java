@@ -33,11 +33,16 @@ public class Stub extends PlayerGameObject {
     public Stub(){
     }
 
+    public Stub(String error){
+        this.joined = false;
+        this.message = error;
+    }
+
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("Successful",joined);
         if(!joined){
-            jo.addProperty("Message","failed to join");
+            jo.addProperty("Message",message==null?"failed to join":message);
             return jo;
         }
         jo.add("_zone",zone.toJson());

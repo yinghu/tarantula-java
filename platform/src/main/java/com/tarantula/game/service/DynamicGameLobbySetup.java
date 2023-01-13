@@ -7,7 +7,7 @@ import com.tarantula.game.*;
 
 public class DynamicGameLobbySetup extends GameObjectSetup {
     private static String CONFIG = "game-lobby-settings";
-    @Override
+    //@Override
     public void setup(ServiceContext serviceContext, Descriptor application, String configName) {
         DynamicGameLobby gameLobby = new DynamicGameLobby();
         gameLobby.distributionKey(application.distributionKey());
@@ -34,7 +34,7 @@ public class DynamicGameLobbySetup extends GameObjectSetup {
         dataStore.createIfAbsent(gameLobby,true);
     }
 
-    @Override
+    //@Override
     public <T extends Configurable> T load(Descriptor application) {
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
         DynamicGameLobby gameLobby = new DynamicGameLobby();

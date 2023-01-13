@@ -20,8 +20,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     private GameServiceProvider gameServiceProvider;
     private ApplicationContext context;
     private Descriptor application;
-    private GameLobby defaultLobby;
-    private boolean usingDefault;
+    //private GameLobby defaultLobby;
+    //private boolean usingDefault;
+
+    private boolean started;
 
     private ConcurrentHashMap<Short,ServiceMessageListener> listeners = new ConcurrentHashMap<>();
 
@@ -32,7 +34,8 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public Stub join(Session session, Rating rating) {
-        if(usingDefault) return defaultLobby.join(session,rating);
+        if(!started) return new Stub("lobby not started");
+        //if(usingDefault) return defaultLobby.join(session,rating);
         //using configurable lobby item
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
@@ -52,10 +55,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void leave(Session session) {
-        if(usingDefault){
-            defaultLobby.leave(session);
-            return;
-        }
+        if(!started) return;
+        //if(usingDefault){
+            //defaultLobby.leave(session);
+            //return;
+        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.remove(stubKey.asString());
         if(stub==null) return;
@@ -65,10 +69,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void update(Session session, byte[] payload){
-        if(usingDefault){
-            defaultLobby.update(session,payload);
-            return;
-        }
+        if(!started) return;
+        //if(usingDefault){
+            //defaultLobby.update(session,payload);
+            //return;
+        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
@@ -80,10 +85,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void list(Session session){
-        if(usingDefault){
-            defaultLobby.list(session);
-            return;
-        }
+        if(!started) return;
+        //if(usingDefault){
+            //defaultLobby.list(session);
+            //return;
+        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
@@ -108,10 +114,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         }));
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        this.defaultLobby = gameServiceProvider.lobby(this.context.descriptor());
-        this.defaultLobby.setup(applicationContext);
-        this.defaultLobby.start();
-        this.usingDefault = true;
+        //this.defaultLobby = gameServiceProvider.lobby(this.context.descriptor());
+        //this.defaultLobby.setup(applicationContext);
+        //this.defaultLobby.start();
+        //this.usingDefault = true;
     }
 
     @Override
@@ -132,7 +138,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void shutdown() throws Exception {
-        defaultLobby.shutdown();
+        //defaultLobby.shutdown();
     }
     private GameZone gameZone(Rating rating){
         if(rating.level>0 && rating.level<101) return zoneIndex.get(1);
@@ -150,17 +156,17 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void onLoaded(LobbyItem lobbyItem){
         this.context.log("configurable lobby item loaded->"+lobbyItem.configurationName(), OnLog.WARN);
-        if(configure(lobbyItem)) this.usingDefault = false;
+        if(configure(lobbyItem)) this.started = true;
     }
     @Override
     public void onUpdated(LobbyItem lobbyItem){
         this.context.log("configurable lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
-        if(configure(lobbyItem)) this.usingDefault = false;
+        if(configure(lobbyItem)) this.started = true;
     }
     @Override
     public void onRemoved(LobbyItem lobbyItem){
         this.context.log("configurable lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
-        this.usingDefault = true;
+        this.started = false;
         zoneIndex.clear();
     }
     private boolean configure(LobbyItem lobbyItem){
@@ -177,7 +183,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         });
         if(zoneIndex.isEmpty()) return false;
         fillLobby();
-        try{this.defaultLobby.shutdown();}catch (Exception ex){}
+        //try{this.defaultLobby.shutdown();}catch (Exception ex){}
         return true;
     }
     private GameZone.RoomProxy roomProxy(String playMode){

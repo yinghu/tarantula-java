@@ -345,10 +345,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
         }
-        if(postSetup!=null){
-            ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
-            setup.setup(tarantulaContext,descriptor,configName);
-        }
+        //if(postSetup!=null){
+            //ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
+            //setup.setup(tarantulaContext,descriptor,configName);
+        //}
         this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionKey());
         return true;
     }
@@ -666,9 +666,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);
                     _lobby.addEntry(a);
-                    if(preSetup[0]!=null){
-                        preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
-                    }
+                    //if(preSetup[0]!=null){
+                        //preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
+                    //}
                 });
             }
             gameCluster.message("["+name+"] game created successfully");

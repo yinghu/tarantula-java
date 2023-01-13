@@ -6,6 +6,7 @@ import com.icodesoftware.util.RecoverableObject;
 public class PlayerGameObject extends RecoverableObject {
 
     protected int stub;
+    protected String message;
 
     public int stub(){
         return stub;

@@ -10,9 +10,8 @@ public interface ApplicationPreSetup {
 
     String SET_UP_NAME = "application-pre-setup";
     //[game]_service
-    void setup(ServiceContext serviceContext,Descriptor application,String configName);
-
-    <T extends Configurable> T load(Descriptor application);
+    //void setup(ServiceContext serviceContext,Descriptor application,String configName);
+    //<T extends Configurable> T load(Descriptor application);
 
 
     <T extends Configurable> boolean save(Descriptor application,T t);

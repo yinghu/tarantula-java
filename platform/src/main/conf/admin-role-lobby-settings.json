@@ -1,5 +1,4 @@
 {
-  "application-pre-setup":"com.tarantula.game.service.DynamicGameLobbySetup",
   "initialZoneCount": 10,
   "zoneCapacityBase": 2000,
   "zoneLimit": 10,
