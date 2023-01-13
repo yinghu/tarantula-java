@@ -19,6 +19,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     private RoomProxy roomProxy;
     private List<Arena> arenaList;
     private ConcurrentHashMap<Integer,Arena> arenaIndex;
+    private ConcurrentHashMap<String,GameRoomRegistry> roomRegistry;
+    private ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue;
 
     public ConfigurableZone(ZoneItem zoneItem){
         this.zoneItem = zoneItem;
@@ -29,6 +31,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
             arenaIndex.put(a.level(),arena);
             arenaList.add(arena);
         });
+        this.roomRegistry = new ConcurrentHashMap<>();
+        this.roomRegistryQueue = new ConcurrentLinkedDeque<>();
     }
 
     @Override
@@ -165,13 +169,13 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public ConcurrentHashMap<String, GameRoomRegistry> roomRegistry() {
-        return null;
+        return this.roomRegistry;
     }
 
 
     @Override
     public ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue() {
-        return null;
+        return this.roomRegistryQueue;
     }
 
     public String toString(){

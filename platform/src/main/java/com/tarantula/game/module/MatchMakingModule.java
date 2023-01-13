@@ -114,9 +114,9 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
         else{
             this.context.log("No lobby Entries for Game->"+context.descriptor().typeId(),OnLog.WARN);
         }
-        //mLobby.forEach((k,v)->{
-            //context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
-        //});
+        mLobby.forEach((k,v)->{
+            context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
+        });
         return lobby;
     }
 

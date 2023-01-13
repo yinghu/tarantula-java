@@ -93,6 +93,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
 
     public synchronized int addPlayer(String systemId, GameRoom.RoomRegistryListener roomRegistryListener){
         roomRegistryListener.onRegistry(this);
+        //return JOINED;
         return super.addPlayer(systemId);
     }
 
