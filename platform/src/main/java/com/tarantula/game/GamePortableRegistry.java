@@ -9,8 +9,8 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;
 
-    public static final int GAME_LOBBY_CID = 1;
-    public static final int GAME_ZONE_CID = 2;
+
+
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
 
@@ -35,12 +35,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
         switch (i){
             case RATING_CID:
                 pt = new Rating();
-                break;
-            case GAME_LOBBY_CID:
-                pt = new DynamicGameLobby();
-                break;
-            case GAME_ZONE_CID:
-                pt = new DynamicZone();
                 break;
             case STUB_CID:
                 pt = new Stub();

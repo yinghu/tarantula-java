@@ -20,8 +20,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     private GameServiceProvider gameServiceProvider;
     private ApplicationContext context;
     private Descriptor application;
-    //private GameLobby defaultLobby;
-    //private boolean usingDefault;
 
     private boolean started;
 
@@ -35,8 +33,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public Stub join(Session session, Rating rating) {
         if(!started) return new Stub("lobby not started");
-        //if(usingDefault) return defaultLobby.join(session,rating);
-        //using configurable lobby item
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
@@ -56,10 +52,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void leave(Session session) {
         if(!started) return;
-        //if(usingDefault){
-            //defaultLobby.leave(session);
-            //return;
-        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.remove(stubKey.asString());
         if(stub==null) return;
@@ -70,10 +62,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void update(Session session, byte[] payload){
         if(!started) return;
-        //if(usingDefault){
-            //defaultLobby.update(session,payload);
-            //return;
-        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
@@ -86,10 +74,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void list(Session session){
         if(!started) return;
-        //if(usingDefault){
-            //defaultLobby.list(session);
-            //return;
-        //}
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
@@ -114,10 +98,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         }));
         this.application = applicationContext.descriptor();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        //this.defaultLobby = gameServiceProvider.lobby(this.context.descriptor());
-        //this.defaultLobby.setup(applicationContext);
-        //this.defaultLobby.start();
-        //this.usingDefault = true;
     }
 
     @Override
@@ -183,7 +163,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         });
         if(zoneIndex.isEmpty()) return false;
         fillLobby();
-        //try{this.defaultLobby.shutdown();}catch (Exception ex){}
         return true;
     }
     private GameZone.RoomProxy roomProxy(String playMode){

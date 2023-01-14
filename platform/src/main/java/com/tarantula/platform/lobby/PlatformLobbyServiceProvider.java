@@ -41,7 +41,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.lobbyListeners = new ConcurrentHashMap<>();
         this.lobbyItems = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
         this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameName);

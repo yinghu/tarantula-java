@@ -49,9 +49,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         this.gameServiceProviders = new ConcurrentHashMap<>();
     }
 
-    //public GameLobby lobby(Descriptor descriptor){
-        //return applicationPreSetup.load(descriptor);
-    //}
 
     public Configuration configuration(){
         return configuration;

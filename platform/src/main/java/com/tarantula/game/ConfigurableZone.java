@@ -40,70 +40,38 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return zoneItem.name();
     }
 
-    @Override
-    public int levelMatch() {
-        return 0;
-    }
 
-    @Override
-    public void levelMatch(int levelMatch) {
-
-    }
 
     @Override
     public String playMode() {
         return zoneItem.playMode();
     }
 
-    @Override
-    public int arenaLimit() {
-        return 0;
-    }
-
-    @Override
-    public void arenaLimit(int arenaLimit) {
-
-    }
 
     @Override
     public int capacity() {
         return this.zoneItem.room().capacity();
     }
 
-    @Override
-    public void capacity(int capacity) {
-
-    }
 
     @Override
     public int maxJoinsPerRoom() {
         return zoneItem.room().capacity();
     }
 
-    @Override
-    public void maxJoinsPerRoom(int maxJoinsPerRoom) {
-
-    }
 
     @Override
     public int joinsOnStart() {
         return zoneItem.room().joinsOnStart();
     }
 
-    @Override
-    public void joinsOnStart(int joinsOnStart) {
-
-    }
 
     @Override
     public long roundDuration() {
         return zoneItem.room().duration();
     }
 
-    @Override
-    public void roundDuration(long roundDuration) {
 
-    }
 
     @Override
     public boolean connected() {
@@ -132,10 +100,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
 
-    @Override
-    public void addArena(Arena arena) {
 
-    }
 
     @Override
     public List<Arena> arenas() {

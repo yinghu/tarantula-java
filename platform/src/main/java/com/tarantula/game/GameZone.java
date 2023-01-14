@@ -17,27 +17,19 @@ public interface GameZone extends Configurable{
 
     String name();
     void name(String name);
-    int levelMatch();
-    void levelMatch(int levelMatch);
-    String playMode();
-    int arenaLimit();
-    void arenaLimit(int arenaLimit);
-    int capacity();
-    void capacity(int capacity);
 
+    String playMode();
+    int capacity();
     int maxJoinsPerRoom();
-    void maxJoinsPerRoom(int maxJoinsPerRoom);
     int joinsOnStart();
-    void joinsOnStart(int joinsOnStart);
     long roundDuration();
-    void roundDuration(long roundDuration);
 
     boolean connected();
     Stub join(Session session,Rating rating);
     void leave(Stub stub);
     void update(Session session, Stub stub, byte[] payload);
     void list(Session session,Stub stub);
-    void addArena(Arena arena);
+
     List<Arena> arenas();
     Arena arena(int level);
     void setup(ApplicationContext applicationContext,GameLobby gameLobby);

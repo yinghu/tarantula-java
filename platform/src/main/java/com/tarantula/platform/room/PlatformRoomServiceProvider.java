@@ -44,7 +44,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private DataStore dataStore;
     private Configuration configuration;
-    //private int roomCapacity;
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
@@ -86,7 +85,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.configuration = serviceContext.configuration(CONFIG);
         this.type = (String) gameCluster.property(GameCluster.MODE);
         JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
-        //this.roomCapacity = jsonObject.get("roomCapacity").getAsInt();
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
@@ -110,7 +108,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 tryOnChannel(cs);
             });
         });
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+roomPoolSizePerZone+"]["+this.type+"]");
     }
 
     @Override
@@ -266,6 +264,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
+        logger.warn(gameZone.playMode()+">>"+gameZone.maxJoinsPerRoom()+">>"+gameZone.capacity()+">>"+gameZone.roundDuration());
         String zkey = t.distributionKey();
         GameZoneIndex clusterIndex = this.distributionRoomService.localManaged(zkey);
         clusterIndex.gameZone = gameZone;
