@@ -20,6 +20,7 @@ public class RoomJoinOperation extends Operation implements PartitionAwareOperat
     public RoomJoinOperation(){}
     public RoomJoinOperation(String serviceName,String zoneId,String roomId, String systemId){
         this.serviceName = serviceName;
+        this.zoneId = zoneId;
         this.roomId = roomId;
         this.systemId = systemId;
     }

@@ -193,6 +193,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameRoom!=null?gameRoom.view():null;
     }
     public GameRoom onRoomJoined(String zoneId,String roomId, String systemId){
+        logger.warn("Room Join->"+zoneId+">>"+roomId+">>"+systemId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
             GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
@@ -203,10 +204,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return _gameRoom;
         });
         if(gameRoom==null) return null;
+        logger.warn("Room Join 1->"+zoneId+">>"+roomId+">>"+systemId);
         return gameRoom.join(systemId,room->{
             ConnectionStub connectionStub = pendingConnections.poll();
             GameChannel gameChannel;
             if(connectionStub==null || (gameChannel=connectionStub.gameChannel())==null) {
+                logger.warn("Room Join 2->"+zoneId+">>"+roomId+">>"+systemId);
                 this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
                 return false;
             }
