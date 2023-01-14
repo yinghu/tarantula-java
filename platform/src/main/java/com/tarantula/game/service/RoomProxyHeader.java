@@ -10,8 +10,6 @@ import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.achievement.AchievementProgress;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -37,7 +35,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         boolean response = false;
         if(jsonObject.has("rating")){
             JsonObject delta = jsonObject.getAsJsonObject("rating");
-            stub.rating.update(delta.get("delta").getAsDouble(),stub.room.arena().xp).update();
+            stub.rating.update(delta.get("delta").getAsDouble(),stub.room.arena().xp()).update();
             if(session.name().equals("rating")) {
                 session.write(stub.rating.toJson().toString().getBytes());
                 response = true;

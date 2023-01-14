@@ -153,7 +153,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return new RoomJoinStub();
         }
         int ret = pending.addPlayer(rating.systemId(),room->{
-            if(room.empty()) room.reset(arena);
+            if(room.empty()) room.reset(arena.level(),gameZone.capacity());
             return true;
         });
         if(ret == RoomRegistry.NOT_JOINED) {

@@ -88,8 +88,8 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
     }
     public void setup(Arena arena){
         this.arena = arena;
-        this.capacity = arena.capacity;
-        this.duration = arena.duration;
+        //this.capacity = arena.capacity;
+        //this.duration = arena.duration;
     }
     public void load(){
         entries = new GameEntry[capacity];

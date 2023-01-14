@@ -15,7 +15,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int MAPPING_OBJECT_CID = 4;
 
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
-    public static final int ARENA_CID = PortableEventRegistry.ARENA_CID;//112
+
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
     public static final int PVP_ROOM_CID = PortableEventRegistry.PVP_ROOM_CID;
     public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
@@ -51,9 +51,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
             case TVT_ROOM_CID:
                 pt = new TVTGameRoom();
                 break;
-            case ARENA_CID:
-                pt = new Arena();
-                break;
+
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
                 break;

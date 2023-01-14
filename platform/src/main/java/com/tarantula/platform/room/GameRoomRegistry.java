@@ -3,7 +3,6 @@ package com.tarantula.platform.room;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.tarantula.game.Arena;
 import com.tarantula.platform.RoomRegistry;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -14,17 +13,11 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
 
     public static final String LABEL = "GRY";
     public int arenaLevel;
-    public String joinTicket;
+
     public GameRoomRegistry(){
         super();
         this.label = LABEL;
         this.onEdge = true;
-    }
-    public GameRoomRegistry(Arena arena){
-        super(arena.capacity);
-        this.label = LABEL;
-        this.onEdge = true;
-        this.arenaLevel = arena.level;
     }
 
     @Override
@@ -53,7 +46,6 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         portableWriter.writeUTF("1",this.bucket);
         portableWriter.writeUTF("2",this.oid);
         portableWriter.writeInt("3",arenaLevel);
-        portableWriter.writeUTF("4",joinTicket);
     }
 
     @Override
@@ -61,11 +53,10 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
         this.bucket = portableReader.readUTF("1");
         this.oid = portableReader.readUTF("2");
         this.arenaLevel = portableReader.readInt("3");
-        this.joinTicket = portableReader.readUTF("4");
     }
-    public void reset(Arena arena){
-        maxSize = arena.capacity;
-        arenaLevel = arena.level;
+    public void reset(int level,int capacity){
+        this.maxSize = capacity;
+        arenaLevel = level;
     }
 
     public void sync(String[] joined,GameRoom.RoomRegistryListener roomRegistryListener){
@@ -93,7 +84,6 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
 
     public synchronized int addPlayer(String systemId, GameRoom.RoomRegistryListener roomRegistryListener){
         roomRegistryListener.onRegistry(this);
-        //return JOINED;
         return super.addPlayer(systemId);
     }
 

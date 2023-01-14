@@ -69,7 +69,8 @@
     {
       "header": {
         "Name": "arena1",
-        "Level": 1
+        "Level": 1,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -82,7 +83,8 @@
     {
       "header": {
         "Name": "arena2",
-        "Level": 2
+        "Level": 2,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -95,7 +97,8 @@
     {
       "header": {
         "Name": "arena3",
-        "Level": 3
+        "Level": 3,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -108,7 +111,8 @@
     {
       "header": {
         "Name": "arena4",
-        "Level": 4
+        "Level": 4,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -121,7 +125,8 @@
     {
       "header": {
         "Name": "arena5",
-        "Level": 5
+        "Level": 5,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -134,7 +139,8 @@
     {
       "header": {
         "Name": "arena6",
-        "Level": 6
+        "Level": 6,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -147,7 +153,8 @@
     {
       "header": {
         "Name": "arena7",
-        "Level": 7
+        "Level": 7,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -160,7 +167,8 @@
     {
       "header": {
         "Name": "arena8",
-        "Level": 8
+        "Level": 8,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -173,7 +181,8 @@
     {
       "header": {
         "Name": "arena9",
-        "Level": 9
+        "Level": 9,
+        "XP": 1000
       },
       "application": {},
       "reference": [],
@@ -186,7 +195,8 @@
     {
       "header": {
         "Name": "arena10",
-        "Level": 10
+        "Level": 10,
+        "XP": 1000
       },
       "application": {},
       "reference": [],

@@ -19,4 +19,7 @@ public class ArenaItem extends Commodity {
     public int level(){
         return header.get("Level").getAsInt();
     }
+    public int xp(){
+        return header.get("XP").getAsInt();
+    }
 }

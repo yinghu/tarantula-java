@@ -29,6 +29,13 @@
             "reference": "Integer",
             "nullable": false,
             "downloadable": false
+          },
+          {
+            "name": "XP",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
           }
         ]
       }
