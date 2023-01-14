@@ -14,6 +14,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     public static final String LABEL = "GRY";
     public int arenaLevel;
 
+
     public GameRoomRegistry(){
         super();
         this.label = LABEL;
@@ -56,7 +57,7 @@ public class GameRoomRegistry extends RoomRegistry implements Portable {
     }
     public void reset(int level,int capacity){
         this.maxSize = capacity;
-        arenaLevel = level;
+        this.arenaLevel = level;
     }
 
     public void sync(String[] joined,GameRoom.RoomRegistryListener roomRegistryListener){

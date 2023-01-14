@@ -144,22 +144,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.distributionRoomService.onLeaveRoom(name,stub.roomId,stub.systemId());
     }
     public RoomJoinStub onRoomRegistered(String gameZoneId,Rating rating){
-        logger.warn("D ROOM 1->"+gameZoneId);
         GameZone gameZone = gameZoneIndex.get(gameZoneId).gameZone;
         Arena arena = gameZone.arena(rating.arenaLevel);
         GameRoomRegistry pending = gameZone.roomRegistryQueue().poll();
-        if(pending==null) {
-            logger.warn("D ROOM 2->"+gameZoneId);
-            return new RoomJoinStub();
-        }
+        if(pending==null) return new RoomJoinStub();
         int ret = pending.addPlayer(rating.systemId(),room->{
             if(room.empty()) room.reset(arena.level(),gameZone.capacity());
             return true;
         });
-        if(ret == RoomRegistry.NOT_JOINED) {
-            logger.warn("D ROOM 3->"+gameZoneId);
-            return new RoomJoinStub();
-        }
+        if(ret == RoomRegistry.NOT_JOINED) return new RoomJoinStub();
         if(ret == RoomRegistry.JOINED || ret == RoomRegistry.ALREADY_JOINED) gameZone.roomRegistryQueue().offerFirst(pending);
         this.dataStore.update(pending);
         return new RoomJoinStub(pending.arenaLevel,pending.instanceId());
@@ -179,10 +172,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
     }
     public void onSync(String zoneId,String roomId,String[] joined){
-        logger.warn("D ROOM 4->"+zoneId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoomRegistry roomRegistry = gameZone.roomRegistry().get(roomId);
-        if(joined.length>0) logger.warn("Sync->"+roomRegistry);
         roomRegistry.sync(joined,room->{
             if(!room.fullJoined())gameZone.roomRegistryQueue().offer(room);
             this.dataStore.update(room);
@@ -248,9 +239,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }));
     }
     public void onRoomLoaded(String zoneId,String roomId){
-        logger.warn("Room loaded->"+zoneId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
-        GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),0);
+        GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
         gameRoom.distributionKey(roomId);
         gameRoom.index(zoneId);
         this.dataStore.createIfAbsent(gameRoom,true);
@@ -264,7 +254,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public <T extends Configurable> void register(T t) {
         GameZone gameZone = (GameZone)t;
-        logger.warn(gameZone.playMode()+">>"+gameZone.maxJoinsPerRoom()+">>"+gameZone.capacity()+">>"+gameZone.roundDuration());
         String zkey = t.distributionKey();
         GameZoneIndex clusterIndex = this.distributionRoomService.localManaged(zkey);
         clusterIndex.gameZone = gameZone;
@@ -387,11 +376,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     private GameRoom createGameRoom(String type,int roomCapacity){
         GameRoom gameRoom = null;
-        if(type.equals(GameZone.PLAY_MODE_PVE)){
-            gameRoom = new PVEGameRoom();
-        }
-        else if(type.equals(GameZone.PLAY_MODE_PVP)){
-            gameRoom = roomCapacity>0?new PVPGameRoom(roomCapacity):new PVPGameRoom();
+        switch (type){
+            case GameZone.PLAY_MODE_PVE:
+                gameRoom = new PVEGameRoom();
+                break;
+            case GameZone.PLAY_MODE_PVP:
+                gameRoom = new PVPGameRoom(roomCapacity);
+                break;
         }
         return gameRoom;
     }
