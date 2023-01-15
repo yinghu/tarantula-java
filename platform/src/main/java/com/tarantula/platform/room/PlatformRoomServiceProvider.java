@@ -347,6 +347,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         onDisConnection(connection.serverId());
     }
     public void onPing(String serverId){
+        logger.warn("Ping from server id->"+serverId);
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         if(connectionStub==null) return;
         connectionStub.ping();

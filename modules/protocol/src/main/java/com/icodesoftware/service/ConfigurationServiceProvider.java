@@ -9,7 +9,6 @@ public interface ConfigurationServiceProvider extends ServiceProvider{
 
     default <T extends Configurable> void register(T configurable){}
     default <T extends Configurable> void release(T configurable){}
-    default void configure(String key){}
 
     default <T extends Configuration> T configuration(String config){throw new UnsupportedOperationException();}
 

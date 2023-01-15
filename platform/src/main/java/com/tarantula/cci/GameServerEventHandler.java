@@ -40,7 +40,6 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         byte[] _payload = exchange.payload();
         GameCluster gameCluster = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
         if(gameCluster==null) throw new RuntimeException("Illegal access");
-
         String typeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         if(action.equals("onStart")){//start game server
             JsonObject resp = new JsonObject();

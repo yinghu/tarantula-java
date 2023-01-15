@@ -8,12 +8,10 @@ import com.icodesoftware.protocol.GameChannelListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
-import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -21,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -554,12 +551,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
+            log.warn("ConnectionID->"+connection.serverId());
             this.integrationCluster.index(connection.configurationTypeId(),connection.toBinary());
             this.integrationCluster.deployService().onRegisterConnection(connection);
             return;
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
+            log.warn("ServerID->"+channelStub.serverId);
             this.integrationCluster.index(channelStub.serverId,channelStub.toBinary());
             this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
             return;
@@ -567,11 +566,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         vMap.putIfAbsent(configurable.key().asString(),configurable);
         configurable.registered();
     }
-    public void configure(String key){
-        if(vMap.containsKey(key)){
-            this.tarantulaContext.integrationCluster().deployService().onUpdateConfigurable(key);
-        }
-    }
+    //public void configure(String key){
+        //if(vMap.containsKey(key)){
+            //this.tarantulaContext.integrationCluster().deployService().onUpdateConfigurable(key);
+        //}
+    //}
 
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
