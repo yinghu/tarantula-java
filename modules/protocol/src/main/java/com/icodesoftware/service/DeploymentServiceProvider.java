@@ -2,7 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.GameChannelListener;
+import com.icodesoftware.protocol.GameServerListener;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void verifyConnection(String typeId,String serverId);
 
 
-    String registerGameChannelListener(GameChannelListener gameChannelListener);
-    void unregisterGameChannelListener(String registerKey);
+    String registerGameServerListener(GameServerListener gameChannelListener);
+    void unregisterGameServerListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs
 
     /**

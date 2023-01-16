@@ -4,7 +4,6 @@ import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaApplicationHeader;
 
-import java.util.Collection;
 
 public class TestClusterProvider extends TarantulaApplicationHeader implements ClusterProvider {
     @Override
@@ -62,44 +61,8 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
         return null;
     }
 
-    @Override
-    public byte[] get(byte[] key) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] createIfAbsent(byte[] key, byte[] pending) {
-        return new byte[0];
-    }
-
-    @Override
-    public void set(byte[] key, byte[] value) {
-
-    }
-
-    @Override
-    public byte[] remove(byte[] key) {
-        return new byte[0];
-    }
-
-    @Override
-    public void index(String index, byte[] key) {
-
-    }
-
-    @Override
-    public void removeIndex(String index, byte[] key) {
-
-    }
-
-    @Override
-    public Collection<byte[]> index(String index) {
+    public ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue){
         return null;
-    }
-
-    @Override
-    public void removeIndex(String index) {
-
     }
 
     @Override

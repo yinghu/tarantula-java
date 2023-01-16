@@ -107,15 +107,15 @@ public class ConnectionStub extends ClientConnection {
     public void ping(){
         pingSequence.incrementAndGet();
     }
-    public boolean check(){
+    public boolean timeout(){
         long ping;
-        if((ping=pingSequence.get())-lastPing>0){
+        if((ping = pingSequence.get()) - lastPing > 0){
             lastPing = ping;
-            tries=0;
-            return true;
+            tries = 0;
+            return false;
         }
         tries++;
-        return tries< UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES;
+        return tries > UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES;
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.GameChannelListener;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
@@ -42,7 +42,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     ConcurrentHashMap<String,Configurable> vMap = new ConcurrentHashMap<>();
 
     //push event cache mappings
-    ConcurrentHashMap<String,GameChannelListener> cListeners = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, GameServerListener> cListeners = new ConcurrentHashMap<>();
 
 
     //module class loader mappings
@@ -520,9 +520,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         oListeners.put(regKey,new TypedListener(type,listener));
         return regKey;
     }
-    public String registerConfigurableListener(Descriptor category, Configurable.Listener listener){
-        throw new UnsupportedOperationException("use string");
-    }
     public void unregisterConfigurableListener(String registryKey){
         oListeners.remove(registryKey);
     }
@@ -551,27 +548,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            log.warn("ConnectionID->"+connection.serverId());
-            this.integrationCluster.index(connection.configurationTypeId(),connection.toBinary());
+            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
+            clusterStore.index(connection.configurationTypeId(),connection.toBinary());
             this.integrationCluster.deployService().onRegisterConnection(connection);
             return;
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
-            log.warn("ServerID->"+channelStub.serverId);
-            this.integrationCluster.index(channelStub.serverId,channelStub.toBinary());
+            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(channelStub.configurationTypeId());
+            clusterStore.index(channelStub.serverId,channelStub.toBinary());
             this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
         configurable.registered();
     }
-    //public void configure(String key){
-        //if(vMap.containsKey(key)){
-            //this.tarantulaContext.integrationCluster().deployService().onUpdateConfigurable(key);
-        //}
-    //}
-
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
@@ -665,9 +656,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     a.applicationClassName(tarantulaContext.singleModuleApplication);
                     mds.create(a);
                     _lobby.addEntry(a);
-                    //if(preSetup[0]!=null){
-                        //preSetup[0].setup(tarantulaContext,a,(String)gameCluster.property(GameCluster.MODE));
-                    //}
                 });
             }
             gameCluster.message("["+name+"] game created successfully");
@@ -719,13 +707,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return lobby;
     }
     public String resetCode(String key){
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        ClusterProvider.ClusterStore icp = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
         String code = UUID.randomUUID().toString();
         icp.set(code.getBytes(),key.getBytes());
         return code;
     }
     public String checkCode(String resetCode){
-        ClusterProvider icp = this.tarantulaContext.integrationCluster();
+        ClusterProvider.ClusterStore icp = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
         byte[] ret = icp.remove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
     }
@@ -733,18 +721,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public byte[] serverKey(String typeId){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        return this.integrationCluster.createIfAbsent(typeId.getBytes(),key);
+        ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(typeId);
+        return clusterStore.createIfAbsent(typeId.getBytes(),key);
     }
 
     public void verifyConnection(String typeId,String serverId){
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
-    public String registerGameChannelListener(GameChannelListener gameChannelListener){
+    public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
         return regKey;
     }
-    public void unregisterGameChannelListener(String registerKey){
+    public void unregisterGameServerListener(String registerKey){
         cListeners.remove(registerKey);
     }
 
@@ -809,6 +798,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
+            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
+            clusterStore.removeIndex(connection.configurationTypeId(),connection.toBinary());
+            clusterStore.removeIndex(connection.serverId());
             this.integrationCluster.deployService().onReleaseConnection(connection);
             return;
         }

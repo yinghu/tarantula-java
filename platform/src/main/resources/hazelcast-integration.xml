@@ -79,7 +79,7 @@
         </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
-    <map name="integration.recoverable.data.*">
+    <map name="integration.recoverable.map.*">
         <async-backup-count>1</async-backup-count>
         <eviction-policy>NONE</eviction-policy>
         <max-size policy="PER_NODE">100000</max-size>
@@ -88,4 +88,7 @@
         <async-backup-count>1</async-backup-count>
         <value-collection-type>SET</value-collection-type>
     </multimap>
+    <queue name="integration.recoverable.queue.*">
+        <async-backup-count>1</async-backup-count>
+    </queue>
 </hazelcast>

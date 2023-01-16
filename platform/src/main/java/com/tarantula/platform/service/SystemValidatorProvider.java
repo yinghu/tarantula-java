@@ -18,7 +18,6 @@ import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +53,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
+    private ClusterProvider.ClusterStore clusterStore;
 
     public MessageDigest messageDigest(){
         try{
@@ -127,7 +127,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             presenceKey.base64key(CipherUtil.toBase64Key());
             this.deployDataStore.update(presenceKey);
-            this.serviceContext.clusterProvider().set(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
+            this.clusterStore.set(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -137,7 +137,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void reset(){
         try{
-            byte[] key = this.serviceContext.clusterProvider().get(presenceKey.distributionKey().getBytes());
+            byte[] key = this.clusterStore.get(presenceKey.distributionKey().getBytes());
             if(key==null) return;
             presenceKey.base64key(CipherUtil.toBase64Key(key));
             encrypt = CipherUtil.encrypt(presenceKey.toKey());
@@ -419,6 +419,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             amazonAws.setup(serviceContext);
             aMap.put(OnAccess.AMAZON,amazonAws);
         }
+        //map only store
+        clusterStore = serviceContext.clusterProvider().clusterStore(TokenValidatorProvider.NAME,true,false,false);
     }
 
     @Override

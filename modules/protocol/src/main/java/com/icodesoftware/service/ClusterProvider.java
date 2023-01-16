@@ -24,18 +24,9 @@ public interface ClusterProvider extends ServiceProvider {
 
     <T extends ServiceProvider> T serviceProvider(String name);
 
+    ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue);
     ClusterStore clusterStore(String name);
-    //CLUSTER KEY VALUE
-    byte[] get(byte[] key);
-    byte[] createIfAbsent(byte[] key,byte[] pending);
-    void set(byte[] key,byte[] value);
-    byte[] remove(byte[] key);
 
-    //CLUSTER INDEX
-    void index(String index,byte[] key);
-    void removeIndex(String index,byte[] key);
-    Collection<byte[]> index(String index);
-    void removeIndex(String index);
 
     void registerMetricsListener(MetricsListener metricsListener);
     String registerReloadListener(ReloadListener reloadListener);
@@ -46,19 +37,25 @@ public interface ClusterProvider extends ServiceProvider {
     Summary summary();
 
     interface ClusterStore{
+        //map operations
         byte[] get(byte[] key);
         byte[] createIfAbsent(byte[] key,byte[] pending);
         void set(byte[] key,byte[] value);
         byte[] remove(byte[] key);
 
-        //CLUSTER INDEX
+        //cluster index operations
         void index(String index,byte[] key);
         void removeIndex(String index,byte[] key);
         Collection<byte[]> index(String index);
         void removeIndex(String index);
 
+        //map lock
         void lock(byte[] key);
         void unlock(byte[] key);
+
+        //queue operation
+        boolean offer(byte[] value);
+        byte[] poll();
 
     }
 

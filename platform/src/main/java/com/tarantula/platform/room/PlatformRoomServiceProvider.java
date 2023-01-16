@@ -3,7 +3,7 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.GameChannelListener;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ConfigurationServiceProvider;
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledFuture;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameChannelListener,SchedulingTask, ReloadListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,SchedulingTask, ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -56,6 +56,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private String reloadKey;
     private String typeLobby;
     private ScheduledFuture scheduledFuture;
+    private ClusterProvider.ClusterStore clusterStore;
     ArrayList<String> kickoff = new ArrayList<>();
 
     public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
@@ -87,20 +88,21 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
-        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameChannelListener(this);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.scheduledFuture = this.serviceContext.schedule(this);
+        this.clusterStore = this.serviceContext.clusterProvider().clusterStore(typeLobby);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
     @Override
     public void start() throws Exception {
-        Collection<byte[]> cb = clusterProvider.index(typeLobby);
+        Collection<byte[]> cb = clusterStore.index(typeLobby);
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
             onConnection(c);
-            Collection<byte[]> cc = clusterProvider.index(c.serverId());
+            Collection<byte[]> cc = clusterStore.index(c.serverId());
             cc.forEach(bb->{
                 ChannelStub cs = new ChannelStub();
                 cs.fromBinary(bb);
@@ -113,7 +115,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void shutdown() throws Exception {
-        this.serviceContext.deploymentServiceProvider().unregisterGameChannelListener(registerKey);
+        this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
         this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
         scheduledFuture.cancel(true);
     }
@@ -193,7 +195,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameRoom!=null?gameRoom.view():null;
     }
     public GameRoom onRoomJoined(String zoneId,String roomId, String systemId){
-        //logger.warn("Room Join->"+zoneId+">>"+roomId+">>"+systemId);
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoomIndex.computeIfAbsent(roomId,(k)->{
             GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
@@ -204,12 +205,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return _gameRoom;
         });
         if(gameRoom==null) return null;
-        //logger.warn("Room Join 1->"+zoneId+">>"+roomId+">>"+systemId);
         return gameRoom.join(systemId,room->{
             ConnectionStub connectionStub = pendingConnections.poll();
             GameChannel gameChannel;
             if(connectionStub==null || (gameChannel=connectionStub.gameChannel())==null) {
-                //logger.warn("Room Join 2->"+zoneId+">>"+roomId+">>"+systemId);
                 this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
                 return false;
             }
@@ -291,11 +290,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(connectionStub==null) return;
         pendingConnections.remove(connectionStub);
         connectionStub.close();
-        clusterProvider.removeIndex(typeLobby,connectionStub.toBinary());
-        clusterProvider.removeIndex(serverId);
-        Collection<byte[]> _cb = clusterProvider.index(typeLobby);
-        Collection<byte[]> _cc = clusterProvider.index(serverId);
+        Collection<byte[]> _cb = clusterStore.index(typeLobby);
+        Collection<byte[]> _cc = clusterStore.index(serverId);
         logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
+        //clusterProvider.removeIndex(typeLobby,connectionStub.toBinary());
+        //clusterProvider.removeIndex(serverId);
         ArrayList<String> removed = new ArrayList<>();
         gameChannelIndex.forEach((k,v)->{
             if(v.serverId.equals(serverId)){
@@ -303,7 +302,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         removed.forEach(k->gameChannelIndex.remove(k));
-        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>vv->"+gameChannelIndex.size());
     }
 
     @Override
@@ -371,7 +369,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void run() {
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
-            if(!v.check()) kickoff.add(k);
+            if(v.timeout()) kickoff.add(k);
         });
         kickoff.forEach(k->{
             logger.warn("Connection kickoff->"+k);
@@ -392,12 +390,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     private Map<String,GameChannelIndex> reload(){
         HashMap<String,GameChannelIndex> tem = new HashMap<>();
-        Collection<byte[]> cb = clusterProvider.index(typeLobby);
+        Collection<byte[]> cb = clusterStore.index(typeLobby);
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
-            Collection<byte[]> cc = clusterProvider.index(c.serverId());
+            Collection<byte[]> cc = clusterStore.index(c.serverId());
             cc.forEach(bb->{
                 ChannelStub cs = new ChannelStub();
                 cs.fromBinary(bb);

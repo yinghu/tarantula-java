@@ -33,7 +33,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final Config config;
     private final String bucket;
     private final String INDEX_MAP_PREFIX = "integration.recoverable.index.";
-    private final String DATA_MAP_PREFIX = "integration.recoverable.data.";
+    private final String DATA_MAP_PREFIX = "integration.recoverable.map.";
+    private final String DATA_QUEUE_PREFIX = "integration.recoverable.queue.";
+
 
     private HazelcastInstance _cluster;
 
@@ -53,6 +55,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private MultiMap<String, byte[]> mIndex;
     private IMap<byte[],byte[]> vMap;
+    //private IQueue<byte[]> vQueue;
 
     private AccessIndexService accessIndexService;
     private DeployService deployService;
@@ -106,8 +109,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         _integrationInstanceStarted.await();
-        mIndex = this._cluster.getMultiMap(INDEX_MAP_PREFIX+"Master");
+        //mIndex = this._cluster.getMultiMap(INDEX_MAP_PREFIX+"Master");
         vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
+        //vQueue = this._cluster.getQueue(DATA_QUEUE_PREFIX+"Master");
         this.accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.accessIndexService.setup(this.tarantulaContext);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
@@ -148,36 +152,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public EventService publisher(){
         return this;
-    }
-
-    //key value pair
-    public byte[] get(byte[] key){
-        return this.vMap.get(key);
-    }
-
-    public byte[] createIfAbsent(byte[] key,byte[] value){
-        byte[] ret = vMap.putIfAbsent(key,value);
-        return ret!=null?ret:value;
-    }
-    public void set(byte[] key,byte[] value){
-        this.vMap.put(key,value);
-    }
-    public byte[] remove(byte[] key){
-        return vMap.remove(key);
-    }
-
-    //key value index list pair
-    public void index(String index,byte[] key){
-        mIndex.put(index,key);
-    }
-    public void removeIndex(String index,byte[] key){
-        mIndex.remove(index,key);
-    }
-    public Collection<byte[]> index(String index){
-        return mIndex.get(index);
-    }
-    public void removeIndex(String index){
-        mIndex.remove(index);
     }
 
     public EventService subscribe(String topic, EventListener callback){
@@ -313,14 +287,28 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         rMap.forEach((k,v)->v.reload(partition,localMember));
     }
 
-    public ClusterStore clusterStore(String name){
+    public ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue){
         if(name.equals("Master")) throw new RuntimeException("Master is reserved for system level cluster store");
+        if( !map && !index && !queue) throw new RuntimeException("Empty Store is not supported");
         return cMap.computeIfAbsent(name,k->{
-            MultiMap<String, byte[]> mIndex = _cluster.getMultiMap(INDEX_MAP_PREFIX+name);
-            IMap<byte[],byte[]> vMap = _cluster.getMap(DATA_MAP_PREFIX+name);
-            IntegrationClusterStore integrationClusterStore = new IntegrationClusterStore(mIndex,vMap);
+            IMap<byte[],byte[]> vMap = null;
+            MultiMap<String, byte[]> mIndex = null;
+            IQueue<byte[]> vQueue = null;
+            if(map){
+                vMap = _cluster.getMap(DATA_MAP_PREFIX+name);
+            }
+            if(index) {
+                mIndex = _cluster.getMultiMap(INDEX_MAP_PREFIX + name);
+            }
+            if(queue) {
+                vQueue = _cluster.getQueue(DATA_QUEUE_PREFIX + name);
+            }
+            IntegrationClusterStore integrationClusterStore = new IntegrationClusterStore(mIndex,vMap,vQueue,TarantulaContext.operationTimeout);
             return integrationClusterStore;
         });
+    }
+    public ClusterStore clusterStore(String name){
+        return clusterStore(name,true,true,true);
     }
 
     public ClusterSummary summary(){
