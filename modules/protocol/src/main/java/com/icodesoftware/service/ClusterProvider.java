@@ -38,10 +38,13 @@ public interface ClusterProvider extends ServiceProvider {
 
     interface ClusterStore{
         //map operations
-        byte[] get(byte[] key);
-        byte[] createIfAbsent(byte[] key,byte[] pending);
-        void set(byte[] key,byte[] value);
-        byte[] remove(byte[] key);
+        byte[] mapGet(byte[] key);
+        byte[] mapCreateIfAbsent(byte[] key,byte[] pending);
+        void mapSet(byte[] key,byte[] value);
+        byte[] mapRemove(byte[] key);
+        void mapLock(byte[] key);
+        void mapUnlock(byte[] key);
+
 
         //cluster index operations
         void index(String index,byte[] key);
@@ -49,13 +52,13 @@ public interface ClusterProvider extends ServiceProvider {
         Collection<byte[]> index(String index);
         void removeIndex(String index);
 
-        //map lock
-        void lock(byte[] key);
-        void unlock(byte[] key);
 
         //queue operation
-        boolean offer(byte[] value);
-        byte[] poll();
+        boolean queueOffer(byte[] value);
+        byte[] queuePoll();
+
+        void clear();
+        void clear(boolean map,boolean index,boolean queue);
 
     }
 

@@ -127,7 +127,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             presenceKey.base64key(CipherUtil.toBase64Key());
             this.deployDataStore.update(presenceKey);
-            this.clusterStore.set(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
+            this.clusterStore.mapSet(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -137,7 +137,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void reset(){
         try{
-            byte[] key = this.clusterStore.get(presenceKey.distributionKey().getBytes());
+            byte[] key = this.clusterStore.mapGet(presenceKey.distributionKey().getBytes());
             if(key==null) return;
             presenceKey.base64key(CipherUtil.toBase64Key(key));
             encrypt = CipherUtil.encrypt(presenceKey.toKey());

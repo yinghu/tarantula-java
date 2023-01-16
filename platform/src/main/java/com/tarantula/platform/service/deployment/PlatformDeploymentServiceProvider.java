@@ -64,6 +64,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     private MetricsListener metricsListener;
     private DistributionCallback distributionCallback;
 
+    private ClusterProvider.ClusterStore clusterStore;
     @Override
     public void start() throws Exception {
         this.secureRandom = new SecureRandom();
@@ -442,6 +443,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             return false;
         });
+        this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
 
@@ -707,22 +709,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return lobby;
     }
     public String resetCode(String key){
-        ClusterProvider.ClusterStore icp = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
         String code = UUID.randomUUID().toString();
-        icp.set(code.getBytes(),key.getBytes());
+        clusterStore.mapSet(code.getBytes(),key.getBytes());
         return code;
     }
     public String checkCode(String resetCode){
-        ClusterProvider.ClusterStore icp = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
-        byte[] ret = icp.remove(resetCode.getBytes());
+        byte[] ret = clusterStore.mapRemove(resetCode.getBytes());
         return (ret!=null?new String(ret):"");
     }
 
     public byte[] serverKey(String typeId){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(typeId);
-        return clusterStore.createIfAbsent(typeId.getBytes(),key);
+        return clusterStore.mapCreateIfAbsent(typeId.getBytes(),key);
     }
 
     public void verifyConnection(String typeId,String serverId){

@@ -290,6 +290,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue){
         if(name.equals("Master")) throw new RuntimeException("Master is reserved for system level cluster store");
         if( !map && !index && !queue) throw new RuntimeException("Empty Store is not supported");
+        log.warn("Creating cluster store->"+name);
         return cMap.computeIfAbsent(name,k->{
             IMap<byte[],byte[]> vMap = null;
             MultiMap<String, byte[]> mIndex = null;

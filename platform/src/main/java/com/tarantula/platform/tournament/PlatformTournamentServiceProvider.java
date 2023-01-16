@@ -112,7 +112,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         Configuration configuration = serviceContext.configuration(CONFIG);
         this.pendingTournamentPoolSize = ((Number)configuration.property("pendingTournamentPoolSize")).intValue();
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
@@ -121,7 +121,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
         this.lookupScheduleKey.distributionKey(gameCluster.distributionKey());
-        this.dataStore = applicationPreSetup.dataStore(gameCluster,name());//serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.partitionNumber());
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
@@ -130,7 +130,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
-        this.clusterStore = this.serviceContext.clusterProvider().clusterStore((String)gameCluster.property(GameCluster.NAME));
+        this.clusterStore = this.serviceContext.clusterProvider().clusterStore((String)gameCluster.property(GameCluster.GAME_LOBBY));
     }
     @Override
     public void waitForData(){
@@ -216,7 +216,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void midnightCheck(){
         //midnight close/launch daily/weekly/monthly tournaments
         this.lookupScheduleKey.keySet().forEach(k->{
-            clusterStore.lock(k.getBytes());
+            clusterStore.mapLock(k.getBytes());
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionKey(k);
             if(applicationPreSetup.load(application,schedule)){
@@ -227,7 +227,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                     }
                 }
             }
-            clusterStore.unlock(k.getBytes());
+            clusterStore.mapUnlock(k.getBytes());
         });
     }
     void onTournamentRegister(Tournament tournamentHeader){
@@ -236,22 +236,22 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void onTournamentClose(TournamentHeader tournamentHeader){
         byte[] lockKey = tournamentHeader.index().getBytes();
         try {
-            clusterStore.lock(lockKey);
+            clusterStore.mapLock(lockKey);
             this.distributionTournamentService.closeTournament(gameServiceName, tournamentHeader.distributionKey());
             this.serviceContext.schedule(new TournamentEndMonitor(tournamentHeader, this));
         }finally {
-            clusterStore.unlock(lockKey);
+            clusterStore.mapUnlock(lockKey);
         }
     }
     void onTournamentEnd(TournamentHeader tournamentHeader){
         byte[] lockKey = tournamentHeader.index().getBytes();
         try {
-            clusterStore.lock(lockKey);
+            clusterStore.mapLock(lockKey);
             endTournament(tournamentHeader);
             this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournamentHeader.distributionKey());
         }
         finally {
-            clusterStore.unlock(lockKey);
+            clusterStore.mapUnlock(lockKey);
         }
     }
     void monitorInstanceOnClose(TournamentHeader tournamentHeader,TournamentInstanceHeader instanceHeader){
@@ -284,7 +284,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public <T extends Configurable> void register(T t) {
         byte[] lockKey = t.distributionKey().getBytes();
         try{
-            clusterStore.lock(lockKey);
+            clusterStore.mapLock(lockKey);
             if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
             TournamentScheduleStatus status = new TournamentScheduleStatus();
             status.distributionKey(t.distributionKey());
@@ -311,14 +311,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             }
             t.registered();
         }finally {
-            clusterStore.unlock(lockKey);
+            clusterStore.mapUnlock(lockKey);
         }
     }
     @Override
     public <T extends Configurable> void release(T t) {
         byte[] lockKey = t.distributionKey().getBytes();
         try {
-            clusterStore.lock(lockKey);
+            clusterStore.mapLock(lockKey);
             TournamentScheduleStatus status = new TournamentScheduleStatus();
             status.distributionKey(t.distributionKey());
             dataStore.createIfAbsent(status, true);
@@ -333,7 +333,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             distributionTournamentService.endTournament(gameServiceName, status.index());
             distributionItemService.onReleaseItem(gameServiceName, name(), t.configurationTypeId(),status.index());
         }finally {
-            clusterStore.unlock(lockKey);
+            clusterStore.mapUnlock(lockKey);
         }
     }
 
@@ -346,11 +346,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
         byte[] scheduleId = tournament.index().getBytes();
         try {
-            clusterStore.lock(scheduleId);
+            clusterStore.mapLock(scheduleId);
             tournament.dataStore(dataStore);
             launch(tournament);
         } finally {
-            clusterStore.unlock(scheduleId);
+            clusterStore.mapUnlock(scheduleId);
         }
         return true;
     }
@@ -369,13 +369,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!this.dataStore.load(tournamentHeader)) return false;
         byte[] lockKey = tournamentHeader.index().getBytes();
         try{
-            clusterStore.lock(lockKey);
+            clusterStore.mapLock(lockKey);
             tournamentHeader.dataStore(this.dataStore);
             if(tournamentHeader.status == Tournament.Status.ENDED) return false;
             launch(tournamentHeader);
             return true;
         }finally {
-            clusterStore.unlock(lockKey);
+            clusterStore.mapUnlock(lockKey);
         }
         //return true;
     }

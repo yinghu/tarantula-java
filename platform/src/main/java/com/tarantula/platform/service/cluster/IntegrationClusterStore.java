@@ -22,60 +22,81 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         this.operationTimeout = operationTimeout;
     }
 
-    public byte[] get(byte[] key){
+    public byte[] mapGet(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         return this.vMap.get(key);
     }
 
-    public byte[] createIfAbsent(byte[] key,byte[] value){
+    public byte[] mapCreateIfAbsent(byte[] key,byte[] value){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         byte[] ret = vMap.putIfAbsent(key,value);
         return ret!=null?ret:value;
     }
-    public void set(byte[] key,byte[] value){
+    public void mapSet(byte[] key,byte[] value){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         this.vMap.put(key,value);
     }
 
-    public byte[] remove(byte[] key){
+    public byte[] mapRemove(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         return vMap.remove(key);
     }
 
     //key value index list pair
     public void index(String index,byte[] key){
+        if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.put(index,key);
     }
 
     public void removeIndex(String index,byte[] key){
+        if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.remove(index,key);
     }
 
     public Collection<byte[]> index(String index){
+        if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         return mIndex.get(index);
     }
 
     public void removeIndex(String index){
+        if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.remove(index);
     }
 
-    public void lock(byte[] key){
+    public void mapLock(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         vMap.lock(key);
     }
 
-    public void unlock(byte[] key){
+    public void mapUnlock(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         vMap.unlock(key);
     }
 
-    public boolean offer(byte[] value){
+    public boolean queueOffer(byte[] value){
+        if(this.vQueue==null) throw new RuntimeException("Queue Operation not enabled");
         try{
             return vQueue.offer(value,operationTimeout, TimeUnit.SECONDS);
         }catch (Exception ex){
             return false;
         }
     }
-    public byte[] poll(){
+    public byte[] queuePoll(){
+        if(this.vQueue==null) throw new RuntimeException("Queue Operation not enabled");
         try{
             return vQueue.poll(operationTimeout, TimeUnit.SECONDS);
         }catch (Exception ex){
             return null;
         }
+    }
+
+    public void clear(){
+        clear(true,true,true);
+    }
+    public void clear(boolean map,boolean index,boolean queue){
+        if(map) vMap.clear();
+        if(index) mIndex.clear();
+        if(queue) vQueue.clear();
     }
 
 }
