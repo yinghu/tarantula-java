@@ -96,13 +96,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public void start() throws Exception {
-        Collection<byte[]> cb = clusterStore.index(typeLobby);
+        Collection<byte[]> cb = clusterStore.indexGet(typeLobby);
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
             onConnection(c);
-            Collection<byte[]> cc = clusterStore.index(c.serverId());
+            Collection<byte[]> cc = clusterStore.indexGet(c.serverId());
             cc.forEach(bb->{
                 ChannelStub cs = new ChannelStub();
                 cs.fromBinary(bb);
@@ -290,8 +290,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(connectionStub==null) return;
         pendingConnections.remove(connectionStub);
         connectionStub.close();
-        Collection<byte[]> _cb = clusterStore.index(typeLobby);
-        Collection<byte[]> _cc = clusterStore.index(serverId);
+        Collection<byte[]> _cb = clusterStore.indexGet(typeLobby);
+        Collection<byte[]> _cc = clusterStore.indexGet(serverId);
         logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
         //clusterProvider.removeIndex(typeLobby,connectionStub.toBinary());
         //clusterProvider.removeIndex(serverId);
@@ -390,12 +390,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     private Map<String,GameChannelIndex> reload(){
         HashMap<String,GameChannelIndex> tem = new HashMap<>();
-        Collection<byte[]> cb = clusterStore.index(typeLobby);
+        Collection<byte[]> cb = clusterStore.indexGet(typeLobby);
         cb.forEach(b->{
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
-            Collection<byte[]> cc = clusterStore.index(c.serverId());
+            Collection<byte[]> cc = clusterStore.indexGet(c.serverId());
             cc.forEach(bb->{
                 ChannelStub cs = new ChannelStub();
                 cs.fromBinary(bb);

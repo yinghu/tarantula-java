@@ -37,6 +37,7 @@ public interface ClusterProvider extends ServiceProvider {
     Summary summary();
 
     interface ClusterStore{
+
         //map operations
         byte[] mapGet(byte[] key);
         byte[] mapCreateIfAbsent(byte[] key,byte[] pending);
@@ -47,11 +48,10 @@ public interface ClusterProvider extends ServiceProvider {
 
 
         //cluster index operations
-        void index(String index,byte[] key);
-        void removeIndex(String index,byte[] key);
-        Collection<byte[]> index(String index);
-        void removeIndex(String index);
-
+        void indexSet(String index,byte[] key);
+        void indexRemove(String index,byte[] key);
+        Collection<byte[]> indexGet(String index);
+        void indexRemove(String index);
 
         //queue operation
         boolean queueOffer(byte[] value);

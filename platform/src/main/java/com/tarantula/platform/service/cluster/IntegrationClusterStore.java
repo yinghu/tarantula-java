@@ -43,22 +43,22 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
     }
 
     //key value index list pair
-    public void index(String index,byte[] key){
+    public void indexSet(String index,byte[] key){
         if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.put(index,key);
     }
 
-    public void removeIndex(String index,byte[] key){
+    public void indexRemove(String index,byte[] key){
         if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.remove(index,key);
     }
 
-    public Collection<byte[]> index(String index){
+    public Collection<byte[]> indexGet(String index){
         if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         return mIndex.get(index);
     }
 
-    public void removeIndex(String index){
+    public void indexRemove(String index){
         if(this.mIndex==null) throw new RuntimeException("Index Operation not enabled");
         mIndex.remove(index);
     }

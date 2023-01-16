@@ -551,14 +551,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
             ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
-            clusterStore.index(connection.configurationTypeId(),connection.toBinary());
+            clusterStore.indexSet(connection.configurationTypeId(),connection.toBinary());
             this.integrationCluster.deployService().onRegisterConnection(connection);
             return;
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
             ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(channelStub.configurationTypeId());
-            clusterStore.index(channelStub.serverId,channelStub.toBinary());
+            clusterStore.indexSet(channelStub.serverId,channelStub.toBinary());
             this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
             return;
         }
@@ -798,8 +798,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
             ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
-            clusterStore.removeIndex(connection.configurationTypeId(),connection.toBinary());
-            clusterStore.removeIndex(connection.serverId());
+            clusterStore.indexRemove(connection.configurationTypeId(),connection.toBinary());
+            clusterStore.indexRemove(connection.serverId());
             this.integrationCluster.deployService().onReleaseConnection(connection);
             return;
         }
