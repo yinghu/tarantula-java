@@ -207,6 +207,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(gameRoom==null) return null;
         return gameRoom.join(systemId,room->{
             ConnectionStub connectionStub = pendingConnections.poll();
+            if(connectionStub==null){
+                logger.warn("no connection->"+typeLobby);
+                return false;
+            }
+            logger.warn("connection->"+connectionStub.serverId());
+            ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connectionStub.serverId());
+            byte[] ret = channelStore.queuePoll();
+            if(ret==null) return false;
+            logger.warn(new String(ret));
             GameChannel gameChannel;
             if(connectionStub==null || (gameChannel=connectionStub.gameChannel())==null) {
                 this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
@@ -314,8 +323,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         ConnectionStub connectionStub = (ConnectionStub)connection;
         //connectionStub.maxCapacity = roomCapacity;
         connectionStub.init();
-        pendingConnections.offer(connectionStub);
+        logger.warn("queued->"+pendingConnections.offer(connectionStub));
         connectionIndex.put(connection.serverId(),connectionStub);
+        logger.warn("Connection->"+connection.serverId()+">>"+typeLobby);
     }
 
     private void tryOnChannel(ChannelStub channelStub){
@@ -345,7 +355,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         onDisConnection(connection.serverId());
     }
     public void onPing(String serverId){
-        logger.warn("Ping from server id->"+serverId);
+        //logger.warn("Ping from server id->"+serverId);
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         if(connectionStub==null) return;
         connectionStub.ping();

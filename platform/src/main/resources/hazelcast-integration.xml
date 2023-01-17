@@ -89,6 +89,7 @@
         <value-collection-type>SET</value-collection-type>
     </multimap>
     <queue name="integration.recoverable.queue.*">
-        <async-backup-count>1</async-backup-count>
+        <max-size>100</max-size>
+        <backup-count>1</backup-count>
     </queue>
 </hazelcast>

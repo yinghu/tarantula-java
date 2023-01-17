@@ -557,8 +557,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
-            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(channelStub.configurationTypeId());
-            clusterStore.indexSet(channelStub.serverId,channelStub.toBinary());
+            log.warn("Server ID->"+channelStub.serverId);
+            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(channelStub.serverId);
+            clusterStore.queueOffer(channelStub.toBinary());
+            //clusterStore.indexSet(channelStub.serverId,channelStub.toBinary());
             this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
             return;
         }

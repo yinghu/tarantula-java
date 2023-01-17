@@ -78,6 +78,7 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         try{
             return vQueue.offer(value,operationTimeout, TimeUnit.SECONDS);
         }catch (Exception ex){
+            ex.printStackTrace();
             return false;
         }
     }
@@ -86,6 +87,7 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         try{
             return vQueue.poll(operationTimeout, TimeUnit.SECONDS);
         }catch (Exception ex){
+            ex.printStackTrace();
             return null;
         }
     }
