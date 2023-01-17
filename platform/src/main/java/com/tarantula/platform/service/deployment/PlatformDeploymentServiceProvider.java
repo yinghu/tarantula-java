@@ -550,18 +550,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
-            clusterStore.indexSet(connection.configurationTypeId(),connection.toBinary());
-            this.integrationCluster.deployService().onRegisterConnection(connection);
+            cListeners.forEach((k,v)->{
+                if(v.typeId().equals(connection.configurationTypeId())) v.onConnection(connection);
+            });
             return;
         }
         if(configurable instanceof Channel){
             ChannelStub channelStub = (ChannelStub)configurable;
-            log.warn("Server ID->"+channelStub.serverId);
-            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(channelStub.serverId);
-            clusterStore.queueOffer(channelStub.toBinary());
-            //clusterStore.indexSet(channelStub.serverId,channelStub.toBinary());
-            this.integrationCluster.deployService().onRegisterChannel(channelStub.configurationTypeId(),channelStub);
+            cListeners.forEach((k,v)->{
+                if(v.typeId().equals(channelStub.configurationTypeId())) v.onChannel(channelStub);
+            });
             return;
         }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
@@ -799,10 +797,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends Configurable> void release(T configurable){
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
-            ClusterProvider.ClusterStore clusterStore = this.integrationCluster.clusterStore(connection.configurationTypeId());
-            clusterStore.indexRemove(connection.configurationTypeId(),connection.toBinary());
-            clusterStore.indexRemove(connection.serverId());
-            this.integrationCluster.deployService().onReleaseConnection(connection);
+            cListeners.forEach((k,v)->{
+                if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
+            });
             return;
         }
         Configurable removed = this.vMap.remove(configurable.distributionKey());

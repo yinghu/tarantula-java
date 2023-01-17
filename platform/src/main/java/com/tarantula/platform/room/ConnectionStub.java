@@ -46,6 +46,7 @@ public class ConnectionStub extends ClientConnection {
         this.properties.put("3",serverId);
         this.properties.put("4",type);
         this.properties.put("5",secured);
+        this.properties.put("6",configurationName);
         return this.properties;
     }
     @Override
@@ -55,6 +56,7 @@ public class ConnectionStub extends ClientConnection {
         this.serverId = (String) properties.get("3");
         this.type = (String) properties.get("4");
         this.secured = (boolean) properties.get("5");
+        this.configurationName = (String) properties.get("6");
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {

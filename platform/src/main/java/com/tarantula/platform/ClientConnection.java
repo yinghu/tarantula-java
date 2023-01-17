@@ -14,6 +14,7 @@ import java.io.IOException;
 public class ClientConnection extends ResponseHeader implements Connection, Portable {
 
     protected String configurationTypeId;
+    protected String configurationName;
     protected String type;
     protected String serverId;
 
@@ -27,6 +28,14 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
 
     public void configurationTypeId(String configurationTypeId) {
         this.configurationTypeId = configurationTypeId;
+    }
+
+    public String configurationName() {
+        return this.configurationName;
+    }
+
+    public void configurationName(String configurationName) {
+        this.configurationName = configurationName;
     }
 
     @Override
@@ -98,6 +107,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         portableWriter.writeUTF("4",host);
         portableWriter.writeInt("5",port);
         portableWriter.writeBoolean("6",secured);
+        portableWriter.writeUTF("7",configurationName);
     }
 
     @Override
@@ -108,6 +118,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.host = portableReader.readUTF("4");
         this.port = portableReader.readInt("5");
         this.secured = portableReader.readBoolean("6");
+        this.configurationName = portableReader.readUTF("7");
     }
 
     @Override

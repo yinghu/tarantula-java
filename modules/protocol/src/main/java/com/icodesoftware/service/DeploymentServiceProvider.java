@@ -109,7 +109,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void onResourceUpdated(String contentUrl,String resourceName);
 
-        boolean onChannelRegistered(String typeId,Channel channel);
         void onConnectionRegistered(String typeId,Connection connection);
         void onConnectionVerified(String typeId,String serverId);
         void onConnectionReleased(String typeId,Connection connection);

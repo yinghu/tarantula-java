@@ -7,7 +7,12 @@ public interface GameServerListener {
 
     String typeId();
     void onConnection(Connection connection);
-    void onPing(String serverId);
     void onDisConnection(Connection connection);
     void onChannel(Channel channel);
+
+    //distributed callbacks
+    void onConnectionReleased(Connection connection);
+    void onConnectionRegistered(Connection connection);
+    void onConnectionVerified(String serverId);
+
 }

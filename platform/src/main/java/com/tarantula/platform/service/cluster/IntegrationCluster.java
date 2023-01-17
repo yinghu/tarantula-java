@@ -303,13 +303,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             if(queue) {
                 vQueue = _cluster.getQueue(DATA_QUEUE_PREFIX + name);
             }
-            return  new IntegrationClusterStore(mIndex,vMap,vQueue,TarantulaContext.operationTimeout);
+            return  new IntegrationClusterStore(this,name,mIndex,vMap,vQueue,TarantulaContext.operationTimeout);
         });
     }
     public ClusterStore clusterStore(String name){
         return clusterStore(name,true,true,true);
     }
 
+    public void closeClusterStore(String name){
+        cMap.remove(name);
+    }
     public ClusterSummary summary(){
         return this.summary;
     }

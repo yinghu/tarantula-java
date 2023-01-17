@@ -22,6 +22,25 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     private ConcurrentHashMap<String,GameRoomRegistry> roomRegistry;
     private ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue;
 
+    private String configurationTypeId;
+    private String configurationName;
+
+    public String configurationTypeId() {
+        return this.configurationTypeId;
+    }
+
+    public void configurationTypeId(String configurationTypeId) {
+        this.configurationTypeId = configurationTypeId;
+    }
+
+    public String configurationName() {
+        return this.configurationName;
+    }
+
+    public void configurationName(String configurationName) {
+        this.configurationName = configurationName;
+    }
+
     public ConfigurableZone(ZoneItem zoneItem){
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
@@ -51,12 +70,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     @Override
     public int capacity() {
         return this.zoneItem.room().capacity();
-    }
-
-
-    @Override
-    public int maxJoinsPerRoom() {
-        return zoneItem.room().capacity();
     }
 
 

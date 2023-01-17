@@ -215,22 +215,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public boolean onChannelRegistered(String typeId, Channel channel) {
-        try{
-            platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onChannel(channel);
-            });
-            return true;
-        }catch (Exception ex){
-            log.error("error on add channel",ex);
-            return false;
-        }
-    }
-
-    @Override
     public void onConnectionRegistered(String typeId, Connection connection) {
         platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onConnection(connection);
+            if(v.typeId().equals(typeId)) v.onConnectionRegistered(connection);
         });
     }
 
@@ -238,7 +225,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     public void onConnectionVerified(String typeId, String serverId) {
         try{
             platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onPing(serverId);
+                if(v.typeId().equals(typeId)) v.onConnectionVerified(serverId);
             });
         }catch (Exception ex){
             log.error("error on ping",ex);
@@ -248,7 +235,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     @Override
     public void onConnectionReleased(String typeId, Connection connection) {
         platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onDisConnection(connection);
+            if(v.typeId().equals(typeId)) v.onConnectionReleased(connection);
         });
     }
 

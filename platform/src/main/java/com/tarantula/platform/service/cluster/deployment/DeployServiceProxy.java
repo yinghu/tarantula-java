@@ -327,18 +327,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean onRegisterChannel(String typeId,Channel channel){
-        NodeEngine nodeEngine = getNodeEngine();
-        RegisterChannelOperation operation = new RegisterChannelOperation(typeId,channel);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(channel.channelId());
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,partitionId);
-        final Future<Boolean> future = builder.invoke();
-        try {
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
-    }
+
     public void onRegisterConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterConnectionOperation operation = new RegisterConnectionOperation(connection.configurationTypeId(),connection);

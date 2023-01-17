@@ -148,9 +148,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().onConfigurableUpdated(key);
     }
 
-    public boolean onRegisterChannel(String typeId,Channel channel){
-        return this.deploymentServiceProvider.distributionCallback().onChannelRegistered(typeId,channel);
-    }
+    //public boolean onRegisterChannel(String typeId,Channel channel){
+        //return this.deploymentServiceProvider.distributionCallback().onChannelRegistered(typeId,channel);
+    //}
     public void onRegisterConnection(String typeId,Connection connection){
         this.deploymentServiceProvider.distributionCallback().onConnectionRegistered(typeId,connection);
     }

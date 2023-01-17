@@ -14,12 +14,19 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
     private final IMap<byte[],byte[]> vMap;
     private final IQueue<byte[]> vQueue;
     private final long operationTimeout;
-
-    public IntegrationClusterStore(MultiMap<String, byte[]> mIndex, IMap<byte[],byte[]> vMap,IQueue<byte[]> vQueue,long operationTimeout){
+    private final IntegrationCluster integrationCluster;
+    private final String name;
+    public IntegrationClusterStore(IntegrationCluster integrationCluster,String name,MultiMap<String, byte[]> mIndex, IMap<byte[],byte[]> vMap,IQueue<byte[]> vQueue,long operationTimeout){
+        this.integrationCluster = integrationCluster;
+        this.name = name;
         this.mIndex = mIndex;
         this.vMap = vMap;
         this.vQueue = vQueue;
         this.operationTimeout = operationTimeout;
+    }
+
+    public String name(){
+        return this.name;
     }
 
     public byte[] mapGet(byte[] key){
@@ -96,9 +103,10 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         clear(true,true,true);
     }
     public void clear(boolean map,boolean index,boolean queue){
-        if(map) vMap.clear();
-        if(index) mIndex.clear();
-        if(queue) vQueue.clear();
+        if(map && vMap != null) vMap.clear();
+        if(index && mIndex != null) mIndex.clear();
+        if(queue && vQueue != null) vQueue.clear();
+        integrationCluster.closeClusterStore(name);
     }
 
 }

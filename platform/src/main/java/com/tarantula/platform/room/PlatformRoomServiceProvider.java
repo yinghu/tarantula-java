@@ -17,6 +17,7 @@ import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.RoomRegistry;
+import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.service.cluster.OneTimeRunner;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -24,9 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.*;
 
 public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,SchedulingTask, ReloadListener {
 
@@ -47,7 +46,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private int roomPoolSizePerZone;
     private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
-    private ConcurrentLinkedDeque<ConnectionStub>  pendingConnections;
+    private ArrayBlockingQueue<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
     private ConcurrentHashMap<String,GameChannelIndex> gameChannelIndex;
 
@@ -81,7 +80,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
         this.gameChannelIndex = new ConcurrentHashMap<>();
-        this.pendingConnections = new ConcurrentLinkedDeque<>();
+        this.pendingConnections = new ArrayBlockingQueue<>(10);
         this.connectionIndex = new ConcurrentHashMap<>();
         this.configuration = serviceContext.configuration(CONFIG);
         this.type = (String) gameCluster.property(GameCluster.MODE);
@@ -101,14 +100,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             ConnectionStub c = new ConnectionStub();
             c.fromBinary(b);
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
-            onConnection(c);
-            Collection<byte[]> cc = clusterStore.indexGet(c.serverId());
-            cc.forEach(bb->{
-                ChannelStub cs = new ChannelStub();
-                cs.fromBinary(bb);
-                cs.serverId = c.serverId();
-                tryOnChannel(cs);
-            });
+            onConnectionRegistered(c);
         });
         logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+roomPoolSizePerZone+"]["+this.type+"]");
     }
@@ -129,12 +121,32 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             gameRoom.distributionKey(roomId);
             return gameRoom;
         }
-        RoomJoinStub roomRegistry = this.distributionRoomService.onRegisterRoom(name,gameZone.distributionKey(),rating);
-        if(!roomRegistry.joined) return null;
-        GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),roomRegistry.roomId,rating.systemId());
-        if(room==null) return null;
-        room.setup(gameZone,rating);
-        return room;
+        try{
+            ConnectionStub connectionStub = pendingConnections.peek();
+            if(connectionStub==null){
+                logger.warn("no connection");
+                return null;
+            }
+            ClusterProvider.ClusterStore cStore = this.clusterProvider.clusterStore(connectionStub.serverId(),false,false,true);
+            byte[] ret = cStore.queuePoll();
+            if(ret != null){
+                logger.warn(new String(ret));
+                //cStore.queueOffer(ret);
+            }
+            else{
+                logger.warn("no channel");
+            }
+            //pendingConnections.offer(connectionStub);
+        }catch (Exception ex){
+            logger.error("err",ex);
+        }
+        return null;
+        //RoomJoinStub roomRegistry = this.distributionRoomService.onRegisterRoom(name,gameZone.distributionKey(),rating);
+        //if(!roomRegistry.joined) return null;
+        //GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),roomRegistry.roomId,rating.systemId());
+        //if(room==null) return null;
+        //room.setup(gameZone,rating);
+        //return room;
     }
     public void leave(Stub stub){
         if(stub.playMode.equals(GameZone.PLAY_MODE_PVE)) {
@@ -211,18 +223,28 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 logger.warn("no connection->"+typeLobby);
                 return false;
             }
+            pendingConnections.offer(connectionStub);
             logger.warn("connection->"+connectionStub.serverId());
-            ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connectionStub.serverId());
-            byte[] ret = channelStore.queuePoll();
-            if(ret==null) return false;
-            logger.warn(new String(ret));
+            CompletableFuture<byte[]> future = CompletableFuture.supplyAsync(()->{
+                ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connectionStub.serverId(),false,false,true);
+                return channelStore.queuePoll();
+            });
+            while (!future.isDone()){
+                try{Thread.sleep(1);}catch (Exception ex){}
+            }
+            try{
+                byte[] ret = future.get();
+                if(ret!=null) logger.warn(new String(ret));
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
             GameChannel gameChannel;
             if(connectionStub==null || (gameChannel=connectionStub.gameChannel())==null) {
                 this.serviceContext.schedule(new OneTimeRunner(100,()->this.distributionRoomService.release(name,gameRoom.index(),roomId,systemId)));
                 return false;
             }
             gameRoom.channel(gameChannel);
-            pendingConnections.offer(connectionStub);
+            //pendingConnections.offer(connectionStub);
             return true;
         });
 
@@ -264,6 +286,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public <T extends Configurable> void register(T t) {
+        logger.warn(t.configurationTypeId()+"/"+t.configurationName());
         GameZone gameZone = (GameZone)t;
         String zkey = t.distributionKey();
         GameZoneIndex clusterIndex = this.distributionRoomService.localManaged(zkey);
@@ -300,10 +323,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         pendingConnections.remove(connectionStub);
         connectionStub.close();
         Collection<byte[]> _cb = clusterStore.indexGet(typeLobby);
-        Collection<byte[]> _cc = clusterStore.indexGet(serverId);
-        logger.warn("cb->"+_cb.size()+">>cc->"+_cc.size()+">>>"+gameChannelIndex.size());
-        //clusterProvider.removeIndex(typeLobby,connectionStub.toBinary());
-        //clusterProvider.removeIndex(serverId);
+        logger.warn("cb->"+_cb.size()+">>"+gameChannelIndex.size());
         ArrayList<String> removed = new ArrayList<>();
         gameChannelIndex.forEach((k,v)->{
             if(v.serverId.equals(serverId)){
@@ -320,45 +340,44 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onConnection(Connection connection) {
-        ConnectionStub connectionStub = (ConnectionStub)connection;
-        //connectionStub.maxCapacity = roomCapacity;
-        connectionStub.init();
-        logger.warn("queued->"+pendingConnections.offer(connectionStub));
-        connectionIndex.put(connection.serverId(),connectionStub);
-        logger.warn("Connection->"+connection.serverId()+">>"+typeLobby);
+        clusterStore.indexSet(typeLobby,connection.toBinary());
+        this.clusterProvider.deployService().onRegisterConnection(connection);
     }
 
-    private void tryOnChannel(ChannelStub channelStub){
-        GameChannelIndex index = distributionRoomService.localManaged(channelStub.channelId());
-        if(!index.localManaged) {
-            index.channelStub = channelStub;
-            index.serverId = channelStub.serverId;
-            gameChannelIndex.put(index.toString(),index);
-            return;
-        }
-        onChannel(channelStub);
-    }
 
     @Override
     public void onChannel(Channel channel) {
         ChannelStub channelStub = (ChannelStub)channel;
-        String serverId = channelStub.serverId;
-        ConnectionStub connectionStub = connectionIndex.get(serverId);
-        connectionStub.addChannel(channelStub);
-        GameChannelIndex index = distributionRoomService.localManaged(channelStub.channelId());
-        index.channelStub = channelStub;
-        index.serverId = serverId;
-        gameChannelIndex.put(index.toString(),index);
-        logger.warn("on channel->"+index);
+        ConnectionStub connectionStub = connectionIndex.get(channelStub.serverId);
+        logger.warn(connectionStub.configurationTypeId()+"/"+connectionStub.configurationName());
+        gameZoneIndex.forEach((k,v)->{
+            logger.warn(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName()+"//"+v.gameZone.capacity());
+        });
+        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(channelStub.serverId,false,false,true);
+        channelStore.queueOffer(channelStub.toBinary());
     }
     public void onDisConnection(Connection connection){
-        onDisConnection(connection.serverId());
+        clusterStore.indexRemove(typeLobby,connection.toBinary());
+        this.clusterProvider.deployService().onReleaseConnection(connection);
+        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connection.serverId(),false,false,true);
+        channelStore.clear();
     }
-    public void onPing(String serverId){
-        //logger.warn("Ping from server id->"+serverId);
+
+    public void onConnectionVerified(String serverId){
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         if(connectionStub==null) return;
         connectionStub.ping();
+    }
+    @Override
+    public void onConnectionRegistered(Connection connection) {
+        ConnectionStub connectionStub = (ConnectionStub)connection;
+        connectionStub.init();
+        pendingConnections.offer(connectionStub);
+        connectionIndex.put(connection.serverId(),connectionStub);
+        logger.warn("Connection->"+connection.serverId()+">>"+typeLobby);
+    }
+    public void onConnectionReleased(Connection connection){
+        onDisConnection(connection.serverId());
     }
     @Override
     public boolean oneTime() {

@@ -16,6 +16,9 @@ public class ConnectionDeserializer implements JsonDeserializer<ConnectionStub> 
     }
     private ConnectionStub toConnection(JsonObject jo){
         ConnectionStub desc = new ConnectionStub();
+        if(jo.has("configurationName")){
+            desc.configurationName(jo.get("configurationName").getAsString());
+        }
         if(jo.has("type")){
             desc.type(jo.get("type").getAsString());
         }

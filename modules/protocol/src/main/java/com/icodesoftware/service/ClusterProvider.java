@@ -39,6 +39,7 @@ public interface ClusterProvider extends ServiceProvider {
     interface ClusterStore{
 
         //map operations
+        String name();
         byte[] mapGet(byte[] key);
         byte[] mapCreateIfAbsent(byte[] key,byte[] pending);
         void mapSet(byte[] key,byte[] value);

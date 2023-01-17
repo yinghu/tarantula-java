@@ -30,7 +30,7 @@ public interface DeployService extends ServiceProvider {
 
     boolean onUpdateConfigurable(String key);
 
-    boolean onRegisterChannel(String typeId,Channel channel);
+    //boolean onRegisterChannel(String typeId,Channel channel);
     void onVerifyConnection(String typeId,String serverId);
     void onRegisterConnection(Connection connection);
     void onReleaseConnection(Connection connection);
