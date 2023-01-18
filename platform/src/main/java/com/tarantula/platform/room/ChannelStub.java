@@ -1,29 +1,23 @@
 package com.tarantula.platform.room;
 
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-import java.io.IOException;
 import java.util.Map;
 
-public class ChannelStub extends GameChannel implements Portable {
+public class ChannelStub extends GameChannel{
 
     public String serverId;
+    public String roomId;
+    public int totalJoined;
 
     public ChannelStub(){
 
     }
-    public ChannelStub(int channelId,int timeout){
+
+    public ChannelStub(int channelId){
         this.channelId = channelId;
-        this.timeout = timeout;
-    }
-    public ChannelStub(int channelId,String serverId){
-        this.channelId = channelId;
-        this.serverId = serverId;
     }
 
     @Override
@@ -39,32 +33,27 @@ public class ChannelStub extends GameChannel implements Portable {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",channelId);
-        this.properties.put("2",timeout);
+        this.properties.put("2",sessionId);
+        this.properties.put("3",roomId);
+        this.properties.put("4",totalJoined);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.channelId = ((Number)properties.get("1")).intValue();
-        this.timeout = ((Number)properties.get("2")).intValue();
+        this.sessionId = ((Number)properties.get("2")).intValue();
+        this.roomId = (String) properties.get("3");
+        this.totalJoined = ((Number)properties.get("4")).intValue();
     }
-
     @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("1",channelId);
-        portableWriter.writeUTF("2",serverId);
-        portableWriter.writeInt("3",timeout);
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        channelId = portableReader.readInt("1");
-        serverId = portableReader.readUTF("2");
-        timeout = portableReader.readInt("3");
+    public int sessionId(){
+        totalJoined++;
+        return super.sessionId();
     }
 
     @Override
     public String toString(){
-        return "cc->"+channelId+">>>"+timeout;
+        return "ChannelId->"+channelId+"->SessionId->"+sessionId+"->RoomId"+roomId+">>joined->"+totalJoined;
     }
     @Override
     public int hashCode(){
@@ -75,4 +64,5 @@ public class ChannelStub extends GameChannel implements Portable {
         if(!(obj instanceof ChannelStub)) return false;
         return channelId == ((ChannelStub)obj).channelId;
     }
+
 }

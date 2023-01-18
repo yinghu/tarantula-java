@@ -10,6 +10,6 @@ public class ChannelDeserializer implements JsonDeserializer<ChannelStub> {
     @Override
     public ChannelStub deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jo = jsonElement.getAsJsonObject();
-        return new ChannelStub(jo.get("channelId").getAsInt(),jo.get("timeout").getAsInt());
+        return new ChannelStub(jo.get("channelId").getAsInt());
     }
 }

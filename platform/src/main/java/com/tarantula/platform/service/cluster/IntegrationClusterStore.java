@@ -16,6 +16,7 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
     private final long operationTimeout;
     private final IntegrationCluster integrationCluster;
     private final String name;
+
     public IntegrationClusterStore(IntegrationCluster integrationCluster,String name,MultiMap<String, byte[]> mIndex, IMap<byte[],byte[]> vMap,IQueue<byte[]> vQueue,long operationTimeout){
         this.integrationCluster = integrationCluster;
         this.name = name;

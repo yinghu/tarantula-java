@@ -34,6 +34,9 @@ public class ConnectionDeserializer implements JsonDeserializer<ConnectionStub> 
         if(jo.has("port")){
             desc.port(jo.get("port").getAsInt());
         }
+        if(jo.has("timeout")){
+            desc.timeout(jo.get("timeout").getAsInt());
+        }
         return desc;
     }
 }

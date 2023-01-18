@@ -17,6 +17,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     protected String configurationName;
     protected String type;
     protected String serverId;
+    protected int timeout;
 
     protected boolean secured;
     protected String host;
@@ -90,7 +91,12 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
         this.port = port;
     }
 
-
+    public int timeout(){
+        return timeout;
+    }
+    public void timeout(int timeout){
+        this.timeout = timeout;
+    }
 
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -102,23 +108,27 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",configurationTypeId);
-        portableWriter.writeUTF("2",type);
-        portableWriter.writeUTF("3",serverId);
-        portableWriter.writeUTF("4",host);
-        portableWriter.writeInt("5",port);
-        portableWriter.writeBoolean("6",secured);
-        portableWriter.writeUTF("7",configurationName);
+        portableWriter.writeUTF("2",configurationName);
+        portableWriter.writeUTF("3",type);
+        portableWriter.writeUTF("4",serverId);
+        portableWriter.writeUTF("5",host);
+        portableWriter.writeInt("6",port);
+        portableWriter.writeBoolean("7",secured);
+        portableWriter.writeInt("8",timeout);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.configurationTypeId = portableReader.readUTF("1");
-        this.type = portableReader.readUTF("2");
-        this.serverId = portableReader.readUTF("3");
-        this.host = portableReader.readUTF("4");
-        this.port = portableReader.readInt("5");
-        this.secured = portableReader.readBoolean("6");
-        this.configurationName = portableReader.readUTF("7");
+        this.configurationName = portableReader.readUTF("2");
+        this.type = portableReader.readUTF("3");
+        this.serverId = portableReader.readUTF("4");
+        this.host = portableReader.readUTF("5");
+        this.port = portableReader.readInt("6");
+        this.secured = portableReader.readBoolean("7");
+        this.timeout = portableReader.readInt("8");
+
+
     }
 
     @Override

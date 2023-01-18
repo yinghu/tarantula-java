@@ -3,26 +3,23 @@ package com.tarantula.platform.room;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.tarantula.cci.udp.GameChannel;
+
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
-
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ConnectionStub extends ClientConnection {
 
     public byte[] serverKey;
 
-    public ConcurrentLinkedDeque<ChannelStub> channelStubs;
     public int maxCapacity;
-    private AtomicInteger sessionId;
     private AtomicLong pingSequence;
     private long lastPing;
     private int tries;
+
+    private int connectionTimeout;
 
     public ConnectionStub(){
 
@@ -47,6 +44,7 @@ public class ConnectionStub extends ClientConnection {
         this.properties.put("4",type);
         this.properties.put("5",secured);
         this.properties.put("6",configurationName);
+        this.properties.put("7",timeout);
         return this.properties;
     }
     @Override
@@ -57,6 +55,7 @@ public class ConnectionStub extends ClientConnection {
         this.type = (String) properties.get("4");
         this.secured = (boolean) properties.get("5");
         this.configurationName = (String) properties.get("6");
+        this.timeout = ((Number)properties.get("7")).intValue();
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
@@ -69,25 +68,13 @@ public class ConnectionStub extends ClientConnection {
         super.readPortable(portableReader);
         serverKey = portableReader.readByteArray("sk");
     }
-    public void addChannel(ChannelStub channelStub){
-        channelStubs.offer(channelStub);
-    }
+
     public void init(){
-        channelStubs = new ConcurrentLinkedDeque<>();
-        sessionId = new AtomicInteger(1);
-        pingSequence = new AtomicLong(0);
-        lastPing = 0;
+        this.pingSequence = new AtomicLong(0);
+        this.lastPing = 0;
+        this.connectionTimeout = timeout;
     }
-    public boolean removeChannel(ChannelStub channelStub){
-        return channelStubs.remove(channelStub);
-    }
-    public GameChannel gameChannel(){
-        ChannelStub channelStub = channelStubs.poll();
-        return channelStub!=null?new GameChannel(channelStub.channelId(),sessionId.getAndAdd(maxCapacity),clientConnection(),serverKey,channelStub.timeout()):null;
-    }
-    public void close(){
-        channelStubs.clear();
-    }
+
 
     @Override
     public boolean equals(Object obj){
@@ -98,6 +85,7 @@ public class ConnectionStub extends ClientConnection {
     public int hashCode(){
         return serverId.hashCode();
     }
+
     private ClientConnection clientConnection(){
         ClientConnection clientConnection = new ClientConnection();
         clientConnection.host(host);
@@ -109,7 +97,11 @@ public class ConnectionStub extends ClientConnection {
     public void ping(){
         pingSequence.incrementAndGet();
     }
-    public boolean timeout(){
+
+    public boolean onTimeout(int delta){
+        connectionTimeout -= delta;
+        if(connectionTimeout > 0) return false;
+        connectionTimeout = timeout;
         long ping;
         if((ping = pingSequence.get()) - lastPing > 0){
             lastPing = ping;

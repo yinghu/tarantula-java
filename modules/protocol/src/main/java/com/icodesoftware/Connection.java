@@ -8,6 +8,9 @@ public interface Connection extends Configurable {
     String type();
     void type(String type);
 
+    int timeout();
+    void timeout(int timeout);
+
     String serverId();
     void serverId(String serverId);
 

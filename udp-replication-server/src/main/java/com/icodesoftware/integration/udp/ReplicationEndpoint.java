@@ -84,6 +84,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         headers[3]=serverId;
         headers[5]="onStart";
         connection.addProperty("serverId",serverId);
+        connection.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
         logger.warn(resp);
         JsonObject jo = JsonUtil.parse(resp);
@@ -93,7 +94,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         for(int i=1;i<=maxChannelSize;i++){
             JsonObject channel = new JsonObject();
             channel.addProperty("channelId",i);
-            channel.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
+            //channel.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
             ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
             activeChannelIndex.put(i,activeChannel);
             headers[5]="onChannel";
