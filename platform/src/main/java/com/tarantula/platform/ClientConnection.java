@@ -135,7 +135,7 @@ public class ClientConnection extends ResponseHeader implements Connection, Port
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Type",type);
-        jsonObject.addProperty("ServerId",serverId);
+        //jsonObject.addProperty("ServerId",serverId);
         jsonObject.addProperty("Secured",secured);
         jsonObject.addProperty("Host",host);
         jsonObject.addProperty("Port",port);

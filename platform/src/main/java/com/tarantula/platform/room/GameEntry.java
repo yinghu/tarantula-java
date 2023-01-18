@@ -64,9 +64,9 @@ public class GameEntry extends RecoverableObject implements Configurable, Portab
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("systemId",systemId);
-        jsonObject.addProperty("seat",seatIndex+1);
-        jsonObject.addProperty("occupied",occupied);
+        jsonObject.addProperty("SystemId",systemId);
+        jsonObject.addProperty("Seat",seatIndex+1);
+        jsonObject.addProperty("Occupied",occupied);
         return jsonObject;
     }
 }

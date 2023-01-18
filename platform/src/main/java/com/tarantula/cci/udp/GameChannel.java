@@ -48,7 +48,7 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
 
     @Override
     public int sessionId() {
-        return sessionId++;
+        return sessionId;
     }
 
     public int timeout(){

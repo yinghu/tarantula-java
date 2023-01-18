@@ -86,12 +86,13 @@ public class ConnectionStub extends ClientConnection {
         return serverId.hashCode();
     }
 
-    private ClientConnection clientConnection(){
+    public ClientConnection clientConnection(){
         ClientConnection clientConnection = new ClientConnection();
         clientConnection.host(host);
         clientConnection.port(port);
         clientConnection.type(type);
         clientConnection.secured(secured);
+        clientConnection.timeout(timeout);
         return clientConnection;
     }
     public void ping(){

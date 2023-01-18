@@ -551,7 +551,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(configurable instanceof Connection){
             Connection connection = (Connection)configurable;
             cListeners.forEach((k,v)->{
-                if(v.typeId().equals(connection.configurationTypeId())) v.onConnection(connection);
+                if(v.typeId().equals(connection.configurationTypeId())){
+                    if(!v.onConnection(connection)) throw new RuntimeException("lobby not existed");
+                }
             });
             return;
         }

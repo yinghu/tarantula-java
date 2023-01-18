@@ -28,14 +28,11 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1",r->true);
-        room.join("player1",r->true);
-        room.join("player1",r->true);
-        room.join("player1",r->true);
-        room.leave("player1",(r)->{
-            Assert.assertEquals(true,r.resetIfEmpty());
-            return true;
-        });
+        room.join("player1");
+        room.join("player1");
+        room.join("player1");
+        room.join("player1");
+        room.leave("player1");
     }
 
     @Test(groups = { "GameRoom" })
@@ -43,27 +40,15 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1",r->true);
-        room.join("player2",r->true);
-        room.join("player3",r->true);
-        room.join("player4",r->true);
+        room.join("player1");
+        room.join("player2");
+        room.join("player3");
+        room.join("player4");
 
-        room.leave("player1",(r)->{
-            Assert.assertEquals(false,r.resetIfEmpty());
-            return false;
-        });
-        room.leave("player2",(r)->{
-            Assert.assertEquals(false,r.resetIfEmpty());
-            return false;
-        });
-        room.leave("player3",(r)->{
-            Assert.assertEquals(false,r.resetIfEmpty());
-            return false;
-        });
-        room.leave("player4",(r)->{
-            Assert.assertEquals(true,r.resetIfEmpty());
-            return false;
-        });
+        room.leave("player1");
+        room.leave("player2");
+        room.leave("player3");
+        room.leave("player4");
         /**
         Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
         Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));

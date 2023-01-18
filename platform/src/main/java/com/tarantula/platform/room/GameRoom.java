@@ -24,10 +24,10 @@ public interface GameRoom extends Configurable {
 
     void setup(GameZone gameZone, Rating rating);
 
-    GameRoom join(String systemId,RoomListener roomListener);
+    GameRoom join(String systemId);
     GameRoom view();
-    void leave(String systemId,RoomListener roomListener);
-    boolean resetIfEmpty();
+    void leave(String systemId);
+    //boolean resetIfEmpty();
 
     Channel channel();
     void channel(Channel channel);
@@ -35,9 +35,6 @@ public interface GameRoom extends Configurable {
     void load();
     String[] joined();
 
-    interface RoomListener{
-        boolean onRoom(GameRoom gameRoom);
-    }
 
     interface RoomRegistryListener{
         boolean onRegistry(GameRoomRegistry gameRoomRegistry);

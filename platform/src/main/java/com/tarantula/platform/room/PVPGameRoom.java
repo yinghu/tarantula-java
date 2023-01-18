@@ -1,6 +1,7 @@
 package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
+import com.icodesoftware.Channel;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.util.HashMap;
@@ -26,15 +27,18 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         return PortableEventRegistry.PVP_ROOM_CID;
     }
 
-
-    public synchronized GameRoom join(String systemId,RoomListener roomListener){
+    @Override
+    public void channel(Channel channel){
+        this.connection = channel.connection();
+        this.channelId = channel.channelId();
+        this.sessionId = channel.sessionId();
+        this.serverKey = channel.serverKey();
+        this.timeout = channel.connection().timeout();
+    }
+    public synchronized GameRoom join(String systemId){
         if(joinIndex.containsKey(systemId)) {
-            if(channel==null && !roomListener.onRoom(this)) return null;
             return duplicate();
         };
-        if(channel==null){
-            if(!roomListener.onRoom(this)) return null;
-        }
         for(int i=0;i<capacity;i++){
             GameEntry e = entries[i];
             if(e!=null&&e.occupied) continue;
@@ -53,13 +57,12 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
         }
         return duplicate();
     }
-    public synchronized void leave(String systemId,RoomListener roomListener){
+    public synchronized void leave(String systemId){
         GameEntry rm = joinIndex.remove(systemId);
         if(rm!=null){
             rm.occupied = false;
             this.dataStore.update(rm);
         }
-        roomListener.onRoom(this);
     }
     public synchronized GameRoom view(){
         PVPGameRoom _room = new PVPGameRoom();

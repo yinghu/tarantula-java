@@ -6,7 +6,7 @@ import com.icodesoftware.Connection;
 public interface GameServerListener {
 
     String typeId();
-    void onConnection(Connection connection);
+    boolean onConnection(Connection connection);
     void onDisConnection(Connection connection);
     void onChannel(Channel channel);
 

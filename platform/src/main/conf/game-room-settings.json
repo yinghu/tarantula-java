@@ -1,14 +1,22 @@
 {
   "pve": {
-    "roomPoolSizePerZone": 10
+    "connectionCheckEnabled": false,
+    "roomPoolSizePerZone": 10,
+    "connectionCheckInterval": 1000
   },
   "pvp": {
-    "roomPoolSizePerZone": 10
+    "connectionCheckEnabled": true,
+    "roomPoolSizePerZone": 10,
+    "connectionCheckInterval": 1000
   },
   "tve": {
-    "roomPoolSizePerZone": 10
+    "connectionCheckEnabled": false,
+    "roomPoolSizePerZone": 10,
+    "connectionCheckInterval": 1000
   },
   "tvt": {
-    "roomPoolSizePerZone": 10
+    "connectionCheckEnabled": false,
+    "roomPoolSizePerZone": 10,
+    "connectionCheckInterval": 1000
   }
 }

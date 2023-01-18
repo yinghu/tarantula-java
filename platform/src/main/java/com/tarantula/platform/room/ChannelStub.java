@@ -1,6 +1,8 @@
 package com.tarantula.platform.room;
 
 
+import com.icodesoftware.Channel;
+import com.icodesoftware.Connection;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -48,7 +50,7 @@ public class ChannelStub extends GameChannel{
     @Override
     public int sessionId(){
         totalJoined++;
-        return super.sessionId();
+        return sessionId++;
     }
 
     @Override
@@ -63,6 +65,10 @@ public class ChannelStub extends GameChannel{
     public boolean equals(Object obj){
         if(!(obj instanceof ChannelStub)) return false;
         return channelId == ((ChannelStub)obj).channelId;
+    }
+
+    public Channel toChannel(Connection connection,byte[] key,int timeout){
+        return new GameChannel(channelId,sessionId,connection,key,timeout);
     }
 
 }

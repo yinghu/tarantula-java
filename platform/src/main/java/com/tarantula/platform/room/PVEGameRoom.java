@@ -22,10 +22,10 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
 
 
 
-    public synchronized PVEGameRoom join(String systemId,RoomListener roomListener){
+    public synchronized PVEGameRoom join(String systemId){
         return this;
     }
-    public synchronized void leave(String systemId,RoomListener roomListener){
+    public synchronized void leave(String systemId){
 
     }
     public synchronized GameRoom view(){
