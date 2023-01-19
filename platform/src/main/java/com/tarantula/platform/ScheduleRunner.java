@@ -1,12 +1,13 @@
-package com.tarantula.platform.service.cluster;
+package com.tarantula.platform;
 
 import com.icodesoftware.SchedulingTask;
 
-public class OneTimeRunner implements SchedulingTask {
+public class ScheduleRunner implements SchedulingTask {
 
     private final Runnable runnable;
     private final long delay;
-    public OneTimeRunner(long delay,Runnable runnable){
+
+    public ScheduleRunner(long delay, Runnable runnable){
         this.delay = delay;
         this.runnable = runnable;
     }

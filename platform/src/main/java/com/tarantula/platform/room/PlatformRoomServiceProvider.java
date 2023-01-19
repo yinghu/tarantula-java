@@ -14,13 +14,14 @@ import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.ScheduleRunner;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.*;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,SchedulingTask, ReloadListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -30,46 +31,46 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
-    private final GameServiceProvider gameServiceProvider;
+
     private ServiceContext serviceContext;
     private ClusterProvider clusterProvider;
     private DistributionRoomService distributionRoomService;
 
+    private ClusterProvider.ClusterStore clusterStore;
     private DataStore dataStore;
-    private Configuration configuration;
-    //private int roomPoolSizePerZone;
+
     private ConcurrentHashMap<String,GameZone> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
     private ArrayBlockingQueue<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
 
-    private String type;
+    private String playMode;
+    private String typeLobby;
+
     private String registerKey;
     private String reloadKey;
-    private String typeLobby;
+
+    private int roomPoolSizePerZone;
     private boolean dedicated;
 
-    private ClusterProvider.ClusterStore clusterStore;
     ArrayList<String> kickoff = new ArrayList<>();
-
     private boolean timerEnabled = false;
     private int timer = 1000;
+    private SchedulingTask schedulingTask;
 
     public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
+        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.playMode = (String) gameCluster.property(GameCluster.MODE);
         this.dedicated = (boolean)gameCluster.property(GameCluster.DEDICATED);
-        this.gameServiceProvider = gameServiceProvider;
     }
 
     @Override
     public String name() {
         return NAME;
     }
-    @Override
-    public void waitForData(){
-        //pull connection
-    }
+    
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
@@ -80,15 +81,20 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.gameRoomIndex = new ConcurrentHashMap<>();
         this.pendingConnections = new ArrayBlockingQueue<>(10);
         this.connectionIndex = new ConcurrentHashMap<>();
-        this.configuration = serviceContext.configuration(CONFIG);
-        this.type = (String) gameCluster.property(GameCluster.MODE);
-        JsonObject jsonObject = ((JsonElement)configuration.property(type)).getAsJsonObject();
+        Configuration configuration = serviceContext.configuration(CONFIG);
+        JsonObject jsonObject = ((JsonElement)configuration.property(playMode)).getAsJsonObject();
+        this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
         this.timerEnabled = jsonObject.get("connectionCheckEnabled").getAsBoolean();
         this.timer = jsonObject.get("connectionCheckInterval").getAsInt();
-        this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
         this.reloadKey = this.clusterProvider.registerReloadListener(this);
-        if(timerEnabled) this.serviceContext.schedule(this);
+        if(timerEnabled) {
+            this.schedulingTask = new ScheduleRunner(timer,()->{
+                onSchedule();
+                this.serviceContext.schedule(this.schedulingTask);
+            });
+            this.serviceContext.schedule(schedulingTask);
+        }
         this.clusterStore = this.serviceContext.clusterProvider().clusterStore(typeLobby);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
@@ -101,7 +107,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
             onConnectionRegistered(c);
         });
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+this.type+"]["+dedicated+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+roomPoolSizePerZone+"]");
     }
 
     @Override
@@ -111,50 +117,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public GameRoom join(GameZone gameZone, Rating rating){
-        if(gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)){
-            String roomId = serviceContext.node().bucketName()+"/"+ SystemUtil.oid();
-            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
-            gameRoom.join(rating.systemId());
-            gameRoom.setup(gameZone,rating);
-            gameRoom.distributionKey(roomId);
-            return gameRoom;
-        }
-        ConnectionStub connectionStub = pendingConnections.poll();
-        if(connectionStub==null){
-            logger.warn("no game server connection for ["+gameZone.configurationTypeId()+"/"+gameZone.configurationName()+"]");
-            return null;
-        }
-        pendingConnections.offer(connectionStub);
-        ClusterProvider.ClusterStore cStore = this.clusterProvider.clusterStore(connectionStub.serverId(),false,false,true);
-        byte[] ret = cStore.queuePoll();
-        if(ret == null){
-            logger.warn("no channel available for connection ["+connectionStub.serverId()+"]");
-            return null;
-        }
-        ChannelStub channelStub = new ChannelStub();
-        channelStub.fromBinary(ret);
-        channelStub.sessionId();
-        GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),channelStub.roomId,rating.systemId());
-        room.distributionKey(channelStub.roomId);
-        room.channel(channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout()));
-        room.setup(gameZone,rating);
-        if(channelStub.totalJoined == gameZone.capacity()){
-            logger.warn(channelStub.toString());
-        }
-        else{
-            cStore.queueOffer(channelStub.toBinary());
-        }
-        return room;
-
+        return dedicated?remoteJoin(gameZone,rating):localJoin(gameZone,rating);
     }
     public void leave(Stub stub){
-        if(stub.playMode.equals(GameZone.PLAY_MODE_PVE)) {
-            GameRoom gameRoom = gameRoomIndex.remove(stub.roomId);
-            if(gameRoom==null) return;
-            gameRoom.leave(stub.systemId());
+        if(dedicated){
+            this.distributionRoomService.onLeaveRoom(name,stub.roomId,stub.systemId());
             return;
         }
-        this.distributionRoomService.onLeaveRoom(name,stub.roomId,stub.systemId());
+        GameRoom gameRoom = gameRoomIndex.remove(stub.roomId);
+        if(gameRoom==null) return;
+        gameRoom.leave(stub.systemId());
     }
 
     public GameRoom onRoomViewed(String zoneId,String roomId){
@@ -200,14 +172,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
 
-    private void onDisConnection(String serverId){
-        ConnectionStub connectionStub = connectionIndex.remove(serverId);
-        if(connectionStub==null) return;
-        pendingConnections.remove(connectionStub);
-        Collection<byte[]> _cb = clusterStore.indexGet(typeLobby);
-        logger.warn("cb->"+_cb.size()+">>");
-    }
-
     @Override
     public String typeId() {
         return this.typeLobby;
@@ -226,7 +190,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.clusterProvider.deployService().onRegisterConnection(connection);
         return true;
     }
-
 
     @Override
     public void onChannel(Channel channel) {
@@ -257,6 +220,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(connectionStub==null) return;
         connectionStub.ping();
     }
+
     @Override
     public void onConnectionRegistered(Connection connection) {
         ConnectionStub connectionStub = (ConnectionStub)connection;
@@ -265,26 +229,25 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         connectionIndex.put(connection.serverId(),connectionStub);
         logger.warn("Connection->"+connection.serverId()+">>"+typeLobby+">>"+connection.timeout());
     }
+
     public void onConnectionReleased(Connection connection){
         onDisConnection(connection.serverId());
     }
-    @Override
-    public boolean oneTime() {
-        return true;
-    }
 
     @Override
-    public long initialDelay() {
-        return timer;
+    public void reload(int partition, boolean localMember) {
+        gameRoomIndex.clear();
     }
 
-    @Override
-    public long delay() {
-        return 0;
+    private void onDisConnection(String serverId){
+        ConnectionStub connectionStub = connectionIndex.remove(serverId);
+        if(connectionStub==null) return;
+        pendingConnections.remove(connectionStub);
+        Collection<byte[]> _cb = clusterStore.indexGet(typeLobby);
+        logger.warn("cb->"+_cb.size()+">>");
     }
 
-    @Override
-    public void run() {
+    private void onSchedule() {
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);
@@ -293,8 +256,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Connection kickoff->"+k);
             onDisConnection(k);
         });
-        this.serviceContext.schedule(this);
     }
+
     private GameRoom createGameRoom(String type,int roomCapacity){
         GameRoom gameRoom = null;
         switch (type){
@@ -314,8 +277,45 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameRoom;
     }
 
-    @Override
-    public void reload(int partition, boolean localMember) {
-        gameRoomIndex.clear();
+    private GameRoom localJoin(GameZone gameZone, Rating rating){
+        if(gameZone.playMode().equals(GameZone.PLAY_MODE_PVE)){
+            String roomId = serviceContext.node().bucketName()+"/"+ SystemUtil.oid();
+            GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
+            gameRoom.join(rating.systemId());
+            gameRoom.setup(gameZone,rating);
+            gameRoom.distributionKey(roomId);
+            return gameRoom;
+        }
+        return null;
     }
+
+    private GameRoom remoteJoin(GameZone gameZone, Rating rating){
+        ConnectionStub connectionStub = pendingConnections.poll();
+        if(connectionStub==null){
+            logger.warn("no game server connection for ["+gameZone.configurationTypeId()+"/"+gameZone.configurationName()+"]");
+            return null;
+        }
+        pendingConnections.offer(connectionStub);
+        ClusterProvider.ClusterStore cStore = this.clusterProvider.clusterStore(connectionStub.serverId(),false,false,true);
+        byte[] ret = cStore.queuePoll();
+        if(ret == null){
+            logger.warn("no channel available for connection ["+connectionStub.serverId()+"]");
+            return null;
+        }
+        ChannelStub channelStub = new ChannelStub();
+        channelStub.fromBinary(ret);
+        channelStub.sessionId();
+        GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),channelStub.roomId,rating.systemId());
+        room.distributionKey(channelStub.roomId);
+        room.channel(channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout()));
+        room.setup(gameZone,rating);
+        if(channelStub.totalJoined == gameZone.capacity()){
+            logger.warn(channelStub.toString());
+        }
+        else{
+            cStore.queueOffer(channelStub.toBinary());
+        }
+        return room;
+    }
+
 }

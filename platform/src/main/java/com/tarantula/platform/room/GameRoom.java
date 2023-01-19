@@ -27,7 +27,6 @@ public interface GameRoom extends Configurable {
     GameRoom join(String systemId);
     GameRoom view();
     void leave(String systemId);
-    //boolean resetIfEmpty();
 
     Channel channel();
     void channel(Channel channel);
