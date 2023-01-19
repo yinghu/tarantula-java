@@ -35,8 +35,4 @@ public interface GameRoom extends Configurable {
     void load();
     String[] joined();
 
-
-    interface RoomRegistryListener{
-        boolean onRegistry(GameRoomRegistry gameRoomRegistry);
-    }
 }

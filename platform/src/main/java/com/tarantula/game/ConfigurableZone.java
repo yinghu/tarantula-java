@@ -6,12 +6,11 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.ZoneItem;
-import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
+
 
 public class ConfigurableZone extends RecoverableObject implements GameZone {
 
@@ -19,8 +18,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     private RoomProxy roomProxy;
     private List<Arena> arenaList;
     private ConcurrentHashMap<Integer,Arena> arenaIndex;
-    private ConcurrentHashMap<String,GameRoomRegistry> roomRegistry;
-    private ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue;
 
     private String configurationTypeId;
     private String configurationName;
@@ -50,8 +47,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
             arenaIndex.put(a.level(),arena);
             arenaList.add(arena);
         });
-        this.roomRegistry = new ConcurrentHashMap<>();
-        this.roomRegistryQueue = new ConcurrentLinkedDeque<>();
     }
 
     @Override
@@ -145,16 +140,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     }
 
-    @Override
-    public ConcurrentHashMap<String, GameRoomRegistry> roomRegistry() {
-        return this.roomRegistry;
-    }
-
-
-    @Override
-    public ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue() {
-        return this.roomRegistryQueue;
-    }
 
     public String toString(){
         return zoneItem.name()+">>"+zoneItem.rank()+">>"+zoneItem.playMode();

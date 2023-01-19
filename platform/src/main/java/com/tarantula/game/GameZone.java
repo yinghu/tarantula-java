@@ -2,11 +2,8 @@ package com.tarantula.game;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.tarantula.platform.room.GameRoomRegistry;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 public interface GameZone extends Configurable{
 
@@ -36,9 +33,6 @@ public interface GameZone extends Configurable{
     DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);
     void close();
-
-    ConcurrentHashMap<String,GameRoomRegistry> roomRegistry();
-    ConcurrentLinkedDeque<GameRoomRegistry> roomRegistryQueue();
 
     interface RoomProxy{
         Stub join(Session session,Rating rating);

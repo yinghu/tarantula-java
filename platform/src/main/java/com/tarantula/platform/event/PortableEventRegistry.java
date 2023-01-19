@@ -63,11 +63,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TOURNAMENT_RACE_BOARD_CID = 116;
 
-    public static final int GAME_ROOM_REGISTRY_CID = 117;
 
     public static final int GAME_ENTRY_CID = 118;
 
-    public static final int ROOM_JOIN_STUB = 119;
 
     public static final int PVE_ROOM_CID = 120;
     public static final int PVP_ROOM_CID = 121;
@@ -145,15 +143,11 @@ public class PortableEventRegistry implements PortableFactory {
             case TOURNAMENT_RACE_BOARD_CID:
                 _ins = new TournamentRaceBoard();
                 break;
-            case GAME_ROOM_REGISTRY_CID:
-                _ins = new GameRoomRegistry();
-                break;
+
             case GAME_ENTRY_CID:
                 _ins = new GameEntry();
                 break;
-            case ROOM_JOIN_STUB:
-                _ins = new RoomJoinStub();
-                break;
+
             case PVE_ROOM_CID:
                 _ins = new PVEGameRoom();
                 break;

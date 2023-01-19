@@ -21,7 +21,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
     public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
 
-    public static final int GAME_ROOM_REGISTRY_CID = PortableEventRegistry.GAME_ROOM_REGISTRY_CID;
     public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
 
     @Override
@@ -55,9 +54,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
                 break;
-            case GAME_ROOM_REGISTRY_CID:
-                pt = new GameRoomRegistry();
-                break;
+
             case GAME_ENTRY_CID:
                 pt = new GameEntry();
                 break;

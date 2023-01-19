@@ -7,10 +7,9 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.game.Rating;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.room.RoomJoinStub;
+
 
 import java.util.Properties;
 
@@ -48,20 +47,6 @@ public class RoomClusterService implements ManagedService, RemoteService {
 
     }
 
-    public RoomJoinStub register(String serviceName, String zoneId, Rating rating){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        return gameServiceProvider.roomServiceProvider().onRoomRegistered(zoneId,rating);
-    }
-
-    public void release(String serviceName,String zoneId,String roomId,String systemId){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.roomServiceProvider().onRelease(zoneId,roomId,systemId);
-    }
-    public void sync(String serviceName,String zoneId,String roomId,String[] joined){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.roomServiceProvider().onSync(zoneId,roomId,joined);
-    }
-
     public GameRoom view(String serviceName,String zoneId, String roomId){
         GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
         return gameServiceProvider.roomServiceProvider().onRoomViewed(zoneId,roomId);
@@ -77,8 +62,4 @@ public class RoomClusterService implements ManagedService, RemoteService {
         gameServiceProvider.roomServiceProvider().onRoomLeft(roomId,systemId);
     }
 
-    public void load(String serviceName,String zoneId,String roomId){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.roomServiceProvider().onRoomLoaded(zoneId,roomId);
-    }
 }

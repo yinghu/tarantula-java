@@ -1,23 +1,15 @@
 package com.tarantula.platform.room;
 
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.Rating;
 
 public interface DistributionRoomService extends ServiceProvider {
 
     String NAME = "DistributionRoomService";
 
-    RoomJoinStub onRegisterRoom(String serviceName,String zoneId,Rating rating);
     GameRoom onJoinRoom(String serviceName, String zoneId,String roomId, String systemId);
     void onLeaveRoom(String serviceName,String roomId,String systemId);
 
-    void onLoadRoom(String serviceName,String zoneId,String roomId);
-
-    void release(String serviceName,String zoneId,String roomId,String systemId);
-    void sync(String serviceName,String zoneId,String roomId,String[] joined);
     GameRoom onRoomView(String serviceName,String zoneId, String roomId);
-    GameZoneIndex localManaged(String key);
-    GameChannelIndex localManaged(int channelId);
 
 
 }

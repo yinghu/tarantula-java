@@ -4,7 +4,6 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.tarantula.platform.room.*;
-import com.tarantula.game.Rating;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.concurrent.Future;
@@ -29,44 +28,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         return DistributionRoomService.NAME;
     }
 
-    @Override
-    public RoomJoinStub onRegisterRoom(String serviceName, String zoneId, Rating rating) {
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
-        RoomRegisterOperation roomRegisterOperation = new RoomRegisterOperation(serviceName,zoneId,rating);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomRegisterOperation,partitionId);
-        final Future<RoomJoinStub> future = builder.invoke();
-        try {
-            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            return null;
-        }
-    }
-    public void release(String serviceName,String zoneId,String roomId,String systemId){
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
-        RoomReleaseOperation roomReleaseOperation = new RoomReleaseOperation(serviceName,zoneId,roomId,systemId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomReleaseOperation,partitionId);
-        final Future<Void> future = builder.invoke();
-        try {
-            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-        }
-    }
-    public void sync(String serviceName,String zoneId,String roomId,String[] joined){
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(zoneId);
-        RoomSyncOperation roomSyncOperation = new RoomSyncOperation(serviceName,zoneId,roomId,joined);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomSyncOperation,partitionId);
-        final Future<Void> future = builder.invoke();
-        try {
-            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-        }
-    }
+
     public GameRoom onRoomView(String serviceName,String zoneId, String roomId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
@@ -107,26 +69,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
-    public void onLoadRoom(String serviceName,String zoneId,String roomId){
-        NodeEngine nodeEngine = getNodeEngine();
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomLoadOperation roomLoadOperation = new RoomLoadOperation(serviceName,zoneId,roomId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLoadOperation,partitionId);
-        final Future<Void> future = builder.invoke();
-        try {
-            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-        }
-    }
-    public GameZoneIndex localManaged(String key){
-        int pid = getNodeEngine().getPartitionService().getPartitionId(key);
-        return new GameZoneIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
-    }
-    public GameChannelIndex localManaged(int channelId){
-        int pid = getNodeEngine().getPartitionService().getPartitionId(channelId);
-        return new GameChannelIndex(pid,getNodeEngine().getPartitionService().getPartition(pid).isLocal());
-    }
+
     @Override
     public String name() {
         return DistributionRoomService.NAME;
