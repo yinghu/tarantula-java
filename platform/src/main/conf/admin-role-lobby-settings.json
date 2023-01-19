@@ -207,9 +207,60 @@
       "configurationVersion": "1.0"
     }
   ],
-  "zone": {
+  "pveZone": {
     "header": {
       "PlayMode": 0,
+      "Name": "zone1",
+      "Rank": "1"
+    },
+    "application": {
+      "Room": [],
+      "ArenaSet": []
+    },
+    "reference": [],
+    "configurationType": "item.lobby",
+    "configurationTypeId": "Zone",
+    "configurationName": "rank1",
+    "configurationCategory": "Zone",
+    "configurationVersion": "1.0"
+  },
+  "pvpZone": {
+    "header": {
+      "PlayMode": 1,
+      "Name": "zone1",
+      "Rank": "1"
+    },
+    "application": {
+      "Room": [],
+      "ArenaSet": []
+    },
+    "reference": [],
+    "configurationType": "item.lobby",
+    "configurationTypeId": "Zone",
+    "configurationName": "rank1",
+    "configurationCategory": "Zone",
+    "configurationVersion": "1.0"
+  },
+  "tveZone": {
+    "header": {
+      "PlayMode": 2,
+      "Name": "zone1",
+      "Rank": "1"
+    },
+    "application": {
+      "Room": [],
+      "ArenaSet": []
+    },
+    "reference": [],
+    "configurationType": "item.lobby",
+    "configurationTypeId": "Zone",
+    "configurationName": "rank1",
+    "configurationCategory": "Zone",
+    "configurationVersion": "1.0"
+  },
+  "tvtZone": {
+    "header": {
+      "PlayMode": 3,
       "Name": "zone1",
       "Rank": "1"
     },

@@ -484,7 +484,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         Configuration lobbyConfiguration = this.context.configuration("lobby");
         String mode = (String)gameCluster.property(GameCluster.MODE);
         JsonObject roomPayload = ((JsonElement) lobbyConfiguration.property(mode+"Room")).getAsJsonObject();
-        JsonObject zonePayload = ((JsonElement)lobbyConfiguration.property("zone")).getAsJsonObject();
+        JsonObject zonePayload = ((JsonElement)lobbyConfiguration.property(mode+"Zone")).getAsJsonObject();
         Component room = new Component();
         createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
         //this.context.log(room.distributionKey(), OnLog.WARN);
