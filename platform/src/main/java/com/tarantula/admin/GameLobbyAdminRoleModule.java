@@ -30,7 +30,12 @@ public class GameLobbyAdminRoleModule implements Module {
         }
         else if(session.action().equals("onGameServiceList")){
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(session.name());
-            session.write(toJson(gameCluster.serviceLobby.entryList()));
+            if(gameCluster.serviceLobby!=null) {
+                session.write(toJson(gameCluster.serviceLobby.entryList()));
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"game cluster not launched").getBytes());
+            }
         }
         else if (session.action().equals("onAddLobby")){
             String[] query = session.name().split("#");
