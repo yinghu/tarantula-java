@@ -94,6 +94,7 @@ public class AdminRoleModule implements Module{
             session.write(new PermissionContext(keys).toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateGameCluster")){
+            //this.context.log(new String(payload),OnLog.WARN);
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String pendingName = (String)onAccess.property("name");
             if(!checkGameClusterName(pendingName)){
@@ -103,7 +104,7 @@ public class AdminRoleModule implements Module{
                 Access ua = _user(session.systemId());
                 Account acc = userService.loadAccount(ua);
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
-                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,(String) onAccess.property("playMode"),(boolean)onAccess.property("tournamentEnabled"));
+                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,onAccess);
                     if(gc.successful()){
                         IndexSet idx = this.userService.loadGameClusterIndex(ua);
                         idx.addKey(gc.distributionKey());

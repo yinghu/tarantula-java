@@ -30,13 +30,16 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String GAME_SERVICE = "4";
     public final static String GAME_DATA = "5";
     public final static String OWNER = "6";
-    public final static String ACCESS_KEY = "7";
-    public final static String TIMESTAMP = "8";
+    //public final static String ACCESS_KEY = "7";
+    //public final static String TIMESTAMP = "8";
     public final static String DISABLED = "9";
     public final static String PUBLISHING_ID = "10";
     public final static String TOURNAMENT_ENABLED = "11";
     public final static String LOBBY_PRE_SETUP_NAME ="12";
-
+    public final static String DEDICATED ="13";
+    public final static String GAME_ICON = "14";
+    public final static String DEVELOPER_ICON = "15";
+    public final static String DEVELOPER = "16";
     public Lobby gameLobby;
     public Lobby serviceLobby;
     public Lobby dataLobby;
@@ -96,8 +99,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         jo.addProperty("gameLobby",(String)property(GameCluster.GAME_LOBBY));
         jo.addProperty("gameService",(String)property(GameCluster.GAME_SERVICE));
         jo.addProperty("gameData",(String)property(GameCluster.GAME_DATA));
-        jo.addProperty("accessKey",(String)property(GameCluster.ACCESS_KEY));
+        jo.addProperty("developer",(String)property(GameCluster.DEVELOPER));
+        jo.addProperty("gameIcon",(String)property(GameCluster.GAME_ICON));
+        jo.addProperty("developerIcon",(String)property(GameCluster.DEVELOPER_ICON));
         jo.addProperty("tournamentEnabled",(Boolean)property(GameCluster.TOURNAMENT_ENABLED));
+        jo.addProperty("dedicated",(Boolean)property(GameCluster.DEDICATED));
         jo.addProperty("disabled",(Boolean)property(GameCluster.DISABLED));
         return jo;
     }

@@ -586,7 +586,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
     }
-    public <T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled){
+
+    public  <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name,0);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
@@ -595,17 +596,27 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return (T)gc;
         }
         String publishingId = accessIndex.distributionKey();
+        String playMode = (String) properties.property("playMode");
+        boolean tournamentEnabled = (boolean)properties.property("tournamentEnabled");
+        boolean dedicated = (boolean)properties.property("dedicated");
+        String gameIcon = (String) properties.property("gameIcon");
+        String developerIcon = (String) properties.property("developerIcon");
+        String developer = (String) properties.property("developer");
+
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.property(GameCluster.NAME,name);
-            gameCluster.property(GameCluster.MODE,mode);
+            gameCluster.property(GameCluster.MODE,playMode);
             gameCluster.property(GameCluster.OWNER,owner);
             gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
-            gameCluster.property(GameCluster.ACCESS_KEY,"pending access key");
-            gameCluster.property(GameCluster.TIMESTAMP,0);
+            gameCluster.property(GameCluster.DEVELOPER,developer);
             gameCluster.property(GameCluster.TOURNAMENT_ENABLED,tournamentEnabled);
             gameCluster.property(GameCluster.DISABLED,true);
+            gameCluster.property(GameCluster.DEDICATED,dedicated);
+            gameCluster.property(GameCluster.GAME_ICON,gameIcon);
+            gameCluster.property(GameCluster.DEVELOPER_ICON,developerIcon);
+
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();

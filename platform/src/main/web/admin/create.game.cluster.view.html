@@ -48,6 +48,8 @@
         <div class="w3-panel">
             <label class="tx-text-12 tx-margin-right-4">Enable Tournament</label>
             <input id='tx-game-cluster-enable-tournament' class="w3-check tx-text-12" type="checkbox">
+            <label class="tx-text-12 tx-margin-right-4">Dedicated Server</label>
+            <input id='tx-game-cluster-dedicated-server' class="w3-check tx-text-12" type="checkbox">
         </div>
         <div class="w3-panel">
             <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
@@ -120,8 +122,10 @@
     document.querySelector('#tx-create-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         let _b = document.querySelector('#tx-game-cluster-enable-tournament').checked;
+        let _d = document.querySelector('#tx-game-cluster-dedicated-server').checked;
         let _gicon = document.querySelector('#tx-game-cluster-logo').value;
         let _dicon = document.querySelector('#tx-game-cluster-developer-logo').value;
+        let _developer = document.querySelector('#tx-game-cluster-developer').value;
         if(_n ==null | _n == ''){
             document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster name cannot be null';
             return;
@@ -138,7 +142,9 @@
         cmd.name = _n;
         cmd.playMode = _mode;
         cmd.tournamentEnabled = _b;
+        cmd.dedicated = _d;
         cmd.gameIcon = _gicon;
+        cmd.developer = _developer;
         cmd.developerIcon = _dicon;
         TARA_API.onService(true,cmd,(resp)=>{
             if(resp.successful){
