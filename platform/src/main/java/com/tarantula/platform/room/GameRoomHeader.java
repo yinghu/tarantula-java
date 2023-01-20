@@ -11,12 +11,9 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
-import com.tarantula.game.service.GameEntryQuery;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
@@ -31,8 +28,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int round;
     protected Arena arena;
 
-    protected HashMap<String,GameEntry> joinIndex;
-    protected GameEntry[] entries;
+    protected HashMap<String,Entry> joinIndex;
+    protected Entry[] entries;
 
     public int channelId(){
         return channelId;
@@ -71,19 +68,27 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return arena;
     }
 
+    @Override
+    public List<Entry> entries(){
+        ArrayList<Entry> list = new ArrayList<>();
+        joinIndex.forEach((k,e)->list.add(e));
+        return list;
+    }
     public GameRoomHeader(int capacity){
         this.capacity = capacity;
     }
 
+    @Override
     public void load(){
-        entries = new GameEntry[capacity];
+        entries = new Entry[capacity];
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
-            entries[ge.seatIndex]=ge;
-            if(ge.occupied) joinIndex.put(ge.systemId,ge);
+            entries[ge.seat()]=ge;
+            if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
             return true;
         });
     }
 
+    @Override
     public void setup(GameZone gameZone,Channel channel, Rating rating){
         this.arena = gameZone.arena(rating.arenaLevel);
         this.capacity = gameZone.capacity();
@@ -125,7 +130,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
         if(entries==null) return jsonObject;
         JsonArray plist = new JsonArray();
-        for(GameEntry ge : entries){
+        for(Entry ge : entries){
             if(ge==null) continue;
             plist.add(ge.toJson());
         }
@@ -143,39 +148,43 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.round = portableReader.readInt("1");
         entries = new GameEntry[portableReader.readInt("2")];
         for(Portable p : portableReader.readPortableArray("3")){
-            GameEntry gameEntry = (GameEntry)p;
-            entries[gameEntry.seatIndex]=gameEntry;
+            Entry gameEntry = (Entry)p;
+            entries[gameEntry.seat()] = gameEntry;
         }
     }
+
     public synchronized GameRoom join(String systemId){
         if(joinIndex.containsKey(systemId)) {
             return view();
         };
         for(int i=0;i<capacity;i++){
-            GameEntry e = entries[i];
-            if(e!=null&&e.occupied) continue;
+            Entry e = entries[i];
+            if(e!=null&&e.occupied()) continue;
             if(e==null){
-                e = new GameEntry(i);
+                e = this.createEntry();
+                e.seat(i);
                 e.owner(this.distributionKey());
                 this.dataStore.create(e);
                 entries[i]=e;
             }
-            e.systemId = systemId;
-            e.occupied = true;
-            e.seatIndex = i;
+            e.systemId(systemId);
+            e.occupied(true);
+            e.seat(i);
             this.dataStore.update(e);
             joinIndex.put(systemId,e);
             break;
         }
         return view();
     }
+
     public synchronized void leave(String systemId){
-        GameEntry rm = joinIndex.remove(systemId);
+        Entry rm = joinIndex.remove(systemId);
         if(rm!=null){
-            rm.occupied = false;
+            rm.occupied(false);
             this.dataStore.update(rm);
         }
     }
+
     public synchronized GameRoom view(){
         GameRoom room = duplicate();
         if(room==null) return this;
@@ -183,7 +192,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         room.oid(this.oid);
         return room;
     }
+
     protected GameRoom duplicate(){
         return null;
+    }
+    protected GameRoom.Entry createEntry(){
+        return new GameEntry();
     }
 }

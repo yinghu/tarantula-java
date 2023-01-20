@@ -91,17 +91,24 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
         this.typeId = jo.get("typeId").getAsString();
+        int channelRegistered =0;
         for(int i=1;i<=maxChannelSize;i++){
             JsonObject channel = new JsonObject();
             channel.addProperty("channelId",i);
             //channel.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
             ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
-            activeChannelIndex.put(i,activeChannel);
             headers[5]="onChannel";
             resp = httpCaller.post(registerPath,activeChannel.payload,headers);
             jo = JsonUtil.parse(resp);
-            if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i,udpEndpointServiceProvider,this,this));
+            if(jo.get("successful").getAsBoolean()) {
+                activeChannelIndex.put(i, activeChannel);
+                udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i, udpEndpointServiceProvider, this, this));
+                channelRegistered++;
+            }
+        }
+        if(channelRegistered==0){
+            shutdown();
+            throw new RuntimeException("channel cannot be registered");
         }
         receiver = new Thread(()->{
                 while (running){
@@ -139,7 +146,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         timer.start();
-        logger.warn("Game server is running on ["+typeId+"] with max channels ["+maxChannelSize+"]");
+        logger.warn("Game server is running on ["+typeId+"] with channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
     @Override

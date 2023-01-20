@@ -14,6 +14,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
 
+
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
 
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;

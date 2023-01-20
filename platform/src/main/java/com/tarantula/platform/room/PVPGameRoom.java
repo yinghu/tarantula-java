@@ -30,7 +30,7 @@ public class PVPGameRoom extends GameRoomHeader implements Portable {
     protected GameRoom duplicate(){
         PVPGameRoom _room = new PVPGameRoom();
         _room.entries = new GameEntry[this.capacity];
-        joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
+        joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
         _room.capacity = this.capacity;
         _room.round = this.round;
         return _room;

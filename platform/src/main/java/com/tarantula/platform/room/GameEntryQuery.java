@@ -1,7 +1,6 @@
-package com.tarantula.game.service;
+package com.tarantula.platform.room;
 
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.room.GameEntry;
 import com.tarantula.game.GamePortableRegistry;
 
 public class GameEntryQuery implements RecoverableFactory<GameEntry> {

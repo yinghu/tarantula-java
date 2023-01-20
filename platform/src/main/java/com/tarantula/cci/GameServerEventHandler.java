@@ -44,22 +44,22 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         if(action.equals("onStart")){//start game server
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
-            resp.addProperty("successful",true);
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
             resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
             connection.configurationTypeId(typeId);
             connection.serverKey = serverKey;
-            this.deploymentServiceProvider.register(connection);
+            boolean suc = this.deploymentServiceProvider.registerConnection(connection);
+            resp.addProperty("successful",suc);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
         else if(action.equals("onChannel")){
             ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
             channel.serverId = serverId;
             channel.configurationTypeId(typeId);
-            deploymentServiceProvider.register(channel);
+            boolean suc = deploymentServiceProvider.registerChannel(channel);
             JsonObject resp = new JsonObject();
-            resp.addProperty("successful",true);
+            resp.addProperty("successful",suc);
             exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
         }
         else if(action.equals("onPing")){

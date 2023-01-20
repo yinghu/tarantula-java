@@ -8,7 +8,7 @@ public interface GameServerListener {
     String typeId();
     boolean onConnection(Connection connection);
     void onDisConnection(Connection connection);
-    void onChannel(Channel channel);
+    boolean onChannel(Channel channel);
 
     //distributed callbacks
     void onConnectionReleased(Connection connection);

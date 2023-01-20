@@ -548,22 +548,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             );
             return;
         }
-        if(configurable instanceof Connection){
-            Connection connection = (Connection)configurable;
-            cListeners.forEach((k,v)->{
-                if(v.typeId().equals(connection.configurationTypeId())){
-                    if(!v.onConnection(connection)) throw new RuntimeException("lobby not existed");
-                }
-            });
-            return;
-        }
-        if(configurable instanceof Channel){
-            ChannelStub channelStub = (ChannelStub)configurable;
-            cListeners.forEach((k,v)->{
-                if(v.typeId().equals(channelStub.configurationTypeId())) v.onChannel(channelStub);
-            });
-            return;
-        }
         vMap.putIfAbsent(configurable.key().asString(),configurable);
         configurable.registered();
     }
@@ -734,9 +718,29 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public byte[] serverKey(String typeId){
         byte[] key = new byte[KEY_SIZE];
         secureRandom.nextBytes(key);
-        return clusterStore.mapCreateIfAbsent(typeId.getBytes(),key);
+        byte[] existing = clusterStore.mapSetIfAbsent(typeId.getBytes(),key);
+        return existing!=null?existing:key;
     }
-
+    public <T extends Configurable> boolean registerConnection(T configurable){
+        Connection connection = (Connection)configurable;
+        int[] suc ={0};
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(connection.configurationTypeId())){
+                if(!v.onConnection(connection)) suc[0]++;
+            }
+        });
+        return suc[0]==0;
+    }
+    public <T extends Configurable> boolean registerChannel(T configurable){
+        ChannelStub channelStub = (ChannelStub)configurable;
+        int[] suc ={0};
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(channelStub.configurationTypeId())) {
+                if(!v.onChannel(channelStub)) suc[0]++;
+            }
+        });
+        return suc[0]==0;
+    }
     public void verifyConnection(String typeId,String serverId){
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }

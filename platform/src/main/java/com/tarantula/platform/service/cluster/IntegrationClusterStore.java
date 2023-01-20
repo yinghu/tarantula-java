@@ -35,10 +35,9 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         return this.vMap.get(key);
     }
 
-    public byte[] mapCreateIfAbsent(byte[] key,byte[] value){
+    public byte[] mapSetIfAbsent(byte[] key,byte[] value){
         if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
-        byte[] ret = vMap.putIfAbsent(key,value);
-        return ret!=null?ret:value;
+        return vMap.putIfAbsent(key,value);
     }
     public void mapSet(byte[] key,byte[] value){
         if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");

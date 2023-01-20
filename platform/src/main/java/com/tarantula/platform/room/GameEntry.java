@@ -4,38 +4,68 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Configurable;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class GameEntry extends RecoverableObject implements Configurable, Portable {
-    public static final String LABEL = "GGE";
-    public String systemId;
-    public int seatIndex;
-    public boolean occupied;
+public class GameEntry extends RecoverableObject implements GameRoom.Entry, Portable {
+
+
+    private String systemId;
+    private int seat;
+    private boolean occupied;
+    private int team;
+
     public GameEntry(){
         this.label = LABEL;
         this.onEdge = true;
     }
-    public GameEntry(int seatIndex){
+    public GameEntry(int seat){
         this();
-        this.seatIndex = seatIndex;
+        this.seat = seat;
     }
+    public int seat(){
+        return seat;
+    }
+    public String systemId(){
+        return systemId;
+    }
+    public int team(){
+        return team;
+    }
+    public boolean occupied(){
+        return occupied;
+    }
+
+    public void seat(int seat){
+        this.seat = seat;
+    }
+    public void systemId(String systemId){
+        this.systemId = systemId;
+    }
+    public void team(int team){
+        this.team = team;
+    }
+    public void occupied(boolean occupied){
+        this.occupied = occupied;
+    }
+
     @Override
     public Map<String,Object> toMap(){
-        properties.put("1",seatIndex);
-        properties.put("2",systemId);
-        properties.put("3",occupied);
+        properties.put("1",seat);
+        properties.put("2",team);
+        properties.put("3",systemId);
+        properties.put("4",occupied);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.seatIndex  =  ((Number)properties.getOrDefault("1",0)).intValue();
-        this.systemId = (String)properties.getOrDefault("2",null);
-        this.occupied = (boolean)properties.getOrDefault("3",false);
+        this.seat  =  ((Number)properties.getOrDefault("1",0)).intValue();
+        this.team = ((Number)properties.getOrDefault("2",0)).intValue();
+        this.systemId = (String)properties.getOrDefault("3",null);
+        this.occupied = (boolean)properties.getOrDefault("4",false);
     }
 
     @Override
@@ -49,22 +79,26 @@ public class GameEntry extends RecoverableObject implements Configurable, Portab
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("1",seatIndex);
-        portableWriter.writeUTF("2",systemId);
-        portableWriter.writeBoolean("3",occupied);
+        portableWriter.writeInt("1",seat);
+        portableWriter.writeInt("2",team);
+        portableWriter.writeUTF("3",systemId);
+        portableWriter.writeBoolean("4",occupied);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        seatIndex = portableReader.readInt("1");
-        systemId = portableReader.readUTF("2");
-        occupied = portableReader.readBoolean("3");
+        seat = portableReader.readInt("1");
+        team = portableReader.readInt("2");
+        systemId = portableReader.readUTF("3");
+        occupied = portableReader.readBoolean("4");
     }
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("EntryId",distributionKey());
         jsonObject.addProperty("SystemId",systemId);
-        jsonObject.addProperty("Seat",seatIndex+1);
+        jsonObject.addProperty("Seat",seat);
+        jsonObject.addProperty("Team",team);
         jsonObject.addProperty("Occupied",occupied);
         return jsonObject;
     }

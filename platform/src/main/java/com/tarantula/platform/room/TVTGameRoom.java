@@ -3,14 +3,9 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Module;
 import com.tarantula.game.Arena;
-import com.tarantula.game.service.GameEntryQuery;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,24 +46,7 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
         return PortableEventRegistry.TVT_ROOM_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",this.distributionKey());
-        portableWriter.writeInt("2",round);
-        portableWriter.writeInt("3",capacity);
-        portableWriter.writePortableArray("4",entries);
-    }
 
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        this.distributionKey(portableReader.readUTF("1"));
-        this.round = portableReader.readInt("2");
-        entries = new GameEntry[portableReader.readInt("3")];
-        for(Portable p : portableReader.readPortableArray("4")){
-            GameEntry gameEntry = (GameEntry)p;
-            entries[gameEntry.seatIndex]=gameEntry;
-        }
-    }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -91,14 +69,7 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
         //this.capacity = arena.capacity;
         //this.duration = arena.duration;
     }
-    public void load(){
-        entries = new GameEntry[capacity];
-        dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
-            entries[ge.seatIndex]=ge;
-            if(ge.occupied) joinIndex.put(ge.systemId,ge);
-            return true;
-        });
-    }
+
     @Override
     public void update(){
 
@@ -108,7 +79,7 @@ public class TVTGameRoom extends GameRoomHeader implements Portable {
     protected TVTGameRoom duplicate(){
         TVTGameRoom _room = new TVTGameRoom();
         _room.entries = new GameEntry[joinIndex.size()];
-        joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
+        joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
         _room.capacity = _room.entries.length;
         _room.round = this.round;
         _room.bucket(this.bucket);

@@ -49,7 +49,7 @@ public class TVEGameRoom extends GameRoomHeader implements Portable {
     protected TVEGameRoom duplicate(){
         TVEGameRoom _room = new TVEGameRoom();
         _room.entries = new GameEntry[joinIndex.size()];
-        joinIndex.forEach((k,e)->_room.entries[e.seatIndex]=e);
+        joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
         _room.capacity = _room.entries.length;
         _room.round = this.round;
         _room.bucket(this.bucket);

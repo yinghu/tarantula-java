@@ -20,10 +20,13 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
 
 
 
-    public synchronized PVEGameRoom join(String systemId){
+    @Override
+    public synchronized GameRoom join(String systemId){
         return this;
     }
-    public synchronized void leave(String systemId){
+    @Override
+    public synchronized void leave(String systemId){}
 
-    }
+
+
 }
