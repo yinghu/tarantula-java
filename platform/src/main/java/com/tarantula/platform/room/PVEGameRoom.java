@@ -1,14 +1,12 @@
 package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
-import com.tarantula.game.GameZone;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 public class PVEGameRoom extends GameRoomHeader implements Portable {
 
     public PVEGameRoom(){
-        this.capacity = 1;
-        this.playMode = GameZone.PLAY_MODE_PVE;
+        super(1);
     }
 
     @Override
@@ -27,8 +25,5 @@ public class PVEGameRoom extends GameRoomHeader implements Portable {
     }
     public synchronized void leave(String systemId){
 
-    }
-    public synchronized GameRoom view(){
-        return this;
     }
 }

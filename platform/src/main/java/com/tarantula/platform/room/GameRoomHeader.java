@@ -20,7 +20,6 @@ import java.util.Map;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
-    protected String playMode;
     protected int channelId;
     protected int sessionId;
     protected int timeout;
@@ -31,13 +30,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected long duration;
     protected int round;
     protected Arena arena;
-    protected Channel channel;
+
     protected HashMap<String,GameEntry> joinIndex;
     protected GameEntry[] entries;
 
-    public String playMode(){
-        return this.playMode;
-    }
     public int channelId(){
         return channelId;
     }
@@ -75,12 +71,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return arena;
     }
 
-    @Override
-    public Channel channel(){
-        return this.channel;
-    }
-    public void channel(Channel channel){
-        this.channel = channel;
+    public GameRoomHeader(int capacity){
+        this.capacity = capacity;
     }
 
     public void load(){
@@ -91,21 +83,17 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             return true;
         });
     }
-    public String[] joined(){
-        if(joinIndex.isEmpty()) return new String[0];
-        String[] joined = new String[joinIndex.size()];
-        int[] i={0};
-        joinIndex.forEach((k,v)->{
-            joined[i[0]]=v.systemId;
-            i[0]++;
-        });
-        return joined;
-    }
-    public void setup(GameZone gameZone, Rating rating){
+
+    public void setup(GameZone gameZone,Channel channel, Rating rating){
         this.arena = gameZone.arena(rating.arenaLevel);
         this.capacity = gameZone.capacity();
         this.duration = gameZone.roundDuration();
-        this.playMode = gameZone.playMode();
+        if(channel==null) return;
+        this.connection = channel.connection();
+        this.channelId = channel.channelId();
+        this.sessionId = channel.sessionId();
+        this.serverKey = channel.serverKey();
+        this.timeout = channel.connection().timeout();
     }
 
     @Override
@@ -128,7 +116,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("Capacity",capacity);
         jsonObject.addProperty("Duration",duration);
         jsonObject.addProperty("Round",round);
-        jsonObject.addProperty("PlayMode",playMode);
         if(connection!=null){
             jsonObject.addProperty("ChannelId",channelId);
             jsonObject.addProperty("SessionId",sessionId);
@@ -147,17 +134,56 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("6",round);
-        portableWriter.writeInt("7",capacity);
-        portableWriter.writePortableArray("8",entries);
+        portableWriter.writeInt("1",round);
+        portableWriter.writeInt("2",capacity);
+        portableWriter.writePortableArray("3",entries);
     }
 
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.round = portableReader.readInt("6");
-        entries = new GameEntry[portableReader.readInt("7")];
-        for(Portable p : portableReader.readPortableArray("8")){
+        this.round = portableReader.readInt("1");
+        entries = new GameEntry[portableReader.readInt("2")];
+        for(Portable p : portableReader.readPortableArray("3")){
             GameEntry gameEntry = (GameEntry)p;
             entries[gameEntry.seatIndex]=gameEntry;
         }
+    }
+    public synchronized GameRoom join(String systemId){
+        if(joinIndex.containsKey(systemId)) {
+            return view();
+        };
+        for(int i=0;i<capacity;i++){
+            GameEntry e = entries[i];
+            if(e!=null&&e.occupied) continue;
+            if(e==null){
+                e = new GameEntry(i);
+                e.owner(this.distributionKey());
+                this.dataStore.create(e);
+                entries[i]=e;
+            }
+            e.systemId = systemId;
+            e.occupied = true;
+            e.seatIndex = i;
+            this.dataStore.update(e);
+            joinIndex.put(systemId,e);
+            break;
+        }
+        return view();
+    }
+    public synchronized void leave(String systemId){
+        GameEntry rm = joinIndex.remove(systemId);
+        if(rm!=null){
+            rm.occupied = false;
+            this.dataStore.update(rm);
+        }
+    }
+    public synchronized GameRoom view(){
+        GameRoom room = duplicate();
+        if(room==null) return this;
+        room.bucket(this.bucket);
+        room.oid(this.oid);
+        return room;
+    }
+    protected GameRoom duplicate(){
+        return null;
     }
 }

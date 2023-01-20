@@ -103,10 +103,11 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
     public void clear(){
         clear(true,true,true);
     }
+
     public void clear(boolean map,boolean index,boolean queue){
-        if(map && vMap != null) vMap.clear();
-        if(index && mIndex != null) mIndex.clear();
-        if(queue && vQueue != null) vQueue.clear();
+        if(map && vMap != null) { vMap.clear(); vMap.destroy();}
+        if(index && mIndex != null) { mIndex.clear(); mIndex.destroy();}
+        if(queue && vQueue != null) { vQueue.clear(); vQueue.destroy();}
         integrationCluster.closeClusterStore(name);
     }
 

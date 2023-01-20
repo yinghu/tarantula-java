@@ -50,12 +50,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private String registerKey;
     private String reloadKey;
 
+    private int maxDedicatedServerConnections;
     private int roomPoolSizePerZone;
     private boolean dedicated;
 
     ArrayList<String> kickoff = new ArrayList<>();
     private boolean timerEnabled = false;
-    private int timer = 1000;
+    private int timer;
     private SchedulingTask schedulingTask;
 
     public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
@@ -70,7 +71,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public String name() {
         return NAME;
     }
-    
+
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
@@ -79,16 +80,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.node().partitionNumber());
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
-        this.pendingConnections = new ArrayBlockingQueue<>(10);
-        this.connectionIndex = new ConcurrentHashMap<>();
         Configuration configuration = serviceContext.configuration(CONFIG);
         JsonObject jsonObject = ((JsonElement)configuration.property(playMode)).getAsJsonObject();
+        this.maxDedicatedServerConnections = jsonObject.get("maxDedicatedServerConnections").getAsInt();
         this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
+        if(this.dedicated){
+            this.pendingConnections = new ArrayBlockingQueue<>(maxDedicatedServerConnections);
+            this.connectionIndex = new ConcurrentHashMap<>();
+        }
         this.timerEnabled = jsonObject.get("connectionCheckEnabled").getAsBoolean();
         this.timer = jsonObject.get("connectionCheckInterval").getAsInt();
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
         this.reloadKey = this.clusterProvider.registerReloadListener(this);
-        if(timerEnabled) {
+        if(this.dedicated && timerEnabled) {
             this.schedulingTask = new ScheduleRunner(timer,()->{
                 onSchedule();
                 this.serviceContext.schedule(this.schedulingTask);
@@ -161,7 +165,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]");
+        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+roomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
         gameZoneIndex.put(gameZone.distributionKey(),gameZone);
     }
@@ -244,7 +248,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(connectionStub==null) return;
         pendingConnections.remove(connectionStub);
         Collection<byte[]> _cb = clusterStore.indexGet(typeLobby);
-        logger.warn("cb->"+_cb.size()+">>");
+        logger.warn("Disconnection->"+serverId+">>"+_cb.size()+">>"+pendingConnections.size());
     }
 
     private void onSchedule() {
@@ -282,7 +286,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             String roomId = serviceContext.node().bucketName()+"/"+ SystemUtil.oid();
             GameRoom gameRoom =gameRoomIndex.computeIfAbsent(roomId,k-> this.createGameRoom(gameZone.playMode(),gameZone.capacity()));
             gameRoom.join(rating.systemId());
-            gameRoom.setup(gameZone,rating);
+            gameRoom.setup(gameZone,null,rating);
             gameRoom.distributionKey(roomId);
             return gameRoom;
         }
@@ -307,8 +311,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         channelStub.sessionId();
         GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),channelStub.roomId,rating.systemId());
         room.distributionKey(channelStub.roomId);
-        room.channel(channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout()));
-        room.setup(gameZone,rating);
+        Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
+        room.setup(gameZone,channel,rating);
         if(channelStub.totalJoined == gameZone.capacity()){
             logger.warn(channelStub.toString());
         }

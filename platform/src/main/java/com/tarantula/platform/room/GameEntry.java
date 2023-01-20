@@ -6,7 +6,6 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;

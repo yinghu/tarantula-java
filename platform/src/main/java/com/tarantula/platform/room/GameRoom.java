@@ -9,7 +9,6 @@ import com.tarantula.game.Rating;
 
 public interface GameRoom extends Configurable {
 
-    String playMode();
     int channelId();
     int sessionId();
     int timeout();
@@ -22,16 +21,13 @@ public interface GameRoom extends Configurable {
     int round();
     Arena arena();
 
-    void setup(GameZone gameZone, Rating rating);
+    //Local Setup After Join
+    void setup(GameZone gameZone,Channel channel,Rating rating);
 
+    //Distributed Methods
     GameRoom join(String systemId);
     GameRoom view();
     void leave(String systemId);
-
-    Channel channel();
-    void channel(Channel channel);
-
     void load();
-    String[] joined();
 
 }

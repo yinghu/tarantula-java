@@ -17,7 +17,6 @@ public interface GameZone extends Configurable{
 
     String playMode();
     int capacity();
-    //int maxJoinsPerRoom();
     int joinsOnStart();
     long roundDuration();
 
