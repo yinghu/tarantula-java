@@ -76,6 +76,7 @@ public class ZoneItem extends Item {
 
     @Override
     public JsonObject toJson(){
+        header.addProperty("ZoneId",this.distributionKey());
         return header;
     }
 

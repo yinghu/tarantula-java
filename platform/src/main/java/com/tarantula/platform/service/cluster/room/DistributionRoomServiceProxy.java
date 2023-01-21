@@ -56,10 +56,10 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
-    public void onLeaveRoom(String serviceName,String roomId,String systemId){
+    public void onLeaveRoom(String serviceName,String zoneId,String roomId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
-        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,roomId,systemId);
+        RoomLeaveOperation roomLeaveOperation = new RoomLeaveOperation(serviceName,zoneId,roomId,systemId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
         final Future<Void> future = builder.invoke();
         try {

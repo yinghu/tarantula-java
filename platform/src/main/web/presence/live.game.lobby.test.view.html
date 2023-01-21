@@ -32,11 +32,15 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-lobby"),{mode:'tree'},{});
+    let zoneId;
     TARA_API.onGet(TARA_API.query().serviceTag,'onTest',"",(resp)=>{
+        if(resp.Successful){
+            zoneId = resp._zone.ZoneId;
+        }
         editor.set(resp);
     });
     document.querySelector('#tx-lobby-live-leave').onclick=()=>{
-        TARA_API.onGet(TARA_API.query().serviceTag,'onLeave',"",(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onLeave',zoneId,(resp)=>{
             editor.set(resp);
         });
     };

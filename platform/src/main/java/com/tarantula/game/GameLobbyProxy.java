@@ -54,9 +54,18 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!started) return;
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.remove(stubKey.asString());
-        if(stub==null) return;
-        stub.zone.leave(stub);
-        stub.pushChannel.close();
+        if(stub!=null){
+            stub.zone.leave(stub);
+            stub.pushChannel.close();
+            return;
+        }
+        stub = new Stub();
+        stub.distributionKey(session.systemId());
+        stub.stub(session.stub());
+        stub.label(application.tag());
+        GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
+        if(!gameZone.dataStore().load(stub) || !stub.joined) return;
+        gameZone.leave(stub);
     }
 
     @Override

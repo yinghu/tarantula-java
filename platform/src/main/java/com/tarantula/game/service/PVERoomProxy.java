@@ -26,12 +26,14 @@ public class PVERoomProxy extends RoomProxyHeader {
             gameLobby.timeout(s,d);
         });
         stub.roomId = stub.room.roomId();
+        stub.zoneId = gameZone.distributionKey();
         stub.zone = gameZone;
         stub.joined = true;
         stub.offline = true;
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
         stub.rating = rating;
+        this.dataStore.update(stub);
         return stub;
     }
     public void leave(Stub stub){

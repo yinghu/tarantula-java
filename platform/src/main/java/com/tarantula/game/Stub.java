@@ -14,9 +14,9 @@ public class Stub extends PlayerGameObject {
 
     public boolean joined;
     public boolean offline;
+    public String zoneId;
     public String roomId;
     public String ticket;
-    //public String playMode;
     public Shop shop;
 
     public GameRoom room;
@@ -64,12 +64,14 @@ public class Stub extends PlayerGameObject {
     @Override
     public Map<String,Object> toMap(){
         properties.put("joined",joined);
+        properties.put("zoneId",zoneId);
         properties.put("roomId",roomId);
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         joined = (boolean)properties.getOrDefault("joined",false);
+        zoneId = ((String)properties.getOrDefault("zoneId",null));
         roomId = ((String)properties.getOrDefault("roomId",null));
     }
     @Override
