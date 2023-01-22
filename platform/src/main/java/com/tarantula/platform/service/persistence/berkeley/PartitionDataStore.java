@@ -14,6 +14,10 @@ import com.tarantula.platform.util.SystemUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The key of the recoverable T is thread-safe. It is locked on concurrent map.
+ * However, the recoverable T itself is not thread-safe. Callers need to take care of the concurrent access.
+ * */
 
 public class PartitionDataStore extends ReplicatedDataStore{
 
