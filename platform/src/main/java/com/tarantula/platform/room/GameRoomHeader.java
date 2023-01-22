@@ -80,11 +80,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.capacity = capacity;
         this.round = 1;
         this.joinIndex = new HashMap<>(capacity);
+        this.entries = new Entry[capacity];
     }
 
     @Override
     public void load(){
-        entries = new Entry[capacity];
+        //entries = new Entry[capacity];
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
             entries[ge.seat()]=ge;
             if(ge.occupied()) joinIndex.put(ge.systemId(),ge);

@@ -140,7 +140,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        GameRoom gameRoom = gameRoom(index.gameZone,stub.roomId);
+        GameRoom gameRoom = gameRoom(index,stub.roomId);
         if(gameRoom==null) {
             logger.warn("Room Missed->"+stub.zoneId+">>"+stub.roomId);
             return;
@@ -155,18 +155,18 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public GameRoom onRoomViewed(String zoneId,String roomId){
-        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
+        GameZoneIndex gameZone = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         return gameRoom!=null?gameRoom.view():null;
     }
     public GameRoom onRoomJoined(String zoneId,String roomId, String systemId){
-        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
+        GameZoneIndex gameZone = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         if(gameRoom==null) return null;
         return gameRoom.join(systemId,(room,entry) -> {});
     }
     public void onRoomLeft(String zoneId,String roomId,String systemId){
-        GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
+        GameZoneIndex gameZone = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         if(gameRoom==null) {
             logger.warn("Room Missed->"+zoneId+">>"+roomId);
@@ -195,7 +195,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.dataStore.createIfAbsent(index.roomIndex,true);
         int[] rooms = {0};
         index.roomIndex.keySet().forEach(k->{
-            GameRoom room = gameRoom(gameZone,k);
+            GameRoom room = gameRoom(index,k);
             logger.warn(room.toString());
             room.reset();
             rooms[0]++;
@@ -374,7 +374,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZone[0];
     }
 
-    private GameRoom gameRoom(GameZone gameZone,String roomId){
+    private GameRoom gameRoom(GameZoneIndex zoneIndex,String roomId){
+        GameZone gameZone = zoneIndex.gameZone;
         if(roomId!=null){
             return gameRoomIndex.computeIfAbsent(roomId,(k)->{
                 GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
@@ -388,6 +389,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
+        zoneIndex.roomIndex.addKey(gameRoom.roomId());
+        this.dataStore.update(zoneIndex.roomIndex);
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
         return gameRoom;
     }
@@ -396,7 +399,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         String roomId = index.pendingRooms.poll();
         if(roomId==null && index.maxRoomPoolSize.decrementAndGet() < 0) return null;
-        GameRoom gameRoom = gameRoom(gameZone,roomId);
+        GameRoom gameRoom = gameRoom(index,roomId);
         if(gameRoom==null) return null;
         GameRoom joined = gameRoom.join(rating.systemId(),(room,entry) -> {
             if(!room.full()) index.pendingRooms.offer(roomId);
