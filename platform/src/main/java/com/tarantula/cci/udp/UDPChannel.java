@@ -11,6 +11,7 @@ import com.icodesoftware.util.BatchUtil;
 
 import java.util.Base64;
 
+
 public class UDPChannel extends GameChannel {
 
     private UserChannel userChannel;
@@ -18,6 +19,8 @@ public class UDPChannel extends GameChannel {
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private Session.TimeoutListener timeoutListener;
     private MessageBuffer messageBuffer;
+
+
     public UDPChannel(Connection connection, UserChannel userChannel,byte[] serverKey,int timeout){
         this.connection = connection;
         this.userChannel = userChannel;
@@ -32,15 +35,6 @@ public class UDPChannel extends GameChannel {
         this.sessionId = sessionId;
         this.requestListener = requestListener;
         this.timeoutListener = timeoutListener;
-    }
-    @Override
-    public int channelId() {
-        return channelId;
-    }
-
-    @Override
-    public int sessionId() {
-        return sessionId;
     }
 
 
@@ -80,9 +74,6 @@ public class UDPChannel extends GameChannel {
             userChannel.queue(messageHeader.sessionId,messageBuffer);
         }
     }
-    public Connection connection(){
-        return this.connection;
-    }
 
     @Override
     public JsonObject toJson(){
@@ -94,9 +85,7 @@ public class UDPChannel extends GameChannel {
         jsonObject.add("_connection",connection.toJson());
         return jsonObject;
     }
-    public void sessionId(int sessionId){
-        this.sessionId = sessionId;
-    }
+
 
     public void close(){
         userChannel.kickoff(sessionId);

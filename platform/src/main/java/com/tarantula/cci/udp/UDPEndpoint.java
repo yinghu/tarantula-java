@@ -11,6 +11,7 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ClientConnection;
+import com.tarantula.platform.ScheduleRunner;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
@@ -18,10 +19,12 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener ,SchedulingTask{
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -53,8 +56,16 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private int channelPoolSize;
     private int frameRate = UDPEndpointServiceProvider.FRAME_RATE;
 
+    private long sessionJoinTimeout;
+    private long sessionJoinTimer = 1000;
+    private SchedulingTask onTimer;
+    private ArrayList<Integer> pendingJoinKickoff;
+    private ConcurrentHashMap<Integer,AtomicLong> pendingJoins;
+
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
+        pendingJoins = new ConcurrentHashMap<>();
+        pendingJoinKickoff = new ArrayList<>();
         pendingQueue = new ConcurrentLinkedDeque<>();
         packetTracks = new ConcurrentHashMap<>();
         expiredPackets = new ArrayList<>();
@@ -82,6 +93,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.secured(true);
         connection.host(serviceContext.node().servicePushAddress());
         frameRate = ((Number)cfg.property("frameRate")).intValue();
+        this.sessionJoinTimeout = ((Number)cfg.property("sessionJoinTimeout")).longValue();
         udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.retryInterval(((Number)cfg.property("retryInterval")).intValue());
@@ -129,7 +141,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         receiverDaemon.start();
         outboundMessageDaemon.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         outboundMessageDaemon.start();
-        serviceContext.schedule(this);
+        this.onTimer = new ScheduleRunner(this.frameRate,()->{
+            this.onTimer();
+        });
+        serviceContext.schedule(onTimer);
         PushUserChannel pushUserChannel;
         do{
             pushUserChannel = pushUserChannels.poll();
@@ -168,6 +183,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         UDPChannel uch = this.pendingQueue.poll();
         uch.register(session,sessionId.getAndIncrement(),requestListener,timeoutListener);
         channels.put(uch.sessionId(),uch);
+        pendingJoins.put(uch.sessionId(),new AtomicLong(sessionJoinTimeout));
         return uch;
     }
     public Channel channel(int sessionId){
@@ -202,7 +218,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
-            return sessionId==messageHeader.sessionId && suc;
+            boolean joined = sessionId==messageHeader.sessionId && suc;
+            return  joined && pendingJoins.remove(sessionId)!=null;
         }catch (Exception ex){
             logger.error("unexpected error on validate",ex);
             return false;
@@ -266,25 +283,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         summary.update(UDPOperationSummary.UDP_GAME_SESSION_SIZE,channels.size());
     }
 
-    @Override
-    public boolean oneTime() {
-        return true;
-    }
-
-    @Override
-    public long initialDelay() {
-        return frameRate;
-    }
-
-    @Override
-    public long delay() {
-        return 0;
-    }
-
-    @Override
-    public void run() {
+    private void onTimer() {
         udpEndpointServiceProvider.onTimer(frameRate);
         packetRemoveTimer -= frameRate;
+        sessionJoinTimer -= frameRate;
         if(packetRemoveTimer<=0){
             expiredPackets.clear();
             packetTracks.forEach((k,v)->{
@@ -298,7 +300,21 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             }
             packetRemoveTimer = packetRemoveInterval;
         }
-        this.serviceContext.schedule(this);
+        if(sessionJoinTimer<=0){
+            sessionJoinTimer = 1000;
+            pendingJoinKickoff.clear();
+            pendingJoins.forEach((k,v)->{
+                if(v.addAndGet(-1*1000)<=0){
+                    pendingJoinKickoff.add(k);
+                }
+            });
+            pendingJoinKickoff.forEach(k->{
+                if(pendingJoins.remove(k)!=null){
+                    onTimeout(0,k);
+                }
+            });
+        }
+        this.serviceContext.schedule(onTimer);
     }
 
     private UDPEndpointServiceProvider createInstance(String className){
