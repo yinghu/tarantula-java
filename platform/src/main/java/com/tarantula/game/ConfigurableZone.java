@@ -140,10 +140,10 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     }
 
-
     public String toString(){
-        return zoneItem.name()+">>"+zoneItem.rank()+">>"+zoneItem.playMode();
+        return "Zone ["+zoneItem.name()+"] Rank ["+zoneItem.rank()+"] Play Mode ["+zoneItem.playMode()+"]";
     }
+
     @Override
     public JsonObject toJson(){
         return this.zoneItem.toJson();
@@ -158,4 +158,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     public String bucket(){
         return this.zoneItem.bucket();
     }
+
+
 }

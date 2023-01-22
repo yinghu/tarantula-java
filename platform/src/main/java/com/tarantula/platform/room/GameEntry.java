@@ -1,7 +1,6 @@
 package com.tarantula.platform.room;
 
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.util.RecoverableObject;
@@ -10,7 +9,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.util.Map;
 
-public class GameEntry extends RecoverableObject implements GameRoom.Entry, Portable {
+public class GameEntry extends RecoverableObject implements GameRoom.Entry{
 
 
     private String systemId;
@@ -21,10 +20,6 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry, Port
     public GameEntry(){
         this.label = LABEL;
         this.onEdge = true;
-    }
-    public GameEntry(int seat){
-        this();
-        this.seat = seat;
     }
     public int seat(){
         return seat;
@@ -101,5 +96,9 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry, Port
         jsonObject.addProperty("Team",team);
         jsonObject.addProperty("Occupied",occupied);
         return jsonObject;
+    }
+
+    public void reset(){
+        this.occupied = false;
     }
 }

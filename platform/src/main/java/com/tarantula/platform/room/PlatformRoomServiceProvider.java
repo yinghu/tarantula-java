@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener {
 
@@ -54,8 +55,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private String reloadKey;
 
     private int maxDedicatedServerConnections;
-    private int roomPoolSizePerZone;
-    private int roomPoolSizePerNode;
+    private int maxRoomPoolSizePerZone;
+    private int minRoomPoolSizePerZone;
 
     private boolean dedicated;
 
@@ -88,8 +89,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         Configuration configuration = serviceContext.configuration(CONFIG);
         JsonObject jsonObject = ((JsonElement)configuration.property(playMode)).getAsJsonObject();
         this.maxDedicatedServerConnections = jsonObject.get("maxDedicatedServerConnections").getAsInt();
-        this.roomPoolSizePerZone = jsonObject.get("roomPoolSizePerZone").getAsInt();
-        this.roomPoolSizePerNode = jsonObject.get("roomPoolSizePerNode").getAsInt();
+        this.maxRoomPoolSizePerZone = jsonObject.get("maxRoomPoolSizePerZone").getAsInt();
+        this.minRoomPoolSizePerZone = jsonObject.get("minRoomPoolSizePerZone").getAsInt();
         if(this.dedicated){
             this.pendingConnections = new ArrayBlockingQueue<>(maxDedicatedServerConnections);
             this.connectionIndex = new ConcurrentHashMap<>();
@@ -117,7 +118,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             c.serverKey = this.serviceContext.deploymentServiceProvider().serverKey(typeLobby);
             onConnectionRegistered(c);
         });
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+roomPoolSizePerZone+"]");
+        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]");
     }
 
     @Override
@@ -144,8 +145,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Room Missed->"+stub.zoneId+">>"+stub.roomId);
             return;
         }
-        gameRoom.leave(stub.systemId());
-        index.pendingRooms.offer(gameRoom.roomId());
+        gameRoom.leave(stub.systemId(),(room,entry)-> {
+            if(room.empty()) {
+                room.reset();
+                index.pendingRooms.offer(room.roomId());
+            }
+        });
+        logger.warn(gameRoom.toString());
     }
 
     public GameRoom onRoomViewed(String zoneId,String roomId){
@@ -157,32 +163,41 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         if(gameRoom==null) return null;
-        return gameRoom.join(systemId);
+        return gameRoom.join(systemId,(room,entry) -> {});
     }
     public void onRoomLeft(String zoneId,String roomId,String systemId){
         GameZone gameZone = gameZoneIndex.get(zoneId).gameZone;
         GameRoom gameRoom = gameRoom(gameZone,roomId);
-        if(gameRoom==null) return;
-        gameRoom.leave(systemId);
+        if(gameRoom==null) {
+            logger.warn("Room Missed->"+zoneId+">>"+roomId);
+            return;
+        }
+        gameRoom.leave(systemId,(room,entry) -> {
+            //if(!room.full())
+        });
     }
 
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+roomPoolSizePerZone+"]");
+        //logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+minRoomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
+        index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
         if(dedicated) {
             index.roomStore = this.clusterProvider.clusterStore(gameZone.oid(), false, false, true);
         }
         else{
-            index.pendingRooms = new ArrayBlockingQueue<>(roomPoolSizePerNode);
+            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
         }
         index.roomIndex = new IndexSet(GameRoom.LABEL);
         index.roomIndex.distributionKey(serviceContext.node().nodeId());
         this.dataStore.createIfAbsent(index.roomIndex,true);
         int[] rooms = {0};
         index.roomIndex.keySet().forEach(k->{
+            GameRoom room = gameRoom(gameZone,k);
+            logger.warn(room.toString());
+            room.reset();
             rooms[0]++;
             if(dedicated){
                 byte[] roomId = k.getBytes();
@@ -194,12 +209,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 index.pendingRooms.offer(k);
             }
         });
-        int remaining = roomPoolSizePerNode-rooms[0];
-        if(remaining>0){
+        if(rooms[0] < minRoomPoolSizePerZone){
+            int remaining = minRoomPoolSizePerZone - rooms[0];
             logger.warn("Creating game room on node->"+serviceContext.node().nodeName()+" : "+remaining);
             for(int i=0; i<remaining;i++){
                 GameRoom gameRoom = createGameRoom(gameZone.playMode(),gameZone.capacity());
                 if(this.dataStore.create(gameRoom)){
+                    rooms[0]++;
                     index.roomIndex.addKey(gameRoom.roomId());
                     if(dedicated){
                         byte[] rkey = gameRoom.roomId().getBytes();
@@ -214,6 +230,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
             this.dataStore.update(index.roomIndex);
         }
+        int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
+        logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"]");
         gameZoneIndex.put(gameZone.distributionKey(),index);
     }
 
@@ -357,26 +375,36 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private GameRoom gameRoom(GameZone gameZone,String roomId){
-        return gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
-            _gameRoom.distributionKey(roomId);
-            if(!this.dataStore.load(_gameRoom)) return null;
-            _gameRoom.dataStore(this.dataStore);
-            _gameRoom.load();
-            return _gameRoom;
-        });
+        if(roomId!=null){
+            return gameRoomIndex.computeIfAbsent(roomId,(k)->{
+                GameRoom _gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
+                _gameRoom.distributionKey(roomId);
+                if(!this.dataStore.load(_gameRoom)) return null;
+                _gameRoom.dataStore(this.dataStore);
+                _gameRoom.load();
+                return _gameRoom;
+            });
+        }
+        GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
+        if(!this.dataStore.create(gameRoom)) return null;
+        gameRoom.dataStore(this.dataStore);
+        gameRoomIndex.put(gameRoom.roomId(),gameRoom);
+        return gameRoom;
     }
 
     private GameRoom localJoin(GameZone gameZone, Rating rating){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         String roomId = index.pendingRooms.poll();
-        if(roomId==null) return null;
+        if(roomId==null && index.maxRoomPoolSize.decrementAndGet() < 0) return null;
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         if(gameRoom==null) return null;
-        gameRoom.join(rating.systemId());
-        gameRoom.setup(gameZone,null,rating);
-        gameRoom.distributionKey(roomId);
-        return gameRoom;
+        GameRoom joined = gameRoom.join(rating.systemId(),(room,entry) -> {
+            if(!room.full()) index.pendingRooms.offer(roomId);
+        });
+        logger.warn(gameRoom.toString());
+        joined.setup(gameZone,null,rating);
+        joined.distributionKey(roomId);
+        return joined;
     }
 
     private GameRoom remoteJoin(GameZone gameZone, Rating rating){

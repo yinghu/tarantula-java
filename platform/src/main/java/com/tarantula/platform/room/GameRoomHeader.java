@@ -26,6 +26,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int capacity;
     protected long duration;
     protected int round;
+    protected int totalJoined;
     protected Arena arena;
 
     protected HashMap<String,Entry> joinIndex;
@@ -63,6 +64,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return round;
     }
 
+
     @Override
     public Arena arena() {
         return arena;
@@ -76,6 +78,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     public GameRoomHeader(int capacity){
         this.capacity = capacity;
+        this.round = 1;
+        this.joinIndex = new HashMap<>(capacity);
     }
 
     @Override
@@ -103,16 +107,16 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("2",capacity);
-        this.properties.put("3",round);
-        this.properties.put("4",this.index);
+        this.properties.put("1",capacity);
+        this.properties.put("2",round);
+        this.properties.put("3",this.totalJoined);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.capacity = ((Number)properties.getOrDefault("2",12)).intValue();
-        this.round = ((Number)properties.getOrDefault("3",0)).intValue();
-        this.index = (String)properties.getOrDefault("4",null);
+        this.capacity = ((Number)properties.getOrDefault("1",12)).intValue();
+        this.round = ((Number)properties.getOrDefault("2",0)).intValue();
+        this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
     }
     @Override
     public JsonObject toJson(){
@@ -153,8 +157,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
     }
 
-    public synchronized GameRoom join(String systemId){
+    public synchronized GameRoom join(String systemId,Listener listener){
         if(joinIndex.containsKey(systemId)) {
+            listener.onUpdated(this,joinIndex.get(systemId));
             return view();
         };
         for(int i=0;i<capacity;i++){
@@ -174,15 +179,21 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             joinIndex.put(systemId,e);
             break;
         }
+        totalJoined++;
+        this.dataStore.update(this);
+        listener.onUpdated(this,joinIndex.get(systemId));
         return view();
     }
 
-    public synchronized void leave(String systemId){
+    public synchronized void leave(String systemId,Listener listener){
         Entry rm = joinIndex.remove(systemId);
         if(rm!=null){
-            rm.occupied(false);
+            totalJoined--;
+            rm.reset();
             this.dataStore.update(rm);
+            this.dataStore.update(this);
         }
+        listener.onUpdated(this,rm);
     }
 
     public synchronized GameRoom view(){
@@ -193,10 +204,34 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return room;
     }
 
+    public boolean empty(){
+        return totalJoined==0;
+    }
+    public boolean full(){
+        return totalJoined==capacity;
+    }
+
+    public synchronized void reset(){
+        joinIndex.forEach((k,v)->{
+            v.reset();
+            this.dataStore.update(v);
+        });
+        joinIndex.clear();
+        entries = new Entry[capacity];
+        totalJoined = 0;
+        round++;
+        this.dataStore.update(this);
+    }
+
     protected GameRoom duplicate(){
         return null;
     }
     protected GameRoom.Entry createEntry(){
         return new GameEntry();
+    }
+
+    @Override
+    public String toString(){
+        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"]";
     }
 }

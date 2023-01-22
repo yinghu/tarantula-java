@@ -1,16 +1,14 @@
 package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
-import com.icodesoftware.Channel;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Connection;
+import com.icodesoftware.*;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 
 import java.util.List;
 
-public interface GameRoom extends Configurable {
+public interface GameRoom extends Resettable,Configurable,Portable {
 
     String LABEL = "ZGR";
 
@@ -31,12 +29,16 @@ public interface GameRoom extends Configurable {
     void setup(GameZone gameZone,Channel channel,Rating rating);
 
     //Distributed Methods
-    GameRoom join(String systemId);
+    GameRoom join(String systemId,Listener listener);
     GameRoom view();
-    void leave(String systemId);
+    void leave(String systemId,Listener listener);
     void load();
+    boolean empty();
+    boolean full();
 
-    interface Entry extends Configurable, Portable {
+
+
+    interface Entry extends Resettable,Configurable, Portable {
 
         String LABEL = "GGE";
 
@@ -49,5 +51,9 @@ public interface GameRoom extends Configurable {
         void systemId(String systemId);
         void team(int team);
         void occupied(boolean occupied);
+    }
+
+    interface Listener{
+        void onUpdated(GameRoom room,Entry entry);
     }
 }

@@ -1,16 +1,13 @@
 package com.tarantula.platform.room;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-import java.util.HashMap;
 
 
-public class PVPGameRoom extends GameRoomHeader implements Portable {
+public class PVPGameRoom extends GameRoomHeader{
 
     public PVPGameRoom(int capacity){
        super(capacity);
-       this.joinIndex = new HashMap<>(capacity);
     }
     public PVPGameRoom(){
        super(0);

@@ -28,11 +28,11 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1");
-        room.join("player1");
-        room.join("player1");
-        room.join("player1");
-        room.leave("player1");
+        room.join("player1",(room1,entry) -> {});
+        room.join("player1",(room1,entry) -> {});
+        room.join("player1",(room1,entry) -> {});
+        room.join("player1",(room1,entry) -> {});
+        room.leave("player1",(room1,entry) -> {});
     }
 
     @Test(groups = { "GameRoom" })
@@ -40,15 +40,15 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1");
-        room.join("player2");
-        room.join("player3");
-        room.join("player4");
+        room.join("player1",(room1,entry) -> {});
+        room.join("player2",(room1,entry) -> {});
+        room.join("player3",(room1,entry) -> {});
+        room.join("player4",(room1,entry) -> {});
 
-        room.leave("player1");
-        room.leave("player2");
-        room.leave("player3");
-        room.leave("player4");
+        room.leave("player1",(room1,entry) -> {});
+        room.leave("player2",(room1,entry) -> {});
+        room.leave("player3",(room1,entry) -> {});
+        room.leave("player4",(room1,entry) -> {});
         /**
         Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
         Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
