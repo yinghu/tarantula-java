@@ -31,6 +31,7 @@ public class ScheduledPlayer{
     private String ticket;
 
     private String tag;
+    private String zoneId;
 
     private Cipher encryper;
     private DatagramSocket udp;
@@ -163,6 +164,7 @@ public class ScheduledPlayer{
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,tag,
                     Session.TARANTULA_ACTION,"onLeave",
+                    Session.TARANTULA_NAME,zoneId,
                     Session.TARANTULA_TOKEN,token
             };
             long requestStart = System.currentTimeMillis();
@@ -261,6 +263,7 @@ public class ScheduledPlayer{
         LoadResult.totalSuccessJoin.incrementAndGet();
         joined = true;
         tag = joinPayload.get("Tag").getAsString();
+        zoneId = joinPayload.get("_zone").getAsJsonObject().get("ZoneId").getAsString();
         if(!udpTested) return;
         JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
         byte[] serverKey = Base64.getDecoder().decode(channel.get("ServerKey").getAsString());
