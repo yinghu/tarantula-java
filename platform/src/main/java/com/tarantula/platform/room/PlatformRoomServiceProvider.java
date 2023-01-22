@@ -140,18 +140,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        GameRoom gameRoom = gameRoom(index,stub.roomId);
-        if(gameRoom==null) {
-            logger.warn("Room Missed->"+stub.zoneId+">>"+stub.roomId);
-            return;
-        }
-        gameRoom.leave(stub.systemId(),(room,entry)-> {
+        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
             if(room.empty()) {
                 room.reset();
                 index.pendingRooms.offer(room.roomId());
             }
         });
-        logger.warn(gameRoom.toString());
     }
 
     public GameRoom onRoomViewed(String zoneId,String roomId){
@@ -163,17 +157,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex gameZone = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         if(gameRoom==null) return null;
-        return gameRoom.join(systemId,(room,entry) -> {});
+        return gameRoom.join(systemId,(room,entry) -> {
+        });
     }
     public void onRoomLeft(String zoneId,String roomId,String systemId){
-        GameZoneIndex gameZone = gameZoneIndex.get(zoneId);
-        GameRoom gameRoom = gameRoom(gameZone,roomId);
-        if(gameRoom==null) {
-            logger.warn("Room Missed->"+zoneId+">>"+roomId);
-            return;
-        }
-        gameRoom.leave(systemId,(room,entry) -> {
-            //if(!room.full())
+        GameZoneIndex index = gameZoneIndex.get(zoneId);
+        localLeave(systemId,index,roomId,(room,entry)->{
+            if(room.empty()){
+                room.reset();
+                clusterStore.queueOffer(room.roomId().getBytes());
+            }
         });
     }
 
@@ -196,7 +189,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         int[] rooms = {0};
         index.roomIndex.keySet().forEach(k->{
             GameRoom room = gameRoom(index,k);
-            logger.warn(room.toString());
+            //logger.warn(room.toString());
             room.reset();
             rooms[0]++;
             if(dedicated){
@@ -396,7 +389,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
         return gameRoom;
     }
-
+    private void localLeave(String systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
+        GameRoom gameRoom = gameRoom(index,roomId);
+        if(gameRoom==null) {
+            logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
+            return;
+        }
+        gameRoom.leave(systemId,listener);
+        logger.warn(gameRoom.toString());
+    }
     private GameRoom localJoin(GameZone gameZone, Rating rating){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         String roomId = index.pendingRooms.poll();
