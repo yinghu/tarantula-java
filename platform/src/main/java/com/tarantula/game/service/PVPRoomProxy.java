@@ -16,23 +16,19 @@ public class PVPRoomProxy extends RoomProxyHeader{
     public Stub join(Session session, Rating rating) {
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
+        stub.stub(session.stub());
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
-        GameRoom _joined = gameServiceProvider.roomServiceProvider().join(gameZone,rating);
-        if(_joined==null) {
-            stub.joined = false;
-            return stub;
-        }
-        stub.room = _joined;
-        stub.joined = true;
+        GameRoom room = gameServiceProvider.roomServiceProvider().join(rating,gameZone);
+        stub.joined = room!=null;
+        if(!stub.joined) return stub;
+        stub.roomId = room.roomId();
+        stub.zoneId = gameZone.distributionKey();
+        stub.room = room;
         stub.zone = gameZone;
         stub.rating = rating;
         stub.pushChannel = context.register(session,(h,m)->super.update(stub,h,m),(s,d)->{
-            if(gameLobby.timeout(s,d)){
-                stub.joined = false;
-                this.dataStore.update(stub);
-                this.gameServiceProvider.roomServiceProvider().leave(stub);
-            }
+            gameLobby.timeout(s,d);
         });
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
@@ -46,7 +42,6 @@ public class PVPRoomProxy extends RoomProxyHeader{
     public void leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
-        stub.pushChannel.close();
         this.gameServiceProvider.roomServiceProvider().leave(stub);
     }
 }

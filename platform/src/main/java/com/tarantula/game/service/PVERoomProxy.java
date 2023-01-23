@@ -3,6 +3,8 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.tarantula.game.*;
 import com.tarantula.game.PlayerSavedGames;
+import com.tarantula.platform.room.GameRoom;
+import com.tarantula.platform.room.GameZoneIndex;
 
 public class PVERoomProxy extends RoomProxyHeader {
 
@@ -17,7 +19,10 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.stub(session.stub());
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
-        stub.room = this.gameServiceProvider.roomServiceProvider().join(gameZone,rating);
+        GameRoom room = this.gameServiceProvider.roomServiceProvider().join(rating,gameZone);
+        stub.joined = room!=null;
+        if(!stub.joined) return stub;
+        stub.room = room;
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
@@ -28,7 +33,6 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.roomId = stub.room.roomId();
         stub.zoneId = gameZone.distributionKey();
         stub.zone = gameZone;
-        stub.joined = true;
         stub.offline = true;
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());

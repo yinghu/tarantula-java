@@ -6,7 +6,7 @@
   "packetRemoveInterval" : 1000,
   "pingListenerInterval" : 6000,
   "retryInterval" : 300,
-  "sessionJoinTimeout": 5000,
+  "sessionJoinTimeout": 10000,
   "sessionTimeout" : 10000,
   "channelPoolSize" : 1000,
   "sessionPoolSize": 5000,

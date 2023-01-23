@@ -145,14 +145,18 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",round);
-        portableWriter.writeInt("2",capacity);
-        portableWriter.writePortableArray("3",entries);
+        portableWriter.writeUTF("2",bucket);
+        portableWriter.writeUTF("3",oid);
+        portableWriter.writeInt("4",capacity);
+        portableWriter.writePortableArray("5",entries);
     }
 
     public void readPortable(PortableReader portableReader) throws IOException {
         this.round = portableReader.readInt("1");
-        entries = new GameEntry[portableReader.readInt("2")];
-        for(Portable p : portableReader.readPortableArray("3")){
+        this.bucket = portableReader.readUTF("2");
+        this.oid = portableReader.readUTF("3");
+        this.entries = new Entry[portableReader.readInt("4")];
+        for(Portable p : portableReader.readPortableArray("5")){
             Entry gameEntry = (Entry)p;
             entries[gameEntry.seat()] = gameEntry;
         }

@@ -65,6 +65,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         try {
             future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
+            e.printStackTrace();
             future.cancel(true);
         }
     }
