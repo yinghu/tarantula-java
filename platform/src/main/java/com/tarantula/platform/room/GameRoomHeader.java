@@ -111,6 +111,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.properties.put("1",capacity);
         this.properties.put("2",round);
         this.properties.put("3",this.totalJoined);
+        this.properties.put("4",this.index);//game zone ID
         return this.properties;
     }
     @Override
@@ -118,6 +119,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.capacity = ((Number)properties.getOrDefault("1",12)).intValue();
         this.round = ((Number)properties.getOrDefault("2",0)).intValue();
         this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.index = (String)properties.getOrDefault("4",null);
     }
     @Override
     public JsonObject toJson(){
@@ -237,6 +239,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     @Override
     public String toString(){
-        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"]";
+        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Zone ID ["+index+"]";
     }
 }

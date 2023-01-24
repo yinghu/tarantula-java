@@ -44,6 +44,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
+
     private ArrayBlockingQueue<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
 
@@ -168,9 +169,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("ON ROOM LEFT->"+room);
             if(room.empty()){
                 room.reset();
-                if(clusterStore.mapSetIfAbsent(roomId.getBytes(),"{}".getBytes())==null){
-                    index.roomStore.queueOffer(roomId.getBytes());
-                }
+                //if(clusterStore.mapSetIfAbsent(roomId.getBytes(),"{}".getBytes())==null){
+                ///index.roomStore.queueOffer(roomId.getBytes());
+                //}
             }
         });
     }
@@ -198,7 +199,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             rooms[0]++;
             if(dedicated){
                 byte[] roomId = k.getBytes();
-                if(clusterStore.mapSetIfAbsent(roomId,"{}".getBytes())==null){
+                if(clusterStore.mapSetIfAbsent(roomId,gameZone.distributionKey().getBytes())==null){
                     index.roomStore.queueOffer(roomId);
                 }
             }
@@ -216,7 +217,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     index.roomIndex.addKey(gameRoom.roomId());
                     if(dedicated){
                         byte[] rkey = gameRoom.roomId().getBytes();
-                        if(clusterStore.mapSetIfAbsent(rkey,"{}".getBytes())==null){
+                        if(clusterStore.mapSetIfAbsent(rkey,gameZone.distributionKey().getBytes())==null){
                             index.roomStore.queueOffer(rkey);
                         }
                     }
@@ -272,7 +273,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(gameRoom==null) return false;
             roomId = gameRoom.roomId().getBytes();
         }
-        clusterStore.mapRemove(roomId);
+        //clusterStore.mapRemove(roomId);
         clusterStore.indexSet(connectionStub.serverId(),roomId);
         channelStub.roomId = new String(roomId);
         ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(channelStub.serverId,true,false,true);
