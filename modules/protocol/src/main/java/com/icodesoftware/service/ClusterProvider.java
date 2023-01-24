@@ -41,6 +41,7 @@ public interface ClusterProvider extends ServiceProvider {
         //map operations
         String name();
         byte[] mapGet(byte[] key);
+        boolean mapExists(byte[] key);
         byte[] mapSetIfAbsent(byte[] key,byte[] pending);
         void mapSet(byte[] key,byte[] value);
         byte[] mapRemove(byte[] key);

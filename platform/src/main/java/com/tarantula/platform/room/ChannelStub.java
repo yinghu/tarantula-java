@@ -38,6 +38,7 @@ public class ChannelStub extends GameChannel{
         this.properties.put("2",sessionId);
         this.properties.put("3",roomId);
         this.properties.put("4",totalJoined);
+        this.properties.put("5",serverId);
         return this.properties;
     }
     @Override
@@ -46,6 +47,7 @@ public class ChannelStub extends GameChannel{
         this.sessionId = ((Number)properties.get("2")).intValue();
         this.roomId = (String) properties.get("3");
         this.totalJoined = ((Number)properties.get("4")).intValue();
+        this.serverId = (String) properties.get("5");
     }
     @Override
     public int sessionId(){

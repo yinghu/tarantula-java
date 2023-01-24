@@ -43,7 +43,10 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         this.vMap.put(key,value);
     }
-
+    public boolean mapExists(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
+        return this.vMap.containsKey(key);
+    }
     public byte[] mapRemove(byte[] key){
         if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         return vMap.remove(key);

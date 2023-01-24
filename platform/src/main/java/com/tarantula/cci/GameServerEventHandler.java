@@ -41,7 +41,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         GameCluster gameCluster = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
         if(gameCluster==null) throw new RuntimeException("Illegal access");
         String typeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
-        if(action.equals("onStart")){//start game server
+        if(action.equals("onConnect")){//start game server
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
@@ -68,10 +68,19 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
             deploymentServiceProvider.verifyConnection(typeId,serverId);
         }
+        else if(action.equals("onStart")){//stop the game server
+            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
+            connection.configurationTypeId(typeId);
+            this.deploymentServiceProvider.startConnection(connection);
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId",typeId);
+            resp.addProperty("successful",true);
+            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+        }
         else if(action.equals("onStop")){//stop the game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             connection.configurationTypeId(typeId);
-            this.deploymentServiceProvider.release(connection);
+            this.deploymentServiceProvider.stopConnection(connection);
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);

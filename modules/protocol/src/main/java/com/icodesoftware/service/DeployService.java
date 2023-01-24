@@ -33,6 +33,7 @@ public interface DeployService extends ServiceProvider {
     //boolean onRegisterChannel(String typeId,Channel channel);
     void onVerifyConnection(String typeId,String serverId);
     void onRegisterConnection(Connection connection);
+    void onStartConnection(Connection connection);
     void onReleaseConnection(Connection connection);
 
     byte[] onClusterKey();

@@ -82,7 +82,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.httpCaller._init();
         headers[1]=accessKey;
         headers[3]=serverId;
-        headers[5]="onStart";
+        headers[5]="onConnect";
         connection.addProperty("serverId",serverId);
         connection.addProperty("timeout",udpEndpointServiceProvider.sessionTimeout());
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
@@ -110,6 +110,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             shutdown();
             throw new RuntimeException("channel cannot be registered");
         }
+        headers[5]="onStart";
+        resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
+        logger.warn(resp);
+        jo = JsonUtil.parse(resp);
+        if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         receiver = new Thread(()->{
                 while (running){
                     try {

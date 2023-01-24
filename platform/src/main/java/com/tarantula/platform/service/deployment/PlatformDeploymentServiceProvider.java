@@ -741,6 +741,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return suc[0]==0;
     }
+    public <T extends Configurable> void startConnection(T connection){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(connection.configurationTypeId())) v.onStartConnection((Connection)connection);
+        });
+    }
+    public <T extends Configurable> void stopConnection(T connection){
+        cListeners.forEach((k,v)->{
+            if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection((Connection)connection);
+        });
+    }
     public void verifyConnection(String typeId,String serverId){
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
@@ -812,13 +822,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
 
     public <T extends Configurable> void release(T configurable){
-        if(configurable instanceof Connection){
-            Connection connection = (Connection)configurable;
-            cListeners.forEach((k,v)->{
-                if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
-            });
-            return;
-        }
+        //if(configurable instanceof Connection){
+            //Connection connection = (Connection)configurable;
+            //cListeners.forEach((k,v)->{
+                //if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
+            //});
+            //return;
+        //}
         Configurable removed = this.vMap.remove(configurable.distributionKey());
         removed.released();
     }

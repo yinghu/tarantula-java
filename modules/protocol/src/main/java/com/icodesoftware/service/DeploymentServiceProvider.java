@@ -19,8 +19,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     <T extends Configurable> boolean registerConnection(T connection);
     <T extends Configurable> boolean registerChannel(T channel);
-    byte[] serverKey(String typeId);
+    <T extends Configurable> void startConnection(T connection);
+    <T extends Configurable> void stopConnection(T connection);
     void verifyConnection(String typeId,String serverId);
+    byte[] serverKey(String typeId);
 
 
     String registerGameServerListener(GameServerListener gameChannelListener);
@@ -114,6 +116,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onResourceUpdated(String contentUrl,String resourceName);
 
         void onConnectionRegistered(String typeId,Connection connection);
+        void onConnectionStarted(String typeId,Connection connection);
         void onConnectionVerified(String typeId,String serverId);
         void onConnectionReleased(String typeId,Connection connection);
 

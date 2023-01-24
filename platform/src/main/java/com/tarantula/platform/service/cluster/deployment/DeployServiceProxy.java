@@ -360,6 +360,22 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             }
         }
     }
+    public void onStartConnection(Connection connection){
+        NodeEngine nodeEngine = getNodeEngine();
+        StartConnectionOperation operation = new StartConnectionOperation(connection.configurationTypeId(),connection);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m :mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
+            final Future<Void> future = builder.invoke();
+            try {
+                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            } catch (Exception e) {
+                future.cancel(true);
+                logger.error("startConnection error on node->"+m.getAddress(),e);
+                //goes to next node if failed
+            }
+        }
+    }
     public void onReleaseConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         ReleaseConnectionOperation operation = new ReleaseConnectionOperation(connection.configurationTypeId(),connection);

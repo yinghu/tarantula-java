@@ -8,6 +8,7 @@ import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ConnectionStub extends ClientConnection {
@@ -15,6 +16,7 @@ public class ConnectionStub extends ClientConnection {
     public byte[] serverKey;
 
     public int maxCapacity;
+    public AtomicBoolean started;
     private AtomicLong pingSequence;
     private long lastPing;
     private int tries;
@@ -73,6 +75,7 @@ public class ConnectionStub extends ClientConnection {
         this.pingSequence = new AtomicLong(0);
         this.lastPing = 0;
         this.connectionTimeout = timeout;
+        this.started = new AtomicBoolean(false);
     }
 
 
@@ -100,6 +103,7 @@ public class ConnectionStub extends ClientConnection {
     }
 
     public boolean onTimeout(int delta){
+        if(!started.get()) return false;
         connectionTimeout -= delta;
         if(connectionTimeout > 0) return false;
         connectionTimeout = timeout;

@@ -9,7 +9,7 @@
   "pvp": {
     "connectionCheckEnabled": true,
     "maxRoomPoolSizePerZone": 2000,
-    "minRoomPoolSizePerZone": 100,
+    "minRoomPoolSizePerZone": 10,
     "maxDedicatedServerConnections": 10,
     "connectionCheckInterval": 1000
   },

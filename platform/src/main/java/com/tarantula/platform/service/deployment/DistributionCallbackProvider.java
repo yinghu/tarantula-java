@@ -233,6 +233,17 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
+    public void onConnectionStarted(String typeId,Connection connection) {
+        try{
+            platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
+                if(v.typeId().equals(typeId)) v.onConnectionStarted(connection);
+            });
+        }catch (Exception ex){
+            log.error("error on start connection",ex);
+        }
+    }
+
+    @Override
     public void onConnectionReleased(String typeId, Connection connection) {
         platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
             if(v.typeId().equals(typeId)) v.onConnectionReleased(connection);
