@@ -168,7 +168,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("ON ROOM LEFT->"+room);
             if(room.empty()){
                 room.reset();
-                //clusterStore.queueOffer(room.roomId().getBytes());
+                if(clusterStore.mapSetIfAbsent(roomId.getBytes(),"{}".getBytes())==null){
+                    index.roomStore.queueOffer(roomId.getBytes());
+                }
             }
         });
     }
@@ -181,7 +183,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.gameZone = gameZone;
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
         if(dedicated) {
-            index.roomStore = this.clusterProvider.clusterStore(gameZone.oid(), false, false, true);
+            index.roomStore = this.clusterProvider.clusterStore(gameZone.oid(), true, false, true);
         }
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
@@ -273,7 +275,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         clusterStore.mapRemove(roomId);
         clusterStore.indexSet(connectionStub.serverId(),roomId);
         channelStub.roomId = new String(roomId);
-        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(channelStub.serverId,false,false,true);
+        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(channelStub.serverId,true,false,true);
         channelStore.queueOffer(channelStub.toBinary());
         return true;
     }

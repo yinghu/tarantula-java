@@ -94,4 +94,5 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
         connection = portableReader.readPortable("4");
     }
     public void close(){}
+    public void reset(){}
 }

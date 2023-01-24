@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 import com.icodesoftware.protocol.MessageBuffer;
 
-public interface Channel extends Configurable{
+public interface Channel extends Configurable,Resettable{
 
     int channelId();
     int sessionId();

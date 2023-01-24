@@ -71,4 +71,8 @@ public class ChannelStub extends GameChannel{
         return new GameChannel(channelId,sessionId,connection,key,timeout);
     }
 
+    public void reset(){
+
+    }
+
 }
