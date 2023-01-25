@@ -37,32 +37,54 @@ public class ValidationUtil {
 
     public  static Token validToken(MessageDigest messageDigest, String token) {
         //System.out.println(token);
+        //int sp = token.indexOf(" ");
+        //String systemId = token.substring(0,sp);
+        //String[] vm = token.substring(sp+1).split("-");
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
+        //messageDigest.reset();
+        //messageDigest.update(systemId.getBytes());//systemId
+        //messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
+        //messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
+        //if(toHexString(messageDigest.digest()).equals(vm[3])){// hash
+            //return new Token(true,systemId,Integer.parseInt(vm[1]));
+        //}
+        //else{
+            //return new Token(false);//throw new RuntimeException("Wrong session token");
+        //}
+
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
+        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash  vm[4] -- cluster suffix
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
         messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
-        if(toHexString(messageDigest.digest()).equals(vm[3])){// hash
-            return new Token(true,systemId,Integer.parseInt(vm[1]));
+        messageDigest.update(vm[3].getBytes());
+        if(toHexString(messageDigest.digest()).equals(vm[4])){// hash
+            return new Token(true,systemId,Integer.parseInt(vm[1]),vm[0],vm[3]);
         }
         else{
-            return new Token(false);//throw new RuntimeException("Wrong session token");
+            return new Token(false);
         }
     }
     public static class Token{
         public boolean valid;
         public String systemId;
         public int stub;
+        public String index;
+        public String ticket;
+
         public Token(boolean valid){
             this.valid = valid;
         }
-        public Token(boolean valid,String systemId,int stub){
+
+        public Token(boolean valid,String systemId,int stub,String index,String ticket){
             this.valid = valid;
             this.systemId = systemId;
             this.stub = stub;
+            this.index = index;
+            this.ticket = ticket;
         }
     }
 }

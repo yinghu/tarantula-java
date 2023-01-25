@@ -173,7 +173,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         localLeave(systemId,index,roomId,(room,entry)->{
             room.index(zoneId);
-            pendingRooms.offer(room);
+            if(room.started()&&room.empty()) pendingRooms.offer(room);
         });
     }
 
@@ -355,17 +355,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = pendingRooms.poll();
         if(gameRoom==null) return;
         GameZoneIndex index = gameZoneIndex.get(gameRoom.index());
-        if(!gameRoom.empty()) return;
-        try {
-            byte[] data = index.roomStore.mapGet(gameRoom.roomId().getBytes());
-            ChannelStub channelStub = new ChannelStub();
-            channelStub.fromBinary(data);
-            ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
-            channelStore.queueOffer(data);
-            logger.warn("queue->" + gameRoom);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        byte[] data = index.roomStore.mapGet(gameRoom.roomId().getBytes());
+        ChannelStub channelStub = new ChannelStub();
+        channelStub.fromBinary(data);
+        ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
+        channelStore.queueOffer(data);
+        logger.warn("queue->" + gameRoom);
     }
 
     private GameRoom createGameRoom(String type,int roomCapacity){

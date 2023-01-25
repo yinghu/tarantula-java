@@ -27,6 +27,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected long duration;
     protected int round;
     protected int totalJoined;
+    protected boolean started;
     protected Arena arena;
 
     protected HashMap<String,Entry> joinIndex;
@@ -110,7 +111,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public Map<String,Object> toMap(){
         this.properties.put("1",capacity);
         this.properties.put("2",round);
-        this.properties.put("3",this.totalJoined);
+        this.properties.put("3",totalJoined);
+        this.properties.put("4",started);
         return this.properties;
     }
     @Override
@@ -118,6 +120,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.capacity = ((Number)properties.getOrDefault("1",1)).intValue();
         this.round = ((Number)properties.getOrDefault("2",0)).intValue();
         this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.started = (Boolean)properties.getOrDefault("4",false);
     }
     @Override
     public JsonObject toJson(){
@@ -185,6 +188,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             break;
         }
         totalJoined++;
+        started = full();
         this.dataStore.update(this);
         listener.onUpdated(this,joinIndex.get(systemId));
         return view();
@@ -214,6 +218,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     public boolean full(){
         return totalJoined==capacity;
+    }
+    public boolean started(){
+        return started;
     }
 
     public synchronized void reset(){

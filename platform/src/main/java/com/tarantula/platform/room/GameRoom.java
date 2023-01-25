@@ -35,6 +35,7 @@ public interface GameRoom extends Resettable,Configurable,Portable {
     void load();
     boolean empty();
     boolean full();
+    boolean started();
 
 
 
