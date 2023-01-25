@@ -12,7 +12,6 @@ import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.MetricsViewMonitor;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -109,7 +108,7 @@ public class MetricsViewSudoRoleModule implements Module {
     }
 
     private String toMessage(String msg,boolean suc){
-       return SystemUtil.toJsonMessage(msg,suc);
+       return JsonUtil.toSimpleResponse(suc,msg);
     }
 
 

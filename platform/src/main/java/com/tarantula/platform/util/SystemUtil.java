@@ -1,8 +1,7 @@
 package com.tarantula.platform.util;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.protocol.ValidationUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -19,6 +18,8 @@ public class SystemUtil {
 
 
     public static String toHexString(byte[] hash){
+        return ValidationUtil.toHexString(hash);
+        /**
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < hash.length; i++){
             int v = hash[i] & 0xff;
@@ -27,7 +28,7 @@ public class SystemUtil {
             }
             sb.append(Integer.toHexString(v));
         }
-        return sb.toString().toUpperCase();
+        return sb.toString().toUpperCase();**/
     }
     public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds,String waterMark) {
         LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
@@ -44,6 +45,8 @@ public class SystemUtil {
     }
 
     public static String validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
+        return ValidationUtil.validTicket(messageDigest,systemId,stub,ticket);
+        /**
         String[] tlist = ticket.split(" ");//validate
         long end = Long.parseLong(tlist[1]);
         messageDigest.reset();
@@ -56,7 +59,7 @@ public class SystemUtil {
         }
         else{
             return null;
-        }
+        }**/
     }
     public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark,String index) {
         //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
@@ -101,6 +104,10 @@ public class SystemUtil {
     }
     public  static OnSession validToken(MessageDigest messageDigest, String token) {
         //System.out.println(token);
+        ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
+        if(!validated.valid) throw new RuntimeException("Wrong session token");
+        return new OnSessionTrack(validated.systemId,validated.stub,validated.index,validated.ticket);
+        /**
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
@@ -115,7 +122,7 @@ public class SystemUtil {
         }
         else{
             throw new RuntimeException("Wrong session token");
-        }
+        }**/
     }
     public static String hashPassword(MessageDigest messageDigest,String password) {
         messageDigest.reset();
@@ -129,91 +136,12 @@ public class SystemUtil {
     public static int partition(String key,int partitionNumber){
         return Math.abs(Arrays.hashCode(key.getBytes()))%partitionNumber;
     }
-    public static String toString(byte[] data){
-        StringBuffer sb = new StringBuffer(data.length);
-        for(byte b:data){
-            sb.append((char)b);
-        }
-        return sb.toString();
-    }
-    public static String toString(String[] list){
-        StringBuffer buffer = new StringBuffer();
-        for(String s : list){
-            buffer.append(s).append(Recoverable.PATH_SEPARATOR);
-        }
-        return buffer.substring(0,buffer.length()-1);
-    }
 
-    public static String toCreditsString(double vc){
-        if(vc>=1000000000){ // B level
-            return String.format("%.2f%c",Double.valueOf(vc/1000000000).doubleValue(),'B');
-        }
-        else if(vc>=1000000&&vc<1000000000){ //1M to 999M
-            return String.format("%.2f%c",Double.valueOf(vc/1000000).doubleValue(),'M');
-        }
-        else if(vc>=1000&&vc<1000000){ //1K to 999K
-            return String.format("%.2f%c",Double.valueOf(vc/1000).doubleValue(),'K');
-        }
-        else{
-            return String.format("%.2f",Double.valueOf(vc).doubleValue());
-        }
-    }
-    public static String toCreditsString2(double vc){
-        if(vc>=1000000000){ // B level
-            return String.format("%.0f%c",Double.valueOf(vc/1000000000).doubleValue(),'B');
-        }
-        else if(vc>=1000000&&vc<1000000000){ //1M to 999M
-            return String.format("%.0f%c",Double.valueOf(vc/1000000).doubleValue(),'M');
-        }
-        else if(vc>=1000&&vc<1000000){ //1K to 999K
-            return String.format("%.0f%c",Double.valueOf(vc/1000).doubleValue(),'K');
-        }
-        else{
-            return String.format("%.0f",Double.valueOf(vc).doubleValue());
-        }
-    }
+
     public static String oid(){
         return UUID.randomUUID().toString().replace("-","");
     }
-    public static boolean timeout(long end){
-        long dm = TimeUtil.durationUTCInSeconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(end));
-        return dm<=0;
-    }
-    public static String remainingTimeAsString(long end,int size){
-        long dm = TimeUtil.durationUTCInSeconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(end));
-        if(dm<=0){
-            return "00:00:00";
-        }
-        StringBuffer sb = new StringBuffer();
-        if(size==3){
-            long h = dm/(3600);
-            sb.append(h>9?h:"0"+h).append(":");
-            dm = dm%(3600);
-            long m = dm/(60);
-            sb.append(m>9?m:"0"+m).append(":");
-            dm= dm%(60);
-            sb.append(dm>9?dm:"0"+dm);
-        }
-        else if(size==2){
-            //long h = dm/(3600);
-            //sb.append(h>9?h:"0"+h).append(":");
-            dm = dm%(3600);
-            long m = dm/(60);
-            sb.append(m>9?m:"0"+m).append(":");
-            dm= dm%(60);
-            sb.append(dm>9?dm:"0"+dm);
-        }
-        else{
-            //long h = dm/(3600);
-            //sb.append(h>9?h:"0"+h).append(":");
-            //dm = dm%(3600);
-            //long m = dm/(60);
-            //sb.append(m>9?m:"0"+m).append(":");
-            dm= dm%(60);
-            sb.append(dm>9?dm:"0"+dm);
-        }
-        return sb.toString();
-    }
+
     public static String mimeType(String path){
         String contentType = "text/html";
         if(path.endsWith(".css")){
@@ -242,6 +170,7 @@ public class SystemUtil {
         }
         return contentType;
     }
+
     public static ApplicationPreSetup applicationPreSetup(String className){
         try{
             return (ApplicationPreSetup)Class.forName(className).getConstructor().newInstance();
@@ -257,10 +186,4 @@ public class SystemUtil {
         return Base64.getDecoder().decode(data);
     }
 
-    public static String toJsonMessage(String msg, boolean suc){
-        JsonObject jms = new JsonObject();
-        jms.addProperty("successful",suc);
-        jms.addProperty("message",msg);
-        return jms.toString();
-    }
 }

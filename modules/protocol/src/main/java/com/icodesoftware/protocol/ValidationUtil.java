@@ -1,5 +1,6 @@
-package com.icodesoftware.util;
+package com.icodesoftware.protocol;
 
+import com.icodesoftware.util.TimeUtil;
 
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 public class ValidationUtil {
 
 
-    private static String toHexString(byte[] hash){
+    public static String toHexString(byte[] hash){
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < hash.length; i++){
             int v = hash[i] & 0xff;
@@ -19,7 +20,8 @@ public class ValidationUtil {
         return sb.toString().toUpperCase();
     }
 
-    public static boolean validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
+    public static String validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
+
         String[] tlist = ticket.split(" ");//validate
         long end = Long.parseLong(tlist[1]);
         messageDigest.reset();
@@ -28,30 +30,14 @@ public class ValidationUtil {
         messageDigest.update(Long.toHexString(end).getBytes());
         if(tlist[2].equals(toHexString(messageDigest.digest()))){
             LocalDateTime ending = TimeUtil.fromUTCMilliseconds(end);
-            return ending.isAfter(LocalDateTime.now());
+            return ending.isAfter(LocalDateTime.now())?tlist[3]:null;
         }
         else{
-            return false;
+            return null;
         }
     }
 
     public  static Token validToken(MessageDigest messageDigest, String token) {
-        //System.out.println(token);
-        //int sp = token.indexOf(" ");
-        //String systemId = token.substring(0,sp);
-        //String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash
-        //messageDigest.reset();
-        //messageDigest.update(systemId.getBytes());//systemId
-        //messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
-        //messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
-        //if(toHexString(messageDigest.digest()).equals(vm[3])){// hash
-            //return new Token(true,systemId,Integer.parseInt(vm[1]));
-        //}
-        //else{
-            //return new Token(false);//throw new RuntimeException("Wrong session token");
-        //}
-
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
@@ -69,6 +55,7 @@ public class ValidationUtil {
         }
     }
     public static class Token{
+
         public boolean valid;
         public String systemId;
         public int stub;

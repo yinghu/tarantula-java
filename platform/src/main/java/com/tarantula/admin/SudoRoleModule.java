@@ -155,7 +155,7 @@ public class SudoRoleModule implements Module {
     }
 
     private String toMessage(String msg,boolean suc){
-       return SystemUtil.toJsonMessage(msg,suc);
+       return JsonUtil.toSimpleResponse(suc,msg);
     }
 
 

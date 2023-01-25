@@ -5,11 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.SystemUtil;
 
 
 public class ModuleSudoRoleModule implements Module {
@@ -122,6 +122,6 @@ public class ModuleSudoRoleModule implements Module {
     }
 
     private String toMessage(String msg,boolean suc){
-        return SystemUtil.toJsonMessage(msg,suc);
+        return JsonUtil.toSimpleResponse(suc,msg);
     }
 }

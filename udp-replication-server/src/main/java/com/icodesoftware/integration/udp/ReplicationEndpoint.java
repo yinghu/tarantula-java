@@ -11,7 +11,7 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.ValidationUtil;
+import com.icodesoftware.protocol.ValidationUtil;
 
 import javax.crypto.Cipher;
 import java.security.MessageDigest;
@@ -188,7 +188,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             String ticket = messageBuffer.readUTF8();
             MessageDigest mda = (MessageDigest)messageDigest.clone();
             ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
-            boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket);
+            boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
             if(suc&&sessionId==messageHeader.sessionId){
                 activeChannelIndex.get(messageHeader.channelId).totalJoined.incrementAndGet();
                 return true;

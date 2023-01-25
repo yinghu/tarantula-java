@@ -10,8 +10,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.*;
-import com.tarantula.platform.util.SystemUtil;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -127,7 +125,7 @@ public class MetricsViewAdminRoleModule implements Module {
                 session.write(view.toCategoryJson().toString().getBytes());
             }
             else{
-                session.write(SystemUtil.toJsonMessage("service provider ["+session.name()+"] not existed",false).getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"service provider ["+session.name()+"] not existed").getBytes());
             }
         }
         else if(session.action().equals("onUpdateServiceView")){
@@ -139,7 +137,7 @@ public class MetricsViewAdminRoleModule implements Module {
                 session.write(view.toMetricsJson(nodes,categories).toString().getBytes());
             }
             else{
-                session.write(SystemUtil.toJsonMessage("service view ["+session.name()+"] not existed",false).getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"service view ["+session.name()+"] not existed").getBytes());
             }
         }
         else{
@@ -162,7 +160,7 @@ public class MetricsViewAdminRoleModule implements Module {
     }
 
     private String toMessage(String msg,boolean suc){
-        return SystemUtil.toJsonMessage(msg,suc);
+        return JsonUtil.toSimpleResponse(suc,msg);
     }
 
 }

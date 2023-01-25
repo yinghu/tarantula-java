@@ -8,6 +8,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -128,7 +129,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     }
 
     private String toMessage(String msg, boolean suc){
-        return SystemUtil.toJsonMessage(msg,suc);
+        return JsonUtil.toSimpleResponse(suc,msg);
     }
 
     @Override
