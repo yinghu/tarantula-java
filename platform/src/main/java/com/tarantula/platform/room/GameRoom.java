@@ -24,7 +24,7 @@ public interface GameRoom extends Resettable,Configurable,Portable {
     int round();
     Arena arena();
     List<Entry> entries();
-
+    boolean dedicated();
     //Local Setup After Join
     void setup(GameZone gameZone,Channel channel,Rating rating);
 

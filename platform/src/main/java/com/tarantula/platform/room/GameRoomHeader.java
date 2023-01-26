@@ -28,6 +28,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int round;
     protected int totalJoined;
     protected boolean started;
+    protected boolean dedicated;
     protected Arena arena;
 
     protected HashMap<String,Entry> joinIndex;
@@ -42,6 +43,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public int timeout(){return timeout;}
     public byte[] serverKey(){
         return serverKey;
+    }
+    public boolean dedicated(){
+        return dedicated;
     }
     public Connection connection(){
         return connection;
@@ -99,7 +103,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.arena = gameZone.arena(rating.arenaLevel);
         this.capacity = gameZone.capacity();
         this.duration = gameZone.roundDuration();
-        if(channel==null) return;
+        this.dedicated = channel!=null;
+        if(!dedicated) return;
         this.connection = channel.connection();
         this.channelId = channel.channelId();
         this.sessionId = channel.sessionId();
@@ -129,6 +134,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("Capacity",capacity);
         jsonObject.addProperty("Duration",duration);
         jsonObject.addProperty("Round",round);
+        jsonObject.addProperty("Dedicated",dedicated);
         if(connection!=null){
             jsonObject.addProperty("ChannelId",channelId);
             jsonObject.addProperty("SessionId",sessionId);
