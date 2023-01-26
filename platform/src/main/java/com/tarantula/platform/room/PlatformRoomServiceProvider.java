@@ -255,14 +255,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public OnAccess onConnection(Connection connection) {
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
         if(index==null) return null;
+        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        int timeout = udpEndpoint.sessionTimeout();
+        connection.timeout(timeout);
         byte[] serverId = connection.serverId().getBytes();
         byte[] data = connection.toBinary();
         serverClusterStore.mapSet(serverId,data);
         serverClusterStore.indexSet(typeLobby,serverId);
         this.clusterProvider.deployService().onRegisterConnection(connection);
         OnAccess onAccess = new OnAccessTrack();
-        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        onAccess.property("sessionTimeout",udpEndpoint.sessionTimeout());
+        onAccess.property("sessionTimeout",timeout);
         onAccess.property("capacity",index.gameZone.capacity());
         return onAccess;
     }
