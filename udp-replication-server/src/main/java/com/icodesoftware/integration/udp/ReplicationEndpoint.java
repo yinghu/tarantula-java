@@ -72,7 +72,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         this.udpEndpointServiceProvider.sessionTimeout(config.get("sessionTimeout").getAsInt());
         this.udpEndpointServiceProvider.registerPingListener(this);
-        this.udpEndpointServiceProvider.start();
+
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
@@ -146,6 +146,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
                 }
             }
         },"tarantula-udp-message-timer");
+        this.udpEndpointServiceProvider.start();
         receiver.setPriority(UDPEndpointServiceProvider.RECEIVER_THREAD_PRIORITY);
         receiver.start();
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);

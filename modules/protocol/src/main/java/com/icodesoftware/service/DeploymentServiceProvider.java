@@ -17,7 +17,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     //GAME SERVER APIs
 
-    <T extends Configurable> boolean registerConnection(T connection);
+    OnAccess registerConnection(Connection connection);
     <T extends Configurable> boolean registerChannel(T channel);
     <T extends Configurable> void startConnection(T connection);
     <T extends Configurable> void stopConnection(T connection);

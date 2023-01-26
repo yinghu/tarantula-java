@@ -62,6 +62,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ArrayList<Integer> pendingJoinKickoff;
     private ConcurrentHashMap<Integer,AtomicLong> pendingJoins;
 
+    private int sessionTimeout;
+
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
         pendingJoins = new ConcurrentHashMap<>();
@@ -94,7 +96,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         connection.host(serviceContext.node().servicePushAddress());
         frameRate = ((Number)cfg.property("frameRate")).intValue();
         this.sessionJoinTimeout = ((Number)cfg.property("sessionJoinTimeout")).longValue();
-        udpEndpointServiceProvider.sessionTimeout(((Number)cfg.property("sessionTimeout")).intValue());
+        this.sessionTimeout = ((Number)cfg.property("sessionTimeout")).intValue();
+        udpEndpointServiceProvider.sessionTimeout(sessionTimeout);
         udpEndpointServiceProvider.receiverTimeout(((Number)cfg.property("receiverTimeout")).intValue());
         udpEndpointServiceProvider.retryInterval(((Number)cfg.property("retryInterval")).intValue());
         udpEndpointServiceProvider.pingListenerInterval(((Number)cfg.property("pingListenerInterval")).intValue());
@@ -315,6 +318,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             });
         }
         this.serviceContext.schedule(onTimer);
+    }
+
+    public int sessionTimeout(){
+        return this.sessionTimeout;
     }
 
     private UDPEndpointServiceProvider createInstance(String className){

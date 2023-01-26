@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
@@ -721,15 +722,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] existing = clusterStore.mapSetIfAbsent(typeId.getBytes(),key);
         return existing!=null?existing:key;
     }
-    public <T extends Configurable> boolean registerConnection(T configurable){
-        Connection connection = (Connection)configurable;
-        int[] suc ={0};
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(connection.configurationTypeId())){
-                if(!v.onConnection(connection)) suc[0]++;
-            }
-        });
-        return suc[0]==0;
+    public OnAccess registerConnection(Connection connection){
+        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
+        if(gameServerListener==null) return null;
+        return gameServerListener.onConnection(connection);
+        //int[] suc ={0};
+        //cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(connection.configurationTypeId())){
+                //if(v.onConnection(connection)==null) suc[0]++;
+            //}
+        //});
+        //return new AccessKey();
     }
     public <T extends Configurable> boolean registerChannel(T configurable){
         ChannelStub channelStub = (ChannelStub)configurable;
@@ -755,7 +758,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
     public String registerGameServerListener(GameServerListener gameChannelListener){
-        String regKey = UUID.randomUUID().toString();
+        String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
         return regKey;
     }

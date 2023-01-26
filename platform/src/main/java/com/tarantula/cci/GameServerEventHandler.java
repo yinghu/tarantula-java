@@ -42,15 +42,21 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         if(gameCluster==null) throw new RuntimeException("Illegal access");
         String typeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         if(action.equals("onConnect")){//start game server
-            JsonObject resp = new JsonObject();
-            resp.addProperty("typeId",typeId);
+
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
-            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
             connection.configurationTypeId(typeId);
             connection.serverKey = serverKey;
-            boolean suc = this.deploymentServiceProvider.registerConnection(connection);
+            OnAccess onAccess = this.deploymentServiceProvider.registerConnection(connection);
+            boolean suc = onAccess!=null;
+            JsonObject resp = new JsonObject();
             resp.addProperty("successful",suc);
+            if(suc) {
+                resp.addProperty("typeId", typeId);
+                resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
+                resp.addProperty("sessionTimeout",(int)onAccess.property("sessionTimeout"));
+                resp.addProperty("capacity",(int)onAccess.property("capacity"));
+            }
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
         else if(action.equals("onChannel")){

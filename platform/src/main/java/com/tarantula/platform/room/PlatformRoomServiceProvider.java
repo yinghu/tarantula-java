@@ -9,12 +9,14 @@ import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ReloadListener;
 import com.icodesoftware.service.ServiceContext;
 
+import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ScheduleRunner;
 
 
@@ -250,15 +252,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     @Override
-    public boolean onConnection(Connection connection) {
-        boolean gameZoneExisted = gameZoneIndex(connection.configurationName())!=null;
-        if(!gameZoneExisted) return false;
+    public OnAccess onConnection(Connection connection) {
+        GameZoneIndex index = gameZoneIndex(connection.configurationName());
+        if(index==null) return null;
         byte[] serverId = connection.serverId().getBytes();
         byte[] data = connection.toBinary();
         serverClusterStore.mapSet(serverId,data);
         serverClusterStore.indexSet(typeLobby,serverId);
         this.clusterProvider.deployService().onRegisterConnection(connection);
-        return true;
+        OnAccess onAccess = new OnAccessTrack();
+        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        onAccess.property("sessionTimeout",udpEndpoint.sessionTimeout());
+        onAccess.property("capacity",index.gameZone.capacity());
+        return onAccess;
     }
 
     @Override
