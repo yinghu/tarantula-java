@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener {
+public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
@@ -159,7 +159,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     public void onTimeout(int channelId, int sessionId) {
         ActiveChannel activeChannel = activeChannelIndex.get(channelId);
         if(activeChannel.totalJoined.decrementAndGet()==0){
-            pendingActiveChannelQueue.offer(activeChannel);
+            //pendingActiveChannelQueue.offer(activeChannel);
+            logger.warn("timeout->"+channelId+">>"+sessionId);
+            if(createChannel()){
+               logger.warn("channel created");
+            }
         }
     }
 
@@ -223,7 +227,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             activeChannelIndex.put(sessionId, activeChannel);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(sessionId, udpEndpointServiceProvider, this, this));
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(sessionId, udpEndpointServiceProvider, this, this,this));
             return true;
         }catch (Exception ex){
             logger.error("error on create channel",ex);
@@ -235,5 +239,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         boolean suc = JsonUtil.parse(httpCaller.get(registerPath,headers)).get("successful").getAsBoolean();
         pingRetries = suc?0:pingRetries+1;
         return suc;
+    }
+
+    @Override
+    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        logger.warn("on request");
+        return null;
     }
 }

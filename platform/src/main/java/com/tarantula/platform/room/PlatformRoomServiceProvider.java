@@ -290,6 +290,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(gameRoom==null) return false;
             roomId = gameRoom.roomId().getBytes();
         }
+        logger.warn("new channel->"+channel.channelId());
         index.roomStore.indexSet(connectionStub.serverId(),roomId);
         channelStub.roomId = new String(roomId);
         byte[] channelData = channelStub.toBinary();

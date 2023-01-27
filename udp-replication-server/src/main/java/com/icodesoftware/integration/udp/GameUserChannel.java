@@ -6,11 +6,13 @@ public class GameUserChannel extends UserChannel {
 
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
+    private UDPEndpointServiceProvider.RequestListener requestListener;
 
-    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
+    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         super(channelId,messenger);
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
+        this.requestListener = requestListener;
     }
 
     @Override
@@ -25,6 +27,7 @@ public class GameUserChannel extends UserChannel {
 
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        System.out.println("on leave");
         super.onLeave(messageHeader, messageBuffer);
     }
 
@@ -36,5 +39,15 @@ public class GameUserChannel extends UserChannel {
     @Override
     protected void onTimeout(int channelId,int sessionId){
         this.sessionListener.onTimeout(channelId,sessionId);
+    }
+
+    @Override
+    protected void onPing(){
+        //super.onPing();
+    }
+
+    @Override
+    protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        requestListener.onMessage(messageHeader,messageBuffer);
     }
 }
