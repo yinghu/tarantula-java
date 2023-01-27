@@ -19,6 +19,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener {
 
@@ -31,6 +32,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private String serverId;
     private int maxChannelSize;
     private int roomCapacity;
+    private AtomicInteger sessionIdSync;
     private MessageDigest messageDigest;
 
 
@@ -67,12 +69,12 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
+        this.sessionIdSync = new AtomicInteger(1);
         this.udpEndpointServiceProvider = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
         this.udpEndpointServiceProvider.address(config.get("binding").getAsString());
         this.udpEndpointServiceProvider.port(config.get("port").getAsInt());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         this.udpEndpointServiceProvider.registerPingListener(this);
-
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
@@ -85,7 +87,6 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         headers[5]="onConnect";
         connection.addProperty("serverId",serverId);
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
-        //logger.warn(resp);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
@@ -93,18 +94,8 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.udpEndpointServiceProvider.sessionTimeout(jo.get("sessionTimeout").getAsInt());
         this.roomCapacity = jo.get("capacity").getAsInt();
         int channelRegistered =0;
-        for(int i=1;i<=maxChannelSize;i++){
-            JsonObject channel = new JsonObject();
-            channel.addProperty("channelId",i);
-            ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
-            headers[5]="onChannel";
-            resp = httpCaller.post(registerPath,activeChannel.payload,headers);
-            jo = JsonUtil.parse(resp);
-            if(jo.get("successful").getAsBoolean()) {
-                activeChannelIndex.put(i, activeChannel);
-                udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(i, udpEndpointServiceProvider, this, this));
-                channelRegistered++;
-            }
+        for(int i=0;i<maxChannelSize;i++){
+            if(createChannel()) channelRegistered++;
         }
         if(channelRegistered==0){
             shutdown();
@@ -112,7 +103,6 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         }
         headers[5]="onStart";
         resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
-        //logger.warn(resp);
         jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         receiver = new Thread(()->{
@@ -211,14 +201,33 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             }
             else{
                 if(ping()){
-                    headers[5]="onChannel";
-                    JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
-                    if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+                    //headers[5]="onChannel";
+                    //JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
+                    //if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
+                    //createChannel();
                 }
             }
         }catch (Exception ex){
             logger.error("unexpected error on ->"+registerPath+"/"+headers[5]+"/"+headers[3],ex);
             if(activeChannel!=null) pendingActiveChannelQueue.offer(activeChannel);
+        }
+    }
+    private boolean createChannel(){
+        try {
+            JsonObject channel = new JsonObject();
+            int sessionId = sessionIdSync.getAndIncrement();
+            channel.addProperty("channelId",sessionId);
+            ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
+            headers[5]="onChannel";
+            String resp = httpCaller.post(registerPath,activeChannel.payload,headers);
+            JsonObject jo = JsonUtil.parse(resp);
+            if(!jo.get("successful").getAsBoolean()) return false;
+            activeChannelIndex.put(sessionId, activeChannel);
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(sessionId, udpEndpointServiceProvider, this, this));
+            return true;
+        }catch (Exception ex){
+            logger.error("error on create channel",ex);
+            return false;
         }
     }
     private boolean ping() throws Exception{

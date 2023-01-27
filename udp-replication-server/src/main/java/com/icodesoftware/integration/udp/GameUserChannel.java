@@ -6,6 +6,7 @@ public class GameUserChannel extends UserChannel {
 
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
+
     public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener){
         super(channelId,messenger);
         this.userSessionValidator = userSessionValidator;
