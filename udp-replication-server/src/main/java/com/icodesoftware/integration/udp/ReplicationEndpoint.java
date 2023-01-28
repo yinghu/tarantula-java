@@ -34,7 +34,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private String serverId;
     private int maxChannelSize;
     private int roomCapacity;
-    private AtomicInteger sessionIdSync;
+
+    private AtomicInteger keySync;
+
     private MessageDigest messageDigest;
 
 
@@ -71,7 +73,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
-        this.sessionIdSync = new AtomicInteger(1);
+        this.keySync = new AtomicInteger(1);
         this.udpEndpointServiceProvider = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
         this.udpEndpointServiceProvider.address(config.get("binding").getAsString());
         this.udpEndpointServiceProvider.port(config.get("port").getAsInt());
@@ -164,9 +166,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         if(activeChannel.totalJoined.decrementAndGet()==0){
             //pendingActiveChannelQueue.offer(activeChannel);
             logger.warn("timeout->"+channelId+">>"+sessionId);
-            if(createChannel()){
-               logger.warn("channel created");
-            }
+            //if(createChannel()){
+               //logger.warn("channel created");
+            //}
         }
     }
 
@@ -222,15 +224,16 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private boolean createChannel(){
         try {
             JsonObject channel = new JsonObject();
-            int sessionId = sessionIdSync.getAndIncrement();
-            channel.addProperty("channelId",sessionId);
+            int channelId = keySync.getAndIncrement();
+            channel.addProperty("channelId",channelId);
+            channel.addProperty("sessionId",keySync.getAndAdd(roomCapacity));
             ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
             headers[5]="onChannel";
             String resp = httpCaller.post(registerPath,activeChannel.payload,headers);
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
-            activeChannelIndex.put(sessionId, activeChannel);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(sessionId, udpEndpointServiceProvider, this, this,this));
+            activeChannelIndex.put(channelId, activeChannel);
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this, this,this));
             return true;
         }catch (Exception ex){
             logger.error("error on create channel",ex);

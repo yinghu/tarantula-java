@@ -8,18 +8,19 @@ import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.util.Map;
 
+//one time room join ticket
 public class ChannelStub extends GameChannel{
 
     public String serverId;
     public String roomId;
-    public int totalJoined;
 
     public ChannelStub(){
 
     }
 
-    public ChannelStub(int channelId){
+    public ChannelStub(int channelId,int sessionId){
         this.channelId = channelId;
+        this.sessionId = sessionId;
     }
 
     @Override
@@ -37,8 +38,7 @@ public class ChannelStub extends GameChannel{
         this.properties.put("1",channelId);
         this.properties.put("2",sessionId);
         this.properties.put("3",roomId);
-        this.properties.put("4",totalJoined);
-        this.properties.put("5",serverId);
+        this.properties.put("4",serverId);
         return this.properties;
     }
     @Override
@@ -46,29 +46,29 @@ public class ChannelStub extends GameChannel{
         this.channelId = ((Number)properties.get("1")).intValue();
         this.sessionId = ((Number)properties.get("2")).intValue();
         this.roomId = (String) properties.get("3");
-        this.totalJoined = ((Number)properties.get("4")).intValue();
-        this.serverId = (String) properties.get("5");
+        this.serverId = (String) properties.get("4");
     }
-    @Override
-    public int sessionId(){
-        totalJoined++;
-        return sessionId++;
-    }
+
 
     @Override
     public String toString(){
-        return "ChannelId->"+channelId+"->SessionId->"+sessionId+"->RoomId"+roomId+">>joined->"+totalJoined;
+        return "ChannelId ["+channelId+"] SessionId ["+sessionId+"] RoomId ["+roomId+"]";
     }
+
     @Override
     public int hashCode(){
         return Integer.hashCode(channelId);
     }
+
     @Override
     public boolean equals(Object obj){
         if(!(obj instanceof ChannelStub)) return false;
         return channelId == ((ChannelStub)obj).channelId;
     }
 
+    public void sessionId(int sessionId){
+        this.sessionId = sessionId;
+    }
     public Channel toChannel(Connection connection,byte[] key,int timeout){
         return new GameChannel(channelId,sessionId,connection,key,timeout);
     }

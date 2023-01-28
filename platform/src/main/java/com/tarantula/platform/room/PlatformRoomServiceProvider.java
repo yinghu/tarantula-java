@@ -20,9 +20,7 @@ import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ScheduleRunner;
 
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,6 +31,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private static final String DS_SUFFIX = "_room";
 
     public static final String NAME = "RoomService";
+
+    public static final byte[] ROOM_ID_QUEUED = "q".getBytes();
 
     private TarantulaLogger logger;
     private final String name;
@@ -47,7 +47,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
     private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
-    private ArrayBlockingQueue<GameRoom>  pendingRooms;
+    private ArrayBlockingQueue<RoomStatus>  pendingRooms;
 
     private ArrayBlockingQueue<ConnectionStub>  pendingConnections;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
@@ -167,15 +167,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = gameRoom(index,roomId);
         if(gameRoom==null) return null;
         return gameRoom.join(systemId,(room,entry) -> {
-            gameRoom.index(zoneId);
-            pendingRooms.offer(gameRoom);
+            pendingRooms.offer(new RoomStatus(zoneId,roomId,room.full()?RoomStatus.FULL:RoomStatus.JOINED));
         });
     }
     public void onRoomLeft(String zoneId,String roomId,String systemId){
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         localLeave(systemId,index,roomId,(room,entry)->{
-            room.index(zoneId);
-            if(room.started()&&room.empty()) pendingRooms.offer(room);
+            boolean empty = room.started() && room.empty();
+            pendingRooms.offer(new RoomStatus(zoneId,roomId,empty?RoomStatus.EMPTY:RoomStatus.LEFT));//reuse room id
         });
     }
 
@@ -205,10 +204,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 //make sure no other nodes are using the roomId
                 index.roomStore.mapLock(roomId);
                 if(!index.roomStore.mapExists(roomId)){
+                    index.roomStore.mapSet(roomId,ROOM_ID_QUEUED);
                     index.roomStore.queueOffer(roomId);
                 }
                 else{
-                    logger.warn(room+" --> Used on other nodes");
+                    logger.warn(room.roomId()+" : <In Use>");
                 }
                 index.roomStore.mapUnlock(roomId);
             }
@@ -226,6 +226,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     index.roomIndex.addKey(gameRoom.roomId());
                     if(dedicated){
                         byte[] rkey = gameRoom.roomId().getBytes();
+                        index.roomStore.mapSet(rkey,ROOM_ID_QUEUED);
                         index.roomStore.queueOffer(rkey);
                     }
                     else{
@@ -290,13 +291,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(gameRoom==null) return false;
             roomId = gameRoom.roomId().getBytes();
         }
-        logger.warn("new channel->"+channel.channelId());
         index.roomStore.indexSet(connectionStub.serverId(),roomId);
         channelStub.roomId = new String(roomId);
-        byte[] channelData = channelStub.toBinary();
-        index.roomStore.mapSet(roomId,channelData);
-        ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
-        channelStore.queueOffer(channelData);
+        for(int i=0;i<index.gameZone.capacity();i++){
+            channelStub.sessionId(channelStub.sessionId()+i);
+            //logger.warn(channelStub.toString());
+            byte[] channelData = channelStub.toBinary();
+            ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
+            channelStore.queueOffer(channelData);
+        }
         return true;
     }
     public void onStartConnection(Connection connection){
@@ -361,15 +364,26 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Connection kickoff->"+k);
             onDisConnection(connectionIndex.get(k));
         });
-        GameRoom gameRoom = pendingRooms.poll();
-        if(gameRoom==null) return;
-        GameZoneIndex index = gameZoneIndex.get(gameRoom.index());
-        byte[] data = index.roomStore.mapGet(gameRoom.roomId().getBytes());
-        ChannelStub channelStub = new ChannelStub();
-        channelStub.fromBinary(data);
-        ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
-        channelStore.queueOffer(data);
-        logger.warn("queue->" + gameRoom);
+        RoomStatus roomStatus = pendingRooms.poll();
+        if(roomStatus==null) return;
+        logger.warn("Reset room->"+roomStatus);
+        GameZoneIndex index = gameZoneIndex.get(roomStatus.zoneId);
+        byte[] roomId = roomStatus.roomId.getBytes();
+        index.roomStore.mapLock(roomId);
+        if(roomStatus.status == RoomStatus.FULL){
+            index.roomStore.mapRemove(roomId);
+        }
+        else if(roomStatus.status == RoomStatus.EMPTY){
+            if(!index.roomStore.mapExists(roomId)){
+                index.roomStore.mapSet(roomId,ROOM_ID_QUEUED);
+                index.roomStore.queueOffer(roomId);
+            }
+            else{
+                logger.warn(roomStatus.roomId+" : <In Use>");
+            }
+        }
+        index.roomStore.mapUnlock(roomId);
+
     }
 
     private GameRoom createGameRoom(String type,int roomCapacity){
@@ -430,7 +444,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         gameRoom.leave(systemId,listener);
-        logger.warn(gameRoom.toString());
     }
     private GameRoom localJoin(Rating rating, GameZoneIndex index){
         String roomId = index.pendingRooms.poll();
@@ -441,7 +454,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(!room.full()) index.pendingRooms.offer(roomId);
         });
         joined.setup(index.gameZone,null,rating);
-        logger.warn(gameRoom.toString());
         return joined;
     }
 
@@ -460,11 +472,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         ChannelStub channelStub = new ChannelStub();
         channelStub.fromBinary(ret);
-        channelStub.sessionId();
         GameRoom room = this.distributionRoomService.onJoinRoom(name,gameZone.distributionKey(),channelStub.roomId,rating.systemId());
         Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
         room.setup(gameZone,channel,rating);
-        if(channelStub.totalJoined < gameZone.capacity()) channelStore.queueOffer(channelStub.toBinary());
         return room;
     }
 

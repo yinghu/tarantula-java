@@ -203,7 +203,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public synchronized void leave(String systemId,Listener listener){
         Entry rm = joinIndex.remove(systemId);
         if(rm!=null){
-            totalJoined--;
             rm.reset();
             this.dataStore.update(rm);
             this.dataStore.update(this);
@@ -220,10 +219,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public boolean empty(){
-        return totalJoined==0;
+        return joinIndex.isEmpty();
     }
     public boolean full(){
-        return totalJoined==capacity;
+        return totalJoined == capacity;
     }
     public boolean started(){
         return started;
