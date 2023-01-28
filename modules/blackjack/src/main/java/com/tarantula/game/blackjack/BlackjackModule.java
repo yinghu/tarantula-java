@@ -2,12 +2,12 @@ package com.tarantula.game.blackjack;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 
-public class BlackjackModule implements Module {
+public class BlackjackModule implements Module, UDPEndpointServiceProvider.RequestListener {
 
     private ApplicationContext context;
-
-
 
     @Override
     public void onJoin(Session session) throws Exception{
@@ -30,5 +30,11 @@ public class BlackjackModule implements Module {
     @Override
     public void clear(){
 
+    }
+
+    @Override
+    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        System.out.println("blackjack request");
+        return null;
     }
 }

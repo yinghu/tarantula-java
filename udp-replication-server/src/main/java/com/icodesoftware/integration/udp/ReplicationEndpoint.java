@@ -12,6 +12,7 @@ import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.protocol.ValidationUtil;
+import com.tarantula.game.blackjack.BlackjackModule;
 
 import javax.crypto.Cipher;
 import java.security.MessageDigest;
@@ -26,6 +27,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
+    private UDPEndpointServiceProvider.RequestListener gameModule;
     private byte[] serverKey;
     private String accessKey;
     private String typeId;
@@ -142,6 +144,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         timer.start();
+        gameModule = new BlackjackModule();
         logger.warn("Game server is running on ["+typeId+"] configured with capacity ["+roomCapacity+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
@@ -243,7 +246,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        logger.warn("on request");
-        return null;
+        //logger.warn("on request");
+        return gameModule.onMessage(messageHeader,messageBuffer);
     }
 }
