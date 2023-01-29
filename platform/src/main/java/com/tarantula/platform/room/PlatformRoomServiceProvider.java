@@ -174,8 +174,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         localLeave(systemId,index,roomId,(room,entry)->{
             boolean empty = room.started() && room.empty();
+            if(empty) room.reset();
             pendingRooms.offer(new RoomStatus(zoneId,roomId,empty?RoomStatus.EMPTY:RoomStatus.LEFT));//reuse room id
         });
+    }
+    public void onRoomReset(String zoneId,String roomId){
+        GameZoneIndex index = gameZoneIndex.get(zoneId);
+        GameRoom gameRoom = gameRoom(index,roomId);
+        gameRoom.reset();
+        //logger.warn("room reset->"+gameRoom);
     }
 
     @Override
@@ -349,6 +356,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
         Collection<byte[]> ids = index.roomStore.indexGet(connection.serverId());
         ids.forEach(k->{
+            //kickoff all remote room
+            this.distributionRoomService.onResetRoom(name,index.gameZone.distributionKey(),new String(k));
             index.roomStore.mapRemove(k);
             index.roomStore.queueOffer(k);
         });
@@ -366,7 +375,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         RoomStatus roomStatus = pendingRooms.poll();
         if(roomStatus==null) return;
-        logger.warn("Reset room->"+roomStatus);
+        //logger.warn("Reset room->"+roomStatus);
         GameZoneIndex index = gameZoneIndex.get(roomStatus.zoneId);
         byte[] roomId = roomStatus.roomId.getBytes();
         index.roomStore.mapLock(roomId);

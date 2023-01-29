@@ -12,5 +12,7 @@ public interface DistributionRoomService extends ServiceProvider {
 
     GameRoom onRoomView(String serviceName,String zoneId, String roomId);
 
+    void onResetRoom(String serviceName,String zoonId,String roomId);
+
 
 }

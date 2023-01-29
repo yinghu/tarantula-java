@@ -5,12 +5,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActiveChannel {
 
-    public byte[] payload;
     public AtomicInteger totalJoined;
+    public AtomicInteger totalLeft;
 
-    public ActiveChannel(byte[] payload){
 
-        this.payload = payload;
+    public ActiveChannel(int capacity){
         totalJoined = new AtomicInteger(0);
+        totalLeft = new AtomicInteger(capacity);
     }
 }

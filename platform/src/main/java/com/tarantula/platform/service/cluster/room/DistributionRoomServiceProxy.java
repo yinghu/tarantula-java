@@ -70,6 +70,19 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         }
     }
 
+    public void onResetRoom(String serviceName,String zoneId,String roomId){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(roomId);
+        RoomResetOperation roomLeaveOperation = new RoomResetOperation(serviceName,zoneId,roomId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionRoomService.NAME, roomLeaveOperation,partitionId);
+        final Future<Void> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            future.cancel(true);
+        }
+    }
 
     @Override
     public String name() {

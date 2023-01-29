@@ -163,12 +163,15 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     @Override
     public void onTimeout(int channelId, int sessionId) {
         ActiveChannel activeChannel = activeChannelIndex.get(channelId);
-        if(activeChannel.totalJoined.decrementAndGet()==0){
-            //pendingActiveChannelQueue.offer(activeChannel);
-            logger.warn("timeout->"+channelId+">>"+sessionId);
-            //if(createChannel()){
-               //logger.warn("channel created");
-            //}
+        int totalLeft = activeChannel.totalLeft.decrementAndGet();
+        logger.warn("Session timeout->"+channelId+">>"+sessionId);
+        if(totalLeft == 0){
+            logger.warn("Channel Removed->"+channelId+">>"+sessionId);
+            this.udpEndpointServiceProvider.releaseUserChannel(channelId);
+            this.activeChannelIndex.remove(channelId);
+            if(createChannel()){
+               logger.warn("channel created");
+            }
         }
     }
 
@@ -203,22 +206,10 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     @Override
     public void onPing() {
         if(pingRetries>UDPEndpointServiceProvider.CONNECTION_HEALTHY_CHECK_RETRIES) return;
-        ActiveChannel activeChannel = pendingActiveChannelQueue.poll();
         try{
-            if(activeChannel==null) {
-                ping();
-            }
-            else{
-                if(ping()){
-                    //headers[5]="onChannel";
-                    //JsonObject ret = JsonUtil.parse(httpCaller.post(registerPath,activeChannel.payload,headers));
-                    //if(!ret.get("successful").getAsBoolean()) pendingActiveChannelQueue.offer(activeChannel);
-                    //createChannel();
-                }
-            }
+            ping();
         }catch (Exception ex){
             logger.error("unexpected error on ->"+registerPath+"/"+headers[5]+"/"+headers[3],ex);
-            if(activeChannel!=null) pendingActiveChannelQueue.offer(activeChannel);
         }
     }
     private boolean createChannel(){
@@ -227,9 +218,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             int channelId = keySync.getAndIncrement();
             channel.addProperty("channelId",channelId);
             channel.addProperty("sessionId",keySync.getAndAdd(roomCapacity));
-            ActiveChannel activeChannel = new ActiveChannel(channel.toString().getBytes());
+            ActiveChannel activeChannel = new ActiveChannel(roomCapacity);
             headers[5]="onChannel";
-            String resp = httpCaller.post(registerPath,activeChannel.payload,headers);
+            String resp = httpCaller.post(registerPath,channel.toString().getBytes(),headers);
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             activeChannelIndex.put(channelId, activeChannel);

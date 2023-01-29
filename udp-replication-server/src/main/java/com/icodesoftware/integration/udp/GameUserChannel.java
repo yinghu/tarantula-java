@@ -28,7 +28,6 @@ public class GameUserChannel extends UserChannel {
 
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        System.out.println("on leave");
         super.onLeave(messageHeader, messageBuffer);
     }
 
