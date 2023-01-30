@@ -788,20 +788,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         aListeners.add(listener);
     }
-    public void registerEndpointListener(EndPoint.Listener listener){
 
-    }
     public void onStart(EndPoint endPoint){
         cListeners.forEach((k,v)->{
             v.onStart(endPoint);
         });
-        //log.warn("End point started");
     }
     public void onStop(EndPoint endPoint){
         cListeners.forEach((k,v)->{
             v.onStop(endPoint);
         });
-        //log.warn("End point stopped");
     }
     public AccessIndexService.AccessIndexStore accessIndexStore(){
         return new AccessIndexStoreViewer(this.tarantulaContext);

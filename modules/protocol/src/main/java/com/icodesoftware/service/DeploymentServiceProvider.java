@@ -24,11 +24,9 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     byte[] serverKey(String typeId);
 
 
-    String registerGameServerListener(GameServerListener gameChannelListener);
+    String registerGameServerListener(GameServerListener gameServerListener);
     void unregisterGameServerListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs
-
-    void registerEndpointListener(EndPoint.Listener listener);
 
     /**
      * Register/Release the service provider on service pool
