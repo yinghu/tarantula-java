@@ -20,4 +20,9 @@ public interface EndPoint extends ServiceProvider {
     interface Resource{
         RequestHandler requestHandler(String name);
     }
+
+    interface Listener{
+        void onStart(EndPoint endPoint);
+        void onStop(EndPoint endPoint);
+    }
 }

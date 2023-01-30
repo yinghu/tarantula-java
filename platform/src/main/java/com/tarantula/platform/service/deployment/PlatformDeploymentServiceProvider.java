@@ -51,9 +51,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     //content cache ( web admin )
     ConcurrentHashMap<String,Content> rMap = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
+
     private EventService publisher;
     private TarantulaContext tarantulaContext;
 
@@ -734,25 +736,36 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         //});
         //return new AccessKey();
     }
-    public <T extends Configurable> boolean registerChannel(T configurable){
+    public boolean registerChannel(Channel configurable){
         ChannelStub channelStub = (ChannelStub)configurable;
-        int[] suc ={0};
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(channelStub.configurationTypeId())) {
-                if(!v.onChannel(channelStub)) suc[0]++;
-            }
-        });
-        return suc[0]==0;
+        GameServerListener gameServerListener = cListeners.get(channelStub.configurationTypeId());
+        if(gameServerListener==null) return false;
+        return gameServerListener.onChannel(channelStub);
+        //int[] suc ={0};
+        //cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(channelStub.configurationTypeId())) {
+                //if(!v.onChannel(channelStub)) suc[0]++;
+            //}
+        //});
+        //return suc[0]==0;
     }
-    public <T extends Configurable> void startConnection(T connection){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(connection.configurationTypeId())) v.onStartConnection((Connection)connection);
-        });
+    public void startConnection(Connection connection){
+        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
+        if(gameServerListener==null) return;
+        gameServerListener.onStartConnection(connection);
+
+        //cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(connection.configurationTypeId())) v.onStartConnection(connection);
+        //});
     }
-    public <T extends Configurable> void stopConnection(T connection){
-        cListeners.forEach((k,v)->{
-            if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection((Connection)connection);
-        });
+    public void stopConnection(Connection connection){
+        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
+        if(gameServerListener==null) return;
+        gameServerListener.onDisConnection(connection);
+
+        //cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
+        //});
     }
     public void verifyConnection(String typeId,String serverId){
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
@@ -775,6 +788,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         aListeners.add(listener);
     }
+    public void registerEndpointListener(EndPoint.Listener listener){
+
+    }
+    public void onStart(EndPoint endPoint){
+        cListeners.forEach((k,v)->{
+            v.onStart(endPoint);
+        });
+        //log.warn("End point started");
+    }
+    public void onStop(EndPoint endPoint){
+        cListeners.forEach((k,v)->{
+            v.onStop(endPoint);
+        });
+        //log.warn("End point stopped");
+    }
     public AccessIndexService.AccessIndexStore accessIndexStore(){
         return new AccessIndexStoreViewer(this.tarantulaContext);
     }
@@ -784,6 +812,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<String> listDataStore(){
         return this.tarantulaContext.dataStoreProvider().list();
     }
+
     public DataStore.Summary validDataStore(String dataStore){
         DataStoreSummary summary = new DataStoreSummary();
         summary.name = dataStore;
@@ -825,13 +854,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
 
     public <T extends Configurable> void release(T configurable){
-        //if(configurable instanceof Connection){
-            //Connection connection = (Connection)configurable;
-            //cListeners.forEach((k,v)->{
-                //if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
-            //});
-            //return;
-        //}
         Configurable removed = this.vMap.remove(configurable.distributionKey());
         removed.released();
     }

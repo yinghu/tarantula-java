@@ -2,6 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.tarantula.platform.GameCluster;
@@ -216,17 +217,23 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     @Override
     public void onConnectionRegistered(String typeId, Connection connection) {
-        platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onConnectionRegistered(connection);
-        });
+        GameServerListener gameServerListener = platformDeploymentServiceProvider.cListeners.get(typeId);
+        if(gameServerListener==null) return;
+        gameServerListener.onConnectionRegistered(connection);
+        //platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(typeId)) v.onConnectionRegistered(connection);
+        //});
     }
 
     @Override
     public void onConnectionVerified(String typeId, String serverId) {
         try{
-            platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onConnectionVerified(serverId);
-            });
+            GameServerListener gameServerListener = platformDeploymentServiceProvider.cListeners.get(typeId);
+            if(gameServerListener==null) return;
+            gameServerListener.onConnectionVerified(serverId);
+            //platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
+                //if(v.typeId().equals(typeId)) v.onConnectionVerified(serverId);
+            //});
         }catch (Exception ex){
             log.error("error on ping",ex);
         }
@@ -235,9 +242,13 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     @Override
     public void onConnectionStarted(String typeId,Connection connection) {
         try{
-            platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-                if(v.typeId().equals(typeId)) v.onConnectionStarted(connection);
-            });
+            GameServerListener gameServerListener = platformDeploymentServiceProvider.cListeners.get(typeId);
+            if(gameServerListener==null) return;
+            gameServerListener.onConnectionStarted(connection);
+
+            //platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
+                //if(v.typeId().equals(typeId)) v.onConnectionStarted(connection);
+            //});
         }catch (Exception ex){
             log.error("error on start connection",ex);
         }
@@ -245,9 +256,13 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     @Override
     public void onConnectionReleased(String typeId, Connection connection) {
-        platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
-            if(v.typeId().equals(typeId)) v.onConnectionReleased(connection);
-        });
+        GameServerListener gameServerListener = platformDeploymentServiceProvider.cListeners.get(typeId);
+        if(gameServerListener==null) return;
+        gameServerListener.onConnectionReleased(connection);
+
+        //platformDeploymentServiceProvider.cListeners.forEach((k,v)->{
+            //if(v.typeId().equals(typeId)) v.onConnectionReleased(connection);
+        //});
     }
 
     public void onAccessIndexDisabled(){

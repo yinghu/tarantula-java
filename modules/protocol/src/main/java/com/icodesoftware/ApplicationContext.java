@@ -36,7 +36,7 @@ public interface ApplicationContext {
 
     void resource(String name,Module.OnResource onResource);
 
-    Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener);
+    //Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener);
 
     PostOffice postOffice();
 

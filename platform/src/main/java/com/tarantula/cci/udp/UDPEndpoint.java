@@ -153,6 +153,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             pushUserChannel = pushUserChannels.poll();
             if(pushUserChannel!=null) this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
         }while (pushUserChannel!=null);
+        this.serviceContext.deploymentServiceProvider().onStart(this);
     }
 
     @Override
@@ -160,6 +161,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.running = false;
         if(udpEndpointServiceProvider==null) return;
         udpEndpointServiceProvider.shutdown();
+        this.serviceContext.deploymentServiceProvider().onStop(this);
     }
 
     @Override

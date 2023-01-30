@@ -163,11 +163,11 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         rMap.clear();
     }
 
-    public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
-        EndPoint udp = (UDPEndpoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        Channel channel = udp.register(session,requestListener,timeoutListener);
-        return channel;
-    }
+    //public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+        ///EndPoint udp = (UDPEndpoint) this.tarantulaContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+        //Channel channel = udp.register(session,requestListener,timeoutListener);
+        //return channel;
+    //}
 
     public ClusterProvider clusterProvider(){
         return this.tarantulaContext.clusterProvider();

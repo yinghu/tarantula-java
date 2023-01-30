@@ -4,10 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.ConfigurationServiceProvider;
-import com.icodesoftware.service.ReloadListener;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.service.*;
 
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.GameZone;
@@ -133,6 +131,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void shutdown() throws Exception {
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
+    }
+    public Channel registerChannel(Session session, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
+        EndPoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+        Channel channel = udp.register(session,requestListener,timeoutListener);
+        return channel;
     }
 
     public GameZone gameZoneFromZoneId(String zoneId){
@@ -348,6 +351,18 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void reload(int partition, boolean localMember) {
         gameRoomIndex.clear();
+    }
+
+    public void onStart(EndPoint endPoint){
+        if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
+            logger.warn("End point started ->"+typeLobby);
+
+        }
+    }
+    public void onStop(EndPoint endPoint){
+        if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
+            logger.warn("End point stopped ->"+typeLobby);
+        }
     }
 
     private void cleanConnection(Connection connection){

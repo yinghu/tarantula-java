@@ -6,7 +6,7 @@ import com.icodesoftware.protocol.GameServerListener;
 
 import java.util.List;
 
-public interface DeploymentServiceProvider extends ConfigurationServiceProvider,MetricsListener{
+public interface DeploymentServiceProvider extends ConfigurationServiceProvider,MetricsListener,EndPoint.Listener{
 
     String DEPLOY_DATA_STORE = "tarantula";
     String SERVER_KEY_SPEC = "AES";
@@ -16,11 +16,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     String NAME = "DeploymentServiceProvider";
 
     //GAME SERVER APIs
-
     OnAccess registerConnection(Connection connection);
-    <T extends Configurable> boolean registerChannel(T channel);
-    <T extends Configurable> void startConnection(T connection);
-    <T extends Configurable> void stopConnection(T connection);
+    boolean registerChannel(Channel channel);
+    void startConnection(Connection connection);
+    void stopConnection(Connection connection);
     void verifyConnection(String typeId,String serverId);
     byte[] serverKey(String typeId);
 
@@ -28,6 +27,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     String registerGameServerListener(GameServerListener gameChannelListener);
     void unregisterGameServerListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs
+
+    void registerEndpointListener(EndPoint.Listener listener);
 
     /**
      * Register/Release the service provider on service pool
