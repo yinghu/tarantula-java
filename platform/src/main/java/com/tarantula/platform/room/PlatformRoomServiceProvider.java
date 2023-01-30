@@ -7,6 +7,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
 
+import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -132,9 +133,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
     }
-    public Channel registerChannel(Session session, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
-        EndPoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        Channel channel = udp.register(session,requestListener,timeoutListener);
+    public Channel registerChannel(Stub stub, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
+        GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
+        UDPChannel channel = index.pendingChannels.poll();
+        UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+        if(channel==null){
+            UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+            for(UDPChannel c : channels){
+                index.pendingChannels.offer(c);
+            }
+            channel = index.pendingChannels.poll();
+        }
+        channel.register(stub,requestListener,timeoutListener);
+        udp.registerChannel(channel);
         return channel;
     }
 
@@ -195,6 +206,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
+        index.pendingChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
         if(dedicated) {
             index.roomStore = this.clusterProvider.clusterStore(gameZone.oid());
         }
@@ -356,7 +368,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
             logger.warn("End point started ->"+typeLobby);
-
+            UDPEndpoint udp = (UDPEndpoint)endPoint;
+            gameZoneIndex.forEach((k,v)->{
+                for(int i=0;i<minRoomPoolSizePerZone;i++){
+                    UDPChannel[] channels = udp.createChannels(v.gameZone.capacity());
+                    for(UDPChannel c : channels){
+                        v.pendingChannels.offer(c);
+                    }
+                }
+            });
         }
     }
     public void onStop(EndPoint endPoint){

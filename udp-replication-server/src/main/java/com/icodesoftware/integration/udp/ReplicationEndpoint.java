@@ -46,8 +46,8 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     private JsonObject config;
 
-    private ConcurrentHashMap<Integer,ActiveChannel> activeChannelIndex;
-    private ConcurrentLinkedDeque<ActiveChannel> pendingActiveChannelQueue;
+    private ConcurrentHashMap<Integer, ActiveGameChannel> activeChannelIndex;
+    private ConcurrentLinkedDeque<ActiveGameChannel> pendingActiveChannelQueue;
     private int pingRetries;
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
@@ -162,7 +162,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
     @Override
     public void onTimeout(int channelId, int sessionId) {
-        ActiveChannel activeChannel = activeChannelIndex.get(channelId);
+        ActiveGameChannel activeChannel = activeChannelIndex.get(channelId);
         int totalLeft = activeChannel.totalLeft.decrementAndGet();
         logger.warn("Session timeout->"+channelId+">>"+sessionId);
         if(totalLeft == 0){
@@ -218,7 +218,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             int channelId = keySync.getAndIncrement();
             channel.addProperty("channelId",channelId);
             channel.addProperty("sessionId",keySync.getAndAdd(roomCapacity));
-            ActiveChannel activeChannel = new ActiveChannel(roomCapacity);
+            ActiveGameChannel activeChannel = new ActiveGameChannel(roomCapacity);
             headers[5]="onChannel";
             String resp = httpCaller.post(registerPath,channel.toString().getBytes(),headers);
             JsonObject jo = JsonUtil.parse(resp);

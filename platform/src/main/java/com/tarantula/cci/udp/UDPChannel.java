@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UserChannel;
 import com.icodesoftware.util.BatchUtil;
+import com.tarantula.game.Stub;
 
 import java.util.Base64;
 
@@ -29,10 +30,10 @@ public class UDPChannel extends GameChannel {
         this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
-    public void register(Session session,int sessionId, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
+    public void register(Stub session,UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
         this.owner = session.systemId();
         this.routingNumber = session.stub();
-        this.sessionId = sessionId;
+        //this.sessionId = sessionId;
         this.requestListener = requestListener;
         this.timeoutListener = timeoutListener;
     }

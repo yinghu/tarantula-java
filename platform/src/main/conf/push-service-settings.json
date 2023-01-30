@@ -9,6 +9,5 @@
   "sessionJoinTimeout": 10000,
   "sessionTimeout" : 10000,
   "channelPoolSize" : 1000,
-  "sessionPoolSize": 5000,
   "receiverTimeout": 3000
 }

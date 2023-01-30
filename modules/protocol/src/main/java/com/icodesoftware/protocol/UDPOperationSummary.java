@@ -10,12 +10,13 @@ public class UDPOperationSummary {
     public static String PENDING_MESSAGE_BUFFER_NUMBER = "pendingMessageBufferNumber";
     public static String USER_CHANNEL_NUMBER = "userChannelNumber";
 
-    public static final String PENDING_UDP_SESSION_SIZE = "pendingUdpSessionSize";
-    public static final String UDP_GAME_SESSION_SIZE = "gameUdpSessionSize";
+    //public static final String PENDING_UDP_SESSION_SIZE = "pendingUdpSessionSize";
+    public static final String USER_SESSION_NUMBER= "userSessionNumber";
 
     public AtomicInteger pendingInboundMessageNumber = new AtomicInteger(0);
     public AtomicInteger pendingOutboundMessageNumber = new AtomicInteger(0);
     public AtomicInteger pendingBufferNumber = new AtomicInteger(0);
     public AtomicInteger pendingMessageBufferNumber = new AtomicInteger(0);
     public AtomicInteger userChannelNumber = new AtomicInteger(0);
+    public AtomicInteger userSessionNumber = new AtomicInteger(0);
 }

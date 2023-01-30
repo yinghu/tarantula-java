@@ -95,4 +95,8 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
     }
     public void close(){}
     public void reset(){}
+
+    public void sessionId(int sessionId) {
+        this.sessionId = sessionId;
+    }
 }

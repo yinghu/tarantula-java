@@ -1,6 +1,8 @@
 package com.tarantula.platform.room;
 
+
 import com.icodesoftware.service.ClusterProvider;
+import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameZone;
 import com.tarantula.platform.IndexSet;
 
@@ -19,5 +21,7 @@ public class GameZoneIndex {
     //no distributed game rooms
     public ArrayBlockingQueue<String> pendingRooms;
 
+    // push channels
+    public ArrayBlockingQueue<UDPChannel> pendingChannels;
 
 }

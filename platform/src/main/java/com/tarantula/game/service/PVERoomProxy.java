@@ -23,15 +23,15 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.joined = room!=null;
         if(!stub.joined) return stub;
         stub.room = room;
+        stub.zoneId = gameZone.distributionKey();
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
-        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(session,(h,m)->super.update(stub,h,m),(s,d)->{
+        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.update(stub,h,m),(s,d)->{
             gameLobby.timeout(s,d);
         });
         stub.roomId = stub.room.roomId();
-        stub.zoneId = gameZone.distributionKey();
         stub.zone = gameZone;
         stub.offline = true;
         stub.tag = application.tag();

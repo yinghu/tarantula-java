@@ -17,8 +17,8 @@ import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import javax.crypto.Cipher;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,8 +30,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
 
-    private ConcurrentLinkedDeque<PushUserChannel> pushUserChannels;
+    private ArrayBlockingQueue<PushUserChannel> pendingUserChannels;
+    private ConcurrentHashMap<Integer,ActivePushChannel> activePushChannelIndex;
     private TokenValidatorProvider tokenValidator;
+    private AtomicInteger channelId;
     private AtomicInteger sessionId;
     private byte[] key;
     private Connection connection;
@@ -39,7 +41,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private String threadPoolSetting;
 
     private ConcurrentHashMap<Integer,UDPChannel> channels;
-    private ConcurrentLinkedDeque<UDPChannel> pendingQueue;
     private ArrayList<MessageBuffer.MessageHeader> expiredPackets;
     private ConcurrentHashMap<MessageBuffer.MessageHeader,PacketTrack> packetTracks;
     private long packetRemoveInterval;
@@ -53,7 +54,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     private ServiceContext serviceContext;
     private boolean running = true;
-    private int channelPoolSize;
+    private AtomicInteger channelPoolSize;
     private int frameRate = UDPEndpointServiceProvider.FRAME_RATE;
 
     private long sessionJoinTimeout;
@@ -63,16 +64,19 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private ConcurrentHashMap<Integer,AtomicLong> pendingJoins;
 
     private int sessionTimeout;
+    private UDPOperationSummary operationSummary;
 
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
+        activePushChannelIndex = new ConcurrentHashMap<>();
         pendingJoins = new ConcurrentHashMap<>();
         pendingJoinKickoff = new ArrayList<>();
-        pendingQueue = new ConcurrentLinkedDeque<>();
         packetTracks = new ConcurrentHashMap<>();
         expiredPackets = new ArrayList<>();
         connection = new ClientConnection();
+        channelId = new AtomicInteger(1);
         sessionId = new AtomicInteger(1);
+        operationSummary = new UDPOperationSummary();
     }
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
@@ -82,13 +86,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.packetRemoveTimer = this.packetRemoveInterval;
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         logger = serviceContext.logger(UDPEndpoint.class);
-        this.pushUserChannels = new ConcurrentLinkedDeque<>();
         String udpProvider = (String)cfg.property("udpEndpointServiceProvider");
         this.udpEndpointServiceProvider = createInstance(udpProvider);
         this.udpEndpointServiceProvider.address(host);
         this.udpEndpointServiceProvider.port(connection.port());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(threadPoolSetting);
-        this.channelPoolSize = ((Number)cfg.property("channelPoolSize")).intValue();
+        int _channelPoolSize = ((Number)cfg.property("channelPoolSize")).intValue();
+        this.channelPoolSize = new AtomicInteger(_channelPoolSize);
+        this.pendingUserChannels = new ArrayBlockingQueue<>(_channelPoolSize);
         this.key = serviceContext.deploymentServiceProvider().serverKey("pushChannel");
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
@@ -124,17 +129,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
                 }
             }
         },"tarantula-udp-outbound-message-sender");
-        for(int i=1;i<=channelPoolSize;i++) {
-            PushUserChannel pushUserChannel = new PushUserChannel(i, udpEndpointServiceProvider, this, this, this);
-            pushUserChannels.offer(pushUserChannel);
-        }
-        int sessionPoolSize = ((Number)cfg.property("sessionPoolSize")).intValue();
-        for(int i=0;i<sessionPoolSize;i++){
-            PushUserChannel pushUserChannel = pushUserChannels.poll();
-            pendingQueue.offer(new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout()));
-            pushUserChannels.offer(pushUserChannel);
-        }
-        logger.warn("UDP Endpoint running as a daemon with session pool size ["+sessionPoolSize+"] on ["+serviceContext.node().servicePushAddress()+"]");
+        logger.warn("UDP Endpoint running as a daemon with channel pool size ["+channelPoolSize+"] on ["+serviceContext.node().servicePushAddress()+"]");
     }
 
     @Override
@@ -148,11 +143,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             this.onTimer();
         });
         serviceContext.schedule(onTimer);
-        PushUserChannel pushUserChannel;
-        do{
-            pushUserChannel = pushUserChannels.poll();
-            if(pushUserChannel!=null) this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
-        }while (pushUserChannel!=null);
         this.serviceContext.deploymentServiceProvider().onStart(this);
     }
 
@@ -184,22 +174,45 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.threadPoolSetting = poolSetting;
     }
 
-    public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
-        UDPChannel uch = this.pendingQueue.poll();
-        uch.register(session,sessionId.getAndIncrement(),requestListener,timeoutListener);
-        channels.put(uch.sessionId(),uch);
-        pendingJoins.put(uch.sessionId(),new AtomicLong(sessionJoinTimeout));
-        return uch;
-    }
     public Channel channel(int sessionId){
         return channels.get(sessionId);
     }
 
+    public UDPChannel[] createChannels(int capacity) {
+        PushUserChannel pushUserChannel = pendingUserChannels.poll();
+        if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0) return new UDPChannel[0];
+
+        if(pushUserChannel == null) {
+            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider, this, this, this);
+            this.activePushChannelIndex.put(pushUserChannel.channelId(),new ActivePushChannel());
+            operationSummary.userChannelNumber.incrementAndGet();
+        }
+        UDPChannel[] channels = new UDPChannel[capacity];
+        for(int i=0;i<capacity;i++){
+            UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout());
+            channels[i] = channel;
+        }
+        operationSummary.userSessionNumber.addAndGet(capacity);
+        this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
+        this.activePushChannelIndex.get(pushUserChannel.channelId()).reset(capacity);
+        return channels;
+    }
+
+    public void registerChannel(UDPChannel channel){
+        channel.sessionId(sessionId.getAndIncrement());
+        channels.put(channel.sessionId(),channel);
+        pendingJoins.put(channel.sessionId(),new AtomicLong(sessionJoinTimeout));
+    }
+
     @Override
     public void onTimeout(int channelId, int sessionId) {
+        ActivePushChannel activePushChannel = activePushChannelIndex.get(channelId);
+        if(activePushChannel.totalLeft.decrementAndGet()==0){
+            PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
+            pendingUserChannels.offer(released);
+        }
         UDPChannel removed = channels.remove(sessionId);
         if(removed == null) return;
-        pendingQueue.offer(removed);
         removed.kickoff();
     }
 
@@ -278,14 +291,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void registerSummary(Summary summary){
         udpEndpointServiceProvider.registerSummary(summary);
-        summary.registerCategory(UDPOperationSummary.PENDING_UDP_SESSION_SIZE);
-        summary.registerCategory(UDPOperationSummary.UDP_GAME_SESSION_SIZE);
+        summary.registerCategory(UDPOperationSummary.USER_CHANNEL_NUMBER);
+        summary.registerCategory(UDPOperationSummary.USER_SESSION_NUMBER);
     }
     @Override
     public void updateSummary(Summary summary){
         udpEndpointServiceProvider.updateSummary(summary);
-        summary.update(UDPOperationSummary.PENDING_UDP_SESSION_SIZE,pendingQueue.size());
-        summary.update(UDPOperationSummary.UDP_GAME_SESSION_SIZE,channels.size());
+        summary.update(UDPOperationSummary.USER_CHANNEL_NUMBER,operationSummary.userChannelNumber.get());
+        summary.update(UDPOperationSummary.USER_SESSION_NUMBER,operationSummary.userSessionNumber.get());
     }
 
     private void onTimer() {
