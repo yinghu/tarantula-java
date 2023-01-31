@@ -65,10 +65,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private boolean dedicated;
 
-    ArrayList<String> kickoff = new ArrayList<>();
+    private ArrayList<String> kickoff = new ArrayList<>();
     private boolean timerEnabled = false;
     private int timer;
     private SchedulingTask schedulingTask;
+    private boolean started;
 
     public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
         this.gameCluster = gameCluster;
@@ -139,10 +140,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
         if(channel==null){
             UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
-            for(UDPChannel c : channels){
-                index.pendingChannels.offer(c);
+            if(channels.length == 0) return null;
+            for(int i=0;i<channels.length;i++){
+                if(i==0){
+                    channel = channels[i];
+                }
+                else{
+                    index.pendingChannels.offer(channels[i]);
+                }
             }
-            channel = index.pendingChannels.poll();
         }
         channel.register(stub,requestListener,timeoutListener);
         udp.registerChannel(channel);
@@ -260,6 +266,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
         logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
+        if(started){
+            UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+            for(int i=0;i<minRoomPoolSizePerZone;i++){
+                UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+                for(UDPChannel c : channels){
+                    index.pendingChannels.offer(c);
+                }
+            }
+            logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
+        }
         gameZoneIndex.put(gameZone.distributionKey(),index);
     }
 
@@ -374,7 +390,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
-            logger.warn("End point started ->"+typeLobby);
             UDPEndpoint udp = (UDPEndpoint)endPoint;
             gameZoneIndex.forEach((k,v)->{
                 for(int i=0;i<minRoomPoolSizePerZone;i++){
@@ -384,12 +399,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 }
             });
+            logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]");
         }
+        started = true;
     }
     public void onStop(EndPoint endPoint){
-        if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
-            logger.warn("End point stopped ->"+typeLobby);
-        }
+        //if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
+            //logger.warn("End point stopped ->"+typeLobby);
+        //}
     }
 
     private void cleanConnection(Connection connection){

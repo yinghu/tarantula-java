@@ -23,16 +23,21 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.joined = room!=null;
         if(!stub.joined) return stub;
         stub.room = room;
+        stub.roomId = stub.room.roomId();
+        stub.zone = gameZone;
         stub.zoneId = gameZone.distributionKey();
+        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.update(stub,h,m),(s,d)->{
+            gameLobby.timeout(s,d);
+        });
+        stub.joined = stub.pushChannel!=null;
+        if(!stub.joined) {
+            leave(stub);
+            return stub;
+        }
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
-        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.update(stub,h,m),(s,d)->{
-            gameLobby.timeout(s,d);
-        });
-        stub.roomId = stub.room.roomId();
-        stub.zone = gameZone;
         stub.offline = true;
         stub.tag = application.tag();
         stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
