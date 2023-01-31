@@ -23,6 +23,6 @@ public interface EndPoint extends ServiceProvider {
 
     interface Listener{
         void onStart(EndPoint endPoint);
-        void onStop(EndPoint endPoint);
+        //void onStop(EndPoint endPoint);
     }
 }

@@ -151,7 +151,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.running = false;
         if(udpEndpointServiceProvider==null) return;
         udpEndpointServiceProvider.shutdown();
-        this.serviceContext.deploymentServiceProvider().onStop(this);
+        //this.serviceContext.deploymentServiceProvider().onStop(this);
     }
 
     @Override

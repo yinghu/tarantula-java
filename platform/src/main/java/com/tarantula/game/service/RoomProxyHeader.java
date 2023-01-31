@@ -30,7 +30,12 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.dataStore = gameZone.dataStore();
     }
     @Override
-    public void update(Session session, Stub stub, byte[] payload){
+    public byte[] update(Stub stub,byte[] payload){
+
+        return null;
+    }
+
+    public byte[] update(Session session, Stub stub, byte[] payload){
         JsonObject jsonObject = JsonUtil.parse(payload);
         boolean response = false;
         if(jsonObject.has("rating")){
@@ -66,6 +71,7 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         if(!response){
             session.write(JsonUtil.toSimpleResponse(false,"no response header setup").getBytes());
         }
+        return null;
     }
     public void list(Session session,Stub stub){
         if(session.name().equals("tournament")&&stub.tournament!=null){

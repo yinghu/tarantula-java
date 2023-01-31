@@ -12,8 +12,8 @@ public interface GameLobby extends Configurable, Serviceable {
 
 
     Stub join(Session session, Rating rating);
-    void leave(Session session);
-    void update(Session session, byte[] payload);
+    boolean leave(Session session);
+    byte[] update(Session session, byte[] payload);
     void list(Session session);
     void validate(Session session);
 

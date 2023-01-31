@@ -794,11 +794,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             v.onStart(endPoint);
         });
     }
-    public void onStop(EndPoint endPoint){
-        cListeners.forEach((k,v)->{
-            v.onStop(endPoint);
-        });
-    }
+
     public AccessIndexService.AccessIndexStore accessIndexStore(){
         return new AccessIndexStoreViewer(this.tarantulaContext);
     }

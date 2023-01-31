@@ -21,21 +21,29 @@ public class GameLobbyModule implements Module{
     private Descriptor application;
     @Override
     public void onJoin(Session session) throws Exception{
-        if(application.tournamentEnabled()&&session.tournamentId()!=null&&(!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
-            session.write(toMessage("no tournament available,please try later",false).getBytes());
+        if(application.tournamentEnabled() && session.tournamentId()!=null && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
+            session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             return;
         }
         Rating rating = gameServiceProvider.rating(session.systemId());
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
-        //this.gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-
         if(session.action().equals("onUpdate")){
-            this.gameLobby.update(session,payload);
+            byte[] response = this.gameLobby.update(session,payload);
+            if(response != null){
+                session.write(response);
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(true,"updated").getBytes());
+            }
+        }
+        else if(session.action().equals("onLeave")){
+            boolean left = gameLobby.leave(session);
+            session.write(JsonUtil.toSimpleResponse(left,"left room").getBytes());
         }
         else if(session.action().equals("onValidate")){
             this.context.log("check game session",OnLog.WARN);
@@ -68,10 +76,7 @@ public class GameLobbyModule implements Module{
             }
             this.gameLobby.list(session);
         }
-        else if(session.action().equals("onLeave")){
-            session.write(toMessage("left room",true).getBytes());
-            gameLobby.leave(session);
-        }
+
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -96,10 +101,6 @@ public class GameLobbyModule implements Module{
         this.gameServiceProvider.lobbyServiceProvider().unregisterConfigurableListener(context.descriptor().tag());
         try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
-    }
-
-    private String toMessage(String msg, boolean successful){
-        return JsonUtil.toSimpleResponse(successful,msg);
     }
 
 

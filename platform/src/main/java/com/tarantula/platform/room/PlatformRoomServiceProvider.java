@@ -403,11 +403,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         started = true;
     }
-    public void onStop(EndPoint endPoint){
-        //if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
-            //logger.warn("End point stopped ->"+typeLobby);
-        //}
-    }
+
 
     private void cleanConnection(Connection connection){
         ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connection.serverId(),false,false,true);

@@ -93,13 +93,13 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     @Override
-    public void leave(Stub stub) {
-        roomProxy.leave(stub);
+    public boolean leave(Stub stub) {
+        return roomProxy.leave(stub);
     }
 
     @Override
-    public void update(Session session, Stub stub, byte[] payload){
-        roomProxy.update(session,stub,payload);
+    public byte[] update(Stub stub, byte[] payload){
+        return roomProxy.update(stub,payload);
     }
 
     @Override

@@ -45,12 +45,13 @@ public class PVERoomProxy extends RoomProxyHeader {
         this.dataStore.update(stub);
         return stub;
     }
-    public void leave(Stub stub){
+    public boolean leave(Stub stub){
         stub.joined = false;
         this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
             gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());
         }
+        return true;
     }
 }

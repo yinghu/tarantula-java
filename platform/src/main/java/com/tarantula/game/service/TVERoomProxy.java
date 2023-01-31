@@ -9,8 +9,8 @@ public class TVERoomProxy extends RoomProxyHeader {
     public Stub join(Session session, Rating rating) {
         return new Stub();
     }
-    public void leave(Stub stub){
-
+    public boolean leave(Stub stub){
+        return false;
     }
 
     public void onTimer(){

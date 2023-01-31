@@ -50,34 +50,35 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public void leave(Session session) {
-        if(!started) return;
+    public boolean leave(Session session) {
+        if(!started) return false;
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.remove(stubKey.asString());
         if(stub!=null){
             stub.zone.leave(stub);
             stub.pushChannel.close();
-            return;
+            return true;
         }
+        //recover from disk
         stub = new Stub();
         stub.distributionKey(session.systemId());
         stub.stub(session.stub());
         stub.label(application.tag());
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
-        if(!gameZone.dataStore().load(stub) || !stub.joined) return;
-        gameZone.leave(stub);
+        if(!gameZone.dataStore().load(stub) || !stub.joined) return false;
+        return gameZone.leave(stub);
     }
 
     @Override
-    public void update(Session session, byte[] payload){
-        if(!started) return;
+    public byte[] update(Session session, byte[] payload){
+        if(!started) return null;
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub==null){
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
-            return;
+            return null;
         }
-        stub.zone.update(session,stub,payload);
+        return stub.zone.update(stub,payload);
     }
 
     @Override
