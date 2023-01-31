@@ -92,6 +92,6 @@ public class UDPChannel extends GameChannel {
         userChannel.kickoff(sessionId);
     }
     public void kickoff(){
-        this.timeoutListener.timeout(this.owner,this.routingNumber);
+        this.timeoutListener.timeout(this.owner, this.routingNumber);
     }
 }

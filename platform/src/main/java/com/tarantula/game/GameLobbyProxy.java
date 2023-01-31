@@ -157,6 +157,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         this.context.log("configurable lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
         this.started = false;
         zoneIndex.clear();
+        lobbyItem.zoneList().forEach(zoneItem -> {
+            ConfigurableZone configurableZone = new ConfigurableZone(zoneItem);
+            this.gameServiceProvider.roomServiceProvider().release(configurableZone);
+        });
+
     }
     private boolean configure(LobbyItem lobbyItem){
         zoneIndex.clear();

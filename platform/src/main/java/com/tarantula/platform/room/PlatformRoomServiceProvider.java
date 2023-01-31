@@ -265,7 +265,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void release(T t) {
-        gameZoneIndex.remove(t.distributionKey());
+        GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
+        UDPChannel udpChannel;
+        do{
+            udpChannel = index.pendingChannels.poll();
+            if(udpChannel!=null){
+                udpChannel.close();
+            }
+        }while (udpChannel!=null);
     }
 
 
