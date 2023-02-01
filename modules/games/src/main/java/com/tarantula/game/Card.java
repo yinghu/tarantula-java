@@ -4,7 +4,7 @@ public class Card {
 
     public enum Suit {Spades,Hearts,Diamonds,Clubs,Back};
 
-    public static Card S1 = new Card(Suit.Spades,"A",1,0);
+    public static Card S1 = new Card(Suit.Spades,"A",1,11,0);
     public static Card S2 = new Card(Suit.Spades,"2",2,1);
     public static Card S3 = new Card(Suit.Spades,"3",3,2);
     public static Card S4 = new Card(Suit.Spades,"4",4,3);
@@ -18,7 +18,7 @@ public class Card {
     public static Card S12 = new Card(Suit.Spades,"Q",10,11);
     public static Card S13 = new Card(Suit.Spades,"K",10,12);
 
-    public static Card H1 = new Card(Suit.Hearts,"A",1,13);
+    public static Card H1 = new Card(Suit.Hearts,"A",1,11,13);
     public static Card H2 = new Card(Suit.Hearts,"2",2,14);
     public static Card H3 = new Card(Suit.Hearts,"3",3,15);
     public static Card H4 = new Card(Suit.Hearts,"4",4,16);
@@ -32,7 +32,7 @@ public class Card {
     public static Card H12 = new Card(Suit.Hearts,"Q",10,24);
     public static Card H13 = new Card(Suit.Hearts,"K",10,25);
 
-    public static Card D1 = new Card(Suit.Diamonds,"A",1,26);
+    public static Card D1 = new Card(Suit.Diamonds,"A",1,11,26);
     public static Card D2 = new Card(Suit.Diamonds,"2",2,27);
     public static Card D3 = new Card(Suit.Diamonds,"3",3,28);
     public static Card D4 = new Card(Suit.Diamonds,"4",4,29);
@@ -46,7 +46,7 @@ public class Card {
     public static Card D12 = new Card(Suit.Diamonds,"Q",10,37);
     public static Card D13 = new Card(Suit.Diamonds,"K",10,38);
 
-    public static Card C1 = new Card(Suit.Clubs,"A",1,39);
+    public static Card C1 = new Card(Suit.Clubs,"A",1,11,39);
     public static Card C2 = new Card(Suit.Clubs,"2",2,40);
     public static Card C3 = new Card(Suit.Clubs,"3",3,41);
     public static Card C4 = new Card(Suit.Clubs,"4",4,42);
@@ -62,15 +62,24 @@ public class Card {
 
     public static Card BJ = new Card(Suit.Back,"",0,52);
 
-    public Suit suit;
-    public String name;
-    public int rank;
-    public int sequence;
+    public final Suit suit;
+    public final String name;
+    public final int rank;
+    public final int alter;
+    public final int sequence;
 
     public Card(Suit suit, String name, int rank, int sequence){
         this.suit = suit;
         this.name = name;
         this.rank = rank;
+        this.alter = rank;
+        this.sequence = sequence;
+    }
+    public Card(Suit suit, String name, int rank,int alter,int sequence){
+        this.suit = suit;
+        this.name = name;
+        this.rank = rank;
+        this.alter = alter;
         this.sequence = sequence;
     }
     @Override
@@ -84,6 +93,6 @@ public class Card {
     }
     @Override
     public String toString(){
-        return "["+suit+"/"+name+"]["+rank+"]["+sequence+"]";
+        return "["+suit+"/"+name+"]["+rank+"]["+alter+"]["+sequence+"]";
     }
 }

@@ -1,9 +1,7 @@
-package com.tarantula.game.blackjack;
+package com.tarantula.game;
 
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.util.*;
-import com.tarantula.game.Card;
-
 
 public class Deck{
 
@@ -22,6 +20,8 @@ public class Deck{
 
     private final String name;
     private final int size;
+    private final boolean autoShuffling;
+
     private int cutter;
     private int stub;
 
@@ -30,6 +30,9 @@ public class Deck{
     }
     public int size(){
         return size;
+    }
+    public boolean autoShuffling(){
+        return autoShuffling;
     }
 
     private void _init(){
@@ -43,13 +46,14 @@ public class Deck{
         }
     }
     public Deck(){
-        this(DECK_SIZE);
+        this(DECK_SIZE,true);
     }
-    public Deck(int size){
+    public Deck(int size,boolean autoShuffling){
         this.name = "deck";
         this.size = size;
+        this.autoShuffling = autoShuffling;
         this._init();
-        this._shuffle();
+        if(autoShuffling) this._shuffle();
     }
     private void _shuffle(){
         for (int i=CARDS_PER_DECK*size-1;i>0;i--) {
@@ -66,10 +70,11 @@ public class Deck{
         _shuffle();
     }
     public synchronized Card draw(){
-        if(this.stub>=cutter){
-            this._shuffle();
+        if(this.stub < cutter) return cardList[deck[stub++]];
+        if(autoShuffling){
+            _shuffle();
+            return cardList[deck[stub++]];
         }
-        Card c = cardList[deck[stub++]];
-        return c;
+        return null;
     }
 }
