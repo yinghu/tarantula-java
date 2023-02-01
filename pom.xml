@@ -14,7 +14,7 @@
     </properties>
     <modules>
         <module>modules/protocol</module>
-        <module>modules/blackjack</module>
+        <module>modules/games</module>
         <module>platform</module>
         <module>modules/agent</module>
         <module>udp-replication-server</module>

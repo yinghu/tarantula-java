@@ -10,10 +10,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>com.icodesoftware</groupId>
-    <artifactId>gec-blackjack</artifactId>
+    <artifactId>gec-games</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-    <name>Game Cluster Blackjack Module</name>
+    <name>Game Cluster Games Module</name>
     <build>
         <plugins>
             <plugin>
