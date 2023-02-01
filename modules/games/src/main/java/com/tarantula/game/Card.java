@@ -1,15 +1,6 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-
-import java.lang.reflect.Type;
-
-/**
- * Updated by yinghu lu on 8/21/2019
- */
-public class Card extends GameObject {
+public class Card {
 
     public enum Suit {Spades,Hearts,Diamonds,Clubs,Back};
 
@@ -72,6 +63,7 @@ public class Card extends GameObject {
     public static Card BJ = new Card(Suit.Back,"",0,52);
 
     public Suit suit;
+    public String name;
     public int rank;
     public int sequence;
 
@@ -93,13 +85,5 @@ public class Card extends GameObject {
     @Override
     public String toString(){
         return "["+suit+"/"+name+"]["+rank+"]["+sequence+"]";
-    }
-    public JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){
-        JsonObject jo = new JsonObject();
-        jo.addProperty("name",this.name);
-        jo.addProperty("suit",this.suit.name());
-        jo.addProperty("rank",this.rank);
-        jo.addProperty("sequence",this.sequence);
-        return jo;
     }
 }

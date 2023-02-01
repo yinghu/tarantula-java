@@ -1,19 +1,14 @@
-package com.tarantula.game;
+package com.tarantula.game.blackjack;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.util.*;
+import com.tarantula.game.Card;
 
-import java.lang.reflect.Type;
 
-/**
- * Updated by yinghu lu on 8/21/2019
- */
-public class Deck extends GameObject {
+public class Deck{
 
-    private final static int SIZE = 4;
+    public final static int DECK_SIZE = 4;
+    public final static int CARDS_PER_DECK = 52;
 
     private static Card[] cardList = new Card[]{
             Card.S1, Card.S2, Card.S3, Card.S4, Card.S5, Card.S6, Card.S7, Card.S8, Card.S9, Card.S10, Card.S11, Card.S12, Card.S13,
@@ -23,22 +18,32 @@ public class Deck extends GameObject {
     };
     private int[] deck;
 
-    private RNG rnd = new JvmRNG();
+    private RNG rnd;
 
-    private int size;
-    public int cutter;
+    private final String name;
+    private final int size;
+    private int cutter;
+    private int stub;
+
+    public String name(){
+        return name;
+    }
+    public int size(){
+        return size;
+    }
 
     private void _init(){
-        deck = new int[52*size];
+        rnd = new JvmRNG();
+        deck = new int[CARDS_PER_DECK*size];
         int ix = 0;
         for(int sz=0;sz<size;sz++){
-            for(int i=0;i<52;i++){
+            for(int i=0;i<CARDS_PER_DECK;i++){
                 deck[ix++]=i;
             }
         }
     }
     public Deck(){
-        this(SIZE);
+        this(DECK_SIZE);
     }
     public Deck(int size){
         this.name = "deck";
@@ -47,13 +52,13 @@ public class Deck extends GameObject {
         this._shuffle();
     }
     private void _shuffle(){
-        for (int i=52*size-1;i>0;i--) {
+        for (int i=CARDS_PER_DECK*size-1;i>0;i--) {
             int _rx = rnd.onNext(i+1);
             int tmp = deck[_rx];
             deck[_rx] = deck[i];
             deck[i] = tmp;
         }
-        cutter = 52*size-rnd.onNext(13);
+        cutter = CARDS_PER_DECK*size-rnd.onNext(13);
         this.stub = 0;
 
     }
@@ -66,11 +71,5 @@ public class Deck extends GameObject {
         }
         Card c = cardList[deck[stub++]];
         return c;
-    }
-    public synchronized JsonElement setup(Type type, JsonSerializationContext jsonSerializationContext){
-        JsonObject jo = new JsonObject();
-        jo.addProperty("index",this.stub);
-        jo.addProperty("cutter",this.cutter);
-        return jo;
     }
 }
