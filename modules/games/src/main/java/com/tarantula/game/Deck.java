@@ -48,6 +48,7 @@ public class Deck{
     public Deck(){
         this(DECK_SIZE,true);
     }
+
     public Deck(int size,boolean autoShuffling){
         this.name = "deck";
         this.size = size;
