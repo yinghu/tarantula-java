@@ -35,8 +35,8 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
         String name = exchange.header(Session.TARANTULA_NAME);//key name
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
-        String pmd = exchange.header(Session.TARANTULA_ACCESS_MODE);
-        int playMode = pmd!=null?Integer.parseInt(pmd):Session.FAST_PLAY_MODE;
+        String pmd = exchange.header(Session.TARANTULA_SERVICE_ID);
+        short serviceId = pmd!=null?Short.parseShort(pmd):0;
         byte[]  _payload = exchange.payload();
         String sid = exchange.id();
         this._hex.put(sid,exchange);
@@ -59,7 +59,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             if(tournamentId!=null&&tournamentId.length()>5) actionEvent.tournamentId(tournamentId);
             actionEvent.name(name);
             actionEvent.clientId(clientId);
-            actionEvent.accessMode(playMode);
+            actionEvent.serviceId(serviceId);
             this.eventService.publish(actionEvent);
         }
         else{

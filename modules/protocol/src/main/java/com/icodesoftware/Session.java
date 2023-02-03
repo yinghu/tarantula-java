@@ -26,13 +26,13 @@ public interface Session extends OnApplication {
     String TARANTULA_CLIENT_ID ="Tarantula-client-id";
 
     String TARANTULA_PAYLOAD = "Tarantula-payload";
-    String TARANTULA_ACCESS_MODE = "Tarantula-access-mode";
+    String TARANTULA_SERVICE_ID = "Tarantula-service-id";
 
 
-    int FAST_PLAY_MODE = 2;
-    int INVITATION_PLAY_MODE = 4;
-    int OFF_LINE_MODE = 3;
-    int GAME_CENTER_PLAY_MODE = 5;
+    //int FAST_PLAY_MODE = 2;
+    //int INVITATION_PLAY_MODE = 4;
+    ///int OFF_LINE_MODE = 3;
+    //int GAME_CENTER_PLAY_MODE = 5;
 
     String source();
     void source(String source);

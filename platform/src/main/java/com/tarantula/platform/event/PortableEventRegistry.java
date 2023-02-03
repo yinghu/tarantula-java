@@ -33,7 +33,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int LEADER_BOARD_GLOBAL_EVENT_CID = 20;
 
-    public static final int GAME_UPDATE_EVENT_CID = 22;
 
     public static final int TOPIC_MAP_STORE_SYNC_EVENT_CID = 23;
 
@@ -99,9 +98,7 @@ public class PortableEventRegistry implements PortableFactory {
             case MAP_STORE_SYNC_EVENT_CID:
                 _ins = new MapStoreSyncEvent();
                 break;
-            case GAME_UPDATE_EVENT_CID:
-                _ins = new GameUpdateEvent();
-                break;
+
             case TOPIC_MAP_STORE_SYNC_EVENT_CID:
                 _ins = new TopicMapStoreSyncEvent();
                 break;

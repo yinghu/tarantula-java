@@ -1,6 +1,5 @@
 package com.tarantula.game.service;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
@@ -33,16 +32,13 @@ public class ServiceCommandHeader implements GameLobby.ServiceProxy {
         this.application = descriptor;
     }
 
-    public byte[] onService(Stub stub, JsonObject payload){
-        return JsonUtil.toSimpleResponse(false,"service not ready").getBytes();
-    }
-
     @Override
     public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         return new byte[0];
     }
 
-    public byte[] onService(Session session, JsonObject payload){
+    @Override
+    public byte[] onService(Session session, byte[] payload){
         return JsonUtil.toSimpleResponse(false,"service not ready").getBytes();
     }
 }

@@ -78,7 +78,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return null;
         }
-        return stub.zone.onService(stub,payload);
+        return this.serviceProxy(session.serviceId()).onService(session,payload);
     }
 
     public void validate(Session session){

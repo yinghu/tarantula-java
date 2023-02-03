@@ -1,10 +1,8 @@
 package com.tarantula.game.service;
 
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Stub;
@@ -31,12 +29,6 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
     public void close(){
 
-    }
-
-    @Override
-    public byte[] onService(Stub stub,byte[] payload){
-        JsonObject request = JsonUtil.parse(payload);
-        return this.gameLobby.serviceProxy(request.get("ServiceId").getAsShort()).onService(stub,request);
     }
 
     public byte[] onService(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){

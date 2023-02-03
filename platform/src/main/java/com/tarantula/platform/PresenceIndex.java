@@ -69,7 +69,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.systemId(session.systemId());
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());
-        fe.accessMode(session.accessMode());
+        //fe.accessMode(session.accessMode());
         fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
         fe.name(session.name());

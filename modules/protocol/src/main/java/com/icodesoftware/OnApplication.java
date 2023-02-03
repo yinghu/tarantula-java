@@ -2,8 +2,8 @@ package com.icodesoftware;
 
 public interface OnApplication extends Response {
 
-    int accessMode();
-    void accessMode(int mode);
+    short serviceId();
+    void serviceId(short serviceId);
 
     String systemId();
     void systemId(String systemId);

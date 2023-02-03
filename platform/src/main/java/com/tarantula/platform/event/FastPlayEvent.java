@@ -31,7 +31,7 @@ public class FastPlayEvent extends Data implements Event {
         out.writeUTF("7",this.owner);
         out.writeDouble("8",this.balance);
         out.writeInt("9",this.stub);
-        out.writeInt("10",this.accessMode);
+        //out.writeInt("10",this.accessMode);
         out.writeUTF("11",this.ticket);
         out.writePortable("14",this.forward);
         out.writeInt("15",routingNumber);
@@ -47,7 +47,7 @@ public class FastPlayEvent extends Data implements Event {
         this.owner = in.readUTF("7");
         this.balance = in.readDouble("8");
         this.stub = in.readInt("9");
-        this.accessMode = in.readInt("10");
+        //this.accessMode = in.readInt("10");
         this.ticket = in.readUTF("11");
         this.forward = in.readPortable("14");
         this.routingNumber = in.readInt("15");

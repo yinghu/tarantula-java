@@ -1,6 +1,5 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
 
@@ -24,8 +23,11 @@ public interface GameLobby extends Configurable, Serviceable {
     ServiceProxy serviceProxy(short serviceId);
 
     interface ServiceProxy extends Initializer {
-        byte[] onService(Session session,JsonObject payload);
-        byte[] onService(Stub stub, JsonObject payload);
+
+        //from http endpoint
+        byte[] onService(Session session,byte[] payload);
+
+        //from udp endpoint
         byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
     }
 

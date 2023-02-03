@@ -15,7 +15,7 @@ public class TopicMapStoreSyncEvent extends Data implements Event {
     public TopicMapStoreSyncEvent(String destination, String topic, int factoryId, int classId, String key, byte[] value){
         this.destination = destination;
         this.trackId = topic;
-        this.accessMode = factoryId;
+        //this.accessMode = factoryId;
         this.stub = classId;
         this.index = key;
         this.payload = value;
@@ -24,7 +24,7 @@ public class TopicMapStoreSyncEvent extends Data implements Event {
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.destination);
         out.writeUTF("2",this.trackId);
-        out.writeInt("3",accessMode);
+        //out.writeInt("3",accessMode);
         out.writeInt("4",stub);
         out.writeUTF("5",this.index);
         out.writeByteArray("6",this.payload);
@@ -33,7 +33,7 @@ public class TopicMapStoreSyncEvent extends Data implements Event {
     public void readPortable(PortableReader in) throws IOException {
         this.destination = in.readUTF("1");
         this.trackId = in.readUTF("2");
-        this.accessMode = in.readInt("3");
+        //this.accessMode = in.readInt("3");
         this.stub = in.readInt("4");
         this.index = in.readUTF("5");
         this.payload = in.readByteArray("6");

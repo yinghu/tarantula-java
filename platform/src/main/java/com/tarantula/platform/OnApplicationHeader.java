@@ -11,7 +11,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String typeId;
 
-    protected int accessMode;
+    protected short serviceId;
 
     protected double balance;
 
@@ -50,11 +50,11 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
 
 
-    public int accessMode(){
-        return this.accessMode;
+    public short serviceId(){
+        return this.serviceId;
     }
-    public void accessMode(int mode){
-        this.accessMode = mode;
+    public void serviceId(short serviceId){
+        this.serviceId = serviceId;
     }
 
 
