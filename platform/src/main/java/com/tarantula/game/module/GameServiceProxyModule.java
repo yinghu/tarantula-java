@@ -9,7 +9,7 @@ import com.tarantula.game.GameLobby;
 import com.tarantula.game.service.GameServiceProvider;
 
 
-public class GameServiceModule implements Module {
+public class GameServiceProxyModule implements Module {
 
     private ApplicationContext context;
     private GameServiceProvider gameServiceProvider;
