@@ -56,6 +56,7 @@ public class Deck{
         this._init();
         if(autoShuffling) this._shuffle();
     }
+
     private void _shuffle(){
         for (int i=CARDS_PER_DECK*size-1;i>0;i--) {
             int _rx = rnd.onNext(i+1);
@@ -67,9 +68,11 @@ public class Deck{
         this.stub = 0;
 
     }
+
     public synchronized void shuffle(){
         _shuffle();
     }
+
     public synchronized Card draw(){
         if(this.stub < cutter) return cardList[deck[stub++]];
         if(autoShuffling){
