@@ -31,8 +31,8 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
     }
     @Override
     public byte[] update(Stub stub,byte[] payload){
-        this.context.log(new String(payload),OnLog.WARN);
-        return payload;
+        JsonObject request = JsonUtil.parse(payload);
+        return this.gameLobby.serviceMessageListener(request.get("ServiceId").getAsShort()).update(stub,request);
     }
 
     public byte[] update(Session session, Stub stub, byte[] payload){

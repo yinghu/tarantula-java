@@ -1,5 +1,6 @@
 package com.tarantula.game;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Configurable;
 
@@ -23,7 +24,7 @@ public interface GameLobby extends Configurable, Serviceable {
     ServiceMessageListener serviceMessageListener(short serviceId);
 
     interface ServiceMessageListener{
-
+        byte[] update(Stub stub, JsonObject payload);
         byte[] update(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
         void setup(ApplicationContext applicationContext);
     }
