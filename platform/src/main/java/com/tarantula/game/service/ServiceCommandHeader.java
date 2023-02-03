@@ -13,9 +13,12 @@ public class ServiceCommandHeader implements GameLobby.ServiceProxy {
     protected ApplicationContext applicationContext;
     protected GameServiceProvider gameServiceProvider;
     protected Descriptor application;
+    private final boolean exported;
+    private final short serviceId;
 
-    public ServiceCommandHeader(){
-
+    public ServiceCommandHeader(short serviceId,boolean exported){
+        this.serviceId = serviceId;
+        this.exported = exported;
     }
 
     public void setup(ApplicationContext applicationContext) throws Exception{
@@ -31,6 +34,15 @@ public class ServiceCommandHeader implements GameLobby.ServiceProxy {
     public void descriptor(Descriptor descriptor){
         this.application = descriptor;
     }
+
+    public short serviceId(){
+        return serviceId;
+    }
+
+    public boolean exported(){
+        return exported;
+    }
+
 
     @Override
     public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {

@@ -41,13 +41,14 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private Metrics metrics;
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
-    private GameLobby gameLobby;
+    private ConcurrentHashMap<Short, GameLobby.ServiceProxy> serviceExported;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
+        this.serviceExported = new ConcurrentHashMap<>();
     }
 
 
@@ -192,8 +193,11 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return (T)gameServiceProviders.get(name);
     }
 
+    public void exportServiceProxy(GameLobby.ServiceProxy serviceProxy){
+        serviceExported.put(serviceProxy.serviceId(),serviceProxy);
+    }
     public GameLobby.ServiceProxy serviceProxy(short serviceId){
-        return this.gameLobby.serviceProxy(serviceId);
+        return this.serviceExported.get(serviceId);
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){

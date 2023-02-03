@@ -7,6 +7,10 @@ import com.tarantula.game.Stub;
 public class CommitStatisticsCommand extends ServiceCommandHeader {
 
 
+    public CommitStatisticsCommand(short serviceId,boolean exported){
+        super(serviceId,exported);
+    }
+
     @Override
     public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         String name = messageBuffer.readUTF8();

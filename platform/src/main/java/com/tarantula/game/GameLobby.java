@@ -24,6 +24,10 @@ public interface GameLobby extends Configurable, Serviceable {
 
     interface ServiceProxy extends Initializer {
 
+        short serviceId();
+
+        boolean exported();
+
         //from http endpoint
         byte[] onService(Session session,byte[] payload);
 

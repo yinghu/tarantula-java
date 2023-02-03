@@ -1,0 +1,12 @@
+{
+  "proxies":
+  [
+    {"serviceId" : 1,"className": "com.tarantula.game.service.RequestStatisticsCommand","export": true},
+    {"serviceId" : 2,"className": "com.tarantula.game.service.CommitStatisticsCommand","export": true},
+    {"serviceId" : 3,"className": "com.tarantula.game.service.RequestTournamentLeaderBoardCommand","export": true},
+    {"serviceId" : 4,"className": "com.tarantula.game.service.CommitTournamentScoreCommand","export": true},
+    {"serviceId" : 5,"className": "com.tarantula.game.service.RequestAchievementCommand","export": true},
+    {"serviceId" : 6,"className": "com.tarantula.game.service.CommitAchievementCommand","export": true},
+    {"serviceId" : 7,"className": "com.tarantula.game.service.RequestLeaderBoardCommand","export": true}
+  ]
+}

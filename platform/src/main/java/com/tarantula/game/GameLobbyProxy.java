@@ -88,15 +88,22 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
+        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        Configuration config = deploymentServiceProvider.configuration("service-listener-settings");
-        JsonArray cmds = ((JsonElement)config.property("listeners")).getAsJsonArray();
+        Configuration config = deploymentServiceProvider.configuration("service-proxy-settings");
+        JsonArray cmds = ((JsonElement)config.property("proxies")).getAsJsonArray();
         cmds.forEach((cmd->{
             JsonObject cc = cmd.getAsJsonObject();
-            listeners.put(cc.get("command").getAsShort(),toServiceMessageListener(cc.get("className").getAsString()));
+            short serviceId = cc.get("serviceId").getAsShort();
+            String className = cc.get("className").getAsString();
+            boolean exported = cc.get("export").getAsBoolean();
+            ServiceProxy serviceProxy = toServiceMessageListener(serviceId,className,exported);
+            if(serviceProxy.exported()){
+                gameServiceProvider.exportServiceProxy(serviceProxy);
+            }
+            listeners.put(serviceId,serviceProxy);
         }));
         this.application = applicationContext.descriptor();
-        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
     }
 
     @Override
@@ -207,16 +214,17 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     public ServiceProxy serviceProxy(short serviceId){
         ServiceProxy listener = listeners.get(serviceId);
-        if(listener==null) return new ErrorCommand();
+        if(listener==null) return new ErrorCommand(serviceId,true);
         return listener;
     }
-    private ServiceProxy toServiceMessageListener(String className){
+    private ServiceProxy toServiceMessageListener(short serviceId,String className,boolean exported){
         try {
-            ServiceProxy serviceMessageListener = (ServiceProxy) Class.forName(className).getConstructor().newInstance();
+            ServiceProxy serviceMessageListener = (ServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class).newInstance(serviceId,exported);
             serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){
-            return new ErrorCommand();
+            this.context.log("Service Proxy ["+className+"] Without Implementation",OnLog.WARN);
+            return new ErrorCommand(serviceId,true);
         }
     }
 }

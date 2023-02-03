@@ -8,6 +8,9 @@ import com.tarantula.game.Stub;
 public class RequestStatisticsCommand extends ServiceCommandHeader{
 
 
+    public RequestStatisticsCommand(short serviceId,boolean exported){
+        super(serviceId,exported);
+    }
     //From http endpoint
     @Override
     public byte[] onService(Session session, byte[] payload){

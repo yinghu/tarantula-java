@@ -11,6 +11,10 @@ import java.util.ArrayList;
 public class RequestLeaderBoardCommand extends ServiceCommandHeader {
 
 
+    public RequestLeaderBoardCommand(short serviceId,boolean exported){
+        super(serviceId,exported);
+    }
+
     @Override
     public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         String category  = messageBuffer.readUTF8();
