@@ -23,7 +23,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     private boolean started;
 
-    private ConcurrentHashMap<Short,ServiceMessageListener> listeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Short,ServiceProxy> listeners = new ConcurrentHashMap<>();
 
     public GameLobbyProxy(){
         this.stubIndex = new ConcurrentHashMap<>();
@@ -70,7 +70,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public byte[] update(Session session, byte[] payload){
+    public byte[] onService(Session session, byte[] payload){
         if(!started) return null;
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
@@ -78,20 +78,9 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return null;
         }
-        return stub.zone.update(stub,payload);
+        return stub.zone.onService(stub,payload);
     }
 
-    @Override
-    public void list(Session session){
-        if(!started) return;
-        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.get(stubKey.asString());
-        if(stub==null){
-            session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
-            return;
-        }
-        stub.zone.list(session,stub);
-    }
     public void validate(Session session){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey.asString())!=null,"").getBytes());
@@ -216,14 +205,14 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         }
     }
 
-    public ServiceMessageListener serviceMessageListener(short serviceId){
-        ServiceMessageListener listener = listeners.get(serviceId);
+    public ServiceProxy serviceProxy(short serviceId){
+        ServiceProxy listener = listeners.get(serviceId);
         if(listener==null) return new ErrorCommand();
         return listener;
     }
-    private ServiceMessageListener toServiceMessageListener(String className){
+    private ServiceProxy toServiceMessageListener(String className){
         try {
-            ServiceMessageListener serviceMessageListener = (ServiceMessageListener) Class.forName(className).getConstructor().newInstance();
+            ServiceProxy serviceMessageListener = (ServiceProxy) Class.forName(className).getConstructor().newInstance();
             serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){

@@ -2,9 +2,8 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
-import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.room.GameZoneIndex;
+
 
 public class PVERoomProxy extends RoomProxyHeader {
 
@@ -26,7 +25,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.zoneId = gameZone.distributionKey();
-        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.update(stub,h,m),(s,d)->{
+        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.onService(stub,h,m),(s,d)->{
             gameLobby.timeout(s,d);
         });
         stub.joined = stub.pushChannel!=null;

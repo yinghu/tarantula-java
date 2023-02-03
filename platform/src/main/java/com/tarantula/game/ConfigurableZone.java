@@ -98,16 +98,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     @Override
-    public byte[] update(Stub stub, byte[] payload){
-        return roomProxy.update(stub,payload);
+    public byte[] onService(Stub stub, byte[] payload){
+        return roomProxy.onService(stub,payload);
     }
-
-    @Override
-    public void list(Session session,Stub stub){
-        roomProxy.list(session,stub);
-    }
-
-
 
 
     @Override

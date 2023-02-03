@@ -19,6 +19,7 @@ public class GameLobbyModule implements Module{
     private GameLobbyProxy gameLobby;
     private GsonBuilder builder;
     private Descriptor application;
+
     @Override
     public void onJoin(Session session) throws Exception{
         if(application.tournamentEnabled() && session.tournamentId()!=null && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
@@ -33,7 +34,7 @@ public class GameLobbyModule implements Module{
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onUpdate")){
-            byte[] response = this.gameLobby.update(session,payload);
+            byte[] response = this.gameLobby.onService(session,payload);
             if(response != null){
                 session.write(response);
             }
@@ -48,9 +49,6 @@ public class GameLobbyModule implements Module{
         else if(session.action().equals("onValidate")){
             this.context.log("check game session",OnLog.WARN);
             this.gameLobby.validate(session);
-        }
-        else if(session.action().equals("onList")){
-            this.gameLobby.list(session);
         }
         else if(session.action().equals("onTest")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
@@ -68,13 +66,7 @@ public class GameLobbyModule implements Module{
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            this.gameLobby.update(session,payload);
-        }
-        else if(session.action().equals("onTestList")){
-            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
-                throw new RuntimeException("no permission");
-            }
-            this.gameLobby.list(session);
+            this.gameLobby.onService(session,payload);
         }
 
         else{

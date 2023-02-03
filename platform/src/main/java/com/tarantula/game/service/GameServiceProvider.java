@@ -41,6 +41,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private Metrics metrics;
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
+    private GameLobby gameLobby;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -189,6 +190,10 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     public <T extends ServiceProvider> T serviceProvider(String name){
         return (T)gameServiceProviders.get(name);
+    }
+
+    public GameLobby.ServiceProxy serviceProxy(short serviceId){
+        return this.gameLobby.serviceProxy(serviceId);
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
