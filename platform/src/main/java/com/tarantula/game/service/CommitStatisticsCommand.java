@@ -5,7 +5,7 @@ import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.MessageBuffer;
 
 
-public class CommitStatisticsCommand extends ServiceCommandHeader {
+public class CommitStatisticsCommand extends GameServiceProxyHeader {
 
 
     public CommitStatisticsCommand(short serviceId,boolean exported){

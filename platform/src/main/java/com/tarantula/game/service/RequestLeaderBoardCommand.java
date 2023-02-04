@@ -3,13 +3,12 @@ package com.tarantula.game.service;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.tarantula.game.Stub;
 import com.tarantula.platform.leaderboard.LeaderBoardView;
 
 
 import java.util.ArrayList;
 
-public class RequestLeaderBoardCommand extends ServiceCommandHeader {
+public class RequestLeaderBoardCommand extends GameServiceProxyHeader {
 
 
     public RequestLeaderBoardCommand(short serviceId,boolean exported){

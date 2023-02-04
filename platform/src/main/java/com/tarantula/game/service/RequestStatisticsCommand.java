@@ -3,9 +3,8 @@ package com.tarantula.game.service;
 import com.icodesoftware.Session;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.tarantula.game.Stub;
 
-public class RequestStatisticsCommand extends ServiceCommandHeader{
+public class RequestStatisticsCommand extends GameServiceProxyHeader {
 
 
     public RequestStatisticsCommand(short serviceId,boolean exported){

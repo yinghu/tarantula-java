@@ -6,7 +6,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.protocol.MessageBuffer;
 
 
-public class RequestTournamentLeaderBoardCommand extends ServiceCommandHeader {
+public class RequestTournamentLeaderBoardCommand extends GameServiceProxyHeader {
 
 
     public RequestTournamentLeaderBoardCommand(short serviceId,boolean exported){

@@ -4,7 +4,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.MessageBuffer;
 
-public class CommitAchievementCommand extends ServiceCommandHeader {
+public class CommitAchievementCommand extends GameServiceProxyHeader {
 
 
     public CommitAchievementCommand(short serviceId,boolean exported){

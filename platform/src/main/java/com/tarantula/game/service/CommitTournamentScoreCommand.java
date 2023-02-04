@@ -3,7 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
 
-public class CommitTournamentScoreCommand extends ServiceCommandHeader{
+public class CommitTournamentScoreCommand extends GameServiceProxyHeader {
 
 
     public CommitTournamentScoreCommand(short serviceId,boolean exported){

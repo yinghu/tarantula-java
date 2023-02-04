@@ -8,7 +8,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.util.JsonUtil;
 
 
-public class ServiceCommandHeader implements GameServiceProxy {
+public class GameServiceProxyHeader implements GameServiceProxy {
 
     protected ApplicationContext applicationContext;
     protected GameServiceProvider gameServiceProvider;
@@ -16,7 +16,7 @@ public class ServiceCommandHeader implements GameServiceProxy {
     private final boolean exported;
     private final short serviceId;
 
-    public ServiceCommandHeader(short serviceId,boolean exported){
+    public GameServiceProxyHeader(short serviceId, boolean exported){
         this.serviceId = serviceId;
         this.exported = exported;
     }
@@ -46,11 +46,11 @@ public class ServiceCommandHeader implements GameServiceProxy {
 
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        return new byte[0];
+        return JsonUtil.toSimpleResponse(false,"service without implementation").getBytes();
     }
 
     @Override
     public byte[] onService(Session session, byte[] payload){
-        return JsonUtil.toSimpleResponse(false,"service not ready").getBytes();
+        return JsonUtil.toSimpleResponse(false,"service without implementation").getBytes();
     }
 }
