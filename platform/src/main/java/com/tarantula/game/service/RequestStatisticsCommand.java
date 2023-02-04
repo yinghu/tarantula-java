@@ -20,7 +20,7 @@ public class RequestStatisticsCommand extends ServiceCommandHeader{
 
 
     @Override
-    public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         Statistics statistics = gameServiceProvider.statistics(stub.systemId());
         return statistics.toJson().toString().getBytes();
     }

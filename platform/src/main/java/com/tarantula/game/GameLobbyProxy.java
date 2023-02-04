@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
@@ -23,7 +24,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     private boolean started;
 
-    private ConcurrentHashMap<Short,ServiceProxy> listeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Short, GameServiceProxy> listeners = new ConcurrentHashMap<>();
 
     public GameLobbyProxy(){
         this.stubIndex = new ConcurrentHashMap<>();
@@ -36,7 +37,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub!=null&&stub.joined) {
-            stub.ticket = this.context.validator().ticket(session.systemId(),session.stub());
+            stub.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
             stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
             PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
             playerSavedGames.gameServiceProvider = gameServiceProvider;
@@ -78,7 +79,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
             return null;
         }
-        return this.serviceProxy(session.serviceId()).onService(session,payload);
+        return this.gameServiceProxy(session.serviceId()).onService(session,payload);
     }
 
     public void validate(Session session){
@@ -97,7 +98,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             short serviceId = cc.get("serviceId").getAsShort();
             String className = cc.get("className").getAsString();
             boolean exported = cc.get("export").getAsBoolean();
-            ServiceProxy serviceProxy = toServiceMessageListener(serviceId,className,exported);
+            GameServiceProxy serviceProxy = toServiceMessageListener(serviceId,className,exported);
             if(serviceProxy.exported()){
                 gameServiceProvider.exportServiceProxy(serviceProxy);
             }
@@ -212,14 +213,14 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         }
     }
 
-    public ServiceProxy serviceProxy(short serviceId){
-        ServiceProxy listener = listeners.get(serviceId);
+    public GameServiceProxy gameServiceProxy(short serviceId){
+        GameServiceProxy listener = listeners.get(serviceId);
         if(listener==null) return new ErrorCommand(serviceId,true);
         return listener;
     }
-    private ServiceProxy toServiceMessageListener(short serviceId,String className,boolean exported){
+    private GameServiceProxy toServiceMessageListener(short serviceId,String className,boolean exported){
         try {
-            ServiceProxy serviceMessageListener = (ServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class).newInstance(serviceId,exported);
+            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class).newInstance(serviceId,exported);
             serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){

@@ -2,6 +2,7 @@ package com.tarantula.game.service;
 
 import com.google.gson.JsonElement;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
@@ -41,7 +42,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private Metrics metrics;
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
-    private ConcurrentHashMap<Short, GameLobby.ServiceProxy> serviceExported;
+    private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -193,10 +194,10 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return (T)gameServiceProviders.get(name);
     }
 
-    public void exportServiceProxy(GameLobby.ServiceProxy serviceProxy){
+    public void exportServiceProxy(GameServiceProxy serviceProxy){
         serviceExported.put(serviceProxy.serviceId(),serviceProxy);
     }
-    public GameLobby.ServiceProxy serviceProxy(short serviceId){
+    public GameServiceProxy serviceProxy(short serviceId){
         return this.serviceExported.get(serviceId);
     }
 

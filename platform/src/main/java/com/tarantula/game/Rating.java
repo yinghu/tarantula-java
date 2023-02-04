@@ -1,7 +1,6 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.DataStore;
@@ -12,7 +11,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import java.io.IOException;
 import java.util.Map;
 
-public class Rating extends PlayerGameObject implements DataStore.Updatable, Portable {
+public class Rating extends PlayerGameObject implements DataStore.Updatable {
 
     public static double BASE_POINTS = 100;
     public static int ARENA_LEVEL_LIMIT = 10;

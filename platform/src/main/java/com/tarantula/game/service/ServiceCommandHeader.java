@@ -3,12 +3,12 @@ package com.tarantula.game.service;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.GameLobby;
-import com.tarantula.game.Stub;
 
-public class ServiceCommandHeader implements GameLobby.ServiceProxy {
+
+public class ServiceCommandHeader implements GameServiceProxy {
 
     protected ApplicationContext applicationContext;
     protected GameServiceProvider gameServiceProvider;
@@ -45,7 +45,7 @@ public class ServiceCommandHeader implements GameLobby.ServiceProxy {
 
 
     @Override
-    public byte[] onService(Stub stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         return new byte[0];
     }
 

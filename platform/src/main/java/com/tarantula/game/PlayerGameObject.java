@@ -1,23 +1,28 @@
 package com.tarantula.game;
 
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Event;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.event.Data;
 
-public class PlayerGameObject extends RecoverableObject {
+import java.io.IOException;
 
-    protected int stub;
-    protected String message;
+public class PlayerGameObject extends Data implements Event {
 
-    public int stub(){
-        return stub;
+
+    @Override
+    public void writePortable(PortableWriter portableWriter) throws IOException {
+
     }
 
-    public void stub(int stub){
-        this.stub = stub;
+    @Override
+    public void readPortable(PortableReader portableReader) throws IOException {
+
     }
-    
+
+    @Override
     public String systemId(){
         return this.bucket+ Recoverable.PATH_SEPARATOR+oid;
     }
-
 }

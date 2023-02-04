@@ -16,13 +16,13 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public String zoneId;
     public String roomId;
-    public String ticket;
+    //public String ticket;
     public Shop shop;
 
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
-    public String tag;
+    //public String tag;
     public Rating rating;
     public DailyLoginTrack dailyLogin;
     public Statistics statistics;
