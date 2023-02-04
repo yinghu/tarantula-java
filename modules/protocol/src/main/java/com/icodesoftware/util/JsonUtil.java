@@ -45,29 +45,25 @@ public class JsonUtil {
         return resp.toString();
     }
     public static JsonElement parseAsJsonElement(byte[] json){
-        return new JsonParser().parse(new InputStreamReader(new ByteArrayInputStream(json)));
+        return JsonParser.parseReader(new InputStreamReader(new ByteArrayInputStream(json)));
     }
     public static JsonArray parseAsJsonArray(String json){
-        JsonParser jp = new JsonParser();
-        return jp.parse(json).getAsJsonArray();
+        return JsonParser.parseString(json).getAsJsonArray();
     }
     public static JsonObject parse(String json){
-        JsonParser jp = new JsonParser();
-        return jp.parse(json).getAsJsonObject();
+        return JsonParser.parseString(json).getAsJsonObject();
     }
 
     public static JsonObject parse(byte[] json){
         return parse(new ByteArrayInputStream(json));
     }
     public static JsonObject parse(InputStream jsonInput){
-        JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(jsonInput);
-        return jp.parse(inr).getAsJsonObject();
+        return JsonParser.parseReader(inr).getAsJsonObject();
     }
     public static Map<String,Object> toMap(InputStream jsonInput){
-        JsonParser jp = new JsonParser();
         InputStreamReader inr = new InputStreamReader(jsonInput);
-        JsonElement j = jp.parse(inr);
+        JsonElement j = JsonParser.parseReader(inr);
         Map<String,Object> _mv = new HashMap<>();
         j.getAsJsonObject().entrySet().forEach((e)->{
             JsonElement je = e.getValue();

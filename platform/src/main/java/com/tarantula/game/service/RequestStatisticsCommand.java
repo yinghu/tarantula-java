@@ -13,6 +13,7 @@ public class RequestStatisticsCommand extends GameServiceProxyHeader {
     //From http endpoint
     @Override
     public byte[] onService(Session session, byte[] payload){
+
         Statistics statistics = gameServiceProvider.statistics(session.systemId());
         return statistics.toJson().toString().getBytes();
     }
