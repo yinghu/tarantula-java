@@ -92,7 +92,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        Configuration config = deploymentServiceProvider.configuration("service-proxy-settings");
+        Configuration config = deploymentServiceProvider.configuration("game-service-proxy-settings");
         JsonArray cmds = ((JsonElement)config.property("proxies")).getAsJsonArray();
         cmds.forEach((cmd->{
             JsonObject cc = cmd.getAsJsonObject();
