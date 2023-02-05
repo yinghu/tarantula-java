@@ -13,7 +13,6 @@ public interface GameServiceProxy extends Initializer {
     byte[] onService(Session session, byte[] payload);
 
     //from udp endpoint
-
-    byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
+    byte[] onService(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
 
 }

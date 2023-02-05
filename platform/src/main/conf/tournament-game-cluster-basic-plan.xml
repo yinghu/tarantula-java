@@ -55,22 +55,7 @@
                 <tag>game/proxy</tag>
                 <module-name>com.tarantula.game.module.GameServiceProxyModule</module-name>
             </application>
-            <application><!-- stats module-->
-                <type-id>game-service</type-id>
-                <name>Statistics</name>
-                <type>application</type>
-                <category>statistics</category>
-                <tag>game/stats</tag>
-                <module-name>com.tarantula.game.module.StatisticsModule</module-name>
-            </application>
-            <application><!-- leader board module-->
-                <type-id>game-service</type-id>
-                <name>LeaderBoard</name>
-                <type>application</type>
-                <category>leaderboard</category>
-                <tag>game/leaderboard</tag>
-                <module-name>com.tarantula.game.module.LeaderBoardModule</module-name>
-            </application>
+
             <application><!-- tournament module-->
                 <type-id>game-service</type-id>
                 <name>Tournament</name>
