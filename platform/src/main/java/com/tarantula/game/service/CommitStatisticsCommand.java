@@ -12,6 +12,7 @@ public class CommitStatisticsCommand extends GameServiceProxyHeader {
         super(serviceId,exported);
     }
 
+
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         String name = messageBuffer.readUTF8();

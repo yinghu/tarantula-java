@@ -11,7 +11,6 @@ import java.util.List;
 public class TournamentSchedule extends Application {
 
 
-
     public TournamentSchedule(){
 
     }

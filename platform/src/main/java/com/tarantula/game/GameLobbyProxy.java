@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobbyProxy extends RecoverableObject implements GameLobby,Configurable.Listener<LobbyItem>{
 
+    private static final String CONFIG = "game-service-proxy-settings";
+
     private ConcurrentHashMap<String,Stub> stubIndex;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
     private GameServiceProvider gameServiceProvider;
@@ -92,10 +94,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        Configuration config = deploymentServiceProvider.configuration("game-service-proxy-settings");
-        JsonArray cmds = ((JsonElement)config.property("proxies")).getAsJsonArray();
-        cmds.forEach((cmd->{
-            JsonObject cc = cmd.getAsJsonObject();
+        Configuration config = deploymentServiceProvider.configuration(CONFIG);
+        JsonArray proxies = ((JsonElement)config.property("proxies")).getAsJsonArray();
+        proxies.forEach((proxy->{
+            JsonObject cc = proxy.getAsJsonObject();
             short serviceId = cc.get("serviceId").getAsShort();
             String className = cc.get("className").getAsString();
             boolean exported = cc.get("export").getAsBoolean();
