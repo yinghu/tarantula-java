@@ -22,14 +22,8 @@
 	  </dependency>
 	  <dependency>
 		  <groupId>com.icodesoftware</groupId>
-		  <artifactId>gec-blackjack</artifactId>
+		  <artifactId>gec-games</artifactId>
 		  <version>1.0</version>
-	  </dependency>
-	  <dependency>
-		  <groupId>com.icodesoftware</groupId>
-		  <artifactId>gec-blackjack</artifactId>
-		  <version>1.0</version>
-		  <scope>compile</scope>
 	  </dependency>
   </dependencies>
   <build>
