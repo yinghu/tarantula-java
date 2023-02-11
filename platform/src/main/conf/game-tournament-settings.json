@@ -1,5 +1,6 @@
 {
-  "pendingTournamentPoolSize": 100,
+  "maxInstancePoolSizePerZone": 2000,
+  "minInstancePoolSizePerZone": 100,
   "minDurationHoursPerSchedule": 1,
   "minDurationMinutesPerInstance": 5
 }

@@ -4,34 +4,34 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Tournament;
+
 
 import java.io.IOException;
 
-public class TournamentConfigureOperation extends Operation implements PartitionAwareOperation {
+public class TournamentFinishOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
     private String systemId;
     private String instanceId;
-    private byte[] payload;
-    private Tournament.Entry entry;
-    public TournamentConfigureOperation() {
+
+    public TournamentFinishOperation() {
     }
-    public TournamentConfigureOperation(String serviceName, String instanceId, String systemId,byte[] payload) {
+
+
+    public TournamentFinishOperation(String serviceName, String instanceId, String systemId) {
         this.serviceName = serviceName;
         this.instanceId = instanceId;
         this.systemId = systemId;
-        this.payload = payload;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.entry = ais.configure(serviceName,instanceId,systemId,payload);
+        ais.finish(serviceName,instanceId,systemId);
     }
 
     @Override
     public Object getResponse() {
-        return this.entry;
+        return null;
     }
 
     @Override
@@ -40,7 +40,6 @@ public class TournamentConfigureOperation extends Operation implements Partition
         out.writeUTF(this.serviceName);
         out.writeUTF(this.instanceId);
         out.writeUTF(this.systemId);
-        out.writeByteArray(payload);
     }
 
     @Override
@@ -49,6 +48,5 @@ public class TournamentConfigureOperation extends Operation implements Partition
         serviceName = in.readUTF();
         instanceId = in.readUTF();
         systemId = in.readUTF();
-        payload = in.readByteArray();
     }
 }

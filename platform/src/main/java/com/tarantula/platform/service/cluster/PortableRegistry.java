@@ -35,7 +35,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int ON_VIEW_OID = 28;
 
-    public static final int ROOM_REGISTRY_CID = 30;
 
 
     //START 100 working with EVENT PORTABLE on same OID
@@ -102,9 +101,6 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
-                break;
-            case ROOM_REGISTRY_CID:
-                _ins = new RoomRegistry();
                 break;
             case PRESENCE_KEY_CID:
                 _ins = new PresenceKey();

@@ -34,7 +34,7 @@ public class PVERoomProxy extends RoomProxyHeader {
             return stub;
         }
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
-            Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
+            Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().enter(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
         stub.offline = true;
@@ -49,7 +49,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
-            gameServiceProvider.tournamentServiceProvider().leave(stub.tournament.distributionKey(),stub.systemId());
+            gameServiceProvider.tournamentServiceProvider().finish(stub.tournament.distributionKey(),stub.systemId());
         }
         return true;
     }

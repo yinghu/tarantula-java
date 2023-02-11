@@ -1,18 +1,16 @@
 package com.tarantula.platform.tournament;
 
+import com.icodesoftware.service.ClusterProvider;
+
 public class TournamentHeaderIndex {
 
     public TournamentHeader tournamentHeader;
-    public int partitionId;
-    public boolean localManaged;
 
-    public TournamentHeaderIndex(int partitionId,boolean localManaged){
-        this.partitionId = partitionId;
-        this.localManaged = localManaged;
-    }
+    public ClusterProvider.ClusterStore instanceStore;
+
 
     @Override
     public String toString(){
-        return "Tournament->"+tournamentHeader.distributionKey()+">>"+localManaged+">>>"+partitionId;
+        return "Tournament->"+tournamentHeader.distributionKey();
     }
 }

@@ -32,8 +32,6 @@ public interface Tournament extends Configurable {
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
-    String register(String systemId);
-
     //void close();
 
 

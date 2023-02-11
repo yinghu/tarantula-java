@@ -7,17 +7,15 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     String NAME = "DistributionTournamentService";
 
-    boolean checkAvailable(String serviceName,String tournamentId);
-    String register(String serviceName, String tournamentId, String systemId);
-    Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId);
-    Tournament.Entry score(String serviceName,String instanceId,String systemId,double delta);
-    Tournament.Entry configure(String serviceName,String instanceId,String systemId,byte[] payload);
 
-    Tournament.RaceBoard list(String serviceName,String instanceId);
-    TournamentHeaderIndex localManaged(String key);
+    Tournament.Instance onEnterTournament(String serviceName,String tournamentId,String instanceId,String systemId);
+    Tournament.Entry onScoreTournament(String serviceName,String instanceId,String systemId,double delta);
+
+    Tournament.RaceBoard onListTournament(String serviceName,String instanceId);
+    void onFinishTournament(String serviceName,String instanceId,String systemId);
 
 
-    void closeTournament(String serviceName,String tournamentId);
-    void endTournament(String serviceName,String tournamentId);
+    void onCloseTournament(String serviceName,String tournamentId);
+    void onEndTournament(String serviceName,String tournamentId);
 
 }

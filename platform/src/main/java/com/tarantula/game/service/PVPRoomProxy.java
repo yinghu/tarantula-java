@@ -31,7 +31,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
             gameLobby.timeout(s,d);
         });
         if(application.tournamentEnabled()&&session.tournamentId()!=null){
-            Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().join(session.tournamentId(),session.systemId());
+            Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().enter(session.tournamentId(),session.systemId());
             stub.tournament = instance;
         }
         stub.tag(application.tag());

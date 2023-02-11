@@ -46,44 +46,24 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         log.warn(objectName+" destroyed");
     }
 
-    public boolean checkAvailable(String serviceName,String tournamentId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournamentServiceProvider().available(tournamentId);
-    }
-    public String register(String serviceName,String tournamentId,String systemId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournamentServiceProvider().tournament(tournamentId).register(systemId);
-    }
+
+
     public Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.tournamentServiceProvider().instance(tournamentId,instanceId);
-        _ins.join(systemId);
+        Tournament.Instance _ins = tsp.tournamentServiceProvider().onTournamentEntered(tournamentId,instanceId,systemId);
         return _ins;
     }
     public Tournament.Entry score(String serviceName, String instanceId, String systemId, double delta){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.tournamentServiceProvider().instance(instanceId);
-        Tournament.Entry[] score={null};
-        _ins.update(systemId,(e)->{
-            e.score(delta);
-            score[0]=e;
-        });
-        return score[0];
-    }
-    public Tournament.Entry configure(String serviceName, String instanceId, String systemId, byte[] payload){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        Tournament.Instance _ins = tsp.tournamentServiceProvider().instance(instanceId);
-        Tournament.Entry[] score={null};
-        _ins.update(systemId,(e)->{
-            if(e.configureAndValidate(payload)){
-                score[0]=e;
-            }
-        });
-        return score[0];
+        return tsp.tournamentServiceProvider().onTournamentScored(instanceId,systemId,delta);
     }
     public Tournament.RaceBoard list(String serviceName,String instanceId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournamentServiceProvider().instance(instanceId).raceBoard();
+        return tsp.tournamentServiceProvider().onTournamentListed(instanceId);
+    }
+    public void finish(String serviceName, String instanceId, String systemId){
+        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        tsp.tournamentServiceProvider().onTournamentFinished(instanceId,systemId);
     }
 
     public void closeTournament(String serviceName,String tournamentId){
