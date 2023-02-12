@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class TournamentInstanceHeader extends RecoverableObject implements Tournament.Instance, Portable {
+public class TournamentInstance extends RecoverableObject implements Tournament.Instance, Portable {
 
     protected Tournament.Status status = Tournament.Status.STARTED;
     protected int maxEntries;
@@ -30,13 +30,13 @@ public class TournamentInstanceHeader extends RecoverableObject implements Tourn
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
-    public TournamentInstanceHeader(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
+    public TournamentInstance(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
         this.maxEntries = maxEntries;
         this.start = start;
         this.close = close;
         this.end = end;
     }
-    public TournamentInstanceHeader(){
+    public TournamentInstance(){
 
     }
     @Override

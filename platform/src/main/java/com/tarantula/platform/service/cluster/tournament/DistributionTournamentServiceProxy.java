@@ -8,7 +8,6 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.tournament.DistributionTournamentService;
-import com.tarantula.platform.tournament.TournamentHeaderIndex;
 
 import java.util.Set;
 import java.util.concurrent.Future;

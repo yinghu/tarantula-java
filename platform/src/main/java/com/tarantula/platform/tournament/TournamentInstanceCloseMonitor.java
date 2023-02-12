@@ -5,10 +5,10 @@ import com.icodesoftware.util.TimeUtil;
 
 public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
-    private final TournamentHeader tournamentHeader;
-    private final TournamentInstanceHeader tournamentInstanceHeader;
+    private final TournamentManager tournamentHeader;
+    private final TournamentInstance tournamentInstanceHeader;
 
-    public TournamentInstanceCloseMonitor(TournamentHeader tournamentHeader,TournamentInstanceHeader tournamentInstanceHeader){
+    public TournamentInstanceCloseMonitor(TournamentManager tournamentHeader, TournamentInstance tournamentInstanceHeader){
         this.tournamentHeader = tournamentHeader;
         this.tournamentInstanceHeader = tournamentInstanceHeader;
     }

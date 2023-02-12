@@ -5,10 +5,10 @@ import com.icodesoftware.util.TimeUtil;
 
 public class TournamentEndMonitor implements SchedulingTask {
 
-    private final TournamentHeader tournamentHeader;
+    private final TournamentManager tournamentHeader;
     private final PlatformTournamentServiceProvider distributedTournamentServiceProvider;
 
-    public TournamentEndMonitor(TournamentHeader tournamentHeader, PlatformTournamentServiceProvider distributedTournamentServiceProvider){
+    public TournamentEndMonitor(TournamentManager tournamentHeader, PlatformTournamentServiceProvider distributedTournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
         this.distributedTournamentServiceProvider = distributedTournamentServiceProvider;
     }

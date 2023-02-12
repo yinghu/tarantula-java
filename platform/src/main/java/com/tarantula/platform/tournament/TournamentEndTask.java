@@ -4,8 +4,8 @@ import com.icodesoftware.SchedulingTask;
 
 public class TournamentEndTask implements SchedulingTask {
 
-    private TournamentHeader tournamentHeader;
-    public TournamentEndTask(TournamentHeader tournamentHeader){
+    private TournamentManager tournamentHeader;
+    public TournamentEndTask(TournamentManager tournamentHeader){
         this.tournamentHeader = tournamentHeader;
     }
     @Override

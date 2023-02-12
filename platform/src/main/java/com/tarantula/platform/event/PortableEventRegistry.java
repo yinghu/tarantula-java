@@ -3,7 +3,6 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.cci.udp.GameChannel;
-import com.tarantula.game.Arena;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.room.*;
 import com.tarantula.game.Rating;
@@ -12,8 +11,8 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.tournament.TournamentEntry;
-import com.tarantula.platform.tournament.TournamentHeader;
-import com.tarantula.platform.tournament.TournamentInstanceHeader;
+import com.tarantula.platform.tournament.TournamentManager;
+import com.tarantula.platform.tournament.TournamentInstance;
 import com.tarantula.platform.tournament.TournamentRaceBoard;
 
 
@@ -129,10 +128,10 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new Rating();
                 break;
             case TOURNAMENT_CID:
-                _ins = new TournamentHeader();
+                _ins = new TournamentManager();
                 break;
             case TOURNAMENT_INSTANCE_CID:
-                _ins = new TournamentInstanceHeader();
+                _ins = new TournamentInstance();
                 break;
             case TOURNAMENT_ENTRY_CID:
                 _ins = new TournamentEntry();

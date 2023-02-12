@@ -9,7 +9,7 @@ public class TournamentRegisterTask implements SchedulingTask {
     private final Tournament tournamentHeader;
     private final PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentRegisterTask(TournamentHeader tournamentHeader, PlatformTournamentServiceProvider tournamentServiceProvider){
+    public TournamentRegisterTask(TournamentManager tournamentHeader, PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
         this.tournamentServiceProvider = tournamentServiceProvider;
     }
