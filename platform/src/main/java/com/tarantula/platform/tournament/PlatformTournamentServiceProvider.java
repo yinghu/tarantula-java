@@ -41,6 +41,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private int minInstancePoolSizePerZone = 100;
     private int minDurationHoursPerSchedule = 1;
     private int minDurationMinutesPerInstance =  5;
+    private int endBufferTimeMinutes = 3;
 
     private String reloadKey;
     private GameCluster gameCluster;
@@ -119,6 +120,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minInstancePoolSizePerZone = ((Number)configuration.property("minInstancePoolSizePerZone")).intValue();
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
+        this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
@@ -388,11 +390,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void launch(TournamentHeader tournament){
         String tkey = tournament.distributionKey();
-        TournamentHeaderIndex index = new TournamentHeaderIndex();//this.distributionTournamentService.localManaged(tkey);
+        TournamentHeaderIndex index = new TournamentHeaderIndex();
+        index.instanceIndex = new IndexSet();
         index.instanceStore = this.serviceContext.clusterProvider().clusterStore(tkey,false,false,true);
         index.tournamentHeader = tournament;
         this.tournamentIndex.put(tkey,index);
-        //if(!index.localManaged) return;
         tournament.setup(instanceIndex,this);
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         TournamentScheduleStatus status = new TournamentScheduleStatus();
@@ -433,6 +435,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupTournamentKey.update();
     }
 
+    //distributed operation callbacks
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         Tournament.Instance _ins = instance(tournamentId,instanceId);
         _ins.join(systemId);
@@ -453,5 +456,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void onTournamentFinished(String instanceId,String systemId){
 
     }
+    public void onTournamentClosed(String tournamentId){
+        this.closeTournament(tournamentId);
+    }
+    public void onTournamentEnded(String tournamentId){
+        this.endTournamentForcefully(tournamentId);
+    }
+
 
 }

@@ -207,7 +207,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T t) {
-        //logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+minRoomPoolSizePerZone+"]");
+        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+minRoomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
@@ -219,7 +219,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
         }
-        index.roomIndex = new IndexSet(GameRoom.LABEL);
+        index.roomIndex = new IndexSet(gameZone.configurationTypeId());
         index.roomIndex.distributionKey(serviceContext.node().nodeId());
         this.dataStore.createIfAbsent(index.roomIndex,true);
         int[] rooms = {0};

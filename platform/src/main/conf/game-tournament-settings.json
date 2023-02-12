@@ -2,5 +2,6 @@
   "maxInstancePoolSizePerZone": 2000,
   "minInstancePoolSizePerZone": 100,
   "minDurationHoursPerSchedule": 1,
-  "minDurationMinutesPerInstance": 5
+  "minDurationMinutesPerInstance": 5,
+  "endBufferTimeMinutes": 3
 }
