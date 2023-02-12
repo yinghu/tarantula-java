@@ -258,9 +258,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void onPrize(String systemId,TournamentPrize prize){
         inventoryServiceProvider.redeem(systemId,prize);
     }
-    void log(String message){
-        logger.warn(message);
-    }
+
     Map<Integer,TournamentPrize> prize(String scheduleId){
         TournamentSchedule schedule = new TournamentSchedule();
         schedule.distributionKey(scheduleId);

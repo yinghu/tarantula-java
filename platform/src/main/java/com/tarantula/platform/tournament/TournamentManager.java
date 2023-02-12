@@ -208,7 +208,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                     this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
                 }
                 else{
-                    this.tournamentServiceProvider.log("Expired tournament instance scheduled to end->"+instanceHeader.distributionKey());
+                    this.tournamentServiceProvider.logger.warn("Expired tournament instance scheduled to end->"+instanceHeader.distributionKey());
                     this.tournamentServiceProvider.monitorInstanceOnEnd(this,instanceHeader);
                 }
             }
@@ -288,7 +288,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         status = Status.ENDED;
         this.dataStore.update(this);
         this.instanceStore.clear();
-        this.tournamentServiceProvider.log("Tournament ["+distributionKey()+"] ended at ["+LocalDateTime.now()+"]");
+        this.tournamentServiceProvider.logger.warn("Tournament ["+distributionKey()+"] ended at ["+LocalDateTime.now()+"]");
     }
 
     private void rank(TournamentInstance ended){
