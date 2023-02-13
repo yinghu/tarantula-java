@@ -194,7 +194,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.instanceStores = new ClusterProvider.ClusterStore[this.tournamentServiceProvider.concurrentInstanceSize];
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
-            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.distributionKey(),true,false,true);
+            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.oid()+"."+i,true,true,true);
+
         }
         tournamentIndexSet = new TournamentIndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName(),1);
         tournamentIndexSet.distributionKey(this.distributionKey());
