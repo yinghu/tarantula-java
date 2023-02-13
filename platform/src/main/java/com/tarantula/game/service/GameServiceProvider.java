@@ -35,7 +35,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
 
     private Configuration configuration;
-    private GameCluster gameCluster;
+    private final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private DataStore serviceDataStore;
     private MetricsListener metricsListener;
@@ -53,6 +53,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         this.serviceExported = new ConcurrentHashMap<>();
     }
 
+    public GameCluster gameCluster(){
+        return gameCluster;
+    }
 
     public Configuration configuration(){
         return configuration;
@@ -70,7 +73,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         JsonElement sp = (JsonElement)this.configuration.property("systemServiceProviders");
         sp.getAsJsonArray().forEach((e)->{
             try{
-                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameCluster.class,GameServiceProvider.class).newInstance(gameCluster,this);
+                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
                 serviceProvider.setup(serviceContext);
                 serviceProvider.waitForData();
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
@@ -81,7 +84,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         JsonElement gp = (JsonElement)this.configuration.property("gameServiceProviders");
         gp.getAsJsonArray().forEach((e)->{
             try{
-                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameCluster.class,GameServiceProvider.class).newInstance(gameCluster,this);
+                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
                 serviceProvider.setup(serviceContext);
                 serviceProvider.waitForData();
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);

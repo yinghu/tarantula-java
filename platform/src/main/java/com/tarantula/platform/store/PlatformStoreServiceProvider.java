@@ -29,9 +29,9 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
-    public PlatformStoreServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformStoreServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override

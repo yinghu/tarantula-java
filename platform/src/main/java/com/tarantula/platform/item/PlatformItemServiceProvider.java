@@ -27,9 +27,9 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     private GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
 
-    public PlatformItemServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformItemServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
     }
 
     public List<ConfigurableObject> list(Descriptor descriptor,String category){

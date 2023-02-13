@@ -295,15 +295,15 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             MultiMap<String, byte[]> mIndex = null;
             IQueue<byte[]> vQueue = null;
             if(map){
-                //log.warn(DATA_MAP_PREFIX+size+name);
+                log.warn(DATA_MAP_PREFIX+size+name);
                 vMap = _cluster.getMap(DATA_MAP_PREFIX+size+name);
             }
             if(index) {
-                //log.warn(INDEX_MAP_PREFIX+name);
+                log.warn(INDEX_MAP_PREFIX+name);
                 mIndex = _cluster.getMultiMap(INDEX_MAP_PREFIX + name);
             }
             if(queue) {
-                //log.warn(DATA_QUEUE_PREFIX+size+name);
+                log.warn(DATA_QUEUE_PREFIX+size+name);
                 vQueue = _cluster.getQueue(DATA_QUEUE_PREFIX + size + name);
             }
             return  new IntegrationClusterStore(this,name,mIndex,vMap,vQueue,TarantulaContext.operationTimeout);

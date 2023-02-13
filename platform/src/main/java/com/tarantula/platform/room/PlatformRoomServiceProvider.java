@@ -29,7 +29,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
 
-    public static final String NAME = "RoomService";
+    public static final String NAME = "room";
 
     public static final byte[] ROOM_ID_QUEUED = "q".getBytes();
 
@@ -71,12 +71,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private SchedulingTask schedulingTask;
     private boolean started;
 
-    public PlatformRoomServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
-        this.gameCluster = gameCluster;
-        this.name = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.typeLobby = (String) this.gameCluster.property(GameCluster.GAME_LOBBY);
-        this.playMode = (String) gameCluster.property(GameCluster.MODE);
-        this.dedicated = (boolean)gameCluster.property(GameCluster.DEDICATED);
+    public PlatformRoomServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
+        this.name = this.gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.typeLobby = this.gameCluster.lobbyType();//(String) this.gameCluster.property(GameCluster.GAME_LOBBY);
+        this.playMode = this.gameCluster.playMode();//(String) gameCluster.property(GameCluster.MODE);
+        this.dedicated = this.gameCluster.dedicated();//boolean)gameCluster.property(GameCluster.DEDICATED);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             });
             this.serviceContext.schedule(schedulingTask);
         }
-        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,typeLobby);
+        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
     @Override

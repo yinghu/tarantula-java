@@ -45,9 +45,9 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private PlatformInventoryServiceProvider inventoryServiceProvider;
     private DistributionItemService distributionItemService;
 
-    public PlatformPresenceServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformPresenceServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 

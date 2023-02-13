@@ -26,9 +26,9 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
-    public PlatformInboxServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformInboxServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override

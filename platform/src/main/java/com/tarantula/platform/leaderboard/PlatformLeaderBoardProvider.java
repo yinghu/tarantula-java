@@ -26,10 +26,11 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     private EventService publisher;
 
     private ClusterProvider integrationCluster;
-
+    private final GameCluster gameCluster;
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
-    public PlatformLeaderBoardProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformLeaderBoardProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.name = gameServiceProvider.name();
     }
     public LeaderBoardSync leaderBoard(String category){

@@ -196,4 +196,40 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         applicationPreSetup.setup(serviceContext);
         return applicationPreSetup;
     }
+
+    @Override
+    public String typeId(){
+        return serviceType().replace("-service","");
+    }
+
+    @Override
+    public String name(){
+        return (String)this.properties.get(NAME);
+    }
+
+    public String playMode(){
+        return (String)this.properties.get(MODE);
+    }
+
+    public String lobbyType(){
+        return (String)this.properties.get(GAME_LOBBY);
+    }
+
+    public String serviceType(){
+        return (String)this.properties.get(GAME_SERVICE);
+    }
+
+    public String dataType(){
+        return (String)this.properties.get(GAME_DATA);
+    }
+
+    public boolean tournamentEnabled(){
+        return (boolean)this.properties.get(TOURNAMENT_ENABLED);
+    }
+
+    public boolean dedicated(){
+        return (boolean)this.properties.get(DEDICATED);
+    }
+
+
 }

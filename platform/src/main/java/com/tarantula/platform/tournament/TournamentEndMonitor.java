@@ -24,7 +24,7 @@ public class TournamentEndMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        if(TimeUtil.expired(tournamentHeader.endTime)) return 3000;
+        if(TimeUtil.expired(tournamentHeader.endTime())) return 3000;
         return TimeUtil.durationUTCMilliseconds(tournamentHeader.closeTime(),tournamentHeader.endTime());
     }
 

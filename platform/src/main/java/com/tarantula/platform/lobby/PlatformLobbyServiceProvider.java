@@ -24,17 +24,18 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
-    private GameCluster gameCluster;
+    private final GameCluster gameCluster;
     private String gameServiceName;
-    private String gameName;
+    private String gameTypeId;
     private ApplicationPreSetup applicationPreSetup;
     private DistributionItemService distributionItemService;
     private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
-    public PlatformLobbyServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
-        this.gameCluster = gameCluster;
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameName = ((String)gameCluster.property(GameCluster.NAME)).toLowerCase();
+
+    public PlatformLobbyServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
+        this.gameServiceName = gameCluster.serviceType();
+        this.gameTypeId = gameCluster.typeId();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
@@ -44,7 +45,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
-        this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameName);
+        this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
     }
     @Override
     public String name() {
@@ -83,14 +84,14 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
             return false;
         }
         lobbyItem.setup();
-        String lobbyTag = gameName+"/"+lobbyItem.configurationName();
+        String lobbyTag = gameTypeId+"/"+lobbyItem.configurationName();
         lobbyItems.put(lobbyTag,lobbyItem);
         ListenerOnLobby lobbyListener = lobbyListeners.get(lobbyTag);
         if(lobbyListener!=null) lobbyListener.listener.onUpdated(lobbyItem);
         return true;
     }
     public boolean onItemReleased(String category,String itemId){
-        String lobbyTag = gameName+"/"+itemId;
+        String lobbyTag = gameTypeId+"/"+itemId;
         LobbyItem removed = lobbyItems.remove(lobbyTag);
         if(removed!=null){
             ListenerOnLobby listener = lobbyListeners.get(lobbyTag);
@@ -106,7 +107,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
             logger.warn(a.configurationCategory()+""+a.distributionKey());
             if(!a.disabled()){
                 a.setup();
-                lobbyItems.put(gameName+"/"+a.configurationName(),a);
+                lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
             }
         });
         lobbyItems.forEach((k,v)->{

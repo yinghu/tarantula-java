@@ -46,16 +46,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int endBufferTimeMinutes = 3;
 
     private String reloadKey;
-    private GameCluster gameCluster;
+    private final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
 
     private ClusterProvider.ClusterStore clusterStore;
 
-    public PlatformTournamentServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformTournamentServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
@@ -105,7 +105,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
         {
-            if(v.status == Tournament.Status.STARTED) _tms.add(v);
+            if(v.status() == Tournament.Status.STARTED) _tms.add(v);
         });
         return _tms;
     }
@@ -134,7 +134,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
-        this.clusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,(String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.clusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
     }
     @Override
     public void waitForData(){
@@ -152,7 +152,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         this.serviceContext.schedule(new TournamentMidnightTask(this));
-        this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]");
+        this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
     }
 
     @Override
@@ -359,7 +359,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         try{
             clusterStore.mapLock(lockKey);
             tournamentHeader.dataStore(this.dataStore);
-            if(tournamentHeader.status == Tournament.Status.ENDED) return false;
+            if(tournamentHeader.status() == Tournament.Status.ENDED) return false;
             launch(tournamentHeader);
             return true;
         }finally {

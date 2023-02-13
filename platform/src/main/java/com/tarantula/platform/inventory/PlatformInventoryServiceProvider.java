@@ -29,8 +29,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
 
-    public PlatformInventoryServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
-        this.gameCluster = gameCluster;
+    public PlatformInventoryServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
     }
 

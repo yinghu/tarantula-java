@@ -36,10 +36,10 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
 
-    public PlatformConfigurationServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.typeId = gameServiceName.replace("-service","");
-        this.gameCluster = gameCluster;
+    public PlatformConfigurationServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
+        this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.typeId = gameCluster.typeId();
     }
 
     @Override

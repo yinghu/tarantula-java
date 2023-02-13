@@ -28,9 +28,9 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Achievement> achievements;
 
-    public PlatformAchievementServiceProvider(GameCluster gameCluster, GameServiceProvider gameServiceProvider){
+    public PlatformAchievementServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.gameCluster = gameCluster;
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.achievements = new ConcurrentHashMap<>();
     }
