@@ -21,11 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TournamentInstance extends RecoverableObject implements Tournament.Instance, Portable {
 
-    protected Tournament.Status status = Tournament.Status.STARTED;
-    protected int maxEntries;
-    protected LocalDateTime start;
-    protected LocalDateTime close;
-    protected LocalDateTime end;
+    private Tournament.Status status = Tournament.Status.PENDING;
+    private int maxEntries;
+    private LocalDateTime start;
+    private LocalDateTime close;
+    private LocalDateTime end;
 
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
@@ -35,6 +35,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.start = start;
         this.close = close;
         this.end = end;
+    }
+    public TournamentInstance(int maxEntries){
+        this.maxEntries = maxEntries;
     }
     public TournamentInstance(){
 
@@ -75,16 +78,18 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
     public Map<String,Object> toMap(){
         properties.put("1",maxEntries);
-        properties.put("2", TimeUtil.toUTCMilliseconds(start));
-        properties.put("3", TimeUtil.toUTCMilliseconds(close));
-        properties.put("4", TimeUtil.toUTCMilliseconds(end));
+        properties.put("2", start!=null?TimeUtil.toUTCMilliseconds(start):0);
+        properties.put("3", close!=null?TimeUtil.toUTCMilliseconds(close):0);
+        properties.put("4", end!=null?TimeUtil.toUTCMilliseconds(end):0);
+        properties.put("5",status.name());
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
         this.maxEntries = ((Number)properties.get("1")).intValue();
-        this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.get("2")).longValue());
-        this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.get("3")).longValue());
-        this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+        this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("2",0)).longValue());
+        this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("3",0)).longValue());
+        this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("4",0)).longValue());
+        this.status = Tournament.Status.valueOf((String) properties.get("5"));
     }
     public Tournament.RaceBoard raceBoard(){
         tournamentRaceBoard.reset();
@@ -126,9 +131,12 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("maxEntries",maxEntries);
         jsonObject.addProperty("start",start.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("close",close.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("end",end.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("status",status.name());
+        jsonObject.addProperty("tournamentId",this.distributionKey());
         return jsonObject;
     }
     List<TournamentEntry> end(){
@@ -136,6 +144,18 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         entryIndex.forEach((k,e)->rankedList.add(e));
         Collections.sort(rankedList,new TournamentEntryComparator());
         return rankedList;
+    }
+
+    void start(LocalDateTime start,LocalDateTime close,LocalDateTime end){
+        this.start = start;
+        this.close = close;
+        this.end = end;
+        this.status = Tournament.Status.STARTED;
+    }
+
+
+    public String toString(){
+        return "Tournament ["+distributionKey()+"]["+status+"]["+maxEntries+"]";
     }
 
 }

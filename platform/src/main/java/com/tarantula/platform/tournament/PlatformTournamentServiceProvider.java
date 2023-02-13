@@ -44,6 +44,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int minDurationHoursPerSchedule = 1;
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
+    int clusterLockTimeoutSeconds = 5;
 
     private String reloadKey;
     private final GameCluster gameCluster;
@@ -121,6 +122,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
+        this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);

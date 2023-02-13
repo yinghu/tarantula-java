@@ -2,5 +2,6 @@
   "minDurationHoursPerSchedule": 1,
   "minDurationMinutesPerInstance": 5,
   "endBufferTimeMinutes": 3,
-  "concurrentInstanceSize": 8
+  "concurrentInstanceSize": 8,
+  "clusterLockTimeoutSeconds": 5
 }

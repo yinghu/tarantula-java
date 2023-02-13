@@ -14,7 +14,7 @@ public interface Tournament extends Configurable {
     int ON_DEMAND_SCHEDULE = 3;
 
     enum Status{
-        SCHEDULED,STARTING,STARTED,CLOSED,ENDED
+        PENDING,SCHEDULED,STARTING,STARTED,CLOSED,ENDED
     }
     int schedule();
     String type();

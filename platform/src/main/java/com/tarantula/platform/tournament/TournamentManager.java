@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
 
@@ -39,6 +40,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     public ScheduledFuture<?> pendingSchedule;
+    private ClusterProvider.ClusterStore tournamentStore;
     private ClusterProvider.ClusterStore[] instanceStores;
 
     public TournamentManager(TournamentSchedule schedule){
@@ -146,13 +148,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public Tournament.Instance lookup(String instanceId){
         return this.tournamentServiceProvider.instanceIndex.computeIfAbsent(instanceId,(k)->{
-            LocalDateTime _startTime = LocalDateTime.now();
-            LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
-            LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
-            TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,_startTime,_closeTime,_endTime);
+            TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(instanceId);
-            this.dataStore.createIfAbsent(instance,true);
+            if(!this.dataStore.load(instance)) return null;
             instance.dataStore(dataStore);
+            if(instance.status().equals(Status.PENDING)){
+                LocalDateTime _startTime = LocalDateTime.now();
+                LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
+                LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
+                instance.start(_startTime,_closeTime,_endTime);
+                instance.update();
+            }
             this.tournamentServiceProvider.monitorInstanceOnClose(this,instance);
             return instance;
         });
@@ -193,31 +199,63 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
+        //recovering local instances
+        activeTournamentIndexSet = new IndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName());
+        activeTournamentIndexSet.distributionKey(this.distributionKey());
+        this.dataStore.createIfAbsent(activeTournamentIndexSet,true);
+        activeTournamentIndexSet.dataStore(this.dataStore);
+        activeTournamentIndexSet.keySet().forEach(k->{
+            this.tournamentServiceProvider.logger.warn("Instance recovered->"+k);
+        });
+        this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.oid(),true,false,false);
         this.instanceStores = new ClusterProvider.ClusterStore[this.tournamentServiceProvider.concurrentInstanceSize];
         String storeSize = storeSize(this.maxEntriesPerInstance);
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
-            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(storeSize,this.oid()+"."+i,true,true,true);
+            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(storeSize,this.oid()+"."+i,false,false,true);
+            byte[] lockKey = this.instanceStores[i].name().getBytes();
+            if(!this.tournamentStore.tryMapLock(lockKey,this.tournamentServiceProvider.clusterLockTimeoutSeconds,TimeUnit.SECONDS)) continue;
+            //recovery or create new instance per instance queue
+            try{
+                this.tournamentServiceProvider.logger.warn(instanceStores[i].name()+" : locked");
+                if(!this.tournamentStore.mapExists(lockKey)){
+                    TournamentInstance instance = createInstance();
+                    byte[] joinKey = instance.distributionKey().getBytes();
+                    for(int m=0;m<instance.maxEntries();m++){
+                        this.instanceStores[i].queueOffer(joinKey);
+                    }
+                    this.tournamentStore.mapSet(lockKey,joinKey);
+                }
+            }finally {
+                this.tournamentStore.mapUnlock(lockKey);
+                this.tournamentServiceProvider.logger.warn(instanceStores[i].name()+" : unlocked");
+            }
         }
+        //trying to recover from noode startup
+        /**
         activeTournamentIndexSet = new IndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName());
         activeTournamentIndexSet.distributionKey(this.distributionKey());
         this.dataStore.createIfAbsent(activeTournamentIndexSet,true);
         activeTournamentIndexSet.dataStore(this.dataStore);
         this.activeTournamentIndexSet.keySet().forEach((k)->{
-            TournamentInstance instanceHeader = new TournamentInstance();
-            instanceHeader.distributionKey(k);
-            if(this.dataStore.load(instanceHeader)){
-                instanceHeader.dataStore(dataStore);
-                instanceHeader.load();
-                this.tournamentServiceProvider.instanceIndex.put(k,instanceHeader);
-                if(!TimeUtil.expired(instanceHeader.closeTime())){
-                    this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
-                }
-                else{
-                    this.tournamentServiceProvider.logger.warn("Expired tournament instance scheduled to end->"+instanceHeader.distributionKey());
-                    this.tournamentServiceProvider.monitorInstanceOnEnd(this,instanceHeader);
+            for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
+                TournamentInstance instanceHeader = new TournamentInstance();
+                instanceHeader.distributionKey(k);
+                if(this.dataStore.load(instanceHeader)){
+                    instanceHeader.dataStore(dataStore);
+                    instanceHeader.load();
+                    this.tournamentServiceProvider.instanceIndex.put(k,instanceHeader);
+                    if(!TimeUtil.expired(instanceHeader.closeTime())){
+                        this.tournamentServiceProvider.monitorInstanceOnClose(this,instanceHeader);
+                    }
+                    else{
+                        this.tournamentServiceProvider.logger.warn("Expired tournament instance scheduled to end->"+instanceHeader.distributionKey());
+                        this.tournamentServiceProvider.monitorInstanceOnEnd(this,instanceHeader);
+                    }
                 }
             }
         });
+        **/
+        //end recovery
 
         status = Status.STARTED;
         this.dataStore.update(this);
@@ -225,11 +263,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public String pollInstanceId(){
         byte[] pendingId = instanceStores[0].queuePoll();
-        if(pendingId==null){
-            String newId = pendingInstanceId();
-
-        }
-        if(pendingId==null) return null;
         return new String(pendingId);
     }
 
@@ -239,8 +272,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     void tournamentInstanceEnded(TournamentInstance ended){
         //end tournament and prize
-        activeTournamentIndexSet.removeKey(ended.distributionKey());
-        activeTournamentIndexSet.update();
+        //activeTournamentIndexSet.removeKey(ended.distributionKey());
+        //activeTournamentIndexSet.update();
         TournamentInstance _ended = this.tournamentServiceProvider.instanceIndex.remove(ended.distributionKey());
         rank(_ended);
     }
@@ -265,10 +298,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
     public void end(){
-        activeTournamentIndexSet.keySet().forEach(k->{
-            TournamentInstance ins  = this.tournamentServiceProvider.instanceIndex.remove(k);
-            if(ins!=null) rank(ins);
-        });
+        //activeTournamentIndexSet.keySet().forEach(k->{
+            //TournamentInstance ins  = this.tournamentServiceProvider.instanceIndex.remove(k);
+            //if(ins!=null) rank(ins);
+        //});
         status = Status.ENDED;
         this.dataStore.update(this);
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
@@ -295,9 +328,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             rank++;
         }
     }
-
-    private String pendingInstanceId(){
-        return this.tournamentServiceProvider.serviceContext.node().bucketName()+ Recoverable.PATH_SEPARATOR+ SystemUtil.oid();
+    private TournamentInstance createInstance(){
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        this.dataStore.create(instance);
+        this.tournamentServiceProvider.logger.warn(instance.toString());
+        activeTournamentIndexSet.addKey(instance.distributionKey());
+        activeTournamentIndexSet.update();
+        return instance;
     }
 
     private String storeSize(int size){
