@@ -57,11 +57,11 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     }
 
     @Override
-    public ClusterStore clusterStore(String name) {
+    public ClusterStore clusterStore(String size,String name) {
         return null;
     }
 
-    public ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue){
+    public ClusterStore clusterStore(String size,String name,boolean map,boolean index,boolean queue){
         return null;
     }
 

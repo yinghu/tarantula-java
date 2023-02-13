@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public interface ClusterProvider extends ServiceProvider {
 
@@ -24,8 +25,8 @@ public interface ClusterProvider extends ServiceProvider {
 
     <T extends ServiceProvider> T serviceProvider(String name);
 
-    ClusterStore clusterStore(String name,boolean map,boolean index,boolean queue);
-    ClusterStore clusterStore(String name);
+    ClusterStore clusterStore(String size,String name,boolean map,boolean index,boolean queue);
+    ClusterStore clusterStore(String size,String name);
 
 
     void registerMetricsListener(MetricsListener metricsListener);
@@ -38,6 +39,10 @@ public interface ClusterProvider extends ServiceProvider {
 
     interface ClusterStore{
 
+        String SMALL = "small.";
+        String MEDIUM = "medium.";
+        String LARGE = "large.";
+
         //map operations
         String name();
         byte[] mapGet(byte[] key);
@@ -47,7 +52,8 @@ public interface ClusterProvider extends ServiceProvider {
         byte[] mapRemove(byte[] key);
         void mapLock(byte[] key);
         void mapUnlock(byte[] key);
-
+        boolean tryMapLock(byte[] key);
+        boolean tryMapLock(byte[] key, long time, TimeUnit timeUnit);
 
         //cluster index operations
         void indexSet(String index,byte[] key);

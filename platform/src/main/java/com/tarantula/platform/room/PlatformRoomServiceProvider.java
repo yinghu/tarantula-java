@@ -113,7 +113,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             });
             this.serviceContext.schedule(schedulingTask);
         }
-        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(typeLobby);
+        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,typeLobby);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
     @Override
@@ -214,7 +214,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
         index.pendingChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
         if(dedicated) {
-            index.roomStore = this.clusterProvider.clusterStore(gameZone.oid());
+            index.roomStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,gameZone.oid());
         }
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
@@ -406,7 +406,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
 
     private void cleanConnection(Connection connection){
-        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(connection.serverId(),false,false,true);
+        ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,connection.serverId(),false,false,true);
         channelStore.clear();
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
         Collection<byte[]> ids = index.roomStore.indexGet(connection.serverId());
@@ -543,7 +543,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
-        return clusterProvider.clusterStore(serverId,false,false,true);
+        return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
 }

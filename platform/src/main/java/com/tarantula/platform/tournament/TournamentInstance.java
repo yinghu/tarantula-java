@@ -39,10 +39,12 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public TournamentInstance(){
 
     }
+
     @Override
     public Tournament.Status status(){
         return status;
     }
+
     @Override
     public Tournament.Entry join(String systemId) {
         return entryIndex.computeIfAbsent(systemId,(k)->{

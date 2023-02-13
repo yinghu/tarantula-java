@@ -446,7 +446,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             return false;
         });
-        this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(DeploymentServiceProvider.NAME,true,false,false);
+        this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(ClusterProvider.ClusterStore.SMALL,DeploymentServiceProvider.NAME,true,false,false);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
 

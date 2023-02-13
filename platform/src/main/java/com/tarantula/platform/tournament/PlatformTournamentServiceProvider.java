@@ -40,8 +40,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private IndexSet lookupTournamentKey;
     private IndexSet lookupScheduleKey;
 
-    int maxInstancePoolSizePerZone =  2000;
-    int minInstancePoolSizePerZone = 100;
+    int concurrentInstanceSize = 8;
     int minDurationHoursPerSchedule = 1;
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
@@ -118,8 +117,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         Configuration configuration = serviceContext.configuration(CONFIG);
-        this.maxInstancePoolSizePerZone = ((Number)configuration.property("maxInstancePoolSizePerZone")).intValue();
-        this.minInstancePoolSizePerZone = ((Number)configuration.property("minInstancePoolSizePerZone")).intValue();
+        this.concurrentInstanceSize = ((Number)configuration.property("concurrentInstanceSize")).intValue();
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
@@ -136,7 +134,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
-        this.clusterStore = this.serviceContext.clusterProvider().clusterStore((String)gameCluster.property(GameCluster.GAME_LOBBY));
+        this.clusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,(String)gameCluster.property(GameCluster.GAME_LOBBY));
     }
     @Override
     public void waitForData(){
@@ -154,7 +152,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         this.serviceContext.schedule(new TournamentMidnightTask(this));
-        this.logger.warn("Tournament service provider started with tournament pool size->["+minInstancePoolSizePerZone+"]["+maxInstancePoolSizePerZone+"] on game service ["+gameServiceName+"]");
+        this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]");
     }
 
     @Override

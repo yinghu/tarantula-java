@@ -420,7 +420,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             aMap.put(OnAccess.AMAZON,amazonAws);
         }
         //map only store
-        clusterStore = serviceContext.clusterProvider().clusterStore(TokenValidatorProvider.NAME,true,false,false);
+        clusterStore = serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,TokenValidatorProvider.NAME,true,false,false);
     }
 
     @Override

@@ -78,6 +78,18 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
         vMap.lock(key);
     }
 
+    public boolean tryMapLock(byte[] key){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
+        return vMap.tryLock(key);
+    }
+    public boolean tryMapLock(byte[] key, long time, TimeUnit timeUnit){
+        if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
+        try{
+            return vMap.tryLock(key,time,timeUnit);
+        }catch (Exception ex){
+            return false;
+        }
+    }
     public void mapUnlock(byte[] key){
         if(this.vMap==null) throw new RuntimeException("Map Operation not enabled");
         vMap.unlock(key);

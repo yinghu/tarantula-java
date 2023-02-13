@@ -79,17 +79,35 @@
         </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
-    <map name="integration.recoverable.map.*">
+    <map name="tarantula.map.small.*">
         <async-backup-count>1</async-backup-count>
         <eviction-policy>NONE</eviction-policy>
-        <max-size policy="PER_NODE">100000</max-size>
+        <max-size>100</max-size>
     </map>
-    <multimap name="integration.recoverable.index.*">
+    <map name="tarantula.map.medium.*">
+        <async-backup-count>1</async-backup-count>
+        <eviction-policy>NONE</eviction-policy>
+        <max-size>1000</max-size>
+    </map>
+    <map name="tarantula.map.large.*">
+        <async-backup-count>1</async-backup-count>
+        <eviction-policy>NONE</eviction-policy>
+        <max-size>10000</max-size>
+    </map>
+    <multimap name="tarantula.index.*">
         <async-backup-count>1</async-backup-count>
         <value-collection-type>SET</value-collection-type>
     </multimap>
-    <queue name="integration.recoverable.queue.*">
-        <max-size>5000</max-size>
+    <queue name="tarantula.queue.small.*">
+        <max-size>100</max-size>
+        <backup-count>1</backup-count>
+    </queue>
+    <queue name="tarantula.queue.medium*">
+        <max-size>1000</max-size>
+        <backup-count>1</backup-count>
+    </queue>
+    <queue name="tarantula.queue.large*">
+        <max-size>10000</max-size>
         <backup-count>1</backup-count>
     </queue>
 </hazelcast>
