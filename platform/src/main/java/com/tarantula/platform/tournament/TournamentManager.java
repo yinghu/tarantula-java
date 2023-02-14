@@ -17,8 +17,10 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
+
 
 
     private int schedule;
@@ -40,8 +42,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public ScheduledFuture<?> pendingSchedule;
     private ClusterProvider.ClusterStore tournamentStore;
     private ClusterProvider.ClusterStore[] instanceStores;
+    private AtomicInteger roundRobin;
 
     public TournamentManager(TournamentSchedule schedule){
+        this();
         this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();
@@ -73,7 +77,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public TournamentManager(){
-
+        roundRobin = new AtomicInteger(0);
     }
     public int schedule(){
         return this.schedule;
@@ -260,16 +264,24 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
 
-    public String pollInstanceId(){
-        byte[] pendingId = instanceStores[0].queuePoll();
-        return new String(pendingId);
+    public byte[] pollInstanceId(){
+        int stub = roundRobin.getAndUpdate((v)->{
+            v = v == this.tournamentServiceProvider.concurrentInstanceSize-1 ? 0 : (v+1);
+            return v;
+        });
+        this.tournamentServiceProvider.logger.warn("polling from ["+stub+"]");
+        return instanceStores[stub].queuePoll();
     }
 
     void tournamentInstanceClosed(TournamentInstance closed){
         //close enter
         this.tournamentServiceProvider.logger.warn("instance closed->"+closed);
         //this.tournamentStore.mapGet()
-        //instanceStores[closed.routingNumber()].queuePoll();
+        this.tournamentServiceProvider.logger.warn(new String(instanceStores[closed.routingNumber()].queuePoll()));
+        instanceStores[closed.routingNumber()].queueClear();
+        if(instanceStores[closed.routingNumber()].queuePoll()==null){
+            this.tournamentServiceProvider.logger.warn("store clear");
+        }
         this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
     }
     void tournamentInstanceEnded(TournamentInstance ended){

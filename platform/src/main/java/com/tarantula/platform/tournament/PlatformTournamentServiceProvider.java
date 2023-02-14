@@ -47,6 +47,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int endBufferTimeMinutes = 3;
     int clusterLockTimeoutSeconds = 5;
 
+    int instanceIdPollingRetries =3;
+
     private String reloadKey;
     private final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -81,10 +83,15 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public Tournament.Instance enter(String tournamentId, String systemId) {
         TournamentManager index = tournamentIndex.get(tournamentId);
-        String pendingId = index.pollInstanceId();
+        byte[] pendingId = null;
+        for(int retry = 0;retry < this.instanceIdPollingRetries;retry++){
+            pendingId = index.pollInstanceId();
+            if(pendingId != null) break;
+        }
         if(pendingId == null) return null;
-        Tournament.Instance instance = this.distributionTournamentService.onEnterTournament(gameServiceName,tournamentId,pendingId,systemId);
-        instance.distributionKey(pendingId);
+        String instanceId = new String(pendingId);
+        Tournament.Instance instance = this.distributionTournamentService.onEnterTournament(gameServiceName,tournamentId,instanceId,systemId);
+        instance.distributionKey(instanceId);
         return instance;
     }
 
@@ -124,6 +131,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
+        this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
@@ -139,8 +147,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.clusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
     }
+
     @Override
-    public void waitForData(){
+    public void start() throws Exception {
         ArrayList<String> removed = new ArrayList();
         lookupTournamentKey.keySet().forEach((k)->{
             if(!loadTournamentHeader(k)){
@@ -151,9 +160,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             lookupTournamentKey.removeKey(r);
         });
         this.lookupTournamentKey.update();
-    }
-    @Override
-    public void start() throws Exception {
         this.serviceContext.schedule(new TournamentMidnightTask(this));
         this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
     }
@@ -428,10 +434,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     //distributed operation callbacks
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         Tournament.Instance _ins = instance(tournamentId,instanceId);
-        if(_ins.join(systemId)==_ins.maxEntries()){
+        int joined = _ins.join(systemId);
+        logger.warn("Join count->"+joined);
+        //if(_ins.join(systemId)==_ins.maxEntries()){
             //closing instance from
             //this.tournamentIndex.get(tournamentId)
-        }
+        //}
         return _ins;
     }
     public Tournament.Entry onTournamentScored(String instanceId, String systemId, double delta){
@@ -447,7 +455,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return instance(instanceId).raceBoard();
     }
     public void onTournamentFinished(String instanceId,String systemId){
-
+        logger.warn("finished->"+instanceId+">>"+systemId);
     }
     public void onTournamentSynced(String tournamentId,String instanceId){
         logger.warn("tournament sync->"+tournamentId+">>>"+instanceId);
