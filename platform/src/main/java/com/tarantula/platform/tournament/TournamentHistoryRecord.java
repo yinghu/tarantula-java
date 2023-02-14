@@ -31,14 +31,15 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         return status;
     }
     @Override
-    public Tournament.Entry join(String systemId) {
-        return entryIndex.computeIfAbsent(systemId,(k)->{
+    public int join(String systemId) {
+        entryIndex.computeIfAbsent(systemId,(k)->{
             TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);
             return entry;
         });
+        return entryIndex.size();
     }
 
     @Override

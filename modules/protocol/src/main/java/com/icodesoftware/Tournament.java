@@ -47,7 +47,7 @@ public interface Tournament extends Configurable {
         LocalDateTime startTime();
         LocalDateTime closeTime();
         LocalDateTime endTime();
-        Entry join(String systemId);
+        int join(String systemId);
         void update(String systemId,OnEntry onEntry);
 
         RaceBoard raceBoard();

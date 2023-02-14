@@ -27,6 +27,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private LocalDateTime close;
     private LocalDateTime end;
 
+    private int totalJoined;
+
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
@@ -44,14 +46,16 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     @Override
-    public Tournament.Entry join(String systemId) {
-        return entryIndex.computeIfAbsent(systemId,(k)->{
+    public int join(String systemId) {
+        entryIndex.computeIfAbsent(systemId,(k)->{
             TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);
+            totalJoined++;
             return entry;
         });
+        return totalJoined;
     }
 
     @Override
@@ -124,18 +128,19 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
             tournamentRaceBoard.addEntry(e);
+            totalJoined++;
             return true;
         });
         return true;
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("maxEntries",maxEntries);
-        jsonObject.addProperty("start",start.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("close",close.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("end",end.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("status",status.name());
-        jsonObject.addProperty("tournamentId",this.distributionKey());
+        jsonObject.addProperty("MaxEntries",maxEntries);
+        jsonObject.addProperty("Start",start.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("Close",close.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("End",end.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("Status",status.name());
+        jsonObject.addProperty("TournamentId",this.distributionKey());
         return jsonObject;
     }
     List<TournamentEntry> end(){

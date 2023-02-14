@@ -428,7 +428,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     //distributed operation callbacks
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         Tournament.Instance _ins = instance(tournamentId,instanceId);
-        _ins.join(systemId);
+        if(_ins.join(systemId)==_ins.maxEntries()){
+            //closing instance from 
+            //this.tournamentIndex.get(tournamentId)
+        }
         return _ins;
     }
     public Tournament.Entry onTournamentScored(String instanceId, String systemId, double delta){
