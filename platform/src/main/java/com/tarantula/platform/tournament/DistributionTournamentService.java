@@ -14,7 +14,7 @@ public interface DistributionTournamentService extends ServiceProvider {
     Tournament.RaceBoard onListTournament(String serviceName,String instanceId);
     void onFinishTournament(String serviceName,String instanceId,String systemId);
 
-
+    void onSyncTournament(String serviceName,String tournamentId,String instanceId);
     void onCloseTournament(String serviceName,String tournamentId);
     void onEndTournament(String serviceName,String tournamentId);
 

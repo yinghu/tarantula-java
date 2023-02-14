@@ -5,14 +5,12 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -159,7 +157,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 instance.start(_startTime,_closeTime,_endTime);
                 instance.update();
             }
-            this.tournamentServiceProvider.monitorInstanceOnClose(this,instance);
+            this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
             return instance;
         });
     }
@@ -206,6 +204,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         activeTournamentIndexSet.dataStore(this.dataStore);
         activeTournamentIndexSet.keySet().forEach(k->{
             this.tournamentServiceProvider.logger.warn("Instance recovered->"+k);
+            //this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName,this.distributionKey(),k);
         });
         this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.oid(),true,false,false);
         this.instanceStores = new ClusterProvider.ClusterStore[this.tournamentServiceProvider.concurrentInstanceSize];
@@ -218,7 +217,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             try{
                 this.tournamentServiceProvider.logger.warn(instanceStores[i].name()+" : locked");
                 if(!this.tournamentStore.mapExists(lockKey)){
-                    TournamentInstance instance = createInstance();
+                    TournamentInstance instance = createInstance(i);
                     byte[] joinKey = instance.distributionKey().getBytes();
                     for(int m=0;m<instance.maxEntries();m++){
                         this.instanceStores[i].queueOffer(joinKey);
@@ -268,12 +267,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     void tournamentInstanceClosed(TournamentInstance closed){
         //close enter
-        this.tournamentServiceProvider.monitorInstanceOnEnd(this,closed);
+        this.tournamentServiceProvider.logger.warn("instance closed->"+closed);
+        //this.tournamentStore.mapGet()
+        //instanceStores[closed.routingNumber()].queuePoll();
+        this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
     }
     void tournamentInstanceEnded(TournamentInstance ended){
         //end tournament and prize
         //activeTournamentIndexSet.removeKey(ended.distributionKey());
         //activeTournamentIndexSet.update();
+        this.tournamentServiceProvider.logger.warn("instance ended->"+ended);
         TournamentInstance _ended = this.tournamentServiceProvider.instanceIndex.remove(ended.distributionKey());
         rank(_ended);
     }
@@ -328,8 +331,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             rank++;
         }
     }
-    private TournamentInstance createInstance(){
-        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+    private TournamentInstance createInstance(int queueNumber){
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,queueNumber);
         this.dataStore.create(instance);
         this.tournamentServiceProvider.logger.warn(instance.toString());
         activeTournamentIndexSet.addKey(instance.distributionKey());
@@ -342,5 +345,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(size<=1000) return ClusterProvider.ClusterStore.MEDIUM;
         return ClusterProvider.ClusterStore.LARGE;
     }
+
 
 }

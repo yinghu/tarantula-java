@@ -110,6 +110,20 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
+    public void onSyncTournament(String serviceName,String tournamentId,String instanceId){
+        NodeEngine nodeEngine = getNodeEngine();
+        SyncTournamentOperation operation = new SyncTournamentOperation(serviceName,tournamentId,instanceId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        final Future<Tournament.Instance> future = builder.invoke();
+        try {
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            //return null;
+        }
+    }
+
     public void onCloseTournament(String serviceName,String tournamentId){
         NodeEngine nodeEngine = getNodeEngine();
         CloseTournamentOperation operation = new CloseTournamentOperation(serviceName,tournamentId);

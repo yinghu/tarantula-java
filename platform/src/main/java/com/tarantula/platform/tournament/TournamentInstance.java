@@ -30,14 +30,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
-    public TournamentInstance(int maxEntries, LocalDateTime start, LocalDateTime close, LocalDateTime end){
+    public TournamentInstance(int maxEntries,int queueNumber){
         this.maxEntries = maxEntries;
-        this.start = start;
-        this.close = close;
-        this.end = end;
-    }
-    public TournamentInstance(int maxEntries){
-        this.maxEntries = maxEntries;
+        this.routingNumber = queueNumber;
     }
     public TournamentInstance(){
 
@@ -76,20 +71,24 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public LocalDateTime endTime(){
         return end;
     }
+
     public Map<String,Object> toMap(){
         properties.put("1",maxEntries);
         properties.put("2", start!=null?TimeUtil.toUTCMilliseconds(start):0);
         properties.put("3", close!=null?TimeUtil.toUTCMilliseconds(close):0);
         properties.put("4", end!=null?TimeUtil.toUTCMilliseconds(end):0);
         properties.put("5",status.name());
+        properties.put("6",routingNumber);
         return properties;
     }
+
     public void fromMap(Map<String,Object> properties){
         this.maxEntries = ((Number)properties.get("1")).intValue();
         this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("2",0)).longValue());
         this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("3",0)).longValue());
         this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("4",0)).longValue());
         this.status = Tournament.Status.valueOf((String) properties.get("5"));
+        this.routingNumber = ((Number)properties.getOrDefault("6",0)).intValue();
     }
     public Tournament.RaceBoard raceBoard(){
         tournamentRaceBoard.reset();
@@ -155,7 +154,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
 
     public String toString(){
-        return "Tournament ["+distributionKey()+"]["+status+"]["+maxEntries+"]";
+        return "Tournament ["+distributionKey()+"]["+status+"]["+maxEntries+"]["+routingNumber+"]";
     }
 
 }

@@ -27,9 +27,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     ServiceContext serviceContext;
 
-    private DistributionTournamentService distributionTournamentService;
+    DistributionTournamentService distributionTournamentService;
+
     private DistributionItemService distributionItemService;
-    private final String gameServiceName;
+    final String gameServiceName;
     private DataStore dataStore;
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -56,7 +57,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     public PlatformTournamentServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = this.gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
@@ -247,12 +248,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         finally {
             clusterStore.mapUnlock(lockKey);
         }
-    }
-    void monitorInstanceOnClose(TournamentManager tournamentHeader, TournamentInstance instanceHeader){
-        this.serviceContext.schedule(new TournamentInstanceCloseMonitor(tournamentHeader,instanceHeader));
-    }
-    void monitorInstanceOnEnd(TournamentManager tournamentHeader, TournamentInstance instanceHeader){
-        this.serviceContext.schedule(new TournamentInstanceEndMonitor(tournamentHeader,instanceHeader));
     }
 
     void onPrize(String systemId,TournamentPrize prize){
@@ -450,6 +445,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void onTournamentFinished(String instanceId,String systemId){
 
+    }
+    public void onTournamentSynced(String tournamentId,String instanceId){
+        logger.warn("tournament sync->"+tournamentId+">>>"+instanceId);
     }
     public void onTournamentClosed(String tournamentId){
         this.closeTournament(tournamentId);
