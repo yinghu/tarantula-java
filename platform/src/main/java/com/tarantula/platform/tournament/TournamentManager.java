@@ -204,7 +204,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         activeTournamentIndexSet.dataStore(this.dataStore);
         activeTournamentIndexSet.keySet().forEach(k->{
             this.tournamentServiceProvider.logger.warn("Instance recovered->"+k);
-            //this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName,this.distributionKey(),k);
+            this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName,this.distributionKey(),k);
         });
         this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.oid(),true,false,false);
         this.instanceStores = new ClusterProvider.ClusterStore[this.tournamentServiceProvider.concurrentInstanceSize];
@@ -308,8 +308,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         status = Status.ENDED;
         this.dataStore.update(this);
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
-            this.instanceStores[i].clear();
+            this.instanceStores[i].destroy();
         }
+        this.tournamentStore.destroy();
         this.tournamentServiceProvider.logger.warn("Tournament ["+distributionKey()+"] ended at ["+LocalDateTime.now()+"]");
     }
 

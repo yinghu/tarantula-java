@@ -113,12 +113,16 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
             return null;
         }
     }
-
-    public void clear(){
-        clear(true,true,true);
+    public void queueClear(){
+        if(this.vQueue==null) throw new RuntimeException("Queue Operation not enabled");
+        vQueue.clear();
     }
 
-    public void clear(boolean map,boolean index,boolean queue){
+    public void destroy(){
+        destroy(true,true,true);
+    }
+
+    public void destroy(boolean map,boolean index,boolean queue){
         if(map && vMap != null) { vMap.clear(); vMap.destroy();}
         if(index && mIndex != null) { mIndex.clear(); mIndex.destroy();}
         if(queue && vQueue != null) { vQueue.clear(); vQueue.destroy();}

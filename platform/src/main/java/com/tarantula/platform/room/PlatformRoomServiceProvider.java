@@ -407,7 +407,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private void cleanConnection(Connection connection){
         ClusterProvider.ClusterStore channelStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,connection.serverId(),false,false,true);
-        channelStore.clear();
+        channelStore.destroy();
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
         Collection<byte[]> ids = index.roomStore.indexGet(connection.serverId());
         ids.forEach(k->{

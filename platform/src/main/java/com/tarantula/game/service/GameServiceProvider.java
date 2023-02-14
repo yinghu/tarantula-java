@@ -117,7 +117,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         gameServiceProviders.forEach((k,sp)->{
             try {
                 sp.start();
-            }catch (Exception nex){}
+            }catch (Exception nex){
+                logger.error("error on service start",nex);
+            }
         });
     }
 

@@ -429,7 +429,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         Tournament.Instance _ins = instance(tournamentId,instanceId);
         if(_ins.join(systemId)==_ins.maxEntries()){
-            //closing instance from 
+            //closing instance from
             //this.tournamentIndex.get(tournamentId)
         }
         return _ins;
