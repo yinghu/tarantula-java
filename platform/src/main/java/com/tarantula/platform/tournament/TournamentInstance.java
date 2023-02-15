@@ -149,7 +149,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return rankedList;
     }
 
-    void start(LocalDateTime start,LocalDateTime close,LocalDateTime end){
+    void started(LocalDateTime start,LocalDateTime close,LocalDateTime end){
         this.start = start;
         this.close = close;
         this.end = end;

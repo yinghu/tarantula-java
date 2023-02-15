@@ -11,11 +11,11 @@ public interface TournamentServiceProvider extends ConfigurationServiceProvider{
     List<Tournament> list();
     boolean available(String tournamentId);
     Tournament.Instance enter(String tournamentId,String systemId);
-    Tournament.Entry score(String instanceId,String systemId, double delta);
+    Tournament.Entry score(String tournamentId,String instanceId,String systemId, double delta);
 
-    void finish(String instanceId,String systemId);
+    void finish(String tournamentId,String instanceId,String systemId);
 
-    Tournament.RaceBoard list(String instanceId);
+    Tournament.RaceBoard list(String tournamentId,String instanceId);
 
     List<Tournament.History> playerHistory(String systemId);
     Tournament.Instance tournamentHistory(String tournamentId);

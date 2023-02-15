@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,7 +39,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private IndexSet activeTournamentIndexSet;
     private ArrayBlockingQueue<TournamentInstance> pendingQueue;
-
+    private ConcurrentHashMap<String, TournamentInstance> instanceIndex;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     public ScheduledFuture<?> pendingSchedule;
@@ -151,7 +152,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
 
     public Tournament.Instance lookup(String instanceId){
-        return this.tournamentServiceProvider.instanceIndex.computeIfAbsent(instanceId,(k)->{
+        return this.instanceIndex.computeIfAbsent(instanceId,(k)->{
             TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(instanceId);
             if(!this.dataStore.load(instance)) return null;
@@ -160,7 +161,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 LocalDateTime _startTime = LocalDateTime.now();
                 LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
                 LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
-                instance.start(_startTime,_closeTime,_endTime);
+                instance.started(_startTime,_closeTime,_endTime);
                 instance.update();
             }
             this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
@@ -204,6 +205,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
         //recovering local instances
+        instanceIndex = new ConcurrentHashMap<>();
         int[] pendingPoolSize = new int[]{0};
         pendingQueue = new ArrayBlockingQueue<>(this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule);
         activeTournamentIndexSet = new IndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName());
@@ -290,7 +292,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         //activeTournamentIndexSet.removeKey(ended.distributionKey());
         //activeTournamentIndexSet.update();
         this.tournamentServiceProvider.logger.warn("instance ended->"+ended);
-        TournamentInstance _ended = this.tournamentServiceProvider.instanceIndex.remove(ended.distributionKey());
+        TournamentInstance _ended = this.instanceIndex.remove(ended.distributionKey());
         rank(_ended);
     }
     @Override

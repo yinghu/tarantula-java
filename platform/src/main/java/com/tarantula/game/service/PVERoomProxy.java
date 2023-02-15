@@ -49,7 +49,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
-            gameServiceProvider.tournamentServiceProvider().finish(stub.tournament.distributionKey(),stub.systemId());
+            gameServiceProvider.tournamentServiceProvider().finish("",stub.tournament.distributionKey(),stub.systemId());
         }
         return true;
     }

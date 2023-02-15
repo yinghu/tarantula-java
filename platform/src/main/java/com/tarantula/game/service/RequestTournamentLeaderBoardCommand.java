@@ -16,7 +16,7 @@ public class RequestTournamentLeaderBoardCommand extends GameServiceProxyHeader 
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         if(!application.tournamentEnabled() || stub.tournamentId()==null) return null;
-        Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournamentId());
+        Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list("",stub.tournamentId());
         return board.toJson().toString().getBytes();
     }
 }
