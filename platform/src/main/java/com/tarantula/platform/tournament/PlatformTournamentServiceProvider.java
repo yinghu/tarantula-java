@@ -46,8 +46,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
     int clusterLockTimeoutSeconds = 5;
-
+    int instanceIdPollingTimeoutSeconds = 3;
     int instanceIdPollingRetries =3;
+    int pendingInstancePoolSizePerSchedule = 100;
 
     private String reloadKey;
     private final GameCluster gameCluster;
@@ -131,7 +132,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
+        this.instanceIdPollingTimeoutSeconds = ((Number)configuration.property("instanceIdPollingTimeoutSeconds")).intValue();
         this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
+        this.pendingInstancePoolSizePerSchedule = ((Number)configuration.property("pendingInstancePoolSizePerSchedule")).intValue();
         this.lookupTournamentKey = new IndexSet(GameCluster.TOURNAMENT_LOOKUP_INDEX);
         this.lookupTournamentKey.distributionKey(gameCluster.distributionKey());
         this.lookupScheduleKey = new IndexSet(GameCluster.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
@@ -459,6 +462,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void onTournamentSynced(String tournamentId,String instanceId){
         logger.warn("tournament sync->"+tournamentId+">>>"+instanceId);
+        TournamentInstance synced = new TournamentInstance();
+        synced.distributionKey(instanceId);
+        this.dataStore.load(synced);
+        logger.warn(synced.toString());
     }
     public void onTournamentClosed(String tournamentId){
         this.closeTournament(tournamentId);

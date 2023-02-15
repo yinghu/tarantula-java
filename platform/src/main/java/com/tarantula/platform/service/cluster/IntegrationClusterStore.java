@@ -104,14 +104,17 @@ public class IntegrationClusterStore implements ClusterProvider.ClusterStore {
             return false;
         }
     }
-    public byte[] queuePoll(){
+    public byte[] queuePoll(long time,TimeUnit timeUnit){
         if(this.vQueue==null) throw new RuntimeException("Queue Operation not enabled");
         try{
-            return vQueue.poll(operationTimeout, TimeUnit.SECONDS);
+            return vQueue.poll(time,timeUnit);
         }catch (Exception ex){
             ex.printStackTrace();
             return null;
         }
+    }
+    public byte[] queuePoll(){
+        return queuePoll(operationTimeout,TimeUnit.SECONDS);
     }
     public void queueClear(){
         if(this.vQueue==null) throw new RuntimeException("Queue Operation not enabled");

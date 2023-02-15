@@ -54,11 +54,13 @@ public class IndexSet extends RecoverableObject {
         }
         return added;
     }
-    public void removeKey(String key){
+    public boolean removeKey(String key){
+        boolean removed;
         synchronized (keySet){
-            keySet.remove(key);
+            removed = keySet.remove(key);
             properties.remove(key);
         }
+        return removed;
     }
     public Set<String> keySet(){
         HashSet<String> copy = new HashSet();

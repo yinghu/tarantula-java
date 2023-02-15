@@ -64,6 +64,7 @@ public interface ClusterProvider extends ServiceProvider {
         //queue operation
         boolean queueOffer(byte[] value);
         byte[] queuePoll();
+        byte[] queuePoll(long time,TimeUnit timeUnit);
         void queueClear();
 
         void destroy();

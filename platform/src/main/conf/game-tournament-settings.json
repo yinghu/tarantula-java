@@ -2,7 +2,9 @@
   "minDurationHoursPerSchedule": 1,
   "minDurationMinutesPerInstance": 5,
   "endBufferTimeMinutes": 3,
-  "concurrentInstanceSize": 8,
+  "concurrentInstanceSize": 1,
   "clusterLockTimeoutSeconds": 5,
-  "instanceIdPollingRetries": 3
+  "instanceIdPollingTimeoutSeconds": 3,
+  "instanceIdPollingRetries": 3,
+  "pendingInstancePoolSizePerSchedule" : 10
 }

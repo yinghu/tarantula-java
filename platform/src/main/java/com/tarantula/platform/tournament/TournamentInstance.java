@@ -32,9 +32,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
-    public TournamentInstance(int maxEntries,int queueNumber){
+    public TournamentInstance(int maxEntries){
         this.maxEntries = maxEntries;
-        this.routingNumber = queueNumber;
     }
     public TournamentInstance(){
 
@@ -155,6 +154,10 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.close = close;
         this.end = end;
         this.status = Tournament.Status.STARTED;
+    }
+    void starting(int queueNumber){
+        this.routingNumber = queueNumber;
+        this.status = Tournament.Status.STARTING;
     }
 
 
