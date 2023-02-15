@@ -9,10 +9,10 @@ public interface DistributionTournamentService extends ServiceProvider {
 
 
     Tournament.Instance onEnterTournament(String serviceName,String tournamentId,String instanceId,String systemId);
-    Tournament.Entry onScoreTournament(String serviceName,String instanceId,String systemId,double delta);
+    Tournament.Entry onScoreTournament(String serviceName,String tournamentId,String instanceId,String systemId,double delta);
 
-    Tournament.RaceBoard onListTournament(String serviceName,String instanceId);
-    void onFinishTournament(String serviceName,String instanceId,String systemId);
+    Tournament.RaceBoard onListTournament(String serviceName,String tournamentId,String instanceId);
+    void onFinishTournament(String serviceName,String tournamentId,String instanceId,String systemId);
 
     void onSyncTournament(String serviceName,String tournamentId,String instanceId);
     void onCloseTournament(String serviceName,String tournamentId);

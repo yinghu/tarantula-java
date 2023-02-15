@@ -36,7 +36,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ConcurrentHashMap<String,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
 
-    //ConcurrentHashMap<String, TournamentInstance> instanceIndex = new ConcurrentHashMap<>();
 
     private IndexSet lookupTournamentKey;
     private IndexSet lookupScheduleKey;
@@ -98,16 +97,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double delta) {
-        Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,instanceId,systemId,delta);
+        Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,delta);
         return _e;
     }
 
     public void finish(String tournamentId,String instanceId, String systemId){
-        this.distributionTournamentService.onFinishTournament(gameServiceName,instanceId,systemId);
+        this.distributionTournamentService.onFinishTournament(gameServiceName,tournamentId,instanceId,systemId);
     }
     @Override
     public Tournament.RaceBoard list(String tournamentId,String instanceId) {
-        Tournament.RaceBoard ins = this.distributionTournamentService.onListTournament(gameServiceName,instanceId);
+        Tournament.RaceBoard ins = this.distributionTournamentService.onListTournament(gameServiceName,tournamentId,instanceId);
         Collections.sort(ins.list(),new TournamentEntryComparator());
         return ins;
     }
@@ -155,7 +154,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void start() throws Exception {
         ArrayList<String> removed = new ArrayList();
         lookupTournamentKey.keySet().forEach((k)->{
-            if(!loadTournamentHeader(k)){
+            if(!loadTournamentManager(k)){
                 removed.add(k);
             }
         });
@@ -173,18 +172,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
     }
 
-    public Tournament tournament(String tournamentId){//schedule node
-        TournamentManager tournament = tournamentIndex.get(tournamentId);
-        return tournament;
-    }
-    public Tournament.Instance instance(String tournamentId,String instanceId){//instance node
-        TournamentManager tournament = this.tournamentIndex.get(tournamentId);
-        return tournament.lookup(instanceId);
-    }
-    //public Tournament.Instance instance(String instanceId){//instance node
-        ///TournamentInstance tournament = this.instanceIndex.get(instanceId);
-        //return tournament;
-    //}
     public List<Tournament.History> playerHistory(String systemId){
         ArrayList<Tournament.History> list = new ArrayList<>();
         IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
@@ -357,7 +344,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return false;
     }
 
-    private boolean loadTournamentHeader(String tournamentId){
+    private boolean loadTournamentManager(String tournamentId){
         TournamentManager tournamentHeader = new TournamentManager();
         tournamentHeader.distributionKey(tournamentId);
         if(!this.dataStore.load(tournamentHeader)) return false;
@@ -403,7 +390,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         status.status = Tournament.Status.STARTED;
         dataStore.update(status);
     }
-
+    private Tournament.Instance instance(String tournamentId,String instanceId){//instance node
+        TournamentManager tournament = this.tournamentIndex.get(tournamentId);
+        return tournament.lookup(instanceId);
+    }
 
     public void closeTournament(String tournamentId){
         TournamentManager index = tournamentIndex.get(tournamentId);
@@ -445,8 +435,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         //}
         return _ins;
     }
-    public Tournament.Entry onTournamentScored(String instanceId, String systemId, double delta){
-        Tournament.Instance _ins = instance("",instanceId);
+    public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double delta){
+        logger.warn(tournamentId+">>"+instanceId+">>"+systemId+">>"+delta);
+        Tournament.Instance _ins = instance(tournamentId,instanceId);
         Tournament.Entry[] score={null};
         _ins.update(systemId,(e)->{
             e.score(delta);
@@ -454,11 +445,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
         return score[0];
     }
-    public Tournament.RaceBoard onTournamentListed(String instanceId){
-        return instance("",instanceId).raceBoard();
+    public Tournament.RaceBoard onTournamentListed(String tournamentId,String instanceId){
+        return instance(tournamentId,instanceId).raceBoard();
     }
-    public void onTournamentFinished(String instanceId,String systemId){
-        logger.warn("finished->"+instanceId+">>"+systemId);
+    public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
+        Tournament.Instance instance = instance(tournamentId,instanceId);
+        logger.warn(instance.toString());
+        logger.warn("finished->"+tournamentId+">>"+instanceId+">>"+systemId);
     }
     public void onTournamentSynced(String tournamentId,String instanceId){
         logger.warn("tournament sync->"+tournamentId+">>>"+instanceId);

@@ -30,8 +30,9 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.pushChannel = gameServiceProvider.roomServiceProvider().registerChannel(stub,(h,m)->super.onService(stub,h,m),(s,d)->{
             gameLobby.timeout(s,d);
         });
-        if(application.tournamentEnabled()&&session.tournamentId()!=null){
+        if(application.tournamentEnabled() && session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().enter(session.tournamentId(),session.systemId());
+            stub.tournamentId(session.tournamentId());
             stub.tournament = instance;
         }
         stub.tag(application.tag());

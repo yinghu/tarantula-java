@@ -16,7 +16,7 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public String zoneId;
     public String roomId;
-    //public String ticket;
+    //public String tournamentId;
     public Shop shop;
 
     public GameRoom room;
@@ -64,6 +64,8 @@ public class Stub extends PlayerGameObject {
         properties.put("joined",joined);
         properties.put("zoneId",zoneId);
         properties.put("roomId",roomId);
+        properties.put("tournamentId",tournamentId);
+        properties.put("trackId",trackId); //tournament instance id
         return properties;
     }
     @Override
@@ -71,6 +73,8 @@ public class Stub extends PlayerGameObject {
         joined = (boolean)properties.getOrDefault("joined",false);
         zoneId = ((String)properties.getOrDefault("zoneId",null));
         roomId = ((String)properties.getOrDefault("roomId",null));
+        tournamentId = ((String)properties.getOrDefault("tournamentId",null));
+        trackId = ((String)properties.getOrDefault("trackId",null));
     }
     @Override
     public Recoverable.Key key(){

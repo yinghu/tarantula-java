@@ -66,9 +66,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public Tournament.Entry onScoreTournament(String serviceName,String instanceId,String systemId,double delta){
+    public Tournament.Entry onScoreTournament(String serviceName,String tournamentId,String instanceId,String systemId,double delta){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,instanceId,systemId,delta);
+        TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<Tournament.Entry> future = builder.invoke();
@@ -82,9 +82,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
 
 
-    public Tournament.RaceBoard onListTournament(String serviceName,String instanceId){
+    public Tournament.RaceBoard onListTournament(String serviceName,String tournamentId,String instanceId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentListOperation operation = new TournamentListOperation(serviceName,instanceId);
+        TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,instanceId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<Tournament.RaceBoard> future = builder.invoke();
@@ -96,9 +96,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public void onFinishTournament(String serviceName,String instanceId,String systemId){
+    public void onFinishTournament(String serviceName,String tournamentId,String instanceId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentFinishOperation operation = new TournamentFinishOperation(serviceName,instanceId,systemId);
+        TournamentFinishOperation operation = new TournamentFinishOperation(serviceName,tournamentId,instanceId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<Tournament.Entry> future = builder.invoke();

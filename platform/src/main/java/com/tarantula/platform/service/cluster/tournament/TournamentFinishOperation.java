@@ -12,21 +12,23 @@ public class TournamentFinishOperation extends Operation implements PartitionAwa
 
     private String serviceName;
     private String systemId;
+    private String tournamentId;
     private String instanceId;
 
     public TournamentFinishOperation() {
     }
 
 
-    public TournamentFinishOperation(String serviceName, String instanceId, String systemId) {
+    public TournamentFinishOperation(String serviceName, String tournamentId,String instanceId, String systemId) {
         this.serviceName = serviceName;
+        this.tournamentId = tournamentId;
         this.instanceId = instanceId;
         this.systemId = systemId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        ais.finish(serviceName,instanceId,systemId);
+        ais.finish(serviceName,tournamentId,instanceId,systemId);
     }
 
     @Override
@@ -38,6 +40,7 @@ public class TournamentFinishOperation extends Operation implements PartitionAwa
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
+        out.writeUTF(this.tournamentId);
         out.writeUTF(this.instanceId);
         out.writeUTF(this.systemId);
     }
@@ -45,8 +48,9 @@ public class TournamentFinishOperation extends Operation implements PartitionAwa
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        serviceName = in.readUTF();
-        instanceId = in.readUTF();
-        systemId = in.readUTF();
+        this.serviceName = in.readUTF();
+        this.tournamentId = in.readUTF();
+        this.instanceId = in.readUTF();
+        this.systemId = in.readUTF();
     }
 }

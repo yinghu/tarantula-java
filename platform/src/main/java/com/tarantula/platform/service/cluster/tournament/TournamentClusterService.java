@@ -53,17 +53,17 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         Tournament.Instance _ins = tsp.tournamentServiceProvider().onTournamentEntered(tournamentId,instanceId,systemId);
         return _ins;
     }
-    public Tournament.Entry score(String serviceName, String instanceId, String systemId, double delta){
+    public Tournament.Entry score(String serviceName, String tournamentId,String instanceId, String systemId, double delta){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournamentServiceProvider().onTournamentScored(instanceId,systemId,delta);
+        return tsp.tournamentServiceProvider().onTournamentScored(tournamentId,instanceId,systemId,delta);
     }
-    public Tournament.RaceBoard list(String serviceName,String instanceId){
+    public Tournament.RaceBoard list(String serviceName,String tournamentId,String instanceId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        return tsp.tournamentServiceProvider().onTournamentListed(instanceId);
+        return tsp.tournamentServiceProvider().onTournamentListed(tournamentId,instanceId);
     }
-    public void finish(String serviceName, String instanceId, String systemId){
+    public void finish(String serviceName,String tournamentId, String instanceId, String systemId){
         GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
-        tsp.tournamentServiceProvider().onTournamentFinished(instanceId,systemId);
+        tsp.tournamentServiceProvider().onTournamentFinished(tournamentId,instanceId,systemId);
     }
 
     public void syncTournament(String serviceName,String tournamentId,String instanceId){
