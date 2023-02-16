@@ -17,26 +17,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class TournamentInstance extends RecoverableObject implements Tournament.Instance, Portable {
 
     private Tournament.Status status = Tournament.Status.PENDING;
     private int maxEntries;
+    private double scoreCredits;
     private LocalDateTime start;
     private LocalDateTime close;
     private LocalDateTime end;
 
     private int totalJoined;
+    private AtomicInteger totalFinished;
 
     private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
+    ScheduledFuture<?> pendingSchedule;
+
+
     public TournamentInstance(int maxEntries){
+        this();
         this.maxEntries = maxEntries;
+        this.scoreCredits = scoreCredits;
     }
     public TournamentInstance(){
-
+        totalFinished = new AtomicInteger();
     }
 
     @Override
@@ -45,9 +54,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     @Override
-    public int join(String systemId) {
+    public int enter(String systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
-            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
+            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey(),scoreCredits);
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);
@@ -61,6 +70,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public void update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);
         updater.on(entry);
+    }
+
+    public int finish(String systemId){
+
+        return 1;
     }
     public int maxEntries(){
         return maxEntries;
@@ -149,7 +163,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return rankedList;
     }
 
-    void started(LocalDateTime start,LocalDateTime close,LocalDateTime end){
+    void started(LocalDateTime start,LocalDateTime close,LocalDateTime end,double scoreCredits){
+        this.scoreCredits = scoreCredits;
         this.start = start;
         this.close = close;
         this.end = end;
@@ -168,6 +183,15 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
     public String toString(){
         return "Tournament ["+distributionKey()+"]["+status+"]["+maxEntries+"]["+routingNumber+"]";
+    }
+
+    long toClosingTime(){
+        if(TimeUtil.expired(close)) return 10;
+        return TimeUtil.durationUTCMilliseconds(start,close);
+    }
+    long toEndingTime(){
+        if(TimeUtil.expired(end)) return 10;
+        return TimeUtil.durationUTCMilliseconds(close,end);
     }
 
 }

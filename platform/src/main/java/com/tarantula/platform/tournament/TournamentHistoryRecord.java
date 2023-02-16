@@ -31,9 +31,9 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         return status;
     }
     @Override
-    public int join(String systemId) {
+    public int enter(String systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
-            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey());
+            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey(),0);
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);
@@ -46,6 +46,9 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
     public void update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);
         updater.on(entry);
+    }
+    public int finish(String systemId){
+        return 1;
     }
     public int maxEntries(){
         return maxEntries;

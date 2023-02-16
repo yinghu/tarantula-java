@@ -11,7 +11,7 @@ public interface TournamentServiceProvider extends ConfigurationServiceProvider{
     List<Tournament> list();
     boolean available(String tournamentId);
     Tournament.Instance enter(String tournamentId,String systemId);
-    Tournament.Entry score(String tournamentId,String instanceId,String systemId, double delta);
+    Tournament.Entry score(String tournamentId,String instanceId,String systemId, double credit,double delta);
 
     void finish(String tournamentId,String instanceId,String systemId);
 

@@ -44,6 +44,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int minDurationHoursPerSchedule = 1;
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
+    double scoreCredits;
     int clusterLockTimeoutSeconds = 5;
     int instanceIdPollingTimeoutSeconds = 3;
     int instanceIdPollingRetries =3;
@@ -96,8 +97,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     @Override
-    public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double delta) {
-        Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,delta);
+    public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double credit,double delta) {
+        Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,credit,delta);
         return _e;
     }
 
@@ -130,6 +131,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
+        this.scoreCredits = ((Number)configuration.property("scoreCredits")).doubleValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.instanceIdPollingTimeoutSeconds = ((Number)configuration.property("instanceIdPollingTimeoutSeconds")).intValue();
         this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
@@ -369,12 +371,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         String tkey = tournament.distributionKey();
         this.tournamentIndex.put(tkey,tournament);
         tournament.setup(this);
-        tournament.tournamentSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(tournament.index());
         status.index(tkey);
         status.status = Tournament.Status.STARTED;
         dataStore.update(status);
+        if(this.application==null) return;
+        tournament.loadPrizes(this.applicationPreSetup,this.application);
     }
     private Tournament.Instance instance(String tournamentId,String instanceId){//instance node
         TournamentManager tournament = this.tournamentIndex.get(tournamentId);
@@ -385,7 +389,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         logger.warn("Tournament forcefully end ->"+tournamentId);
         TournamentManager tournamentHeaderIndex = tournamentIndex.get(tournamentId);
         if(tournamentHeaderIndex!=null) {
-            tournamentHeaderIndex.tournamentSchedule.cancel(true);
+            tournamentHeaderIndex.pendingSchedule.cancel(true);
             endTournament(tournamentHeaderIndex);
         }
     }
@@ -408,15 +412,15 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
-        if(_ins.join(systemId)==_ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
+        if(_ins.enter(systemId)==_ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
         return _ins;
     }
-    public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double delta){
-        logger.warn(tournamentId+">>"+instanceId+">>"+systemId+">>"+delta);
+    public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double credit,double delta){
+        logger.warn(tournamentId+">>"+instanceId+">>"+systemId+">>"+delta+">>>"+credit);
         Tournament.Instance _ins = instance(tournamentId,instanceId);
         Tournament.Entry[] score={null};
         _ins.update(systemId,(e)->{
-            e.score(delta);
+            e.score(credit,delta);
             score[0]=e;
         });
         return score[0];
@@ -427,17 +431,18 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
-        tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
+        if(_ins.finish(systemId)==_ins.maxEntries()) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
         logger.warn(_ins.toString());
         logger.warn("finished->"+tournamentId+">>"+instanceId+">>"+systemId);
     }
 
     public void onTournamentSynced(String tournamentId,String instanceId){
-        logger.warn("tournament sync->"+tournamentId+">>>"+instanceId);
-        TournamentInstance synced = new TournamentInstance();
+        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        TournamentInstance synced = tournamentManager.lookup(instanceId);
         synced.distributionKey(instanceId);
         this.dataStore.load(synced);
-        logger.warn(synced.toString());
+        if(!synced.status().equals(Tournament.Status.STARTING)) tournamentManager.closeTournamentInstanceWithFullyJoined(synced);
+        logger.warn(">>Sync->"+synced);
     }
     public void onTournamentClosed(String tournamentId){
         TournamentManager index = tournamentIndex.get(tournamentId);

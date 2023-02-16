@@ -14,23 +14,25 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     private String systemId;
     private String tournamentId;
     private String instanceId;
+    private double credit;
     private double delta;
     private Tournament.Entry entry;
     public TournamentScoreOperation() {
     }
 
 
-    public TournamentScoreOperation(String serviceName,String tournamentId,String instanceId, String systemId,double delta) {
+    public TournamentScoreOperation(String serviceName,String tournamentId,String instanceId, String systemId,double credit,double delta) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
         this.instanceId = instanceId;
         this.systemId = systemId;
+        this.credit = credit;
         this.delta = delta;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.entry = ais.score(serviceName,tournamentId,instanceId,systemId,delta);
+        this.entry = ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta);
     }
 
     @Override
@@ -45,6 +47,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
         out.writeUTF(this.tournamentId);
         out.writeUTF(this.instanceId);
         out.writeUTF(this.systemId);
+        out.writeDouble(this.credit);
         out.writeDouble(this.delta);
     }
 
@@ -55,6 +58,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
         tournamentId = in.readUTF();
         instanceId = in.readUTF();
         systemId = in.readUTF();
+        credit = in.readDouble();
         delta = in.readDouble();
     }
 }

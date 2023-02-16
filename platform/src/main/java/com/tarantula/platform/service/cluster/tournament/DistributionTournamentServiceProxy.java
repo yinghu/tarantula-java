@@ -66,9 +66,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         }
     }
 
-    public Tournament.Entry onScoreTournament(String serviceName,String tournamentId,String instanceId,String systemId,double delta){
+    public Tournament.Entry onScoreTournament(String serviceName,String tournamentId,String instanceId,String systemId,double credit,double delta){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,delta);
+        TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,credit,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         final Future<Tournament.Entry> future = builder.invoke();

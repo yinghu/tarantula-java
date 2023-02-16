@@ -2,6 +2,7 @@
   "minDurationHoursPerSchedule": 1,
   "minDurationMinutesPerInstance": 5,
   "endBufferTimeMinutes": 3,
+  "scoreCredits": 1000,
   "concurrentInstanceSize": 1,
   "clusterLockTimeoutSeconds": 5,
   "instanceIdPollingTimeoutSeconds": 3,

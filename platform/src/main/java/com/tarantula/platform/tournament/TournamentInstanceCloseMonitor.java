@@ -1,7 +1,6 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.util.TimeUtil;
 
 public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
@@ -24,7 +23,7 @@ public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        return TimeUtil.durationUTCMilliseconds(tournamentInstanceHeader.startTime(),tournamentInstanceHeader.closeTime());
+        return this.tournamentInstanceHeader.toClosingTime();
     }
 
     @Override

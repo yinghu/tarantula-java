@@ -17,6 +17,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -45,8 +46,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private PlatformTournamentServiceProvider tournamentServiceProvider;
     private HashMap<Integer,TournamentPrize> prizes;
 
-    ScheduledFuture<?> tournamentSchedule;
-    private ScheduledFuture<?> instanceSchedule;
+    ScheduledFuture<?> pendingSchedule;
 
     private ClusterProvider.ClusterStore tournamentStore;
     private ClusterProvider.ClusterStore[] instanceStores;
@@ -166,10 +166,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 LocalDateTime _startTime = LocalDateTime.now();
                 LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
                 LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
-                instance.started(_startTime,_closeTime,_endTime);
+                instance.started(_startTime,_closeTime,_endTime,this.tournamentServiceProvider.scoreCredits);
                 instance.update();
             }
-            instanceSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
+            instance.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
             return instance;
         });
     }
@@ -211,6 +211,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.tournamentServiceProvider = tournamentServiceProvider;
         //recovering local instances
         instanceIndex = new ConcurrentHashMap<>();
+        ArrayList<  String> synced = new ArrayList<>();
         int[] pendingPoolSize = new int[]{0};
         pendingQueue = new ArrayBlockingQueue<>(this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule);
         activeTournamentIndexSet = new IndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName());
@@ -226,7 +227,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                     pendingPoolSize[0]++;
                 }
                 else {//to master node for sync
-                    this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName, this.distributionKey(), k);
+                    synced.add(k);
                     this.activeTournamentIndexSet.removeKey(k);
                 }
             }
@@ -247,6 +248,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         status = Status.STARTED;
         this.dataStore.update(this);
+        synced.forEach(sync-> this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName, this.distributionKey(),sync));
+        synced.clear();
     }
 
 
@@ -285,7 +288,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return joinKey;
     }
     void closeTournamentInstanceWithFullyJoined(TournamentInstance closed){
-        this.instanceSchedule.cancel(true);
+        closed.pendingSchedule.cancel(true);
         this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(10,()->{
             closeTournamentInstance(closed);
         }));
@@ -309,10 +312,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         closed.closed();
         this.dataStore.update(closed);
-        this.instanceSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
+        closed.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
     }
     void endTournamentInstanceWithFullyFinished(TournamentInstance ended){
-        this.instanceSchedule.cancel(true);
+        ended.pendingSchedule.cancel(true);
         this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(10,()->{
             endTournamentInstance(ended);
         }));
@@ -321,6 +324,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         //end tournament and prize
         TournamentInstance pendingEnded = this.instanceIndex.remove(ended.distributionKey());
         if(pendingEnded==null || pendingEnded.status().equals(Status.ENDED)) return;
+        if(!pendingEnded.status().equals(Status.CLOSED)) closeTournamentInstance(ended);
         if(activeTournamentIndexSet.removeKey(ended.distributionKey())){
             activeTournamentIndexSet.update();
         }
@@ -371,7 +375,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
             indexSet.distributionKey(entry.systemId());
             this.dataStore.createIfAbsent(indexSet,true);
-            TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(0),LocalDateTime.now());
+            TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(0,0),LocalDateTime.now());
             dataStore.create(history);
             indexSet.addKey(history.distributionKey());
             dataStore.update(indexSet);
@@ -408,6 +412,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             this.tournamentServiceProvider.logger.warn("Rank->"+c.rank()+" Prize ["+c.distributionKey()+"]");
             prizes.put(c.rank(),c);
         });
+    }
+
+    long toClosingTime(){
+        if(TimeUtil.expired(closeTime)) return 1000;
+        return TimeUtil.durationUTCMilliseconds(startTime,closeTime);
+    }
+    long toEndingTime(){
+        if(TimeUtil.expired(endTime)) return 1000;
+        return TimeUtil.durationUTCMilliseconds(closeTime,endTime);
     }
 
 }
