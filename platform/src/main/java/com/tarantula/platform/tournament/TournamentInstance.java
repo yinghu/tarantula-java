@@ -159,7 +159,12 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.routingNumber = queueNumber;
         this.status = Tournament.Status.STARTING;
     }
-
+    void closed(){
+        this.status = Tournament.Status.CLOSED;
+    }
+    void ended(){
+        this.status = Tournament.Status.ENDED;
+    }
 
     public String toString(){
         return "Tournament ["+distributionKey()+"]["+status+"]["+maxEntries+"]["+routingNumber+"]";

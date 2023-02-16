@@ -29,6 +29,6 @@ public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
     @Override
     public void run() {
-        tournamentHeader.tournamentInstanceClosed(tournamentInstanceHeader);
+        tournamentHeader.closeTournamentInstance(tournamentInstanceHeader);
     }
 }
