@@ -42,7 +42,6 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public TournamentInstance(int maxEntries){
         this();
         this.maxEntries = maxEntries;
-        this.scoreCredits = scoreCredits;
     }
     public TournamentInstance(){
         totalFinished = new AtomicInteger();
@@ -73,9 +72,6 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return false;
     }
 
-    public int finish(String systemId){
-        return 1;
-    }
     public int maxEntries(){
         return maxEntries;
     }

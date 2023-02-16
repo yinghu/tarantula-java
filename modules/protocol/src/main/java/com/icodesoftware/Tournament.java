@@ -38,6 +38,8 @@ public interface Tournament extends Configurable {
     interface Entry extends Configurable {
         String systemId();
         double score(double credit,double delta);
+        void finish();
+        boolean finished();
         int rank();
     }
     interface Instance extends Configurable {
@@ -49,7 +51,6 @@ public interface Tournament extends Configurable {
         LocalDateTime endTime();
         int enter(String systemId);
         boolean update(String systemId,OnEntry onEntry);
-        int finish(String systemId);
         RaceBoard raceBoard();
     }
     interface Prize extends Configurable{

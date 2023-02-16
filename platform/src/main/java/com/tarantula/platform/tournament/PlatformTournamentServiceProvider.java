@@ -420,7 +420,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(_ins.update(systemId,(e)->{
             e.score(credit,delta);
             score[0]=e;
-            return false;
+            return e.finished();
         })) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
         return score[0];
     }
@@ -432,7 +432,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
-        //if(_ins.finish(systemId)==_ins.maxEntries()) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
+        _ins.update(systemId,e->{
+            e.finish();
+            return e.finished();
+        });
         logger.warn(_ins.toString());
         logger.warn("finished->"+tournamentId+">>"+instanceId+">>"+systemId);
     }
@@ -440,7 +443,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void onTournamentSynced(String tournamentId,String instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance synced = tournamentManager.lookup(instanceId);
-        logger.warn(">>Sync->"+synced);
+        logger.warn("SYNC Instance : "+synced);
     }
     public void onTournamentClosed(String tournamentId){
         TournamentManager index = tournamentIndex.get(tournamentId);

@@ -19,6 +19,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private String systemId;
     private double credits;
     private double score;
+    private boolean finished;
     private int rank;
     private JsonObject payload = new JsonObject();
 
@@ -47,6 +48,12 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         }
         return score;
     }
+    public void finish(){
+        finished = true;
+    }
+    public boolean finished(){
+        return finished;
+    }
     @Override
     public int rank(){
         return rank;
@@ -60,6 +67,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         properties.put("3",timestamp);
         properties.put("4",rank);
         properties.put("5",credits);
+        properties.put("6",finished);
         return properties;
     }
     public void fromMap(Map<String,Object> properties){
@@ -68,7 +76,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.timestamp = ((Number)properties.getOrDefault("3",0)).longValue();
         this.rank = ((Number)properties.getOrDefault("4",0)).intValue();
         this.credits = ((Number)properties.getOrDefault("5",0)).doubleValue();
-
+        this.finished = (boolean)properties.getOrDefault("6",false);
     }
     @Override
     public int getFactoryId() {
