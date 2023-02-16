@@ -48,7 +48,7 @@ public interface Tournament extends Configurable {
         LocalDateTime closeTime();
         LocalDateTime endTime();
         int enter(String systemId);
-        void update(String systemId,OnEntry onEntry);
+        boolean update(String systemId,OnEntry onEntry);
         int finish(String systemId);
         RaceBoard raceBoard();
     }
@@ -73,7 +73,7 @@ public interface Tournament extends Configurable {
     }
 
     interface OnEntry{
-        void on(Entry entry);
+        boolean on(Entry entry);
     }
 
 }

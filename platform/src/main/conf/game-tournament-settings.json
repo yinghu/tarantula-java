@@ -3,7 +3,7 @@
   "minDurationMinutesPerInstance": 5,
   "endBufferTimeMinutes": 3,
   "scoreCredits": 1000,
-  "concurrentInstanceSize": 1,
+  "concurrentInstanceSize": 8,
   "clusterLockTimeoutSeconds": 5,
   "instanceIdPollingTimeoutSeconds": 3,
   "instanceIdPollingRetries": 3,

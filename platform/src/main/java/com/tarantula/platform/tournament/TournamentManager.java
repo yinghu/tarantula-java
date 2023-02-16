@@ -169,6 +169,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 instance.started(_startTime,_closeTime,_endTime,this.tournamentServiceProvider.scoreCredits);
                 instance.update();
             }
+            instance.load();
             instance.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
             return instance;
         });
@@ -227,7 +228,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                     pendingPoolSize[0]++;
                 }
                 else {//to master node for sync
-                    synced.add(k);
+                    if(!instance.status().equals(Status.STARTING)) synced.add(k);
                     this.activeTournamentIndexSet.removeKey(k);
                 }
             }
@@ -313,6 +314,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         closed.closed();
         this.dataStore.update(closed);
         closed.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
+        this.tournamentServiceProvider.logger.warn("instance closed->"+closed);
     }
     void endTournamentInstanceWithFullyFinished(TournamentInstance ended){
         ended.pendingSchedule.cancel(true);
@@ -408,10 +410,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         schedule.distributionKey(this.index);
         if(!applicationPreSetup.load(application,schedule)) return;
         schedule.setup();
-        schedule.list().forEach(c-> {
-            this.tournamentServiceProvider.logger.warn("Rank->"+c.rank()+" Prize ["+c.distributionKey()+"]");
-            prizes.put(c.rank(),c);
-        });
+        schedule.list().forEach(c-> prizes.put(c.rank(),c));
     }
 
     long toClosingTime(){

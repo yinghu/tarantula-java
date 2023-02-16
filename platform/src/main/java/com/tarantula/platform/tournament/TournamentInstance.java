@@ -67,13 +67,13 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     @Override
-    public void update(String systemId, Tournament.OnEntry updater) {
+    public boolean update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);
-        updater.on(entry);
+        if(updater.on(entry)) totalFinished.incrementAndGet();
+        return false;
     }
 
     public int finish(String systemId){
-
         return 1;
     }
     public int maxEntries(){
