@@ -161,6 +161,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(instanceId);
             if(!this.dataStore.load(instance)) return null;
+            if(instance.status().equals(Status.ENDED)){
+                this.tournamentServiceProvider.logger.warn(instance.toString());
+                return null;
+            }
             instance.dataStore(dataStore);
             if(instance.status().equals(Status.STARTING)){
                 LocalDateTime _startTime = LocalDateTime.now();
@@ -377,7 +381,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
             indexSet.distributionKey(entry.systemId());
             this.dataStore.createIfAbsent(indexSet,true);
-            TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(0,0),LocalDateTime.now());
+            TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(),LocalDateTime.now());
             dataStore.create(history);
             indexSet.addKey(history.distributionKey());
             dataStore.update(indexSet);

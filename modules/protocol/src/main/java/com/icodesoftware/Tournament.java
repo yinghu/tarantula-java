@@ -37,7 +37,9 @@ public interface Tournament extends Configurable {
 
     interface Entry extends Configurable {
         String systemId();
-        double score(double credit,double delta);
+        void score(double credit,double delta);
+        double score();
+        double credit();
         void finish();
         boolean finished();
         int rank();

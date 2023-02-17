@@ -21,7 +21,6 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private double score;
     private boolean finished;
     private int rank;
-    private JsonObject payload = new JsonObject();
 
     public TournamentEntry(String systemId,String instanceId,double credits){
         this();
@@ -39,13 +38,15 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
 
     @Override
-    public double score(double credit,double delta) {
-        score = score+delta;
+    public void score(double credit,double delta) {
+        if(credits - credit < 0) return;
+        score += delta;
         credits -= credit;
-        if(delta>0){
-            timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-            this.update();
-        }
+        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        finished = credits <= 0;
+        this.update();
+    }
+    public double score(){
         return score;
     }
     public void finish(){
@@ -53,6 +54,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     }
     public boolean finished(){
         return finished;
+    }
+    public double credit(){
+        return credits;
     }
     @Override
     public int rank(){
@@ -94,7 +98,8 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         portableWriter.writeDouble("2",score);
         portableWriter.writeLong("3",timestamp);
         portableWriter.writeInt("4",rank);
-        //portableWriter.writeUTF("5",payload.toString());
+        portableWriter.writeDouble("5",credits);
+        portableWriter.writeBoolean("6",finished);
     }
 
     @Override
@@ -103,14 +108,10 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.score = portableReader.readDouble("2");
         this.timestamp = portableReader.readLong("3");
         this.rank = portableReader.readInt("4");
-        //this.payload = JsonUtil.parse(portableReader.readUTF("5"));
+        this.credits = portableReader.readDouble("5");
+        this.finished = portableReader.readBoolean("6");
     }
 
-    @Override
-    public boolean configureAndValidate(byte[] data){
-        payload = JsonUtil.parse(data);
-        return true;
-    }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -119,6 +120,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         jsonObject.addProperty("score",score);
         jsonObject.addProperty("rank",rank);
         jsonObject.addProperty("timestamp",timestamp);
+        jsonObject.addProperty("finished",finished);
         return jsonObject;
     }
 }

@@ -99,6 +99,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double credit,double delta) {
         Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,credit,delta);
+        logger.warn(_e.toJson().toString());
         return _e;
     }
 
@@ -409,35 +410,35 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
-        if(_ins.enter(systemId)==_ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
+        if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
         return _ins;
     }
     public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double credit,double delta){
-        logger.warn(tournamentId+">>"+instanceId+">>"+systemId+">>"+delta+">>>"+credit);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
+        if(_ins==null) return new TournamentEntry();
         Tournament.Entry[] score={null};
         if(_ins.update(systemId,(e)->{
             e.score(credit,delta);
             score[0]=e;
             return e.finished();
-        })) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
+        })) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
         return score[0];
     }
     public Tournament.RaceBoard onTournamentListed(String tournamentId,String instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         Tournament.Instance _ins = tournamentManager.lookup(instanceId);
+        if(_ins == null) return new TournamentRaceBoard();
         return _ins.raceBoard();
     }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         TournamentInstance _ins = tournamentManager.lookup(instanceId);
-        _ins.update(systemId,e->{
+        if(_ins==null) return;
+        if(_ins.update(systemId,e->{
             e.finish();
             return e.finished();
-        });
-        logger.warn(_ins.toString());
-        logger.warn("finished->"+tournamentId+">>"+instanceId+">>"+systemId);
+        })) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
     }
 
     public void onTournamentSynced(String tournamentId,String instanceId){

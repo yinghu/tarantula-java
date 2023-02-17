@@ -7,7 +7,7 @@ import java.util.Comparator;
 public class TournamentEntryComparator implements Comparator<Tournament.Entry> {
 
     public int compare(Tournament.Entry o1, Tournament.Entry o2) {
-        double diff = o1.score(0,0)-o2.score(0,0);
+        double diff = o1.score()-o2.score();
         if(diff>0){
             return -1;
         }
