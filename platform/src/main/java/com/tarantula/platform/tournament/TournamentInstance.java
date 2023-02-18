@@ -70,7 +70,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         TournamentEntry entry = entryIndex.get(systemId);
         if(updater.on(entry)) totalFinished.incrementAndGet();
         int finished = totalFinished.get();
-        return status.equals(Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
+        return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
     }
 
     public int maxEntries(){

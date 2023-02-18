@@ -32,7 +32,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private String type;
     private String description;
     private double enterCost;
-    private Status status = Status.STARTED;
+    private Status status = Status.STARTING;
     private LocalDateTime startTime;
     private LocalDateTime closeTime;
     private LocalDateTime endTime;
@@ -161,12 +161,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(instanceId);
             if(!this.dataStore.load(instance)) return null;
-            if(instance.status().equals(Status.ENDED)){
+            if(instance.status() == (Status.ENDED)){
                 this.tournamentServiceProvider.logger.warn(instance.toString());
                 return null;
             }
             instance.dataStore(dataStore);
-            if(instance.status().equals(Status.STARTING)){
+            if(instance.status() == (Status.STARTING)){
                 LocalDateTime _startTime = LocalDateTime.now();
                 LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
                 LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
@@ -227,12 +227,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(k);
             if(this.dataStore.load(instance)) {
-                if(instance.status().equals(Status.PENDING)){
+                if(instance.status() == (Status.PENDING)){
                     pendingQueue.offer(instance);
                     pendingPoolSize[0]++;
                 }
                 else {//to master node for sync
-                    if(!instance.status().equals(Status.STARTING)) synced.add(k);
+                    if(instance.status() != (Status.STARTING)) synced.add(k);
                     this.activeTournamentIndexSet.removeKey(k);
                 }
             }
@@ -329,8 +329,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     void endTournamentInstance(TournamentInstance ended){
         //end tournament and prize
         TournamentInstance pendingEnded = this.instanceIndex.remove(ended.distributionKey());
-        if(pendingEnded==null || pendingEnded.status().equals(Status.ENDED)) return;
-        if(!pendingEnded.status().equals(Status.CLOSED)) closeTournamentInstance(ended);
+        if(pendingEnded == null || pendingEnded.status() == (Status.ENDED)) return;
+        if(pendingEnded.status() != (Status.CLOSED)) closeTournamentInstance(ended);
         if(activeTournamentIndexSet.removeKey(ended.distributionKey())){
             activeTournamentIndexSet.update();
         }
@@ -352,7 +352,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     @Override
     public String toString(){
-        return "Tournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]";
+        return "Tournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]["+status+"]";
     }
 
     public void close(){

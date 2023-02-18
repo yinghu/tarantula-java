@@ -228,7 +228,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void onTournamentRegister(Tournament tournamentHeader){
         this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournamentHeader.distributionKey());
     }
-    void onTournamentClose(TournamentManager tournamentHeader){
+    void closeTournament(TournamentManager tournamentHeader){
         this.listeners.forEach(l->l.tournamentClosed(tournamentHeader));
         byte[] lockKey = tournamentHeader.index().getBytes();
         try {
@@ -239,7 +239,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             scheduleStore.mapUnlock(lockKey);
         }
     }
-    void onTournamentEnd(TournamentManager tournamentHeader){
+    void eendTournament(TournamentManager tournamentHeader){
         byte[] lockKey = tournamentHeader.index().getBytes();
         try {
             scheduleStore.mapLock(lockKey);
@@ -261,10 +261,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             TournamentScheduleStatus status = new TournamentScheduleStatus();
             status.distributionKey(t.distributionKey());
             dataStore.createIfAbsent(status,true);
-            if(status.index() != null) throw new RuntimeException("schedule is running on tournament ["+status.index()+"]");
+            logger.warn("Status : "+status);
+            if(status.status != Tournament.Status.ENDED ) throw new RuntimeException("schedule is running on tournament ["+status.index()+"]");
             TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
-            if(schedule.durationHoursPerSchedule()<minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
-            if(schedule.durationMinutesPerInstance()<minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+            if(schedule.durationHoursPerSchedule() < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+            if(schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){
                 case Tournament.DAILY_SCHEDULE:
                 case Tournament.WEEKLY_SCHEDULE:
@@ -330,9 +331,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public boolean onItemReleased(String category, String itemId) {
         TournamentManager index = tournamentIndex.remove(itemId);
-        if(index==null) return false;
+        if(index == null) return false;
         listeners.forEach(l->l.tournamentClosed(index));
-        return false;
+        return true;
     }
 
     private boolean loadTournamentManager(String tournamentId){
@@ -357,10 +358,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupScheduleKey.update();
     }
     private TournamentManager createTournament(TournamentSchedule schedule){
+        TournamentScheduleStatus status = schedule.status();
+        this.dataStore.load(status);
         TournamentManager tournament = new TournamentManager(schedule);
         tournament.dataStore(dataStore);
         dataStore.create(tournament);
-        TournamentScheduleStatus status = schedule.status();
         status.index(tournament.distributionKey());
         status.status = Tournament.Status.STARTING;
         dataStore.update(status);
@@ -368,6 +370,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         lookupTournamentKey.update();
         lookupScheduleKey.removeKey(schedule.distributionKey());
         lookupScheduleKey.update();
+        logger.warn("Create : "+tournament);
         return tournament;
     }
     private void launch(TournamentManager tournament){
@@ -377,9 +380,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(tournament.index());
-        status.index(tkey);
+        dataStore.load(status);
         status.status = Tournament.Status.STARTED;
         dataStore.update(status);
+        logger.warn("Launch : "+tournament);
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
     }
@@ -397,7 +401,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         serviceContext.schedule(new TournamentEndTask(tournamentHeader));
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(tournamentHeader.index());
+        this.dataStore.load(status);
         status.index(null);
+        status.status = Tournament.Status.ENDED;
         dataStore.update(status);
         ConfigurableObject schedule = new ConfigurableObject();
         schedule.distributionKey(tournamentHeader.index());
@@ -405,6 +411,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         schedule.released();
         lookupTournamentKey.removeKey(tournamentHeader.distributionKey());
         lookupTournamentKey.update();
+        logger.warn("End : "+tournamentHeader);
     }
 
     //distributed operation callbacks
