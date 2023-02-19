@@ -10,6 +10,7 @@ import java.util.List;
 
 public class TournamentSchedule extends Application {
 
+    ConfigurableObject configurableObject;
 
     public TournamentSchedule(){
 
@@ -17,6 +18,7 @@ public class TournamentSchedule extends Application {
 
     public TournamentSchedule(ConfigurableObject configurableObject){
         super(configurableObject);
+        this.configurableObject = configurableObject;
     }
 
     public String name(){
@@ -82,5 +84,6 @@ public class TournamentSchedule extends Application {
         status.distributionKey(this.distributionKey());
         return status;
     }
+
 
 }

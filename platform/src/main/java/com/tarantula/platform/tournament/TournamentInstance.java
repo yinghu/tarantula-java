@@ -141,7 +141,6 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             totalJoined++;
             return true;
         });
-        //return true;
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

@@ -82,6 +82,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         this.application = descriptor;
         this.tournamentIndex.forEach((k,t)->t.loadPrizes(applicationPreSetup,application));
+        scheduleTournament();
         return null;
     }
 
@@ -109,12 +110,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double credit,double delta) {
         Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,credit,delta);
-        logger.warn(_e.toJson().toString());
+        //logger.warn(_e.toJson().toString());
         return _e;
     }
 
     public void finish(String tournamentId,String instanceId, String systemId){
         this.distributionTournamentService.onFinishTournament(gameServiceName,tournamentId,instanceId,systemId);
+        //Tournament.RaceBoard board = this.distributionTournamentService.onListTournament(gameServiceName,tournamentId,instanceId);
+        //logger.warn(board.toJson().toString());
     }
     @Override
     public Tournament.RaceBoard list(String tournamentId,String instanceId) {
@@ -197,9 +200,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             lookupTournamentKey.removeKey(r);
         });
         this.lookupTournamentKey.update();
-        lookupScheduleKey.keySet().forEach(k->{
-
-        });
         this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
     }
 
@@ -240,33 +240,38 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void atMidnight(){
         serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
-            midnightCheck();
+            logger.warn("Running midnight check tasks ...");
+            byte[] pendingSchedule;
+            do{
+                //midnight scheduling
+                pendingSchedule = this.scheduleStore.queuePoll();
+                if(pendingSchedule!=null){
+                    TournamentSchedule schedule = this.tournamentSchedule(new String(pendingSchedule));
+                    if(schedule!=null && !schedule.configurableObject.disabled()){
+                        registerTournament(schedule);
+                    }
+                }
+            }while(pendingSchedule!=null);
         }));
+        lookupScheduleKey.reload();
+        scheduleTournament();
     }
-    void midnightCheck(){
-        //midnight close/launch daily/weekly/monthly tournaments
-        logger.warn("Running midnight check tasks ...");
-        byte[] pendingSchedule;
-        do{
-            //midnight scheduling
-            pendingSchedule = this.scheduleStore.queuePoll();
-            if(pendingSchedule!=null){
-                TournamentSchedule schedule = new TournamentSchedule();
-                schedule.distributionKey(new String(pendingSchedule));
-                if(applicationPreSetup.load(application,schedule)){
-                    registerTournament(schedule);
+    private void scheduleTournament(){
+        LocalDateTime _current = LocalDateTime.now();
+        lookupScheduleKey.keySet().forEach(k->{
+            TournamentSchedule schedule = this.tournamentSchedule(k);
+            if(schedule!=null){
+                if(schedule.startTime().getDayOfYear() == _current.plusDays(1).getDayOfYear()){
+                    scheduleStore.queueOffer(k.getBytes());
                 }
             }
-        }while(pendingSchedule!=null);
-        lookupScheduleKey.reload();
-        lookupScheduleKey.keySet().forEach(k->{
-
+            else{
+                lookupScheduleKey.removeKey(k);
+            }
         });
-        lookupTournamentKey.reload();
-        lookupTournamentKey.keySet().forEach(k->{
-
-        });
+        this.lookupScheduleKey.update();
     }
+
 
     void closeTournament(TournamentManager tournament){
         this.listeners.forEach(l->l.tournamentClosed(tournament));
@@ -378,6 +383,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 || (schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear())) throw new RuntimeException("start time already expired on daily midnight launch");
         lookupScheduleKey.addKey(schedule.distributionKey());
         lookupScheduleKey.update();
+        if(schedule.startTime().getDayOfYear() == _current.plusDays(1).getDayOfYear()){
+            this.scheduleStore.queueOffer(schedule.distributionKey().getBytes());
+        }
     }
     private void registerTournament(TournamentSchedule schedule){
         TournamentScheduleStatus status = schedule.status();
@@ -422,10 +430,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         status.index(null);
         status.status = Tournament.Status.PENDING;
         dataStore.update(status);
-        ConfigurableObject schedule = new ConfigurableObject();
-        schedule.distributionKey(tournament.index());
-        applicationPreSetup.load(application,schedule);
+        ConfigurableObject schedule = this.tournamentSchedule(tournament.index()).configurableObject;
         schedule.released();
+    }
+    private TournamentSchedule tournamentSchedule(String scheduleId){
+        ConfigurableObject schedule = new ConfigurableObject();
+        schedule.distributionKey(scheduleId);
+        return applicationPreSetup.load(application,schedule) ? new TournamentSchedule(schedule) : null;
     }
 
     //distributed operation callbacks
