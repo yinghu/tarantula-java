@@ -295,7 +295,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     void closeTournamentInstanceWithFullyJoined(TournamentInstance closed){
         closed.pendingSchedule.cancel(true);
-        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(10,()->{
+        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
             closeTournamentInstance(closed);
         }));
     }
@@ -323,7 +323,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     void endTournamentInstanceWithFullyFinished(TournamentInstance ended){
         ended.pendingSchedule.cancel(true);
-        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(10,()->{
+        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
             endTournamentInstance(ended);
         }));
     }

@@ -19,15 +19,19 @@ import java.util.List;
 
 public class DataStoreTest {
 
-    static {
-        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
-    }
+    //static {
+        //System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
+    //}
 
 
     DataStoreProvider dataStoreProvider;
     ServiceContext serviceContext;
     @BeforeClass
     public void setUp() {
+        DataStoreTestEvn.setUp();
+        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
+        serviceContext = DataStoreTestEvn.serviceContext;
+        /**
         serviceContext = new TestServiceContext();
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext,dataStoreProvider->{
             try{
@@ -44,7 +48,7 @@ public class DataStoreTest {
         }catch (Exception ex){
             ex.printStackTrace();
             throw new RuntimeException(ex);
-        }
+        }**/
     }
 
     @Test(groups = { "DataStore" })

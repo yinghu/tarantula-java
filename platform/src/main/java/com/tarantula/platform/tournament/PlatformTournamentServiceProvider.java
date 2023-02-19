@@ -28,7 +28,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
 
-    private final static long SCHEDULE_RUNNER_DELAY = 500;
+    final static long SCHEDULE_RUNNER_DELAY = 500;
 
     TarantulaLogger logger;
 

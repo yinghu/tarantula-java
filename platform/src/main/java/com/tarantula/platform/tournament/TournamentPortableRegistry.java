@@ -22,6 +22,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
 
     public static final int TOURNAMENT_SCHEDULE_STATUS_CID = 17;
 
+    public static final int PLAYER_TOURNAMENT_HISTORY_CID = 18;
 
 
     public Recoverable create(int i) {
@@ -50,6 +51,9 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 break;
             case TOURNAMENT_SCHEDULE_STATUS_CID:
                 pt = new TournamentScheduleStatus();
+                break;
+            case PLAYER_TOURNAMENT_HISTORY_CID:
+                pt = new PlayerTournamentHistory();
                 break;
             default:
         }
