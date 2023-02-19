@@ -8,7 +8,7 @@ import java.util.Map;
 public class TournamentScheduleStatus extends RecoverableObject {
 
 
-    public Tournament.Status status = Tournament.Status.PENDING;//-> STARTING -> STARTED -> ENDED
+    public Tournament.Status status = Tournament.Status.PENDING;//-> STARTING -> STARTED -> PENDING
     @Override
     public Map<String,Object> toMap(){
         properties.put("index",index);
@@ -29,6 +29,6 @@ public class TournamentScheduleStatus extends RecoverableObject {
     }
 
     public String toString(){
-        return "Tournament ["+index+"]["+status+"]";
+        return "Tournament Schedule ["+index+"]["+status+"]";
     }
 }

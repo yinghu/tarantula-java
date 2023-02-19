@@ -133,7 +133,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.end = TimeUtil.fromUTCMilliseconds(portableReader.readLong("3"));
     }
 
-    public boolean load(){
+    public void load(){
         dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
@@ -141,7 +141,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             totalJoined++;
             return true;
         });
-        return true;
+        //return true;
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

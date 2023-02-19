@@ -6,11 +6,11 @@ import com.icodesoftware.util.TimeUtil;
 public class TournamentEndMonitor implements SchedulingTask {
 
     private final TournamentManager tournamentHeader;
-    private final PlatformTournamentServiceProvider distributedTournamentServiceProvider;
+    private final PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentEndMonitor(TournamentManager tournamentHeader, PlatformTournamentServiceProvider distributedTournamentServiceProvider){
+    public TournamentEndMonitor(TournamentManager tournamentHeader, PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentHeader = tournamentHeader;
-        this.distributedTournamentServiceProvider = distributedTournamentServiceProvider;
+        this.tournamentServiceProvider = tournamentServiceProvider;
     }
     @Override
     public boolean oneTime() {
@@ -29,6 +29,6 @@ public class TournamentEndMonitor implements SchedulingTask {
 
     @Override
     public void run() {
-        this.distributedTournamentServiceProvider.eendTournament(tournamentHeader);
+        this.tournamentServiceProvider.endTournament(tournamentHeader);
     }
 }

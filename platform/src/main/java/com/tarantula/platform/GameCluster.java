@@ -45,12 +45,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public Lobby dataLobby;
 
 
-
-    public final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
-
-    public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
-    public final static String PLAY_LIST_INDEX ="playlist";
-
     public final static String GAME_ASSET_CATEGORY_TEMPLATE = "assets";
     public final static String GAME_COMPONENT_CATEGORY_TEMPLATE = "components";
     public final static String GAME_COMMODITY_CATEGORY_TEMPLATE = "commodities";

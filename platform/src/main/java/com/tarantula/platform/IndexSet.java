@@ -69,5 +69,11 @@ public class IndexSet extends RecoverableObject {
         }
         return copy;
     }
+    public void reload(){
+        synchronized (keySet){
+            keySet.clear();
+        }
+        this.dataStore.load(this);
+    }
 
 }

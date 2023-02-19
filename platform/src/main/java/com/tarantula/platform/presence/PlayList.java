@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class PlayList extends RecoverableObject {
 
+    private final static String PLAY_LIST_INDEX ="playlist";
+
     public FIFOBuffer<String> playListIndex;
 
     public PlayList(){}
@@ -40,7 +42,7 @@ public class PlayList extends RecoverableObject {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid, GameCluster.PLAY_LIST_INDEX);
+        return new AssociateKey(this.bucket,this.oid, PLAY_LIST_INDEX);
     }
 
 

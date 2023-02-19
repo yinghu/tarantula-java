@@ -352,7 +352,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     @Override
     public String toString(){
-        return "Tournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]["+status+"]";
+        return "\nTournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]\n Status ["+status+"]";
     }
 
     public void close(){
@@ -360,17 +360,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
     public void end(){
-        //activeTournamentIndexSet.keySet().forEach(k->{
-            //TournamentInstance ins  = this.tournamentServiceProvider.instanceIndex.remove(k);
-            //if(ins!=null) rank(ins);
-        //});
-        status = Status.ENDED;
-        this.dataStore.update(this);
+        instanceIndex.forEach((k,ins)-> this.endTournamentInstance(ins));
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
             this.instanceStores[i].destroy();
         }
+        status = Status.ENDED;
+        this.dataStore.update(this);
         this.tournamentStore.destroy();
-        this.tournamentServiceProvider.logger.warn("Tournament ["+distributionKey()+"] ended at ["+LocalDateTime.now()+"]");
     }
 
     private void rank(TournamentInstance ended){
