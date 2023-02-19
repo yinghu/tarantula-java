@@ -260,6 +260,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
 
     public byte[] pollInstanceId(){
+        if(status == Status.CLOSED || status == Status.ENDED) return null;
         int stub = roundRobin.getAndUpdate((v)->{
             v = v == this.tournamentServiceProvider.concurrentInstanceSize-1 ? 0 : (v+1);
             return v;
