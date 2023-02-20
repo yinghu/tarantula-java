@@ -56,6 +56,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int instanceIdPollingTimeoutSeconds = 3;
     int instanceIdPollingRetries =3;
     int pendingInstancePoolSizePerSchedule = 100;
+    int maxPlayerHistoryRecords = 10;
 
     private String reloadKey;
     private final GameCluster gameCluster;
@@ -146,6 +147,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
         this.scoreCredits = ((Number)configuration.property("scoreCredits")).doubleValue();
+        this.maxPlayerHistoryRecords = ((Number)configuration.property("maxPlayerHistoryRecords")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.instanceIdPollingTimeoutSeconds = ((Number)configuration.property("instanceIdPollingTimeoutSeconds")).intValue();
         this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();

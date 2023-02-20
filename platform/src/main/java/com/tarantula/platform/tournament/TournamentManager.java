@@ -375,7 +375,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentEntry entry : ended.end()){
             entry.rank(rank);
             entry.update();
-            IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
+            PlayerTournamentHistory indexSet = new PlayerTournamentHistory(tournamentServiceProvider.maxPlayerHistoryRecords);
             indexSet.distributionKey(entry.systemId());
             this.dataStore.createIfAbsent(indexSet,true);
             TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(),LocalDateTime.now());
