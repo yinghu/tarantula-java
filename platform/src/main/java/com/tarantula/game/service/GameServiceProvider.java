@@ -43,7 +43,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
     private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
-
+    private ErrorCommand errorCommand;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
@@ -97,9 +97,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         serviceContext.registerMetrics(metrics);
         this.metrics = serviceContext.metrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
-
+        this.errorCommand = new ErrorCommand((short) 0,true,this);
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
@@ -201,10 +201,10 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     }
 
     public void exportServiceProxy(GameServiceProxy serviceProxy){
-        serviceExported.put(serviceProxy.serviceId(),serviceProxy);
+        serviceExported.putIfAbsent(serviceProxy.serviceId(),serviceProxy);
     }
     public GameServiceProxy serviceProxy(short serviceId){
-        return this.serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
+        return this.serviceExported.getOrDefault(serviceId,errorCommand);
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){

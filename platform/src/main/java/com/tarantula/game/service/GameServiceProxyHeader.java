@@ -11,20 +11,21 @@ import com.icodesoftware.util.JsonUtil;
 public class GameServiceProxyHeader implements GameServiceProxy {
 
     protected ApplicationContext applicationContext;
-    protected GameServiceProvider gameServiceProvider;
     protected Descriptor application;
+
+    protected final GameServiceProvider gameServiceProvider;
     private final boolean exported;
     private final short serviceId;
 
-    public GameServiceProxyHeader(short serviceId, boolean exported){
+    public GameServiceProxyHeader(short serviceId, boolean exported,GameServiceProvider gameServiceProvider){
         this.serviceId = serviceId;
         this.exported = exported;
+        this.gameServiceProvider = gameServiceProvider;
     }
 
     public void setup(ApplicationContext applicationContext) throws Exception{
         this.applicationContext = applicationContext;
         this.application = this.applicationContext.descriptor();
-        this.gameServiceProvider = applicationContext.serviceProvider(application.typeId().replace("lobby","service"));
     }
 
     public Descriptor descriptor(){

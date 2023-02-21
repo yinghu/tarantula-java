@@ -28,6 +28,8 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     private ConcurrentHashMap<Short, GameServiceProxy> serviceProxies;
 
+    private ErrorCommand errorCommand;
+
     public GameLobbyProxy(){
         this.stubIndex = new ConcurrentHashMap<>();
         this.zoneIndex = new ConcurrentHashMap<>();
@@ -93,6 +95,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
+        this.errorCommand = new ErrorCommand((short) 0,true,gameServiceProvider);
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         Configuration config = deploymentServiceProvider.configuration(CONFIG);
         JsonArray proxies = ((JsonElement)config.property("proxies")).getAsJsonArray();
@@ -101,7 +104,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             short serviceId = cc.get("serviceId").getAsShort();
             String className = cc.get("className").getAsString();
             boolean exported = cc.get("export").getAsBoolean();
-            GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className,exported);
+            GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className,exported,this.gameServiceProvider);
             if(serviceProxy.exported()){
                 gameServiceProvider.exportServiceProxy(serviceProxy);
             }
@@ -217,16 +220,16 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     public GameServiceProxy gameServiceProxy(short serviceId){
-        return serviceProxies.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
+        return serviceProxies.getOrDefault(serviceId,errorCommand);
     }
-    private GameServiceProxy toGameServiceProxy(short serviceId,String className,boolean exported){
+    private GameServiceProxy toGameServiceProxy(short serviceId,String className,boolean exported,GameServiceProvider gameServiceProvider){
         try {
-            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class).newInstance(serviceId,exported);
+            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class,GameServiceProvider.class).newInstance(serviceId,exported,gameServiceProvider);
             serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){
             this.context.log("Service Proxy ["+className+"] Without Implementation",OnLog.WARN);
-            return new ErrorCommand(serviceId,false);
+            return new ErrorCommand(serviceId,true,gameServiceProvider);
         }
     }
 }

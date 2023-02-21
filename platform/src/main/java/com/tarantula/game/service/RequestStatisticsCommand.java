@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class RequestStatisticsCommand extends GameServiceProxyHeader {
 
 
-    public RequestStatisticsCommand(short serviceId,boolean exported){
-        super(serviceId,exported);
+    public RequestStatisticsCommand(short serviceId,boolean exported,GameServiceProvider gameServiceProvider){
+        super(serviceId,exported,gameServiceProvider);
     }
     //From http endpoint
     @Override
