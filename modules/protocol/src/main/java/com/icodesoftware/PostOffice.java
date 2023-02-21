@@ -3,7 +3,6 @@ package com.icodesoftware;
 public interface PostOffice {
 
     //app to client
-    //OnChannel onChannel(Session session);
     OnEmail onEmail();
     OnSMS onSMS();
 
@@ -15,11 +14,6 @@ public interface PostOffice {
     interface OnTopic{
         void send(String topic,Recoverable data);
     }
-
-    //send data to client on the connection
-    //interface OnChannel{
-        //void send(String label,byte[] data);
-    //}
 
     interface OnEmail{
         boolean send(String emailAddress,String text);

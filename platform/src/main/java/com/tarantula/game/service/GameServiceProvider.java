@@ -13,6 +13,7 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
+import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
@@ -192,6 +193,11 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     public PlatformConfigurationServiceProvider configurationServiceProvider(){
         return serviceProvider(PlatformConfigurationServiceProvider.NAME);
+    }
+
+
+    public PlatformMessagingServiceProvider messagingServiceProvider(){
+        return serviceProvider(PlatformMessagingServiceProvider.NAME);
     }
 
     public <T extends ServiceProvider> T serviceProvider(String name){

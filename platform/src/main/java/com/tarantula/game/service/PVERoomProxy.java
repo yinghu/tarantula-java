@@ -2,6 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
+import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.room.GameRoom;
 
 
@@ -33,6 +34,7 @@ public class PVERoomProxy extends RoomProxyHeader {
             leave(stub);
             return stub;
         }
+        gameServiceProvider.messagingServiceProvider().registerChannel(stub,stub.pushChannel);
         if(application.tournamentEnabled() && session.tournamentId()!=null){
             Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().enter(session.tournamentId(),session.systemId());
             stub.tournamentId(session.tournamentId());
@@ -47,6 +49,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         return stub;
     }
     public boolean leave(Stub stub){
+        gameServiceProvider.messagingServiceProvider().unregisterGameChannel(stub);
         stub.joined = false;
         this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);

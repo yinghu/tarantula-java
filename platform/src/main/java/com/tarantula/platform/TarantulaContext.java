@@ -965,4 +965,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         itemSet.property("itemList",items);
         return itemSet;
     }
+
+    public PostOffice postOffice(){
+        return this.deploymentService().registerPostOffice();
+    }
 }

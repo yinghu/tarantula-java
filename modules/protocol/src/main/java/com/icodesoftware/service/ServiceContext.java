@@ -39,4 +39,6 @@ public interface ServiceContext {
     Metrics metrics(String name);
     void registerMetrics(Metrics metrics);
     void unregisterMetrics(Metrics metrics);
+
+    PostOffice postOffice();
 }

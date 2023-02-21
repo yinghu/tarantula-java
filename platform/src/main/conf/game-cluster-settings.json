@@ -6,7 +6,8 @@
     "com.tarantula.platform.item.PlatformItemServiceProvider",
     "com.tarantula.platform.room.PlatformRoomServiceProvider",
     "com.tarantula.platform.lobby.PlatformLobbyServiceProvider",
-    "com.tarantula.platform.configuration.PlatformConfigurationServiceProvider"
+    "com.tarantula.platform.configuration.PlatformConfigurationServiceProvider",
+    "com.tarantula.platform.messaging.PlatformMessagingServiceProvider"
   ],
   "gameServiceProviders": [
     "com.tarantula.platform.achievement.PlatformAchievementServiceProvider",

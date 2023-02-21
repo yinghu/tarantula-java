@@ -113,5 +113,8 @@ public class ServiceContextProxy implements ServiceContext {
     public HttpClientProvider httpClientProvider(){
         return this.tarantulaContext.httpClientProvider();
     }
+    public PostOffice postOffice(){
+        return this.tarantulaContext.postOffice();
+    }
 
 }

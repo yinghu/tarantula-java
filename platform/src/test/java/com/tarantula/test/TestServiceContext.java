@@ -134,4 +134,7 @@ public class TestServiceContext implements ServiceContext {
     public HttpClientProvider httpClientProvider(){
         return null;
     }
+    public PostOffice postOffice(){
+        return null;
+    }
 }
