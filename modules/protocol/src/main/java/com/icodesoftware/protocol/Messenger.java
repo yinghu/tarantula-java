@@ -15,6 +15,7 @@ public interface Messenger {
     short ON_JOIN  = 200;
     short ON_REQUEST = 202;
     short ON_LEAVE = 203;
+    short ON_PUSH = 204;
 
     //SERVER PENDING ACTION
     short ON_PENDING_ACTION = 500;

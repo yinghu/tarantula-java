@@ -46,7 +46,7 @@ public class UDPChannel extends GameChannel {
         synchronized (messageBuffer){
             for(BatchUtil.Offset offset : batch.offsets){
                 messageBuffer.reset();
-                messageHeader.commandId = Messenger.ON_REQUEST;
+                messageHeader.commandId = Messenger.ON_PUSH;
                 messageHeader.channelId = channelId;
                 messageHeader.sessionId = sessionId;
                 messageHeader.encrypted = false;

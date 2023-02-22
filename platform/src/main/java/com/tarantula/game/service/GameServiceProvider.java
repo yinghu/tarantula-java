@@ -46,7 +46,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
 
     public GameServiceProvider(GameCluster gameCluster){
-        NAME = (String) gameCluster.property(GameCluster.GAME_SERVICE);
+        NAME = gameCluster.serviceType();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();

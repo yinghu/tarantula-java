@@ -190,7 +190,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onResetCode")){
             String code = this.deploymentServiceProvider.resetCode(session.trackId());
-            if(this.deploymentServiceProvider.registerPostOffice().onEmail().send(session.trackId(),code)){
+            if(this.deploymentServiceProvider.registerPostOffice().onEmail(session.trackId()).send(code)){
                 session.write(JsonUtil.toSimpleResponse(true,"check email for code").getBytes());
             }
             else{

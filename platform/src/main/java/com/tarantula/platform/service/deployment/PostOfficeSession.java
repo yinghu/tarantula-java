@@ -11,14 +11,14 @@ public class PostOfficeSession implements PostOffice {
     public PostOfficeSession(EventService eventService){
         this.eventService = eventService;
     }
-    public OnTopic onTopic(){
-        return new PostOfficeOnTopic(this.eventService);
+    public OnTopic onTopic(String topic){
+        return new PostOfficeOnTopic(topic,this.eventService);
     }
-    public OnSMS onSMS(){
-        return ((emailAddress, data) -> Email.send(emailAddress,data));
+    public OnSMS onSMS(String phoneNumber){
+        return ((data) -> Email.send(phoneNumber,data));
     }
-    public OnEmail onEmail(){
-        return ((emailAddress, data) -> Email.send(emailAddress,data));
+    public OnEmail onEmail(String emailAddress){
+        return ((data) -> Email.send(emailAddress,data));
     }
 
     public OnTag onTag(String tag){
