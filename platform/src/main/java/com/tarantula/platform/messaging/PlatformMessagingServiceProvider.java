@@ -15,14 +15,14 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     public static final String NAME = "messaging";
 
     private final GameServiceProvider gameServiceProvider;
+    private final String serviceName;
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
     private ConcurrentHashMap<Recoverable.Key,Channel> channelMap;
     public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
+        this.serviceName = this.gameServiceProvider.gameCluster().serviceType();
         this.channelMap = new ConcurrentHashMap<>();
-        //this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
-        //this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
     @Override
@@ -32,7 +32,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
-
+        this.logger.warn("Messaging service started on ["+serviceName+"]");
     }
 
     @Override
@@ -43,14 +43,17 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
-        logger.warn("Messaging service started");
+        this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
+        this.serviceContext.eventService().registerEventListener(serviceName,e->{
+            logger.warn(e.toString());
+            return true;
+        });
     }
 
     public void registerChannel(Session session,Channel gameChannel){
         logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
         channelMap.put(session.key(),gameChannel);
-        //this.serviceContext.postOffice().onTopic().send("","");
+        //this.serviceContext.postOffice().onTopic().send(serviceName,"{}".getBytes());
         //channelMap.put()
     }
     public void unregisterGameChannel(Session session){

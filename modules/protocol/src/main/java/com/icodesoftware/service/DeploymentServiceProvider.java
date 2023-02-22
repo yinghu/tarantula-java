@@ -87,8 +87,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     DataStore.Summary validDataStore(String dataStore);
     ClusterProvider.Summary clusterSummary();
 
-    RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
-    void unregisterRecoverableListener(String topic);
+    //RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
+    //void unregisterRecoverableListener(String topic);
 
     DistributionCallback distributionCallback();
 

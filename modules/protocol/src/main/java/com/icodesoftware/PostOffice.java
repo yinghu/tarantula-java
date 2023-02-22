@@ -13,6 +13,7 @@ public interface PostOffice {
     //send data to client on the notification topic
     interface OnTopic{
         void send(String topic,Recoverable data);
+        void send(String topic, byte[] data);
     }
 
     interface OnEmail{
@@ -26,6 +27,7 @@ public interface PostOffice {
     //app to app messaging
     interface OnTag{
        void send(String distributionKey, Recoverable data);
+       void send(String distributionKey, byte[] data);
     }
 
 }

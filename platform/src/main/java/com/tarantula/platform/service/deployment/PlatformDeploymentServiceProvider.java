@@ -8,9 +8,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
-import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.*;
-import com.tarantula.platform.event.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.util.*;
@@ -30,7 +28,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
-    private EventService integrationEventService;
+    //private EventService integrationEventService;
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
@@ -54,11 +52,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
 
-    private EventService publisher;
+    //private EventService publisher;
     private TarantulaContext tarantulaContext;
 
+    private PostOfficeSession postOfficeSession;
 
     String contentDir;
 
@@ -395,7 +394,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metricsListener = (n,v)->{};
         this.tarantulaContext = (TarantulaContext)serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
-        this.integrationEventService = integrationCluster.publisher();
+        //this.integrationEventService = integrationCluster.publisher();
+        this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
         try{
             contentDir = this.tarantulaContext.deployDir+"/web";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
@@ -438,6 +438,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
+        /**
         this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
             String tp = e.trackId();
             RecoverableListener listener = tMap.get(tp);
@@ -445,7 +446,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 listener.onUpdated(e.stub(),e.trackId(),e.index(),e.payload());
             }
             return false;
-        });
+        });**/
         this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(ClusterProvider.ClusterStore.SMALL,DeploymentServiceProvider.NAME,true,false,false);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
@@ -827,13 +828,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<String> listMetricsView(){
         return this.tarantulaContext.metricsList();
     }
+    /**
     public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
         tMap.put(topic,recoverableListener);
         return recoverableListener;
     }
     public void unregisterRecoverableListener(String topic){
         tMap.remove(topic);
-    }
+    }**/
     public void atMidnight(){
 
     }
@@ -841,7 +843,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return this.distributionCallback;
     }
     public PostOffice registerPostOffice(){
-        return new PostOfficeSession();
+        return this.postOfficeSession;
     }
 
 
@@ -925,31 +927,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc1&&suc2&&suc3;
     }
 
-    private class PostOfficeSession implements PostOffice{
-
-        public OnTopic onTopic(){
-            return (topic,data)->{
-                TopicMapStoreSyncEvent event = new TopicMapStoreSyncEvent(NAME,topic,data.getFactoryId(),data.getClassId(),data.key().asString(),data.toBinary());
-                publisher.publish(event);
-            };
-        }
-        public OnSMS onSMS(){
-            return ((emailAddress, data) ->Email.send(emailAddress,data));
-        }
-        public OnEmail onEmail(){
-            return ((emailAddress, data) -> Email.send(emailAddress,data));
-        }
-
-        public OnTag onTag(String tag){
-           return (dkey,t)->{
-               String key = t.key().asString();
-               byte[] payload = t.toBinary();
-               RoutingKey routingKey = integrationEventService.routingKey(dkey,tag);
-               MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),t.owner(),t.getFactoryId(),t.getClassId(),key!=null?key:"",payload);
-               integrationEventService.publish(mapStoreSyncEvent);
-           };
-        }
-    }
     class ModuleProxy implements Module{
 
         private Module module;

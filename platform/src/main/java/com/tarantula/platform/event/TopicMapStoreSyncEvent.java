@@ -8,35 +8,38 @@ import java.io.IOException;
 
 public class TopicMapStoreSyncEvent extends Data implements Event {
 
+    private int factoryId;
+    private int classId;
 
     public TopicMapStoreSyncEvent(){
 
     }
-    public TopicMapStoreSyncEvent(String destination, String topic, int factoryId, int classId, String key, byte[] value){
+    public TopicMapStoreSyncEvent(String destination,byte[] value){
         this.destination = destination;
-        this.trackId = topic;
-        //this.accessMode = factoryId;
-        this.stub = classId;
+        this.payload = value;
+    }
+    public TopicMapStoreSyncEvent(String destination,int factoryId, int classId, String key, byte[] value){
+        this.destination = destination;
+        this.factoryId = factoryId;
+        this.classId = classId;
         this.index = key;
         this.payload = value;
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.destination);
-        out.writeUTF("2",this.trackId);
-        //out.writeInt("3",accessMode);
-        out.writeInt("4",stub);
-        out.writeUTF("5",this.index);
-        out.writeByteArray("6",this.payload);
+        out.writeInt("2",factoryId);
+        out.writeInt("3",classId);
+        out.writeUTF("4",this.index);
+        out.writeByteArray("5",this.payload);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.destination = in.readUTF("1");
-        this.trackId = in.readUTF("2");
-        //this.accessMode = in.readInt("3");
-        this.stub = in.readInt("4");
-        this.index = in.readUTF("5");
-        this.payload = in.readByteArray("6");
+        this.factoryId = in.readInt("2");
+        this.classId = in.readInt("3");
+        this.index = in.readUTF("4");
+        this.payload = in.readByteArray("5");
     }
     @Override
     public int getClassId() {
@@ -48,6 +51,6 @@ public class TopicMapStoreSyncEvent extends Data implements Event {
     }
     @Override
     public String toString(){
-        return "Topic map store sync event ->["+trackId+"/"+index+">>>"+new String(payload)+"]";
+        return "Topic map store sync event ->["+destination+"/"+index+">>>"+new String(payload)+"]";
     }
 }
