@@ -60,8 +60,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     private long sessionJoinTimeout;
     private long sessionJoinTimer = 1000;
     private SchedulingTask onTimer;
-    private ArrayList<Integer> pendingJoinKickoff;
-    private ConcurrentHashMap<Integer,AtomicLong> pendingJoins;
+    private ArrayList<Channel> pendingJoinKickoff;
+    private ConcurrentHashMap<Integer,PendingJoinChannel> pendingJoins;
 
     private int sessionTimeout;
     private UDPOperationSummary operationSummary;
@@ -151,7 +151,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         this.running = false;
         if(udpEndpointServiceProvider==null) return;
         udpEndpointServiceProvider.shutdown();
-        //this.serviceContext.deploymentServiceProvider().onStop(this);
     }
 
     @Override
@@ -201,7 +200,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void registerChannel(UDPChannel channel){
         channel.sessionId(sessionId.getAndIncrement());
         channels.put(channel.sessionId(),channel);
-        pendingJoins.put(channel.sessionId(),new AtomicLong(sessionJoinTimeout));
+        pendingJoins.put(channel.sessionId,new PendingJoinChannel(channel,sessionTimeout));
     }
 
     @Override
@@ -236,7 +235,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
-            boolean joined = sessionId==messageHeader.sessionId && suc;
+            boolean joined = sessionId == messageHeader.sessionId && suc;
             return  joined && pendingJoins.remove(sessionId)!=null;
         }catch (Exception ex){
             logger.error("unexpected error on validate",ex);
@@ -322,13 +321,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             sessionJoinTimer = 1000;
             pendingJoinKickoff.clear();
             pendingJoins.forEach((k,v)->{
-                if(v.addAndGet(-1*1000)<=0){
-                    pendingJoinKickoff.add(k);
+                if(v.timeout.addAndGet(-1*1000)<=0){
+                    pendingJoinKickoff.add(v.channel);
                 }
             });
-            pendingJoinKickoff.forEach(k->{
-                if(pendingJoins.remove(k)!=null){
-                    onTimeout(0,k);
+            pendingJoinKickoff.forEach(c->{
+                if(pendingJoins.remove(c.sessionId())!=null){
+                    onTimeout(c.channelId(),c.sessionId());
                 }
             });
         }

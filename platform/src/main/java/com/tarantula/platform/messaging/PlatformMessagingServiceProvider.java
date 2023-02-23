@@ -54,7 +54,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     }
 
     public void registerChannel(Session session,Channel gameChannel){
-        //logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
+        logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
         channelMap.put(session.key(),gameChannel);
         this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
@@ -63,14 +63,14 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     }
 
     public void unregisterGameChannel(Session session){
-        //logger.warn("unregister game channel->"+session.key().asString());
+        logger.warn("unregister game channel->"+session.key().asString());
         channelMap.remove(session.key());
     }
 
     private void send(Channel channel,byte[] payload){
         MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
         header.objectId = MESSAGE_OBJECT_ID;
-        header.sequence = messageSequence.incrementAndGet();
+        header.sequence = 1;//messageSequence.incrementAndGet();
         channel.write(header,payload);
     }
 }

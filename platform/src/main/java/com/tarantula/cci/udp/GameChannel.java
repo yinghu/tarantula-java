@@ -10,6 +10,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 
 public class GameChannel extends RecoverableObject implements Channel, Portable {
@@ -98,5 +99,15 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
 
     public void sessionId(int sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public int hashCode(){
+        return Arrays.hashCode(new int[]{channelId,sessionId});
+    }
+    @Override
+    public boolean equals(Object obj){
+        GameChannel r = (GameChannel)obj;
+        return channelId == r.channelId() && sessionId == r.sessionId();
     }
 }
