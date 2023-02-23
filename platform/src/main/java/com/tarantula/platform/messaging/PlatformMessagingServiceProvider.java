@@ -23,7 +23,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
-        this.serviceName = this.gameServiceProvider.gameCluster().serviceType()+"-"+NAME;
+        this.serviceName = this.gameServiceProvider.gameCluster().typeId()+"-"+NAME;
         this.channelMap = new ConcurrentHashMap<>();
         this.messageSequence = new AtomicInteger(0);
     }
@@ -48,26 +48,25 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         this.serviceContext = serviceContext;
         this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
         this.serviceContext.eventService().registerEventListener(serviceName,e->{
-            //logger.warn(new String(e.payload()));
             this.channelMap.forEach((k,c)->send(c,e.payload()));
             return true;
         });
     }
 
     public void registerChannel(Session session,Channel gameChannel){
-        logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
+        //logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
         channelMap.put(session.key(),gameChannel);
-        //this.serviceContext.postOffice().onTopic(serviceName).send("{}".getBytes());
-        //channelMap.put()
         this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
             this.serviceContext.postOffice().onTopic(serviceName).send(statistics.toJson().toString().getBytes());
         }));
     }
+
     public void unregisterGameChannel(Session session){
-        logger.warn("unregister game channel->"+session.key().asString());
+        //logger.warn("unregister game channel->"+session.key().asString());
         channelMap.remove(session.key());
     }
+
     private void send(Channel channel,byte[] payload){
         MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
         header.objectId = MESSAGE_OBJECT_ID;

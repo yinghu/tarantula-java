@@ -8,7 +8,6 @@ import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.LeaderBoardGlobalEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,12 +25,10 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     private EventService publisher;
 
     private ClusterProvider integrationCluster;
-    private final GameCluster gameCluster;
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
     public PlatformLeaderBoardProvider(GameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.name = gameServiceProvider.name();
+        this.name = gameServiceProvider.gameCluster().typeId()+"-"+NAME;
     }
     public LeaderBoardSync leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
@@ -66,7 +63,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started");
+        logger.warn("Leader board service provider started ["+name+"]");
     }
 
     @Override
