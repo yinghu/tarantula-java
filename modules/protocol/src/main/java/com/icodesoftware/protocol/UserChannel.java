@@ -167,7 +167,9 @@ public class UserChannel {
         messenger.messageBuffer(pingBuffer);
     }
     public final void queue(int sessionId,MessageBuffer messageBuffer){
-        messenger.queue(messageBuffer,userSessionIndex.get(sessionId).source);
+        UserSession userSession = userSessionIndex.get(sessionId);
+        if(userSession==null) return;
+        messenger.queue(messageBuffer,userSession.source);
     }
 
     public final void kickoff(int sessionId){

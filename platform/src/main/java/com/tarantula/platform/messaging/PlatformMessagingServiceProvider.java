@@ -2,13 +2,14 @@ package com.tarantula.platform.messaging;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
 import com.tarantula.platform.ScheduleRunner;
+import com.tarantula.platform.event.ServerPushEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlatformMessagingServiceProvider implements ServiceProvider {
 
@@ -19,13 +20,13 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
     private ConcurrentHashMap<Recoverable.Key,Channel> channelMap;
-    private AtomicInteger messageSequence;
+
+    private EventService publisher;
 
     public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.serviceName = this.gameServiceProvider.gameCluster().typeId()+"-"+NAME;
         this.channelMap = new ConcurrentHashMap<>();
-        this.messageSequence = new AtomicInteger(0);
     }
 
     @Override
@@ -47,8 +48,9 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
-        this.serviceContext.eventService().registerEventListener(serviceName,e->{
-            this.channelMap.forEach((k,c)->send(c,e.payload()));
+        this.publisher = this.serviceContext.clusterProvider().publisher();
+        this.publisher.registerEventListener(serviceName,e->{
+            this.channelMap.forEach((k,c)->send(c,(ServerPushEvent)e));
             return true;
         });
     }
@@ -58,7 +60,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         channelMap.put(session.key(),gameChannel);
         this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            this.serviceContext.postOffice().onTopic(serviceName).send(statistics.toJson().toString().getBytes());
+            publisher.publish(new ServerPushEvent(serviceName,1,statistics.toJson().toString().getBytes()));
         }));
     }
 
@@ -67,10 +69,12 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         channelMap.remove(session.key());
     }
 
-    private void send(Channel channel,byte[] payload){
+
+    private void send(Channel channel, ServerPushEvent serverPushEvent){
+        logger.warn(serverPushEvent.toString());
         MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
         header.objectId = MESSAGE_OBJECT_ID;
-        header.sequence = 1;//messageSequence.incrementAndGet();
-        channel.write(header,payload);
+        header.sequence = serverPushEvent.stub();//messageSequence.incrementAndGet();
+        channel.write(header,serverPushEvent.payload());
     }
 }
