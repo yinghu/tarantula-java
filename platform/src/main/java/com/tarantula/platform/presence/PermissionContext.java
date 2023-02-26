@@ -2,7 +2,6 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.OnAccess;
 import com.tarantula.platform.ResponseHeader;
 
 import java.util.List;

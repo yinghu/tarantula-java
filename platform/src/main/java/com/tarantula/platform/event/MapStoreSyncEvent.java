@@ -8,8 +8,8 @@ import java.io.IOException;
 
 public class MapStoreSyncEvent extends Data implements Event {
 
-    private int factoryId;
-    private int classId;
+    public int factoryId;
+    public int classId;
 
     public MapStoreSyncEvent(){
 

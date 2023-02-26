@@ -1,7 +1,5 @@
 package com.icodesoftware;
 
-import com.icodesoftware.protocol.MessageBuffer;
-
 public interface Channel extends Configurable,Resettable{
 
     int channelId();
@@ -9,7 +7,7 @@ public interface Channel extends Configurable,Resettable{
     int timeout();
     byte[] serverKey();
 
-    void write(MessageBuffer.MessageHeader messageHeader,byte[] payload);
+    void write(Session.Header messageHeader,byte[] payload);
 
     Connection connection();
 

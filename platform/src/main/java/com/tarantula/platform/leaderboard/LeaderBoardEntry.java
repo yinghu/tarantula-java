@@ -1,5 +1,6 @@
 package com.tarantula.platform.leaderboard;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Recoverable;
 
@@ -117,5 +118,17 @@ public class LeaderBoardEntry extends RecoverableObject implements LeaderBoard.E
     @Override
     public int hashCode(){
         return this.owner.hashCode();
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Category",category);
+        jsonObject.addProperty("Classifier",classifier);
+        jsonObject.addProperty("Rank",rank);
+        jsonObject.addProperty("Owner",owner);
+        jsonObject.addProperty("Value",value);
+        jsonObject.addProperty("Timestamp",timestamp);
+        return jsonObject;
     }
 }

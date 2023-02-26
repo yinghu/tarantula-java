@@ -40,9 +40,10 @@ public class UDPChannel extends GameChannel {
 
 
     @Override
-    public void write(MessageBuffer.MessageHeader messageHeader,byte[] payload) {
+    public void write(Session.Header header,byte[] payload) {
         if(payload==null||payload.length==0) return;
         BatchUtil.Batch batch = BatchUtil.batch(payload.length,MessageBuffer.PAYLOAD_SIZE);
+        MessageBuffer.MessageHeader messageHeader = (MessageBuffer.MessageHeader)header;
         synchronized (messageBuffer){
             for(BatchUtil.Offset offset : batch.offsets){
                 messageBuffer.reset();

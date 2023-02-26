@@ -44,6 +44,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
     private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
+    private ConcurrentHashMap<String,EventListener> eventListeners;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
@@ -51,6 +52,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
         this.serviceExported = new ConcurrentHashMap<>();
+        this.eventListeners = new ConcurrentHashMap<>();
     }
 
     public GameCluster gameCluster(){
@@ -100,6 +102,12 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
+        this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{
+            EventListener listener = eventListeners.get(e.trackId());
+            if(listener==null) return false;
+            listener.onEvent(e);
+            return true;
+        });
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
     }
     @Override
@@ -124,7 +132,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     @Override
     public void shutdown() throws Exception {
-
+        this.serviceContext.clusterProvider().unsubscribe(gameCluster.typeId());
         gameServiceProviders.forEach((k,sp)->{
             try {
                 sp.shutdown();
@@ -264,5 +272,9 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener== null) return;
         this.metricsListener = metricsListener;
+    }
+    public String registerEventListener(String trackId,EventListener eventListener){
+        eventListeners.putIfAbsent(trackId,eventListener);
+        return this.gameCluster.typeId();
     }
 }

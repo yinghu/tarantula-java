@@ -1,5 +1,7 @@
 package com.icodesoftware.protocol;
 
+import com.icodesoftware.Session;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -146,7 +148,7 @@ public class MessageBuffer {
         return limit;
     }
 
-    public static class MessageHeader{
+    public static class MessageHeader implements Session.Header {
         public boolean ack;
         public int channelId;
         public int sessionId;
@@ -184,6 +186,56 @@ public class MessageBuffer {
             copy.broadcasting = broadcasting;
             copy.encrypted = encrypted;
             return copy;
+        }
+
+        @Override
+        public boolean ack() {
+            return ack;
+        }
+
+        @Override
+        public int channelId() {
+            return channelId;
+        }
+
+        @Override
+        public int sessionId() {
+            return sessionId;
+        }
+
+        @Override
+        public int objectId() {
+            return objectId;
+        }
+
+        @Override
+        public int sequence() {
+            return sequence;
+        }
+
+        @Override
+        public short commandId() {
+            return commandId;
+        }
+
+        @Override
+        public short batchSize() {
+            return batchSize;
+        }
+
+        @Override
+        public short batch() {
+            return batch;
+        }
+
+        @Override
+        public boolean broadcasting() {
+            return broadcasting;
+        }
+
+        @Override
+        public boolean encrypted() {
+            return encrypted;
         }
     }
 

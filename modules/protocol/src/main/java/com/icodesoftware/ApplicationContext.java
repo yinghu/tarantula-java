@@ -1,6 +1,5 @@
 package com.icodesoftware;
 
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
@@ -35,8 +34,6 @@ public interface ApplicationContext {
     <T extends ServiceProvider> T serviceProvider(String name);
 
     void resource(String name,Module.OnResource onResource);
-
-    //Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener);
 
     PostOffice postOffice();
 

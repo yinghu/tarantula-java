@@ -969,4 +969,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public PostOffice postOffice(){
         return this.deploymentService().registerPostOffice();
     }
+    public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
+ 	    return null;
+    }
+    public void unregisterRecoverableListener(String topic){
+
+    }
 }

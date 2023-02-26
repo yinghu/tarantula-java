@@ -23,8 +23,4 @@ public class PostOfficeOnTag implements PostOffice.OnTag {
         eventService.publish(mapStoreSyncEvent);
     }
 
-    @Override
-    public void send(String distributionKey, byte[] data) {
-
-    }
 }

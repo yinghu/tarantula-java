@@ -1,14 +1,13 @@
 package com.tarantula.platform.leaderboard;
 
+import com.google.gson.GsonBuilder;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.event.LeaderBoardGlobalEvent;
+import com.tarantula.platform.event.ServerPushEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,17 +17,18 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     public static final String NAME = "leaderboard";
 
     private TarantulaLogger logger;
-    private final String name;
+    private String topic;
     private static int LDB_SIZE = 10;
     private DataStore dataStore;
 
-    private EventService publisher;
+    private ServiceContext serviceContext;
+    private GsonBuilder gsonBuilder;
 
-    private ClusterProvider integrationCluster;
+    private final GameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
     public PlatformLeaderBoardProvider(GameServiceProvider gameServiceProvider){
-        this.name = gameServiceProvider.gameCluster().typeId()+"-"+NAME;
+        this.gameServiceProvider = gameServiceProvider;
     }
     public LeaderBoardSync leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
@@ -42,18 +42,20 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
-        this.dataStore = serviceContext.dataStore(name.replace("-","_"),serviceContext.node().partitionNumber());//typeId_service
-        this.publisher = serviceContext.eventService();
-        integrationCluster = serviceContext.clusterProvider();
-        integrationCluster.subscribe(name,(e)->{
-            if(e instanceof LeaderBoardGlobalEvent){
-                LeaderBoardEntry update = new LeaderBoardEntry(e.index(),e.name(),((LeaderBoardGlobalEvent) e).rank,e.owner(),e.balance(),e.timestamp());
+        this.serviceContext = serviceContext;
+        this.dataStore = serviceContext.dataStore(gameServiceProvider.gameCluster().serviceType().replace("-","_"),serviceContext.node().partitionNumber());//typeId_service
+        this.gsonBuilder = new GsonBuilder();
+        this.gsonBuilder.registerTypeAdapter(LeaderBoardEntry.class,new LeaderBoardEntrySerializer());
+        this.gsonBuilder.registerTypeAdapter(LeaderBoardEntry.class,new LeaderBoardEntryDeserializer());
+        this.topic = this.gameServiceProvider.registerEventListener(NAME,(e)->{
+            if(e instanceof ServerPushEvent){
+                LeaderBoard.Entry update = this.gsonBuilder.create().fromJson(new String(e.payload()),LeaderBoardEntry.class);
                 LeaderBoardSync ldb = this.leaderBoard(update.category());
                 ldb.onView(update);
             }
             return false;
         });
+        this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started ["+name+"]");
+        logger.warn("Leader board service provider started ["+topic+"]");
     }
 
     @Override
@@ -73,7 +75,8 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        publisher.publish(new LeaderBoardGlobalEvent(name,name,entry));
+        byte[] payload = this.gsonBuilder.create().toJson(entry).getBytes();
+        this.serviceContext.postOffice().onTopic(topic).send(NAME,payload);
     }
     @Override
     public void atMidnight(){
@@ -81,4 +84,5 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
             v.reset();
         });
     }
+
 }

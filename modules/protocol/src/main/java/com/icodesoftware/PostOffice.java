@@ -12,8 +12,9 @@ public interface PostOffice {
 
     //send data to client on the notification topic
     interface OnTopic{
-        void send(Recoverable data);
-        void send(byte[] data);
+        //void send(Recoverable data);
+        void send(String trackId,byte[] data);
+        void send(String trackId,Session.Header header,byte[] data);
     }
 
     interface OnEmail{
@@ -27,7 +28,6 @@ public interface PostOffice {
     //app to app messaging
     interface OnTag{
        void send(String distributionKey, Recoverable data);
-       void send(String distributionKey, byte[] data);
     }
 
 }

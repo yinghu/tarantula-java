@@ -75,4 +75,17 @@ public interface Session extends OnApplication {
         void timeout(String systemId,int stub);
     }
 
+    interface Header{
+        boolean ack();
+        int channelId();
+        int sessionId();
+        int objectId();
+        int sequence();
+        short commandId();
+        short batchSize();
+        short batch();
+        boolean broadcasting();
+        boolean encrypted();
+    }
+
 }

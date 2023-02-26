@@ -5,7 +5,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
-import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -60,7 +60,7 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
     }
 
     @Override
-    public void write(MessageBuffer.MessageHeader messageHeader, byte[] bytes) {
+    public void write(Session.Header messageHeader, byte[] bytes) {
 
     }
 

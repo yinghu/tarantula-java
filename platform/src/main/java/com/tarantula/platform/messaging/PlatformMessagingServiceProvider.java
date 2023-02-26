@@ -2,7 +2,6 @@ package com.tarantula.platform.messaging;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
@@ -16,16 +15,14 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     public static final String NAME = "messaging";
     private static final int MESSAGE_OBJECT_ID = 0;
     private final GameServiceProvider gameServiceProvider;
-    private final String serviceName;
+    private String topic;
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
     private ConcurrentHashMap<Recoverable.Key,Channel> channelMap;
 
-    private EventService publisher;
 
     public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
-        this.serviceName = this.gameServiceProvider.gameCluster().typeId()+"-"+NAME;
         this.channelMap = new ConcurrentHashMap<>();
     }
 
@@ -36,7 +33,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Messaging service started on ["+serviceName+"]");
+        this.logger.warn("Messaging service started on ["+topic+"]");
     }
 
     @Override
@@ -48,8 +45,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
-        this.publisher = this.serviceContext.clusterProvider().publisher();
-        this.publisher.registerEventListener(serviceName,e->{
+        topic = this.gameServiceProvider.registerEventListener(NAME,e->{
             this.channelMap.forEach((k,c)->send(c,(ServerPushEvent)e));
             return true;
         });
@@ -60,9 +56,10 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         channelMap.put(session.key(),gameChannel);
         this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
             Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
-            publisher.publish(new ServerPushEvent(serviceName,1,statistics.toJson().toString().getBytes()));
+            this.serviceContext.postOffice().onTopic(topic).send(NAME,messageHeader(),statistics.toJson().toString().getBytes());
         }));
     }
+
 
     public void unregisterGameChannel(Session session){
         logger.warn("unregister game channel->"+session.key().asString());
@@ -71,10 +68,12 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
 
 
     private void send(Channel channel, ServerPushEvent serverPushEvent){
-        logger.warn(serverPushEvent.toString());
+        channel.write(serverPushEvent.messageHeader(),serverPushEvent.payload());
+    }
+    private MessageBuffer.MessageHeader messageHeader(){
         MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
         header.objectId = MESSAGE_OBJECT_ID;
-        header.sequence = serverPushEvent.stub();//messageSequence.incrementAndGet();
-        channel.write(header,serverPushEvent.payload());
+        header.sequence = 1;
+        return header;
     }
 }
