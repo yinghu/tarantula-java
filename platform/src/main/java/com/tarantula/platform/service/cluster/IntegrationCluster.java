@@ -155,6 +155,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public EventService subscribe(String topic, EventListener callback){
+        //log.warn("Event subscription ["+topic+"] to integration cluster");
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
             eventSubscriber.callback = callback;
@@ -171,7 +172,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(sub!=null){
             ITopic<Event> top = topicList.remove(topic);
             top.removeMessageListener(sub.registrationKey);
-            //log.warn("Event subscription ["+topic+"] released from integration cluster");
         }
     }
 
@@ -206,6 +206,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void registerEventListener(String topic, EventListener callback){
         this.subscribe(topic,callback);
+    }
+    public void unregisterEventListener(String topic){
+        this.unsubscribe(topic);
     }
 
     public void onMerging(){

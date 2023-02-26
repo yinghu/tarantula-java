@@ -65,7 +65,7 @@ public class FastPlayEvent extends Data implements Event {
     }
     @Override
     public String toString(){
-        return this.systemId+"/"+this.stub;
+        return "FastPlayEvent ["+this.systemId+"/"+this.stub+"]";
     }
 
 }
