@@ -147,7 +147,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private MirrorClusterBackupProvider mirrorBackupProvider;
 
     public List<String> serviceViewList = new ArrayList<>();
-    //public List<String> metricsViewList = new ArrayList<>();
+    private PostOfficeSession postOfficeSession;
 
 
     private HttpClientProvider httpClientProvider;
@@ -155,7 +155,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
-         //this.serviceView = new ServiceView();
     }
 
 	public static TarantulaContext getInstance(){
@@ -572,6 +571,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
         this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
+        this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
     }
     public void _syncNodeData() throws Exception{
         _systemServiceStarted.await();
@@ -967,6 +967,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public PostOffice postOffice(){
-        return this.deploymentService().registerPostOffice();
+        return this.postOfficeSession;
     }
 }

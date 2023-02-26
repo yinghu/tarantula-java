@@ -85,7 +85,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             String email = (String) onAccess.property(OnAccess.EMAIL_ADDRESS);
             if(userService.updateEmail(onAccess)){
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
-                if(this.deploymentServiceProvider.registerPostOffice().onEmail(email).send(code)){
+                if(this.context.postOffice().onEmail(email).send(code)){
                     session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
                 }else {
                     session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());
@@ -103,7 +103,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             else{
                 if(u.emailAddress()!=null&&u.emailAddress().contains("@")){
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
-                    if(this.deploymentServiceProvider.registerPostOffice().onEmail(u.emailAddress()).send(code)){
+                    if(this.context.postOffice().onEmail(u.emailAddress()).send(code)){
                         session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
                     }else {
                         session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());

@@ -41,8 +41,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     Content resource(String name);
 
-    //message publisher
-    PostOffice registerPostOffice();
     String resetCode(String key);
     String checkCode(String resetCode);
     //end
@@ -86,9 +84,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     List<String> listMetricsView();
     DataStore.Summary validDataStore(String dataStore);
     ClusterProvider.Summary clusterSummary();
-
-    //RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
-    //void unregisterRecoverableListener(String topic);
 
     DistributionCallback distributionCallback();
 

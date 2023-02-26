@@ -153,7 +153,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public PostOffice postOffice(){
-        return this.tarantulaContext.deploymentService().registerPostOffice();
+        return this.tarantulaContext.postOffice();
     }
 
     public void clear(){

@@ -52,12 +52,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private ConcurrentHashMap<String,ExposedGameService> eMap = new ConcurrentHashMap<>();
 
-    //private ConcurrentHashMap<String,RecoverableListener> tMap = new ConcurrentHashMap<>();
 
-    //private EventService publisher;
     private TarantulaContext tarantulaContext;
 
-    private PostOfficeSession postOfficeSession;
 
     String contentDir;
 
@@ -394,8 +391,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.metricsListener = (n,v)->{};
         this.tarantulaContext = (TarantulaContext)serviceContext;
         this.integrationCluster = serviceContext.clusterProvider();
-        //this.integrationEventService = integrationCluster.publisher();
-        this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
         try{
             contentDir = this.tarantulaContext.deployDir+"/web";
             Path _path = Paths.get(this.tarantulaContext.deployDir);
@@ -828,22 +823,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<String> listMetricsView(){
         return this.tarantulaContext.metricsList();
     }
-    /**
-    public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
-        tMap.put(topic,recoverableListener);
-        return recoverableListener;
-    }
-    public void unregisterRecoverableListener(String topic){
-        tMap.remove(topic);
-    }**/
+
     public void atMidnight(){
 
     }
     public DistributionCallback distributionCallback(){
         return this.distributionCallback;
-    }
-    public PostOffice registerPostOffice(){
-        return this.postOfficeSession;
     }
 
 
