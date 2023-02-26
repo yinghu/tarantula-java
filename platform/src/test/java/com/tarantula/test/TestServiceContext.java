@@ -137,10 +137,4 @@ public class TestServiceContext implements ServiceContext {
     public PostOffice postOffice(){
         return null;
     }
-    public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
-        return null;
-    }
-    public void unregisterRecoverableListener(String topic){
-
-    }
 }

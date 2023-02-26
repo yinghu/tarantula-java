@@ -12,7 +12,6 @@ public interface PostOffice {
 
     //send data to client on the notification topic
     interface OnTopic{
-        //void send(Recoverable data);
         void send(String trackId,byte[] data);
         void send(String trackId,Session.Header header,byte[] data);
     }

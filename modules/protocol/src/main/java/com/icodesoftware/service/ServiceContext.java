@@ -41,7 +41,7 @@ public interface ServiceContext {
     void unregisterMetrics(Metrics metrics);
 
     PostOffice postOffice();
-    RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
-    void unregisterRecoverableListener(String topic);
+    //RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener);
+    //void unregisterRecoverableListener(String topic);
 
 }

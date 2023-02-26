@@ -116,11 +116,4 @@ public class ServiceContextProxy implements ServiceContext {
     public PostOffice postOffice(){
         return this.tarantulaContext.postOffice();
     }
-    public RecoverableListener registerRecoverableListener(String topic,RecoverableListener recoverableListener){
-        return this.tarantulaContext.registerRecoverableListener(topic,recoverableListener);
-    }
-    public void unregisterRecoverableListener(String topic){
-        this.tarantulaContext.unregisterRecoverableListener(topic);
-    }
-
 }
