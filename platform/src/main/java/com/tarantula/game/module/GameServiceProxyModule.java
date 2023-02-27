@@ -4,6 +4,7 @@ import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameServiceProvider;
 
@@ -15,12 +16,19 @@ public class GameServiceProxyModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        Module serviceProxy = this.gameServiceProvider.serviceModule(session.name());
-        if(serviceProxy != null) {
-            serviceProxy.onRequest(session,payload);
+        if(session.action().equals("onService")){
+            GameServiceProxy proxy = this.gameServiceProvider.serviceProxy(session.serviceId());
+            byte[] resp = proxy.onService(session,payload);
+            session.write(resp!=null?resp:JsonUtil.toSimpleResponse(true,"").getBytes());
         }
-        else{
-            session.write(JsonUtil.toSimpleResponse(false,"service module not available").getBytes());
+        else if(session.action().equals("onModule")){
+            Module serviceProxy = this.gameServiceProvider.serviceModule(session.name());
+            if(serviceProxy != null) {
+                serviceProxy.onRequest(session,payload);
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"service module not available").getBytes());
+            }
         }
         return false;
     }

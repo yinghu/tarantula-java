@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.google.gson.JsonElement;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
@@ -45,6 +46,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
     private ConcurrentHashMap<String,EventListener> eventListeners;
     private ConcurrentHashMap<String, Module> moduleExported;
+    private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
@@ -52,6 +54,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
         this.moduleExported = new ConcurrentHashMap<>();
+        this.serviceExported = new ConcurrentHashMap<>();
         this.eventListeners = new ConcurrentHashMap<>();
     }
 
@@ -218,6 +221,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     public Module serviceModule(String module){
         return moduleExported.get(module);
+    }
+
+    public void exportServiceProxy(GameServiceProxy proxy){
+        serviceExported.putIfAbsent(proxy.serviceId(),proxy);
+    }
+    public GameServiceProxy serviceProxy(short serviceId){
+        return serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
