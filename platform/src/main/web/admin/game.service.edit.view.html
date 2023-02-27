@@ -26,6 +26,7 @@
     let serviceBar = document.querySelector('#tx-game-service-list');
     document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
     TARA_API.onGet('role/admin','availableGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
+        //console.log(resp);
         tx_service_bar_reset(resp);       
     });
     document.querySelector('#tx-game-service-list-close').onclick=()=>{

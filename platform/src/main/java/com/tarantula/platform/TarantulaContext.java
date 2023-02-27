@@ -836,7 +836,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             });
         }
         catch (Exception ex){
-            //ignore
+            log.error("failed to load upgrade services",ex);
         }
         return alist;
     }

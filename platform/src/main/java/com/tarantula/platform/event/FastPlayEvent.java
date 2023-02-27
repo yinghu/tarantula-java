@@ -27,33 +27,31 @@ public class FastPlayEvent extends Data implements Event {
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.systemId);
         out.writeUTF("2",this.destination);
-        out.writeUTF("6",this.tournamentId);
-        out.writeUTF("7",this.owner);
-        out.writeDouble("8",this.balance);
-        out.writeInt("9",this.stub);
-        //out.writeInt("10",this.accessMode);
-        out.writeUTF("11",this.ticket);
-        out.writePortable("14",this.forward);
-        out.writeInt("15",routingNumber);
-        out.writeUTF("16",name);
-        out.writeUTF("17",clientId);
-        out.writeByteArray("18",payload!=null?payload:new byte[0]);
+        out.writeUTF("3",this.tournamentId);
+        out.writeUTF("4",this.owner);
+        out.writeDouble("5",this.balance);
+        out.writeInt("6",this.stub);
+        out.writeUTF("7",this.ticket);
+        out.writePortable("8",this.forward);
+        out.writeInt("9",routingNumber);
+        out.writeUTF("10",name);
+        out.writeUTF("11",clientId);
+        out.writeByteArray("12",payload!=null?payload:new byte[0]);
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.systemId = in.readUTF("1");
         this.destination = in.readUTF("2");
-        this.tournamentId = in.readUTF("6");
-        this.owner = in.readUTF("7");
-        this.balance = in.readDouble("8");
-        this.stub = in.readInt("9");
-        //this.accessMode = in.readInt("10");
-        this.ticket = in.readUTF("11");
-        this.forward = in.readPortable("14");
-        this.routingNumber = in.readInt("15");
-        this.name = in.readUTF("16");
-        this.clientId = in.readUTF("17");
-        this.payload = in.readByteArray("18");
+        this.tournamentId = in.readUTF("3");
+        this.owner = in.readUTF("4");
+        this.balance = in.readDouble("5");
+        this.stub = in.readInt("6");
+        this.ticket = in.readUTF("7");
+        this.forward = in.readPortable("8");
+        this.routingNumber = in.readInt("9");
+        this.name = in.readUTF("10");
+        this.clientId = in.readUTF("11");
+        this.payload = in.readByteArray("12");
     }
     @Override
     public void write(byte[] payload){
