@@ -1,5 +1,6 @@
 package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
+import com.icodesoftware.Session;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.OnApplicationHeader;
 
@@ -163,5 +164,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     public void write(byte[] payload,boolean closed){
         this.eventService.publish(new ResponsiveEvent(this.source,this.sessionId,payload,closed));
     }
+    public void write(Session.Header messageHeader, byte[] payload){};
 
 }

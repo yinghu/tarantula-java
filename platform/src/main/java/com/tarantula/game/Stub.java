@@ -110,4 +110,10 @@ public class Stub extends PlayerGameObject {
     public String toString(){
         return key().toString();
     }
+
+    @Override
+    public void write(Session.Header messageHeader,byte[] payload){
+        if(pushChannel == null) return;
+        pushChannel.write(messageHeader,payload);
+    }
 }
