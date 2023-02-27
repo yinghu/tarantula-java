@@ -21,6 +21,7 @@ public class JsonServiceParser {
             descriptor.moduleName(temp.get("moduleName").getAsString());
             descriptor.applicationClassName(temp.get("applicationClassName").getAsString());
             descriptor.disabled(temp.get("disabled").getAsBoolean());
+            if(temp.has("accessMode")) descriptor.accessMode(temp.get("accessMode").getAsInt());
             return descriptor;
         }catch (Exception ex){
             throw new RuntimeException(ex);

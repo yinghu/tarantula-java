@@ -20,8 +20,6 @@ public class SingletonApplicationManager extends DefaultApplication implements B
     @Override
     public void start() throws Exception {
         super.start();
-        //DeploymentDescriptor dd = this.deploymentDescriptor.deploy();
-        //dd.owner(dd.distributionKey());
         this.singleton = this.launch(this.deploymentDescriptor);
         this.tarantulaContext.deploymentServiceProvider().onUpdated(DeploymentMetrics.DEPLOYMENT_APPLICATION_COUNT,1);
         this.singleton._setup();//inject the app context proxy to decouple the TarantulaApplicationContext
