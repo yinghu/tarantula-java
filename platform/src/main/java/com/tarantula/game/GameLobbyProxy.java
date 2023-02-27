@@ -103,9 +103,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
             String className = cc.get("className").getAsString();
             boolean exported = cc.get("export").getAsBoolean();
             GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className,exported,this.gameServiceProvider);
-            if(serviceProxy.exported()){
-                gameServiceProvider.exportServiceProxy(serviceProxy);
-            }
             serviceProxies.put(serviceId,serviceProxy);
         }));
         this.application = applicationContext.descriptor();

@@ -2,13 +2,12 @@ package com.tarantula.game.service;
 
 import com.google.gson.JsonElement;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.GameServiceProxy;
+import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
-import com.tarantula.platform.event.ServerPushEvent;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
@@ -44,15 +43,15 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private Metrics metrics;
 
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
-    private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
     private ConcurrentHashMap<String,EventListener> eventListeners;
+    private ConcurrentHashMap<String, Module> moduleExported;
 
     public GameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
-        this.serviceExported = new ConcurrentHashMap<>();
+        this.moduleExported = new ConcurrentHashMap<>();
         this.eventListeners = new ConcurrentHashMap<>();
     }
 
@@ -213,11 +212,12 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return (T)gameServiceProviders.get(name);
     }
 
-    public void exportServiceProxy(GameServiceProxy serviceProxy){
-        serviceExported.putIfAbsent(serviceProxy.serviceId(),serviceProxy);
+    public void exportServiceModule(String tag,Module serviceProxy){
+        moduleExported.putIfAbsent(tag,serviceProxy);
     }
-    public GameServiceProxy serviceProxy(short serviceId){
-        return this.serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
+
+    public Module serviceModule(String module){
+        return moduleExported.get(module);
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
