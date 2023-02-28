@@ -86,6 +86,7 @@ public class GameLobbyModule implements Module{
         this.gameLobby.setup(context);
         this.gameLobby.start();
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this.gameLobby);
+        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override

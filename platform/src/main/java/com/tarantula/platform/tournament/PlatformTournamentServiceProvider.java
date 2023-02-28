@@ -242,7 +242,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void atMidnight(){
         serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
-            logger.warn("Running midnight check tasks ...");
+            logger.warn("Running midnight check tasks ->"+gameServiceName);
             byte[] pendingSchedule;
             do{
                 //midnight scheduling
@@ -254,21 +254,21 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                     }
                 }
             }while(pendingSchedule!=null);
-        }));
-        lookupScheduleKey.reload();
-        scheduleTournament();
-        ArrayList<String> removed = new ArrayList();
-        this.lookupTournamentKey.reload();
-        this.lookupTournamentKey.keySet().forEach(k->{
-            TournamentManager tournamentManager = new TournamentManager();
-            tournamentManager.distributionKey(k);
-            this.dataStore.load(tournamentManager);
-            if(tournamentManager.status() == Tournament.Status.ENDED) removed.add(k);
-        });
-        removed.forEach((r)->{
-            lookupTournamentKey.removeKey(r);
-        });
-        lookupTournamentKey.update();
+            lookupScheduleKey.reload();
+            scheduleTournament();
+            ArrayList<String> removed = new ArrayList();
+            this.lookupTournamentKey.reload();
+            this.lookupTournamentKey.keySet().forEach(k->{
+                TournamentManager tournamentManager = new TournamentManager();
+                tournamentManager.distributionKey(k);
+                this.dataStore.load(tournamentManager);
+                if(tournamentManager.status() == Tournament.Status.ENDED) removed.add(k);
+            });
+            removed.forEach((r)->{
+                lookupTournamentKey.removeKey(r);
+            });
+            lookupTournamentKey.update();}
+        ));
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();

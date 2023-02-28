@@ -49,6 +49,7 @@ public class InventoryModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Inventory module started", OnLog.WARN);
     }
     @Override

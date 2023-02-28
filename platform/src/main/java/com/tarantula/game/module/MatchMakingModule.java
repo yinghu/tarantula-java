@@ -38,13 +38,22 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby!=null) {
-                Response response = context.presence(session).onPlay(session, lobby);
-                if (response != null) session.write(this.builder.create().toJson(response).getBytes());
+                //if(lobby.entryCost()>0)
+                //Presence presence = this.context.presence(session);
+                //presence.transact()
+                Module module = this.gameServiceProvider.serviceModule(lobby.tag());
+                module.onJoin(session);
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
             }
             this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
+        }
+        else if(session.action().equals("onLeave")){
+            String[] query = session.name().split("#");
+            session.name(query[1]);
+            Module module = this.gameServiceProvider.serviceModule(query[0]);
+            module.onRequest(session,payload);
         }
         else if(session.action().equals("onTestTournament")){
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
