@@ -74,18 +74,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         return gameZone.leave(stub);
     }
 
-    @Override
-    public byte[] onService(Session session, byte[] payload){
-        if(!started) return null;
-        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.get(stubKey.asString());
-        if(stub==null){
-            session.write(JsonUtil.toSimpleResponse(false,"no access token").getBytes());
-            return null;
-        }
-        return this.gameServiceProxy(session.serviceId()).onService(session,payload);
-    }
-
     public void validate(Session session){
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey.asString())!=null,"").getBytes());

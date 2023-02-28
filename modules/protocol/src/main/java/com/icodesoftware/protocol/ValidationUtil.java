@@ -41,7 +41,7 @@ public class ValidationUtil {
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);
         String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash  vm[4] -- cluster suffix
+        //vm[0] - ticket, vm[1] - stub, vm[2] - start, vm[3] -- cluster-suffix,  vm[4] -- hash
         messageDigest.reset();
         messageDigest.update(systemId.getBytes());//systemId
         messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
@@ -66,12 +66,12 @@ public class ValidationUtil {
             this.valid = valid;
         }
 
-        public Token(boolean valid,String systemId,int stub,String index,String ticket){
+        public Token(boolean valid,String systemId,int stub,String ticket,String index){
             this.valid = valid;
             this.systemId = systemId;
             this.stub = stub;
-            this.index = index;
             this.ticket = ticket;
+            this.index = index;
         }
     }
 }

@@ -50,7 +50,7 @@ public class InventoryModule implements Module {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
-        this.context.log("Inventory module started", OnLog.WARN);
+        this.context.log("Inventory module started on tag ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
     @Override
     public void clear(){

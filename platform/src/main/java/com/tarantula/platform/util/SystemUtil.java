@@ -106,7 +106,7 @@ public class SystemUtil {
         //System.out.println(token);
         ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
         if(!validated.valid) throw new RuntimeException("Wrong session token");
-        return new OnSessionTrack(validated.systemId,validated.stub,validated.index,validated.ticket);
+        return new OnSessionTrack(validated.systemId,validated.stub,validated.ticket,validated.index);
         /**
         int sp = token.indexOf(" ");
         String systemId = token.substring(0,sp);

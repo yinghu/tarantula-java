@@ -11,8 +11,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String typeId;
 
-    protected short serviceId;
-
     protected double balance;
 
     protected int stub;
@@ -48,15 +46,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     public void tournamentId(String tournamentId) {
         this.tournamentId = tournamentId;
     }
-
-
-    public short serviceId(){
-        return this.serviceId;
-    }
-    public void serviceId(short serviceId){
-        this.serviceId = serviceId;
-    }
-
 
     public String typeId(){
         return this.typeId;

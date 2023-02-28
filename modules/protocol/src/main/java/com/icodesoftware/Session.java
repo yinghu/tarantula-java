@@ -26,8 +26,8 @@ public interface Session extends OnApplication {
     String TARANTULA_CLIENT_ID ="Tarantula-client-id";
 
     String TARANTULA_PAYLOAD = "Tarantula-payload";
-    String TARANTULA_SERVICE_ID = "Tarantula-service-id";
-
+    //String TARANTULA_SERVICE_ID = "Tarantula-service-id";
+    String TARANTULA_TRACK_ID ="Tarantula-track-id";
 
     //int FAST_PLAY_MODE = 2;
     //int INVITATION_PLAY_MODE = 4;

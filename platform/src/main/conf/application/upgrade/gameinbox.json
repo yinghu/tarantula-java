@@ -1,0 +1,12 @@
+{
+  "typeId":"game-service",
+  "name":"GameInbox",
+  "type":"application",
+  "category":"inbox",
+  "tag":"game/inbox",
+  "resetEnabled": false,
+  "moduleName":"com.tarantula.game.module.GameInboxModule",
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
+  "disabled": false,
+  "accessMode": 13
+}

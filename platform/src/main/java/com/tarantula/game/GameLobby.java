@@ -14,7 +14,7 @@ public interface GameLobby extends Configurable, Serviceable {
 
     Stub join(Session session, Rating rating);
     boolean leave(Session session);
-    byte[] onService(Session session, byte[] payload);
+
     void validate(Session session);
 
     void setup(ApplicationContext applicationContext) throws Exception;

@@ -35,14 +35,16 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
             Rating rating = this.gameServiceProvider.rating(session.systemId());
-            int mix = rating.rank>maxRank?maxRank:rating.rank;
+            int mix = rating.rank > maxRank? maxRank : rating.rank;
             Descriptor lobby = mLobby.get(mix);
-            if(lobby!=null) {
-                //if(lobby.entryCost()>0)
-                //Presence presence = this.context.presence(session);
-                //presence.transact()
-                Module module = this.gameServiceProvider.serviceModule(lobby.tag());
-                module.onJoin(session);
+            if(lobby != null) {
+                if(lobby.entryCost() > 0 && !this.context.presence(session).transact(lobby.entryCost()*(-1))){
+                    session.write(JsonUtil.toSimpleResponse(false,"not enough balance").getBytes());
+                }
+                else{
+                    Module module = this.gameServiceProvider.serviceModule(lobby.tag());
+                    module.onJoin(session);
+                }
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());

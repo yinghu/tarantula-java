@@ -34,11 +34,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.ticket = ticket;
         this.index = index;
     }
-    public OnSessionTrack(String systemId,int stub){
-        this();
-        this.systemId = systemId;
-        this.stub = stub;
-    }
+
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;

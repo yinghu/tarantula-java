@@ -6,6 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.*;
+import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
@@ -157,6 +158,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public Rating rating(String systemId){
         return presenceServiceProvider().rating(systemId);
     }
+
     public Statistics statistics(String systemId){
         return presenceServiceProvider().statistics(systemId,serviceProvider(PlatformLeaderBoardProvider.NAME));
     }
@@ -220,12 +222,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     }
 
     public Module serviceModule(String module){
-        return moduleExported.get(module);
+        return moduleExported.getOrDefault(module, ErrorModule.ERROR_MODULE);
     }
 
     public void exportServiceProxy(GameServiceProxy proxy){
         serviceExported.putIfAbsent(proxy.serviceId(),proxy);
     }
+
     public GameServiceProxy serviceProxy(short serviceId){
         return serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
     }

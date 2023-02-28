@@ -16,19 +16,16 @@ public class GameServiceProxyModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onService")){
-            GameServiceProxy proxy = this.gameServiceProvider.serviceProxy(session.serviceId());
+        String[] query = session.action().split("#");
+        if(query[0].equals("onService")){
+            GameServiceProxy proxy = this.gameServiceProvider.serviceProxy(Short.parseShort(query[1]));
             byte[] resp = proxy.onService(session,payload);
             session.write(resp!=null?resp:JsonUtil.toSimpleResponse(true,"").getBytes());
         }
-        else if(session.action().equals("onModule")){
-            Module serviceProxy = this.gameServiceProvider.serviceModule(session.name());
-            if(serviceProxy != null) {
-                serviceProxy.onRequest(session,payload);
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"service module not available").getBytes());
-            }
+        else if(query[0].equals("onModule")){
+            session.action(query[1]);
+            Module serviceProxy = this.gameServiceProvider.serviceModule(session.trackId());
+            serviceProxy.onRequest(session,payload);
         }
         return false;
     }

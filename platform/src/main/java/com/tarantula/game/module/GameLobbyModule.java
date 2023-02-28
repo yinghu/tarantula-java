@@ -33,16 +33,7 @@ public class GameLobbyModule implements Module{
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onUpdate")){
-            byte[] response = this.gameLobby.onService(session,payload);
-            if(response != null){
-                session.write(response);
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(true,"updated").getBytes());
-            }
-        }
-        else if(session.action().equals("onLeave")){
+        if(session.action().equals("onLeave")){
             boolean left = gameLobby.leave(session);
             session.write(JsonUtil.toSimpleResponse(left,"left room").getBytes());
         }
@@ -66,7 +57,6 @@ public class GameLobbyModule implements Module{
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            this.gameLobby.onService(session,payload);
         }
 
         else{
