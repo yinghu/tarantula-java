@@ -104,5 +104,5 @@ If you make a code change, the image will need to get rebuilt, and can be done b
 
 ## Test web
 open index page `localhost:8090`
-click signin icon to popup login page with user/pwd pair root/root
+click signin icon to popup login page with user: `dev/root` pass: `root`
 dashboard page includes player/acount/developer/sudo tabs
