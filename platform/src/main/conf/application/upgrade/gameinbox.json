@@ -7,6 +7,5 @@
   "resetEnabled": false,
   "moduleName":"com.tarantula.game.module.GameInboxModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
-  "disabled": false,
-  "accessMode": 13
+  "disabled": false
 }

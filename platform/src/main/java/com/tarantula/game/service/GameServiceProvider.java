@@ -217,8 +217,8 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return (T)gameServiceProviders.get(name);
     }
 
-    public void exportServiceModule(String tag,Module serviceProxy){
-        moduleExported.putIfAbsent(tag,serviceProxy);
+    public void exportServiceModule(String tag,Module serviceModule){
+        moduleExported.putIfAbsent(tag,serviceModule);
     }
 
     public Module serviceModule(String module){

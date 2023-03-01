@@ -33,6 +33,7 @@ public class GameItemModule implements Module,Configurable.Listener<Configurable
         this.itemList = new ConcurrentHashMap<>();
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.gameServiceProvider.itemServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game item module started", OnLog.WARN);
     }
     public void onCreated(ConfigurableObject item){

@@ -11,6 +11,7 @@ import com.tarantula.platform.tournament.TournamentHistoryContext;
 public class TournamentModule implements Module , Tournament.Listener,Configurable.Listener {
     private ApplicationContext context;
     private TournamentServiceProvider tournamentServiceProvider;
+    private GameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
@@ -37,10 +38,11 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        GameServiceProvider gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
+        gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerTournamentListener(this);
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
+        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
 

@@ -92,6 +92,7 @@ public class SavedGameModule implements Module {
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(SavedGame.class,new SavedGameDeserializer());
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 }
