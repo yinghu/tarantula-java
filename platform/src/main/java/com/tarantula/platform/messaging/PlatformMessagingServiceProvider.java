@@ -52,17 +52,17 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     }
 
     public void registerChannel(Session session,Channel gameChannel){
-        logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
+        //logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
         channelMap.put(session.key(),gameChannel);
         this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
-            Statistics statistics = this.gameServiceProvider.statistics(session.systemId());
+            Statistics statistics = this.gameServiceProvider.presenceServiceProvider().statistics(session.systemId());
             this.serviceContext.postOffice().onTopic(topic).send(NAME,messageHeader(),statistics.toJson().toString().getBytes());
         }));
     }
 
 
     public void unregisterGameChannel(Session session){
-        logger.warn("unregister game channel->"+session.key().asString());
+        //logger.warn("unregister game channel->"+session.key().asString());
         channelMap.remove(session.key());
     }
 

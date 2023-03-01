@@ -5,7 +5,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
-import com.tarantula.game.*;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
@@ -16,7 +15,6 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
-import com.tarantula.platform.presence.DailyLoginTrack;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -80,8 +78,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         sp.getAsJsonArray().forEach((e)->{
             try{
                 ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
-                serviceProvider.setup(serviceContext);
-                serviceProvider.waitForData();
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
             }catch (Exception nex){
                 throw new RuntimeException(nex);
@@ -91,12 +87,14 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         gp.getAsJsonArray().forEach((e)->{
             try{
                 ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
-                serviceProvider.setup(serviceContext);
-                serviceProvider.waitForData();
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
             }catch (Exception nex){
                 throw new RuntimeException(nex);
             }
+        });
+        gameServiceProviders.forEach((k,p)->{
+            p.setup(serviceContext);
+            p.waitForData();
         });
         this.metrics = new GameClusterMetrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.metrics.setup(serviceContext);
@@ -118,10 +116,16 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public void waitForData(){
         this.gameCluster.setup();
     }
+
     @Override
     public void atMidnight(){
-        leaderBoardProvider().atMidnight();
-        tournamentServiceProvider().atMidnight();
+        gameServiceProviders.forEach((k,sp)->{
+            try {
+                sp.atMidnight();
+            }catch (Exception nex){
+                logger.error("error on service start",nex);
+            }
+        });
     }
     @Override
     public void start() throws Exception {
@@ -153,19 +157,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public PlatformRoomServiceProvider roomServiceProvider(){
         return serviceProvider(PlatformRoomServiceProvider.NAME);
     }
-
-    //player data service provider hook calls
-    public Rating rating(String systemId){
-        return presenceServiceProvider().rating(systemId);
-    }
-
-    public Statistics statistics(String systemId){
-        return presenceServiceProvider().statistics(systemId,serviceProvider(PlatformLeaderBoardProvider.NAME));
-    }
-    public DailyLoginTrack dailyLogin(String systemId){
-        return presenceServiceProvider().checkDailyLogin(systemId);
-    }
-
     public PlatformLobbyServiceProvider lobbyServiceProvider() {
         return serviceProvider(PlatformLobbyServiceProvider.NAME);
     }

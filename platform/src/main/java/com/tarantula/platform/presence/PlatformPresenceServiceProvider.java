@@ -44,10 +44,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
     private DistributionItemService distributionItemService;
+    private PlatformLeaderBoardProvider platformLeaderBoardProvider;
+    private GameServiceProvider gameServiceProvider;
 
     public PlatformPresenceServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
@@ -72,6 +75,7 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     }
     @Override
     public void waitForData(){
+        this.platformLeaderBoardProvider = gameServiceProvider.leaderBoardProvider();
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject dailyReward = ((JsonElement)configuration.property("dailyReward")).getAsJsonObject();
         this.dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
@@ -126,13 +130,13 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         rating.dataStore(this.presenceDataStore);
         return rating;
     }
-    public Statistics statistics(String systemId, PlatformLeaderBoardProvider leaderBoardProvider){
+    public Statistics statistics(String systemId){
         UserStatistics deltaStatistics = new UserStatistics();
         deltaStatistics.distributionKey(systemId);
         deltaStatistics.dataStore(this.presenceDataStore);
         this.presenceDataStore.createIfAbsent(deltaStatistics,true);
         deltaStatistics.registerListener((entry -> {
-            LeaderBoard leaderBoard = leaderBoardProvider.leaderBoard(entry.name());
+            LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);
         }));
         return deltaStatistics;

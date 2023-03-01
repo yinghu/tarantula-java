@@ -26,7 +26,7 @@ public class GameLobbyModule implements Module{
             session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             return;
         }
-        Rating rating = gameServiceProvider.rating(session.systemId());
+        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session.systemId());
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
     }
@@ -47,7 +47,7 @@ public class GameLobbyModule implements Module{
             }
             session.clientId("device_"+session.stub());
             session.name("web_device");
-            Rating rating = gameServiceProvider.rating(session.systemId());
+            Rating rating = gameServiceProvider.presenceServiceProvider().rating(session.systemId());
             rating.level = this.context.descriptor().accessRank()*100-99;
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());

@@ -644,7 +644,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             serviceProviders.forEach((k,v)->{
                 v.atMidnight();
             });
-            this.deploymentDataStoreProvider.atMidnight();
+            //this.deploymentDataStoreProvider.atMidnight();
             availableApplicationManagers.forEach((k,v)->{
                 v.atMidnight();
             });
