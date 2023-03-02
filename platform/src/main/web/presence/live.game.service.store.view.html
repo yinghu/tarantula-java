@@ -47,7 +47,7 @@
         case 'inventory':
             tx_live_inventory_setup();
             break;
-        case 'savedgame':
+        case 'save':
             tx_live_savedgame_setup();
             break;
         case 'achievement':
@@ -214,7 +214,7 @@
     }
     function tx_live_inbox_setup(){
         console.log(TARA_API.query()); 
-        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
+        TARA_API.getOnModule(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
             editor.set(resp);
         });   
     }

@@ -273,21 +273,23 @@ var TARA_API = (function(){
     aj.setRequestHeader('Tarantula-name',emailAddress);
     aj.send();               
   };
-  let _developer = function(developerKey,callback){
+  let _module_get = function(serviceTag,command,key,callback){
     let aj = new XMLHttpRequest();   
     aj.responseType = 'text';
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
-            let jsb = JSON.parse(aj.responseText);
-            callback(jsb);
+            callback(JSON.parse(aj.responseText));
         }
     };
-    aj.open("GET","/user/action",true);
+    aj.open("GET","/service/action",true);
     aj.setRequestHeader('Accept','application/json');
-    aj.setRequestHeader('Tarantula-tag','index/user');
-    aj.setRequestHeader('Tarantula-action','onDeveloper');
-    aj.setRequestHeader('Tarantula-access-key',developerKey);
-    aj.send();               
+    aj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    aj.setRequestHeader('Tarantula-tag',serviceTag.split('/')[0]+'/proxy');
+    aj.setRequestHeader('Tarantula-token',presence.token);
+    aj.setRequestHeader('Tarantula-action','onModule#'+command);
+    aj.setRequestHeader('Tarantula-name',key);
+    aj.setRequestHeader('Tarantula-track-id',serviceTag);
+    aj.send();             
   };  
   let _resetPassword = function(payload,callback){
     let _ps = JSON.stringify(payload);
@@ -425,7 +427,7 @@ var TARA_API = (function(){
       send : _send,
       disconnect : _disconnect,
       onPlay : _play,
-      //onDeveloper : _developer,
+      getOnModule : _module_get,
   };
     
 })();

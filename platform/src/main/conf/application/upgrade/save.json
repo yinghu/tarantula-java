@@ -1,11 +1,11 @@
 {
   "typeId":"game-service",
-  "name":"GameInbox",
+  "name":"Save",
   "type":"application",
-  "category":"inbox",
-  "tag":"game/inbox",
+  "category":"save",
+  "tag":"game/save",
   "resetEnabled": false,
-  "moduleName":"com.tarantula.game.module.GameInboxModule",
+  "moduleName":"com.tarantula.game.module.SavedGameModule",
   "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
   "disabled": false
 }
