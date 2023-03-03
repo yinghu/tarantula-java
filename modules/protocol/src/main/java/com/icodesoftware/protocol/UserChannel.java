@@ -74,13 +74,12 @@ public class UserChannel {
             //server clear on ack
             for(int i=0;i<MessageBuffer.PENDING_ACK_SIZE;i++){
                 String h = messageBuffer.readHeader().toString();
-                if(pendingAckMessageIndex.containsKey(h)){
-                    PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
-                    pendingAckMessage.pendingAck--;
-                    if(pendingAckMessage.pendingAck<=0){
-                        PendingAckMessage removed = pendingAckMessageIndex.remove(h);
-                        if(removed!=null) messenger.buffer(removed.buffer);
-                    }
+                PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
+                if(pendingAckMessage == null) continue;
+                pendingAckMessage.pendingAck--;
+                if(pendingAckMessage.pendingAck<=0){
+                    PendingAckMessage removed = pendingAckMessageIndex.remove(h);
+                    if(removed!=null) messenger.buffer(removed.buffer);
                 }
             }
             return;
