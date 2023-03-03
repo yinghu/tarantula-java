@@ -121,7 +121,6 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
     public void onTimer(int frameRate){
         try{
-            userChannelIndex.forEach((k,v)->v.onPendingAction(frameRate));//enqueue pending action data
             retryTimer -= frameRate;
             kickoffTimer -= frameRate;
             pingTimer -= frameRate;

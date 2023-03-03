@@ -20,14 +20,9 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        //skip
+        super.onRelay(messageHeader,messageBuffer);
     }
 
-
-    @Override
-    protected void onPendingAction(int frameRate){
-        //skip
-    }
 
     @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {

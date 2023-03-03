@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserChannel {
@@ -19,11 +18,9 @@ public class UserChannel {
     protected AtomicInteger sequence;
 
     protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
-    protected ConcurrentLinkedDeque<PendingActionMessage> pendingActionMessageQueue;
 
     private ArrayList<Integer> _offline;
     private ArrayList<String> _retried;
-    private ArrayList<PendingActionMessage> requeueList;
     private MessageBuffer.MessageHeader pingHeader;
 
 
@@ -32,11 +29,9 @@ public class UserChannel {
         this.messenger = messenger;
         this.userSessionIndex = new ConcurrentHashMap<>();
         this.pendingAckMessageIndex = new ConcurrentHashMap<>();
-        this.pendingActionMessageQueue = new ConcurrentLinkedDeque<>();
         this.sequence = new AtomicInteger(0);
         this._offline = new ArrayList<>();
         this._retried = new ArrayList<>();
-        this.requeueList = new ArrayList<>();
         this.pingHeader = new MessageBuffer.MessageHeader();
         this.pingHeader.commandId = Messenger.PING;
         this.pingHeader.channelId = channelId;
@@ -107,21 +102,6 @@ public class UserChannel {
         if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
         messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
-        int pendingTime = messageHeader.batchSize*Short.MAX_VALUE+messageHeader.batch;
-        if(pendingTime>0){
-            MessageBuffer.MessageHeader pendingHeader = messageHeader.copy();
-            pendingHeader.commandId += Messenger.ON_PENDING_ACTION;
-            messageBuffer.rewind();
-            messageBuffer.readHeader();
-            byte[] data = messageBuffer.readPayload();
-            messageBuffer.reset();
-            messageBuffer.writeHeader(pendingHeader);
-            messageBuffer.writePayload(data);
-            messageBuffer.rewind();
-            byte[] buffer = messenger.buffer();
-            int length = messageBuffer.toArray(buffer);
-            pendingActionMessageQueue.offer(new PendingActionMessage(buffer,length,pendingTime,messageHeader));
-        }
     }
     public final void onKickoff(){
         userSessionIndex.forEach((k,v)->{
@@ -176,33 +156,7 @@ public class UserChannel {
         userSessionIndex.remove(sessionId);
         this.onTimeout(channelId,sessionId);
     }
-    protected void onPendingAction(int frameRate){
-        requeueList.clear();
-        PendingActionMessage p;
-        do{
-            p = pendingActionMessageQueue.poll();
-            if(p!=null ){
-                p.pendingTime -= frameRate;
-                if(p.pendingTime>0) {
-                    requeueList.add(p);
-                }
-                else{
-                    byte[] data = p.buffer;
-                    int[] pendingAck ={0};
-                    userSessionIndex.forEach((k,v)->{
-                        messenger.queue(data,data.length,v.source);
-                        pendingAck[0]++;
-                    });
-                    if(p.messageHeader.ack && pendingAck[0]>0){
-                        PendingAckMessage pendingAckMessage = new PendingAckMessage(p.messageHeader.sessionId,data,p.length);
-                        pendingAckMessage.pendingAck = pendingAck[0];
-                        pendingAckMessageIndex.put(p.messageHeader.toString(),pendingAckMessage);
-                    }
-                }
-            }
-        }while (p != null);
-        requeueList.forEach(pr->pendingActionMessageQueue.offer(pr));
-    }
+
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,SocketAddress source){
         userSession.pendingAck(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAckList();
@@ -305,18 +259,4 @@ public class UserChannel {
             this.broadcasting = broadcasting;
         }
     }
-    protected class PendingActionMessage{
-        public byte[] buffer;
-        public int length;
-        public int pendingTime;
-        public MessageBuffer.MessageHeader messageHeader;
-
-        public PendingActionMessage(byte[] data,int length,int pendingTime, MessageBuffer.MessageHeader messageHeader){
-            this.buffer = data;
-            this.length = length;
-            this.pendingTime = pendingTime;
-            this.messageHeader = messageHeader;
-        }
-    }
-
 }

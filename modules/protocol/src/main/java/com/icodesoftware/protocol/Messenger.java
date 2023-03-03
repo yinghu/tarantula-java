@@ -17,8 +17,6 @@ public interface Messenger {
     short ON_LEAVE = 203;
     short ON_PUSH = 204;
 
-    //SERVER PENDING ACTION
-    short ON_PENDING_ACTION = 500;
 
     byte[] buffer();
     void buffer(byte[] buffer);
