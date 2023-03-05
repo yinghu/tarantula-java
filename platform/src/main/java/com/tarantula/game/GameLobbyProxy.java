@@ -51,7 +51,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         GameZone _zone = gameZone(rating);
         stub = _zone.join(session,rating);
         stubIndex.put(stub.key().asString(),stub);
-        this.context.log("Room->"+stub.roomId,OnLog.WARN);
+        //this.context.log("Room->"+stub.roomId,OnLog.WARN);
         return stub;
     }
 
