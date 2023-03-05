@@ -217,7 +217,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.roomStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,gameZone.oid());
         }
         else{
-            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
+            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
         }
         index.roomIndex = new IndexSet(gameZone.configurationTypeId());
         index.roomIndex.distributionKey(serviceContext.node().nodeId());
@@ -241,7 +241,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 index.roomStore.mapUnlock(roomId);
             }
             else{
-                index.pendingRooms.offer(k);
+                for(int i=0;i<gameZone.capacity();i++){
+                    index.pendingRooms.offer(k);
+                }
             }
         });
         if(rooms[0] < minRoomPoolSizePerZone){
@@ -258,7 +260,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                         index.roomStore.queueOffer(rkey);
                     }
                     else{
-                        index.pendingRooms.offer(gameRoom.roomId());
+                        for(int iz=0;iz<gameZone.capacity();iz++){
+                            index.pendingRooms.offer(gameRoom.roomId());
+                        }
                     }
                 }
             }

@@ -40,7 +40,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!started) return new Stub("lobby not started");
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
-        if(stub!=null&&stub.joined) {
+        if(stub !=null && stub.joined) {
             stub.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
             stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
             PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
@@ -51,6 +51,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         GameZone _zone = gameZone(rating);
         stub = _zone.join(session,rating);
         stubIndex.put(stub.key().asString(),stub);
+        this.context.log("Room->"+stub.roomId,OnLog.WARN);
         return stub;
     }
 
