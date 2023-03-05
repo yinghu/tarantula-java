@@ -73,10 +73,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public PlatformRoomServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.name = this.gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.typeLobby = this.gameCluster.lobbyType();//(String) this.gameCluster.property(GameCluster.GAME_LOBBY);
-        this.playMode = this.gameCluster.playMode();//(String) gameCluster.property(GameCluster.MODE);
-        this.dedicated = this.gameCluster.dedicated();//boolean)gameCluster.property(GameCluster.DEDICATED);
+        this.name = this.gameCluster.serviceType();
+        this.typeLobby = this.gameCluster.lobbyType();
+        this.playMode = this.gameCluster.playMode();
+        this.dedicated = this.gameCluster.dedicated();
     }
 
     @Override
@@ -116,6 +116,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
+
     @Override
     public void start() throws Exception {
         Collection<byte[]> cb = serverClusterStore.indexGet(typeLobby);
@@ -134,11 +135,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
     }
+
     public Channel registerChannel(Stub stub, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         UDPChannel channel = index.pendingChannels.poll();
         UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        if(channel==null){
+        if(channel == null){
             UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
             if(channels.length == 0) return null;
             for(int i=0;i<channels.length;i++){
@@ -163,6 +165,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         return dedicated?remoteJoin(rating,gameZone):localJoin(rating,index);
     }
+
     public void leave(Stub stub){
         if(dedicated){
             this.distributionRoomService.onLeaveRoom(name,stub.zoneId,stub.roomId,stub.systemId());
@@ -182,6 +185,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = gameRoom(gameZone,roomId);
         return gameRoom!=null?gameRoom.view():null;
     }
+
     public GameRoom onRoomJoined(String zoneId,String roomId, String systemId){
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(index,roomId);
@@ -190,6 +194,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             pendingRooms.offer(new RoomStatus(zoneId,roomId,room.full()?RoomStatus.FULL:RoomStatus.JOINED));
         });
     }
+
     public void onRoomLeft(String zoneId,String roomId,String systemId){
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         localLeave(systemId,index,roomId,(room,entry)->{
@@ -198,6 +203,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             pendingRooms.offer(new RoomStatus(zoneId,roomId,empty?RoomStatus.EMPTY:RoomStatus.LEFT));//reuse room id
         });
     }
+
     public void onRoomReset(String zoneId,String roomId){
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         GameRoom gameRoom = gameRoom(index,roomId);
@@ -241,9 +247,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 index.roomStore.mapUnlock(roomId);
             }
             else{
-                for(int i=0;i<gameZone.capacity();i++){
-                    index.pendingRooms.offer(k);
-                }
+                resetRoom(index,k);
             }
         });
         if(rooms[0] < minRoomPoolSizePerZone){
@@ -260,9 +264,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                         index.roomStore.queueOffer(rkey);
                     }
                     else{
-                        for(int iz=0;iz<gameZone.capacity();iz++){
-                            index.pendingRooms.offer(gameRoom.roomId());
-                        }
+                        resetRoom(index,gameRoom.roomId());
                     }
                 }
             }
@@ -351,11 +353,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         return true;
     }
+
     public void onStartConnection(Connection connection){
         ConnectionStub connectionStub = connectionIndex.get(connection.serverId());
         if(connectionStub==null) return;
         this.clusterProvider.deployService().onStartConnection(connection);
     }
+
     public void onDisConnection(Connection connection){
         this.clusterProvider.deployService().onReleaseConnection(connection);//clean node local cache
         serverClusterStore.mapRemove(connection.serverId().getBytes());
@@ -369,6 +373,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         connectionStub.started.set(true);
         pendingConnections.offer(connectionStub);
     }
+
     public void onConnectionVerified(String serverId){
         ConnectionStub connectionStub = connectionIndex.get(serverId);
         if(connectionStub==null) return;
@@ -505,6 +510,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
         return gameRoom;
     }
+
     private void localLeave(String systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
         GameRoom gameRoom = gameRoom(index,roomId);
         if(gameRoom==null) {
@@ -513,6 +519,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         gameRoom.leave(systemId,listener);
     }
+
     private GameRoom localJoin(Rating rating, GameZoneIndex index){
         String roomId = index.pendingRooms.poll();
         if(roomId==null && index.maxRoomPoolSize.decrementAndGet() < 0) return null;
@@ -544,6 +551,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
         room.setup(gameZone,channel,rating);
         return room;
+    }
+
+    private void resetRoom(GameZoneIndex index,String roomId){
+        for(int i=0; i<index.gameZone.capacity(); i++){
+            index.pendingRooms.offer(roomId);
+        }
     }
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
