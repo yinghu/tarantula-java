@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.protocol.UDPOperationSummary;
+import com.icodesoftware.protocol.UserSession;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
@@ -16,15 +17,14 @@ import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener{
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.RelayListener{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -182,7 +182,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0) return new UDPChannel[0];
 
         if(pushUserChannel == null) {
-            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider, this, this, this);
+            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider, this, this, this,this);
             this.activePushChannelIndex.put(pushUserChannel.channelId(),new ActivePushChannel());
             operationSummary.userChannelNumber.incrementAndGet();
         }
@@ -344,5 +344,11 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         }catch (Exception ex){
             throw new RuntimeException("udp provider ["+className+"] not existed");
         }
+    }
+
+    @Override
+    public void onMessage(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        UDPChannel channel = channels.get(messageHeader.sessionId);
+        channel.onRelay(sessions,messageHeader,messageBuffer);
     }
 }

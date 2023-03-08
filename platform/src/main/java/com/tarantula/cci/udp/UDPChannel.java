@@ -3,14 +3,12 @@ package com.tarantula.cci.udp;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.Messenger;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UserChannel;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.BatchUtil;
 import com.tarantula.game.Stub;
 
 import java.util.Base64;
+import java.util.Map;
 
 
 public class UDPChannel extends GameChannel {
@@ -18,6 +16,7 @@ public class UDPChannel extends GameChannel {
     private UserChannel userChannel;
 
     private UDPEndpointServiceProvider.RequestListener requestListener;
+    private UDPEndpointServiceProvider.RelayListener relayListener;
     private Session.TimeoutListener timeoutListener;
     private MessageBuffer messageBuffer;
 
@@ -30,11 +29,12 @@ public class UDPChannel extends GameChannel {
         this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
-    public void register(Stub session,UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
+    public void register(Stub session,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.RelayListener relayListener, Session.TimeoutListener timeoutListener){
         this.owner = session.systemId();
         this.routingNumber = session.stub();
         //this.sessionId = sessionId;
         this.requestListener = requestListener;
+        this.relayListener = relayListener;
         this.timeoutListener = timeoutListener;
     }
 
@@ -75,6 +75,10 @@ public class UDPChannel extends GameChannel {
             messageBuffer.flip();
             userChannel.queue(messageHeader.sessionId,messageBuffer);
         }
+    }
+
+    public void onRelay(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        relayListener.onMessage(sessions,messageHeader,messageBuffer);
     }
 
     @Override

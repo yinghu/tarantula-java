@@ -2,6 +2,8 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.service.EndPoint;
 
+import java.util.Map;
+
 public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     int GAME_SESSION_TIME_OUT = 10000; //10s
@@ -55,6 +57,10 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     interface RequestListener{
         byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+    }
+
+    interface RelayListener{
+        void onMessage(Map<Integer,UserSession> sessions,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
     }
 
     //ping game cluster from udp server

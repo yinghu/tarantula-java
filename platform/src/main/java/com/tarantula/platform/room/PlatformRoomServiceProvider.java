@@ -152,7 +152,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }
         }
-        channel.register(stub,requestListener,timeoutListener);
+        channel.register(stub,requestListener,(u,h,m)->{
+            u.forEach((i,s)->{
+                logger.warn(i+" Relay callback ->"+s.source+">>"+stub.systemId()+">>"+stub.roomId);
+            });
+        },timeoutListener);
         udp.registerChannel(channel);
         return channel;
     }

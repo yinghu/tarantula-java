@@ -36,9 +36,11 @@ public class UserChannel {
         this.pingHeader.commandId = Messenger.PING;
         this.pingHeader.channelId = channelId;
     }
+
     public int channelId(){
         return this.channelId;
     }
+
     public void channelId(int channelId){
         this.channelId = channelId;
     }
@@ -102,6 +104,7 @@ public class UserChannel {
         messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
     }
+
     public final void onKickoff(){
         userSessionIndex.forEach((k,v)->{
             if(!v.online()) _offline.add(k);
@@ -112,6 +115,7 @@ public class UserChannel {
         });
         _offline.clear();
     }
+
     public final void onRetry(){
         _retried.clear();
         pendingAckMessageIndex.forEach((k,v)->{
@@ -132,6 +136,7 @@ public class UserChannel {
             if(removed!=null) messenger.buffer(removed.buffer);
         });
     }
+
     protected void onPing(){
         long timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         MessageBuffer pingBuffer = messenger.messageBuffer();
@@ -145,6 +150,7 @@ public class UserChannel {
         });
         messenger.messageBuffer(pingBuffer);
     }
+
     public final void queue(int sessionId,MessageBuffer messageBuffer){
         UserSession userSession = userSessionIndex.get(sessionId);
         if(userSession==null) return;
@@ -169,6 +175,7 @@ public class UserChannel {
         messenger.queue(messageBuffer,source);
         messenger.messageBuffer(messageBuffer);
     }
+
     protected void onJoin(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         messageBuffer.reset();
         messageHeader.ack = true;
@@ -188,6 +195,7 @@ public class UserChannel {
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
+
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         userSessionIndex.remove(messageHeader.sessionId);
         this.onTimeout(channelId,messageHeader.sessionId);
@@ -208,6 +216,7 @@ public class UserChannel {
         });
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
+
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
@@ -229,15 +238,19 @@ public class UserChannel {
         pendingAckMessage.pendingAck = pendingAck[0];
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
+
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
 
     }
+
     protected boolean validate(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         return false;
     }
+
     protected void onTimeout(int channelId,int sessionId){
 
     }
+
     protected class PendingAckMessage{
         public int sessionId;
         public byte[] buffer;

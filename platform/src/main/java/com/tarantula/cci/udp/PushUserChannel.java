@@ -10,17 +10,19 @@ public class PushUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
+    private UDPEndpointServiceProvider.RelayListener relayListener;
 
-    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
+    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.RelayListener relayListener){
         super(channelId,messenger);
         this.requestListener = requestListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
+        this.relayListener = relayListener;
     }
 
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        super.onRelay(messageHeader,messageBuffer);
+        relayListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
     }
 
 
