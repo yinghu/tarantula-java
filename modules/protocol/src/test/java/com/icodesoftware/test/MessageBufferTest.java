@@ -13,7 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 
-public class MessageBufferTest {
+public class
+MessageBufferTest {
 
     @BeforeClass
     public void setUp() {
@@ -295,5 +296,7 @@ public class MessageBufferTest {
         Assert.assertEquals(messageBuffer.readInt(),2);
         Assert.assertEquals(messageBuffer.readUTF8(),"kills");
         Assert.assertEquals(messageBuffer.readFloat(),1.0f);
+
     }
+
 }

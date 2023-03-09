@@ -159,20 +159,24 @@ public class MessageBuffer {
         public short batch;
         public boolean broadcasting;
         public boolean encrypted;
+
         @Override
         public String toString(){
             return "H_"+channelId+"_"+sessionId+"_"+objectId+"_"+sequence;
         }
+
         @Override
         public boolean equals(Object obj){
             if(!(obj instanceof MessageHeader)) return false;
             MessageHeader messageHeader = (MessageHeader)obj;
             return messageHeader.channelId == channelId && messageHeader.sessionId == sessionId && messageHeader.objectId == objectId && messageHeader.sequence == sequence;
         }
+
         @Override
         public int hashCode(){
             return Arrays.hashCode(new int[]{channelId,sequence,objectId,sequence});
         }
+
         public MessageHeader copy(){
             MessageHeader copy = new MessageHeader();
             copy.ack = ack;

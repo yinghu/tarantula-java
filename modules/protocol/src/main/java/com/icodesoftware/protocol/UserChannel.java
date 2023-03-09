@@ -97,11 +97,11 @@ public class UserChannel {
             return;
         }
         if(messageHeader.commandId == Messenger.LEAVE){
+            if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
             onLeave(messageHeader,messageBuffer);
             return;
         }
         if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
-        messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
     }
 
