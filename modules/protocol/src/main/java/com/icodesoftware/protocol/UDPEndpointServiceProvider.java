@@ -59,7 +59,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
         byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
-    interface RelayListener{
+    interface PlayListener{
         void onMessage(Map<Integer,UserSession> sessions,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
     }
 

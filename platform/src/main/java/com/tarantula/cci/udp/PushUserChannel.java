@@ -10,21 +10,26 @@ public class PushUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
-    private UDPEndpointServiceProvider.RelayListener relayListener;
+    private UDPEndpointServiceProvider.PlayListener playListener;
 
-    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.RelayListener relayListener){
+    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.PlayListener playListener){
         super(channelId,messenger);
         this.requestListener = requestListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
-        this.relayListener = relayListener;
+        this.playListener = playListener;
     }
 
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        relayListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
+        super.onRelay(messageHeader,messageBuffer);
+        //playListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
     }
 
+    @Override
+    protected void onPlay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        playListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
+    }
 
     @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {

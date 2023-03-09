@@ -101,7 +101,13 @@ public class UserChannel {
             onLeave(messageHeader,messageBuffer);
             return;
         }
+        if(messageHeader.commandId == Messenger.PLAY){
+            if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
+            onPlay(messageHeader,messageBuffer);
+            return;
+        }
         if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
+        messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
     }
 
@@ -240,6 +246,10 @@ public class UserChannel {
     }
 
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+
+    }
+
+    protected void onPlay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
 
     }
 
