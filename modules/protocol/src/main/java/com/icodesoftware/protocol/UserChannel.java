@@ -101,13 +101,12 @@ public class UserChannel {
             onLeave(messageHeader,messageBuffer);
             return;
         }
-        if(messageHeader.commandId == Messenger.PLAY){
+        if(messageHeader.commandId == Messenger.ACTION){
             if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
-            onPlay(messageHeader,messageBuffer);
+            onAction(messageHeader,messageBuffer);
             return;
         }
         if(messageHeader.ack) onAck(userSession,messageHeader.copy(),source);
-        messageBuffer.rewind();
         onRelay(messageHeader,messageBuffer);
     }
 
@@ -223,13 +222,20 @@ public class UserChannel {
         pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
     }
 
+    //no ack relay message
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        //if(messageHeader.commandId == 1){
+            //System.out.println("x->"+messageBuffer.readFloat());
+            //System.out.println("y->"+messageBuffer.readFloat());
+            //System.out.println("z->"+messageBuffer.readFloat());
+        //}
+        messageBuffer.rewind();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
         int[] pendingAck ={0};
         userSessionIndex.forEach((sid,session)->{
             if(!messageHeader.broadcasting){
-                if(messageHeader.sessionId!=sid){
+                if(messageHeader.sessionId != sid){
                     messenger.queue(buffer,length,session.source);
                     pendingAck[0]++;
                 }
@@ -249,7 +255,7 @@ public class UserChannel {
 
     }
 
-    protected void onPlay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+    protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
 
     }
 

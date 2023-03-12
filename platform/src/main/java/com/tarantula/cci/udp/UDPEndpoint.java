@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.PlayListener{
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -349,6 +349,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public void onMessage(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         UDPChannel channel = channels.get(messageHeader.sessionId);
-        channel.onRelay(sessions,messageHeader,messageBuffer);
+        channel.onAction(sessions,messageHeader,messageBuffer);
     }
 }

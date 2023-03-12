@@ -10,9 +10,7 @@ public interface Messenger {
     short PING = 101;
     short REQUEST = 102;
     short LEAVE =103;
-
-    //short RELAY = 105;
-    short PLAY = 106;
+    short ACTION = 105;
 
     //SERVER PUSH NOTIFICATION
     short ON_JOIN  = 200;
@@ -20,8 +18,9 @@ public interface Messenger {
     short ON_LEAVE = 203;
     short ON_PUSH = 204;
 
-    //short ON_RELAY = 205;
-    short ON_PLAY = 206;
+    short ON_ACTION = 205;
+
+
 
 
     byte[] buffer();

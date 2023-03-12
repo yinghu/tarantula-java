@@ -16,7 +16,7 @@ public class UDPChannel extends GameChannel {
     private UserChannel userChannel;
 
     private UDPEndpointServiceProvider.RequestListener requestListener;
-    private UDPEndpointServiceProvider.PlayListener playListener;
+    private UDPEndpointServiceProvider.ActionListener actionListener;
     private Session.TimeoutListener timeoutListener;
     private MessageBuffer messageBuffer;
 
@@ -29,12 +29,12 @@ public class UDPChannel extends GameChannel {
         this.timeout = timeout;
         messageBuffer = new MessageBuffer();
     }
-    public void register(Stub session,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.PlayListener playListener, Session.TimeoutListener timeoutListener){
+    public void register(Stub session,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
         this.owner = session.systemId();
         this.routingNumber = session.stub();
         //this.sessionId = sessionId;
         this.requestListener = requestListener;
-        this.playListener = playListener;
+        this.actionListener = actionListener;
         this.timeoutListener = timeoutListener;
     }
 
@@ -77,8 +77,8 @@ public class UDPChannel extends GameChannel {
         }
     }
 
-    public void onRelay(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        playListener.onMessage(sessions,messageHeader,messageBuffer);
+    public void onAction(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        actionListener.onMessage(sessions,messageHeader,messageBuffer);
     }
 
     @Override

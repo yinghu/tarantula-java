@@ -10,14 +10,14 @@ public class PushUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.RequestListener requestListener;
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
-    private UDPEndpointServiceProvider.PlayListener playListener;
+    private UDPEndpointServiceProvider.ActionListener actionListener;
 
-    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.PlayListener playListener){
+    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.ActionListener actionListener){
         super(channelId,messenger);
         this.requestListener = requestListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
-        this.playListener = playListener;
+        this.actionListener = actionListener;
     }
 
     @Override
@@ -27,8 +27,8 @@ public class PushUserChannel extends UserChannel {
     }
 
     @Override
-    protected void onPlay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        playListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
+    protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        actionListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
     }
 
     @Override
