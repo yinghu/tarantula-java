@@ -77,8 +77,8 @@ public class UDPChannel extends GameChannel {
         }
     }
 
-    public void onAction(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        actionListener.onMessage(sessions,messageHeader,messageBuffer);
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.ActionCallback callback){
+        actionListener.onMessage(messageHeader,messageBuffer,callback);
     }
 
     @Override

@@ -23,12 +23,13 @@ public class PushUserChannel extends UserChannel {
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
         super.onRelay(messageHeader,messageBuffer);
-        //playListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
     }
 
     @Override
     protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        actionListener.onMessage(super.userSessionIndex,messageHeader,messageBuffer);
+        actionListener.onMessage(messageHeader,messageBuffer,(broadcasting,resp)->{
+
+        });
     }
 
     @Override
@@ -48,7 +49,7 @@ public class PushUserChannel extends UserChannel {
         UserSession userSession = userSessionIndex.get(messageHeader.sessionId);
         messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
         pendingAckMessage.pendingAck= 1;
-        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
+        pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
     }
 
     @Override

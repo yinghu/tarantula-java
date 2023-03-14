@@ -17,10 +17,10 @@ public class UserChannel {
     protected Messenger messenger;
     protected AtomicInteger sequence;
 
-    protected ConcurrentHashMap<String,PendingAckMessage> pendingAckMessageIndex;
+    protected ConcurrentHashMap<MessageBuffer.MessageHeader,PendingAckMessage> pendingAckMessageIndex;
 
     private ArrayList<Integer> _offline;
-    private ArrayList<String> _retried;
+    private ArrayList<MessageBuffer.MessageHeader> _retried;
     private MessageBuffer.MessageHeader pingHeader;
 
 
@@ -75,7 +75,7 @@ public class UserChannel {
         if(messageHeader.commandId == Messenger.ACK){
             //server clear on ack
             for(int i=0;i<MessageBuffer.PENDING_ACK_SIZE;i++){
-                String h = messageBuffer.readHeader().toString();
+                MessageBuffer.MessageHeader h = messageBuffer.readHeader();
                 PendingAckMessage pendingAckMessage = pendingAckMessageIndex.get(h);
                 if(pendingAckMessage == null) continue;
                 pendingAckMessage.pendingAck--;
@@ -198,7 +198,7 @@ public class UserChannel {
             messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
-        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
+        pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
     }
 
     protected void onLeave(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
@@ -219,16 +219,10 @@ public class UserChannel {
             messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,session.source);
             pendingAckMessage.pendingAck++;
         });
-        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
+        pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
     }
 
-    //no ack relay message
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        //if(messageHeader.commandId == 1){
-            //System.out.println("x->"+messageBuffer.readFloat());
-            //System.out.println("y->"+messageBuffer.readFloat());
-            //System.out.println("z->"+messageBuffer.readFloat());
-        //}
         messageBuffer.rewind();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
@@ -248,7 +242,7 @@ public class UserChannel {
         if(!messageHeader.ack||pendingAck[0]==0) return;
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         pendingAckMessage.pendingAck = pendingAck[0];
-        pendingAckMessageIndex.put(messageHeader.toString(),pendingAckMessage);
+        pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
     }
 
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){

@@ -60,11 +60,15 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     }
 
     interface ActionListener{
-        void onMessage(Map<Integer,UserSession> sessions,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
+        void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer,ActionCallback callback);
     }
 
     //ping game cluster from udp server
     interface PingListener{
         void onPing();
+    }
+
+    interface ActionCallback{
+        void onAction(boolean broadcasting,byte[] response);
     }
 }

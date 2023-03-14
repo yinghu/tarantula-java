@@ -1,10 +1,7 @@
 package com.tarantula.cci.udp;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UDPOperationSummary;
-import com.icodesoftware.protocol.UserSession;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
@@ -347,8 +344,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void onMessage(Map<Integer, UserSession> sessions, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.ActionCallback callback) {
         UDPChannel channel = channels.get(messageHeader.sessionId);
-        channel.onAction(sessions,messageHeader,messageBuffer);
+        channel.onAction(messageHeader,messageBuffer,callback);
     }
 }
