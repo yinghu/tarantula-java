@@ -344,7 +344,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.ActionCallback callback) {
+    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
     }

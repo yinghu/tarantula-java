@@ -155,7 +155,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         channel.register(stub,requestListener,(h,m,c)->{
                 GameRoom room = gameRoomIndex.get(stub.roomId);
                 //logger.warn(i+" Action callback->"+s.source+">>"+stub.systemId()+">>"+room.distributionKey());
-                c.onAction(true,"".getBytes());
+                c.onAction(h,m);
                 logger.warn("header->"+h);
                 logger.warn("x->"+m.readShort());
                 logger.warn("y->"+m.readFloat());

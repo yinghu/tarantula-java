@@ -77,7 +77,7 @@ public class UDPChannel extends GameChannel {
         }
     }
 
-    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.ActionCallback callback){
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
         actionListener.onMessage(messageHeader,messageBuffer,callback);
     }
 
