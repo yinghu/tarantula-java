@@ -14,14 +14,13 @@ import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener{
+public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -347,5 +346,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
+    }
+
+    public MessageBuffer decrypt(MessageBuffer messageBuffer){
+
+        return messageBuffer;
+    }
+    public MessageBuffer encrypt(MessageBuffer messageBuffer){
+        return messageBuffer;
     }
 }

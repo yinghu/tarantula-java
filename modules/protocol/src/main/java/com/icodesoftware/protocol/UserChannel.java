@@ -239,7 +239,7 @@ public class UserChannel {
                 pendingAck[0]++;
             }
         });
-        if(!messageHeader.ack||pendingAck[0]==0) return;
+        if(!messageHeader.ack || pendingAck[0]==0) return;
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length);
         pendingAckMessage.pendingAck = pendingAck[0];
         pendingAckMessageIndex.put(messageHeader,pendingAckMessage);

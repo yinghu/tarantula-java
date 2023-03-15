@@ -2,8 +2,6 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.service.EndPoint;
 
-import java.util.Map;
-
 public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     int GAME_SESSION_TIME_OUT = 10000; //10s
@@ -70,5 +68,10 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     interface RelayListener{
         void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+    }
+
+    interface CipherListener{
+        MessageBuffer decrypt(MessageBuffer messageBuffer);
+        MessageBuffer encrypt(MessageBuffer messageBuffer);
     }
 }

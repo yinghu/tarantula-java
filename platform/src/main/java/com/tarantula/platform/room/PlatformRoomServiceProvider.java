@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
+import com.icodesoftware.protocol.MessageBuffer;
+import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
 
@@ -153,14 +155,22 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         }
         channel.register(stub,requestListener,(h,m,c)->{
-                GameRoom room = gameRoomIndex.get(stub.roomId);
+                //GameRoom room = gameRoomIndex.get(stub.roomId);
                 //logger.warn(i+" Action callback->"+s.source+">>"+stub.systemId()+">>"+room.distributionKey());
+                //logger.warn("header->"+h);
+                //logger.warn("cmd->"+h.commandId());
+                //logger.warn("x->"+m.readShort());
+                //logger.warn("y->"+m.readFloat());
+                //logger.warn("z->"+m.readUTF8());
+
+                h.commandId = Messenger.ON_ACTION;
+                m.reset();
+                m.writeHeader(h);
+                m.writeShort((short)10);
+                m.writeFloat(100);
+                m.writeUTF8("running");
                 c.onAction(h,m);
-                logger.warn("header->"+h);
-                logger.warn("x->"+m.readShort());
-                logger.warn("y->"+m.readFloat());
-                logger.warn("z->"+m.readUTF8());
-                },timeoutListener);
+        },timeoutListener);
         udp.registerChannel(channel);
         return channel;
     }

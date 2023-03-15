@@ -28,7 +28,7 @@ public class PushUserChannel extends UserChannel {
     @Override
     protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
         actionListener.onMessage(messageHeader,messageBuffer,(h,m)->{
-            //onRelay(h,m);
+            this.onRelay(h,m);
         });
     }
 
