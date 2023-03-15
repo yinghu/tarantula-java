@@ -222,7 +222,10 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         this.userChannelIndex.put(userChannel.channelId(),userChannel);
         this.operationSummary.userChannelNumber.incrementAndGet();
     }
-    
+
+    public void registerCipherListener(CipherListener cipherListener){
+
+    }
     public UserChannel releaseUserChannel(int channelId){
         this.operationSummary.userChannelNumber.decrementAndGet();
         return this.userChannelIndex.remove(channelId);

@@ -35,6 +35,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     UserChannel releaseUserChannel(int channelId);
 
     void registerPingListener(PingListener pingListener);
+    void registerCipherListener(CipherListener cipherListener);
 
     //single outbound message sent out
     boolean onOutboundMessage();

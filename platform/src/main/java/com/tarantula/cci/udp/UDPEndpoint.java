@@ -349,10 +349,41 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     public MessageBuffer decrypt(MessageBuffer messageBuffer){
-
-        return messageBuffer;
+        MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
+        if(!messageHeader.encrypted) return messageBuffer;
+        try{
+            Cipher cipher = CipherUtil.decrypt(key);
+            byte[] buffer = udpEndpointServiceProvider.buffer();
+            int length = messageBuffer.readPayload(buffer);
+            byte[] plain = cipher.doFinal(buffer,0,length);
+            udpEndpointServiceProvider.buffer(buffer);
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(plain);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            return messageBuffer;
+        }catch (Exception ex){
+            throw new RuntimeException("Invalid payload");
+        }
     }
     public MessageBuffer encrypt(MessageBuffer messageBuffer){
-        return messageBuffer;
+        MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
+        if(!messageHeader.encrypted) return messageBuffer;
+        try{
+            Cipher cipher = CipherUtil.encrypt(key);
+            byte[] buffer = udpEndpointServiceProvider.buffer();
+            int length = messageBuffer.readPayload(buffer);
+            byte[] encrypt = cipher.doFinal(buffer,0,length);
+            udpEndpointServiceProvider.buffer(buffer);
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(encrypt);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            return messageBuffer;
+        }catch (Exception ex){
+            throw new RuntimeException("Invalid payload");
+        }
     }
 }
