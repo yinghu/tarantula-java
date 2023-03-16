@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-final public class UDPEndpointService implements UDPEndpointServiceProvider {
+final public class UDPEndpointService implements UDPEndpointServiceProvider, UDPEndpointServiceProvider.CipherListener {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UDPEndpointService.class);
     private static int BUFFER_SIZE = MessageBuffer.SIZE;
@@ -44,6 +44,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     private int receiverTimeout = UDP_RECEIVE_TIME_OUT;
 
     private PingListener pingListener  = ()->{};
+    private CipherListener cipherListener;
 
     private boolean running = true;
 
@@ -224,7 +225,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
     }
 
     public void registerCipherListener(CipherListener cipherListener){
-
+        this.cipherListener = cipherListener;
     }
     public UserChannel releaseUserChannel(int channelId){
         this.operationSummary.userChannelNumber.decrementAndGet();
@@ -283,5 +284,15 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider {
         }catch (Exception ex){
             log.error("unexpected error on send",ex);
         }
+    }
+
+    @Override
+    public MessageBuffer decrypt(MessageBuffer messageBuffer) {
+        return cipherListener!=null? cipherListener.decrypt(messageBuffer) : messageBuffer;
+    }
+
+    @Override
+    public MessageBuffer encrypt(MessageBuffer messageBuffer) {
+        return cipherListener!=null? cipherListener.encrypt(messageBuffer) : messageBuffer;
     }
 }
