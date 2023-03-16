@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 
-public class
-MessageBufferTest {
+public class MessageBufferTest {
 
     @BeforeClass
     public void setUp() {

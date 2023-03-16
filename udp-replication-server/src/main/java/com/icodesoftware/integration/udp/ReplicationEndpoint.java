@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener {
+public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.CipherListener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
 
@@ -224,7 +224,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             activeChannelIndex.put(channelId, activeChannel);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this, this,this));
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this,this, this,this));
             return true;
         }catch (Exception ex){
             logger.error("error on create channel",ex);
@@ -242,5 +242,15 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //logger.warn("on request");
         return gameModule.onMessage(messageHeader,messageBuffer);
+    }
+
+    @Override
+    public boolean decrypt(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        return false;
+    }
+
+    @Override
+    public boolean encrypt(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        return false;
     }
 }

@@ -20,6 +20,7 @@ public class RequestStatisticsCommand extends GameServiceProxyHeader {
 
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        //messageHeader.encrypted = true;
         Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(stub.systemId());
         return statistics.toJson().toString().getBytes();
     }

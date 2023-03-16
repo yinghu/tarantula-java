@@ -8,9 +8,11 @@ public class GameUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
     private UDPEndpointServiceProvider.RequestListener requestListener;
+    private UDPEndpointServiceProvider.CipherListener cipherListener;
 
-    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
+    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
         super(channelId,messenger);
+        this.cipherListener = cipherListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
         this.requestListener = requestListener;

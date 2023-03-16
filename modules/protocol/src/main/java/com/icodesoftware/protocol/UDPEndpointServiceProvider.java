@@ -72,7 +72,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     }
 
     interface CipherListener{
-        MessageBuffer decrypt(MessageBuffer messageBuffer);
-        MessageBuffer encrypt(MessageBuffer messageBuffer);
+        boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+        boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 }

@@ -11,9 +11,11 @@ public class PushUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
     private UDPEndpointServiceProvider.ActionListener actionListener;
+    private UDPEndpointServiceProvider.CipherListener cipherListener;
 
-    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.ActionListener actionListener){
+    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.ActionListener actionListener){
         super(channelId,messenger);
+        this.cipherListener = cipherListener;
         this.requestListener = requestListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
@@ -22,6 +24,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        if(messageHeader.encrypted && !cipherListener.encrypt(messageHeader,messageBuffer)) return;
         super.onRelay(messageHeader,messageBuffer);
     }
 
@@ -34,15 +37,18 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        messageBuffer.reset();
         messageHeader.ack = true;
-        messageHeader.encrypted = false;
+        messageHeader.encrypted = true;
         messageHeader.commandId = Messenger.ON_JOIN;
         messageHeader.sequence = sequence.incrementAndGet();
+        messageBuffer.reset();
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(messageHeader.sessionId);
         messageBuffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         messageBuffer.flip();
+        messageBuffer.readHeader();
+        if(!cipherListener.encrypt(messageHeader,messageBuffer)) return;
+        messageBuffer.rewind();
         byte[] buffer = messenger.buffer();
         int length = messageBuffer.toArray(buffer);
         PendingAckMessage pendingAckMessage = new PendingAckMessage(messageHeader.sessionId,buffer,length,false);

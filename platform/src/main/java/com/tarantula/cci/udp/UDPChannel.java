@@ -8,7 +8,6 @@ import com.icodesoftware.util.BatchUtil;
 import com.tarantula.game.Stub;
 
 import java.util.Base64;
-import java.util.Map;
 
 
 public class UDPChannel extends GameChannel {

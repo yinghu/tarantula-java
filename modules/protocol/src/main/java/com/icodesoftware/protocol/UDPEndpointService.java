@@ -84,6 +84,10 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
                             messageBuffer.reset(packet.getData(),0,packet.getLength());
                             messageBuffer.flip();
                             MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
+                            if(messageHeader.encrypted && !this.cipherListener.decrypt(messageHeader,messageBuffer)){
+                                pendingBufferQueue.offer(packet.getData());
+                                throw new RuntimeException("invalid message");
+                            }
                             UserChannel userChannel = userChannelIndex.get(messageHeader.channelId);
                             if(userChannel!=null){
                                 userChannel.onMessage(messageHeader,messageBuffer,packet.getSocketAddress());
@@ -287,12 +291,12 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
     }
 
     @Override
-    public MessageBuffer decrypt(MessageBuffer messageBuffer) {
-        return cipherListener!=null? cipherListener.decrypt(messageBuffer) : messageBuffer;
+    public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        return cipherListener!=null? cipherListener.decrypt(messageHeader,messageBuffer) : false;
     }
 
     @Override
-    public MessageBuffer encrypt(MessageBuffer messageBuffer) {
-        return cipherListener!=null? cipherListener.encrypt(messageBuffer) : messageBuffer;
+    public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        return cipherListener!=null? cipherListener.encrypt(messageHeader,messageBuffer) : false;
     }
 }

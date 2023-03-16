@@ -103,6 +103,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         udpEndpointServiceProvider.retryInterval(((Number)cfg.property("retryInterval")).intValue());
         udpEndpointServiceProvider.pingListenerInterval(((Number)cfg.property("pingListenerInterval")).intValue());
         udpEndpointServiceProvider.pingClientInterval(((Number)cfg.property("pingClientInterval")).intValue());
+        udpEndpointServiceProvider.registerCipherListener(this);
         receiverDaemon = new Thread(()->{
             while (running){
                 try {
@@ -178,7 +179,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0) return new UDPChannel[0];
 
         if(pushUserChannel == null) {
-            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider, this, this, this,this);
+            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider,this, this, this, this,this);
             this.activePushChannelIndex.put(pushUserChannel.channelId(),new ActivePushChannel());
             operationSummary.userChannelNumber.incrementAndGet();
         }
@@ -214,17 +215,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     @Override
     public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         try{
-            if(!messageHeader.encrypted) return false;
-            Cipher cipher = CipherUtil.decrypt(key);
-            byte[] buffer = udpEndpointServiceProvider.buffer();
-            int length = messageBuffer.readPayload(buffer);
-            byte[] plain = cipher.doFinal(buffer,0,length);
-            udpEndpointServiceProvider.buffer(buffer);
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(plain);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
             int sessionId = messageBuffer.readInt();
             String token = messageBuffer.readUTF8();
             String ticket = messageBuffer.readUTF8();
@@ -241,7 +231,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //logger.warn("Message header->"+messageHeader.toString());
+        //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
             if(v==null) v = new PacketTrack(packetTimeout);
             v.count++;
@@ -251,28 +241,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             return null;
         }
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
-        if(messageHeader.encrypted){
-            try{
-                Cipher cipher = CipherUtil.decrypt(key);
-                byte[] buffer = udpEndpointServiceProvider.buffer();
-                int length = messageBuffer.readPayload(buffer);
-                byte[] plain = cipher.doFinal(buffer,0,length);
-                udpEndpointServiceProvider.buffer(buffer);
-                messageBuffer.reset();
-                messageBuffer.writeHeader(messageHeader);
-                messageBuffer.writePayload(plain);
-                messageBuffer.flip();
-                messageBuffer.readHeader();
-                udpChannel.onMessage(messageHeader,messageBuffer);
-                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
-            }catch (Exception ex){
-                logger.error("error on message",ex);
-            }
-        }
-        else{
-            udpChannel.onMessage(messageHeader,messageBuffer);
-            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
-        }
+        udpChannel.onMessage(messageHeader,messageBuffer);
+        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
         return null;
     }
 
@@ -344,13 +314,12 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
 
     @Override
     public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+        logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
     }
 
-    public MessageBuffer decrypt(MessageBuffer messageBuffer){
-        MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
-        if(!messageHeader.encrypted) return messageBuffer;
+    public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         try{
             Cipher cipher = CipherUtil.decrypt(key);
             byte[] buffer = udpEndpointServiceProvider.buffer();
@@ -362,14 +331,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             messageBuffer.writePayload(plain);
             messageBuffer.flip();
             messageBuffer.readHeader();
-            return messageBuffer;
+            return true;
         }catch (Exception ex){
-            throw new RuntimeException("Invalid payload");
+            logger.error("invalid message",ex);
+            return false;
         }
     }
-    public MessageBuffer encrypt(MessageBuffer messageBuffer){
-        MessageBuffer.MessageHeader messageHeader = messageBuffer.readHeader();
-        if(!messageHeader.encrypted) return messageBuffer;
+    public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         try{
             Cipher cipher = CipherUtil.encrypt(key);
             byte[] buffer = udpEndpointServiceProvider.buffer();
@@ -381,9 +349,10 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             messageBuffer.writePayload(encrypt);
             messageBuffer.flip();
             messageBuffer.readHeader();
-            return messageBuffer;
+            return true;
         }catch (Exception ex){
-            throw new RuntimeException("Invalid payload");
+            logger.error("invalid message",ex);
+            return false;
         }
     }
 }
