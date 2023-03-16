@@ -42,4 +42,8 @@ public class CipherUtil {
     public static byte[] fromBase64Key(String base64Key){
         return Base64.getDecoder().decode(base64Key);
     }
+
+    public static int cipherSize(int plainSize){
+        return DeploymentServiceProvider.KEY_SIZE - (plainSize % DeploymentServiceProvider.KEY_SIZE);
+    }
 }
