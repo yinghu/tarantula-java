@@ -5,10 +5,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
-import com.tarantula.platform.ScheduleRunner;
-import com.tarantula.platform.event.ServerPushEvent;
 
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformMessagingServiceProvider implements ServiceProvider {
 
@@ -18,12 +15,10 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     private String topic;
     private ServiceContext serviceContext;
     private TarantulaLogger logger;
-    private ConcurrentHashMap<Recoverable.Key,Channel> channelMap;
 
 
     public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
-        this.channelMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -46,30 +41,14 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         this.serviceContext = serviceContext;
         this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
         topic = this.gameServiceProvider.registerEventListener(NAME,e->{
-            this.channelMap.forEach((k,c)->send(c,(ServerPushEvent)e));
             return true;
         });
     }
 
-    public void registerChannel(Session session,Channel gameChannel){
-        //logger.warn("register game channel->"+session.key().asString()+">>>"+gameChannel.sessionId());
-        channelMap.put(session.key(),gameChannel);
-        this.serviceContext.schedule(new ScheduleRunner(3000,()-> {
-            Statistics statistics = this.gameServiceProvider.presenceServiceProvider().statistics(session.systemId());
-            this.serviceContext.postOffice().onTopic(topic).send(NAME,messageHeader(),statistics.toJson().toString().getBytes());
-        }));
+    public void publish(byte[] message){
+        this.serviceContext.postOffice().onTopic(topic).send(NAME,messageHeader(),message);
     }
 
-
-    public void unregisterGameChannel(Session session){
-        //logger.warn("unregister game channel->"+session.key().asString());
-        channelMap.remove(session.key());
-    }
-
-
-    private void send(Channel channel, ServerPushEvent serverPushEvent){
-        channel.write(serverPushEvent.messageHeader(),serverPushEvent.payload());
-    }
     private MessageBuffer.MessageHeader messageHeader(){
         MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
         header.objectId = MESSAGE_OBJECT_ID;
