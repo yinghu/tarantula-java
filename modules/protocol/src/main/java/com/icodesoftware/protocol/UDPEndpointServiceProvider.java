@@ -47,7 +47,8 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     void onTimer(int frameRate);
 
     interface SessionListener{
-        void onTimeout(int channelId,int sessionId);
+        void onLeft(int channelId,int sessionId);
+        void onJoined(int channelId,int sessionId);
     }
 
     interface UserSessionValidator {

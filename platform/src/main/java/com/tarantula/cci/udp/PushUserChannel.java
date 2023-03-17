@@ -56,12 +56,13 @@ public class PushUserChannel extends UserChannel {
         messenger.queue(pendingAckMessage.buffer,pendingAckMessage.length,userSession.source);
         pendingAckMessage.pendingAck= 1;
         pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
+        this.sessionListener.onJoined(messageHeader.channelId,messageHeader.sessionId);
     }
 
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         userSessionIndex.remove(messageHeader.sessionId);
-        sessionListener.onTimeout(channelId(),messageHeader.sessionId);
+        sessionListener.onLeft(channelId(),messageHeader.sessionId);
     }
 
     @Override
@@ -76,8 +77,9 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onTimeout(int channelId,int sessionId){
-        this.sessionListener.onTimeout(channelId,sessionId);
+        this.sessionListener.onLeft(channelId,sessionId);
     }
+
     @Override
     protected void onPing(){
         //super.onPing();

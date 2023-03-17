@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserSession {
+
     public final int sessionId;
     public SocketAddress source;
 
@@ -29,18 +30,22 @@ public class UserSession {
     public boolean onJoin(){
         return onJoined.getAndSet(false);
     }
+
     public void onPing(){
         sequence.incrementAndGet();
     }
+
     public boolean online(){
         int seq = sequence.get();
         if(lastSequence == seq) return false;
         lastSequence = seq;
         return true;
     }
+
     public void pendingAck(MessageBuffer.MessageHeader ack){
         pendingAckBuffer.push(ack);
     }
+
     public List<MessageBuffer.MessageHeader> pendingAckList(){
         return pendingAckBuffer.list(new ArrayList<>(MessageBuffer.PENDING_ACK_SIZE));
     }

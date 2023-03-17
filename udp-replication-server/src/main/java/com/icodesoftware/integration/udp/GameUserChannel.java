@@ -40,7 +40,7 @@ public class GameUserChannel extends UserChannel {
 
     @Override
     protected void onTimeout(int channelId,int sessionId){
-        this.sessionListener.onTimeout(channelId,sessionId);
+        this.sessionListener.onLeft(channelId,sessionId);
     }
 
     @Override

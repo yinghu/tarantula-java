@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,ChannelListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -153,7 +153,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }
         }
-        channel.register(stub,requestListener,(h,m,c)->{
+        channel.register(stub,this,requestListener,(h,m,c)->{
                 //GameRoom room = gameRoomIndex.get(stub.roomId);
                 //logger.warn(i+" Action callback->"+s.source+">>"+stub.systemId()+">>"+room.distributionKey());
                 //logger.warn("header->"+h);
@@ -583,4 +583,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
+
+    @Override
+    public void onJoined(Channel channel) {
+        logger.warn("channel joined->"+channel.owner());
+    }
+
+    @Override
+    public void onLeft(Channel channel) {
+        logger.warn("channel left->"+channel.owner());
+    }
 }

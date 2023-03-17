@@ -201,7 +201,8 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void onTimeout(int channelId, int sessionId) {
+    public void onLeft(int channelId, int sessionId) {
+        //logger.warn("Session left->"+sessionId+">>"+channelId);
         ActivePushChannel activePushChannel = activePushChannelIndex.get(channelId);
         if(activePushChannel.totalLeft.decrementAndGet()==0){
             PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
@@ -210,6 +211,13 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         UDPChannel removed = channels.remove(sessionId);
         if(removed == null) return;
         removed.kickoff();
+    }
+
+    @Override
+    public void onJoined(int channelId, int sessionId){
+        //logger.warn("Session joined->"+sessionId+">>"+channelId);
+        UDPChannel joined = channels.get(sessionId);
+        joined.joined();
     }
 
     @Override
@@ -293,7 +301,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             });
             pendingJoinKickoff.forEach(c->{
                 if(pendingJoins.remove(c.sessionId())!=null){
-                    onTimeout(c.channelId(),c.sessionId());
+                    onLeft(c.channelId(),c.sessionId());
                 }
             });
         }

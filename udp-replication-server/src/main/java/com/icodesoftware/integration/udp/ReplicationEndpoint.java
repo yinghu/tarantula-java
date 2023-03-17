@@ -161,7 +161,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
 
 
     @Override
-    public void onTimeout(int channelId, int sessionId) {
+    public void onLeft(int channelId, int sessionId) {
         ActiveGameChannel activeChannel = activeChannelIndex.get(channelId);
         int totalLeft = activeChannel.totalLeft.decrementAndGet();
         logger.warn("Session timeout->"+channelId+">>"+sessionId);
@@ -173,6 +173,11 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
                logger.warn("channel created");
             }
         }
+    }
+
+    @Override
+    public void onJoined(int channelId, int sessionId){
+
     }
 
     @Override
