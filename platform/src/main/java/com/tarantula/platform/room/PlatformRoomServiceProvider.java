@@ -171,7 +171,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 m.writeUTF8("running");
                 m.flip();
                 m.readHeader();
-                c.onAction(h,m);
+                c.onRelay(h,m);
         },timeoutListener);
         udp.registerChannel(channel);
         return channel;

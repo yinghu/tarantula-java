@@ -185,7 +185,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         }
         UDPChannel[] channels = new UDPChannel[capacity];
         for(int i=0;i<capacity;i++){
-            UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout());
+            UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout(),this);
             channels[i] = channel;
         }
         operationSummary.userSessionNumber.addAndGet(capacity);
@@ -230,7 +230,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
             if(v==null) v = new PacketTrack(packetTimeout);
@@ -241,7 +241,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             return null;
         }
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
-        udpChannel.onMessage(messageHeader,messageBuffer);
+        udpChannel.onRequest(messageHeader,messageBuffer);
         metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
         return null;
     }
@@ -313,7 +313,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
     }
 
     @Override
-    public void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
@@ -343,6 +343,7 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
             byte[] buffer = udpEndpointServiceProvider.buffer();
             int length = messageBuffer.readPayload(buffer);
             byte[] encrypt = cipher.doFinal(buffer,0,length);
+            if(encrypt.length > MessageBuffer.PAYLOAD_SIZE) throw new RuntimeException("over sized payload ["+encrypt.length+"]");
             udpEndpointServiceProvider.buffer(buffer);
             messageBuffer.reset();
             messageBuffer.writeHeader(messageHeader);

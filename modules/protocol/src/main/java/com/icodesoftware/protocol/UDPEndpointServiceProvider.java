@@ -55,11 +55,11 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     }
 
     interface RequestListener{
-        byte[] onMessage(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+        byte[] onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
     interface ActionListener{
-        void onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer,RelayListener callback);
+        void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer,RelayListener callback);
     }
 
     //ping game cluster from udp server
@@ -68,7 +68,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     }
 
     interface RelayListener{
-        void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+        void onRelay(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 
     interface CipherListener{

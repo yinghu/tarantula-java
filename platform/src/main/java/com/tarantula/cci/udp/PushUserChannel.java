@@ -30,7 +30,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
-        actionListener.onMessage(messageHeader,messageBuffer,(h,m)->{
+        actionListener.onAction(messageHeader,messageBuffer,(h,m)->{
             this.onRelay(h,m);
         });
     }
@@ -66,7 +66,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        requestListener.onMessage(messageHeader,messageBuffer);
+        requestListener.onRequest(messageHeader,messageBuffer);
     }
 
     @Override

@@ -33,7 +33,7 @@ public class BlackjackModule implements Module, UDPEndpointServiceProvider.Reque
     }
 
     @Override
-    public byte[] onMessage(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         System.out.println("blackjack request");
         return null;
     }
