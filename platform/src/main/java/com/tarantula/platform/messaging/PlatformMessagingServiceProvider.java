@@ -1,19 +1,20 @@
 package com.tarantula.platform.messaging;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.GameServiceProvider;
 
-
 public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     public static final String NAME = "messaging";
-    private static final int MESSAGE_OBJECT_ID = 0;
+
     private final GameServiceProvider gameServiceProvider;
+
     private String topic;
+
     private ServiceContext serviceContext;
+
     private TarantulaLogger logger;
 
 
@@ -45,14 +46,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
         });
     }
 
-    public void publish(byte[] message){
-        this.serviceContext.postOffice().onTopic(topic).send(NAME,messageHeader(),message);
-    }
-
-    private MessageBuffer.MessageHeader messageHeader(){
-        MessageBuffer.MessageHeader header = new MessageBuffer.MessageHeader();
-        header.objectId = MESSAGE_OBJECT_ID;
-        header.sequence = 1;
-        return header;
+    public void publish(Session.Header header,byte[] message){
+        this.serviceContext.postOffice().onTopic(topic).send(NAME,header,message);
     }
 }
