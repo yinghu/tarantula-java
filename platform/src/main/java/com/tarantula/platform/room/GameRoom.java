@@ -2,13 +2,14 @@ package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 
 import java.util.List;
 
-public interface GameRoom extends Resettable,Configurable,Portable {
+public interface GameRoom extends Resettable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener {
 
     String LABEL = "ZGR";
 
@@ -37,6 +38,7 @@ public interface GameRoom extends Resettable,Configurable,Portable {
     boolean full();
     boolean started();
 
+    void setup(Channel channel, UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener);
 
 
     interface Entry extends Resettable,Configurable, Portable {

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
+import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.protocol.Messenger;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
@@ -37,6 +38,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
+    private final GameServiceProvider gameServiceProvider;
 
     private ServiceContext serviceContext;
     private ClusterProvider clusterProvider;
@@ -73,6 +75,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private boolean started;
 
     public PlatformRoomServiceProvider(GameServiceProvider gameServiceProvider){
+        this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
         this.name = this.gameCluster.serviceType();
         this.typeLobby = this.gameCluster.lobbyType();
@@ -137,7 +140,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
     }
 
-    public Channel registerChannel(Stub stub, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){
+    public Channel registerChannel(Stub stub,Session.TimeoutListener timeoutListener){
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         UDPChannel channel = index.pendingChannels.poll();
         UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
@@ -153,8 +156,27 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }
         }
+        GameRoom room = gameRoomIndex.get(stub.roomId);
+        room.setup(channel,(h,m)->{
+            short cmd = m.readShort();
+            GameServiceProxy messageListener = gameServiceProvider.serviceProxy(cmd);
+            return messageListener.onService(stub,h,m);
+        },(h,m,c)->{
+            h.ack = true;
+            h.encrypted = true;
+            h.commandId = Messenger.ON_ACTION;
+            m.reset();
+            m.writeHeader(h);
+            m.writeShort((short)10);
+            m.writeFloat(100);
+            m.writeUTF8("running");
+            m.flip();
+            m.readHeader();
+            c.onRelay(h,m);
+        });
+        channel.register(stub,this,room,room,timeoutListener);
+        /**
         channel.register(stub,this,requestListener,(h,m,c)->{
-                //GameRoom room = gameRoomIndex.get(stub.roomId);
                 //logger.warn(i+" Action callback->"+s.source+">>"+stub.systemId()+">>"+room.distributionKey());
                 //logger.warn("header->"+h);
                 //logger.warn("enc->"+h.encrypted);
@@ -173,6 +195,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 m.readHeader();
                 c.onRelay(h,m);
         },timeoutListener);
+         **/
         udp.registerChannel(channel);
         return channel;
     }
@@ -549,6 +572,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(!room.full()) index.pendingRooms.offer(roomId);
         });
         joined.setup(index.gameZone,null,rating);
+
         return joined;
     }
 

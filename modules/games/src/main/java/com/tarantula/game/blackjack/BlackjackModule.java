@@ -5,7 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 
-public class BlackjackModule implements Module, UDPEndpointServiceProvider.RequestListener {
+public class BlackjackModule implements Module, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener {
 
     private ApplicationContext context;
 
@@ -13,7 +13,6 @@ public class BlackjackModule implements Module, UDPEndpointServiceProvider.Reque
     public void onJoin(Session session) throws Exception{
         //session.write(ret,this.label());
     }
-
 
 
     @Override
@@ -24,7 +23,7 @@ public class BlackjackModule implements Module, UDPEndpointServiceProvider.Reque
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        this.context.log("Item service started", OnLog.INFO);
+        this.context.log("Blackjack service started", OnLog.INFO);
     }
 
     @Override
@@ -36,5 +35,10 @@ public class BlackjackModule implements Module, UDPEndpointServiceProvider.Reque
     public byte[] onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         System.out.println("blackjack request");
         return null;
+    }
+
+    @Override
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+
     }
 }
