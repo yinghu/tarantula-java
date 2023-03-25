@@ -312,13 +312,6 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         return this.sessionTimeout;
     }
 
-    private UDPEndpointServiceProvider createInstance(String className){
-        try{
-            return (UDPEndpointServiceProvider) Class.forName(className).getConstructor().newInstance();
-        }catch (Exception ex){
-            throw new RuntimeException("udp provider ["+className+"] not existed");
-        }
-    }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
@@ -362,6 +355,14 @@ public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.Sessio
         }catch (Exception ex){
             logger.error("invalid message",ex);
             return false;
+        }
+    }
+
+    private UDPEndpointServiceProvider createInstance(String className){
+        try{
+            return (UDPEndpointServiceProvider) Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException("udp provider ["+className+"] not existed");
         }
     }
 }
