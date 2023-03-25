@@ -6,13 +6,13 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class CommitTournamentScoreCommand extends GameServiceProxyHeader {
 
 
-    public CommitTournamentScoreCommand(short serviceId,boolean exported,GameServiceProvider gameServiceProvider){
-        super(serviceId,exported,gameServiceProvider);
+    public CommitTournamentScoreCommand(short serviceId,GameServiceProvider gameServiceProvider){
+        super(serviceId,gameServiceProvider);
     }
 
    @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        if(!application.tournamentEnabled() || stub.tournamentId()==null) return null;
+        if(!tournamentEnabled || stub.tournamentId()==null) return null;
         this.gameServiceProvider.tournamentServiceProvider().score(stub.tournamentId(),stub.trackId(),stub.systemId(),200,messageBuffer.readDouble());
         return null;
     }

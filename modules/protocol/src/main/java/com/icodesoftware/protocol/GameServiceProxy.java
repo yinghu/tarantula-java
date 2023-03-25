@@ -1,13 +1,10 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.Initializer;
 import com.icodesoftware.Session;
 
-public interface GameServiceProxy extends Initializer {
+public interface GameServiceProxy{
 
     short serviceId();
-
-    boolean exported();
 
     //from http endpoint
     byte[] onService(Session session, byte[] payload);

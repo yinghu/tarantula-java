@@ -1,11 +1,6 @@
 package com.tarantula.game;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.GameServiceProxy;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.service.*;
@@ -16,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobbyProxy extends RecoverableObject implements GameLobby,Configurable.Listener<LobbyItem>{
 
-    private static final String CONFIG = "game-service-proxy-settings";
 
     private ConcurrentHashMap<String,Stub> stubIndex;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
@@ -26,13 +20,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     private boolean started;
 
-    private ConcurrentHashMap<Short, GameServiceProxy> serviceProxies;
-
 
     public GameLobbyProxy(){
         this.stubIndex = new ConcurrentHashMap<>();
         this.zoneIndex = new ConcurrentHashMap<>();
-        this.serviceProxies =  new ConcurrentHashMap<>();
     }
 
     @Override
@@ -83,18 +74,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
-        DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        Configuration config = deploymentServiceProvider.configuration(CONFIG);
-        JsonArray proxies = ((JsonElement)config.property("proxies")).getAsJsonArray();
-        proxies.forEach((proxy->{
-            JsonObject cc = proxy.getAsJsonObject();
-            short serviceId = cc.get("serviceId").getAsShort();
-            String className = cc.get("className").getAsString();
-            boolean exported = cc.get("export").getAsBoolean();
-            GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className,exported,this.gameServiceProvider);
-            serviceProxies.put(serviceId,serviceProxy);
-            if(exported) gameServiceProvider.exportServiceProxy(serviceProxy);
-        }));
         this.application = applicationContext.descriptor();
     }
 
@@ -201,20 +180,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
                     }
                 }
             }
-        }
-    }
-
-    public GameServiceProxy gameServiceProxy(short serviceId){
-        return serviceProxies.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
-    }
-    private GameServiceProxy toGameServiceProxy(short serviceId,String className,boolean exported,GameServiceProvider gameServiceProvider){
-        try {
-            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,boolean.class,GameServiceProvider.class).newInstance(serviceId,exported,gameServiceProvider);
-            serviceMessageListener.setup(this.context);
-            return serviceMessageListener;
-        }catch (Exception ex){
-            this.context.log("Service Proxy ["+className+"] Without Implementation",OnLog.WARN);
-            return ErrorCommand.ERROR_COMMAND;
         }
     }
 }

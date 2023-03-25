@@ -2,12 +2,8 @@ package com.tarantula.game.service;
 
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.GameServiceProxy;
-import com.icodesoftware.protocol.MessageBuffer;
 import com.tarantula.game.GameLobby;
 import com.tarantula.game.GameZone;
-import com.tarantula.game.Stub;
-
 
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
@@ -32,10 +28,5 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
     }
 
-    public byte[] onService(Stub stub,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        short cmd = messageBuffer.readShort();
-        GameServiceProxy messageListener = gameLobby.gameServiceProxy(cmd);
-        return messageListener.onService(stub,messageHeader,messageBuffer);
-    }
 
 }

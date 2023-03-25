@@ -7,8 +7,8 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class CommitAchievementCommand extends GameServiceProxyHeader {
 
 
-    public CommitAchievementCommand(short serviceId,boolean exported,GameServiceProvider gameServiceProvider){
-        super(serviceId,exported,gameServiceProvider);
+    public CommitAchievementCommand(short serviceId,GameServiceProvider gameServiceProvider){
+        super(serviceId,gameServiceProvider);
     }
 
     @Override

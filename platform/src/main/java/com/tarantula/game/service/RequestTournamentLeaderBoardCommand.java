@@ -9,13 +9,13 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class RequestTournamentLeaderBoardCommand extends GameServiceProxyHeader {
 
 
-    public RequestTournamentLeaderBoardCommand(short serviceId,boolean exported,GameServiceProvider gameServiceProvider){
-        super(serviceId,exported,gameServiceProvider);
+    public RequestTournamentLeaderBoardCommand(short serviceId,GameServiceProvider gameServiceProvider){
+        super(serviceId,gameServiceProvider);
     }
 
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        if(!application.tournamentEnabled() || stub.tournamentId()==null) return null;
+        if(!tournamentEnabled || stub.tournamentId()==null) return null;
         Tournament.RaceBoard board = gameServiceProvider.tournamentServiceProvider().list(stub.tournamentId(),stub.trackId());
         return board.toJson().toString().getBytes();
     }

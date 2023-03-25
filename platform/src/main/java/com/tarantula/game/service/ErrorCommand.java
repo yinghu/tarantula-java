@@ -5,10 +5,10 @@ package com.tarantula.game.service;
 public class ErrorCommand extends GameServiceProxyHeader {
 
 
-    public final static ErrorCommand ERROR_COMMAND = new ErrorCommand((short) 0,true);
+    public final static ErrorCommand ERROR_COMMAND = new ErrorCommand((short) 0);
 
-    public ErrorCommand(short serviceId,boolean exported){
-        super(serviceId,exported,null);
+    public ErrorCommand(short serviceId){
+        super(serviceId,null);
     }
 
 }

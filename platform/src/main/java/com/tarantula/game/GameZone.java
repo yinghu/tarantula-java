@@ -37,7 +37,5 @@ public interface GameZone extends Configurable{
         boolean leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
         void close();
-
-        byte[] onService(Stub stub,MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
     }
 }

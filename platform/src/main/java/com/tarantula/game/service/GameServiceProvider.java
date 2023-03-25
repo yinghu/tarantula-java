@@ -1,6 +1,8 @@
 package com.tarantula.game.service;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameServiceProxy;
@@ -28,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GameServiceProvider implements ServiceProvider,MetricsListener,ItemDistributionCallback{
+
+    private static final String CONFIG = "game-service-proxy-settings";
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -96,6 +100,15 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
             p.setup(serviceContext);
             p.waitForData();
         });
+        Configuration config = serviceContext.configuration(CONFIG);
+        JsonArray proxies = ((JsonElement)config.property("proxies")).getAsJsonArray();
+        proxies.forEach((proxy->{
+            JsonObject cc = proxy.getAsJsonObject();
+            short serviceId = cc.get("serviceId").getAsShort();
+            String className = cc.get("className").getAsString();
+            GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className);
+            serviceExported.put(serviceId,serviceProxy);
+        }));
         this.metrics = new GameClusterMetrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.metrics.setup(serviceContext);
         serviceContext.registerMetrics(metrics);
@@ -216,10 +229,6 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return moduleExported.getOrDefault(module, ErrorModule.ERROR_MODULE);
     }
 
-    public void exportServiceProxy(GameServiceProxy proxy){
-        serviceExported.putIfAbsent(proxy.serviceId(),proxy);
-    }
-
     public GameServiceProxy serviceProxy(short serviceId){
         return serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
     }
@@ -274,12 +283,25 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     public boolean onItemReleased(String category, String itemId) {
         return false;
     }
+
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener== null) return;
         this.metricsListener = metricsListener;
     }
+
     public String registerEventListener(String trackId,EventListener eventListener){
         eventListeners.putIfAbsent(trackId,eventListener);
         return this.gameCluster.typeId();
+    }
+
+    private GameServiceProxy toGameServiceProxy(short serviceId,String className){
+        try {
+            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,GameServiceProvider.class).newInstance(serviceId,this);
+            //serviceMessageListener.setup(this.context);
+            return serviceMessageListener;
+        }catch (Exception ex){
+            this.logger.warn("Service Proxy ["+className+"] Without Implementation");
+            return ErrorCommand.ERROR_COMMAND;
+        }
     }
 }
