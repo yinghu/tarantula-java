@@ -6,7 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 
 
@@ -48,11 +48,11 @@ public class ItemClusterService implements ManagedService, RemoteService {
     }
 
     public boolean onRegister(String gameServiceName,String serviceName, String category,String itemId){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
+        PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
         return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemRegistered(category,itemId);
     }
     public boolean onRelease(String gameServiceName,String serviceName, String category,String itemId){
-        GameServiceProvider gameServiceProvider = (GameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
+        PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
         return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemReleased(category,itemId);
     }
 }

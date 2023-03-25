@@ -3,7 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.ScheduleRunner;
@@ -66,7 +66,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ClusterProvider.ClusterStore scheduleStore;
 
-    public PlatformTournamentServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformTournamentServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = this.gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();

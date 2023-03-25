@@ -3,13 +3,13 @@ package com.tarantula.platform.messaging;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 
 public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     public static final String NAME = "messaging";
 
-    private final GameServiceProvider gameServiceProvider;
+    private final PlatformGameServiceProvider gameServiceProvider;
 
     private String topic;
 
@@ -18,7 +18,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     private TarantulaLogger logger;
 
 
-    public PlatformMessagingServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformMessagingServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
     }
 

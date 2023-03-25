@@ -7,7 +7,7 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.Properties;
@@ -49,35 +49,35 @@ public class TournamentClusterService implements ManagedService, RemoteService {
 
 
     public Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         Tournament.Instance _ins = tsp.tournamentServiceProvider().onTournamentEntered(tournamentId,instanceId,systemId);
         return _ins;
     }
     public Tournament.Entry score(String serviceName, String tournamentId,String instanceId, String systemId,double credit,double delta){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentScored(tournamentId,instanceId,systemId,credit,delta);
     }
     public Tournament.RaceBoard list(String serviceName,String tournamentId,String instanceId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentListed(tournamentId,instanceId);
     }
     public void finish(String serviceName,String tournamentId, String instanceId, String systemId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         tsp.tournamentServiceProvider().onTournamentFinished(tournamentId,instanceId,systemId);
     }
 
     public void syncTournament(String serviceName,String tournamentId,String instanceId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         tsp.tournamentServiceProvider().onTournamentSynced(tournamentId,instanceId);
     }
 
     public void closeTournament(String serviceName,String tournamentId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         tsp.tournamentServiceProvider().onTournamentClosed(tournamentId);
     }
 
     public void endTournament(String serviceName,String tournamentId){
-        GameServiceProvider tsp = (GameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         tsp.tournamentServiceProvider().onTournamentEnded(tournamentId);
     }
 }

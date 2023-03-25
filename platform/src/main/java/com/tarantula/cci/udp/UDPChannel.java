@@ -20,6 +20,7 @@ public class UDPChannel extends GameChannel {
     private ChannelListener channelListener;
     private UDPEndpointServiceProvider.CipherListener cipherListener;
     private MessageBuffer messageBuffer;
+    private Session stub;
 
 
     public UDPChannel(Connection connection, UserChannel userChannel, byte[] serverKey, int timeout, UDPEndpointServiceProvider.CipherListener cipherListener){
@@ -33,6 +34,7 @@ public class UDPChannel extends GameChannel {
     }
 
     public void register(Stub session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
+        this.stub = session;
         this.owner = session.systemId();
         this.routingNumber = session.stub();
         this.channelListener = channelListener;
@@ -74,7 +76,7 @@ public class UDPChannel extends GameChannel {
 
     //udp request call
     public void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        byte[] ret = this.requestListener.onRequest(messageHeader,messageBuffer);
+        byte[] ret = this.requestListener.onRequest(stub,messageHeader,messageBuffer);
         if(ret==null) return;
         boolean encrypted = messageHeader.encrypted;
         int batchSize = encrypted? MessageBuffer.PAYLOAD_SIZE- CipherUtil.cipherSize(ret.length) : MessageBuffer.PAYLOAD_SIZE;

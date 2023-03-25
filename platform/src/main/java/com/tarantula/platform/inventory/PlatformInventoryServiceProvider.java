@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
@@ -29,7 +29,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
 
-    public PlatformInventoryServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformInventoryServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
     }

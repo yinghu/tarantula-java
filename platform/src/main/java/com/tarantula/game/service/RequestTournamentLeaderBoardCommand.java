@@ -9,7 +9,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class RequestTournamentLeaderBoardCommand extends GameServiceProxyHeader {
 
 
-    public RequestTournamentLeaderBoardCommand(short serviceId,GameServiceProvider gameServiceProvider){
+    public RequestTournamentLeaderBoardCommand(short serviceId, PlatformGameServiceProvider gameServiceProvider){
         super(serviceId,gameServiceProvider);
     }
 

@@ -3,7 +3,7 @@ package com.tarantula.platform.achievement;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
@@ -28,7 +28,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Achievement> achievements;
 
-    public PlatformAchievementServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();

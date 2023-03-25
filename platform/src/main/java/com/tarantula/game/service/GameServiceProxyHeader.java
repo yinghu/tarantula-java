@@ -8,12 +8,12 @@ import com.icodesoftware.util.JsonUtil;
 
 public class GameServiceProxyHeader implements GameServiceProxy {
 
-    protected final GameServiceProvider gameServiceProvider;
+    protected final PlatformGameServiceProvider gameServiceProvider;
     protected final boolean tournamentEnabled;
 
     private final short serviceId;
 
-    public GameServiceProxyHeader(short serviceId,GameServiceProvider gameServiceProvider){
+    public GameServiceProxyHeader(short serviceId, PlatformGameServiceProvider gameServiceProvider){
         this.serviceId = serviceId;
         this.gameServiceProvider = gameServiceProvider;
         this.tournamentEnabled = this.gameServiceProvider!=null? this.gameServiceProvider.gameCluster().tournamentEnabled() : false;

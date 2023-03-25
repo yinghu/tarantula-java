@@ -4,14 +4,14 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
 
 public class TournamentModule implements Module , Tournament.Listener,Configurable.Listener {
     private ApplicationContext context;
     private TournamentServiceProvider tournamentServiceProvider;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){

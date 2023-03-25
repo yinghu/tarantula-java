@@ -6,19 +6,19 @@ import com.icodesoftware.OnLog;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 
 
 public class GameServiceProxyModule implements Module {
 
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         String[] query = session.action().split("#");
         if(query[0].equals("onService")){
-            GameServiceProxy proxy = this.gameServiceProvider.serviceProxy(Short.parseShort(query[1]));
+            GameServiceProxy proxy = this.gameServiceProvider.gameServiceProxy(Short.parseShort(query[1]));
             byte[] resp = proxy.onService(session,payload);
             session.write(resp!=null?resp:JsonUtil.toSimpleResponse(true,"").getBytes());
         }

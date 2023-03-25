@@ -7,7 +7,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -15,7 +15,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 public class GameLobbyModule implements Module{
 
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private GameLobbyProxy gameLobby;
     private GsonBuilder builder;
     private Descriptor application;

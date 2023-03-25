@@ -3,7 +3,7 @@ package com.tarantula.platform.inbox;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -26,7 +26,7 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     private ApplicationPreSetup applicationPreSetup;
     private ConcurrentHashMap<String,Configurable.Listener<Achievement>> rListeners = new ConcurrentHashMap<>();
 
-    public PlatformInboxServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformInboxServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();

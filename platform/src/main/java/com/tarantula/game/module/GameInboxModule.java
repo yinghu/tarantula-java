@@ -2,13 +2,13 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inbox.Inbox;
 
 
 public class GameInboxModule implements Module{
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {

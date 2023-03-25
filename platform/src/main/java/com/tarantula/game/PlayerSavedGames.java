@@ -2,14 +2,14 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
 
 import java.util.List;
 
 public class PlayerSavedGames{
 
-    public GameServiceProvider gameServiceProvider;
+    public PlatformGameServiceProvider gameServiceProvider;
     public String systemId;
     public String deviceId;
     public List<SavedGame> savedGames;

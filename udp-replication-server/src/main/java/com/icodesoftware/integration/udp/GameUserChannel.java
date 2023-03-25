@@ -1,5 +1,6 @@
 package com.icodesoftware.integration.udp;
 
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.BatchUtil;
 
@@ -49,8 +50,8 @@ public class GameUserChannel extends UserChannel {
     }
 
     @Override
-    protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        byte[] response = requestListener.onRequest(messageHeader,messageBuffer);
+    protected void onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
+        byte[] response = requestListener.onRequest(null,messageHeader,messageBuffer);
         if(response==null) return;
         BatchUtil.Batch batch = BatchUtil.batch(response.length,MessageBuffer.PAYLOAD_SIZE);
         for(BatchUtil.Offset offset : batch.offsets){

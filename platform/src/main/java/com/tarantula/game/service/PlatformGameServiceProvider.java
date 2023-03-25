@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
@@ -29,7 +30,7 @@ import com.tarantula.platform.tournament.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class GameServiceProvider implements ServiceProvider,MetricsListener,ItemDistributionCallback{
+public class PlatformGameServiceProvider implements GameServiceProvider,MetricsListener,ItemDistributionCallback{
 
     private static final String CONFIG = "game-service-proxy-settings";
 
@@ -51,7 +52,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
     private ConcurrentHashMap<String, Module> moduleExported;
     private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
 
-    public GameServiceProvider(GameCluster gameCluster){
+    public PlatformGameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
@@ -75,13 +76,13 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.logger = serviceContext.logger(GameServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformGameServiceProvider.class);
         gameCluster.setup(serviceContext);
         this.configuration = serviceContext.configuration("game-cluster-settings");
         JsonElement sp = (JsonElement)this.configuration.property("systemServiceProviders");
         sp.getAsJsonArray().forEach((e)->{
             try{
-                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
+                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(PlatformGameServiceProvider.class).newInstance(this);
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
             }catch (Exception nex){
                 throw new RuntimeException(nex);
@@ -90,7 +91,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         JsonElement gp = (JsonElement)this.configuration.property("gameServiceProviders");
         gp.getAsJsonArray().forEach((e)->{
             try{
-                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(GameServiceProvider.class).newInstance(this);
+                ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(PlatformGameServiceProvider.class).newInstance(this);
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
             }catch (Exception nex){
                 throw new RuntimeException(nex);
@@ -229,7 +230,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
         return moduleExported.getOrDefault(module, ErrorModule.ERROR_MODULE);
     }
 
-    public GameServiceProxy serviceProxy(short serviceId){
+    public GameServiceProxy gameServiceProxy(short serviceId){
         return serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
     }
 
@@ -296,7 +297,7 @@ public class GameServiceProvider implements ServiceProvider,MetricsListener,Item
 
     private GameServiceProxy toGameServiceProxy(short serviceId,String className){
         try {
-            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class,GameServiceProvider.class).newInstance(serviceId,this);
+            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class, PlatformGameServiceProvider.class).newInstance(serviceId,this);
             //serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){

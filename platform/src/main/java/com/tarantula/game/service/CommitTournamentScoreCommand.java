@@ -6,7 +6,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class CommitTournamentScoreCommand extends GameServiceProxyHeader {
 
 
-    public CommitTournamentScoreCommand(short serviceId,GameServiceProvider gameServiceProvider){
+    public CommitTournamentScoreCommand(short serviceId, PlatformGameServiceProvider gameServiceProvider){
         super(serviceId,gameServiceProvider);
     }
 

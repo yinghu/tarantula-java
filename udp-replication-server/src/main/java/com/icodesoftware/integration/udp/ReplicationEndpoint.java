@@ -244,9 +244,9 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     }
 
     @Override
-    public byte[] onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+    public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //logger.warn("on request");
-        return gameModule.onRequest(messageHeader,messageBuffer);
+        return gameModule.onRequest(null,messageHeader,messageBuffer);
     }
 
     @Override

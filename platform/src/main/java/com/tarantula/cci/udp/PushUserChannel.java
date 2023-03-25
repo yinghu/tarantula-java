@@ -67,7 +67,7 @@ public class PushUserChannel extends UserChannel {
 
     @Override
     protected void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        requestListener.onRequest(messageHeader,messageBuffer);
+        requestListener.onRequest(null,messageHeader,messageBuffer);
     }
 
     @Override

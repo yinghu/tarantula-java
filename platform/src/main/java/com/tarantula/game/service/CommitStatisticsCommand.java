@@ -8,7 +8,7 @@ import com.icodesoftware.protocol.MessageBuffer;
 public class CommitStatisticsCommand extends GameServiceProxyHeader {
 
 
-    public CommitStatisticsCommand(short serviceId,GameServiceProvider gameServiceProvider){
+    public CommitStatisticsCommand(short serviceId, PlatformGameServiceProvider gameServiceProvider){
         super(serviceId,gameServiceProvider);
     }
 

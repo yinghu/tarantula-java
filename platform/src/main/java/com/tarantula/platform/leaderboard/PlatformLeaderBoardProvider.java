@@ -6,7 +6,7 @@ import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.event.ServerPushEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,10 +24,10 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     private ServiceContext serviceContext;
     private GsonBuilder gsonBuilder;
 
-    private final GameServiceProvider gameServiceProvider;
+    private final PlatformGameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
-    public PlatformLeaderBoardProvider(GameServiceProvider gameServiceProvider){
+    public PlatformLeaderBoardProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
     }
     public LeaderBoardSync leaderBoard(String category){

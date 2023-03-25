@@ -3,14 +3,14 @@ package com.tarantula.game.module;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
 
 public class InventoryModule implements Module {
 
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
 
 
     @Override

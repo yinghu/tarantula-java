@@ -8,7 +8,7 @@ import com.tarantula.game.GameZone;
 abstract public class RoomProxyHeader implements GameZone.RoomProxy {
 
     protected ApplicationContext context;
-    protected GameServiceProvider gameServiceProvider;
+    protected PlatformGameServiceProvider gameServiceProvider;
     protected Descriptor application;
     protected GameLobby gameLobby;
     protected GameZone gameZone;

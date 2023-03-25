@@ -4,9 +4,8 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.AccessControl;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
@@ -19,7 +18,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     private ApplicationContext context;
     private PlatformStoreServiceProvider storeServiceProvider;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
     private String serviceTypeId;
     @Override

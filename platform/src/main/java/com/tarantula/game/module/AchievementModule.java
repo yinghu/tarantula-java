@@ -3,7 +3,7 @@ package com.tarantula.game.module;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.achievement.ItemAchievementContext;
@@ -28,7 +28,7 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
-        GameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.achievementServiceProvider = gameServiceProvider.achievementServiceProvider();
         this.achievementServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);

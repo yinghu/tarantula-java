@@ -6,7 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -36,7 +36,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
 
-    public PlatformConfigurationServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.typeId = gameCluster.typeId();

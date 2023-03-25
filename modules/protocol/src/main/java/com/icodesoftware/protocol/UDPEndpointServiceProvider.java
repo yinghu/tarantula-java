@@ -1,5 +1,6 @@
 package com.icodesoftware.protocol;
 
+import com.icodesoftware.Session;
 import com.icodesoftware.service.EndPoint;
 
 public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
@@ -56,7 +57,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     }
 
     interface RequestListener{
-        byte[] onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer);
+        byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer);
     }
 
     interface ActionListener{

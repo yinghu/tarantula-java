@@ -19,7 +19,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.cci.udp.UDPEndpoint;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
@@ -322,7 +322,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public synchronized void setGameServiceProvider(GameCluster gameCluster){
         try{
-            GameServiceProvider gameServiceProvider = new GameServiceProvider(gameCluster);
+            PlatformGameServiceProvider gameServiceProvider = new PlatformGameServiceProvider(gameCluster);
             gameCluster.dataStore(masterDataStore());
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.registerMetricsListener(metrics(Metrics.SYSTEM));

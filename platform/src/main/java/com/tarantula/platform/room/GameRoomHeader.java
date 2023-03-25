@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
@@ -36,7 +37,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected HashMap<String,Entry> joinIndex;
     protected Entry[] entries;
 
-    private UDPEndpointServiceProvider.RequestListener requestListener =(a,b)->{ return null;};
+    private UDPEndpointServiceProvider.RequestListener requestListener =(s,a,b)->{ return null;};
     private UDPEndpointServiceProvider.ActionListener actionListener = (a,b,c)->{};
 
     public int channelId(){
@@ -262,8 +263,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"]";
     }
 
-    public byte[] onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        return requestListener.onRequest(messageHeader,messageBuffer);
+    public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
+        return requestListener.onRequest(session,messageHeader,messageBuffer);
     }
 
 

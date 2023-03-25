@@ -7,7 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -32,7 +32,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
 
-    public PlatformLobbyServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformLobbyServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();
         this.gameTypeId = gameCluster.typeId();

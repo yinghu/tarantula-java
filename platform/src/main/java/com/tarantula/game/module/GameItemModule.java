@@ -2,7 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.game.ItemContext;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameItemModule implements Module,Configurable.Listener<ConfigurableObject>{
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private ConcurrentHashMap<String,ConfigurableObject> itemList;
 
     @Override

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class RequestLeaderBoardCommand extends GameServiceProxyHeader {
 
 
-    public RequestLeaderBoardCommand(short serviceId,GameServiceProvider gameServiceProvider){
+    public RequestLeaderBoardCommand(short serviceId, PlatformGameServiceProvider gameServiceProvider){
         super(serviceId,gameServiceProvider);
     }
 

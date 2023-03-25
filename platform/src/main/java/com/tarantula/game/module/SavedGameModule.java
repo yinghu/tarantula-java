@@ -6,7 +6,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 
 public class SavedGameModule implements Module {
     private ApplicationContext context;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {

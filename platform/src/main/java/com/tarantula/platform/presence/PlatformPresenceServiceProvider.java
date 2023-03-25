@@ -6,7 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Rating;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
@@ -45,9 +45,9 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private PlatformInventoryServiceProvider inventoryServiceProvider;
     private DistributionItemService distributionItemService;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
 
-    public PlatformPresenceServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);

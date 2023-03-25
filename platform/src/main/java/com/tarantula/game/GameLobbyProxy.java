@@ -14,7 +14,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     private ConcurrentHashMap<String,Stub> stubIndex;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private ApplicationContext context;
     private Descriptor application;
 

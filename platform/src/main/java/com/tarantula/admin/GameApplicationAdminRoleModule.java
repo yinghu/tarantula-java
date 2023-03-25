@@ -4,7 +4,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -43,7 +43,7 @@ public class GameApplicationAdminRoleModule implements Module {
 
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
             app.distributionKey(query[1]);
@@ -60,7 +60,7 @@ public class GameApplicationAdminRoleModule implements Module {
         else if (session.action().equals("onRelease")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            GameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
             Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);

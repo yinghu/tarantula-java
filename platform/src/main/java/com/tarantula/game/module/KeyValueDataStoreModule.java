@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MappingObject;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 
@@ -13,7 +13,7 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
 
     private ApplicationContext context;
     private DataStore dataStore;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private int maxSizeOnSet;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {

@@ -7,7 +7,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
@@ -24,7 +24,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
 
     private ApplicationContext context;
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
-    private GameServiceProvider gameServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
     private String lobbyId;
     private int maxRank;

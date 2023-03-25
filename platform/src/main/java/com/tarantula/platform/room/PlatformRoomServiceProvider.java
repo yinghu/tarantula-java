@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.protocol.GameServiceProxy;
-import com.icodesoftware.protocol.Messenger;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.*;
 
 import com.tarantula.cci.udp.UDPChannel;
@@ -14,7 +12,8 @@ import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
-import com.tarantula.game.service.GameServiceProvider;
+import com.tarantula.game.blackjack.BlackjackModule;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnAccessTrack;
@@ -38,7 +37,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
-    private final GameServiceProvider gameServiceProvider;
+    private final PlatformGameServiceProvider gameServiceProvider;
 
     private ServiceContext serviceContext;
     private ClusterProvider clusterProvider;
@@ -74,7 +73,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private SchedulingTask schedulingTask;
     private boolean started;
 
-    public PlatformRoomServiceProvider(GameServiceProvider gameServiceProvider){
+    public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
         this.name = this.gameCluster.serviceType();
@@ -157,45 +156,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         }
         GameRoom room = gameRoomIndex.get(stub.roomId);
-        room.setup(channel,(h,m)->{
-            short cmd = m.readShort();
-            GameServiceProxy messageListener = gameServiceProvider.serviceProxy(cmd);
-            return messageListener.onService(stub,h,m);
-        },(h,m,c)->{
-            h.ack = true;
-            h.encrypted = true;
-            h.commandId = Messenger.ON_ACTION;
-            m.reset();
-            m.writeHeader(h);
-            m.writeShort((short)10);
-            m.writeFloat(100);
-            m.writeUTF8("running");
-            m.flip();
-            m.readHeader();
-            c.onRelay(h,m);
-        });
+        BlackjackModule module = new BlackjackModule();
+        module.setup(gameServiceProvider);
+        room.setup(channel,module,module);
         channel.register(stub,this,room,room,timeoutListener);
-        /**
-        channel.register(stub,this,requestListener,(h,m,c)->{
-                //logger.warn(i+" Action callback->"+s.source+">>"+stub.systemId()+">>"+room.distributionKey());
-                //logger.warn("header->"+h);
-                //logger.warn("enc->"+h.encrypted);
-                //logger.warn("x->"+m.readShort());
-                //logger.warn("y->"+m.readFloat());
-                //logger.warn("z->"+m.readUTF8());
-                h.ack = true;
-                h.encrypted = true;
-                h.commandId = Messenger.ON_ACTION;
-                m.reset();
-                m.writeHeader(h);
-                m.writeShort((short)10);
-                m.writeFloat(100);
-                m.writeUTF8("running");
-                m.flip();
-                m.readHeader();
-                c.onRelay(h,m);
-        },timeoutListener);
-         **/
         udp.registerChannel(channel);
         return channel;
     }
