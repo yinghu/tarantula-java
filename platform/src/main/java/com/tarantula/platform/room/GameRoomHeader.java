@@ -8,6 +8,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
+import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
@@ -37,9 +38,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected HashMap<String,Entry> joinIndex;
     protected Entry[] entries;
 
-    private UDPEndpointServiceProvider.RequestListener requestListener =(s,a,b)->{ return null;};
-    private UDPEndpointServiceProvider.ActionListener actionListener = (a,b,c)->{};
-
+    private GameModule gameModule;
     public int channelId(){
         return channelId;
     }
@@ -253,10 +252,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return new GameEntry();
     }
 
-    public void setup(Channel channel, UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener){
-        if(requestListener==null && actionListener == null) return;
-        this.requestListener = requestListener;
-        this.actionListener  = actionListener;
+    public void setup(Channel channel, GameModule gameModule){
+        this.gameModule = gameModule;
     }
     @Override
     public String toString(){
@@ -264,11 +261,21 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        return requestListener.onRequest(session,messageHeader,messageBuffer);
+        return gameModule.onRequest(session,messageHeader,messageBuffer);
     }
 
 
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
-        actionListener.onAction(messageHeader,messageBuffer,callback);
+        gameModule.onAction(messageHeader,messageBuffer,callback);
+    }
+
+    @Override
+    public void onJoined(Channel channel) {
+        System.out.println("channel joined->"+channel.owner());
+    }
+
+    @Override
+    public void onLeft(Channel channel) {
+        System.out.println("channel left->"+channel.owner());
     }
 }

@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
-import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 
 import com.tarantula.cci.udp.UDPChannel;
@@ -25,7 +24,7 @@ import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,ChannelListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -158,8 +157,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom room = gameRoomIndex.get(stub.roomId);
         BlackjackModule module = new BlackjackModule();
         module.setup(gameServiceProvider);
-        room.setup(channel,module,module);
-        channel.register(stub,this,room,room,timeoutListener);
+        room.setup(channel,module);
+        channel.register(stub,room,room,room,timeoutListener);
         udp.registerChannel(channel);
         return channel;
     }
@@ -572,13 +571,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
 
-    @Override
-    public void onJoined(Channel channel) {
-        logger.warn("channel joined->"+channel.owner());
-    }
+    //@Override
+    //public void onJoined(Channel channel) {
+        //logger.warn("channel joined->"+channel.owner());
+    //}
 
-    @Override
-    public void onLeft(Channel channel) {
-        logger.warn("channel left->"+channel.owner());
-    }
+    //@Override
+    //public void onLeft(Channel channel) {
+      //  logger.warn("channel left->"+channel.owner());
+    //}
 }
