@@ -9,7 +9,7 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ClientConnection;
-import com.tarantula.platform.ScheduleRunner;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import javax.crypto.Cipher;

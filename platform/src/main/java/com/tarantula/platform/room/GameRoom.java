@@ -10,20 +10,20 @@ import com.tarantula.game.Rating;
 
 import java.util.List;
 
-public interface GameRoom extends Resettable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,ChannelListener {
+public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,ChannelListener {
 
     String LABEL = "ZGR";
 
     int channelId();
     int sessionId();
-    int timeout();
+    //int timeout();
     byte[] serverKey();
     Connection connection();
 
     String roomId();
-    int capacity();
-    long duration();
-    int round();
+    //int capacity();
+    //long duration();
+    //int round();
     Arena arena();
     List<Entry> entries();
     boolean dedicated();

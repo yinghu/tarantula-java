@@ -1,6 +1,9 @@
 package com.icodesoftware.protocol;
 
-public interface GameModule extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener{
+import com.icodesoftware.ChannelListener;
+import com.icodesoftware.Room;
 
-    void setup(GameServiceProvider gameServiceProvider);
+public interface GameModule extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener {
+
+    void setup(Room room, GameContext gameContext);
 }

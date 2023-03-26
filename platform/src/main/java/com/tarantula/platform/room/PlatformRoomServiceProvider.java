@@ -16,7 +16,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.platform.ScheduleRunner;
+import com.icodesoftware.util.ScheduleRunner;
 
 
 import java.util.ArrayList;
@@ -156,7 +156,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         GameRoom room = gameRoomIndex.get(stub.roomId);
         BlackjackModule module = new BlackjackModule();
-        module.setup(gameServiceProvider);
+        module.setup(room,gameServiceProvider);
         room.setup(module);
         channel.register(stub,room,room,room,timeoutListener);
         udp.registerChannel(channel);

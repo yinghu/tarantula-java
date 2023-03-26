@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.GameServiceProvider;
+import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
@@ -28,9 +28,10 @@ import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.tournament.*;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 
-public class PlatformGameServiceProvider implements GameServiceProvider,MetricsListener,ItemDistributionCallback{
+public class PlatformGameServiceProvider implements ServiceProvider,GameContext,MetricsListener,ItemDistributionCallback{
 
     private static final String CONFIG = "game-service-proxy-settings";
 
@@ -295,6 +296,9 @@ public class PlatformGameServiceProvider implements GameServiceProvider,MetricsL
         return this.gameCluster.typeId();
     }
 
+    public ScheduledFuture<?> schedule(SchedulingTask task){
+        return this.serviceContext.schedule(task);
+    }
     private GameServiceProxy toGameServiceProxy(short serviceId,String className){
         try {
             GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class, PlatformGameServiceProvider.class).newInstance(serviceId,this);

@@ -271,11 +271,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     @Override
     public void onJoined(Channel channel) {
-        //System.out.println("channel joined->"+channel.owner());
+       gameModule.onJoined(channel);
     }
 
     @Override
     public void onLeft(Channel channel) {
-        //System.out.println("channel left->"+channel.owner());
+       gameModule.onLeft(channel);
     }
 }

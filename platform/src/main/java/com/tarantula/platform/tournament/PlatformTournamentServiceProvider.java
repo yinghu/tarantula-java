@@ -6,7 +6,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.ScheduleRunner;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;

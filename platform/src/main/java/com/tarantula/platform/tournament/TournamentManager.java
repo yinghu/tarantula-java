@@ -11,7 +11,7 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
-import com.tarantula.platform.ScheduleRunner;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
