@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPEndpoint implements EndPoint , UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
+public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;

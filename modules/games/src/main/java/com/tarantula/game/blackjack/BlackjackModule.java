@@ -10,7 +10,7 @@ public class BlackjackModule implements GameModule{
 
     public void setup(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
-        this.blackjackGame = blackjackGame;
+        this.blackjackGame = new BlackjackGame(3,true,true);
     }
 
 
