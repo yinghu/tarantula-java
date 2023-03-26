@@ -27,6 +27,10 @@ public class BlackjackGame {
         return new Card[]{card1,card2};
     }
 
+    public Card draw(){
+        return deck.draw();
+    }
+
     public boolean blackjack(Card[] hand){
         return hand[0].alter + hand[1].alter == 21;
     }

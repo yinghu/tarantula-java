@@ -5,6 +5,7 @@ import com.icodesoftware.Room;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.ScheduleRunner;
+import com.tarantula.game.Card;
 
 public class BlackjackModule implements GameModule{
 
@@ -16,7 +17,7 @@ public class BlackjackModule implements GameModule{
         this.gameContext = gameContext;
         this.blackjackGame = new BlackjackGame(3,true,true);
         this.gameContext.schedule(new ScheduleRunner(5000,()->{
-            System.out.println("MAX>>"+room.capacity());
+            //System.out.println("MAX>>"+room.capacity());
         }));
     }
 
@@ -30,15 +31,20 @@ public class BlackjackModule implements GameModule{
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-
+        Card[] hand = blackjackGame.deal();
+        //System.out.println(hand[0]);
+        //System.out.println(hand[1]);
         messageHeader.ack = true;
         messageHeader.encrypted = true;
         messageHeader.commandId = Messenger.ON_ACTION;
         messageBuffer.reset();
         messageBuffer.writeHeader(messageHeader);
-        messageBuffer.writeShort((short)10);
-        messageBuffer.writeFloat(100);
-        messageBuffer.writeUTF8("running");
+        messageBuffer.writeInt(hand[0].suit.ordinal());
+        messageBuffer.writeUTF8(hand[0].name);
+        messageBuffer.writeInt(hand[0].rank);
+        messageBuffer.writeInt(hand[1].suit.ordinal());
+        messageBuffer.writeUTF8(hand[1].name);
+        messageBuffer.writeInt(hand[1].rank);
         messageBuffer.flip();
         messageBuffer.readHeader();
         callback.onRelay(messageHeader,messageBuffer);
