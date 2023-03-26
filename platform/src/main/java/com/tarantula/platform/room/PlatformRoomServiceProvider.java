@@ -157,7 +157,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom room = gameRoomIndex.get(stub.roomId);
         BlackjackModule module = new BlackjackModule();
         module.setup(gameServiceProvider);
-        room.setup(channel,module);
+        room.setup(module);
         channel.register(stub,room,room,room,timeoutListener);
         udp.registerChannel(channel);
         return channel;
@@ -570,14 +570,4 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
-
-    //@Override
-    //public void onJoined(Channel channel) {
-        //logger.warn("channel joined->"+channel.owner());
-    //}
-
-    //@Override
-    //public void onLeft(Channel channel) {
-      //  logger.warn("channel left->"+channel.owner());
-    //}
 }

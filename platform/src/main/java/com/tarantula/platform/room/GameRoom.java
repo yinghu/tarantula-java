@@ -39,7 +39,7 @@ public interface GameRoom extends Resettable,Configurable,Portable, UDPEndpointS
     boolean full();
     boolean started();
 
-    void setup(Channel channel, GameModule gameModule);
+    void setup(GameModule gameModule);
 
 
     interface Entry extends Resettable,Configurable, Portable {

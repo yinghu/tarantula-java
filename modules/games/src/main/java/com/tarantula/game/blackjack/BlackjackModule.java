@@ -6,9 +6,11 @@ import com.icodesoftware.protocol.*;
 public class BlackjackModule implements GameModule{
 
     private GameServiceProvider gameServiceProvider;
+    private BlackjackGame blackjackGame;
 
     public void setup(GameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
+        this.blackjackGame = blackjackGame;
     }
 
 
