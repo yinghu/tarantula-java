@@ -6,4 +6,5 @@ public interface Room {
     long duration();
     int round();
     int timeout();
+    boolean dedicated();
 }

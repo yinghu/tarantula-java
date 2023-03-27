@@ -299,10 +299,38 @@ public class PlatformGameServiceProvider implements ServiceProvider,GameContext,
     public ScheduledFuture<?> schedule(SchedulingTask task){
         return this.serviceContext.schedule(task);
     }
+    public void log(String message,int level){
+        switch (level){
+            case OnLog.DEBUG:
+                this.logger.debug(message);
+                break;
+            case OnLog.INFO:
+                this.logger.info(message);
+                break;
+            case OnLog.WARN:
+                this.logger.warn(message);
+                break;
+        }
+
+    }
+    public void log(String message,Exception error,int level){
+        switch (level){
+            case OnLog.WARN:
+                if(error!=null){
+                    this.logger.warn(message);
+                }
+                else{
+                    this.logger.warn(message,error);
+                }
+                break;
+            case OnLog.ERROR:
+                this.logger.error(message,error);
+                break;
+        }
+    }
     private GameServiceProxy toGameServiceProxy(short serviceId,String className){
         try {
             GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class, PlatformGameServiceProvider.class).newInstance(serviceId,this);
-            //serviceMessageListener.setup(this.context);
             return serviceMessageListener;
         }catch (Exception ex){
             this.logger.warn("Service Proxy ["+className+"] Without Implementation");
