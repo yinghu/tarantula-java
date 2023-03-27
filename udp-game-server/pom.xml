@@ -9,11 +9,11 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
   <groupId>com.tarantula</groupId>
-  <artifactId>gec-udp-replication-server</artifactId>
+  <artifactId>gec-udp-game-server</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
-  <name>Game Cluster UDP Replication Server</name>
-  <description>Tarantula Platform Integration Server</description>
+  <name>Game Cluster UDP Game Server</name>
+  <description>Tarantula Platform Integration Game Server</description>
   <dependencies>
 	  <dependency>
 		  <groupId>com.icodesoftware</groupId>

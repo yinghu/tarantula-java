@@ -720,57 +720,42 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] existing = clusterStore.mapSetIfAbsent(typeId.getBytes(),key);
         return existing!=null?existing:key;
     }
+
     public OnAccess registerConnection(Connection connection){
         GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
         if(gameServerListener==null) return null;
         return gameServerListener.onConnection(connection);
-        //int[] suc ={0};
-        //cListeners.forEach((k,v)->{
-            //if(v.typeId().equals(connection.configurationTypeId())){
-                //if(v.onConnection(connection)==null) suc[0]++;
-            //}
-        //});
-        //return new AccessKey();
     }
+
     public boolean registerChannel(Channel configurable){
         ChannelStub channelStub = (ChannelStub)configurable;
         GameServerListener gameServerListener = cListeners.get(channelStub.configurationTypeId());
         if(gameServerListener==null) return false;
         return gameServerListener.onChannel(channelStub);
-        //int[] suc ={0};
-        //cListeners.forEach((k,v)->{
-            //if(v.typeId().equals(channelStub.configurationTypeId())) {
-                //if(!v.onChannel(channelStub)) suc[0]++;
-            //}
-        //});
-        //return suc[0]==0;
     }
+
     public void startConnection(Connection connection){
         GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
         if(gameServerListener==null) return;
         gameServerListener.onStartConnection(connection);
-
-        //cListeners.forEach((k,v)->{
-            //if(v.typeId().equals(connection.configurationTypeId())) v.onStartConnection(connection);
-        //});
     }
+
     public void stopConnection(Connection connection){
         GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
         if(gameServerListener==null) return;
         gameServerListener.onDisConnection(connection);
-
-        //cListeners.forEach((k,v)->{
-            //if(v.typeId().equals(connection.configurationTypeId())) v.onDisConnection(connection);
-        //});
     }
+
     public void verifyConnection(String typeId,String serverId){
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
+
     public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
         return regKey;
     }
+
     public void unregisterGameServerListener(String registerKey){
         cListeners.remove(registerKey);
     }
@@ -794,9 +779,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public AccessIndexService.AccessIndexStore accessIndexStore(){
         return new AccessIndexStoreViewer(this.tarantulaContext);
     }
+
     public void issueDataStoreBackup(){
 
     }
+
     public List<String> listDataStore(){
         return this.tarantulaContext.dataStoreProvider().list();
     }
@@ -813,6 +800,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         summary.dataStore = ds;
         return summary;
     }
+
     public ClusterProvider.Summary clusterSummary(){
         return integrationCluster.summary();
     }
@@ -820,6 +808,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<String> listServiceView(){
        return tarantulaContext.serviceViewList;
     }
+
     public List<String> listMetricsView(){
         return this.tarantulaContext.metricsList();
     }
@@ -827,6 +816,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void atMidnight(){
 
     }
+
     public DistributionCallback distributionCallback(){
         return this.distributionCallback;
     }
@@ -841,6 +831,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;
     }
+
     public void onUpdated(String mkey,double delta){
         this.metricsListener.onUpdated(mkey,delta);
     }
@@ -894,6 +885,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all enabled
     }
+
     boolean disableGameCluster(String gameClusterId){
         GameCluster gameCluster = new GameCluster();
         gameCluster.distributionKey(gameClusterId);

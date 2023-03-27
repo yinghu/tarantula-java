@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.Serviceable;
@@ -22,12 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.CipherListener {
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.CipherListener {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(ReplicationEndpoint.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    private UDPEndpointServiceProvider.RequestListener gameModule;
+    private GameModule gameModule;
     private byte[] serverKey;
     private String accessKey;
     private String typeId;
@@ -62,7 +63,7 @@ public class ReplicationEndpoint implements Serviceable,UDPEndpointServiceProvid
     private Thread sender;
     private boolean running = true;
     private Thread timer;
-    public ReplicationEndpoint(JsonObject config){
+    public UDPGameEndpoint(JsonObject config){
         this.config = config;
     }
 

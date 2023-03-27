@@ -324,6 +324,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("sessionTimeout",timeout);
         onAccess.property("capacity",index.gameZone.capacity());
+        onAccess.property("duration",index.gameZone.roundDuration());
+        //onAccess.property("timeout",index.gameZone.);
         return onAccess;
     }
 

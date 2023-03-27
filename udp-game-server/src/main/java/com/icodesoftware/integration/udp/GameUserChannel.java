@@ -1,6 +1,5 @@
 package com.icodesoftware.integration.udp;
 
-import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.BatchUtil;
 
@@ -66,4 +65,5 @@ public class GameUserChannel extends UserChannel {
             queue(messageHeader.sessionId,messageBuffer);
         }
     }
+
 }

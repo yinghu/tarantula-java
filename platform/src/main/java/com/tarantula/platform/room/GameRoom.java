@@ -16,7 +16,7 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
 
     int channelId();
     int sessionId();
-    //int timeout();
+
     byte[] serverKey();
     Connection connection();
 

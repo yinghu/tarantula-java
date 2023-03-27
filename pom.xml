@@ -17,7 +17,7 @@
         <module>modules/games</module>
         <module>platform</module>
         <module>modules/agent</module>
-        <module>udp-replication-server</module>
+        <module>udp-game-server</module>
         <module>load-test</module>
     </modules>
 
