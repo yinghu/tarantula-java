@@ -80,6 +80,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.udpEndpointServiceProvider.port(config.get("port").getAsInt());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         this.udpEndpointServiceProvider.registerPingListener(this);
+        this.udpEndpointServiceProvider.registerCipherListener(this);
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
@@ -184,14 +185,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         try{
-            if(!messageHeader.encrypted) return false;
-            Cipher cipher = CipherUtil.decrypt(serverKey);
-            byte[] plain = cipher.doFinal(messageBuffer.readPayload());
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(plain);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
             int sessionId = messageBuffer.readInt();
             String token = messageBuffer.readUTF8();
             String ticket = messageBuffer.readUTF8();
@@ -251,13 +244,41 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     }
 
 
-    @Override
-    public boolean decrypt(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        return false;
+    public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        try{
+            Cipher cipher = CipherUtil.decrypt(serverKey);
+            byte[] buffer = udpEndpointServiceProvider.buffer();
+            int length = messageBuffer.readPayload(buffer);
+            byte[] plain = cipher.doFinal(buffer,0,length);
+            udpEndpointServiceProvider.buffer(buffer);
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(plain);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            return true;
+        }catch (Exception ex){
+            logger.error("invalid message",ex);
+            return false;
+        }
     }
-
-    @Override
-    public boolean encrypt(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        return false;
+    public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+        try{
+            Cipher cipher = CipherUtil.encrypt(serverKey);
+            byte[] buffer = udpEndpointServiceProvider.buffer();
+            int length = messageBuffer.readPayload(buffer);
+            byte[] encrypt = cipher.doFinal(buffer,0,length);
+            if(encrypt.length > MessageBuffer.PAYLOAD_SIZE) throw new RuntimeException("over sized payload ["+encrypt.length+"]");
+            udpEndpointServiceProvider.buffer(buffer);
+            messageBuffer.reset();
+            messageBuffer.writeHeader(messageHeader);
+            messageBuffer.writePayload(encrypt);
+            messageBuffer.flip();
+            messageBuffer.readHeader();
+            return true;
+        }catch (Exception ex){
+            logger.error("invalid message",ex);
+            return false;
+        }
     }
 }
