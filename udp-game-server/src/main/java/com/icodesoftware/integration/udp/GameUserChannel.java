@@ -21,6 +21,7 @@ public class GameUserChannel extends UserChannel {
 
     @Override
     protected void onRelay(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        if(messageHeader.encrypted && !cipherListener.encrypt(messageHeader,messageBuffer)) return;
         super.onRelay(messageHeader,messageBuffer);
     }
 

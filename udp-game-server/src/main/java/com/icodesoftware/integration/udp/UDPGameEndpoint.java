@@ -81,6 +81,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         this.udpEndpointServiceProvider.registerPingListener(this);
         this.udpEndpointServiceProvider.registerCipherListener(this);
+        this.createGameModule(config.get("gameModule").getAsString());
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
@@ -148,7 +149,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         timer.start();
-        gameModule = new BlackjackModule();
         logger.warn("Game server is running on ["+typeId+"] configured with capacity ["+roomCapacity+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
@@ -280,5 +280,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             logger.error("invalid message",ex);
             return false;
         }
+    }
+
+    private void createGameModule(String moduleName) throws Exception{
+        this.gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
+        this.gameModule.setup(new DedicatedRoom(),new DedicatedGameContext());
     }
 }

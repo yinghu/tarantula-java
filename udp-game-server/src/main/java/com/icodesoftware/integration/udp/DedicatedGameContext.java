@@ -7,6 +7,7 @@ import com.icodesoftware.protocol.GameServiceProxy;
 import java.util.concurrent.ScheduledFuture;
 
 public class DedicatedGameContext implements GameContext {
+
     @Override
     public GameServiceProxy gameServiceProxy(short serviceId) {
         return null;
