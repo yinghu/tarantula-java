@@ -42,7 +42,6 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         if(gameCluster==null) throw new RuntimeException("Illegal access");
         String typeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         if(action.equals("onConnect")){//start game server
-
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
             connection.configurationTypeId(typeId);

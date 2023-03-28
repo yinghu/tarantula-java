@@ -7,15 +7,16 @@ public class GameUserChannel extends UserChannel {
 
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
     private UDPEndpointServiceProvider.SessionListener sessionListener;
-    private UDPEndpointServiceProvider.RequestListener requestListener;
+    //private UDPEndpointServiceProvider.RequestListener requestListener;
     private UDPEndpointServiceProvider.CipherListener cipherListener;
+    private UDPEndpointServiceProvider.ActionListener actionListener;
 
-    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener){
+    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.ActionListener actionListener){
         super(channelId,messenger);
         this.cipherListener = cipherListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
-        this.requestListener = requestListener;
+        this.actionListener = actionListener;
     }
 
     @Override
@@ -49,21 +50,11 @@ public class GameUserChannel extends UserChannel {
     }
 
     @Override
-    protected void onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        byte[] response = requestListener.onRequest(null,messageHeader,messageBuffer);
-        if(response==null) return;
-        BatchUtil.Batch batch = BatchUtil.batch(response.length,MessageBuffer.PAYLOAD_SIZE);
-        for(BatchUtil.Offset offset : batch.offsets){
-            messageBuffer.reset();
-            messageHeader.commandId = Messenger.ON_REQUEST;
-            messageHeader.encrypted = false;
-            messageHeader.batch = offset.batch;
-            messageHeader.batchSize = batch.size;
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(response,offset.offset,offset.length);
-            messageBuffer.flip();
-            queue(messageHeader.sessionId,messageBuffer);
-        }
+    protected void onAction(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
+        actionListener.onAction(messageHeader,messageBuffer,(h,m)->{
+            this.onRelay(h,m);
+        });
     }
+
 
 }

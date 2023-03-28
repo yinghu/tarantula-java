@@ -8,7 +8,7 @@
     "register":{
         "url":"http://192.168.1.21:8090",
         "path":"server",
-        "accessKey":"BDS/81b23bc538cc4b16a6e2ce7e67ce9d61-CFB753739B1DF89C3E3F7954C58E0AA73493F85E-976EBD00854BBEA5142822411ACC54EF"
+        "accessKey":"BDS/93475418d3994bdd8ba3bef910497f88-C8FE1ED1D1782B965B2FB77B0714C05A8C2837A4-ED796C730FCBB8B9AC2FD348EDBE2ECC"
     },
     "connection":{
         "configurationName":"lobby1/rank1",

@@ -312,7 +312,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public OnAccess onConnection(Connection connection) {
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
-        if(index==null) return null;
+        if(index==null || !gameCluster.dedicated()) return null;
         UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         int timeout = udpEndpoint.sessionTimeout();
         connection.timeout(timeout);
@@ -324,7 +324,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("sessionTimeout",timeout);
         onAccess.property("capacity",index.gameZone.capacity());
-        onAccess.property("duration",index.gameZone.roundDuration());
+        //onAccess.property("duration",index.gameZone.roundDuration());
         //onAccess.property("timeout",index.gameZone.);
         return onAccess;
     }

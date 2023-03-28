@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.RequestListener, UDPEndpointServiceProvider.CipherListener {
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
 
@@ -245,10 +245,11 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     }
 
     @Override
-    public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //logger.warn("on request");
-        return gameModule.onRequest(null,messageHeader,messageBuffer);
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+        //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
+        this.gameModule.onAction(messageHeader,messageBuffer,callback);
     }
+
 
     @Override
     public boolean decrypt(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
