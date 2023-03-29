@@ -2,9 +2,11 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
+import javax.crypto.Cipher;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -290,6 +292,10 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
         }
     }
 
+    public CipherListener registerCipherListener(byte[] key){
+        this.cipherListener = new _CipherListener(key,this);
+        return this.cipherListener;
+    }
     @Override
     public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
         return cipherListener!=null? cipherListener.decrypt(messageHeader,messageBuffer) : false;
@@ -298,5 +304,50 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
     @Override
     public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer) {
         return cipherListener!=null? cipherListener.encrypt(messageHeader,messageBuffer) : false;
+    }
+    private class _CipherListener implements CipherListener{
+        private byte[] serverKey;
+        private UDPEndpointServiceProvider udpEndpointServiceProvider;
+        public _CipherListener(byte[] serverKey,UDPEndpointServiceProvider udpEndpointServiceProvider){
+            this.serverKey = serverKey;
+            this.udpEndpointServiceProvider = udpEndpointServiceProvider;
+        }
+        public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+            try{
+                Cipher cipher = CipherUtil.decrypt(serverKey);
+                byte[] buffer = udpEndpointServiceProvider.buffer();
+                int length = messageBuffer.readPayload(buffer);
+                byte[] plain = cipher.doFinal(buffer,0,length);
+                udpEndpointServiceProvider.buffer(buffer);
+                messageBuffer.reset();
+                messageBuffer.writeHeader(messageHeader);
+                messageBuffer.writePayload(plain);
+                messageBuffer.flip();
+                messageBuffer.readHeader();
+                return true;
+            }catch (Exception ex){
+                log.error("invalid message",ex);
+                return false;
+            }
+        }
+        public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
+            try{
+                Cipher cipher = CipherUtil.encrypt(serverKey);
+                byte[] buffer = udpEndpointServiceProvider.buffer();
+                int length = messageBuffer.readPayload(buffer);
+                byte[] encrypt = cipher.doFinal(buffer,0,length);
+                if(encrypt.length > MessageBuffer.PAYLOAD_SIZE) throw new RuntimeException("over sized payload ["+encrypt.length+"]");
+                udpEndpointServiceProvider.buffer(buffer);
+                messageBuffer.reset();
+                messageBuffer.writeHeader(messageHeader);
+                messageBuffer.writePayload(encrypt);
+                messageBuffer.flip();
+                messageBuffer.readHeader();
+                return true;
+            }catch (Exception ex){
+                log.error("invalid message",ex);
+                return false;
+            }
+        }
     }
 }

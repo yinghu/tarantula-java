@@ -6,13 +6,11 @@ import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ClientConnection;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
-import javax.crypto.Cipher;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -20,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
+public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener{
 
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
@@ -32,6 +30,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     private AtomicInteger channelId;
     private AtomicInteger sessionId;
     private byte[] key;
+    private UDPEndpointServiceProvider.CipherListener cipherListener;
     private Connection connection;
     private String host;
     private String threadPoolSetting;
@@ -103,7 +102,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         udpEndpointServiceProvider.retryInterval(((Number)cfg.property("retryInterval")).intValue());
         udpEndpointServiceProvider.pingListenerInterval(((Number)cfg.property("pingListenerInterval")).intValue());
         udpEndpointServiceProvider.pingClientInterval(((Number)cfg.property("pingClientInterval")).intValue());
-        udpEndpointServiceProvider.registerCipherListener(this);
+        this.cipherListener = udpEndpointServiceProvider.registerCipherListener(this.key);
         receiverDaemon = new Thread(()->{
             while (running){
                 try {
@@ -179,13 +178,13 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0) return new UDPChannel[0];
 
         if(pushUserChannel == null) {
-            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider,this, this, this, this,this);
+            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);
             this.activePushChannelIndex.put(pushUserChannel.channelId(),new ActivePushChannel());
             operationSummary.userChannelNumber.incrementAndGet();
         }
         UDPChannel[] channels = new UDPChannel[capacity];
         for(int i=0;i<capacity;i++){
-            UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout(),this);
+            UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout(),this.cipherListener);
             channels[i] = channel;
         }
         operationSummary.userSessionNumber.addAndGet(capacity);
@@ -320,43 +319,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         channel.onAction(messageHeader,messageBuffer,callback);
     }
 
-    public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        try{
-            Cipher cipher = CipherUtil.decrypt(key);
-            byte[] buffer = udpEndpointServiceProvider.buffer();
-            int length = messageBuffer.readPayload(buffer);
-            byte[] plain = cipher.doFinal(buffer,0,length);
-            udpEndpointServiceProvider.buffer(buffer);
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(plain);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
-            return true;
-        }catch (Exception ex){
-            logger.error("invalid message",ex);
-            return false;
-        }
-    }
-    public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        try{
-            Cipher cipher = CipherUtil.encrypt(key);
-            byte[] buffer = udpEndpointServiceProvider.buffer();
-            int length = messageBuffer.readPayload(buffer);
-            byte[] encrypt = cipher.doFinal(buffer,0,length);
-            if(encrypt.length > MessageBuffer.PAYLOAD_SIZE) throw new RuntimeException("over sized payload ["+encrypt.length+"]");
-            udpEndpointServiceProvider.buffer(buffer);
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(encrypt);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
-            return true;
-        }catch (Exception ex){
-            logger.error("invalid message",ex);
-            return false;
-        }
-    }
 
     private UDPEndpointServiceProvider createInstance(String className){
         try{

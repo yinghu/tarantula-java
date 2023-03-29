@@ -1,41 +1,38 @@
 package com.icodesoftware.integration.udp;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Room;
-import com.icodesoftware.Session;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.GameModule;
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.protocol.ValidationUtil;
+import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 
-import javax.crypto.Cipher;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener, UDPEndpointServiceProvider.CipherListener {
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,GameContext {
 
     private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
+
+    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduleRunner timer;
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private GameModule gameModule;
     private Room room;
-    private byte[] serverKey;
+
+    private UDPEndpointServiceProvider.CipherListener cipherListener;
     private String accessKey;
     private String typeId;
     private String serverId;
     private int maxChannelSize;
-    //private int roomCapacity;
 
     private AtomicInteger keySync;
 
@@ -63,7 +60,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread receiver;
     private Thread sender;
     private boolean running = true;
-    private Thread timer;
+
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
     }
@@ -71,6 +68,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void start() throws Exception {
+        this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeChannelIndex = new ConcurrentHashMap<>();
         this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
@@ -81,8 +79,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.udpEndpointServiceProvider.port(config.get("port").getAsInt());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(config.get("inboundThreadPoolSetting").getAsString());
         this.udpEndpointServiceProvider.registerPingListener(this);
-        this.udpEndpointServiceProvider.registerCipherListener(this);
-        this.createGameModule(config.get("gameModule").getAsString());
         JsonObject register = config.getAsJsonObject("register");
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
@@ -97,7 +93,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
-        this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
+        byte[] serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
         this.typeId = jo.get("typeId").getAsString();
         int timeout = jo.get("sessionTimeout").getAsInt();
         this.udpEndpointServiceProvider.sessionTimeout(timeout);
@@ -106,6 +102,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
         this.room = new DedicatedRoom(capacity,duration,overtime,joinsOnStart,timeout);
+        this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;
         for(int i=0;i<maxChannelSize;i++){
             if(createChannel()) channelRegistered++;
@@ -139,22 +136,22 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
                 }
             }
         },"tarantula-udp-outbound-message-sender");
-        timer = new Thread(()->{
-            while(running){
-                try{
-                    Thread.sleep(UDPEndpointServiceProvider.FRAME_RATE);
-                    udpEndpointServiceProvider.onTimer(UDPEndpointServiceProvider.FRAME_RATE);
-                }catch (Exception ex){
-                    //ignore
-                }
+        timer = new ScheduleRunner(UDPEndpointServiceProvider.FRAME_RATE,()->{
+            try{
+                udpEndpointServiceProvider.onTimer(UDPEndpointServiceProvider.FRAME_RATE);
+            }catch (Exception ex){
+                logger.error("error on timer",ex);
+                //ignore
             }
-        },"tarantula-udp-message-timer");
+            this.schedule(timer);
+        });
         this.udpEndpointServiceProvider.start();
         receiver.setPriority(UDPEndpointServiceProvider.RECEIVER_THREAD_PRIORITY);
         receiver.start();
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
-        timer.start();
+        this.schedule(timer);
+        this.createGameModule(config.get("gameModule").getAsString());
         logger.warn("Game server is running with ["+typeId+"] configured with capacity ["+room.capacity()+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
@@ -229,7 +226,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             activeChannelIndex.put(channelId, activeChannel);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this,this, this,this));
+            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this));
             return true;
         }catch (Exception ex){
             logger.error("error on create channel",ex);
@@ -250,47 +247,54 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     }
 
 
-    public boolean decrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        try{
-            Cipher cipher = CipherUtil.decrypt(serverKey);
-            byte[] buffer = udpEndpointServiceProvider.buffer();
-            int length = messageBuffer.readPayload(buffer);
-            byte[] plain = cipher.doFinal(buffer,0,length);
-            udpEndpointServiceProvider.buffer(buffer);
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(plain);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
-            return true;
-        }catch (Exception ex){
-            logger.error("invalid message",ex);
-            return false;
-        }
-    }
-    public boolean encrypt(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
-        try{
-            Cipher cipher = CipherUtil.encrypt(serverKey);
-            byte[] buffer = udpEndpointServiceProvider.buffer();
-            int length = messageBuffer.readPayload(buffer);
-            byte[] encrypt = cipher.doFinal(buffer,0,length);
-            if(encrypt.length > MessageBuffer.PAYLOAD_SIZE) throw new RuntimeException("over sized payload ["+encrypt.length+"]");
-            udpEndpointServiceProvider.buffer(buffer);
-            messageBuffer.reset();
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(encrypt);
-            messageBuffer.flip();
-            messageBuffer.readHeader();
-            return true;
-        }catch (Exception ex){
-            logger.error("invalid message",ex);
-            return false;
-        }
-    }
-
     private void createGameModule(String moduleName) throws Exception{
         this.gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
+        this.gameModule.setup(this.room,this);
+        logger.warn("Game module ["+moduleName+"] created");
+    }
 
-        this.gameModule.setup(this.room,new DedicatedGameContext(this.logger));
+
+    //game context
+    public ScheduledFuture<?> schedule(SchedulingTask task) {
+        if(task.oneTime()){
+            return this.scheduledExecutorService.schedule(task,task.initialDelay()+task.delay(), TimeUnit.MILLISECONDS);
+        }else{
+            return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public void log(String message,int level){
+        switch (level){
+            case OnLog.DEBUG:
+                this.logger.debug(message);
+                break;
+            case OnLog.INFO:
+                this.logger.info(message);
+                break;
+            case OnLog.WARN:
+                this.logger.warn(message);
+                break;
+        }
+
+    }
+
+    public void log(String message,Exception error,int level){
+        switch (level){
+            case OnLog.WARN:
+                if(error!=null){
+                    this.logger.warn(message);
+                }
+                else{
+                    this.logger.warn(message,error);
+                }
+                break;
+            case OnLog.ERROR:
+                this.logger.error(message,error);
+                break;
+        }
+    }
+
+    public GameServiceProxy gameServiceProxy(short serviceId) {
+        return null;
     }
 }

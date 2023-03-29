@@ -24,6 +24,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     int RECEIVER_THREAD_PRIORITY = 8;
     int SENDER_THREAD_PRIORITY = 8;
 
+
     void sessionTimeout(int timeout);
     int sessionTimeout();
 
@@ -37,7 +38,7 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
 
     void registerPingListener(PingListener pingListener);
     void registerCipherListener(CipherListener cipherListener);
-
+    CipherListener registerCipherListener(byte[] key);
     //single outbound message sent out
     boolean onOutboundMessage();
 

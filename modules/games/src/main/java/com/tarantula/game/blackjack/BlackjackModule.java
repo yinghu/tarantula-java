@@ -21,6 +21,7 @@ public class BlackjackModule implements GameModule{
         this.gameContext.schedule(new ScheduleRunner(5000,()->{
             this.gameContext.log("MX->"+room.capacity(), OnLog.WARN);
         }));
+        this.gameContext.log("Blackjack module started->"+room.capacity(),OnLog.WARN);
     }
 
 

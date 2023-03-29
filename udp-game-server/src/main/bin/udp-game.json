@@ -1,6 +1,7 @@
 {
     "endpointServiceProvider":"com.icodesoftware.protocol.UDPEndpointService",
     "inboundThreadPoolSetting":"udp-messaging,8,8,8,30,0",
+    "schedulerSetting": "game-scheduler,3,3",
     "maxChannelSize": 10,
     "binding":"192.168.1.21",
     "port":16693,
