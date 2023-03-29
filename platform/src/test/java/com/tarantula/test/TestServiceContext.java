@@ -38,6 +38,16 @@ public class TestServiceContext implements ServiceContext {
     }
 
     @Override
+    public void log(String message, int level) {
+
+    }
+
+    @Override
+    public void log(String message, Exception error, int level) {
+
+    }
+
+    @Override
     public EventService eventService() {
         return null;
     }

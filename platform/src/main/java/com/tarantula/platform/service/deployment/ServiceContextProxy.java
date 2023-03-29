@@ -116,4 +116,12 @@ public class ServiceContextProxy implements ServiceContext {
     public PostOffice postOffice(){
         return this.tarantulaContext.postOffice();
     }
+
+    public void log(String message,int level){
+        this.tarantulaContext.log(message,level);
+
+    }
+    public void log(String message,Exception error,int level){
+        this.tarantulaContext.log(message,error,level);
+    }
 }

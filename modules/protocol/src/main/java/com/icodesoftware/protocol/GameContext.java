@@ -1,15 +1,10 @@
 package com.icodesoftware.protocol;
 
+import com.icodesoftware.Context;
 
-import com.icodesoftware.SchedulingTask;
-
-import java.util.concurrent.ScheduledFuture;
-
-public interface GameContext{
+public interface GameContext extends Context {
 
     GameServiceProxy gameServiceProxy(short serviceId);
-    ScheduledFuture<?> schedule(SchedulingTask task);
-    void log(String message,int level);
-    void log(String message,Exception error,int level);
+
 
 }

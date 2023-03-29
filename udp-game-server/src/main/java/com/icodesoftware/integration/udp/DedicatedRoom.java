@@ -4,14 +4,33 @@ import com.icodesoftware.Room;
 
 public class DedicatedRoom implements Room {
 
+    private int capacity;
+    private long duration;
+    private long overtime;
+    private int joinsOnStart;
+    private int timeout;
+
+    public DedicatedRoom(int capacity,long duration,long overtime,int joinsOnStart,int timeout){
+        this.capacity = capacity;
+        this.duration = duration;
+        this.overtime = overtime;
+        this.joinsOnStart = joinsOnStart;
+        this.timeout = timeout;
+    }
+
     @Override
     public int capacity() {
-        return 0;
+        return capacity;
     }
 
     @Override
     public long duration() {
-        return 0;
+        return duration;
+    }
+
+    @Override
+    public long overtime() {
+        return overtime;
     }
 
     @Override
@@ -21,7 +40,12 @@ public class DedicatedRoom implements Room {
 
     @Override
     public int timeout() {
-        return 0;
+        return timeout;
+    }
+
+    @Override
+    public int joinsOnStart() {
+        return joinsOnStart;
     }
 
     @Override

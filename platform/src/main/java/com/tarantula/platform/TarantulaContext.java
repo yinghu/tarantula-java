@@ -968,4 +968,34 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public PostOffice postOffice(){
         return this.postOfficeSession;
     }
+
+    public void log(String message,int level){
+        switch (level){
+            case OnLog.DEBUG:
+                this.log.debug(message);
+                break;
+            case OnLog.INFO:
+                this.log.info(message);
+                break;
+            case OnLog.WARN:
+                this.log.warn(message);
+                break;
+        }
+
+    }
+    public void log(String message,Exception error,int level){
+        switch (level){
+            case OnLog.WARN:
+                if(error!=null){
+                    this.log.warn(message);
+                }
+                else{
+                    this.log.warn(message,error);
+                }
+                break;
+            case OnLog.ERROR:
+                this.log.error(message,error);
+                break;
+        }
+    }
 }

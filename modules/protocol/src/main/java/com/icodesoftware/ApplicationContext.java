@@ -7,7 +7,7 @@ import com.icodesoftware.service.ServiceProvider;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public interface ApplicationContext {
+public interface ApplicationContext extends Context{
 
     Lobby lobby(String typeId);
     List<Lobby> index();
@@ -16,7 +16,6 @@ public interface ApplicationContext {
 
     void absence(Session session);
 
-    ScheduledFuture<?> schedule(SchedulingTask task);
 
     Configuration configuration(String name);
 
@@ -27,9 +26,6 @@ public interface ApplicationContext {
 
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
     void unregisterRecoverableListener(int factoryId);
-
-    void log(String message,int level);
-    void log(String message,Exception error,int level);
 
     <T extends ServiceProvider> T serviceProvider(String name);
 

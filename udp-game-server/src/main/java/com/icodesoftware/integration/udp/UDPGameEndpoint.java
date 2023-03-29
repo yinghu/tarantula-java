@@ -1,6 +1,7 @@
 package com.icodesoftware.integration.udp;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Room;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -13,7 +14,6 @@ import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.protocol.ValidationUtil;
-import com.tarantula.game.blackjack.BlackjackModule;
 
 import javax.crypto.Cipher;
 import java.security.MessageDigest;
@@ -29,12 +29,13 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
     private GameModule gameModule;
+    private Room room;
     private byte[] serverKey;
     private String accessKey;
     private String typeId;
     private String serverId;
     private int maxChannelSize;
-    private int roomCapacity;
+    //private int roomCapacity;
 
     private AtomicInteger keySync;
 
@@ -98,8 +99,13 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
         this.serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
         this.typeId = jo.get("typeId").getAsString();
-        this.udpEndpointServiceProvider.sessionTimeout(jo.get("sessionTimeout").getAsInt());
-        this.roomCapacity = jo.get("capacity").getAsInt();
+        int timeout = jo.get("sessionTimeout").getAsInt();
+        this.udpEndpointServiceProvider.sessionTimeout(timeout);
+        int capacity = jo.get("capacity").getAsInt();
+        long duration = jo.get("duration").getAsLong();
+        long overtime = jo.get("overtime").getAsLong();
+        int joinsOnStart = jo.get("joinsOnStart").getAsInt();
+        this.room = new DedicatedRoom(capacity,duration,overtime,joinsOnStart,timeout);
         int channelRegistered =0;
         for(int i=0;i<maxChannelSize;i++){
             if(createChannel()) channelRegistered++;
@@ -149,7 +155,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         timer.start();
-        logger.warn("Game server is running on ["+typeId+"] configured with capacity ["+roomCapacity+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
+        logger.warn("Game server is running with ["+typeId+"] configured with capacity ["+room.capacity()+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
     @Override
@@ -216,8 +222,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject channel = new JsonObject();
             int channelId = keySync.getAndIncrement();
             channel.addProperty("channelId",channelId);
-            channel.addProperty("sessionId",keySync.getAndAdd(roomCapacity));
-            ActiveGameChannel activeChannel = new ActiveGameChannel(roomCapacity);
+            channel.addProperty("sessionId",keySync.getAndAdd(this.room.capacity()));
+            ActiveGameChannel activeChannel = new ActiveGameChannel(this.room.capacity());
             headers[5]="onChannel";
             String resp = httpCaller.post(registerPath,channel.toString().getBytes(),headers);
             JsonObject jo = JsonUtil.parse(resp);
@@ -284,6 +290,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private void createGameModule(String moduleName) throws Exception{
         this.gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
-        this.gameModule.setup(new DedicatedRoom(),new DedicatedGameContext());
+
+        this.gameModule.setup(this.room,new DedicatedGameContext(this.logger));
     }
 }

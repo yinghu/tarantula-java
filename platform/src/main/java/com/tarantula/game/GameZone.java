@@ -1,7 +1,6 @@
 package com.tarantula.game;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.MessageBuffer;
 
 import java.util.List;
 
@@ -16,9 +15,11 @@ public interface GameZone extends Configurable{
     void name(String name);
 
     String playMode();
+
     int capacity();
     int joinsOnStart();
     long roundDuration();
+    long roundOvertime();
 
     boolean connected();
     Stub join(Session session,Rating rating);

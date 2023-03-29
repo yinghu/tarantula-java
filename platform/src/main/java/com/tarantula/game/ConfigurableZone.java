@@ -79,7 +79,10 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return zoneItem.room().duration();
     }
 
-
+    @Override
+    public long roundOvertime() {
+        return zoneItem.room().overtime();
+    }
 
     @Override
     public boolean connected() {

@@ -5,12 +5,12 @@ import com.icodesoftware.*;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public interface ServiceContext {
+public interface ServiceContext extends Context{
 
     //create data scope partitioned data store
     DataStore dataStore(String name, int partition);
 
-    ScheduledFuture<?> schedule(SchedulingTask task);
+    //ScheduledFuture<?> schedule(SchedulingTask task);
     EventService eventService();
     ClusterProvider clusterProvider();
     ServiceProvider serviceProvider(String name);

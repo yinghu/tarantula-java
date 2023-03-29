@@ -30,6 +30,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int capacity;
     protected long duration;
     protected int round;
+    protected int joinsOnStart;
+    protected long overtime;
+
     protected int totalJoined;
     protected boolean started;
     protected boolean dedicated;
@@ -39,6 +42,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected Entry[] entries;
 
     private GameModule gameModule;
+
     public int channelId(){
         return channelId;
     }
@@ -60,6 +64,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public String roomId(){
         return this.distributionKey();
     }
+
     @Override
     public long duration() {
         return duration;
@@ -69,11 +74,21 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public int capacity() {
         return capacity;
     }
+
     @Override
     public int round() {
         return round;
     }
 
+    @Override
+    public int joinsOnStart() {
+        return joinsOnStart;
+    }
+
+    @Override
+    public long overtime() {
+        return overtime;
+    }
 
     @Override
     public Arena arena() {
@@ -108,6 +123,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.arena = gameZone.arena(rating.arenaLevel);
         this.capacity = gameZone.capacity();
         this.duration = gameZone.roundDuration();
+        this.overtime = gameZone.roundOvertime();
+        this.joinsOnStart = gameZone.joinsOnStart();
         this.dedicated = channel!=null;
         if(!dedicated) return;
         this.connection = channel.connection();
