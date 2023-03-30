@@ -29,6 +29,7 @@ public class GameUserChannel extends UserChannel {
     @Override
     protected void onJoin(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         super.onJoin(messageHeader,messageBuffer);
+        sessionListener.onJoined(messageHeader.channelId,messageHeader.sessionId());
     }
 
     @Override

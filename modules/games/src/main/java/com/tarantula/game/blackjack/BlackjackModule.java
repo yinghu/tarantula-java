@@ -23,7 +23,9 @@ public class BlackjackModule implements GameModule{
         }));
         this.gameContext.log("Blackjack module started->"+room.capacity(),OnLog.WARN);
     }
-
+    public Room room(){
+        return this.room;
+    }
 
     @Override
     public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {

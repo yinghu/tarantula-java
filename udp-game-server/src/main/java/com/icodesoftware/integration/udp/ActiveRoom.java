@@ -2,7 +2,7 @@ package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.Room;
 
-public class DedicatedRoom implements Room {
+public class ActiveRoom implements Room {
 
     private int capacity;
     private long duration;
@@ -10,12 +10,27 @@ public class DedicatedRoom implements Room {
     private int joinsOnStart;
     private int timeout;
 
-    public DedicatedRoom(int capacity,long duration,long overtime,int joinsOnStart,int timeout){
+    private int channelId;
+
+    public ActiveRoom(int capacity, long duration, long overtime, int joinsOnStart, int timeout){
         this.capacity = capacity;
         this.duration = duration;
         this.overtime = overtime;
         this.joinsOnStart = joinsOnStart;
         this.timeout = timeout;
+    }
+
+    public ActiveRoom(int channelId,int capacity, long duration, long overtime, int joinsOnStart, int timeout){
+        this.channelId = channelId;
+        this.capacity = capacity;
+        this.duration = duration;
+        this.overtime = overtime;
+        this.joinsOnStart = joinsOnStart;
+        this.timeout = timeout;
+    }
+
+    public int channelId(){
+        return this.channelId;
     }
 
     @Override
@@ -51,5 +66,9 @@ public class DedicatedRoom implements Room {
     @Override
     public boolean dedicated() {
         return true;
+    }
+
+    public ActiveRoom assign(int channelId){
+        return new ActiveRoom(channelId,capacity,duration,overtime,joinsOnStart,timeout);
     }
 }

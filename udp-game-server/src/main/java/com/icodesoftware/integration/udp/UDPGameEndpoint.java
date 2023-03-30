@@ -25,8 +25,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private ScheduleRunner timer;
 
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    private GameModule gameModule;
-    private Room room;
+    //private GameModule gameModule;
+    private String moduleName;
+    private ActiveRoom room;
 
     private UDPEndpointServiceProvider.CipherListener cipherListener;
     private String accessKey;
@@ -45,8 +46,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private JsonObject config;
 
-    private ConcurrentHashMap<Integer, ActiveGameChannel> activeChannelIndex;
-    private ConcurrentLinkedDeque<ActiveGameChannel> pendingActiveChannelQueue;
+    private ConcurrentHashMap<Integer, ActiveGame> activeGameIndex;
+    //private ConcurrentLinkedDeque<ActiveGameChannel> pendingActiveChannelQueue;
     private int pingRetries;
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
@@ -69,8 +70,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
-        this.activeChannelIndex = new ConcurrentHashMap<>();
-        this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
+        this.activeGameIndex = new ConcurrentHashMap<>();
+        this.moduleName = config.get("gameModule").getAsString();
+        //this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -101,7 +103,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
-        this.room = new DedicatedRoom(capacity,duration,overtime,joinsOnStart,timeout);
+        this.room = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;
         for(int i=0;i<maxChannelSize;i++){
@@ -151,7 +153,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         this.schedule(timer);
-        this.createGameModule(config.get("gameModule").getAsString());
         logger.warn("Game server is running with ["+typeId+"] configured with capacity ["+room.capacity()+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
@@ -167,13 +168,14 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onLeft(int channelId, int sessionId) {
-        ActiveGameChannel activeChannel = activeChannelIndex.get(channelId);
-        int totalLeft = activeChannel.totalLeft.decrementAndGet();
+        ActiveGame activeGame = activeGameIndex.get(channelId);
+        int totalLeft = activeGame.totalLeft.decrementAndGet();
         logger.warn("Session timeout->"+channelId+">>"+sessionId);
+        //activeGame.gameModule.onLeft(activeGame);
         if(totalLeft == 0){
             logger.warn("Channel Removed->"+channelId+">>"+sessionId);
             this.udpEndpointServiceProvider.releaseUserChannel(channelId);
-            this.activeChannelIndex.remove(channelId);
+            this.activeGameIndex.remove(channelId);
             if(createChannel()){
                logger.warn("channel created");
             }
@@ -183,6 +185,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onJoined(int channelId, int sessionId){
         logger.warn("Session joined->"+channelId+">>"+sessionId);
+        ActiveGame activeGameChannel = activeGameIndex.get(channelId);
+        //activeGameChannel.owner("systemId");
+        //gameModule.onJoined(activeGameChannel);
     }
 
     @Override
@@ -195,7 +200,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
             boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
             if(suc&&sessionId==messageHeader.sessionId){
-                activeChannelIndex.get(messageHeader.channelId).totalJoined.incrementAndGet();
+                activeGameIndex.get(messageHeader.channelId).totalJoined.incrementAndGet();
                 return true;
             }
             return false;
@@ -220,12 +225,12 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             int channelId = keySync.getAndIncrement();
             channel.addProperty("channelId",channelId);
             channel.addProperty("sessionId",keySync.getAndAdd(this.room.capacity()));
-            ActiveGameChannel activeChannel = new ActiveGameChannel(this.room.capacity());
             headers[5]="onChannel";
             String resp = httpCaller.post(registerPath,channel.toString().getBytes(),headers);
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
-            activeChannelIndex.put(channelId, activeChannel);
+            ActiveGame activeChannel = new ActiveGame(this.createGameModule(channelId));
+            activeGameIndex.put(channelId, activeChannel);
             udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this));
             return true;
         }catch (Exception ex){
@@ -242,14 +247,16 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        this.gameModule.onAction(messageHeader,messageBuffer,callback);
+        ActiveGame activeGame = activeGameIndex.get(messageHeader.channelId);
+        activeGame.gameModule.onAction(messageHeader,messageBuffer,callback);
     }
 
 
-    private void createGameModule(String moduleName) throws Exception{
-        this.gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
-        this.gameModule.setup(this.room,this);
+    private GameModule createGameModule(int channelId) throws Exception{
+        GameModule gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
+        gameModule.setup(room.assign(channelId),this);
         logger.warn("Game module ["+moduleName+"] created");
+        return gameModule;
     }
 
 

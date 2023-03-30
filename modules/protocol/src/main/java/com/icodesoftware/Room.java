@@ -2,6 +2,8 @@ package com.icodesoftware;
 
 public interface Room {
 
+    int channelId();
+
     int capacity();
 
     long duration();
