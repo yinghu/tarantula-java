@@ -1,14 +1,15 @@
 package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.BatchUtil;
 
 public class GameUserChannel extends UserChannel {
 
     private UDPEndpointServiceProvider.UserSessionValidator userSessionValidator;
+
     private UDPEndpointServiceProvider.SessionListener sessionListener;
-    //private UDPEndpointServiceProvider.RequestListener requestListener;
+
     private UDPEndpointServiceProvider.CipherListener cipherListener;
+
     private UDPEndpointServiceProvider.ActionListener actionListener;
 
     public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.ActionListener actionListener){

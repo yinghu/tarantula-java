@@ -3,25 +3,15 @@ package com.tarantula.cci.udp;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
-import com.icodesoftware.Session;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.protocol.ChannelHeader;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 
-public class GameChannel extends RecoverableObject implements Channel, Portable {
-
-    protected String configurationTypeId;
-
-    protected int channelId;
-    protected int sessionId;
-    protected int timeout;
-    protected byte[] serverKey;
-    protected Connection connection;
+public class GameChannel extends ChannelHeader implements Portable {
 
 
     public GameChannel(){
@@ -34,41 +24,6 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
         this.serverKey = serverKey;
         this.timeout = timeout;
     }
-    public String configurationTypeId() {
-        return this.configurationTypeId;
-    }
-
-    public void configurationTypeId(String configurationTypeId) {
-        this.configurationTypeId = configurationTypeId;
-    }
-
-    @Override
-    public int channelId() {
-        return channelId;
-    }
-
-    @Override
-    public int sessionId() {
-        return sessionId;
-    }
-
-    public int timeout(){
-        return this.timeout;
-    }
-    public byte[] serverKey(){
-        return serverKey;
-    }
-
-    @Override
-    public void write(Session.Header messageHeader, byte[] bytes) {
-
-    }
-
-    @Override
-    public Connection connection() {
-        return connection;
-    }
-
 
     @Override
     public int getFactoryId() {
@@ -94,8 +49,6 @@ public class GameChannel extends RecoverableObject implements Channel, Portable 
         serverKey = portableReader.readByteArray("3");
         connection = portableReader.readPortable("4");
     }
-    public void close(){}
-    public void reset(){}
 
     public void sessionId(int sessionId) {
         this.sessionId = sessionId;

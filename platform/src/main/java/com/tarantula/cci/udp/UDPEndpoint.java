@@ -196,7 +196,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     public void registerChannel(UDPChannel channel){
         channel.sessionId(sessionId.getAndIncrement());
         channels.put(channel.sessionId(),channel);
-        pendingJoins.put(channel.sessionId,new PendingJoinChannel(channel,sessionJoinTimeout));
+        pendingJoins.put(channel.sessionId(),new PendingJoinChannel(channel,sessionJoinTimeout));
     }
 
     @Override

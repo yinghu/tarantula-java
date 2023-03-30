@@ -182,7 +182,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onJoined(int channelId, int sessionId){
-
+        logger.warn("Session joined->"+channelId+">>"+sessionId);
     }
 
     @Override
@@ -242,7 +242,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         this.gameModule.onAction(messageHeader,messageBuffer,callback);
     }
 
