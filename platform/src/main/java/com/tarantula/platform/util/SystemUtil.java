@@ -1,6 +1,7 @@
 package com.tarantula.platform.util;
 
 import com.icodesoftware.OnSession;
+import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.ValidationUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
@@ -174,6 +175,14 @@ public class SystemUtil {
     public static ApplicationPreSetup applicationPreSetup(String className){
         try{
             return (ApplicationPreSetup)Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static GameModule gameModule(String className){
+        try{
+            return (GameModule) Class.forName(className).getConstructor().newInstance();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

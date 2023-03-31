@@ -94,14 +94,10 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
-        else if(action.equals("onTest")){
+        else if(action.equals("onUpdate")){
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
-            resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
-            Cipher cipher = CipherUtil.encrypt(serverKey);
-            resp.addProperty("token", Base64.getEncoder().encodeToString(cipher.doFinal("hello".getBytes())));
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
     }

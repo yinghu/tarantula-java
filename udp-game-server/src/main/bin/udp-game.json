@@ -3,18 +3,18 @@
     "inboundThreadPoolSetting":"udp-messaging,8,8,8,30,0",
     "schedulerSetting": "game-scheduler,3,3",
     "maxChannelSize": 10,
-    "binding":"192.168.1.21",
+    "binding":"192.168.1.23",
     "port":16693,
     "receiverTimeout": 3000,
     "gameModule": "com.tarantula.game.blackjack.BlackjackModule",
     "register":{
-        "url":"http://192.168.1.21:8090",
+        "url":"http://192.168.1.23:8090",
         "path":"server",
-        "accessKey":"BDS/93475418d3994bdd8ba3bef910497f88-C8FE1ED1D1782B965B2FB77B0714C05A8C2837A4-ED796C730FCBB8B9AC2FD348EDBE2ECC"
+        "accessKey":"BDS/8dcb3df02086450cb6e83bd0be62c4e8-AA3E1FE0226E46B8673308E49167E5DC8B791566-4830E2A832E33FF8D744C7D5627AEF81"
     },
     "connection":{
         "configurationName":"lobby1/rank1",
-        "host":"192.168.1.21",
+        "host":"192.168.1.23",
         "port":16693,
         "type":"udp",
         "secured":true

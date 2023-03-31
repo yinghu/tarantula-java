@@ -1,25 +1,25 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-create-game-cluster-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+            <span id="tx-edit-game-cluster-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">CREATE GAME CLUSTER</span>
+            <span class="tx-margin-left-8 tx-text-24">EDIT GAME CLUSTER</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-create-game-cluster-message"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-edit-game-cluster-message"></div>
     <div class="w3-panel w3-border-bottom w3-border-red tx-text-14">
         <div class="w3-container w3-center">
-            <p>You are creating a game service cluster to support your new game title</p>
+            <p>You are editing a game service cluster to support your new game title</p>
         </div>
     </div>
-    <div id='tx-create-game-cluster-form' class="w3-container w3-border-bottom w3-border-red">
+    <div id='tx-edit-game-cluster-form' class="w3-container w3-border-bottom w3-border-red">
         <div class="w3-panel">
             <label class="tx-text-12">Game Title Name :</label>
-            <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name'/>
+            <input id ="tx-game-cluster-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game title name' disabled/>
         </div>
         <div class="w3-panel">
             <span><label class="tx-text-12">Game Logo Icon :</label></span>
@@ -47,7 +47,7 @@
         </div>
         <div class="w3-panel">
             <label class="tx-text-12 tx-margin-right-4">Enable Tournament</label>
-            <input id='tx-game-cluster-enable-tournament' class="w3-check tx-text-12" type="checkbox">
+            <input id='tx-game-cluster-enable-tournament' class="w3-check tx-text-12" type="checkbox" disabled>
             <label class="tx-text-12 tx-margin-right-4">Enable Dedicated Server</label>
             <input id='tx-game-cluster-dedicated-server' class="w3-check tx-text-12" type="checkbox">
         </div>
@@ -61,7 +61,7 @@
             </select>
         </div>
         <div class="w3-panel">
-            <span id="tx-create-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create Game Cluster</span>
+            <span id="tx-edit-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Edit Game Cluster</span>
         </div>
     </div> 
     <div id='tx-launch-game-cluster-form' class="w3-container w3-border-bottom w3-border-red w3-center">
@@ -127,8 +127,20 @@
 <script>
     let _mode = "pve";
     let _pendingIcon ={ready:false,progress:1};
+    document.querySelector("#tx-edit-game-cluster-message").innerHTML = TARA_API.query().gameClusterId;
+    TARA_API.onGet('role/admin',"onLoadGameCluster",TARA_API.query().gameClusterId,(resp)=>{
+                    console.log(resp);
+                    document.querySelector('#tx-game-cluster-name').value = resp.name; 
+                    document.querySelector('#tx-game-cluster-logo').value = resp.gameIcon;
+                    document.querySelector('#tx-game-cluster-developer-logo').value = resp.developerIcon;
+                    document.querySelector('#tx-game-cluster-dedicated-server').checked = resp.dedicated;   
+                    document.querySelector('#tx-game-cluster-enable-tournament').checked = resp.tournamentEnabled;
+                    document.querySelector('#tx-play-mode').value = resp.mode;
+                    _mode = resp.mode;
+
+                });
     document.querySelector('#tx-launch-game-cluster-form').style.display='none';
-    document.querySelector('#tx-create-game-cluster').onclick=()=>{
+    document.querySelector('#tx-edit-game-cluster').onclick=()=>{
         let _n = document.querySelector('#tx-game-cluster-name').value;
         let _b = document.querySelector('#tx-game-cluster-enable-tournament').checked;
         let _d = document.querySelector('#tx-game-cluster-dedicated-server').checked;
@@ -136,18 +148,18 @@
         let _dicon = document.querySelector('#tx-game-cluster-developer-logo').value;
         let _developer = document.querySelector('#tx-game-cluster-developer').value;
         if(_n ==null | _n == ''){
-            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster name cannot be null';
+            document.querySelector('#tx-edit-game-cluster-message').innerHTML = 'Game cluster name cannot be null';
             return;
         }
         if(_gicon ==null | _gicon == ''){
-            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster icon cannot be null';
+            document.querySelector('#tx-edit-game-cluster-message').innerHTML = 'Game cluster icon cannot be null';
             return;
         }
         if(_dicon ==null | _dicon == ''){
-            document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game developer icon cannot be null';
+            document.querySelector('#tx-edit-game-cluster-message').innerHTML = 'Game developer icon cannot be null';
             return;
         }
-        let cmd = {serviceTag:'role/admin',command:'onCreateGameCluster'};
+        let cmd = {serviceTag:'role/admin',command:'oneditGameCluster'};
         cmd.name = _n;
         cmd.playMode = _mode;
         cmd.tournamentEnabled = _b;
@@ -159,12 +171,12 @@
             if(resp.successful){
                 //goes to do lobby configurations
                 TARA_API.query().gameClusterId = resp.gameClusterId;
-                document.querySelector('#tx-create-game-cluster-form').style.display='none';
+                document.querySelector('#tx-edit-game-cluster-form').style.display='none';
                 document.querySelector('#tx-launch-game-cluster-form').style.display='block';
                 TARA_API.query().callback();
             }
             else{
-                document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;
+                document.querySelector('#tx-edit-game-cluster-message').innerHTML = resp.message;
             }
         });       
     };
@@ -208,7 +220,7 @@
             document.querySelector("#tx-logo-icon-file-name").innerHTML = 'Select PNG format file!'; 
             return;
         } 
-        TARA_API.onUpload(_pendingIcon.data,f.name,'image/png','createGameCluster',(resp)=>{
+        TARA_API.onUpload(_pendingIcon.data,f.name,'image/png','editGameCluster',(resp)=>{
             if(resp.successful){
                 console.log(_pendingIcon.icon);
                 document.querySelector('#'+_pendingIcon.icon).value = resp.message;
@@ -233,14 +245,14 @@
  
     document.querySelector('#tx-launch-game-cluster').onclick=()=>{
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onLaunchGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
-            document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;  
+            document.querySelector('#tx-edit-game-cluster-message').innerHTML = resp.message;  
             TARA_API.query().callback(); 
             let m3 = document.querySelector('#tx-popup');
             m3.innerHTML="";
             m3.style.display = 'none';   
         });
     };
-    document.querySelector('#tx-create-game-cluster-close').onclick=()=>{
+    document.querySelector('#tx-edit-game-cluster-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

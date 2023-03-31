@@ -3,6 +3,7 @@
   "context": "admin",
   "viewList":[
     {"type":"create.game.cluster","moduleResourceFile":"admin/create.game.cluster.view.html"},
+    {"type":"edit.game.cluster","moduleResourceFile":"admin/edit.game.cluster.view.html"},
     {"type":"create.access.key","moduleResourceFile":"admin/create.access.key.view.html"},
     {"type":"list.developer.key","moduleResourceFile":"admin/list.developer.key.view.html"},
     {"type":"create.developer.key","moduleResourceFile":"admin/create.developer.key.view.html"},
@@ -12,10 +13,10 @@
     {"type":"create.category","moduleResourceFile":"admin/create.category.view.html"},
     {"type":"create.enum","moduleResourceFile":"admin/create.enum.view.html"},
     {"type":"create.primitive","moduleResourceFile":"admin/create.primitive.view.html"},
-    {"type":"game.service.edit","moduleResourceFile":"admin/game.service.edit.view.html"},
+    {"type":"game.cluster.service.edit","moduleResourceFile":"admin/game.cluster.service.edit.view.html"},
     {"type":"game.cluster.launch","moduleResourceFile":"admin/game.cluster.launch.view.html"},
     {"type":"game.cluster.shutdown","moduleResourceFile":"admin/game.cluster.shutdown.view.html"},
-    {"type":"game.cluster.edit","moduleResourceFile":"admin/game.cluster.edit.view.html"},
+    {"type":"game.cluster.lobby.edit","moduleResourceFile":"admin/game.cluster.lobby.edit.view.html"},
     {"type":"game.cluster.metrics","moduleResourceFile":"admin/game.cluster.metrics.view.html"}
   ]
 }

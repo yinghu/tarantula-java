@@ -47,7 +47,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private JsonObject config;
 
     private ConcurrentHashMap<Integer, ActiveGame> activeGameIndex;
-    //private ConcurrentLinkedDeque<ActiveGameChannel> pendingActiveChannelQueue;
+
     private int pingRetries;
     private String[] headers = new String[]{
             Session.TARANTULA_ACCESS_KEY,
@@ -72,7 +72,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
         this.moduleName = config.get("gameModule").getAsString();
-        //this.pendingActiveChannelQueue = new ConcurrentLinkedDeque<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -314,6 +313,13 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onUpdated(Room room, byte[] payload) {
         this.logger.warn("room updated->"+room.channelId());
+        try{
+            headers[5]="onUpdate";
+            String rest = httpCaller.post(registerPath,payload,headers);
+            logger.warn(">>>"+rest);
+        }catch (Exception ex){
+            logger.error("error on updated",ex);
+        }
     }
 
     @Override
