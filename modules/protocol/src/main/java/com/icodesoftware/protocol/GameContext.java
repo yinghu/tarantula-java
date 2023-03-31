@@ -6,6 +6,4 @@ public interface GameContext extends Context {
 
     GameServiceProxy gameServiceProxy(short serviceId);
 
-    
-
 }

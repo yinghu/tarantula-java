@@ -1,18 +1,19 @@
 package com.tarantula.game.blackjack;
 
-import com.icodesoftware.Channel;
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Room;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.Card;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BlackjackModule implements GameModule{
 
     private GameContext gameContext;
     private BlackjackGame blackjackGame;
     private Room room;
+    private RoomListener roomListener;
+    private ConcurrentHashMap<Integer,Channel> channels;
 
     public void setup(Room room, GameContext gameContext){
         this.room = room;
@@ -21,6 +22,7 @@ public class BlackjackModule implements GameModule{
         this.gameContext.schedule(new ScheduleRunner(5000,()->{
             this.gameContext.log("MX->"+room.capacity(), OnLog.WARN);
         }));
+        this.channels = new ConcurrentHashMap<>();
         this.gameContext.log("Blackjack module started->"+room.capacity(),OnLog.WARN);
     }
     public Room room(){
@@ -55,12 +57,27 @@ public class BlackjackModule implements GameModule{
     }
 
     @Override
+    public void onValidated(Channel channel) {
+        this.channels.put(channel.sessionId(),channel);
+    }
+
+    @Override
     public void onJoined(Channel channel) {
-        this.gameContext.log("JOINED->"+channel.owner(),OnLog.WARN);
+        Channel validated  = this.channels.get(channel.sessionId());
+        this.gameContext.log("JOINED->"+validated.owner(),OnLog.WARN);
+        if(roomListener==null) return;
+        roomListener.onStarted(this.room);
     }
 
     @Override
     public void onLeft(Channel channel) {
-        this.gameContext.log("LEFT->"+channel.owner(),OnLog.WARN);
+        Channel removed = channels.remove(channel.sessionId());
+        this.gameContext.log("LEFT->"+removed.owner(),OnLog.WARN);
+        if(roomListener==null) return;
+        roomListener.onEnded(this.room);
+    }
+
+    public void registerRoomListener(RoomListener roomListener){
+        this.roomListener = roomListener;
     }
 }

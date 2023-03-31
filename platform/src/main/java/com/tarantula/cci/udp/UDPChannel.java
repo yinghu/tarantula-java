@@ -128,5 +128,8 @@ public class UDPChannel extends GameChannel {
     public void joined(){
         this.channelListener.onJoined(this);
     }
+    public void validated(){
+        this.channelListener.onValidated(this);
+    }
 
 }

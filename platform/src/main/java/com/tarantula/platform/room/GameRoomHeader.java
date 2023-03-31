@@ -287,6 +287,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
+    public void onValidated(Channel channel) {
+        gameModule.onValidated(channel);
+    }
+
+
+    @Override
     public void onJoined(Channel channel) {
        gameModule.onJoined(channel);
     }
@@ -295,4 +301,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public void onLeft(Channel channel) {
        gameModule.onLeft(channel);
     }
+
+
 }

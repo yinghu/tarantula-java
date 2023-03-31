@@ -228,8 +228,9 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
             boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
-            boolean joined = sessionId == messageHeader.sessionId && suc;
-            return  joined && pendingJoins.remove(sessionId)!=null;
+            boolean joined = sessionId == messageHeader.sessionId && suc && pendingJoins.remove(sessionId)!=null;
+            if(joined) channels.get(sessionId).validated();
+            return joined;
         }catch (Exception ex){
             logger.error("unexpected error on validate",ex);
             return false;

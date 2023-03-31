@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,GameContext {
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,GameContext{
 
     private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
 
@@ -171,7 +171,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         ActiveGame activeGame = activeGameIndex.get(channelId);
         int totalLeft = activeGame.totalLeft.decrementAndGet();
         logger.warn("Session timeout->"+channelId+">>"+sessionId);
-        //activeGame.gameModule.onLeft(activeGame);
+        activeGame.gameModule.onLeft(new ActiveChannel(sessionId));
         if(totalLeft == 0){
             logger.warn("Channel Removed->"+channelId+">>"+sessionId);
             this.udpEndpointServiceProvider.releaseUserChannel(channelId);
@@ -185,9 +185,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onJoined(int channelId, int sessionId){
         logger.warn("Session joined->"+channelId+">>"+sessionId);
-        ActiveGame activeGameChannel = activeGameIndex.get(channelId);
-        //activeGameChannel.owner("systemId");
-        //gameModule.onJoined(activeGameChannel);
+        ActiveGame activeGame = activeGameIndex.get(channelId);
+        activeGame.gameModule.onJoined(new ActiveChannel(sessionId));
     }
 
     @Override
@@ -200,7 +199,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
             boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
             if(suc&&sessionId==messageHeader.sessionId){
-                activeGameIndex.get(messageHeader.channelId).totalJoined.incrementAndGet();
+                ActiveGame activeGame = activeGameIndex.get(messageHeader.channelId);
+                activeGame.totalJoined.incrementAndGet();
+                activeGame.gameModule.onValidated(new ActiveChannel(session.systemId,sessionId));
                 return true;
             }
             return false;
@@ -230,6 +231,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             ActiveGame activeChannel = new ActiveGame(this.createGameModule(channelId));
+            activeChannel.gameModule.registerRoomListener(activeChannel);
             activeGameIndex.put(channelId, activeChannel);
             udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this));
             return true;

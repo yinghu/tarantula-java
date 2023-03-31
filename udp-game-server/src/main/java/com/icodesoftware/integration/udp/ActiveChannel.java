@@ -4,7 +4,12 @@ import com.icodesoftware.protocol.ChannelHeader;
 
 public class ActiveChannel extends ChannelHeader {
 
-    public ActiveChannel(){
+    public ActiveChannel(String owner,int sessionId){
+        this.owner = owner;
+        this.sessionId = sessionId;
+    }
 
+    public ActiveChannel(int sessionId){
+        this.sessionId = sessionId;
     }
 }
