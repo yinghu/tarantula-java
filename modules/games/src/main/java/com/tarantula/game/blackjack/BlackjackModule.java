@@ -74,6 +74,7 @@ public class BlackjackModule implements GameModule{
         Channel removed = channels.remove(channel.sessionId());
         this.gameContext.log("LEFT->"+removed.owner(),OnLog.WARN);
         if(roomListener==null) return;
+        roomListener.onUpdated(this.room,"".getBytes());
         roomListener.onEnded(this.room);
     }
 
