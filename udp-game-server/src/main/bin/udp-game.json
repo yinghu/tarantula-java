@@ -6,7 +6,6 @@
     "binding":"192.168.1.23",
     "port":16693,
     "receiverTimeout": 3000,
-    "gameModule": "com.tarantula.game.blackjack.BlackjackModule",
     "register":{
         "url":"http://192.168.1.23:8090",
         "path":"server",

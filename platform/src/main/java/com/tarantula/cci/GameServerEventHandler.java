@@ -51,13 +51,14 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("successful",suc);
             if(suc) {
-                resp.addProperty("typeId", typeId);
+                resp.addProperty("typeId",typeId);
                 resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
                 resp.addProperty("sessionTimeout",(int)onAccess.property("sessionTimeout"));
                 resp.addProperty("capacity",(int)onAccess.property("capacity"));
                 resp.addProperty("joinsOnStart",(int)onAccess.property("joinsOnStart"));
                 resp.addProperty("duration",(long)onAccess.property("duration"));
                 resp.addProperty("overtime",(long)onAccess.property("overtime"));
+                resp.addProperty("gameModule",(String)onAccess.property("gameModule"));
             }
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }

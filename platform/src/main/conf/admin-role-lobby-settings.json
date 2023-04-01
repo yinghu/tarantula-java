@@ -211,7 +211,6 @@
     "header": {
       "PlayMode": 0,
       "Name": "zone1",
-      "GameModuleName": "com.tarantula.platform.room.PlaceholderGameModule",
       "Rank": "1"
     },
     "application": {
@@ -229,7 +228,6 @@
     "header": {
       "PlayMode": 1,
       "Name": "zone1",
-      "GameModuleName": "com.tarantula.platform.room.PlaceholderGameModule",
       "Rank": "1"
     },
     "application": {
@@ -247,7 +245,6 @@
     "header": {
       "PlayMode": 2,
       "Name": "zone1",
-      "GameModuleName": "com.tarantula.platform.room.PlaceholderGameModule",
       "Rank": "1"
     },
     "application": {
@@ -265,7 +262,6 @@
     "header": {
       "PlayMode": 3,
       "Name": "zone1",
-      "GameModuleName": "com.tarantula.platform.room.PlaceholderGameModule",
       "Rank": "1"
     },
     "application": {
@@ -281,7 +277,8 @@
   },
   "lobby": {
     "header": {
-      "Name": "lobby1"
+      "Name": "lobby1",
+      "GameModuleName": "com.tarantula.platform.room.PlaceholderGameModule"
     },
     "application": {
       "ZoneSet": []

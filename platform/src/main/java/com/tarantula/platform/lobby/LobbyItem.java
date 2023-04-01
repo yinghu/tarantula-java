@@ -26,6 +26,10 @@ public class LobbyItem extends Application{
         return this.header.get("Name").getAsString();
     }
 
+    public String gameModule(){
+        return header.get("GameModuleName").getAsString();
+    }
+
     public List<ZoneItem> zoneList(){
         ArrayList<ZoneItem> zlist = new ArrayList<>();
         _reference.forEach(ref->{

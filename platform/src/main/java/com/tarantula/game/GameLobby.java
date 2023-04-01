@@ -18,4 +18,6 @@ public interface GameLobby extends Configurable, Serviceable {
     void setup(ApplicationContext applicationContext) throws Exception;
     boolean timeout(String systemId,int stub);
 
+    //String gameModule();
+
 }

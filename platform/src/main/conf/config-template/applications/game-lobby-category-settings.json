@@ -24,6 +24,13 @@
             "downloadable": false
           },
           {
+            "name": "GameModuleName",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "ZoneSet",
             "type": "set",
             "reference": "category:Zone",

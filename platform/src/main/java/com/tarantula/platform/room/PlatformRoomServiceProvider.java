@@ -3,6 +3,7 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 
@@ -11,12 +12,12 @@ import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
-import com.tarantula.game.blackjack.BlackjackModule;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnAccessTrack;
 import com.icodesoftware.util.ScheduleRunner;
+import com.tarantula.platform.util.SystemUtil;
 
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,RoomListener {
 
     private static final String CONFIG = "game-room-settings";
     private static final String DS_SUFFIX = "_room";
@@ -155,9 +156,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         }
         GameRoom room = gameRoomIndex.get(stub.roomId);
-        BlackjackModule module = new BlackjackModule();
-        module.setup(room,gameServiceProvider);
-        room.setup(module);
         channel.register(stub,room,room,room,timeoutListener);
         udp.registerChannel(channel);
         return channel;
@@ -221,7 +219,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public <T extends Configurable> void register(T t) {
         logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"/"+t.configurationName()+"]["+minRoomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
-        //this.logger.warn("GAME MODULE->"+gameZone.gameModule());
+        this.logger.warn("Game zone is running on game module ["+gameZone.gameModule()+"]");
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
@@ -328,6 +326,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         onAccess.property("duration",index.gameZone.roundDuration());
         onAccess.property("overtime",index.gameZone.roundOvertime());
         onAccess.property("joinsOnStart",index.gameZone.joinsOnStart());
+        onAccess.property("gameModule",index.gameZone.gameModule());
         return onAccess;
     }
 
@@ -507,12 +506,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 if(!this.dataStore.load(_gameRoom)) return null;
                 _gameRoom.dataStore(this.dataStore);
                 _gameRoom.load();
+                GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),_gameRoom);
+                _gameRoom.setup(gameModule);
                 return _gameRoom;
             });
         }
         GameRoom gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
+        GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
+        gameRoom.setup(gameModule);
         synchronized (zoneIndex.roomIndex){
             zoneIndex.roomIndex.addKey(gameRoom.roomId());
             this.dataStore.update(zoneIndex.roomIndex);
@@ -574,4 +577,24 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
+    private GameModule gameModule(String moduleName,Room room){
+        GameModule gameModule = SystemUtil.gameModule(moduleName);
+        gameModule.setup(room,gameServiceProvider);
+        gameModule.registerRoomListener(this);
+        return gameModule;
+    }
+
+    @Override
+    public void onStarted(Room room) {
+        this.logger.warn("Room started");
+    }
+    @Override
+    public void onUpdated(Room room, byte[] payload) {
+        this.logger.warn("Room updated");
+    }
+
+    @Override
+    public void onEnded(Room room) {
+        this.logger.warn("Room ended");
+    }
 }

@@ -40,9 +40,6 @@ public class ZoneItem extends Item {
         return header.get("Name").getAsString();
     }
 
-    public String gameModule(){
-        return header.get("GameModuleName").getAsString();
-    }
 
     public RoomItem room(){
 

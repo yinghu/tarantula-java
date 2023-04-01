@@ -71,7 +71,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
-        this.moduleName = config.get("gameModule").getAsString();
+        //this.moduleName = config.get("gameModule").getAsString();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -102,6 +102,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
+        this.moduleName = jo.get("gameModule").getAsString();
         this.room = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;

@@ -30,7 +30,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String GAME_SERVICE = "4";
     public final static String GAME_DATA = "5";
     public final static String OWNER = "6";
-    public final static String  GAME_MODULE_NAME = "7";
+
     public final static String DISABLED = "9";
     public final static String PUBLISHING_ID = "10";
     public final static String TOURNAMENT_ENABLED = "11";
@@ -98,7 +98,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         jo.addProperty("tournamentEnabled",(Boolean)property(GameCluster.TOURNAMENT_ENABLED));
         jo.addProperty("dedicated",(Boolean)property(GameCluster.DEDICATED));
         jo.addProperty("disabled",(Boolean)property(GameCluster.DISABLED));
-        jo.addProperty("gameModule",gameModule());
         return jo;
     }
     @Override
@@ -223,10 +222,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public boolean dedicated(){
         return (boolean)this.properties.get(DEDICATED);
-    }
-
-    public String gameModule(){
-        return (String)this.properties.get(GAME_MODULE_NAME);
     }
 
 

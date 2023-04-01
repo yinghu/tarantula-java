@@ -22,6 +22,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     private String configurationTypeId;
     private String configurationName;
 
+    private String gameModule;
+
     public String configurationTypeId() {
         return this.configurationTypeId;
     }
@@ -38,7 +40,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         this.configurationName = configurationName;
     }
 
-    public ConfigurableZone(ZoneItem zoneItem){
+
+    public ConfigurableZone(String gameModule,ZoneItem zoneItem){
+        this.gameModule = gameModule;
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
         this.arenaIndex = new ConcurrentHashMap<>();
@@ -64,7 +68,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public String gameModule(){
-        return zoneItem.gameModule();
+        return this.gameModule;
     }
     @Override
     public int capacity() {

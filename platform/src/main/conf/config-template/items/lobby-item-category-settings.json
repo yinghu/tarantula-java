@@ -31,13 +31,6 @@
             "downloadable": false
           },
           {
-            "name": "GameModuleName",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "Rank",
             "type": "number",
             "reference": "Integer",
