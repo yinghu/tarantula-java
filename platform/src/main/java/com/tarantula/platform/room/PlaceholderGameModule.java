@@ -30,6 +30,7 @@ public class PlaceholderGameModule implements GameModule {
     public void onLeft(Channel channel) {
         if(channels.remove(channel.sessionId())==null) return;
         if(totalJoined.decrementAndGet()>0) return;
+        this.roomListener.onUpdated(room,"".getBytes());
         this.roomListener.onEnded(this.room);
     }
 
@@ -39,7 +40,7 @@ public class PlaceholderGameModule implements GameModule {
         this.gameContext = gameContext;
         this.channels = new ConcurrentHashMap<>();
         this.totalJoined = new AtomicInteger(0);
-        this.gameContext.log("Placeholder game  module started", OnLog.WARN);
+        this.gameContext.log("Placeholder game  module started on channel ["+room.channelId()+"]", OnLog.WARN);
     }
 
     @Override
