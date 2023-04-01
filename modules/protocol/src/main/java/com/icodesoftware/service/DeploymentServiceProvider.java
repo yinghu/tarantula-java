@@ -63,6 +63,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     boolean disableApplication(String applicationId);
     //<T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled);
     <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties);
+    <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);
+
 
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);

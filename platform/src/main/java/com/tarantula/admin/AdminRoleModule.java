@@ -70,7 +70,7 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onEditGameCluster")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            GameCluster g = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster g = this.deploymentServiceProvider.updateGameCluster(session.name(),onAccess);
             session.write(g.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateAccessKey")){

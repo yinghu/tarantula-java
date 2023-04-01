@@ -570,6 +570,25 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
 
+    public <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties){
+        GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionKey(gameClusterId);
+        DataStore mds = this.tarantulaContext.masterDataStore();
+        if(!mds.load(gameCluster)) throw new RuntimeException("["+gameClusterId+"] not existed");
+        String playMode = (String) properties.property("playMode");
+        boolean dedicated = (boolean)properties.property("dedicated");
+        String gameIcon = (String) properties.property("gameIcon");
+        String developerIcon = (String) properties.property("developerIcon");
+        String developer = (String) properties.property("developer");
+        gameCluster.property(GameCluster.MODE,playMode);
+        gameCluster.property(GameCluster.DEVELOPER,developer);
+        gameCluster.property(GameCluster.DEDICATED,dedicated);
+        gameCluster.property(GameCluster.GAME_ICON,gameIcon);
+        gameCluster.property(GameCluster.DEVELOPER_ICON,developerIcon);
+        mds.update(gameCluster);
+        return (T)gameCluster;
+    }
+
     public  <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.accessIndexService().set(name,0);//name+"-"+mode
         if(accessIndex==null){

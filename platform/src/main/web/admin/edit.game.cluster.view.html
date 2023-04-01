@@ -13,7 +13,7 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-edit-game-cluster-message"></div>
     <div class="w3-panel w3-border-bottom w3-border-red tx-text-14">
         <div class="w3-container w3-center">
-            <p>You are editing a game service cluster to support your new game title</p>
+            <p>You are editing a game service cluster</p>
         </div>
     </div>
     <div id='tx-edit-game-cluster-form' class="w3-container w3-border-bottom w3-border-red">
@@ -50,15 +50,6 @@
             <input id='tx-game-cluster-enable-tournament' class="w3-check tx-text-12" type="checkbox" disabled>
             <label class="tx-text-12 tx-margin-right-4">Enable Dedicated Server</label>
             <input id='tx-game-cluster-dedicated-server' class="w3-check tx-text-12" type="checkbox">
-        </div>
-        <div class="w3-panel">
-            <label class="tx-text-12 tx-margin-right-4">Game Module :</label>
-            <select id='tx-game-module' class="w3-select w3-border w3-round tx-text-12" name='module'>
-                <option value="" disabled selected>Choose Game Module</option>
-                <option value="blackjack">Blackjack</option>
-                <option value="mahjong">MahJong</option>
-                <option value="rogue">Rogue</option>   
-            </select>
         </div>
         <div class="w3-panel">
             <span id="tx-edit-game-cluster" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Edit Game Cluster</span>
@@ -135,6 +126,7 @@
                     document.querySelector('#tx-game-cluster-developer-logo').value = resp.developerIcon;
                     document.querySelector('#tx-game-cluster-dedicated-server').checked = resp.dedicated;   
                     document.querySelector('#tx-game-cluster-enable-tournament').checked = resp.tournamentEnabled;
+                    document.querySelector('#tx-game-cluster-developer').value = resp.developer;
                     document.querySelector('#tx-play-mode').value = resp.mode;
                     _mode = resp.mode;
 
@@ -159,7 +151,7 @@
             document.querySelector('#tx-edit-game-cluster-message').innerHTML = 'Game developer icon cannot be null';
             return;
         }
-        let cmd = {serviceTag:'role/admin',command:'onEditGameCluster'};
+        let cmd = {};
         cmd.name = _n;
         cmd.playMode = _mode;
         cmd.tournamentEnabled = _b;
@@ -167,13 +159,15 @@
         cmd.gameIcon = _gicon;
         cmd.developer = _developer;
         cmd.developerIcon = _dicon;
-        TARA_API.onService(true,cmd,(resp)=>{
+        TARA_API.onSet('role/admin','onEditGameCluster',TARA_API.query().gameClusterId,cmd,(resp)=>{
+            console.log(resp);
             if(resp.successful){
+                console.log(resp);
                 //goes to do lobby configurations
-                TARA_API.query().gameClusterId = resp.gameClusterId;
-                document.querySelector('#tx-edit-game-cluster-form').style.display='none';
-                document.querySelector('#tx-launch-game-cluster-form').style.display='block';
-                TARA_API.query().callback();
+                //TARA_API.query().gameClusterId = resp.gameClusterId;
+                //document.querySelector('#tx-edit-game-cluster-form').style.display='none';
+                //document.querySelector('#tx-launch-game-cluster-form').style.display='block';
+                //TARA_API.query().callback();
             }
             else{
                 document.querySelector('#tx-edit-game-cluster-message').innerHTML = resp.message;
