@@ -190,7 +190,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
             if(room.empty()) {
                 room.reset();
-                index.pendingRooms.offer(room.roomId());
+                resetRoom(index,room.roomId());
+                //index.pendingRooms.offer(room.roomId());
             }
         });
     }
@@ -293,11 +294,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
         if(started){
             UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-            for(int i=0;i<minRoomPoolSizePerZone;i++){
-                UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
-                for(UDPChannel c : channels){
-                    index.pendingChannels.offer(c);
+            if(dedicated){
+                for(int i=0;i<minRoomPoolSizePerZone;i++){
+                    UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+                    for(UDPChannel c : channels){
+                        index.pendingChannels.offer(c);
+                    }
                 }
+            }
+            else{
+                gameRoomIndex.forEach((rk,rv)->{
+                    rv.setup(udp.createChannels(gameZone.capacity()));
+                    //logger.warn("room->"+rv.capacity()+"/"+rv.channelId());
+                });
             }
             logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
         }
@@ -558,14 +567,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private GameRoom localJoin(Rating rating, GameZoneIndex index){
         String roomId = index.pendingRooms.poll();
+        logger.warn("RoomID->"+roomId+">>>"+index.pendingRooms.size());
         if(roomId==null && index.maxRoomPoolSize.decrementAndGet() < 0) return null;
         GameRoom gameRoom = gameRoom(index,roomId);
         if(gameRoom==null) return null;
         GameRoom joined = gameRoom.join(rating.systemId(),(room,entry)->{
-            if(!room.full()) index.pendingRooms.offer(roomId);
+            //if(!room.full()) index.pendingRooms.offer(roomId);
         });
         joined.setup(index.gameZone,null,rating);
-
         return joined;
     }
 
