@@ -67,6 +67,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private boolean dedicated;
 
+
     private ArrayList<String> kickoff = new ArrayList<>();
     private boolean timerEnabled = false;
     private int timer;
@@ -141,24 +142,30 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public Channel registerChannel(Stub stub,Session.TimeoutListener timeoutListener){
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        UDPChannel channel = index.pendingChannels.poll();
-        UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
-        if(channel == null){
-            UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
-            if(channels.length == 0) return null;
-            for(int i=0;i<channels.length;i++){
-                if(i==0){
-                    channel = channels[i];
-                }
-                else{
-                    index.pendingChannels.offer(channels[i]);
+        if(this.dedicated){
+            UDPChannel channel = index.pendingChannels.poll();
+            UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
+            if(channel == null){
+                UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+                if(channels.length == 0) return null;
+                for(int i=0;i<channels.length;i++){
+                    if(i==0){
+                        channel = channels[i];
+                    }
+                    else{
+                        index.pendingChannels.offer(channels[i]);
+                    }
                 }
             }
+            GameRoom room = index.gameRoom;//gameRoomIndex.get(stub.roomId);
+            channel.register(stub,room,room,room,timeoutListener);
+            udp.registerChannel(channel);
+            return channel;
         }
-        GameRoom room = gameRoomIndex.get(stub.roomId);
-        channel.register(stub,room,room,room,timeoutListener);
-        udp.registerChannel(channel);
-        return channel;
+        else{//local join case
+            GameRoom room = gameRoomIndex.get(stub.roomId);
+            return room.registerChannel(stub,timeoutListener);
+        }
     }
 
     public GameZone gameZoneFromZoneId(String zoneId){
@@ -226,6 +233,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.pendingChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
         if(dedicated) {
             index.roomStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,gameZone.oid());
+            index.gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
+            GameModule gameModule = gameModule(gameZone.gameModule(),index.gameRoom);
+            index.gameRoom.setup(gameZone,gameModule,dedicated);
         }
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
@@ -507,7 +517,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 _gameRoom.dataStore(this.dataStore);
                 _gameRoom.load();
                 GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),_gameRoom);
-                _gameRoom.setup(gameModule);
+                _gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
                 return _gameRoom;
             });
         }
@@ -515,7 +525,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
         GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
-        gameRoom.setup(gameModule);
+        gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
         synchronized (zoneIndex.roomIndex){
             zoneIndex.roomIndex.addKey(gameRoom.roomId());
             this.dataStore.update(zoneIndex.roomIndex);

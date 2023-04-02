@@ -35,8 +35,9 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
     boolean full();
     boolean started();
 
-    void setup(GameModule gameModule);
+    void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);
 
+    Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
 
     interface Entry extends Resettable,Configurable, Portable {
 

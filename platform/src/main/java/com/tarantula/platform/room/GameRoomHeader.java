@@ -269,8 +269,17 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return new GameEntry();
     }
 
-    public void setup(GameModule gameModule){
+    public void setup(GameZone gameZone,GameModule gameModule,boolean dedicated){
+        this.capacity = gameZone.capacity();
+        this.duration = gameZone.roundDuration();
+        this.overtime = gameZone.roundOvertime();
+        this.joinsOnStart = gameZone.joinsOnStart();
+        this.dedicated = dedicated;
         this.gameModule = gameModule;
+    }
+
+    public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
+        return null;
     }
     @Override
     public String toString(){
