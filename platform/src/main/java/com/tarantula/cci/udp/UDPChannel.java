@@ -1,7 +1,7 @@
 package com.tarantula.cci.udp;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.ChannelListener;
+import com.icodesoftware.protocol.ChannelListener;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
@@ -33,7 +33,7 @@ public class UDPChannel extends GameChannel {
         this.cipherListener = cipherListener;
     }
 
-    public void register(Stub session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
+    public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
         this.stub = session;
         this.owner = session.systemId();
         this.routingNumber = session.stub();

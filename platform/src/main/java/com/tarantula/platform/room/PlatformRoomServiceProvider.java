@@ -3,6 +3,7 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
@@ -140,11 +141,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
     }
 
-    public Channel registerChannel(Stub stub,Session.TimeoutListener timeoutListener){
+    public Channel registerChannel(Stub stub, Session.TimeoutListener timeoutListener){
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
+        UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
         if(this.dedicated){
             UDPChannel channel = index.pendingChannels.poll();
-            UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
             if(channel == null){
                 UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
                 if(channels.length == 0) return null;
@@ -164,7 +165,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         else{//local join case
             GameRoom room = gameRoomIndex.get(stub.roomId);
-            return room.registerChannel(stub,timeoutListener);
+            Channel channel = room.registerChannel(stub,timeoutListener);
+            udp.registerChannel((UDPChannel)channel);
+            logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
+            return channel;
         }
     }
 
@@ -420,14 +424,23 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
             UDPEndpoint udp = (UDPEndpoint)endPoint;
             gameZoneIndex.forEach((k,v)->{
-                for(int i=0;i<minRoomPoolSizePerZone;i++){
-                    UDPChannel[] channels = udp.createChannels(v.gameZone.capacity());
-                    for(UDPChannel c : channels){
-                        v.pendingChannels.offer(c);
+                if(dedicated){
+                    for(int i=0;i<minRoomPoolSizePerZone;i++){
+                        UDPChannel[] channels = udp.createChannels(v.gameZone.capacity());
+                        for(UDPChannel c : channels){
+                            v.pendingChannels.offer(c);
+                        }
                     }
                 }
+                else{
+                    gameRoomIndex.forEach((rk,rv)->{
+                        rv.setup(udp.createChannels(v.gameZone.capacity()));
+                        //logger.warn("room->"+rv.capacity()+"/"+rv.channelId());
+                    });
+                }
+
             });
-            logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]");
+            logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]["+dedicated+"]");
         }
         started = true;
     }

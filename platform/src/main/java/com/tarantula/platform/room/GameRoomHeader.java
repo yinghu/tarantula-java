@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Channel;
+import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.GameModule;
@@ -18,6 +18,7 @@ import com.tarantula.game.Rating;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
@@ -42,6 +43,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected Entry[] entries;
 
     private GameModule gameModule;
+    private ArrayBlockingQueue<Channel> pendingChannels;
 
     public int channelId(){
         return channelId;
@@ -278,8 +280,16 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.gameModule = gameModule;
     }
 
+    public void setup(Channel[] channels){
+        pendingChannels = new ArrayBlockingQueue<>(channels.length);
+        for(int i=0;i<channels.length;i++){
+            pendingChannels.offer(channels[i]);
+        }
+    }
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
-        return null;
+        Channel channel = pendingChannels.poll();
+        channel.register(session,this,this,this,timeoutListener);
+        return channel;
     }
     @Override
     public String toString(){

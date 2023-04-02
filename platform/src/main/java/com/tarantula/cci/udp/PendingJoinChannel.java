@@ -1,6 +1,6 @@
 package com.tarantula.cci.udp;
 
-import com.icodesoftware.Channel;
+import com.icodesoftware.protocol.Channel;
 
 import java.util.concurrent.atomic.AtomicLong;
 

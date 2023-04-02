@@ -1,8 +1,6 @@
 package com.icodesoftware.protocol;
 
 
-import com.icodesoftware.Channel;
-import com.icodesoftware.ChannelListener;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 
@@ -100,7 +98,9 @@ public class ChannelHeader extends RecoverableObject implements Channel {
 
     }
 
+    public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
 
+    }
     public void close(){
         userChannel.kickoff(sessionId);
     }

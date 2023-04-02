@@ -1,6 +1,5 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.ChannelListener;
 import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 

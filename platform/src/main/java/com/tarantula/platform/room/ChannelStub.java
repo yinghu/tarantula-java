@@ -1,7 +1,7 @@
 package com.tarantula.platform.room;
 
 
-import com.icodesoftware.Channel;
+import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Connection;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.event.PortableEventRegistry;

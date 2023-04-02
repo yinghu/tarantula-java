@@ -1,6 +1,5 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.EndPoint;

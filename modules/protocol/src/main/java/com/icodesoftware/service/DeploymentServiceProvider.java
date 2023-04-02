@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameServerListener;
 
 import java.util.List;

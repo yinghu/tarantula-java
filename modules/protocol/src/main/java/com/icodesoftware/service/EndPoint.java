@@ -1,7 +1,7 @@
 package com.icodesoftware.service;
 
 
-import com.icodesoftware.Channel;
+import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 
