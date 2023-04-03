@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface Room {
+public interface Room extends Recoverable {
 
     int channelId();
 

@@ -1,8 +1,9 @@
 package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.Room;
+import com.icodesoftware.util.RecoverableObject;
 
-public class ActiveRoom implements Room {
+public class ActiveRoom extends RecoverableObject implements Room {
 
     private int capacity;
     private long duration;

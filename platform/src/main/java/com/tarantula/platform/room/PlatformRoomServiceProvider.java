@@ -188,9 +188,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
+            logger.warn("Room left->"+room.empty());
             if(room.empty()) {
                 room.reset();
-                resetRoom(index,room.roomId());
+                //resetRoom(index,room.roomId());
                 //index.pendingRooms.offer(room.roomId());
             }
         });
@@ -611,7 +612,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private GameModule gameModule(String moduleName,Room room){
         GameModule gameModule = SystemUtil.gameModule(moduleName);
-        gameModule.setup(room,gameServiceProvider);
+        gameModule.setup(room,gameServiceProvider.gameContext(gameModule.getClass()));
         gameModule.registerRoomListener(this);
         return gameModule;
     }

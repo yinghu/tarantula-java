@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Room;
 import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
@@ -320,6 +321,5 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public void onLeft(Channel channel) {
        gameModule.onLeft(channel);
     }
-
 
 }

@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 
-public class PlatformGameServiceProvider implements ServiceProvider,GameContext,MetricsListener,ItemDistributionCallback{
+public class PlatformGameServiceProvider implements ServiceProvider,MetricsListener,ItemDistributionCallback{
 
     private static final String CONFIG = "game-service-proxy-settings";
 
@@ -296,38 +296,10 @@ public class PlatformGameServiceProvider implements ServiceProvider,GameContext,
         return this.gameCluster.typeId();
     }
 
-    public ScheduledFuture<?> schedule(SchedulingTask task){
-        return this.serviceContext.schedule(task);
+    public GameContext gameContext(Class module){
+        return new PlatformGameContext(this.serviceContext,this,this.serviceContext.logger(module));
     }
-    public void log(String message,int level){
-        switch (level){
-            case OnLog.DEBUG:
-                this.logger.debug(message);
-                break;
-            case OnLog.INFO:
-                this.logger.info(message);
-                break;
-            case OnLog.WARN:
-                this.logger.warn(message);
-                break;
-        }
 
-    }
-    public void log(String message,Exception error,int level){
-        switch (level){
-            case OnLog.WARN:
-                if(error!=null){
-                    this.logger.warn(message);
-                }
-                else{
-                    this.logger.warn(message,error);
-                }
-                break;
-            case OnLog.ERROR:
-                this.logger.error(message,error);
-                break;
-        }
-    }
     private GameServiceProxy toGameServiceProxy(short serviceId,String className){
         try {
             GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class, PlatformGameServiceProvider.class).newInstance(serviceId,this);
