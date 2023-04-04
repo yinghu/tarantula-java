@@ -270,6 +270,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.joinsOnStart = gameZone.joinsOnStart();
         this.dedicated = dedicated;
         this.gameModule = gameModule;
+        this.owner = gameZone.distributionKey();
     }
 
     public void setup(Channel[] channels){

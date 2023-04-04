@@ -2,6 +2,7 @@ package com.tarantula.platform.room;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.util.ScheduleRunner;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,8 +34,9 @@ public class PlaceholderGameModule implements GameModule {
         if(channels.remove(channel.sessionId())==null) return;
         if(totalJoined.decrementAndGet()>0) return;
         this.roomListener.onUpdated(room,"".getBytes());
-        this.roomListener.onEnded(this.room);
-        //this.gameContext.log("left->"+channel.sessionId(),OnLog.WARN);
+        this.gameContext.schedule(new ScheduleRunner(5000,()->{
+            this.roomListener.onEnded(this.room);
+        }));
     }
 
     @Override

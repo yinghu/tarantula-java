@@ -1,9 +1,13 @@
 package com.tarantula.test;
 
+import com.tarantula.platform.room.PVEGameRoom;
 import com.tarantula.platform.room.PVPGameRoom;
+import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class GameRoomTest {
 
@@ -28,11 +32,21 @@ public class GameRoomTest {
         PVPGameRoom room = new PVPGameRoom(10);
         room.dataStore(new EmptyDataStore());
         room.load();
-        room.join("player1",(room1,entry) -> {});
-        room.join("player1",(room1,entry) -> {});
-        room.join("player1",(room1,entry) -> {});
-        room.join("player1",(room1,entry) -> {});
-        room.leave("player1",(room1,entry) -> {});
+        room.join("player1",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.join("player2",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.join("player3",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.join("player4",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.leave("player5",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
     }
 
     @Test(groups = { "GameRoom" })
@@ -45,10 +59,18 @@ public class GameRoomTest {
         room.join("player3",(room1,entry) -> {});
         room.join("player4",(room1,entry) -> {});
 
-        room.leave("player1",(room1,entry) -> {});
-        room.leave("player2",(room1,entry) -> {});
-        room.leave("player3",(room1,entry) -> {});
-        room.leave("player4",(room1,entry) -> {});
+        room.leave("player1",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.leave("player2",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.leave("player3",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
+        room.leave("player4",(room1,entry) -> {
+            Assert.assertTrue(room1.available());
+        });
         /**
         Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
         Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
@@ -65,6 +87,27 @@ public class GameRoomTest {
             ex.printStackTrace();
         }
         **/
+    }
+    @Test(groups = { "GameRoom" })
+    public void removeTest() {
+        LinkedBlockingDeque q = new LinkedBlockingDeque(3);
+        PVEGameRoom p1 = new PVEGameRoom();
+        p1.distributionKey("bds/"+ SystemUtil.oid());
+        PVEGameRoom p2 = new PVEGameRoom();
+        p2.distributionKey("bds/"+ SystemUtil.oid());
+        PVEGameRoom p3 = new PVEGameRoom();
+        p3.distributionKey("bds/"+ SystemUtil.oid());
+        PVEGameRoom p4 = new PVEGameRoom();
+        p4.distributionKey("bds/"+ SystemUtil.oid());
+
+        q.offer(p1);
+        q.offer(p2);
+        q.offer(p3);
+        q.offer(p4);
+
+        Assert.assertEquals(3,q.size());
+        Assert.assertTrue(q.remove(p2));
+        Assert.assertEquals(2,q.size());
     }
 
 }

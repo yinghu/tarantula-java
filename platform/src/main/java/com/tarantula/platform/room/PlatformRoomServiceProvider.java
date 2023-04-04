@@ -118,12 +118,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             });
             this.serviceContext.schedule(schedulingTask);
         }
-        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
+        if(this.dedicated) this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
     }
 
     @Override
     public void start() throws Exception {
+        if(!dedicated) return;
         Collection<byte[]> cb = serverClusterStore.indexGet(typeLobby);
         cb.forEach(b->{
             byte[] data = serverClusterStore.mapGet(b);
@@ -331,7 +332,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public OnAccess onConnection(Connection connection) {
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
-        if(index==null || !gameCluster.dedicated()) return null;
+        if(index==null || !this.dedicated) return null;
         UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         int timeout = udpEndpoint.sessionTimeout();
         connection.timeout(timeout);
@@ -634,7 +635,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onEnded(Room room) {
-        //this.logger.warn("Room ended");
+        this.logger.warn("Room ended->"+room.distributionKey()+">>>"+room.owner());
+        GameZoneIndex index = gameZoneIndex.get(room.owner());
+        this.logger.warn(""+index.runningRooms.remove(room));
         //forcefully reset room
     }
 }
