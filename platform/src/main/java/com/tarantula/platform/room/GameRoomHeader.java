@@ -36,7 +36,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected long overtime;
 
     protected int totalJoined;
-    protected boolean started;
     protected boolean dedicated;
     protected Arena arena;
 
@@ -142,7 +141,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.properties.put("1",capacity);
         this.properties.put("2",round);
         this.properties.put("3",totalJoined);
-        this.properties.put("4",started);
         return this.properties;
     }
     @Override
@@ -150,7 +148,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.capacity = ((Number)properties.getOrDefault("1",1)).intValue();
         this.round = ((Number)properties.getOrDefault("2",0)).intValue();
         this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
-        this.started = (Boolean)properties.getOrDefault("4",false);
     }
     @Override
     public JsonObject toJson(){
@@ -219,7 +216,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             break;
         }
         totalJoined++;
-        started = full();
         this.dataStore.update(this);
         listener.onUpdated(this,joinIndex.get(systemId));
         return view();
@@ -243,14 +239,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return room;
     }
 
-    public boolean empty(){
-        return joinIndex.isEmpty();
-    }
-    public boolean full(){
-        return totalJoined == capacity;
-    }
-    public boolean started(){
-        return started;
+
+    public boolean available(){
+        return totalJoined < capacity;
     }
 
     public synchronized void reset(){
@@ -282,7 +273,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void setup(Channel[] channels){
-        pendingChannels = new ArrayBlockingQueue<>(channels.length);
+        if(pendingChannels==null) pendingChannels = new ArrayBlockingQueue<>(channels.length);
         for(int i=0;i<channels.length;i++){
             pendingChannels.offer(channels[i]);
         }

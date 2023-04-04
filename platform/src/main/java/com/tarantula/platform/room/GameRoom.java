@@ -33,9 +33,11 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
     GameRoom view();
     void leave(String systemId,Listener listener);
     void load();
-    boolean empty();
-    boolean full();
-    boolean started();
+    //boolean empty();
+    //boolean full();
+
+    boolean available();
+
 
     void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);
 

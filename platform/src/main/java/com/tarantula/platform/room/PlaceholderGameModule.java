@@ -18,14 +18,14 @@ public class PlaceholderGameModule implements GameModule {
     @Override
     public void onValidated(Channel channel) {
         channels.put(channel.sessionId(),channel);
-        this.gameContext.log("validated->"+channel.sessionId(),OnLog.WARN);
+        //this.gameContext.log("validated->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override
     public void onJoined(Channel channel) {
         if(!channels.containsKey(channel.sessionId())) return;
         totalJoined.incrementAndGet();
-        this.gameContext.log("joined->"+channel.sessionId(),OnLog.WARN);
+        //this.gameContext.log("joined->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class PlaceholderGameModule implements GameModule {
         if(totalJoined.decrementAndGet()>0) return;
         this.roomListener.onUpdated(room,"".getBytes());
         this.roomListener.onEnded(this.room);
-        this.gameContext.log("left->"+channel.sessionId(),OnLog.WARN);
+        //this.gameContext.log("left->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override

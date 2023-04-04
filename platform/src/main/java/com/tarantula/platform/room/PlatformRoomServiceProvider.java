@@ -188,12 +188,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
-            logger.warn("Room left->"+room.empty());
-            if(room.empty()) {
-                room.reset();
-                //resetRoom(index,room.roomId());
-                //index.pendingRooms.offer(room.roomId());
-            }
+            if(!room.available()) resetRoom(index,room);
         });
     }
 
@@ -208,16 +203,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = gameRoom(index,roomId);
         if(gameRoom==null) return null;
         return gameRoom.join(systemId,(room,entry) -> {
-            pendingRooms.offer(new RoomStatus(zoneId,roomId,room.full()?RoomStatus.FULL:RoomStatus.JOINED));
+            //pendingRooms.offer(new RoomStatus(zoneId,roomId,room.full()?RoomStatus.FULL:RoomStatus.JOINED));
         });
     }
 
     public void onRoomLeft(String zoneId,String roomId,String systemId){
         GameZoneIndex index = gameZoneIndex.get(zoneId);
         localLeave(systemId,index,roomId,(room,entry)->{
-            boolean empty = room.started() && room.empty();
-            if(empty) room.reset();
-            pendingRooms.offer(new RoomStatus(zoneId,roomId,empty?RoomStatus.EMPTY:RoomStatus.LEFT));//reuse room id
+            //boolean empty = room.started() && room.empty();
+            //if(empty) room.reset();
+            //pendingRooms.offer(new RoomStatus(zoneId,roomId,empty?RoomStatus.EMPTY:RoomStatus.LEFT));//reuse room id
         });
     }
 
@@ -244,7 +239,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.gameRoom.setup(gameZone,gameModule,dedicated);
         }
         else{
-            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
+            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
+            index.runningRooms = new LinkedBlockingDeque<>(maxRoomPoolSizePerZone);
         }
         index.roomIndex = new IndexSet(gameZone.configurationTypeId());
         index.roomIndex.distributionKey(serviceContext.node().nodeId());
@@ -268,7 +264,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 index.roomStore.mapUnlock(roomId);
             }
             else{
-                resetRoom(index,k);
+                index.pendingRooms.offer(room);
             }
         });
         if(rooms[0] < minRoomPoolSizePerZone){
@@ -285,7 +281,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                         index.roomStore.queueOffer(rkey);
                     }
                     else{
-                        resetRoom(index,gameRoom.roomId());
+                        index.pendingRooms.offer(gameRoom);
                     }
                 }
             }
@@ -566,17 +562,24 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoom.leave(systemId,listener);
     }
 
-    private GameRoom localJoin(Rating rating, GameZoneIndex index){
-        String roomId = index.pendingRooms.poll();
-        logger.warn("RoomID->"+roomId+">>>"+index.pendingRooms.size());
-        if(roomId==null && index.maxRoomPoolSize.decrementAndGet() < 0) return null;
-        GameRoom gameRoom = gameRoom(index,roomId);
-        if(gameRoom==null) return null;
+    private GameRoom localJoin(GameZoneIndex index,GameRoom gameRoom,Rating rating){
+        logger.warn("RoomID A->"+gameRoom.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
         GameRoom joined = gameRoom.join(rating.systemId(),(room,entry)->{
-            //if(!room.full()) index.pendingRooms.offer(roomId);
+            if(room.available()) index.runningRooms.addFirst(room);
         });
         joined.setup(index.gameZone,null,rating);
+        logger.warn("RoomID B->"+gameRoom.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
         return joined;
+    }
+    private GameRoom localJoin(Rating rating, GameZoneIndex index){
+        GameRoom gameRoom = index.runningRooms.poll();
+        if(gameRoom != null) return localJoin(index,gameRoom,rating);
+        gameRoom = index.pendingRooms.poll();
+        if(gameRoom != null) return localJoin(index,gameRoom,rating);
+        if(index.maxRoomPoolSize.decrementAndGet() < 0) return null;
+        gameRoom = gameRoom(index,null);
+        if(gameRoom==null) return null;
+        return localJoin(index,gameRoom,rating);
     }
 
     private GameRoom remoteJoin(Rating rating,GameZone gameZone){
@@ -600,10 +603,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return room;
     }
 
-    private void resetRoom(GameZoneIndex index,String roomId){
-        for(int i=0; i<index.gameZone.capacity(); i++){
-            index.pendingRooms.offer(roomId);
-        }
+    private void resetRoom(GameZoneIndex index,GameRoom room){
+        logger.warn("Room reset ->"+room.roomId()+">>"+room.available());
+        room.reset();
+        index.pendingRooms.offer(room);
+        logger.warn("RoomID C->"+room.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
+        UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        if(!dedicated) room.setup(udp.createChannels(index.gameZone.capacity()));
     }
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
@@ -619,15 +625,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onStarted(Room room) {
-        this.logger.warn("Room started");
+        //logger.warn("RoomID B->"+room.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
-        this.logger.warn("Room updated");
+        //this.logger.warn("Room updated");
     }
 
     @Override
     public void onEnded(Room room) {
-        this.logger.warn("Room ended");
+        //this.logger.warn("Room ended");
+        //forcefully reset room
     }
 }
