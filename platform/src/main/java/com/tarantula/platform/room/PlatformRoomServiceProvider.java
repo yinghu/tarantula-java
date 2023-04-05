@@ -551,6 +551,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.dataStore.update(zoneIndex.roomIndex);
         }
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
+        resetRoom(zoneIndex,gameRoom);
         return gameRoom;
     }
 
@@ -605,12 +606,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void resetRoom(GameZoneIndex index,GameRoom room){
+        if(dedicated) return;
         logger.warn("Room reset ->"+room.roomId()+">>"+room.available());
         room.reset();
         index.pendingRooms.offer(room);
         logger.warn("RoomID C->"+room.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
         UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        if(!dedicated) room.setup(udp.createChannels(index.gameZone.capacity()));
+        room.setup(udp.createChannels(index.gameZone.capacity()));
     }
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
