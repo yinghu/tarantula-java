@@ -15,6 +15,8 @@ public class GameZoneIndex {
     public IndexSet roomIndex;
     public AtomicInteger maxRoomPoolSize;
 
+    public ArrayBlockingQueue<RemoteGameServer>  pendingServers;
+
     //distributed game rooms
     public ClusterProvider.ClusterStore roomStore;
 
@@ -23,7 +25,7 @@ public class GameZoneIndex {
     public LinkedBlockingDeque<GameRoom> runningRooms;
 
     // push channels
-    public ArrayBlockingQueue<UDPChannel> pendingChannels;
+    public ArrayBlockingQueue<UDPChannel> pendingPushChannels;
 
     // use as shared if dedicated = true
     public GameRoom gameRoom;

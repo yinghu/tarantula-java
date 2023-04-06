@@ -146,7 +146,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
         if(this.dedicated){
-            UDPChannel channel = index.pendingChannels.poll();
+            UDPChannel channel = index.pendingPushChannels.poll();
             if(channel == null){
                 UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
                 if(channels.length == 0) return null;
@@ -155,7 +155,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                         channel = channels[i];
                     }
                     else{
-                        index.pendingChannels.offer(channels[i]);
+                        index.pendingPushChannels.offer(channels[i]);
                     }
                 }
             }
@@ -179,7 +179,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public GameRoom join(Rating rating,GameZone gameZone){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
-        return dedicated?remoteJoin(rating,gameZone):localJoin(rating,index);
+        return dedicated?remoteJoin(rating,index):localJoin(rating,index);
     }
 
     public void leave(Stub stub){
@@ -232,7 +232,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
-        index.pendingChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
+        index.pendingPushChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
         if(dedicated) {
             index.roomStore = this.clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,gameZone.oid());
             index.gameRoom = this.createGameRoom(gameZone.playMode(),gameZone.capacity());
@@ -296,7 +296,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 for(int i=0;i<minRoomPoolSizePerZone;i++){
                     UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
                     for(UDPChannel c : channels){
-                        index.pendingChannels.offer(c);
+                        index.pendingPushChannels.offer(c);
                     }
                 }
             }
@@ -316,7 +316,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
         UDPChannel udpChannel;
         do{
-            udpChannel = index.pendingChannels.poll();
+            udpChannel = index.pendingPushChannels.poll();
             if(udpChannel!=null){
                 udpChannel.close();
             }
@@ -435,14 +435,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     for(int i=0;i<minRoomPoolSizePerZone;i++){
                         UDPChannel[] channels = udp.createChannels(v.gameZone.capacity());
                         for(UDPChannel c : channels){
-                            v.pendingChannels.offer(c);
+                            v.pendingPushChannels.offer(c);
                         }
                     }
                 }
                 else{
                     gameRoomIndex.forEach((rk,rv)->{
                         rv.setup(udp.createChannels(v.gameZone.capacity()));
-                        //logger.warn("room->"+rv.capacity()+"/"+rv.channelId());
+                        logger.warn("room->"+rv.capacity()+"/"+rv.channelId());
                     });
                 }
 
@@ -584,7 +584,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return localJoin(index,gameRoom,rating);
     }
 
-    private GameRoom remoteJoin(Rating rating,GameZone gameZone){
+    private GameRoom remoteJoin(Rating rating,GameZoneIndex gameZoneIndex){
+        RemoteGameServer remoteGameServer = gameZoneIndex.pendingServers.poll();
+        GameZone gameZone = gameZoneIndex.gameZone;
         ConnectionStub connectionStub = pendingConnections.poll();
         if(connectionStub==null){
             logger.warn("no game server connection for ["+gameZone.configurationTypeId()+"/"+gameZone.configurationName()+"]");
