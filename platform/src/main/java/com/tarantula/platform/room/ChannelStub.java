@@ -12,7 +12,7 @@ import java.util.Map;
 public class ChannelStub extends GameChannel{
 
     public String serverId;
-    public String roomId;
+    //public String roomId;
 
     public ChannelStub(){
 
@@ -37,7 +37,7 @@ public class ChannelStub extends GameChannel{
     public Map<String,Object> toMap(){
         this.properties.put("1",channelId);
         this.properties.put("2",sessionId);
-        this.properties.put("3",roomId);
+        //this.properties.put("3",roomId);
         this.properties.put("4",serverId);
         return this.properties;
     }
@@ -45,14 +45,14 @@ public class ChannelStub extends GameChannel{
     public void fromMap(Map<String,Object> properties){
         this.channelId = ((Number)properties.get("1")).intValue();
         this.sessionId = ((Number)properties.get("2")).intValue();
-        this.roomId = (String) properties.get("3");
+        //this.roomId = (String) properties.get("3");
         this.serverId = (String) properties.get("4");
     }
 
 
     @Override
     public String toString(){
-        return "ChannelId ["+channelId+"] SessionId ["+sessionId+"] RoomId ["+roomId+"]";
+        return "ChannelId ["+channelId+"] SessionId ["+sessionId+"]";
     }
 
     @Override

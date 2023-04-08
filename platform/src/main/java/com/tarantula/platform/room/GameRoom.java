@@ -26,23 +26,22 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
 
     Arena arena();
     List<Entry> entries();
-    void setup(GameZone gameZone, Channel channel, Rating rating);
+    void setup(GameZone gameZone,Rating rating);
 
     //Distributed Methods
     GameRoom join(String systemId,Listener listener);
     GameRoom view();
     void leave(String systemId,Listener listener);
     void load();
-    //boolean empty();
-    //boolean full();
 
     boolean available();
 
 
     void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);
 
-    void setup(Channel[] channels);
+    void setup(Channel[] channels,boolean dedicated);
 
+    void registerChannel(Channel channel);
     Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
 
     interface Entry extends Resettable,Configurable, Portable {

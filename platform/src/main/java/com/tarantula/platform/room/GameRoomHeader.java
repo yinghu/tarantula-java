@@ -44,7 +44,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     private GameModule gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
+    private ArrayBlockingQueue<Channel> pendingRemoteChannels;
 
+    private Channel channel;
     public int channelId(){
         return channelId;
     }
@@ -121,13 +123,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
-    public void setup(GameZone gameZone,Channel channel, Rating rating){
+    public void setup(GameZone gameZone, Rating rating){
         this.arena = gameZone.arena(rating.arenaLevel);
         this.capacity = gameZone.capacity();
         this.duration = gameZone.roundDuration();
         this.overtime = gameZone.roundOvertime();
         this.joinsOnStart = gameZone.joinsOnStart();
-        this.dedicated = channel!=null;
         if(!dedicated) return;
         this.connection = channel.connection();
         this.channelId = channel.channelId();
@@ -218,7 +219,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         totalJoined++;
         this.dataStore.update(this);
         listener.onUpdated(this,joinIndex.get(systemId));
-        return view();
+        GameRoom joined = view();
+        if(dedicated) joined.registerChannel(this.pendingRemoteChannels.poll());
+        return joined;
     }
 
     public synchronized void leave(String systemId,Listener listener){
@@ -273,11 +276,23 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.owner = gameZone.distributionKey();
     }
 
-    public void setup(Channel[] channels){
-        if(pendingChannels==null) pendingChannels = new ArrayBlockingQueue<>(channels.length);
-        for(int i=0;i<channels.length;i++){
-            pendingChannels.offer(channels[i]);
+    public void setup(Channel[] channels,boolean dedicated){
+        if(dedicated){
+            if(pendingRemoteChannels==null) pendingRemoteChannels = new ArrayBlockingQueue<>(channels.length);
+            for(int i=0;i<channels.length;i++){
+                pendingRemoteChannels.offer(channels[i]);
+            }
         }
+        else{
+            if(pendingChannels==null) pendingChannels = new ArrayBlockingQueue<>(channels.length);
+            for(int i=0;i<channels.length;i++){
+                pendingChannels.offer(channels[i]);
+            }
+        }
+    }
+
+    public void registerChannel(Channel channel){
+        this.channel = channel;
     }
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
         Channel channel = pendingChannels.poll();

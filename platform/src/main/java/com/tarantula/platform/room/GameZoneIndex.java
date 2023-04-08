@@ -15,7 +15,7 @@ public class GameZoneIndex {
     public IndexSet roomIndex;
     public AtomicInteger maxRoomPoolSize;
 
-    public ArrayBlockingQueue<RemoteGameServer>  pendingServers;
+    public ArrayBlockingQueue<ConnectionStub>  pendingConnections;
 
     //distributed game rooms
     public ClusterProvider.ClusterStore roomStore;
