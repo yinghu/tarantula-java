@@ -80,7 +80,7 @@ public class DedicatedGameModule implements GameModule {
     public void reset(){
 
     }
-    public void update(ServiceContext serviceContext, byte[] payload){
+    public void update(byte[] payload){
         this.gameContext.log("Update room",OnLog.WARN);
     }
 }

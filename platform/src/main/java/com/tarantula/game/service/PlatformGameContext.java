@@ -1,8 +1,6 @@
 package com.tarantula.game.service;
 
-import com.icodesoftware.OnLog;
-import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.ServiceContext;
@@ -58,4 +56,9 @@ public class PlatformGameContext implements GameContext {
     public GameServiceProxy gameServiceProxy(short serviceId) {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
+
+    public DataStore dataStore(String name){
+        return this.serviceContext.dataStore(name,serviceContext.node().partitionNumber());
+    }
+    public PostOffice postOffice(){ return serviceContext.postOffice();}
 }
