@@ -289,7 +289,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onUpdate(String lobby,byte[] payload){
         logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
         GameZoneIndex index = gameZoneIndex(lobby);
-        index.gameModule.update(payload);
+        index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),payload);
     }
     @Override
     public boolean onChannel(Channel channel) {

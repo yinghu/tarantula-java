@@ -93,7 +93,7 @@ public class PlaceholderGameModule implements GameModule {
 
     }
 
-    public void update(byte[] payload){
+    public void update(GameServiceProvider gameServiceProvider,byte[] payload){
         this.gameContext.log("update room",OnLog.WARN);
     }
 }

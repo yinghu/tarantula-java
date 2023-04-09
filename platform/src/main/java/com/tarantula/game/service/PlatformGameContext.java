@@ -2,12 +2,13 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameContext;
+import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.ServiceContext;
 
 import java.util.concurrent.ScheduledFuture;
 
-public class PlatformGameContext implements GameContext {
+public class PlatformGameContext implements GameContext, GameServiceProvider {
 
     private final ServiceContext serviceContext;
     private final TarantulaLogger logger;
@@ -56,9 +57,7 @@ public class PlatformGameContext implements GameContext {
     public GameServiceProxy gameServiceProxy(short serviceId) {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
-
-    public DataStore dataStore(String name){
-        return this.serviceContext.dataStore(name,serviceContext.node().partitionNumber());
+    public Statistics statistics(String systemId){
+        return this.platformGameServiceProvider.presenceServiceProvider().statistics(systemId);
     }
-    public PostOffice postOffice(){ return serviceContext.postOffice();}
 }

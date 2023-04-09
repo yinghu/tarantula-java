@@ -6,7 +6,4 @@ public interface GameContext extends Context {
 
     GameServiceProxy gameServiceProxy(short serviceId);
 
-    default DataStore dataStore(String name){ return null;}
-    default PostOffice postOffice(){ return null;}
-
 }
