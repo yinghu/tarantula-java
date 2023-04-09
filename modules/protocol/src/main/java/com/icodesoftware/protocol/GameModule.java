@@ -1,9 +1,11 @@
 package com.icodesoftware.protocol;
 
+import com.icodesoftware.Closable;
+import com.icodesoftware.Resettable;
 import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 
-public interface GameModule extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener {
+public interface GameModule extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener, Closable, Resettable {
 
     void setup(Room room, GameContext gameContext);
 
@@ -11,5 +13,4 @@ public interface GameModule extends UDPEndpointServiceProvider.RequestListener,U
 
     void registerRoomListener(RoomListener roomListener);
 
-    void close();
 }

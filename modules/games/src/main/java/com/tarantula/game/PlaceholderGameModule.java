@@ -87,4 +87,8 @@ public class PlaceholderGameModule implements GameModule {
     public void close(){
 
     }
+
+    public void reset(){
+
+    }
 }

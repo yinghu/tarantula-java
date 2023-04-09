@@ -21,8 +21,6 @@ public class DedicatedGameModule implements GameModule {
 
     private ConcurrentHashMap<Integer,Channel> channels;
 
-    private ScheduleRunner scheduleRunner;
-    private boolean running = true;
     @Override
     public void onValidated(Channel channel) {
         channels.put(channel.sessionId(),channel);
@@ -47,11 +45,6 @@ public class DedicatedGameModule implements GameModule {
         this.channels = new ConcurrentHashMap<>();
         this.totalJoined = new AtomicInteger(0);
         this.gameContext.log("Single dedicated game  module started on game zone ["+room.owner()+"]", OnLog.WARN);
-        scheduleRunner = new ScheduleRunner(10000,()->{
-            gameContext.log("Total joined ["+totalJoined.get()+"]["+running+"]",OnLog.WARN);
-            if(running) gameContext.schedule(scheduleRunner);
-        });
-        gameContext.schedule(scheduleRunner);
     }
 
     @Override
@@ -81,6 +74,9 @@ public class DedicatedGameModule implements GameModule {
     }
 
     public void close(){
-        running = false;
+    }
+
+    public void reset(){
+
     }
 }

@@ -2,7 +2,6 @@ package com.tarantula.game.blackjack;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.Card;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +18,8 @@ public class BlackjackModule implements GameModule{
         this.room = room;
         this.gameContext = gameContext;
         this.blackjackGame = new BlackjackGame(3,true,true);
-        this.gameContext.schedule(new ScheduleRunner(5000,()->{
-            this.gameContext.log("MX->"+room.capacity(), OnLog.WARN);
-        }));
         this.channels = new ConcurrentHashMap<>();
-        this.gameContext.log("Blackjack module started->"+room.capacity(),OnLog.WARN);
+        this.gameContext.log("Blackjack module started->"+room,OnLog.WARN);
     }
     public Room room(){
         return this.room;
@@ -64,7 +60,6 @@ public class BlackjackModule implements GameModule{
     @Override
     public void onJoined(Channel channel) {
         Channel validated  = this.channels.get(channel.sessionId());
-        this.gameContext.log("JOINED->"+validated.owner(),OnLog.WARN);
         if(roomListener==null) return;
         roomListener.onStarted(this.room);
     }
@@ -72,7 +67,6 @@ public class BlackjackModule implements GameModule{
     @Override
     public void onLeft(Channel channel) {
         Channel removed = channels.remove(channel.sessionId());
-        this.gameContext.log("LEFT->"+removed.owner(),OnLog.WARN);
         if(roomListener==null) return;
         roomListener.onUpdated(this.room,"".getBytes());
         roomListener.onEnded(this.room);
@@ -83,6 +77,10 @@ public class BlackjackModule implements GameModule{
     }
 
     public void close(){
+
+    }
+
+    public void reset(){
 
     }
 }

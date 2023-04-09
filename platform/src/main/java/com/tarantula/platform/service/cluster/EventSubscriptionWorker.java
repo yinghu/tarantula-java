@@ -2,14 +2,14 @@ package com.tarantula.platform.service.cluster;
 
 import com.icodesoftware.Event;
 import com.icodesoftware.service.EventService;
-import com.tarantula.platform.service.Closable;
+import com.icodesoftware.Closable;
 
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class EventSubscriptionWorker implements Closable {
+public class EventSubscriptionWorker implements Closable,Runnable {
 
     private final EventService eventService;
     private final ConcurrentLinkedQueue<Event> replicationQueue;

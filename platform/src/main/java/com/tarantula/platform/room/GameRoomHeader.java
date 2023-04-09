@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Room;
 import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
@@ -240,6 +239,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public synchronized void reset(){
+        if(pendingChannels!=null) pendingChannels.clear();
         joinIndex.forEach((k,v)->{
             v.reset();
             this.dataStore.update(v);
@@ -273,6 +273,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         for(int i=0;i<channels.length;i++){
             pendingChannels.offer(channels[i]);
         }
+        this.channelId = channels[0].channelId();
     }
 
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
@@ -282,7 +283,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     @Override
     public String toString(){
-        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"]";
+        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
     }
 
     public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){

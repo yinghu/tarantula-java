@@ -389,11 +389,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     gameRoomIndex.forEach((rk,rv)->{
                         rv.setup(udp.createChannels(v.gameZone.capacity()));
                     });
-                    logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"]");
+                    logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
                 }
 
             });
-            logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]["+dedicated+"]");
+            //logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]["+dedicated+"]");
         }
         started = true;
     }
@@ -572,6 +572,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Game lobby not available ["+room.owner()+"]");
             return;
         }
+        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        udpEndpoint.releaseChannel(room.channelId());
         index.runningRooms.remove(room);
         resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
         //forcefully reset room

@@ -201,12 +201,8 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onLeft(int channelId, int sessionId) {
-        //logger.warn("Session left->"+sessionId+">>"+channelId);
         ActivePushChannel activePushChannel = activePushChannelIndex.get(channelId);
-        if(activePushChannel.totalLeft.decrementAndGet()==0){
-            PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
-            pendingUserChannels.offer(released);
-        }
+        if(activePushChannel.totalLeft.decrementAndGet()==0) releaseChannel(channelId);
         UDPChannel removed = channels.remove(sessionId);
         if(removed == null) return;
         removed.kickoff();
@@ -217,6 +213,11 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         //logger.warn("Session joined->"+sessionId+">>"+channelId);
         UDPChannel joined = channels.get(sessionId);
         joined.joined();
+    }
+
+    public void releaseChannel(int channelId){
+        PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
+        pendingUserChannels.offer(released);
     }
 
     @Override
