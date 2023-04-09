@@ -5,7 +5,6 @@ import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.ScheduleRunner;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,14 +21,14 @@ public class PlaceholderGameModule implements GameModule {
     @Override
     public void onValidated(Channel channel) {
         channels.put(channel.sessionId(),channel);
-        //this.gameContext.log("validated->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override
     public void onJoined(Channel channel) {
         if(!channels.containsKey(channel.sessionId())) return;
-        totalJoined.incrementAndGet();
-        //this.gameContext.log("joined->"+channel.sessionId(),OnLog.WARN);
+        if(totalJoined.incrementAndGet()==room.joinsOnStart()){
+            roomListener.onStarted(room);
+        }
     }
 
     @Override
@@ -37,9 +36,7 @@ public class PlaceholderGameModule implements GameModule {
         if(channels.remove(channel.sessionId())==null) return;
         if(totalJoined.decrementAndGet()>0) return;
         this.roomListener.onUpdated(room,"".getBytes());
-        this.gameContext.schedule(new ScheduleRunner(5000,()->{
-            this.roomListener.onEnded(this.room);
-        }));
+        this.roomListener.onEnded(this.room);
     }
 
     @Override

@@ -180,9 +180,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void leave(Stub stub){
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
-            if(!room.available()) resetGameRoom(index,room,true);
-        });
+        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {});
     }
 
     @Override
@@ -270,6 +268,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
             return null;
         }
+        byte[] lockKey = index.gameZone.distributionKey().getBytes();
+        serverClusterStore.mapLock(lockKey);
+        serverClusterStore.mapGet(lockKey);
+        serverClusterStore.mapUnlock(lockKey);
         UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         int timeout = udpEndpoint.sessionTimeout();
         connection.timeout(timeout);
@@ -299,7 +301,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             byte[] channelData = channelStub.toBinary();
             ClusterProvider.ClusterStore channelStore = channelStore(channelStub.serverId);
             channelStore.queueOffer(channelData);
-            //logger.warn("Channel registered ["+channelStub+"]");
         }
         return true;
     }
@@ -554,20 +555,25 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onStarted(Room room) {
+        logger.warn("Room started->"+room.distributionKey());
         //logger.warn("RoomID B->"+room.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
-        //this.logger.warn("Room updated");
+        this.logger.warn("Room updated");
     }
 
     @Override
     public void onEnded(Room room) {
         if(room.dedicated()) return;
-        //this.logger.warn("Room ended->"+room.distributionKey()+">>>"+room.owner());
+        this.logger.warn("Room ended");
         GameZoneIndex index = gameZoneIndex.get(room.owner());
+        if(index==null){
+            logger.warn("Game lobby not available ["+room.owner()+"]");
+            return;
+        }
         index.runningRooms.remove(room);
-        //resetGameRoom(index,gameRoomIndex.get(room.distributionKey()));
+        resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
         //forcefully reset room
     }
 }
