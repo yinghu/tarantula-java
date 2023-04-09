@@ -4,7 +4,6 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.Resettable;
 import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
-import com.icodesoftware.service.ServiceContext;
 
 public interface GameModule extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener, Closable, Resettable {
 

@@ -33,8 +33,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public static final String NAME = "room";
 
-    private static final String DEDICATED_GAME_MODULE_NAME = "com.tarantula.platform.room.DedicatedGameModule";
-
     private TarantulaLogger logger;
     private final String name;
     private final GameCluster gameCluster;
@@ -195,9 +193,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.pendingPushChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
             index.pendingConnections = new LinkedBlockingDeque<>(maxDedicatedServerConnections);
             index.gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-            GameModule gameModule = gameModule(DEDICATED_GAME_MODULE_NAME,index.gameRoom);
-            index.gameModule = gameModule;
-            index.gameRoom.setup(gameZone,gameModule,dedicated);
+            GameModule gameModule = gameModule(gameZone.gameModule(),index.gameRoom);
+            index.gameModule = new DedicatedGameModuleProxy(gameModule);
+            index.gameModule.setup(index.gameRoom,gameServiceProvider.gameContext(index.gameModule.getClass()));
+            index.gameModule.registerRoomListener(this);
+            index.gameRoom.setup(gameZone,index.gameModule,dedicated);
             if(started){
                 UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
                 for(int i=0;i<minRoomPoolSizePerZone;i++){
@@ -287,9 +287,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public void onUpdate(String lobby,byte[] payload){
-        logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
-        GameZoneIndex index = gameZoneIndex(lobby);
-        index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),payload);
+        serviceContext.schedule(new ScheduleRunner(1000,()->{
+            logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
+            GameZoneIndex index = gameZoneIndex(lobby);
+            index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),payload);
+        }));
     }
     @Override
     public boolean onChannel(Channel channel) {
@@ -560,18 +562,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onStarted(Room room) {
-        logger.warn("Room started->"+room.distributionKey());
-        //logger.warn("RoomID B->"+room.roomId()+">>>"+index.pendingRooms.size()+">>>"+index.runningRooms.size());
+
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
-        this.logger.warn("Room updated");
+
     }
 
     @Override
     public void onEnded(Room room) {
         if(room.dedicated()) return;
-        this.logger.warn("Room ended");
         GameZoneIndex index = gameZoneIndex.get(room.owner());
         if(index==null){
             logger.warn("Game lobby not available ["+room.owner()+"]");

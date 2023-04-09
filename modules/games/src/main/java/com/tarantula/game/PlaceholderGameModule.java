@@ -1,11 +1,7 @@
 package com.tarantula.game;
 
-import com.icodesoftware.OnLog;
-import com.icodesoftware.Room;
-import com.icodesoftware.RoomListener;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ServiceContext;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,9 +30,16 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public void onLeft(Channel channel) {
-        if(channels.remove(channel.sessionId())==null) return;
+        Channel removed = channels.remove(channel.sessionId());
+        if(removed==null) return;
+        UpdateBatch updateBatch = new UpdateBatch(new PlayerUpdate[]{
+                new PlayerUpdate(removed.owner(),new GameExperience[]{
+                        new GameExperience("melee",100,100),
+                        new GameExperience("bossesKilled",2,200)
+                })
+        });
+        this.roomListener.onUpdated(room,updateBatch.toBytes());
         if(totalJoined.decrementAndGet()>0) return;
-        this.roomListener.onUpdated(room,"".getBytes());
         this.roomListener.onEnded(this.room);
     }
 
@@ -94,6 +97,12 @@ public class PlaceholderGameModule implements GameModule {
     }
 
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){
-        this.gameContext.log("update room",OnLog.WARN);
+        UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
+        for(PlayerUpdate playerUpdate :updateBatch.playerUpdates){
+            Statistics statistics = gameServiceProvider.statistics(playerUpdate.systemId);
+            for(GameExperience gameExperience : playerUpdate.gameExperiences){
+                statistics.entry(gameExperience.name).update(gameExperience.statisticsDelta).update();
+            }
+        }
     }
 }

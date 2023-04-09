@@ -5,14 +5,14 @@ import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.ScheduleRunner;
 
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DedicatedGameModule implements GameModule {
+public class DedicatedGameModuleProxy implements GameModule {
+
+    private GameModule gameModule;
 
     private GameContext gameContext;
     private Room room;
@@ -22,6 +22,9 @@ public class DedicatedGameModule implements GameModule {
 
     private ConcurrentHashMap<Integer,Channel> channels;
 
+    public DedicatedGameModuleProxy(GameModule gameModule){
+        this.gameModule = gameModule;
+    }
     @Override
     public void onValidated(Channel channel) {
         channels.put(channel.sessionId(),channel);
@@ -81,6 +84,7 @@ public class DedicatedGameModule implements GameModule {
 
     }
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){
-        this.gameContext.log("Update room",OnLog.WARN);
+        //this.gameContext.log("Update room",OnLog.WARN);
+        this.gameModule.update(gameServiceProvider,payload);
     }
 }

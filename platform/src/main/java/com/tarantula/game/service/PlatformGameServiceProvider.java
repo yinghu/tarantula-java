@@ -5,8 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.GameContext;
-import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
