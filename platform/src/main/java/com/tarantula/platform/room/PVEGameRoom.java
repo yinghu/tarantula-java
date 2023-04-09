@@ -17,4 +17,18 @@ public class PVEGameRoom extends GameRoomHeader{
         return PortableEventRegistry.PVE_ROOM_CID;
     }
 
+    protected GameRoom duplicate() {
+        PVEGameRoom _room = new PVEGameRoom();
+        _room.capacity = this.capacity;
+        _room.round = this.round;
+        _room.dedicated = this.dedicated;
+        _room.duration = this.duration;
+        _room.joinsOnStart = this.joinsOnStart;
+        _room.overtime = this.overtime;
+        if (!this.dedicated){
+            _room.entries = new GameEntry[this.capacity];
+            joinIndex.forEach((k, e) -> _room.entries[e.seat()] = e);
+        }
+        return _room;
+    }
 }

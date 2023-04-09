@@ -1,13 +1,17 @@
 package com.tarantula.platform.room;
 
-import com.icodesoftware.*;
+import com.icodesoftware.OnLog;
+import com.icodesoftware.Room;
+import com.icodesoftware.RoomListener;
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.util.ScheduleRunner;
+
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlaceholderGameModule implements GameModule {
+public class DedicatedGameModule implements GameModule {
 
     private GameContext gameContext;
     private Room room;
@@ -16,27 +20,24 @@ public class PlaceholderGameModule implements GameModule {
     private AtomicInteger totalJoined;
 
     private ConcurrentHashMap<Integer,Channel> channels;
+
+    private ScheduleRunner scheduleRunner;
+    private boolean running = true;
     @Override
     public void onValidated(Channel channel) {
         channels.put(channel.sessionId(),channel);
-        //this.gameContext.log("validated->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override
     public void onJoined(Channel channel) {
         if(!channels.containsKey(channel.sessionId())) return;
         totalJoined.incrementAndGet();
-        //this.gameContext.log("joined->"+channel.sessionId(),OnLog.WARN);
     }
 
     @Override
     public void onLeft(Channel channel) {
         if(channels.remove(channel.sessionId())==null) return;
-        if(totalJoined.decrementAndGet()>0) return;
-        this.roomListener.onUpdated(room,"".getBytes());
-        this.gameContext.schedule(new ScheduleRunner(5000,()->{
-            this.roomListener.onEnded(this.room);
-        }));
+        totalJoined.decrementAndGet();
     }
 
     @Override
@@ -45,7 +46,12 @@ public class PlaceholderGameModule implements GameModule {
         this.gameContext = gameContext;
         this.channels = new ConcurrentHashMap<>();
         this.totalJoined = new AtomicInteger(0);
-        this.gameContext.log("Placeholder game  module started on channel ["+room.channelId()+"]", OnLog.WARN);
+        this.gameContext.log("Single dedicated game  module started on game zone ["+room.owner()+"]", OnLog.WARN);
+        scheduleRunner = new ScheduleRunner(10000,()->{
+            gameContext.log("Total joined ["+totalJoined.get()+"]["+running+"]",OnLog.WARN);
+            if(running) gameContext.schedule(scheduleRunner);
+        });
+        gameContext.schedule(scheduleRunner);
     }
 
     @Override
@@ -60,7 +66,10 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        if(room.dedicated()) return null;
+        if(!channels.containsKey(messageHeader.sessionId)){
+            this.gameContext.log("Invalid session ["+messageHeader.sessionId+"]",OnLog.WARN);
+            return null;
+        }
         short cmd = messageBuffer.readShort();
         GameServiceProxy messageListener = gameContext.gameServiceProxy(cmd);
         return messageListener.onService(session,messageHeader,messageBuffer);
@@ -68,19 +77,10 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        messageHeader.ack = true;
-        messageHeader.encrypted = true;
-        messageHeader.commandId = Messenger.ON_ACTION;
-        messageBuffer.reset();
-        messageBuffer.writeHeader(messageHeader);
-        messageBuffer.writeInt(1);
-        messageBuffer.writeUTF8("A");
-        messageBuffer.writeInt(1);
-        messageBuffer.writeInt(2);
-        messageBuffer.writeUTF8("B");
-        messageBuffer.writeInt(2);
-        messageBuffer.flip();
-        messageBuffer.readHeader();
-        callback.onRelay(messageHeader,messageBuffer);
+
+    }
+
+    public void close(){
+        running = false;
     }
 }

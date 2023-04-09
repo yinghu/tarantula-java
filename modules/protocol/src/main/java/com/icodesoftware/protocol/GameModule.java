@@ -10,4 +10,6 @@ public interface GameModule extends UDPEndpointServiceProvider.RequestListener,U
     Room room();
 
     void registerRoomListener(RoomListener roomListener);
+
+    void close();
 }

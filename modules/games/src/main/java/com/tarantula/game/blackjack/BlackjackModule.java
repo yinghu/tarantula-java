@@ -81,4 +81,8 @@ public class BlackjackModule implements GameModule{
     public void registerRoomListener(RoomListener roomListener){
         this.roomListener = roomListener;
     }
+
+    public void close(){
+
+    }
 }
