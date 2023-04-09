@@ -286,6 +286,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return onAccess;
     }
 
+    public void onUpdate(String lobby,byte[] payload){
+        logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
+        GameZoneIndex index = gameZoneIndex(lobby);
+        index.gameModule.update(this.serviceContext,payload);
+    }
     @Override
     public boolean onChannel(Channel channel) {
         ChannelStub channelStub = (ChannelStub)channel;

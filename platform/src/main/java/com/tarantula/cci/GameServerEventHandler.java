@@ -37,6 +37,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         String action = exchange.header(Session.TARANTULA_ACTION);
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
         String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
+        String name = exchange.header(Session.TARANTULA_NAME);
         byte[] _payload = exchange.payload();
         GameCluster gameCluster = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
         if(gameCluster==null) throw new RuntimeException("Illegal access");
@@ -99,6 +100,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
+            this.deploymentServiceProvider.updateRoom(typeId,name,_payload);
             exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
         }
     }

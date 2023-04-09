@@ -56,6 +56,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             "",
             Session.TARANTULA_ACTION,
             "",
+            Session.TARANTULA_NAME,
+            ""
     };
 
     private Thread receiver;
@@ -316,6 +318,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.logger.warn("room updated->"+room.channelId());
         try{
             headers[5]="onUpdate";
+            headers[7]= connection.get("configurationName").getAsString();
             String rest = httpCaller.post(registerPath,payload,headers);
             logger.warn(">>>"+rest);
         }catch (Exception ex){

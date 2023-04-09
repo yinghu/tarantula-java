@@ -5,6 +5,7 @@ import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 
 
@@ -78,5 +79,8 @@ public class DedicatedGameModule implements GameModule {
 
     public void reset(){
 
+    }
+    public void update(ServiceContext serviceContext, byte[] payload){
+        this.gameContext.log("Update room",OnLog.WARN);
     }
 }

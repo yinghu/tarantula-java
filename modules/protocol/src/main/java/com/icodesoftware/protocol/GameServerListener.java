@@ -9,7 +9,11 @@ public interface GameServerListener extends EndPoint.Listener {
     String typeId();
     OnAccess onConnection(Connection connection);
     void onStartConnection(Connection connection);
+
     void onDisConnection(Connection connection);
+
+    void onUpdate(String lobby,byte[] payload);
+
     boolean onChannel(Channel channel);
 
     //distributed callbacks

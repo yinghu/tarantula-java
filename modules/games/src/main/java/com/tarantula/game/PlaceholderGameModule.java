@@ -5,6 +5,7 @@ import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.service.ServiceContext;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,5 +91,9 @@ public class PlaceholderGameModule implements GameModule {
 
     public void reset(){
 
+    }
+
+    public void update(ServiceContext serviceContext, byte[] payload){
+        this.gameContext.log("update room",OnLog.WARN);
     }
 }

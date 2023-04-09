@@ -770,6 +770,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
     }
 
+    public void updateRoom(String typeId,String lobby,byte[] payload){
+        GameServerListener gameServerListener = cListeners.get(typeId);
+        if(gameServerListener==null) return;
+        gameServerListener.onUpdate(lobby,payload);
+    }
+
     public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
