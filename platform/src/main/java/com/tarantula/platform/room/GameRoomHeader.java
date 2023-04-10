@@ -5,12 +5,9 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
-import com.icodesoftware.protocol.GameModule;
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
@@ -309,6 +306,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void onLeft(Channel channel) {
        gameModule.onLeft(channel);
+    }
+
+    @Override
+    public void onUpdated(GameServiceProvider gameServiceProvider, byte[] payload){
+        gameModule.update(gameServiceProvider,payload);
     }
 
 }

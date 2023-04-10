@@ -13,10 +13,9 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
-
+    public static final int GAME_UPDATE_OBJECT_CID = 5;
 
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
-
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
     public static final int PVP_ROOM_CID = PortableEventRegistry.PVP_ROOM_CID;
     public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
@@ -33,6 +32,12 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
+            case MAPPING_OBJECT_CID:
+                pt = new MappingObject();
+                break;
+            case GAME_UPDATE_OBJECT_CID:
+                pt = new GameUpdateObject();
+                break;
             case RATING_CID:
                 pt = new Rating();
                 break;
@@ -51,11 +56,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
             case TVT_ROOM_CID:
                 pt = new TVTGameRoom();
                 break;
-
-            case MAPPING_OBJECT_CID:
-                pt = new MappingObject();
-                break;
-
             case GAME_ENTRY_CID:
                 pt = new GameEntry();
                 break;

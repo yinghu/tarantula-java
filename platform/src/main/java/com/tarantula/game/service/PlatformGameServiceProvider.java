@@ -51,6 +51,8 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     private ConcurrentHashMap<String, Module> moduleExported;
     private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
 
+    private Descriptor serviceProxy;
+
     public PlatformGameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
         this.gameCluster = gameCluster;
@@ -296,6 +298,13 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     public PlatformGameContext gameContext(Class module){
         return new PlatformGameContext(this.serviceContext,this,this.serviceContext.logger(module));
+    }
+
+    public void registerServiceProxyModule(Descriptor descriptor){
+        this.serviceProxy = descriptor;
+    }
+    public Descriptor serviceProxy(){
+        return this.serviceProxy;
     }
 
     private GameServiceProxy toGameServiceProxy(short serviceId,String className){

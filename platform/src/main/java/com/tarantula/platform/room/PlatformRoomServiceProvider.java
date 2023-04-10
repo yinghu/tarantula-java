@@ -10,9 +10,7 @@ import com.icodesoftware.service.*;
 
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
-import com.tarantula.game.GameZone;
-import com.tarantula.game.Rating;
-import com.tarantula.game.Stub;
+import com.tarantula.game.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
@@ -288,9 +286,17 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public void onUpdate(String lobby,byte[] payload){
         serviceContext.schedule(new ScheduleRunner(1000,()->{
-            logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
+            //logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
             GameZoneIndex index = gameZoneIndex(lobby);
-            index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),payload);
+            UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
+            for(PlayerUpdate update : updateBatch.playerUpdates){
+                UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
+                GameUpdateObject mappingObject = new GameUpdateObject();
+                mappingObject.value(batch.toBytes());
+                mappingObject.owner(update.systemId);
+                mappingObject.distributionKey(index.gameZone.distributionKey());
+                this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
+            }
         }));
     }
     @Override
@@ -463,6 +469,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
             _gameRoom.load();
+            //_gameRoom.owner(zoneIndex.gameZone.distributionKey());
             GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),_gameRoom);
             _gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
             resetGameRoom(zoneIndex,_gameRoom,true);
@@ -479,6 +486,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
+        //gameRoom.owner(zoneIndex.gameZone.distributionKey());
         GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
         synchronized (zoneIndex.roomIndex){
@@ -566,7 +574,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
-
+        GameRoom gameRoom = (GameRoom)room;
+        gameRoom.onUpdated(gameServiceProvider.gameContext(gameRoom.getClass()),payload);
     }
 
     @Override
@@ -582,5 +591,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.runningRooms.remove(room);
         resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
         //forcefully reset room
+    }
+
+    public void onGameUpdate(GameUpdateObject gameUpdateObject){
+        GameZoneIndex index = gameZoneIndex.get(gameUpdateObject.key().asString());
+        if(index==null){
+            logger.warn("Game lobby not available ["+gameUpdateObject.key().asString()+"]");
+        }
+        index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),gameUpdateObject.value());
     }
 }

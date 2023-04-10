@@ -2,10 +2,7 @@ package com.tarantula.platform.room;
 
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.Channel;
-import com.icodesoftware.protocol.ChannelListener;
-import com.icodesoftware.protocol.GameModule;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
+import com.icodesoftware.protocol.*;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -40,6 +37,8 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
     void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);
 
     void setup(Channel[] channels);
+
+    void onUpdated(GameServiceProvider gameServiceProvider,byte[] payload);
 
     Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
 
