@@ -1,8 +1,7 @@
 package com.icodesoftware.protocol;
 
-
-import com.icodesoftware.Statistics;
-
 public interface GameServiceProvider {
-    Statistics statistics(String systemId);
+
+    void updateStatistics(String system,String name,double delta);
+    void updateExperience(String system,double delta);
 }

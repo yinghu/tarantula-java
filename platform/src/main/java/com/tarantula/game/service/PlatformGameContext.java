@@ -57,7 +57,12 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
     public GameServiceProxy gameServiceProxy(short serviceId) {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
-    public Statistics statistics(String systemId){
-        return this.platformGameServiceProvider.presenceServiceProvider().statistics(systemId);
+
+    public void updateStatistics(String system,String name,double delta){
+        Statistics statistics = this.platformGameServiceProvider.presenceServiceProvider().statistics(system);
+        statistics.entry(name).update(delta).update();
+    }
+    public void updateExperience(String system,double delta){
+
     }
 }

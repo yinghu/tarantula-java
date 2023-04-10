@@ -72,6 +72,7 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+        this.gameContext.log("action->",OnLog.WARN);
         messageHeader.ack = true;
         messageHeader.encrypted = true;
         messageHeader.commandId = Messenger.ON_ACTION;
@@ -99,9 +100,9 @@ public class PlaceholderGameModule implements GameModule {
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){
         UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
         for(PlayerUpdate playerUpdate :updateBatch.playerUpdates){
-            Statistics statistics = gameServiceProvider.statistics(playerUpdate.systemId);
             for(GameExperience gameExperience : playerUpdate.gameExperiences){
-                statistics.entry(gameExperience.name).update(gameExperience.statisticsDelta).update();
+                gameServiceProvider.updateStatistics(playerUpdate.systemId,gameExperience.name,gameExperience.statisticsDelta);
+                gameServiceProvider.updateExperience(playerUpdate.systemId,gameExperience.experienceDelta);
             }
         }
     }
