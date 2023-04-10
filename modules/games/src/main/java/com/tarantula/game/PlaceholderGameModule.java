@@ -72,7 +72,6 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        this.gameContext.log("action->",OnLog.WARN);
         messageHeader.ack = true;
         messageHeader.encrypted = true;
         messageHeader.commandId = Messenger.ON_ACTION;
