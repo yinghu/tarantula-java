@@ -11,6 +11,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.*;
+import com.tarantula.game.service.PlatformGameContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
@@ -65,6 +66,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private SchedulingTask schedulingTask;
     private boolean started;
 
+    private PlatformGameContext gameUpdateContext;
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
@@ -107,6 +109,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.serviceContext.schedule(schedulingTask);
         }
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
+        this.gameUpdateContext = new PlatformGameContext(serviceContext,gameServiceProvider,this.logger);
     }
 
     @Override
@@ -176,7 +179,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void leave(Stub stub){
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {});
+        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
+            logger.warn("LEAVE ROOM->"+room.available()+">>"+room.channelId());
+            if(!room.available()) releaseRoom(room);
+        });
     }
 
     @Override
@@ -251,6 +257,14 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 udpChannel.close();
             }
         }while (udpChannel!=null);
+        GameRoom gameRoom;
+        do{
+            gameRoom = index.pendingRooms.poll();
+            if(gameRoom!=null){
+                gameRoom.close();
+                gameRoomIndex.remove(gameRoom.roomId());
+            }
+        }while (gameRoom!=null);
     }
 
 
@@ -556,6 +570,20 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return joined;
     }
 
+    private void releaseRoom(Room room) {
+        GameZoneIndex index = gameZoneIndex.get(room.owner());
+        if(index==null){
+            logger.warn("Game lobby not available ["+room.owner()+"]");
+            return;
+        }
+        logger.warn("Release room->"+room.distributionKey()+" on->"+room.owner());
+        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        udpEndpoint.releaseChannel(room.channelId());
+        index.runningRooms.remove(room);
+        resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
+        //forcefully reset room
+    }
+
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
@@ -570,29 +598,25 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onStarted(Room room) {
-
+        logger.warn("room started->"+room.channelId()+">>"+room.capacity());
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
+        logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
         GameRoom gameRoom = (GameRoom)room;
-        gameRoom.onUpdated(gameServiceProvider.gameContext(gameRoom.getClass()),payload);
+        gameRoom.onUpdated(gameUpdateContext,payload);
     }
 
     @Override
     public void onEnded(Room room) {
         if(room.dedicated()) return;
-        GameZoneIndex index = gameZoneIndex.get(room.owner());
-        if(index==null){
-            logger.warn("Game lobby not available ["+room.owner()+"]");
-            return;
-        }
-        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        udpEndpoint.releaseChannel(room.channelId());
-        index.runningRooms.remove(room);
-        resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
-        //forcefully reset room
+        logger.warn("room ended->"+room.channelId()+">>>"+room.available());
+        releaseRoom(room);
     }
 
+    public void onClosed(Room room){
+
+    }
     public void onGameUpdate(GameUpdateObject gameUpdateObject){
         GameZoneIndex index = gameZoneIndex.get(gameUpdateObject.key().asString());
         if(index==null){

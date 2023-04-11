@@ -19,4 +19,10 @@ public interface Room extends Recoverable {
     int timeout();
 
     boolean dedicated();
+
+    boolean available();
+
+    int totalJoined();
+
+    int totalLeft();
 }

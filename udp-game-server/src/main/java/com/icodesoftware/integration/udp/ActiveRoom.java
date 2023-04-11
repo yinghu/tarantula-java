@@ -69,6 +69,19 @@ public class ActiveRoom extends RecoverableObject implements Room {
         return true;
     }
 
+    @Override
+    public   boolean available(){
+        return true;
+    }
+
+    public int totalJoined(){
+        return 0;
+    }
+
+    public int totalLeft(){
+        return 0;
+    }
+
     public ActiveRoom assign(int channelId){
         return new ActiveRoom(channelId,capacity,duration,overtime,joinsOnStart,timeout);
     }

@@ -234,8 +234,16 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public boolean available(){
         return totalJoined < capacity;
     }
+    public int totalJoined(){
+        return totalJoined;
+    }
+
+    public int totalLeft(){
+        return 0;
+    }
 
     public synchronized void reset(){
+        if(gameModule!=null) gameModule.reset();
         if(pendingChannels!=null) pendingChannels.clear();
         joinIndex.forEach((k,v)->{
             v.reset();
@@ -246,6 +254,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         totalJoined = 0;
         round++;
         this.dataStore.update(this);
+    }
+
+    public synchronized void close(){
+        if(gameModule!=null) gameModule.close();
     }
 
     protected GameRoom duplicate(){

@@ -64,7 +64,6 @@ public class PlaceholderGameModule implements GameModule {
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        if(room.dedicated()) return null;
         short cmd = messageBuffer.readShort();
         GameServiceProxy messageListener = gameContext.gameServiceProxy(cmd);
         return messageListener.onService(session,messageHeader,messageBuffer);

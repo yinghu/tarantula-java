@@ -9,7 +9,7 @@ import com.tarantula.game.Rating;
 
 import java.util.List;
 
-public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener {
+public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener {
 
     String LABEL = "ZGR";
 
@@ -31,7 +31,7 @@ public interface GameRoom extends Room,Resettable,Configurable,Portable, UDPEndp
     void leave(String systemId,Listener listener);
     void load();
 
-    boolean available();
+    //boolean available();
 
 
     void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);

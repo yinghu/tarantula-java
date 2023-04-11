@@ -23,9 +23,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private ScheduledExecutorService scheduledExecutorService;
     private ScheduleRunner timer;
-
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-    //private GameModule gameModule;
+
     private String moduleName;
     private ActiveRoom room;
 
@@ -64,8 +63,11 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
+    private GameServiceProxy gameServiceProxy;
+
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
+        gameServiceProxy = new EmptyGameServiceProxy();
     }
 
 
@@ -73,7 +75,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
-        //this.moduleName = config.get("gameModule").getAsString();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -172,22 +173,21 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void onLeft(int channelId, int sessionId) {
         ActiveGame activeGame = activeGameIndex.get(channelId);
         int totalLeft = activeGame.totalLeft.decrementAndGet();
-        logger.warn("Session timeout->"+channelId+">>"+sessionId);
         activeGame.gameModule.onLeft(new ActiveChannel(sessionId));
         if(totalLeft == 0){
             logger.warn("Channel Removed->"+channelId+">>"+sessionId);
             this.udpEndpointServiceProvider.releaseUserChannel(channelId);
             this.activeGameIndex.remove(channelId);
-            if(createChannel()){
-               logger.warn("channel created");
+            if(!createChannel()){
+               logger.warn("failed to create channel");
             }
         }
     }
 
     @Override
     public void onJoined(int channelId, int sessionId){
-        logger.warn("Session joined->"+channelId+">>"+sessionId);
         ActiveGame activeGame = activeGameIndex.get(channelId);
+        activeGame.totalJoined.incrementAndGet();
         activeGame.gameModule.onJoined(new ActiveChannel(sessionId));
     }
 
@@ -200,9 +200,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             MessageDigest mda = (MessageDigest)messageDigest.clone();
             ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
             boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
-            if(suc&&sessionId==messageHeader.sessionId){
+            if(suc && sessionId == messageHeader.sessionId){
                 ActiveGame activeGame = activeGameIndex.get(messageHeader.channelId);
-                activeGame.totalJoined.incrementAndGet();
                 activeGame.gameModule.onValidated(new ActiveChannel(session.systemId,sessionId));
                 return true;
             }
@@ -306,7 +305,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     }
 
     public GameServiceProxy gameServiceProxy(short serviceId) {
-        return null;
+        return gameServiceProxy;
     }
 
     @Override
@@ -325,6 +324,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         }catch (Exception ex){
             logger.error("error on updated",ex);
         }
+    }
+
+    public void onClosed(Room room){
+
     }
 
     @Override

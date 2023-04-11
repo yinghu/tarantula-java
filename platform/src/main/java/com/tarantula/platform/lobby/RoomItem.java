@@ -23,9 +23,9 @@ public class RoomItem extends Component {
         return header.get("JoinsOnStart").getAsInt();
     }
     public long duration(){
-        return header.get("Duration").getAsInt()*1000;
+        return header.get("Duration").getAsInt()*1000*60;
     }
     public long overtime(){
-        return header.get("Overtime").getAsInt()*1000;
+        return header.get("Overtime").getAsInt()*1000*60;
     }
 }

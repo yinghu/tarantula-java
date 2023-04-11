@@ -13,6 +13,6 @@ public interface GameModule extends UDPEndpointServiceProvider.RequestListener,U
 
     void registerRoomListener(RoomListener roomListener);
 
-    default void update(GameServiceProvider gameServiceProvider,byte[] payload){}
+    void update(GameServiceProvider gameServiceProvider,byte[] payload);
 
 }
