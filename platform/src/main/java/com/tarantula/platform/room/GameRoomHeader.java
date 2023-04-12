@@ -16,6 +16,7 @@ import com.tarantula.game.Rating;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
@@ -32,14 +33,17 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected long overtime;
 
     protected int totalJoined;
+    protected int totalLeft;
     protected boolean dedicated;
     protected Arena arena;
 
-    protected HashMap<String,Entry> joinIndex;
+    protected ConcurrentHashMap<String,Entry> joinIndex;
     protected Entry[] entries;
 
     private GameModule gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
+
+    private Entry placeHolder;
     public int channelId(){
         return channelId;
     }
@@ -101,18 +105,29 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public GameRoomHeader(int capacity){
         this.capacity = capacity;
         this.round = 1;
-        this.joinIndex = new HashMap<>(capacity);
+        this.joinIndex = new ConcurrentHashMap<>(capacity);
         this.entries = new Entry[capacity];
+        this.placeHolder = createEntry();
     }
 
     @Override
     public void load(){
-        //entries = new Entry[capacity];
+        int[] created ={0};
         dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
             entries[ge.seat()]=ge;
             if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
+            created[0]++;
             return true;
         });
+        if(created[0]==capacity) return;
+        for(int i=0;i<capacity;i++){
+            Entry entry = createEntry();
+            entry.seat(i);
+            entry.occupied(false);
+            entry.owner(this.distributionKey());
+            if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
+            entries[i]=entry;
+        }
     }
 
     @Override
@@ -131,6 +146,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.properties.put("1",capacity);
         this.properties.put("2",round);
         this.properties.put("3",totalJoined);
+        this.properties.put("4",totalLeft);
         return this.properties;
     }
     @Override
@@ -138,6 +154,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.capacity = ((Number)properties.getOrDefault("1",1)).intValue();
         this.round = ((Number)properties.getOrDefault("2",0)).intValue();
         this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
+        this.totalLeft = ((Number)properties.getOrDefault("4",0)).intValue();
+
     }
     @Override
     public JsonObject toJson(){
@@ -183,46 +201,40 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
     }
 
-    public synchronized GameRoom join(String systemId,Listener listener){
-        if(joinIndex.containsKey(systemId)) {
-            listener.onUpdated(this,joinIndex.get(systemId));
-            return view();
-        };
-        for(int i=0;i<capacity;i++){
-            Entry e = entries[i];
-            if(e!=null&&e.occupied()) continue;
-            if(e==null){
-                e = this.createEntry();
-                e.seat(i);
-                e.owner(this.distributionKey());
-                this.dataStore.create(e);
-                entries[i]=e;
+    public GameRoom join(String systemId,Listener listener){
+        Entry entry = joinIndex.putIfAbsent(systemId,placeHolder);
+        if(entry != null) return view();
+        synchronized (entries){
+            for(int i=0;i<capacity;i++){
+                if(!entries[i].occupied()){
+                    entry = entries[i];
+                    entry.occupied(true);
+                    entry.systemId(systemId);
+                    totalJoined++;
+                    break;
+                }
             }
-            e.systemId(systemId);
-            e.occupied(true);
-            e.seat(i);
-            this.dataStore.update(e);
-            joinIndex.put(systemId,e);
-            break;
         }
-        totalJoined++;
+        joinIndex.replace(systemId,entry);
+        listener.onUpdated(this,entry);
+        this.dataStore.update(entry);
         this.dataStore.update(this);
-        listener.onUpdated(this,joinIndex.get(systemId));
-        GameRoom joined = view();
-        return joined;
+        return view();
     }
 
-    public synchronized void leave(String systemId,Listener listener){
-        Entry rm = joinIndex.remove(systemId);
-        if(rm!=null){
-            rm.reset();
-            this.dataStore.update(rm);
-            this.dataStore.update(this);
+    public void leave(String systemId,Listener listener){
+        Entry entry = joinIndex.remove(systemId);
+        if(entry == null) return;
+        synchronized (entries){
+            entries[entry.seat()].reset();
+            totalLeft++;
         }
-        listener.onUpdated(this,rm);
+        listener.onUpdated(this,entry);
+        this.dataStore.update(entry);
+        this.dataStore.update(this);
     }
 
-    public synchronized GameRoom view(){
+    public GameRoom view(){
         GameRoom room = duplicate();
         if(room==null) return this;
         room.bucket(this.bucket);
@@ -239,24 +251,24 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public int totalLeft(){
-        return 0;
+        return totalLeft;
     }
 
-    public synchronized void reset(){
+    public void reset(){
         if(gameModule!=null) gameModule.reset();
         if(pendingChannels!=null) pendingChannels.clear();
-        joinIndex.forEach((k,v)->{
-            v.reset();
-            this.dataStore.update(v);
-        });
         joinIndex.clear();
-        entries = new Entry[capacity];
+        for(int i=0;i<capacity;i++){
+            entries[i].reset();
+            this.dataStore.update(entries[i]);
+        }
         totalJoined = 0;
+        totalLeft = 0;
         round++;
         this.dataStore.update(this);
     }
 
-    public synchronized void close(){
+    public void close(){
         if(gameModule!=null) gameModule.close();
     }
 

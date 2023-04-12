@@ -1,14 +1,11 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.tournament.PlayerTournamentHistory;
 import com.tarantula.platform.util.SystemUtil;
@@ -21,11 +18,6 @@ import java.util.List;
 
 public class DataStoreTest {
 
-    //static {
-        //System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
-    //}
-
-
     DataStoreProvider dataStoreProvider;
     ServiceContext serviceContext;
     @BeforeClass
@@ -33,24 +25,6 @@ public class DataStoreTest {
         DataStoreTestEvn.setUp();
         dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
         serviceContext = DataStoreTestEvn.serviceContext;
-        /**
-        serviceContext = new TestServiceContext();
-        DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext,dataStoreProvider->{
-            try{
-                this.dataStoreProvider = dataStoreProvider;
-                this.dataStoreProvider.start();
-                this.dataStoreProvider.setup(serviceContext);
-            }catch (Exception exx){
-                exx.printStackTrace();
-                throw new RuntimeException(exx);
-            }
-        });
-        try {
-            parser.start();
-        }catch (Exception ex){
-            ex.printStackTrace();
-            throw new RuntimeException(ex);
-        }**/
     }
 
     @Test(groups = { "DataStore" })

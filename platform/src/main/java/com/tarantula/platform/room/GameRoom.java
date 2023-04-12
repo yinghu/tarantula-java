@@ -31,8 +31,6 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
     void leave(String systemId,Listener listener);
     void load();
 
-    //boolean available();
-
 
     void setup(GameZone gameZone,GameModule gameModule,boolean dedicated);
 

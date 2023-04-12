@@ -483,7 +483,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(!this.dataStore.load(_gameRoom)) return null;
             _gameRoom.dataStore(this.dataStore);
             _gameRoom.load();
-            //_gameRoom.owner(zoneIndex.gameZone.distributionKey());
             GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),_gameRoom);
             _gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
             resetGameRoom(zoneIndex,_gameRoom,true);
@@ -500,7 +499,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
-        //gameRoom.owner(zoneIndex.gameZone.distributionKey());
         GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
         synchronized (zoneIndex.roomIndex){

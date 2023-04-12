@@ -1,93 +1,98 @@
 package com.tarantula.test;
 
-import com.tarantula.platform.room.PVEGameRoom;
-import com.tarantula.platform.room.PVPGameRoom;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.room.*;
+import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class GameRoomTest {
 
+    DataStoreProvider dataStoreProvider;
+    ServiceContext serviceContext;
+
+    DataStore dataStore;
     @BeforeClass
     public void setUp() {
+        DataStoreTestEvn.setUp();
+        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
+        serviceContext = DataStoreTestEvn.serviceContext;
+        dataStore = dataStoreProvider.create("room",serviceContext.node().partitionNumber());
     }
 
     @Test(groups = { "GameRoom" })
     public void setupTest() {
         PVPGameRoom room = new PVPGameRoom(10);
-        room.dataStore(new EmptyDataStore());
+        Assert.assertTrue(dataStore.create(room));
+        room.dataStore(dataStore);
         room.load();
-        Assert.assertEquals(room.capacity(),10);
-        //Arena arena = new Arena();
-        //arena.capacity = 2;
-        //room.setup(arena);
-        //Assert.assertEquals(room.capacity(),10);
+        List<GameEntry> entries = dataStore.list(new GameEntryQuery(room.roomId()));
+        Assert.assertEquals(entries.size(),10);
 
+        PVPGameRoom load = new PVPGameRoom(10);
+        load.distributionKey(room.distributionKey());
+        Assert.assertTrue(dataStore.load(load));
+        load.dataStore(dataStore);
+        load.load();
+        List<GameEntry> loadEntries = dataStore.list(new GameEntryQuery(room.roomId()));
+        Assert.assertEquals(loadEntries.size(),10);
     }
     @Test(groups = { "GameRoom" })
     public void joinTest() {
-        PVPGameRoom room = new PVPGameRoom(10);
-        room.dataStore(new EmptyDataStore());
+        PVPGameRoom room = new PVPGameRoom(5);
+        dataStore.create(room);
+        room.dataStore(dataStore);
         room.load();
         room.join("player1",(room1,entry) -> {
             Assert.assertTrue(room1.available());
+            Assert.assertEquals(room.totalJoined(),1);
         });
         room.join("player2",(room1,entry) -> {
             Assert.assertTrue(room1.available());
+            Assert.assertEquals(room.totalJoined(),2);
         });
         room.join("player3",(room1,entry) -> {
             Assert.assertTrue(room1.available());
+            Assert.assertEquals(room.totalJoined(),3);
         });
         room.join("player4",(room1,entry) -> {
             Assert.assertTrue(room1.available());
+            Assert.assertEquals(room.totalJoined(),4);
         });
-        room.leave("player5",(room1,entry) -> {
-            Assert.assertTrue(room1.available());
+        room.join("player5",(room1,entry) -> {
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalJoined(),5);
+            Assert.assertTrue(room.totalJoined()==room.capacity());
         });
-    }
-
-    @Test(groups = { "GameRoom" })
-    public void leaveTest() {
-        PVPGameRoom room = new PVPGameRoom(10);
-        room.dataStore(new EmptyDataStore());
-        room.load();
-        room.join("player1",(room1,entry) -> {});
-        room.join("player2",(room1,entry) -> {});
-        room.join("player3",(room1,entry) -> {});
-        room.join("player4",(room1,entry) -> {});
-
         room.leave("player1",(room1,entry) -> {
-            Assert.assertTrue(room1.available());
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalLeft(),1);
         });
         room.leave("player2",(room1,entry) -> {
-            Assert.assertTrue(room1.available());
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalLeft(),2);
         });
         room.leave("player3",(room1,entry) -> {
-            Assert.assertTrue(room1.available());
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalLeft(),3);
         });
         room.leave("player4",(room1,entry) -> {
-            Assert.assertTrue(room1.available());
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalLeft(),4);
         });
-        /**
-        Assert.assertEquals(true,"application".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
-        Assert.assertEquals(true,"application.lobby".startsWith(Configurable.APPLICATION_CONFIG_TYPE));
-        String token = "BDS01/7c88ac77da684826857c63816a1ce442 tarantula 1656978601324 DA2195B286A6A3D3144D5A42123C997D25360361-84-1656972601324-F2FBD235841399B0EFE2A7D88D37F48D9F325397";
-        try{
-            MessageDigest msg = MessageDigest.getInstance(MDA);
-            OnSession session = SystemUtil.validToken(msg,token);
-            Assert.assertEquals(true,session.systemId()!=null);
-            boolean suc = SystemUtil.validTicket(msg,session.systemId(),session.stub(),session.ticket());
-            System.out.println(session.ticket()+">>>"+suc);
-            System.out.println(session.systemId());
-            System.out.println(session.stub());
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        **/
+        room.leave("player5",(room1,entry) -> {
+            Assert.assertFalse(room1.available());
+            Assert.assertEquals(room.totalLeft(),5);
+            Assert.assertTrue(room.totalLeft()==room.capacity());
+        });
     }
+
     @Test(groups = { "GameRoom" })
     public void removeTest() {
         LinkedBlockingDeque q = new LinkedBlockingDeque(3);

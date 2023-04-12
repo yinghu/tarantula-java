@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlaceholderGameModule implements GameModule {
 
@@ -12,7 +11,6 @@ public class PlaceholderGameModule implements GameModule {
     private Room room;
     private RoomListener roomListener;
 
-    private AtomicInteger totalJoined;
 
     private ConcurrentHashMap<Integer,Channel> channels;
     @Override
@@ -23,7 +21,7 @@ public class PlaceholderGameModule implements GameModule {
     @Override
     public void onJoined(Channel channel) {
         if(!channels.containsKey(channel.sessionId())) return;
-        if(totalJoined.incrementAndGet()==room.joinsOnStart()){
+        if(room.totalJoined()==room.joinsOnStart()){
             roomListener.onStarted(room);
         }
     }
@@ -39,7 +37,7 @@ public class PlaceholderGameModule implements GameModule {
                 })
         });
         this.roomListener.onUpdated(room,updateBatch.toBytes());
-        if(totalJoined.decrementAndGet()>0) return;
+        if(room.totalLeft()>0) return;
         this.roomListener.onEnded(this.room);
     }
 
@@ -48,7 +46,6 @@ public class PlaceholderGameModule implements GameModule {
         this.room = room;
         this.gameContext = gameContext;
         this.channels = new ConcurrentHashMap<>();
-        this.totalJoined = new AtomicInteger(0);
         this.gameContext.log("Placeholder game  module started on channel ["+room.channelId()+"]", OnLog.WARN);
     }
 

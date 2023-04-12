@@ -1,7 +1,10 @@
 package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.Room;
+import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.util.RecoverableObject;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ActiveRoom extends RecoverableObject implements Room {
 
@@ -12,6 +15,11 @@ public class ActiveRoom extends RecoverableObject implements Room {
     private int timeout;
 
     private int channelId;
+
+    private AtomicInteger totalJoined;
+    private AtomicInteger totalLeft;
+
+    public GameModule gameModule;
 
     public ActiveRoom(int capacity, long duration, long overtime, int joinsOnStart, int timeout){
         this.capacity = capacity;
@@ -28,6 +36,8 @@ public class ActiveRoom extends RecoverableObject implements Room {
         this.overtime = overtime;
         this.joinsOnStart = joinsOnStart;
         this.timeout = timeout;
+        this.totalJoined = new AtomicInteger(0);
+        this.totalLeft = new AtomicInteger(0);
     }
 
     public int channelId(){
@@ -71,17 +81,23 @@ public class ActiveRoom extends RecoverableObject implements Room {
 
     @Override
     public   boolean available(){
-        return true;
+        return totalJoined.get() < capacity;
     }
 
     public int totalJoined(){
-        return 0;
+        return totalJoined.get();
     }
 
     public int totalLeft(){
-        return 0;
+        return totalLeft.get();
     }
 
+    public int join(){
+        return totalJoined.incrementAndGet();
+    }
+    public int leave(){
+        return totalLeft.incrementAndGet();
+    }
     public ActiveRoom assign(int channelId){
         return new ActiveRoom(channelId,capacity,duration,overtime,joinsOnStart,timeout);
     }
