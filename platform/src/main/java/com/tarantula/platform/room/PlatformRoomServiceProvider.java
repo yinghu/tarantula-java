@@ -61,12 +61,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
 
     private ArrayList<String> kickoff = new ArrayList<>();
-    private boolean timerEnabled = false;
+
     private int timer;
     private SchedulingTask schedulingTask;
+    private ScheduledFuture scheduledFuture;
     private boolean started;
 
     private PlatformGameContext gameUpdateContext;
+    private LinkedBlockingDeque<PendingReleaseRoom> pendingReleaseRooms;
+
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
@@ -97,19 +100,18 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.connectionIndex = new ConcurrentHashMap<>();
             this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         }
-        this.timerEnabled = jsonObject.get("connectionCheckEnabled").getAsBoolean();
-        this.timer = jsonObject.get("connectionCheckInterval").getAsInt();
+        String checkInterval = dedicated? "dedicatedCheckInterval" : "checkInterval";
+        this.timer = ((Number)configuration.property(checkInterval)).intValue();
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
         this.reloadKey = this.clusterProvider.registerReloadListener(this);
-        if(this.dedicated && timerEnabled) {
-            this.schedulingTask = new ScheduleRunner(timer,()->{
-                onSchedule();
-                this.serviceContext.schedule(this.schedulingTask);
-            });
-            this.serviceContext.schedule(schedulingTask);
-        }
+        this.schedulingTask = new ScheduleRunner(timer,()->{
+            onSchedule();
+            this.scheduledFuture = this.serviceContext.schedule(this.schedulingTask);
+        });
+        this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
         this.gameUpdateContext = new PlatformGameContext(serviceContext,gameServiceProvider,this.logger);
+        this.pendingReleaseRooms = new LinkedBlockingDeque<>(this.maxRoomPoolSizePerZone);
     }
 
     @Override
@@ -129,6 +131,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void shutdown() throws Exception {
+        if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
         gameZoneIndex.forEach((k,z)->{
@@ -180,8 +183,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
-            logger.warn("LEAVE ROOM->"+room.available()+">>"+room.channelId());
-            if(!room.available()) releaseRoom(room);
+            //mark is as pending release
         });
     }
 
@@ -436,6 +438,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void onSchedule() {
+        //logger.warn("Running schedule->"+dedicated+">>"+timer);
+        if(!dedicated) return;
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);

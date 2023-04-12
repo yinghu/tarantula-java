@@ -21,7 +21,7 @@ public class PlaceholderGameModule implements GameModule {
     @Override
     public void onJoined(Channel channel) {
         if(!channels.containsKey(channel.sessionId())) return;
-        if(room.totalJoined()==room.joinsOnStart()){
+        if(room.totalJoined() == room.joinsOnStart()){
             roomListener.onStarted(room);
         }
     }
@@ -37,7 +37,7 @@ public class PlaceholderGameModule implements GameModule {
                 })
         });
         this.roomListener.onUpdated(room,updateBatch.toBytes());
-        if(room.totalLeft()>0) return;
+        if(room.totalLeft() == room.capacity()) return;
         this.roomListener.onEnded(this.room);
     }
 

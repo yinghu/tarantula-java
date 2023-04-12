@@ -63,11 +63,12 @@ public class BlackjackModule implements GameModule{
     @Override
     public void onJoined(Channel channel) {
         if(!this.channels.containsKey(channel.sessionId())) return;
-        this.gameContext.log("Total joined->"+room.totalJoined(),OnLog.WARN);
-        roomListener.onStarted(this.room);
-        this.scheduledFuture = this.gameContext.schedule(new ScheduleRunner(room.duration(),()->{
-            this.roomListener.onEnded(room);
-        }));
+        if(room.totalJoined() == room.joinsOnStart()){
+            roomListener.onStarted(this.room);
+            this.scheduledFuture = this.gameContext.schedule(new ScheduleRunner(room.duration(),()->{
+                this.roomListener.onEnded(room);
+            }));
+        }
     }
 
     @Override
@@ -75,7 +76,9 @@ public class BlackjackModule implements GameModule{
         Channel removed = channels.remove(channel.sessionId());
         if(removed==null) return;
         roomListener.onUpdated(this.room,"{}".getBytes());
-        //roomListener.onEnded(this.room);
+        if(room.totalLeft() == room.capacity()) {
+            roomListener.onEnded(this.room);
+        }
     }
 
     public void registerRoomListener(RoomListener roomListener){

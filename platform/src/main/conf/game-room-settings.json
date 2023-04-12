@@ -1,30 +1,24 @@
 {
+  "checkInterval": 10000,
+  "dedicatedCheckInterval": 1000,
   "pve": {
-    "connectionCheckEnabled": true,
     "maxRoomPoolSizePerZone": 10,
     "minRoomPoolSizePerZone": 1,
-    "maxDedicatedServerConnections": 10,
-    "connectionCheckInterval": 1000
+    "maxDedicatedServerConnections": 10
   },
   "pvp": {
-    "connectionCheckEnabled": true,
     "maxRoomPoolSizePerZone": 10,
     "minRoomPoolSizePerZone": 1,
-    "maxDedicatedServerConnections": 10,
-    "connectionCheckInterval": 1000
+    "maxDedicatedServerConnections": 10
   },
   "tve": {
-    "connectionCheckEnabled": true,
     "maxRoomPoolSizePerZone": 2000,
     "minRoomPoolSizePerZone": 100,
-    "maxDedicatedServerConnections": 10,
-    "connectionCheckInterval": 1000
+    "maxDedicatedServerConnections": 10
   },
   "tvt": {
-    "connectionCheckEnabled": true,
     "maxRoomPoolSizePerZone": 2000,
     "minRoomPoolSizePerZone": 100,
-    "maxDedicatedServerConnections": 10,
-    "connectionCheckInterval": 1000
+    "maxDedicatedServerConnections": 10
   }
 }
