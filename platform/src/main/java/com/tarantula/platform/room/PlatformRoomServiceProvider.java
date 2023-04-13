@@ -121,6 +121,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void start() throws Exception {
+        this.udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
+        this.started = this.udpEndpoint != null;
         if(!dedicated) return;
         Collection<byte[]> cb = serverClusterStore.indexGet(typeLobby);
         cb.forEach(b->{

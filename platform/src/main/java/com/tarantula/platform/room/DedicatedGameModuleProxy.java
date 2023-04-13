@@ -16,7 +16,7 @@ public class DedicatedGameModuleProxy implements GameModule {
 
     private GameContext gameContext;
     private Room room;
-    private RoomListener roomListener;
+    //private RoomListener roomListener;
 
     private AtomicInteger totalJoined;
 
@@ -58,7 +58,7 @@ public class DedicatedGameModuleProxy implements GameModule {
 
     @Override
     public void registerRoomListener(RoomListener roomListener) {
-        this.roomListener = roomListener;
+        //this.roomListener = roomListener;
     }
 
     @Override
