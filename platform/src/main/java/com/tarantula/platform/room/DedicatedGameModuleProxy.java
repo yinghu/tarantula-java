@@ -87,4 +87,7 @@ public class DedicatedGameModuleProxy implements GameModule {
         //this.gameContext.log("Update room",OnLog.WARN);
         this.gameModule.update(gameServiceProvider,payload);
     }
+    public void countdown(long durationCountdown){
+
+    }
 }

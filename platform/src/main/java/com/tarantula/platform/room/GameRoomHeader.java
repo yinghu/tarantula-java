@@ -43,6 +43,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     private GameModule gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
 
+    private long countdownTimer;
     private Entry placeHolder;
     public int channelId(){
         return channelId;
@@ -265,6 +266,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         totalJoined = 0;
         totalLeft = 0;
         round++;
+        countdownTimer = duration+overtime;
         this.dataStore.update(this);
     }
 
@@ -287,6 +289,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.dedicated = dedicated;
         this.gameModule = gameModule;
         this.owner = gameZone.distributionKey();
+        this.countdownTimer = this.duration+this.overtime;
     }
 
     public void setup(Channel[] channels){
@@ -335,6 +338,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void onUpdated(GameServiceProvider gameServiceProvider, byte[] payload){
         gameModule.update(gameServiceProvider,payload);
+    }
+
+    @Override
+    public void onCountdown(long delta){
+        countdownTimer -= delta;
+        gameModule.countdown(countdownTimer);
     }
 
 }

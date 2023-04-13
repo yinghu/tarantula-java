@@ -15,4 +15,5 @@ public interface GameModule extends UDPEndpointServiceProvider.RequestListener,U
 
     void update(GameServiceProvider gameServiceProvider,byte[] payload);
 
+    void countdown(long durationCountdown);
 }

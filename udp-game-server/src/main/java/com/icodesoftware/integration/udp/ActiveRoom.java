@@ -92,6 +92,10 @@ public class ActiveRoom extends RecoverableObject implements Room {
         return totalLeft.get();
     }
 
+    public void onCountdown(long delta){
+
+    }
+
     public int join(){
         return totalJoined.incrementAndGet();
     }

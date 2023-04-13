@@ -38,6 +38,7 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
 
     void onUpdated(GameServiceProvider gameServiceProvider,byte[] payload);
 
+
     Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
 
     interface Entry extends Resettable,Configurable, Portable {

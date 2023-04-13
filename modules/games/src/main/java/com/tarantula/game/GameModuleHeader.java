@@ -85,4 +85,8 @@ public class GameModuleHeader implements GameModule {
             }
         }
     }
+
+    public void countdown(long durationCountdown){
+
+    }
 }

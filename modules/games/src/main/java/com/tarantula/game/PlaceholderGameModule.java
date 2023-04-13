@@ -45,4 +45,8 @@ public class PlaceholderGameModule extends GameModuleHeader {
         this.gameContext.log("room reset",OnLog.WARN);
     }
 
+    @Override
+    public void countdown(long durationCountdown) {
+        this.gameContext.log("Remaining time->"+durationCountdown,OnLog.WARN);
+    }
 }

@@ -443,6 +443,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(!dedicated) {
             kickoff.clear();
             pendingReleaseRooms.forEach((k,p)->{
+                p.room.onCountdown(timer);
                 if(TimeUtil.expired(p.pendingSchedule)) kickoff.add(k);
             });
             kickoff.forEach(k->{
@@ -610,7 +611,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void onStarted(Room room) {
         //logger.warn("room started->"+room.channelId()+">>"+room.capacity());
-        pendingReleaseRooms.put(room.distributionKey(),new PendingReleaseRoom(room,LocalDateTime.now().plus(room.duration(), ChronoUnit.MILLIS)));
+        pendingReleaseRooms.put(room.distributionKey(),new PendingReleaseRoom(room,LocalDateTime.now().plus(room.duration()+room.overtime(), ChronoUnit.MILLIS)));
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
