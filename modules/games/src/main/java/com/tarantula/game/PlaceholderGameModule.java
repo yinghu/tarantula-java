@@ -37,8 +37,9 @@ public class PlaceholderGameModule implements GameModule {
                 })
         });
         this.roomListener.onUpdated(room,updateBatch.toBytes());
-        if(room.totalLeft() == room.capacity()) return;
-        this.roomListener.onEnded(this.room);
+        if(room.totalLeft() == room.capacity()){
+            this.roomListener.onEnded(this.room);
+        }
     }
 
     @Override
@@ -85,11 +86,11 @@ public class PlaceholderGameModule implements GameModule {
     }
 
     public void close(){
-
+        this.gameContext.log("room close",OnLog.WARN);
     }
 
     public void reset(){
-
+        this.gameContext.log("room reset",OnLog.WARN);
     }
 
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){

@@ -218,6 +218,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     public void releaseChannel(int channelId){
         PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
         if(released == null) return;
+        released.kickoff();
         pendingUserChannels.offer(released);
     }
 

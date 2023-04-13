@@ -2,11 +2,8 @@ package com.tarantula.game.blackjack;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.Card;
-
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 
 public class BlackjackModule implements GameModule{
 
@@ -15,8 +12,6 @@ public class BlackjackModule implements GameModule{
     private Room room;
     private RoomListener roomListener;
     private ConcurrentHashMap<Integer,Channel> channels;
-
-    private ScheduledFuture scheduledFuture;
 
     public void setup(Room room, GameContext gameContext){
         this.room = room;
@@ -65,9 +60,6 @@ public class BlackjackModule implements GameModule{
         if(!this.channels.containsKey(channel.sessionId())) return;
         if(room.totalJoined() == room.joinsOnStart()){
             roomListener.onStarted(this.room);
-            this.scheduledFuture = this.gameContext.schedule(new ScheduleRunner(room.duration(),()->{
-                this.roomListener.onEnded(room);
-            }));
         }
     }
 
@@ -87,14 +79,10 @@ public class BlackjackModule implements GameModule{
 
     public void close(){
         this.gameContext.log("close game->",OnLog.WARN);
-        if(this.scheduledFuture==null || this.scheduledFuture.isCancelled()) return;
-        this.scheduledFuture.cancel(true);
     }
 
     public void reset(){
         this.gameContext.log("reset game->",OnLog.WARN);
-        if(this.scheduledFuture==null || this.scheduledFuture.isCancelled()) return;
-        this.scheduledFuture.cancel(true);
     }
 
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){

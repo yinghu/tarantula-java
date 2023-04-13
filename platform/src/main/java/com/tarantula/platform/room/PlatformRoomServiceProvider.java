@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.*;
@@ -20,6 +21,9 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.util.SystemUtil;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.*;
@@ -68,7 +72,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private boolean started;
 
     private PlatformGameContext gameUpdateContext;
-    private LinkedBlockingDeque<PendingReleaseRoom> pendingReleaseRooms;
+    private UDPEndpoint udpEndpoint;
+    private ConcurrentHashMap<String,PendingReleaseRoom> pendingReleaseRooms;
 
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
@@ -111,7 +116,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
         this.gameUpdateContext = new PlatformGameContext(serviceContext,gameServiceProvider,this.logger);
-        this.pendingReleaseRooms = new LinkedBlockingDeque<>(this.maxRoomPoolSizePerZone);
+        this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
     }
 
     @Override
@@ -137,15 +142,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameZoneIndex.forEach((k,z)->{
             if(dedicated) z.gameModule.close();
         });
+        gameRoomIndex.forEach((k,r)->r.close());
     }
 
     public Channel registerChannel(Stub stub, Session.TimeoutListener timeoutListener){
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        UDPEndpoint udp = (UDPEndpoint) this.serviceContext.serviceProvider(EndPoint.UDP_ENDPOINT);
         if(this.dedicated){
             UDPChannel channel = index.pendingPushChannels.poll();
             if(channel == null){
-                UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+                UDPChannel[] channels = udpEndpoint.createChannels(index.gameZone.capacity());
                 if(channels.length == 0) return null;
                 for(int i=0;i<channels.length;i++){
                     if(i==0){
@@ -158,13 +163,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
             GameRoom room = index.gameRoom;
             channel.register(stub,room,room,room,timeoutListener);
-            udp.registerChannel(channel);
+            udpEndpoint.registerChannel(channel);
             return channel;
         }
         else{//local join case
             GameRoom room = gameRoomIndex.get(stub.roomId);
             Channel channel = room.registerChannel(stub,timeoutListener);
-            udp.registerChannel((UDPChannel)channel);
+            udpEndpoint.registerChannel((UDPChannel)channel);
             //logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
             return channel;
         }
@@ -182,9 +187,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void leave(Stub stub){
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        localLeave(stub.systemId(),index,stub.roomId,(room,entry)-> {
-            //mark is as pending release
-        });
+        localLeave(stub.systemId(),index,stub.roomId,(room,entry)->{});
     }
 
     @Override
@@ -205,9 +208,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.gameModule.registerRoomListener(this);
             index.gameRoom.setup(gameZone,index.gameModule,dedicated);
             if(started){
-                UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
                 for(int i=0;i<minRoomPoolSizePerZone;i++){
-                    UDPChannel[] channels = udp.createChannels(index.gameZone.capacity());
+                    UDPChannel[] channels = udpEndpoint.createChannels(index.gameZone.capacity());
                     for(UDPChannel c : channels){
                         index.pendingPushChannels.offer(c);
                     }
@@ -238,9 +240,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
             logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
             if(started) {
-                UDPEndpoint udp = (UDPEndpoint) serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
                 gameRoomIndex.forEach((rk, rv) -> {
-                    rv.setup(udp.createChannels(gameZone.capacity()));
+                    rv.setup(udpEndpoint.createChannels(gameZone.capacity()));
                 });
                 logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
             }
@@ -286,7 +287,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         serverClusterStore.mapLock(lockKey);
         serverClusterStore.mapGet(lockKey);
         serverClusterStore.mapUnlock(lockKey);
-        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         int timeout = udpEndpoint.sessionTimeout();
         connection.timeout(timeout);
         this.clusterProvider.deployService().onRegisterConnection(connection);
@@ -404,11 +404,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
-            UDPEndpoint udp = (UDPEndpoint)endPoint;
+            this.udpEndpoint = (UDPEndpoint)endPoint;
             gameZoneIndex.forEach((k,v)->{
                 if(dedicated){
                     for(int i=0;i<minRoomPoolSizePerZone;i++){
-                        UDPChannel[] channels = udp.createChannels(v.gameZone.capacity());
+                        UDPChannel[] channels = udpEndpoint.createChannels(v.gameZone.capacity());
                         for(UDPChannel c : channels){
                             v.pendingPushChannels.offer(c);
                         }
@@ -416,7 +416,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
                 else{
                     gameRoomIndex.forEach((rk,rv)->{
-                        rv.setup(udp.createChannels(v.gameZone.capacity()));
+                        rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
                     });
                     logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
                 }
@@ -438,8 +438,17 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void onSchedule() {
-        //logger.warn("Running schedule->"+dedicated+">>"+timer);
-        if(!dedicated) return;
+        if(!dedicated) {
+            kickoff.clear();
+            pendingReleaseRooms.forEach((k,p)->{
+                if(TimeUtil.expired(p.pendingSchedule)) kickoff.add(k);
+            });
+            kickoff.forEach(k->{
+                PendingReleaseRoom pendingReleaseRoom = pendingReleaseRooms.remove(k);
+                if(pendingReleaseRoom!=null) udpEndpoint.releaseChannel(pendingReleaseRoom.room.channelId());
+            });
+            return;
+        }
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);
@@ -518,8 +527,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.reset();
         if(queued) index.pendingRooms.offer(room);
         if(!started) return;
-        UDPEndpoint udp = (UDPEndpoint)serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        room.setup(udp.createChannels(index.gameZone.capacity()));
+        room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
 
     private void localLeave(String systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
@@ -579,7 +587,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         logger.warn("Release room->"+room.distributionKey()+" on->"+room.owner());
-        UDPEndpoint udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         udpEndpoint.releaseChannel(room.channelId());
         index.runningRooms.remove(room);
         resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
@@ -600,11 +607,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onStarted(Room room) {
-        logger.warn("room started->"+room.channelId()+">>"+room.capacity());
+        //logger.warn("room started->"+room.channelId()+">>"+room.capacity());
+        pendingReleaseRooms.put(room.distributionKey(),new PendingReleaseRoom(room,LocalDateTime.now().plus(room.duration(), ChronoUnit.MILLIS)));
     }
     @Override
     public void onUpdated(Room room, byte[] payload) {
-        logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
+        //logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
         GameRoom gameRoom = (GameRoom)room;
         gameRoom.onUpdated(gameUpdateContext,payload);
     }
@@ -612,7 +620,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void onEnded(Room room) {
         if(room.dedicated()) return;
-        logger.warn("room ended->"+room.channelId()+">>>"+room.available());
+        pendingReleaseRooms.remove(room.distributionKey());
         releaseRoom(room);
     }
 

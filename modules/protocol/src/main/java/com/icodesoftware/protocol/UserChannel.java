@@ -167,6 +167,13 @@ public class UserChannel {
         this.onTimeout(channelId,sessionId);
     }
 
+    public final void kickoff(){
+        userSessionIndex.forEach((k,u)->{
+            this.onTimeout(channelId,k);
+        });
+        userSessionIndex.clear();
+    }
+
     private void onAck(UserSession userSession, MessageBuffer.MessageHeader messageHeader,SocketAddress source){
         userSession.pendingAck(messageHeader);
         List<MessageBuffer.MessageHeader> _acks = userSession.pendingAckList();
