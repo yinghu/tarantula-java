@@ -47,7 +47,7 @@ public class PlatformUserService implements UserService {
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
-        PresenceIndex px = new PresenceIndex((Double)onAccess.property(OnAccess.BALANCE));
+        PresenceIndex px = new PresenceIndex();
         px.distributionKey(acc.distributionKey());
         presenceDataStore.createIfAbsent(px,false);
         this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);

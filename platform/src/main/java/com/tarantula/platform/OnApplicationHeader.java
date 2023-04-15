@@ -11,20 +11,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String typeId;
 
-    protected double balance;
+    //protected double balance;
 
     protected int stub;
 
     protected String ticket;
 
-    public double balance() {
-        return this.balance;
-    }
-
-
-    public void balance(double balance) {
-        this.balance = balance;
-    }
 
 
 

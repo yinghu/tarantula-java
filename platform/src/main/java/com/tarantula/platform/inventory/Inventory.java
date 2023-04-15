@@ -104,7 +104,15 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
 
     @Override
     public boolean transact(double amount) {
-        return false;
+        if(!rechargeable || amount==0) return false;
+        if(amount>0) {
+            balance += amount;
+            return true;
+        }
+        double remaining = balance-(amount*(-1));
+        if(remaining<0) return false;
+        balance -= amount*(-1);
+        return true;
     }
     public int count(int delta){
         count += delta;

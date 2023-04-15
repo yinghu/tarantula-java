@@ -79,7 +79,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             log.warn("Fetching presence from presence service ...");
             PresenceFetcher httpCaller = fMap.get(session.trackId());
             OnSession onSession = httpCaller.presence(session.token());
-            PresenceIndex px = new PresenceIndex(onSession.stub(),onSession.balance(),session.trackId());
+            PresenceIndex px = new PresenceIndex(onSession.stub(),session.trackId());
             px.distributionKey(onSession.systemId());
             pdataStore.update(px);
             px.dataStore(pdataStore);
@@ -418,6 +418,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             amazonAws.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             amazonAws.setup(serviceContext);
             aMap.put(OnAccess.AMAZON,amazonAws);
+        }
+        AuthVendorRegistry applicationStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.APPLICATION_STORE);
+        if(applicationStore!=null){
+            applicationStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
+            applicationStore.setup(serviceContext);
+            aMap.put(OnAccess.APPLICATION_STORE,applicationStore);
         }
         //map only store
         clusterStore = serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,TokenValidatorProvider.NAME,true,false,false);

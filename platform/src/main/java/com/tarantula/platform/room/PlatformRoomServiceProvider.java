@@ -515,6 +515,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
+        gameRoom.load();
         GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
         synchronized (zoneIndex.roomIndex){

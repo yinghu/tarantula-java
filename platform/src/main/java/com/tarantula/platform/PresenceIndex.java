@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.icodesoftware.*;
 import com.icodesoftware.service.EventService;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -10,56 +9,39 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class PresenceIndex extends RecoverableObject implements Presence {
 
-    private AtomicDouble balance;
     private int counter;
 
     private boolean local = true;
     private EventService eventService;
 
-    public PresenceIndex(double initialBalance){
-        this();
-        this.balance.getAndAdd(initialBalance);
-    }
-    public PresenceIndex(int stub,double initialBalance,String index){
+    public PresenceIndex(int stub,String index){
         this();
         this.counter = stub;
-        this.balance.getAndAdd(initialBalance);
         this.local = false;
         this.index = index;
     }
 
     public PresenceIndex(){
         this.label = "Presence";
-        this.balance = new AtomicDouble();
+        //this.balance = new AtomicDouble();
     }
     @Override
     public boolean distributable(){
         return true;
     }
-    public double balance() {
-        return this.balance.get();
-    }
-    public boolean transact(double delta) {
-        if((balance.get()+(delta)>=0)){
-            balance.getAndAdd((delta));
-            this.update();
-            return true;
-        }else{
-            return false;
-        }
-    }
+
     public void registerEventService(EventService eventService){
         this.eventService = eventService;
     }
 
     public Response onPlay(Session session,Descriptor desc){
         Response resp = null;
-        if(this.transact(desc.entryCost()*(-1))){
+        //if(this.transact(desc.entryCost()*(-1))){
             fastJoin(session,desc,session.payload());
-        }
-        else{
-            resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
-        }
+        //}
+        //else{
+            //resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
+        //}
         return resp;
     }
     private void fastJoin(Session session,Descriptor desc,byte[] payload){
@@ -70,7 +52,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());
         //fe.accessMode(session.accessMode());
-        fe.balance(desc.entryCost());
+        //fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
         fe.name(session.name());
         fe.clientId(session.clientId());
@@ -92,7 +74,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",balance);
         this.properties.put("2",counter);
         this.properties.put("3",disabled);
         this.properties.put("4",this.timestamp);
@@ -102,7 +83,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.balance.getAndAdd(((Number)properties.getOrDefault("1",0)).doubleValue());
         this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
         this.disabled = (Boolean)properties.getOrDefault("3",false);
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
@@ -130,6 +110,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     @Override
     public String toString(){
-        return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+balance+"/"+counter+"/"+disabled+"]";
+        return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+counter+"/"+disabled+"]";
     }
 }

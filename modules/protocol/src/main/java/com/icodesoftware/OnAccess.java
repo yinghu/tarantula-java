@@ -12,7 +12,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String PRIMARY_USER = "primary";
     String VALIDATED = "validated";
     String ACTIVATED = "activated";
-    String BALANCE = "balance";
+    //String BALANCE = "balance";
     String EMAIL_ADDRESS = "emailAddress";
 
     String GOOGLE = "google";
@@ -27,6 +27,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String GOOGLE_STORE = "googleStore";
 
     String MOCK_STORE = "mockStore";
+
+    String APPLICATION_STORE = "applicationStore";
 
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";

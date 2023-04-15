@@ -38,13 +38,13 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
             int mix = rating.rank > maxRank? maxRank : rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby != null) {
-                if(lobby.entryCost() > 0 && !this.context.presence(session).transact(lobby.entryCost()*(-1))){
-                    session.write(JsonUtil.toSimpleResponse(false,"not enough balance").getBytes());
-                }
-                else{
+                //if(lobby.entryCost() > 0 && !this.context.presence(session).transact(lobby.entryCost()*(-1))){
+                    //session.write(JsonUtil.toSimpleResponse(false,"not enough balance").getBytes());
+                //}
+                //else{
                     Module module = this.gameServiceProvider.serviceModule(lobby.tag());
                     module.onJoin(session);
-                }
+                //}
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());

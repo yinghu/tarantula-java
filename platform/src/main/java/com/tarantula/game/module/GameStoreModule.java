@@ -12,6 +12,7 @@ import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.StorePurchase;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
@@ -24,6 +25,12 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
+            Map<String,Object> params = new HashMap<>();
+            params.put(OnAccess.SYSTEM_ID,session.systemId());
+            params.put(OnAccess.TYPE_ID,serviceTypeId);
+            params.put(OnAccess.PROVIDER,OnAccess.APPLICATION_STORE);
+            params.put(OnAccess.STORE_BUNDLE_ID,"BUNDLE_ID");
+            this.context.validator().validateToken(params);
             session.write(this.storeServiceProvider.shop(session.name()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onValidate")){

@@ -60,7 +60,7 @@ public class PresenceFetcher{
             OnSession presence = new OnSessionTrack();
             presence.systemId(jsonObject.get("systemId").getAsString());
             presence.stub(jsonObject.get("stub").getAsInt());
-            presence.balance(jsonObject.get("balance").getAsDouble());
+            //presence.balance(jsonObject.get("balance").getAsDouble());
             return presence;
         }catch (Exception ex){
             ex.printStackTrace();

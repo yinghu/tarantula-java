@@ -1,6 +1,5 @@
 {
   "activated":false,
-  "initialBalance":1000000,
   "trialDays":30,
   "root":"root",
   "password":"root"

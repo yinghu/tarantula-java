@@ -13,19 +13,16 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     private String login;
 
-    public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
+    public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED",false);
 
     public OnSessionTrack(){
 
     }
-    public OnSessionTrack(String msg){
-        this.message = msg;
-        this.successful = false;
-    }
-    public OnSessionTrack(String systemId,double balance){
+
+    public OnSessionTrack(String systemId,boolean successful){
         this();
         this.systemId = systemId;
-        this.balance = balance;
+        this.successful = successful;
     }
     public OnSessionTrack(String systemId,int stub,String ticket,String index){
         this();

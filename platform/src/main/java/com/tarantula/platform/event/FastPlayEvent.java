@@ -29,7 +29,7 @@ public class FastPlayEvent extends Data implements Event {
         out.writeUTF("2",this.destination);
         out.writeUTF("3",this.tournamentId);
         out.writeUTF("4",this.owner);
-        out.writeDouble("5",this.balance);
+        //out.writeDouble("5",this.balance);
         out.writeInt("6",this.stub);
         out.writeUTF("7",this.ticket);
         out.writePortable("8",this.forward);
@@ -44,7 +44,7 @@ public class FastPlayEvent extends Data implements Event {
         this.destination = in.readUTF("2");
         this.tournamentId = in.readUTF("3");
         this.owner = in.readUTF("4");
-        this.balance = in.readDouble("5");
+        //this.balance = in.readDouble("5");
         this.stub = in.readInt("6");
         this.ticket = in.readUTF("7");
         this.forward = in.readPortable("8");

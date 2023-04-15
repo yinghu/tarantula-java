@@ -20,7 +20,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private boolean activated;
     private int trialDays;
 
-    private double initialBalance;
+    //private double initialBalance;
     private AccessIndexService accessIndexService;
     private UserService userService;
     private DeploymentServiceProvider deploymentServiceProvider;
@@ -37,7 +37,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         Configuration configuration = this.context.configuration("account");
         //this.lobbyId = (String)configuration.property("lobbyId");
         this.activated = (boolean)configuration.property("activated");
-        this.initialBalance = ((Number)configuration.property("initialBalance")).doubleValue();
+        //this.initialBalance = ((Number)configuration.property("initialBalance")).doubleValue();
         this.trialDays = ((Number)configuration.property("trialDays")).intValue();
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
@@ -280,7 +280,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.VALIDATOR,validator);
         payload.property(OnAccess.VALIDATED,validated);
         payload.property(OnAccess.PRIMARY_USER,primary);
-        payload.property(OnAccess.BALANCE,initialBalance);
+        //payload.property(OnAccess.BALANCE,initialBalance);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(accountId,payload);
     }
@@ -290,7 +290,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.VALIDATOR,validator);
         payload.property(OnAccess.VALIDATED,validated);
         payload.property(OnAccess.PRIMARY_USER,primary);
-        payload.property(OnAccess.BALANCE,initialBalance);
+        //payload.property(OnAccess.BALANCE,initialBalance);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(payload);
     }

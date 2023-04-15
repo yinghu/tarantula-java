@@ -8,6 +8,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.store.ApplicationStoreProvider;
 import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
@@ -36,9 +37,12 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
 
+    private PlatformGameServiceProvider platformGameServiceProvider;
+
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
+        this.platformGameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();
         this.typeId = gameCluster.typeId();
     }
 
@@ -80,6 +84,9 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         GameCenterAuthProvider gameCenterAuthProvider = new GameCenterAuthProvider(typeId,serviceContext.metrics(gameServiceName));
         serviceContext.registerAuthVendor(gameCenterAuthProvider);
         registered.put(gameCenterAuthProvider.name(),gameCenterAuthProvider);
+        ApplicationStoreProvider applicationStoreProvider = new ApplicationStoreProvider(typeId,this.platformGameServiceProvider);
+        registered.put(applicationStoreProvider.name(),applicationStoreProvider);
+        serviceContext.registerAuthVendor(applicationStoreProvider);
         return null;
     }
     @Override

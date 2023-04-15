@@ -2,8 +2,6 @@ package com.icodesoftware;
 
 public interface OnApplication extends Response {
 
-    //short serviceId();
-    //void serviceId(short serviceId);
 
     String systemId();
     void systemId(String systemId);
@@ -18,8 +16,6 @@ public interface OnApplication extends Response {
     String tournamentId();
     void tournamentId(String tournamentId);
 
-    double balance();
-    void balance(double balance);
 
     String typeId();
     void typeId(String typeId);

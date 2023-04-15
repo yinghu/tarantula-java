@@ -75,9 +75,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         else if(k.equals("name")){
             access.name((String) v);
         }
-        //else if(k.equals("accessMode")){
-            //access.accessMode(((Number)v).intValue());
-        //}
+
         else if(k.equals("tournamentId")){
             access.tournamentId((String) v);
         }
@@ -86,9 +84,6 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         }
         else if(k.equals("oid")){
             access.oid((String) v);
-        }
-        else if(k.equals("balance")){
-            access.balance(((Number)v).doubleValue());
         }
         else if(k.equals("timestamp")){
             access.timestamp(((Number)v).longValue());

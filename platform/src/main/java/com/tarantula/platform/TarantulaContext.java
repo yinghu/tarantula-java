@@ -657,22 +657,23 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.schedule(new MidnightCheck(this));
     }
     public AuthVendorRegistry authVendor(String name){
- 	    if(name.equals(OnAccess.GOOGLE)) return new ThirdPartyServiceProvider(OnAccess.GOOGLE);//loadGoogleCredentials();
+ 	    if(name.equals(OnAccess.GOOGLE)) return new ThirdPartyServiceProvider(OnAccess.GOOGLE);
 
- 	    if(name.equals(OnAccess.FACEBOOK)) return new ThirdPartyServiceProvider(OnAccess.FACEBOOK);//loadFacebookCredentials();
+ 	    if(name.equals(OnAccess.FACEBOOK)) return new ThirdPartyServiceProvider(OnAccess.FACEBOOK);
 
-        if(name.equals(OnAccess.APPLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE);//loadAppleStoreCredentials();
+        if(name.equals(OnAccess.APPLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE);
 
  	    if(name.equals(OnAccess.STRIPE)) return loadStripeCredentials();//system config
 
-        if(name.equals(OnAccess.MOCK_STORE)) return new ThirdPartyServiceProvider(OnAccess.MOCK_STORE);//loadMockStoreCredentials();
+        if(name.equals(OnAccess.MOCK_STORE)) return new ThirdPartyServiceProvider(OnAccess.MOCK_STORE);
 
-        if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);//GameCenterAuthProvider();//no config
+        if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);
 
-        if(name.equals(OnAccess.GOOGLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.GOOGLE_STORE);//loadGoogleStoreCredentials();
+        if(name.equals(OnAccess.GOOGLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.GOOGLE_STORE);
 
-        if(name.equals(OnAccess.AMAZON)) return new ThirdPartyServiceProvider(OnAccess.AMAZON);//loadAmazonAwsCredentials();
+        if(name.equals(OnAccess.AMAZON)) return new ThirdPartyServiceProvider(OnAccess.AMAZON);
 
+        if(name.equals(OnAccess.APPLICATION_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLICATION_STORE);
         return null;
 
     }

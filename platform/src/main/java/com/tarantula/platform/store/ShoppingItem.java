@@ -32,6 +32,14 @@ public class ShoppingItem extends Item{
         return header.get("SkuName").getAsString();
     }
 
+    public boolean IAP(){
+        return header.get("IAP").getAsBoolean();
+    }
+
+    public double price(){
+        return header.get("Price").getAsDouble();
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();

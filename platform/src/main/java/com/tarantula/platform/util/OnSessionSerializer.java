@@ -14,7 +14,6 @@ public class  OnSessionSerializer implements JsonSerializer<OnSession>{
         JsonObject jp = new JsonObject();
         jp.addProperty("systemId",presence.systemId());
         jp.addProperty("stub",presence.stub());
-        jp.addProperty("balance",String.format( "%.2f",presence.balance()));
         return jp;
     }
 }

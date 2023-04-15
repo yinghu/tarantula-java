@@ -51,9 +51,30 @@
             "downloadable": false
           },
           {
+            "name": "IAP",
+            "type": "boolean",
+            "reference": "Boolean",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ItemType",
+            "type": "enum",
+            "reference": "ItemType",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "SkuName",
             "type": "string",
             "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Price",
+            "type": "number",
+            "reference": "Double",
             "nullable": false,
             "downloadable": false
           },
