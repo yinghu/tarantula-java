@@ -51,16 +51,16 @@
             "downloadable": false
           },
           {
-            "name": "IAP",
-            "type": "boolean",
-            "reference": "Boolean",
+            "name": "ItemType",
+            "type": "enum",
+            "reference": "ItemType",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "ItemType",
+            "name": "PurchaseType",
             "type": "enum",
-            "reference": "ItemType",
+            "reference": "PurchaseType",
             "nullable": false,
             "downloadable": false
           },

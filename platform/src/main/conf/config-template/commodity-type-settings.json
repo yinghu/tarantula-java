@@ -5,7 +5,8 @@
   "description": "types of commodity category",
   "itemList":
   [
-    {"type": "category","name": "GameCurrency"},
+    {"type": "category","name": "HardCurrency"},
+    {"type": "category","name": "SoftCurrency"},
     {"type": "category","name": "GameAward"},
     {"type": "category","name": "Arena"}
   ]

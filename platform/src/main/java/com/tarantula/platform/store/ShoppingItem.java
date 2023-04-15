@@ -8,6 +8,8 @@ import com.tarantula.platform.item.*;
 public class ShoppingItem extends Item{
 
 
+    public enum ItemType{HardCurrency,SoftCurrency,Bundle};
+    public enum PurchaseType{HardCurrency,SoftCurrency,IAP};
     public ShoppingItem(){
 
     }
@@ -32,8 +34,12 @@ public class ShoppingItem extends Item{
         return header.get("SkuName").getAsString();
     }
 
-    public boolean IAP(){
-        return header.get("IAP").getAsBoolean();
+    public ItemType itemType(){
+        return ItemType.valueOf(header.get("ItemType").getAsString());
+    }
+
+    public PurchaseType purchaseType(){
+        return PurchaseType.valueOf(header.get("PurchaseType").getAsString());
     }
 
     public double price(){

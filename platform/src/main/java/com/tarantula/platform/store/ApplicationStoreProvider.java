@@ -40,9 +40,12 @@ public class ApplicationStoreProvider extends AuthObject {
     public boolean validate(Map<String,Object> params){
         logger.warn("Passing->"+typeId+">>"+params.get(OnAccess.STORE_BUNDLE_ID));
         ShoppingItem shoppingItem = this.platformGameServiceProvider.storeServiceProvider().shoppingItem("");
-        if(shoppingItem==null){
-            logger.warn("no item found");
+        if(shoppingItem!=null){
+            shoppingItem.itemType();
+            shoppingItem.purchaseType();
+            //logger.warn("no item found");
         }
+
         String systemId = (String) params.get(OnAccess.SYSTEM_ID);
         Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,"GameCurrency","Gold");
         if(inventory!=null) logger.warn(">>>>"+inventory.balance()+inventory.name());
