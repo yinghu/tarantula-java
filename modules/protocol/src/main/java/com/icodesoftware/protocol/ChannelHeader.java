@@ -18,15 +18,15 @@ public class ChannelHeader extends RecoverableObject implements Channel {
     protected byte[] serverKey;
     protected Connection connection;
 
-    private UserChannel userChannel;
+    protected UserChannel userChannel;
 
-    private UDPEndpointServiceProvider.RequestListener requestListener;
-    private UDPEndpointServiceProvider.ActionListener actionListener;
-    private Session.TimeoutListener timeoutListener;
-    private ChannelListener channelListener;
-    private UDPEndpointServiceProvider.CipherListener cipherListener;
-    private MessageBuffer messageBuffer;
-    private Session stub;
+    protected UDPEndpointServiceProvider.RequestListener requestListener;
+    protected UDPEndpointServiceProvider.ActionListener actionListener;
+    protected Session.TimeoutListener timeoutListener;
+    protected ChannelListener channelListener;
+    protected UDPEndpointServiceProvider.CipherListener cipherListener;
+    protected MessageBuffer messageBuffer;
+    protected Session stub;
 
 
     public String configurationTypeId() {
@@ -93,13 +93,14 @@ public class ChannelHeader extends RecoverableObject implements Channel {
         return connection;
     }
 
-    @Override
-    public void reset() {
-
-    }
-
     public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
-
+        this.stub = session;
+        this.owner = session.systemId();
+        this.routingNumber = session.stub();
+        this.channelListener = channelListener;
+        this.requestListener = requestListener;
+        this.actionListener = actionListener;
+        this.timeoutListener = timeoutListener;
     }
     public void close(){
         userChannel.kickoff(sessionId);
@@ -108,9 +109,5 @@ public class ChannelHeader extends RecoverableObject implements Channel {
     public void kickoff(){
         this.timeoutListener.timeout(this.owner, this.routingNumber);
         this.channelListener.onLeft(this);
-    }
-
-    public void joined(){
-        this.channelListener.onJoined(this);
     }
 }

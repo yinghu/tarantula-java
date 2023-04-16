@@ -1,11 +1,8 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Connection;
-import com.icodesoftware.Resettable;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 
-public interface Channel extends Configurable, Resettable {
+public interface Channel extends Configurable, Closable {
 
     int channelId();
     int sessionId();
@@ -15,8 +12,6 @@ public interface Channel extends Configurable, Resettable {
     void write(Session.Header messageHeader, byte[] payload);
 
     Connection connection();
-
-    void close();
 
     void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener);
 

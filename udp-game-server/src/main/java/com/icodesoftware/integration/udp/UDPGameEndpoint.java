@@ -202,7 +202,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-                activeGame.gameModule.onValidated(new ActiveChannel(session.systemId,sessionId));
+                ActiveChannel activeChannel = new ActiveChannel(session.systemId,activeGame.channelId(),sessionId);
+
+                //activeChannel.register(new ActiveSession(session.systemId,session.stub),this,this,this,this);
+                activeGame.gameModule.onValidated(activeChannel);
                 return true;
             }
             return false;
@@ -232,9 +235,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             ActiveRoom activeRoom =  roomTemplate.assign(channelId);
-            activeRoom.gameModule = this.createGameModule(channelId,activeRoom);
+            activeRoom.gameModule = this.createGameModule(activeRoom);
+            activeRoom.gameUserChannel =  new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this);
             activeGameIndex.put(channelId, activeRoom);
-            udpEndpointServiceProvider.registerUserChannel(new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this));
+            udpEndpointServiceProvider.registerUserChannel(activeRoom.gameUserChannel);
             return true;
         }catch (Exception ex){
             logger.error("error on create channel",ex);
@@ -255,7 +259,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     }
 
 
-    private GameModule createGameModule(int channelId,ActiveRoom room) throws Exception{
+    private GameModule createGameModule(ActiveRoom room) throws Exception{
         GameModule gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
         gameModule.setup(room,this);
         gameModule.registerRoomListener(this);

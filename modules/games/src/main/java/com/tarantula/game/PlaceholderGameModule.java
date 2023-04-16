@@ -48,7 +48,9 @@ public class PlaceholderGameModule extends GameModuleHeader {
     @Override
     public void countdown(long durationCountdown) {
         this.gameContext.log("Remaining time->"+durationCountdown,OnLog.WARN);
-        //MessageBuffer.MessageHeader h = new MessageBuffer.MessageHeader();
-        //playerUpdates.forEach((k,p)->p.channel.write(h,));
+        MessageBuffer.MessageHeader h = new MessageBuffer.MessageHeader();
+        h.commandId = Messenger.ON_PUSH;
+        h.channelId = room().channelId();
+        playerUpdates.forEach((k,p)->p.channel.write(h,"{}".getBytes()));
     }
 }

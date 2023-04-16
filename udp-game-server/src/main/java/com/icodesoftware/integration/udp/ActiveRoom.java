@@ -20,6 +20,7 @@ public class ActiveRoom extends RecoverableObject implements Room {
     private AtomicInteger totalLeft;
 
     public GameModule gameModule;
+    public GameUserChannel gameUserChannel;
 
     public ActiveRoom(int capacity, long duration, long overtime, int joinsOnStart, int timeout){
         this.capacity = capacity;
