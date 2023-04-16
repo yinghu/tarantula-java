@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
@@ -26,6 +27,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private String accessKey;
     private String packageName;
 
+    private TarantulaLogger logger;
+
     public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
         this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
         this.applicationMetricsListener = metricsListener;
@@ -45,6 +48,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
+        logger = serviceContext.logger(GoogleStorePurchaseValidator.class);
     }
 
 
@@ -69,13 +73,16 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 responseData.dataAsString = _response.body();
                 return _response.statusCode();
             });
-            if(code!=200) return false;
+            if(code!=200) {
+                logger.warn("Error:"+responseData.dataAsString);
+                return false;
+            }
             JsonObject payload = JsonUtil.parse(responseData.dataAsString);
-            //System.out.println(payload.toString());
+            logger.warn("Response:"+payload.toString());
             onMetrics(GameClusterMetrics.PAYMENT_GOOGLE_STORE_COUNT);
-            return true;//(payload.has("orderId")&&payload.get("orderId").getAsString().equals(orderId));
+            return payload.has("orderId") && payload.get("orderId").getAsString().equals(orderId);
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("Error on google pay",ex);
             return false;
         }
     }

@@ -26,7 +26,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String GOOGLE_PLAY = "googlePlay";
     String GOOGLE_STORE = "googleStore";
 
-    String MOCK_STORE = "mockStore";
+    String DEVELOPER_STORE = "developerStore";
 
     String APPLICATION_STORE = "applicationStore";
 

@@ -395,11 +395,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             gameCenter.setup(serviceContext);
             aMap.put(OnAccess.GAME_CENTER,gameCenter);
         }
-        AuthVendorRegistry mockStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.MOCK_STORE);
-        if(mockStore!=null){
-            mockStore.registerMetricsLister((k,v)->{});
-            mockStore.setup(serviceContext);
-            aMap.put(OnAccess.MOCK_STORE,mockStore);
+        AuthVendorRegistry developerStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.DEVELOPER_STORE);
+        if(developerStore!=null){
+            developerStore.registerMetricsLister((k,v)->{});
+            developerStore.setup(serviceContext);
+            aMap.put(OnAccess.DEVELOPER_STORE,developerStore);
         }
         AuthVendorRegistry stripe = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.STRIPE);
         if(stripe!=null){

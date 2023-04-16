@@ -665,7 +665,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
  	    if(name.equals(OnAccess.STRIPE)) return loadStripeCredentials();//system config
 
-        if(name.equals(OnAccess.MOCK_STORE)) return new ThirdPartyServiceProvider(OnAccess.MOCK_STORE);
+        if(name.equals(OnAccess.DEVELOPER_STORE)) return new ThirdPartyServiceProvider(OnAccess.DEVELOPER_STORE);
 
         if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);
 

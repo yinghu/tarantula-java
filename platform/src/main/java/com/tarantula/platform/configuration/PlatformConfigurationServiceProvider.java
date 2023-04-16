@@ -87,6 +87,9 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         ApplicationStoreProvider applicationStoreProvider = new ApplicationStoreProvider(typeId,this.platformGameServiceProvider);
         registered.put(applicationStoreProvider.name(),applicationStoreProvider);
         serviceContext.registerAuthVendor(applicationStoreProvider);
+        DeveloperStoreProvider developerStoreProvider = new DeveloperStoreProvider(typeId);
+        this.serviceContext.registerAuthVendor(developerStoreProvider);
+        registered.put(developerStoreProvider.name(),developerStoreProvider);
         return null;
     }
     @Override
@@ -145,11 +148,6 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Configuration service provider started on ->"+gameServiceName+">>>"+gameCluster.property(GameCluster.NAME));
-    }
-    @Override
-    public void waitForData(){
-        MockStoreProvider mockStoreProvider = new MockStoreProvider(typeId,"");
-        this.serviceContext.registerAuthVendor(mockStoreProvider);
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
