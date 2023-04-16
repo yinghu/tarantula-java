@@ -63,8 +63,8 @@
     {
       "header": {
         "scope": "commodity",
-        "type": "GameAward",
-        "description": "visual game award",
+        "type": "GameItem",
+        "description": "visual game item",
         "version": "1.0",
         "rechargeable": false
       },

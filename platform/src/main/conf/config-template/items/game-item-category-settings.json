@@ -39,6 +39,86 @@
 
         ]
       }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Gold",
+        "description": "gold pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Item",
+            "type": "category",
+            "reference": "category:HardCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Gem",
+        "description": "gem pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Item",
+            "type": "category",
+            "reference": "category:HardCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Coin",
+        "description": "coin pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Item",
+            "type": "category",
+            "reference": "category:SoftCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Chip",
+        "description": "chip pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Item",
+            "type": "category",
+            "reference": "category:SoftCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
     }
   ]
 }

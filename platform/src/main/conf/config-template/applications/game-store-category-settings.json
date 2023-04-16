@@ -79,6 +79,13 @@
             "downloadable": false
           },
           {
+            "name": "VirtualCurrency",
+            "type": "enum",
+            "reference": "VirtualCurrency",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "SkuList",
             "type": "list",
             "reference": "category:Sku",

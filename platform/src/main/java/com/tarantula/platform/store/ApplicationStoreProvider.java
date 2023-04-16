@@ -38,26 +38,28 @@ public class ApplicationStoreProvider extends AuthObject {
     }
     @Override
     public boolean validate(Map<String,Object> params){
-        logger.warn("Passing->"+typeId+">>"+params.get(OnAccess.STORE_BUNDLE_ID));
-        ShoppingItem shoppingItem = this.platformGameServiceProvider.storeServiceProvider().shoppingItem("");
-        if(shoppingItem!=null){
-            shoppingItem.itemType();
-            shoppingItem.purchaseType();
-            //logger.warn("no item found");
+        String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
+        ShoppingItem shoppingItem = this.platformGameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
+        if(shoppingItem == null){
+            logger.warn("Shopping Item not existed");
+            return false;
         }
-
+        if(shoppingItem.purchaseType() == ShoppingItem.PurchaseType.IAP){
+            logger.warn("IAP shopping item cannot be here");
+            return false;
+        }
         String systemId = (String) params.get(OnAccess.SYSTEM_ID);
-        Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,"GameCurrency","Gold");
-        if(inventory!=null) logger.warn(">>>>"+inventory.balance()+inventory.name());
-        //platformGameServiceProvider.inventoryServiceProvider().inventory("s")
+        Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.itemType().name(),shoppingItem.virtualCurrency().name());
+        logger.warn("Application store on ->["+typeId+"]"+shoppingItem.price());
+        if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
+            logger.warn("Not enough balance to buy");
+            return false;
+        }
         String tid = UUID.randomUUID().toString();
-        //params.put(OnAccess.STORE_TRANSACTION_ID,tid);
-        //params.put(OnAccess.STORE_PRODUCT_ID,params.get(OnAccess.STORE_RECEIPT));
-        //params.put(OnAccess.STORE_QUANTITY,1);
-        //Transaction transaction = new Transaction();
-        //transaction.index(tid);
-        //transaction.owner((String)params.get(OnAccess.SYSTEM_ID));
-        //dataStore.create(transaction);
+        Transaction transaction = new Transaction();
+        transaction.index(tid);
+        transaction.owner(systemId);
+        dataStore.create(transaction);
         return true;
     }
 

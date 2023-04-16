@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
@@ -25,12 +26,6 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            Map<String,Object> params = new HashMap<>();
-            params.put(OnAccess.SYSTEM_ID,session.systemId());
-            params.put(OnAccess.TYPE_ID,serviceTypeId);
-            params.put(OnAccess.PROVIDER,OnAccess.APPLICATION_STORE);
-            params.put(OnAccess.STORE_BUNDLE_ID,"BUNDLE_ID");
-            this.context.validator().validateToken(params);
             session.write(this.storeServiceProvider.shop(session.name()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onValidate")){
@@ -65,11 +60,21 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             }
             ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(session.name());
             if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
-            this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
-            StorePurchase storePurchase = new StorePurchase();
-            storePurchase.transactionId = session.name();
-            storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
-            session.write(storePurchase.toJson().toString().getBytes());
+            Map<String,Object> params = new HashMap<>();
+            params.put(OnAccess.SYSTEM_ID,session.systemId());
+            params.put(OnAccess.TYPE_ID,serviceTypeId);
+            params.put(OnAccess.PROVIDER,OnAccess.APPLICATION_STORE);
+            params.put(OnAccess.STORE_BUNDLE_ID,shoppingItem.distributionKey());
+            if(this.context.validator().validateToken(params)){
+                this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
+                StorePurchase storePurchase = new StorePurchase();
+                storePurchase.transactionId = session.name();
+                storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.systemId());
+                session.write(storePurchase.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"failed to be validated").toString().getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

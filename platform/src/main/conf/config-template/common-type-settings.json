@@ -19,6 +19,7 @@
     {"type": "enum","name": "PlayMode","value": [{"name":"pve","value":0},{"name":"pvp","value":1},{"name":"tve","value":2},{"name":"tvt","value":3}]},
     {"type": "enum","name": "Schedule","value": [{"name":"Daily","value":0},{"name":"Weekly","value":1},{"name":"Monthly","value":2},{"name":"OnDemand","value":3}]},
     {"type": "enum","name": "ItemType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"Bundle","value":2}]},
-    {"type": "enum","name": "PurchaseType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"IAP","value":2}]}
+    {"type": "enum","name": "PurchaseType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"IAP","value":2}]},
+    {"type": "enum","name": "VirtualCurrency","value": [{"name":"Gold","value":0},{"name":"Gem","value":1},{"name":"Coin","value":2},{"name":"Chip","value":3},{"name":"None","value":4}]}
   ]
 }

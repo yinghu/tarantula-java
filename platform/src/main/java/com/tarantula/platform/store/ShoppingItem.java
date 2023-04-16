@@ -8,8 +8,10 @@ import com.tarantula.platform.item.*;
 public class ShoppingItem extends Item{
 
 
-    public enum ItemType{HardCurrency,SoftCurrency,Bundle};
-    public enum PurchaseType{HardCurrency,SoftCurrency,IAP};
+    public enum ItemType{HardCurrency,SoftCurrency,Bundle,None};
+    public enum PurchaseType{HardCurrency,SoftCurrency,IAP,None};
+
+    public enum VirtualCurrency{Gold,Gem,Coin,Chip,None}
     public ShoppingItem(){
 
     }
@@ -35,11 +37,15 @@ public class ShoppingItem extends Item{
     }
 
     public ItemType itemType(){
-        return ItemType.valueOf(header.get("ItemType").getAsString());
+        return toItemType(header.get("ItemType").getAsInt());
     }
 
     public PurchaseType purchaseType(){
-        return PurchaseType.valueOf(header.get("PurchaseType").getAsString());
+        return toPurchaseType(header.get("PurchaseType").getAsInt());
+    }
+
+    public VirtualCurrency virtualCurrency(){
+        return toVirtualCurrency(header.get("VirtualCurrency").getAsInt());
     }
 
     public double price(){
@@ -57,4 +63,23 @@ public class ShoppingItem extends Item{
         return json;
     }
 
+    private ItemType toItemType(int type){
+        if(type==ItemType.HardCurrency.ordinal()) return ItemType.HardCurrency;
+        if(type==ItemType.SoftCurrency.ordinal()) return ItemType.SoftCurrency;
+        if(type==ItemType.Bundle.ordinal()) return ItemType.Bundle;
+        return ItemType.None;
+    }
+    private PurchaseType toPurchaseType(int type){
+        if(type==PurchaseType.HardCurrency.ordinal()) return PurchaseType.HardCurrency;
+        if(type==PurchaseType.SoftCurrency.ordinal()) return PurchaseType.SoftCurrency;
+        if(type==PurchaseType.IAP.ordinal()) return PurchaseType.IAP;
+        return PurchaseType.None;
+    }
+    private VirtualCurrency toVirtualCurrency(int type){
+        if(type==VirtualCurrency.Gold.ordinal()) return VirtualCurrency.Gold;
+        if(type==VirtualCurrency.Gem.ordinal()) return VirtualCurrency.Gem;
+        if(type==VirtualCurrency.Coin.ordinal()) return VirtualCurrency.Coin;
+        if(type==VirtualCurrency.Chip.ordinal()) return VirtualCurrency.Chip;
+        return VirtualCurrency.None;
+    }
 }

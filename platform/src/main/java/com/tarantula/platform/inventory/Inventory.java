@@ -107,11 +107,13 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         if(!rechargeable || amount==0) return false;
         if(amount>0) {
             balance += amount;
+            this.dataStore.update(this);
             return true;
         }
         double remaining = balance-(amount*(-1));
         if(remaining<0) return false;
         balance -= amount*(-1);
+        this.dataStore.update(this);
         return true;
     }
     public int count(int delta){
