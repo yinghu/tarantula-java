@@ -1,4 +1,4 @@
-package com.tarantula.game.mahjong;
+package com.icodesoftware.game.mahjong;
 
 
 import java.util.Arrays;

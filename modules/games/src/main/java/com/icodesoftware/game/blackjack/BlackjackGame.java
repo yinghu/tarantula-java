@@ -1,7 +1,7 @@
-package com.tarantula.game.blackjack;
+package com.icodesoftware.game.blackjack;
 
-import com.tarantula.game.Card;
-import com.tarantula.game.Deck;
+import com.icodesoftware.game.Card;
+import com.icodesoftware.game.Deck;
 
 public class BlackjackGame {
 

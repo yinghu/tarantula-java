@@ -1,5 +1,7 @@
-package com.tarantula.game.mahjong;
+package com.icodesoftware.game.mahjong;
 
+
+import com.icodesoftware.game.mahjong.Tile;
 
 import java.util.Comparator;
 

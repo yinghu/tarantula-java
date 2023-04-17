@@ -1,4 +1,4 @@
-package com.tarantula.game;
+package com.icodesoftware.game;
 
 import com.icodesoftware.Room;
 import com.icodesoftware.RoomListener;
@@ -13,7 +13,7 @@ public class GameModuleHeader implements GameModule {
     protected Room room;
     protected RoomListener roomListener;
 
-    protected ConcurrentHashMap<Integer,PlayerUpdate> playerUpdates;
+    protected ConcurrentHashMap<Integer, PlayerUpdate> playerUpdates;
     @Override
     public void onValidated(Channel channel) {
         playerUpdates.put(channel.sessionId(),new PlayerUpdate(channel));

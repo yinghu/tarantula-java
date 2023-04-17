@@ -278,7 +278,7 @@
   "lobby": {
     "header": {
       "Name": "lobby1",
-      "GameModuleName": "com.tarantula.game.PlaceholderGameModule"
+      "GameModuleName": "com.icodesoftware.game.PlaceholderGameModule"
     },
     "application": {
       "ZoneSet": []

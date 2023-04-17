@@ -329,6 +329,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onStarted(Room room) {
         this.logger.warn("room started->"+room.channelId());
+        //ActiveRoom activeRoom = activeGameIndex.get(room.channelId());
+        //activeRoom.onCountdown(this.gameModuleCountdownInterval);
     }
 
     @Override

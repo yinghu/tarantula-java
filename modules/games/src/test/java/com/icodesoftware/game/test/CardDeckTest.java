@@ -1,7 +1,7 @@
 package com.icodesoftware.game.test;
 
-import com.tarantula.game.Card;
-import com.tarantula.game.Deck;
+import com.icodesoftware.game.Card;
+import com.icodesoftware.game.Deck;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

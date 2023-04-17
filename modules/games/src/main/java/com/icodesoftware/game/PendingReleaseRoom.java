@@ -1,4 +1,4 @@
-package com.tarantula.game;
+package com.icodesoftware.game;
 
 import com.icodesoftware.Room;
 

@@ -3,6 +3,9 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.game.PendingReleaseRoom;
+import com.icodesoftware.game.PlayerUpdate;
+import com.icodesoftware.game.UpdateBatch;
 import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
@@ -72,7 +75,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private PlatformGameContext gameUpdateContext;
     private UDPEndpoint udpEndpoint;
-    private ConcurrentHashMap<String,PendingReleaseRoom> pendingReleaseRooms;
+    private ConcurrentHashMap<String, PendingReleaseRoom> pendingReleaseRooms;
 
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;

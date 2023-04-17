@@ -1,8 +1,8 @@
 package com.icodesoftware.game.test;
 
-import com.tarantula.game.mahjong.Stack;
-import com.tarantula.game.mahjong.Tile;
-import com.tarantula.game.mahjong.TitleComparator;
+import com.icodesoftware.game.mahjong.Stack;
+import com.icodesoftware.game.mahjong.Tile;
+import com.icodesoftware.game.mahjong.TitleComparator;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

@@ -1,10 +1,11 @@
-package com.tarantula.game.blackjack;
+package com.icodesoftware.game.blackjack;
 
 import com.icodesoftware.*;
+import com.icodesoftware.game.blackjack.BlackjackGame;
 import com.icodesoftware.protocol.*;
-import com.tarantula.game.Card;
-import com.tarantula.game.GameModuleHeader;
-import com.tarantula.game.PlayerUpdate;
+import com.icodesoftware.game.Card;
+import com.icodesoftware.game.GameModuleHeader;
+import com.icodesoftware.game.PlayerUpdate;
 
 
 public class BlackjackModule extends GameModuleHeader {
