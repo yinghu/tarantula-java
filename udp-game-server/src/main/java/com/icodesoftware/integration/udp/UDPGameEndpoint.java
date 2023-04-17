@@ -2,6 +2,7 @@ package com.icodesoftware.integration.udp;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.game.PendingReleaseRoom;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.Serviceable;
@@ -12,6 +13,8 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -49,7 +52,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private JsonObject config;
 
     private ConcurrentHashMap<Integer, ActiveRoom> activeGameIndex;
-    //private
+    private ConcurrentHashMap<Integer, PendingReleaseRoom> pendingReleaseRooms;
 
     private int pingRetries;
     private String[] headers = new String[]{
@@ -79,6 +82,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
+        this.pendingReleaseRooms = new ConcurrentHashMap<>();
         this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -189,12 +193,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         int totalLeft = activeGame.leave();
         activeGame.gameModule.onLeft(new ActiveChannel(sessionId));
         if(totalLeft == activeGame.capacity()){
-            logger.warn("Channel Removed->"+channelId+">>"+sessionId);
-            this.udpEndpointServiceProvider.releaseUserChannel(channelId);
-            this.activeGameIndex.remove(channelId);
-            if(!createChannel()){
-               logger.warn("failed to create channel");
-            }
+            pendingReleaseRooms.remove(channelId);
         }
     }
 
@@ -329,8 +328,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onStarted(Room room) {
         this.logger.warn("room started->"+room.channelId());
-        //ActiveRoom activeRoom = activeGameIndex.get(room.channelId());
-        //activeRoom.onCountdown(this.gameModuleCountdownInterval);
+        this.pendingReleaseRooms.put(room.channelId(),new PendingReleaseRoom(room, LocalDateTime.now().plus(room.duration(), ChronoUnit.MILLIS)));
     }
 
     @Override
@@ -340,23 +338,29 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             headers[5]="onUpdate";
             headers[7]= connection.get("configurationName").getAsString();
             String rest = httpCaller.post(registerPath,payload,headers);
-            logger.warn(">>>"+rest);
+            JsonObject suc = JsonUtil.parse(rest);
+            if(!suc.get("successful").getAsBoolean()){
+                logger.warn("Failed to update game result ["+room.channelId()+"]");
+            }
         }catch (Exception ex){
             logger.error("error on updated",ex);
         }
     }
 
     public void onClosed(Room room){
-
+        logger.warn("room closed->"+room.channelId());
     }
 
     @Override
     public void onEnded(Room room) {
-        this.logger.warn("room ended->"+room.channelId());
+        this.udpEndpointServiceProvider.releaseUserChannel(room.channelId());
+        this.activeGameIndex.remove(room.channelId());
+        if(!createChannel()){
+            logger.warn("failed to create channel");
+        }
     }
 
     private void onCountdown(){
-        logger.warn("Count down ...");
-        //activeGameIndex.forEach((k,v)->v.onCountdown(1000));
+        pendingReleaseRooms.forEach((k,v)->v.room.onCountdown(gameModuleCountdownInterval));
     }
 }

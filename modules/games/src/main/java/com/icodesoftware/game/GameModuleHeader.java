@@ -14,6 +14,8 @@ public class GameModuleHeader implements GameModule {
     protected RoomListener roomListener;
 
     protected ConcurrentHashMap<Integer, PlayerUpdate> playerUpdates;
+
+    protected boolean closed;
     @Override
     public void onValidated(Channel channel) {
         playerUpdates.put(channel.sessionId(),new PlayerUpdate(channel));
@@ -44,6 +46,7 @@ public class GameModuleHeader implements GameModule {
         this.room = room;
         this.gameContext = gameContext;
         this.playerUpdates = new ConcurrentHashMap<>();
+        this.closed = false;
     }
 
     @Override
