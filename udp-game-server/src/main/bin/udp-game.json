@@ -6,6 +6,7 @@
     "binding":"192.168.1.23",
     "port":16693,
     "receiverTimeout": 3000,
+    "gameModuleCountdownInterval": 10000,
     "register":{
         "url":"http://192.168.1.23:8090",
         "path":"server",

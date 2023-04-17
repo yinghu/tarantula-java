@@ -9,6 +9,11 @@ import com.icodesoftware.util.CipherUtil;
 
 public class UDPChannel extends GameChannel {
 
+    private UDPEndpointServiceProvider.RequestListener requestListener;
+    private UDPEndpointServiceProvider.ActionListener actionListener;
+    private Session.TimeoutListener timeoutListener;
+    private ChannelListener channelListener;
+
     public UDPChannel(Connection connection, UserChannel userChannel, byte[] serverKey, int timeout, UDPEndpointServiceProvider.CipherListener cipherListener){
         this.connection = connection;
         this.userChannel = userChannel;
@@ -21,7 +26,13 @@ public class UDPChannel extends GameChannel {
 
 
     public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
-        super.register(session,channelListener,requestListener,actionListener,timeoutListener);
+        this.stub = session;
+        this.owner = session.systemId();
+        this.routingNumber = session.stub();
+        this.channelListener = channelListener;
+        this.requestListener = requestListener;
+        this.actionListener = actionListener;
+        this.timeoutListener = timeoutListener;
     }
 
     //server push call
@@ -66,9 +77,9 @@ public class UDPChannel extends GameChannel {
         super.close();
     }
 
-    @Override
     public void kickoff(){
-        super.kickoff();
+        this.timeoutListener.timeout(this.owner, this.routingNumber);
+        this.channelListener.onLeft(this);
     }
     public void joined(){
         this.channelListener.onJoined(this);

@@ -9,6 +9,7 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.Arena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
@@ -302,7 +303,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
         Channel channel = pendingChannels.poll();
-        channel.register(session,this,this,this,timeoutListener);
+        ((UDPChannel)channel).register(session,this,this,this,timeoutListener);
         return channel;
     }
     @Override

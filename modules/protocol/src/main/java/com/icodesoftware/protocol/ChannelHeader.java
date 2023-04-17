@@ -20,10 +20,6 @@ public class ChannelHeader extends RecoverableObject implements Channel {
 
     protected UserChannel userChannel;
 
-    protected UDPEndpointServiceProvider.RequestListener requestListener;
-    protected UDPEndpointServiceProvider.ActionListener actionListener;
-    protected Session.TimeoutListener timeoutListener;
-    protected ChannelListener channelListener;
     protected UDPEndpointServiceProvider.CipherListener cipherListener;
     protected MessageBuffer messageBuffer;
     protected Session stub;
@@ -36,7 +32,6 @@ public class ChannelHeader extends RecoverableObject implements Channel {
     public void configurationTypeId(String configurationTypeId) {
         this.configurationTypeId = configurationTypeId;
     }
-
 
     @Override
     public int channelId() {
@@ -93,21 +88,9 @@ public class ChannelHeader extends RecoverableObject implements Channel {
         return connection;
     }
 
-    public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
-        this.stub = session;
-        this.owner = session.systemId();
-        this.routingNumber = session.stub();
-        this.channelListener = channelListener;
-        this.requestListener = requestListener;
-        this.actionListener = actionListener;
-        this.timeoutListener = timeoutListener;
-    }
+    @Override
     public void close(){
         userChannel.kickoff(sessionId);
     }
 
-    public void kickoff(){
-        this.timeoutListener.timeout(this.owner, this.routingNumber);
-        this.channelListener.onLeft(this);
-    }
 }

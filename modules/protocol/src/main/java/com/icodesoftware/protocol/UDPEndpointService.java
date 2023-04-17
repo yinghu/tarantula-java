@@ -229,9 +229,7 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
         this.userChannelIndex.put(userChannel.channelId(),userChannel);
         this.operationSummary.userChannelNumber.incrementAndGet();
     }
-    public <T extends UserChannel> T userChannel(int channelId){
-        return (T)userChannelIndex.get(channelId);
-    }
+
     public void registerCipherListener(CipherListener cipherListener){
         this.cipherListener = cipherListener;
     }

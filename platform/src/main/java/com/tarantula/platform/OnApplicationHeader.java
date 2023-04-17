@@ -11,8 +11,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String typeId;
 
-    //protected double balance;
-
     protected int stub;
 
     protected String ticket;

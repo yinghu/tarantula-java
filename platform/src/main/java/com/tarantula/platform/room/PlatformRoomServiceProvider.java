@@ -22,7 +22,6 @@ import com.tarantula.platform.util.SystemUtil;
 
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -254,22 +253,26 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public <T extends Configurable> void release(T t) {
         GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
-        index.gameModule.close();
-        UDPChannel udpChannel;
-        do{
-            udpChannel = index.pendingPushChannels.poll();
-            if(udpChannel!=null){
-                udpChannel.close();
-            }
-        }while (udpChannel!=null);
-        GameRoom gameRoom;
-        do{
-            gameRoom = index.pendingRooms.poll();
-            if(gameRoom!=null){
-                gameRoom.close();
-                gameRoomIndex.remove(gameRoom.roomId());
-            }
-        }while (gameRoom!=null);
+        if(dedicated){
+            index.gameModule.close();
+            UDPChannel udpChannel;
+            do{
+                udpChannel = index.pendingPushChannels.poll();
+                if(udpChannel!=null){
+                    udpChannel.close();
+                }
+            }while (udpChannel!=null);
+        }
+        else{
+            GameRoom gameRoom;
+            do{
+                gameRoom = index.pendingRooms.poll();
+                if(gameRoom!=null){
+                    gameRoom.close();
+                    gameRoomIndex.remove(gameRoom.roomId());
+                }
+            }while (gameRoom!=null);
+        }
     }
 
 

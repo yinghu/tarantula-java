@@ -1,4 +1,4 @@
-package com.tarantula.platform.room;
+package com.tarantula.game;
 
 import com.icodesoftware.Room;
 
@@ -23,5 +23,4 @@ public class PendingReleaseRoom {
     public int hashCode(){
         return room.distributionKey().hashCode();
     }
-
 }

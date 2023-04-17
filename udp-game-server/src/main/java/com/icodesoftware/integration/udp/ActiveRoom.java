@@ -22,6 +22,8 @@ public class ActiveRoom extends RecoverableObject implements Room {
     public GameModule gameModule;
     public GameUserChannel gameUserChannel;
 
+    private long countdownTimer;
+
     public ActiveRoom(int capacity, long duration, long overtime, int joinsOnStart, int timeout){
         this.capacity = capacity;
         this.duration = duration;
@@ -39,6 +41,7 @@ public class ActiveRoom extends RecoverableObject implements Room {
         this.timeout = timeout;
         this.totalJoined = new AtomicInteger(0);
         this.totalLeft = new AtomicInteger(0);
+        this.countdownTimer = this.duration + this.overtime;
     }
 
     public int channelId(){
@@ -94,7 +97,8 @@ public class ActiveRoom extends RecoverableObject implements Room {
     }
 
     public void onCountdown(long delta){
-
+        countdownTimer -= delta;
+        this.gameModule.countdown(countdownTimer);
     }
 
     public int join(){

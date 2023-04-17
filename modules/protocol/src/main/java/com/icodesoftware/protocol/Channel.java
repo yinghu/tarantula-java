@@ -13,6 +13,4 @@ public interface Channel extends Configurable, Closable {
 
     Connection connection();
 
-    void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener);
-
 }

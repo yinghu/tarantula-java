@@ -23,9 +23,12 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private ScheduledExecutorService scheduledExecutorService;
     private ScheduleRunner timer;
+
+    private ScheduleRunner countdownTimer;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
 
     private String moduleName;
+    private long gameModuleCountdownInterval;
     private ActiveRoom roomTemplate;
 
     private UDPEndpointServiceProvider.CipherListener cipherListener;
@@ -46,6 +49,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private JsonObject config;
 
     private ConcurrentHashMap<Integer, ActiveRoom> activeGameIndex;
+    //private
 
     private int pingRetries;
     private String[] headers = new String[]{
@@ -87,6 +91,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.accessKey = register.get("accessKey").getAsString();
         this.registerPath = register.get("path").getAsString();
         this.maxChannelSize = config.get("maxChannelSize").getAsInt();
+        this.gameModuleCountdownInterval = config.get("gameModuleCountdownInterval").getAsLong();
         this.connection = config.getAsJsonObject("connection");
         this.httpCaller = new HttpCaller(register.get("url").getAsString());
         this.httpCaller._init();
@@ -156,6 +161,15 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         sender.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         sender.start();
         this.schedule(timer);
+        countdownTimer = new ScheduleRunner(gameModuleCountdownInterval,()->{
+            try{
+                this.onCountdown();
+            }catch (Exception ex){
+                logger.error("error on countdown",ex);
+            }
+            this.schedule(countdownTimer);
+        });
+        this.schedule(countdownTimer);
         logger.warn("Game server is running with ["+typeId+"] configured with capacity ["+roomTemplate.capacity()+"] Session Time ["+udpEndpointServiceProvider.sessionTimeout()+"] channels registered ["+channelRegistered+"/"+maxChannelSize+"]");
     }
 
@@ -203,8 +217,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
                 ActiveChannel activeChannel = new ActiveChannel(session.systemId,activeGame.channelId(),sessionId);
-
-                //activeChannel.register(new ActiveSession(session.systemId,session.stub),this,this,this,this);
+                activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
                 activeGame.gameModule.onValidated(activeChannel);
                 return true;
             }
@@ -338,5 +351,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onEnded(Room room) {
         this.logger.warn("room ended->"+room.channelId());
+    }
+
+    private void onCountdown(){
+        logger.warn("Count down ...");
+        //activeGameIndex.forEach((k,v)->v.onCountdown(1000));
     }
 }
