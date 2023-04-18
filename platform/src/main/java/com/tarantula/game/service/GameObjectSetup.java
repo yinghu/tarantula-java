@@ -11,7 +11,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class GameObjectSetup implements ApplicationPreSetup {
+public class GameObjectSetup implements ApplicationPreSetup {
 
 
     protected String DS_CONFIG = "configuration";

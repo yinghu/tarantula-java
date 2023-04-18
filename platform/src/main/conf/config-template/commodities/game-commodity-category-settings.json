@@ -83,13 +83,6 @@
             "reference": "Double",
             "nullable": false,
             "downloadable": false
-          },
-          {
-            "name": "DisplayCard",
-            "type": "category",
-            "reference": "category:DisplayCard",
-            "nullable": false,
-            "downloadable": false
           }
         ]
       }
