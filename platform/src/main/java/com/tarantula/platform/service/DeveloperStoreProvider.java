@@ -38,14 +38,13 @@ public class DeveloperStoreProvider extends AuthObject{
     }
     @Override
     public boolean validate(Map<String,Object> params){
-        GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey((String)params.get(OnAccess.ACCESS_KEY));
+        GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey((String)params.get(OnAccess.STORE_RECEIPT));
         if(gameCluster==null|| !gameCluster.typeId().equals(this.typeId)){
-            logger.warn("Illegal access");
+            logger.warn("Illegal access from ["+params.get(OnAccess.STORE_RECEIPT)+"]");
             return false;
         }
         String tid = UUID.randomUUID().toString();
         params.put(OnAccess.STORE_TRANSACTION_ID,tid);
-        params.put(OnAccess.STORE_PRODUCT_ID,params.get(OnAccess.STORE_RECEIPT));
         params.put(OnAccess.STORE_QUANTITY,1);
         Transaction transaction = new Transaction();
         transaction.index(tid);

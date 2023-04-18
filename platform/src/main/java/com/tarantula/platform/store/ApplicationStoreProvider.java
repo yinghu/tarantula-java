@@ -49,8 +49,7 @@ public class ApplicationStoreProvider extends AuthObject {
             return false;
         }
         String systemId = (String) params.get(OnAccess.SYSTEM_ID);
-        Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.itemType().name(),shoppingItem.virtualCurrency().name());
-        logger.warn("Application store on ->["+typeId+"]"+shoppingItem.price());
+        Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.purchaseType().name(),shoppingItem.virtualCurrency().name());
         if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
             logger.warn("Not enough balance to buy");
             return false;

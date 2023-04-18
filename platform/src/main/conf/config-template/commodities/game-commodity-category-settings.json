@@ -78,6 +78,13 @@
             "downloadable": false
           },
           {
+            "name": "Amount",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "DisplayCard",
             "type": "category",
             "reference": "category:DisplayCard",
