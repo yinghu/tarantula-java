@@ -10,6 +10,7 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -98,7 +99,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             onSession(access,session);
         }
         else if(session.action().equals("onToken")){//exchange token
-            boolean suc = this.context.validator().validateToken(acc.toMap());
+            Map<String,Object> params = acc.toMap();
+            params.put(OnAccess.SYSTEM_ID,session.systemId());
+            boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.systemId());
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.systemId(),_ox.password(),session);
@@ -121,6 +124,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onTokenRegister")){
             Map<String,Object> params = acc.toMap();
+            params.put(OnAccess.SYSTEM_ID,session.systemId());
             if(this.context.validator().validateToken(params)){
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){

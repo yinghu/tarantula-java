@@ -21,7 +21,7 @@ public class FacebookAuthProvider extends AuthObject{
     private final static String ME_URI = "https://graph.facebook.com/me";
     private final static String GRAPH_URI = "https://graph.facebook.com";
 
-    //private HttpClient client;
+
     private String accessToken;
     private String secureKey;
 
@@ -81,8 +81,7 @@ public class FacebookAuthProvider extends AuthObject{
             return response.statusCode();
         });
         if(code!=200) return false;
-        JsonParser p = new JsonParser();
-        JsonObject j = p.parse(resp[0]).getAsJsonObject();
+        JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
         if(!j.has("access_token")) return false;
         String acc = j.get("access_token").getAsString();
         int ix = acc.lastIndexOf('|');
@@ -108,8 +107,7 @@ public class FacebookAuthProvider extends AuthObject{
             return response.statusCode();
         });
         if(code!=200) return false;
-        JsonParser p = new JsonParser();
-        JsonObject j = p.parse(resp[0]).getAsJsonObject();
+        JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
         return j.has("id") && j.get("id").getAsString().equals(uid);
     }
 
@@ -130,8 +128,7 @@ public class FacebookAuthProvider extends AuthObject{
             return response.statusCode();
         });
         if(code!= 200) return false;
-        JsonParser p = new JsonParser();
-        JsonObject j = p.parse(resp[0]).getAsJsonObject();
+        JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
         return !j.has("error");
     }
     private boolean validateUser(Map<String,Object> params) throws Exception{
@@ -151,8 +148,7 @@ public class FacebookAuthProvider extends AuthObject{
             return response.statusCode();
         });
         if(code!=200) return false;
-        JsonParser p = new JsonParser();
-        JsonObject j = p.parse(resp[0]).getAsJsonObject();
+        JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
         return !j.has("error");
     }
 

@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
@@ -54,16 +55,17 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     public boolean validate(Map<String,Object> params){
         try{
+            Session session = (Session)params.get(OnAccess.SESSION);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-            String token = (String)params.get(OnAccess.STORE_RECEIPT);
+            String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
             //{packageName}/purchases/products/{productId}/tokens/{token}",
             String query = new StringBuffer(VALIDATION_URI).append(packageName).append("/purchases/products/").append(sku)
-                    .append("/tokens/").append(token).append("?key=").append(accessKey).toString();
+                    .append("/tokens/").append(token).toString();
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                    //.header(AUTHORIZATION,"Bearer "+ accessToken)
+                     .header(AUTHORIZATION,"Bearer "+ tokenValidatorProvider.presence(session).vendorToken())
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();

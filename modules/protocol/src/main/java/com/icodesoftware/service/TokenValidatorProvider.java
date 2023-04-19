@@ -36,6 +36,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     void timeout(int minutes,int seconds);
 
     Presence presence(Session session);
+    void updateVendorAccessToken(String systemId,String accessToken);
 
     Access.Role role(String systemId);
     boolean checkRole(Access access,String role);

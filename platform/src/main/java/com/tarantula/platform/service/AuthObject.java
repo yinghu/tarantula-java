@@ -22,6 +22,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected ServiceContext serviceContext;
     protected MetricsListener metricsListener;
     protected MetricsListener applicationMetricsListener;
+    protected TokenValidatorProvider tokenValidatorProvider;
 
     public AuthObject(String typeId,String clientId){
         this.typeId = typeId;
@@ -53,6 +54,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+        tokenValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
     public void registerMetricsLister(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

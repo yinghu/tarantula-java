@@ -31,7 +31,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private int timeoutInSeconds;
 
     private ServiceContext serviceContext;
-    private ConcurrentHashMap<String,Presence> pMap;
+    private ConcurrentHashMap<String,PresenceIndex> pMap;
     private HashMap<String,Access.Role> rMap;
     private HashMap<String,AuthVendorRegistry> aMap;
     private DataStore pdataStore;//presence
@@ -98,6 +98,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.registerEventService(this.serviceContext.eventService());
             return px;
         });
+    }
+
+    public void updateVendorAccessToken(String systemId,String accessToken){
+        PresenceIndex presenceIndex = (PresenceIndex)presence(systemId);
+        presenceIndex.vendorToken(accessToken);
     }
     public byte[] clusterKey(String clusterNameSuffix){
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;

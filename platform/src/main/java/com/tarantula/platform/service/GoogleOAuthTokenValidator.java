@@ -4,19 +4,28 @@ import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.GooglePlayConfiguration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
+import com.tarantula.platform.util.GoogleAuthCredentialsDeserializer;
 
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -32,6 +41,8 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private String accessKey;
     private String applicationId;
     private String secureKey;
+
+    private TarantulaLogger logger;
 
     public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration, MetricsListener metricsListener){
         this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
@@ -53,6 +64,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
+        logger = serviceContext.logger(GoogleOAuthTokenValidator.class);
     }
     @Override
     public boolean validate(Map<String,Object> params) {
@@ -90,9 +102,11 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             JsonObject payload = JsonUtil.parse(responseData.dataAsString);
             if(!payload.has("player_id")) return false;
             String pendingPlayerId = (String) params.get(OnAccess.LOGIN);
-            return pendingPlayerId.endsWith(payload.get("player_id").getAsString());
+            boolean verifying = pendingPlayerId.endsWith(payload.get("player_id").getAsString());
+            if(verifying) tokenValidatorProvider.updateVendorAccessToken((String)params.get(OnAccess.SYSTEM_ID),accessToken);
+            return verifying;
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("Error on google auth ["+typeId+"]",ex);
             return false;
         }
     }

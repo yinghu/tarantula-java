@@ -12,4 +12,6 @@ public interface Presence extends Recoverable,DataStore.Updatable,Countable{
 
     boolean local();
 
+    String vendorToken();
+
 }

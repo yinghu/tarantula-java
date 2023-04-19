@@ -26,9 +26,6 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  SANDBOX_VERIFY_URI = "https://sandbox.itunes.apple.com/verifyReceipt";
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
-
-    //private HttpClient client;
-    private JsonParser jsonParser;
     private DataStore dataStore;
 
     private String secureKey;
@@ -43,13 +40,6 @@ public class AppleStoreProvider extends AuthObject{
         super(typeId,"");
         this.secureKey = key;
         this.isSandbox = isSandbox;
-        //try{
-            //SSLContext sct = SSLContext.getInstance("TLS");
-            //sct.init(null,new TrustManager[]{new AppleStoreProvider._X509TrustManager()},null);
-            //client = HttpClient.newBuilder().sslContext(sct).build();
-        //}catch (Exception ex){
-            //throw new RuntimeException(ex);
-        //}
     }
     @Override
     public String name(){
@@ -58,7 +48,6 @@ public class AppleStoreProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        jsonParser = new JsonParser();
         String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
 
@@ -108,7 +97,7 @@ public class AppleStoreProvider extends AuthObject{
         String systemId = (String) params.get(OnAccess.SYSTEM_ID);
         String pendingTransactionId = (String)params.get("transactionId");
         //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
-        JsonObject receipt = jsonParser.parse(resp).getAsJsonObject();
+        JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array
         boolean validated = false;

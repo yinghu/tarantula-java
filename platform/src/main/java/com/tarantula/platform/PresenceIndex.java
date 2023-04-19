@@ -13,6 +13,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     private boolean local = true;
     private EventService eventService;
+    private String vendorToken;
 
     public PresenceIndex(int stub,String index){
         this();
@@ -23,7 +24,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     public PresenceIndex(){
         this.label = "Presence";
-        //this.balance = new AtomicDouble();
     }
     @Override
     public boolean distributable(){
@@ -51,8 +51,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         fe.systemId(session.systemId());
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());
-        //fe.accessMode(session.accessMode());
-        //fe.balance(desc.entryCost());
         fe.ticket(session.ticket());
         fe.name(session.name());
         fe.clientId(session.clientId());
@@ -107,6 +105,13 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
     public boolean local(){
         return local;
+    }
+
+    public String vendorToken(){
+        return vendorToken;
+    }
+    public void vendorToken(String vendorToken){
+        this.vendorToken = vendorToken;
     }
     @Override
     public String toString(){

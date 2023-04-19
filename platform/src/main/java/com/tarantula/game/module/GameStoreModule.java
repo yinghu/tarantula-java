@@ -37,6 +37,7 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             params.put(OnAccess.TYPE_ID,serviceTypeId);
             params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.skuName());
+            params.put(OnAccess.SESSION,session);
             if(this.context.validator().validateToken(params)){
                 String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
                 if(shoppingItem.skuName().equals(sku)){
