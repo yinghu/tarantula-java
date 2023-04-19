@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
@@ -69,10 +70,13 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public boolean validate(Map<String,Object> params) {
         try{
+            ArrayList<String> scopes = new ArrayList<>();
+            scopes.add("https://www.googleapis.com/auth/androidpublisher");
             String token = (String) params.get("token");
             String typeId = (String) params.get("typeId");
             GoogleAuthorizationCodeTokenRequest request =
                     new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,TOKEN_URI,clientId(typeId),secureKey,token,"");
+            request.setScopes(scopes);
             GoogleTokenResponse response = request.execute();
             onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
             return verifyPlayer(response.getAccessToken(),params);
