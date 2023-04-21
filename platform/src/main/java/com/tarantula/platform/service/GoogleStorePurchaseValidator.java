@@ -24,7 +24,6 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     //"acknowledge_uri": "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge"
 
-
     private String accessKey;
     private String packageName;
 
