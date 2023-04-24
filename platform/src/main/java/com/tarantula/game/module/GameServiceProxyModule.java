@@ -40,9 +40,6 @@ public class GameServiceProxyModule implements Module {
         this.gameServiceProvider.registerServiceProxyModule(this.context.descriptor());
         this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.GAME_UPDATE_OBJECT_CID,(o)->{
             GameUpdateObject gameUpdateObject  = (GameUpdateObject)o;
-            //this.context.log("game object->"+gameUpdateObject,OnLog.WARN);
-            //this.context.log(gameUpdateObject.key().asString(),OnLog.WARN);
-            //this.context.log(gameUpdateObject.owner(),OnLog.WARN);
             this.gameServiceProvider.roomServiceProvider().onGameUpdate(gameUpdateObject);
         });
         this.context.log("Game Service Module Started", OnLog.WARN);

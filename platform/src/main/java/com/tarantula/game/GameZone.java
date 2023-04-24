@@ -27,8 +27,8 @@ public interface GameZone extends Configurable{
     Stub join(Session session,Rating rating);
     boolean leave(Stub stub);
 
-    List<Arena> arenas();
-    Arena arena(int level);
+    List<GameArena> arenas();
+    GameArena arena(int level);
     void setup(ApplicationContext applicationContext,GameLobby gameLobby);
     DataStore dataStore();
     void roomProxy(RoomProxy roomProxy);

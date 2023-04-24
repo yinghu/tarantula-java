@@ -27,4 +27,6 @@ public interface Room extends Recoverable {
     int totalLeft();
 
     void onCountdown(long delta);
+
+    Arena arena();
 }

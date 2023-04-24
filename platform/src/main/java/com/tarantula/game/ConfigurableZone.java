@@ -16,8 +16,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     private ZoneItem zoneItem;
     private RoomProxy roomProxy;
-    private List<Arena> arenaList;
-    private ConcurrentHashMap<Integer,Arena> arenaIndex;
+    private List<GameArena> arenaList;
+    private ConcurrentHashMap<Integer, GameArena> arenaIndex;
 
     private String configurationTypeId;
     private String configurationName;
@@ -47,7 +47,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         this.arenaList = new ArrayList<>();
         this.arenaIndex = new ConcurrentHashMap<>();
         this.zoneItem.arenaList().forEach(a->{
-            Arena arena = new Arena(a);
+            GameArena arena = new GameArena(a);
             arenaIndex.put(a.level(),arena);
             arenaList.add(arena);
         });
@@ -110,12 +110,12 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
 
     @Override
-    public List<Arena> arenas() {
+    public List<GameArena> arenas() {
         return arenaList;
     }
 
     @Override
-    public Arena arena(int level) {
+    public GameArena arena(int level) {
         return arenaIndex.get(level);
     }
 

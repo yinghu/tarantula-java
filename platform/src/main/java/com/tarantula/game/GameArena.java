@@ -1,14 +1,15 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Arena;
 import com.tarantula.platform.lobby.ArenaItem;
 
 
-public class Arena {
+public class GameArena implements Arena {
 
     private ArenaItem arenaItem;
 
-    public Arena(ArenaItem arenaItem){
+    public GameArena(ArenaItem arenaItem){
         this.arenaItem = arenaItem;
     }
     public int xp(){

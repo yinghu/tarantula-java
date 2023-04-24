@@ -5,12 +5,13 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Arena;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.cci.udp.UDPChannel;
-import com.tarantula.game.Arena;
+import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
 import com.tarantula.game.Rating;
 
@@ -36,7 +37,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int totalJoined;
     protected int totalLeft;
     protected boolean dedicated;
-    protected Arena arena;
+    protected GameArena arena;
 
     protected ConcurrentHashMap<String,Entry> joinIndex;
     protected Entry[] entries;
@@ -346,5 +347,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         countdownTimer -= delta;
         gameModule.countdown(countdownTimer);
     }
+
 
 }

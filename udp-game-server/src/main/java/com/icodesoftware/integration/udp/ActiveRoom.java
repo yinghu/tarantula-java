@@ -1,5 +1,6 @@
 package com.icodesoftware.integration.udp;
 
+import com.icodesoftware.Arena;
 import com.icodesoftware.Room;
 import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.util.RecoverableObject;
@@ -110,4 +111,6 @@ public class ActiveRoom extends RecoverableObject implements Room {
     public ActiveRoom assign(int channelId){
         return new ActiveRoom(channelId,capacity,duration,overtime,joinsOnStart,timeout);
     }
+
+    public Arena arena(){return null;}
 }
