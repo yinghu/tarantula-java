@@ -605,7 +605,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String gameIcon = (String) properties.property("gameIcon");
         String developerIcon = (String) properties.property("developerIcon");
         String developer = (String) properties.property("developer");
-
+        Configuration gameClusterConfig = (Configuration)properties.property(OnAccess.GAME_CLUSTER_CONFIG);
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();

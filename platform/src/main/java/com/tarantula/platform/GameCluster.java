@@ -39,6 +39,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String GAME_ICON = "14";
     public final static String DEVELOPER_ICON = "15";
     public final static String DEVELOPER = "16";
+
     public Lobby gameLobby;
     public Lobby serviceLobby;
     public Lobby dataLobby;
@@ -223,7 +224,15 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public boolean dedicated(){
         return (boolean)this.properties.get(DEDICATED);
     }
-
+    public int maxLobbyCount(){
+        return 10;
+    }
+    public int maxZoneCount(){
+        return 10;
+    }
+    public int maxArenaCount(){
+        return 10;
+    }
 
 
 }

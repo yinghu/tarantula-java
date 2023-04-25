@@ -22,4 +22,7 @@ public class ArenaItem extends Commodity {
     public int xp(){
         return header.get("XP").getAsInt();
     }
+    public String name(){
+        return this.header.get("Name").getAsString();
+    }
 }

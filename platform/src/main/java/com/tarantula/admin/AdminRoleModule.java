@@ -35,6 +35,7 @@ public class AdminRoleModule implements Module{
 
     private UserService userService;
     private int maxGameClusterCount;
+    private Configuration gameClusterConfiguration;
 
     private ConcurrentHashMap<String,Descriptor> pendingGameServices;
 
@@ -112,6 +113,7 @@ public class AdminRoleModule implements Module{
                 Access ua = _user(session.systemId());
                 Account acc = userService.loadAccount(ua);
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
+                    onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,onAccess);
                     if(gc.successful()){
                         IndexSet idx = this.userService.loadGameClusterIndex(ua);
@@ -191,7 +193,8 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
-        this.maxGameClusterCount = ((Number)this.context.configuration("cluster").property("maxGameClusterCount")).intValue();
+        this.gameClusterConfiguration = this.context.configuration("cluster");
+        this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
         this.pendingGameServices = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }

@@ -18,6 +18,9 @@ public class GameArena implements Arena {
     public int level(){
         return arenaItem.level();
     }
+    public String name(){
+        return arenaItem.name();
+    }
     public JsonObject toJson(){
         if(arenaItem==null) return new JsonObject();
         return arenaItem.toJson();

@@ -59,6 +59,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String MYSQL = "mysql";
     String WEB_HOOK = "webHook";
 
+    String GAME_CLUSTER_CONFIG = "gameClusterConfig";
+
 
     Object property(String name);
     void property(String name,Object value);
