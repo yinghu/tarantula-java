@@ -1,6 +1,4 @@
 {
-  "maxSizeOnSet": 4000,
-  "matchMakingMaxRank": 10,
   "systemServiceProviders": [
     "com.tarantula.platform.inventory.PlatformInventoryServiceProvider",
     "com.tarantula.platform.item.PlatformItemServiceProvider",

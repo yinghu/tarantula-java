@@ -1,6 +1,6 @@
 {
   "dailyReward":
-    {"waitingTimeHours": 5,
+    { "waitingTimeHours": 5,
       "maxConsecutiveDays": 7,
       "maxRewardTiers": 7
     },

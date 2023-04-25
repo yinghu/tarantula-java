@@ -40,6 +40,12 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String DEVELOPER_ICON = "15";
     public final static String DEVELOPER = "16";
 
+    public final static String MAX_LOBBY_COUNT = "17";
+    public final static String MAX_ZONE_COUNT = "18";
+    public final static String MAX_ARENA_COUNT = "19";
+    public final static String MAX_DATA_SIZE_ON_SET = "20";
+
+
     public Lobby gameLobby;
     public Lobby serviceLobby;
     public Lobby dataLobby;
@@ -224,15 +230,25 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public boolean dedicated(){
         return (boolean)this.properties.get(DEDICATED);
     }
+
     public int maxLobbyCount(){
-        return 10;
-    }
-    public int maxZoneCount(){
-        return 10;
-    }
-    public int maxArenaCount(){
-        return 10;
+        Number number = (Number) properties.get(MAX_LOBBY_COUNT);
+        return number!=null? number.intValue():10;
     }
 
+    public int maxZoneCount(){
+        Number number = (Number) properties.get(MAX_ZONE_COUNT);
+        return number!=null? number.intValue():10;
+    }
+
+    public int maxArenaCount(){
+        Number number = (Number) properties.get(MAX_ARENA_COUNT);
+        return number!=null? number.intValue():10;
+    }
+
+    public int maxDataSizeCount(){
+        Number number = (Number) properties.get(MAX_DATA_SIZE_ON_SET);
+        return number!=null? number.intValue():4000;
+    }
 
 }

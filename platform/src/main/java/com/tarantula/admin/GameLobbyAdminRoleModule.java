@@ -15,7 +15,7 @@ import java.util.List;
 public class GameLobbyAdminRoleModule implements Module {
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private int maxGameLobbyCount;
+
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
@@ -43,7 +43,7 @@ public class GameLobbyAdminRoleModule implements Module {
             int lobbyIndex = Integer.parseInt(query[1]);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Lobby lobby = gameCluster.gameLobby;
-            if(lobby.entryList().size()<maxGameLobbyCount&&lobbyIndex<=maxGameLobbyCount){
+            if(lobby.entryList().size() < gameCluster.maxLobbyCount() &&lobbyIndex<= gameCluster.maxLobbyCount()){
                 HashMap<Integer,Descriptor> eMap = new HashMap<>();
                 lobby.entryList().forEach((d)->{
                     eMap.put(d.accessRank(),d);
@@ -65,7 +65,7 @@ public class GameLobbyAdminRoleModule implements Module {
                 }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"lobby size is over max count->"+maxGameLobbyCount).getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"lobby size is over max count->"+gameCluster.maxLobbyCount()).getBytes());
             }
         }
         else if(session.action().equals("onDisableLobby")){
@@ -88,7 +88,6 @@ public class GameLobbyAdminRoleModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.maxGameLobbyCount = Integer.parseInt(this.context.configuration("cluster").property("maxGameLobbyCount").toString());
         this.context.log("Game lobby admin module started", OnLog.WARN);
     }
 

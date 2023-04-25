@@ -645,14 +645,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
-                ApplicationPreSetup[] preSetup = {null};
-                Configuration setupConfig = this.tarantulaContext.configuration(configuration.descriptor.category()+"-pre-setup-settings");
-                if(setupConfig != null){
-                    String cname = (String) setupConfig.property(ApplicationPreSetup.SET_UP_NAME);
-                    gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
-                    preSetup[0] = gameCluster.applicationPreSetup();
-                }
-                //log.warn("Create named lobby type id->"+configuration.descriptor.typeId());
+                String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
+                gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.owner(publishingId);
                 descriptor.label(LobbyDescriptor.LABEL);

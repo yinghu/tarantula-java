@@ -56,7 +56,7 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
         this.context = context;
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
         this.dataStore = this.gameServiceProvider.serviceDataStore();
-        this.maxSizeOnSet = ((Number)this.gameServiceProvider.configuration().property("maxSizeOnSet")).intValue();
+        this.maxSizeOnSet = this.gameServiceProvider.gameCluster().maxDataSizeCount();
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Data store module ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);

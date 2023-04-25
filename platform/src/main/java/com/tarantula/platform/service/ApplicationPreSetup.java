@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ApplicationPreSetup {
 
-    String SET_UP_NAME = "application-pre-setup";
+    String SET_UP_NAME = "applicationPreSetup";
     //[game]_service
     //void setup(ServiceContext serviceContext,Descriptor application,String configName);
     //<T extends Configurable> T load(Descriptor application);

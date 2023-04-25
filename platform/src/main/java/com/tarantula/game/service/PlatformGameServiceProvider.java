@@ -67,9 +67,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         return gameCluster;
     }
 
-    public Configuration configuration(){
-        return configuration;
-    }
+
     @Override
     public String name() {
         return NAME;
