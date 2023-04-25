@@ -105,6 +105,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         jo.addProperty("tournamentEnabled",(Boolean)property(GameCluster.TOURNAMENT_ENABLED));
         jo.addProperty("dedicated",(Boolean)property(GameCluster.DEDICATED));
         jo.addProperty("disabled",(Boolean)property(GameCluster.DISABLED));
+        jo.addProperty("maxLobbyCount",maxLobbyCount());
+        jo.addProperty("maxZoneCount",maxZoneCount());
+        jo.addProperty("maxArenaCount",maxArenaCount());
         return jo;
     }
     @Override

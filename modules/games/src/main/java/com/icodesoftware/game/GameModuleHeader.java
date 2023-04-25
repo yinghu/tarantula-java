@@ -83,8 +83,8 @@ public class GameModuleHeader implements GameModule {
         UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
         for(PlayerUpdate playerUpdate :updateBatch.playerUpdates){
             for(GameExperience gameExperience : playerUpdate.gameExperiences){
-                gameServiceProvider.updateStatistics(playerUpdate.systemId,gameExperience.name,gameExperience.statisticsDelta);
-                gameServiceProvider.updateExperience(playerUpdate.systemId,gameExperience.experienceDelta);
+                gameServiceProvider.updateStatistics(room,playerUpdate.systemId,gameExperience.name,gameExperience.statisticsDelta);
+                gameServiceProvider.updateExperience(room,playerUpdate.systemId,gameExperience.experienceDelta);
             }
         }
     }

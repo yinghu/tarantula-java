@@ -24,5 +24,5 @@ public class GameZoneIndex {
     public IndexSet roomIndex;
     public ArrayBlockingQueue<GameRoom> pendingRooms;
     public LinkedBlockingDeque<GameRoom> runningRooms;
-
+    public LinkedBlockingDeque<GameRoom>[] rankingRooms;
 }
