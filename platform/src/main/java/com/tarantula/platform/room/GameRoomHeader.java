@@ -134,8 +134,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
-    public void setup(GameZone gameZone, Channel channel,Rating rating){
-        this.arena = gameZone.arena(rating.arenaLevel);
+    public void setup(Channel channel){
+        //this.arena = gameZone.arena(rating.arenaLevel);
         if(!dedicated) return;
         this.connection = channel.connection();
         this.channelId = channel.channelId();
@@ -182,6 +182,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             plist.add(ge.toJson());
         }
         jsonObject.add("_players",plist);
+        //jsonObject.add("_arena",arena.toJson());
         return jsonObject;
     }
 
@@ -292,6 +293,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.gameModule = gameModule;
         this.owner = gameZone.distributionKey();
         this.countdownTimer = this.duration+this.overtime;
+        this.arena = gameZone.arena(1);
     }
 
     public void setup(Channel[] channels){

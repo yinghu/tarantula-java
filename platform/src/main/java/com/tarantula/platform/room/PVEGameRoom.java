@@ -29,6 +29,7 @@ public class PVEGameRoom extends GameRoomHeader{
             _room.entries = new GameEntry[this.capacity];
             joinIndex.forEach((k, e) -> _room.entries[e.seat()] = e);
         }
+        _room.arena = arena;
         return _room;
     }
 }

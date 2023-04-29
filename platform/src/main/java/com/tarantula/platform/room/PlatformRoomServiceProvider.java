@@ -555,7 +555,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 index.runningRooms.addFirst(room);
             }
         });
-        joined.setup(index.gameZone,null,rating);
+        //joined.setup(index.gameZone,null,rating);
         return joined;
     }
     private GameRoom localJoin(Rating rating, GameZoneIndex index){
@@ -586,7 +586,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         channelStub.fromBinary(ret);
         Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
         GameRoom joined = gameZoneIndex.gameRoom.view();
-        joined.setup(gameZone,channel,rating);
+        joined.setup(channel);
         return joined;
     }
 

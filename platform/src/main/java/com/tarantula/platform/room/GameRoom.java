@@ -3,9 +3,7 @@ package com.tarantula.platform.room;
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
-import com.tarantula.game.Rating;
 
 import java.util.List;
 
@@ -22,7 +20,7 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
     String roomId();
 
     List<Entry> entries();
-    void setup(GameZone gameZone,Channel channel,Rating rating);
+    void setup(Channel channel);
 
     //Distributed Methods
     GameRoom join(String systemId,Listener listener);

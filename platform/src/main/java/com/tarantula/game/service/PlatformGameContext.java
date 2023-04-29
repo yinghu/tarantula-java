@@ -5,6 +5,7 @@ import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.Rating;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -63,6 +64,8 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
         statistics.entry(name).update(delta).update();
     }
     public void updateExperience(Room room,String systemId,double delta){
-        //this.platformGameServiceProvider.presenceServiceProvider().rating(systemId).update(delta,room.arena().xp());
+        Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(systemId);
+        //logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
+        rating.update(delta,room.arena().xp()).update();
     }
 }
