@@ -45,6 +45,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public final static String MAX_ARENA_COUNT = "19";
     public final static String MAX_DATA_SIZE_ON_SET = "20";
 
+    public final static String UPGRADE_VERSION = "21";
+
 
     public Lobby gameLobby;
     public Lobby serviceLobby;
@@ -252,6 +254,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public int maxDataSizeCount(){
         Number number = (Number) properties.get(MAX_DATA_SIZE_ON_SET);
         return number!=null? number.intValue():4000;
+    }
+
+    public int upgradeVersion(){
+        Number number = (Number) properties.get(UPGRADE_VERSION);
+        return number!=null? number.intValue():0;
     }
 
 }

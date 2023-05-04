@@ -125,21 +125,18 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         this.started = false;
         zoneIndex.clear();
         lobbyItem.zoneList().forEach(zoneItem -> {
-            ConfigurableZone configurableZone = new ConfigurableZone("",zoneItem);
+            ConfigurableZone configurableZone = new ConfigurableZone(zoneItem);
             this.gameServiceProvider.roomServiceProvider().release(configurableZone);
         });
     }
 
-    //public String gameModule(){
-        //return this.gameModule;
-    //}
     private boolean configure(LobbyItem lobbyItem){
         zoneIndex.clear();
         //this.gameServiceProvider.roomServiceProvider().register(lobbyItem);
         lobbyItem.zoneList().forEach(zoneItem -> {
-            ConfigurableZone configurableZone = new ConfigurableZone(lobbyItem.gameModule(),zoneItem);
-            configurableZone.configurationTypeId(lobbyItem.configurationName());
-            configurableZone.configurationName(zoneItem.configurationName());
+            ConfigurableZone configurableZone = new ConfigurableZone(lobbyItem,zoneItem);
+            //configurableZone.configurationTypeId(lobbyItem.configurationName());
+            //configurableZone.configurationName(zoneItem.configurationName());
             configurableZone.dataStore(gameServiceProvider.serviceDataStore());
             configurableZone.setup(context,this);
             GameZone.RoomProxy roomProxy = roomProxy(zoneItem.playMode());

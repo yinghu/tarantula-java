@@ -5,6 +5,7 @@ import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.ZoneItem;
 
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     private ConcurrentHashMap<Integer, GameArena> arenaIndex;
 
     private String configurationTypeId;
-    private String configurationName;
 
     private String gameModule;
 
@@ -28,21 +28,28 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return this.configurationTypeId;
     }
 
-    public void configurationTypeId(String configurationTypeId) {
-        this.configurationTypeId = configurationTypeId;
-    }
-
     public String configurationName() {
-        return this.configurationName;
+        return this.zoneItem.configurationName();
+    }
+    public String configurationVersion() {
+        return this.zoneItem.configurationVersion();
     }
 
-    public void configurationName(String configurationName) {
-        this.configurationName = configurationName;
+    public ConfigurableZone(LobbyItem lobbyItem, ZoneItem zoneItem){
+        this.gameModule = lobbyItem.gameModule();
+        this.configurationTypeId = lobbyItem.configurationName()+"_"+zoneItem.configurationName()+"_"+zoneItem.configurationVersion();
+        this.zoneItem = zoneItem;
+        this.arenaList = new ArrayList<>();
+        this.arenaIndex = new ConcurrentHashMap<>();
+        this.zoneItem.arenaList().forEach(a->{
+            GameArena arena = new GameArena(a);
+            arenaIndex.put(a.level(),arena);
+            arenaList.add(arena);
+        });
     }
 
-
-    public ConfigurableZone(String gameModule,ZoneItem zoneItem){
-        this.gameModule = gameModule;
+    public ConfigurableZone(ZoneItem zoneItem){
+        //this.gameModule = lobbyItem.configurationName();
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
         this.arenaIndex = new ConcurrentHashMap<>();

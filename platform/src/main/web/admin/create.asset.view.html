@@ -22,6 +22,8 @@
                 <input id='tx-configuration-asset-type-id' class="w3-input w3-round w3-border tx-text-12" type="text">  
                 <label class="tx-text-12 tx-margin-left-4">Configuration Name:</label>
                 <input id='tx-configuration-asset-name' class="w3-input w3-round w3-border tx-text-12" type="text">
+                <label class="tx-text-12 tx-margin-left-4">Configuration Version:</label>
+                <input id='tx-configuration-asset-version' class="w3-input w3-round w3-border tx-text-12" type="text">
             </fieldset>
         </div>
         <div class="w3-panel"> 
@@ -312,6 +314,7 @@
     document.querySelector('#tx-configuration-asset-preview').onclick=()=>{
         let _typeId = document.querySelector('#tx-configuration-asset-type-id').value;
         let _name= document.querySelector('#tx-configuration-asset-name').value;
+        let _version = document.querySelector('#tx-configuration-asset-version').value;
         if(_typeId==null||_typeId==''){
             document.querySelector("#tx-create-asset-warning-message").innerHTML = "TypeId cannot be null";
             document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';   
@@ -331,7 +334,7 @@
         itemTemplate.configurationTypeId = _typeId;
         itemTemplate.configurationName = _name;
         itemTemplate.configurationCategory = selectedItem.header.type;
-        itemTemplate.configurationVersion = selectedItem.header.version;
+        itemTemplate.configurationVersion = _version;//selectedItem.header.version;
         if(selectedItem.application.properties.length==0){
             document.querySelector("#tx-create-asset-warning-message").innerHTML = "Do not create asset for type->"+ selectedItem.header.type;
             document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';
@@ -577,6 +580,7 @@
         console.log(data);
         document.querySelector('#tx-configuration-asset-type-id').value = data.configurationTypeId;
         document.querySelector('#tx-configuration-asset-name').value = data.configurationName;
+        document.querySelector('#tx-configuration-asset-version').value = data.configurationVersion;
         console.log(selectedItem);
         selectedItem.application.properties.forEach(prop=>{
             let pv = document.querySelector('#tx-asset-property-'+prop.name);

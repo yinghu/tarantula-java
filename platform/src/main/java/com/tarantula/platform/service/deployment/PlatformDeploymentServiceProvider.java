@@ -586,6 +586,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         gameCluster.property(GameCluster.DEDICATED,dedicated);
         gameCluster.property(GameCluster.GAME_ICON,gameIcon);
         gameCluster.property(GameCluster.DEVELOPER_ICON,developerIcon);
+        gameCluster.property(GameCluster.UPGRADE_VERSION,gameCluster.upgradeVersion()+1);
         mds.update(gameCluster);
         return (T)gameCluster;
     }
@@ -628,7 +629,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gameCluster.property(GameCluster.MAX_ZONE_COUNT,maxZoneCount);
             gameCluster.property(GameCluster.MAX_ARENA_COUNT,maxArenaCount);
             gameCluster.property(GameCluster.MAX_DATA_SIZE_ON_SET,maxDataSize);
-
+            gameCluster.property(GameCluster.UPGRADE_VERSION,1);
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
