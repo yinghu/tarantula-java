@@ -15,6 +15,17 @@
         <span id="tx-configuration-asset-type" class='w3-right tx-text-18 tx-margin-top-8 tx-margin-left-8'>Asset</span>
     </div>
     <div class="w3-container" id="tx-asset-create-section">
+        <div class="w3-panel"  id="tx-asset-version-selection" style="display: none;"> 
+            <fieldset class="w3-border-blue"> 
+                <legend class="tx-text-14 w3-text-blue">Version</legend>
+                <select id='tx-asset-update-version' class="w3-select w3-border w3-round tx-text-12" name='version'>
+                    <option value="pve">v1.7</option>
+                    <option value="pvp">v.1.6</option>
+                    <option value="tve">v.1.1</option>
+                    <option value="tvt">v.1.0</option>   
+                </select>
+            </fieldset>
+        </div>
         <div class="w3-panel">  
             <fieldset class="w3-border-blue"> 
                 <legend class="tx-text-14 w3-text-blue">Configuration</legend>
@@ -171,6 +182,10 @@
     let pendingUpload ={ready:false,progress:1};
     if(TARA_API.query().operation == 'Update'){
         populate(TARA_API.query().pendingUpdate);
+        TARA_API.onGet('role/admin/item',"onVersionedStock",TARA_API.query().gameClusterId+'#'+TARA_API.query().pendingUpdate.itemId,(resp)=>{
+                console.log(resp);
+            });
+        document.querySelector('#tx-asset-version-selection').style.display = 'block';
     }
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{

@@ -277,7 +277,7 @@
         let tem = [];
         tem.push('<span tx-application-id=\''+a.itemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-service-item-action\'>');
-        tem.push(a.configurationCategory+':'+a.configurationName);
+        tem.push(a.configurationCategory+':'+a.configurationName+':'+a.configurationVersion);
         tem.push('</span>');
         return tem.join('');    
     }
@@ -286,7 +286,7 @@
         let tem = [];
         tem.push('<span tx-item-id=\''+a.itemId);
         tem.push('\' class=\'w3-bar-item w3-tag w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-stock-item-action\'>');
-        tem.push(a.configurationCategory+':'+a.configurationName);
+        tem.push(a.configurationCategory+':'+a.configurationName+':'+a.configurationVersion);
         tem.push('</span>');
         return tem.join('');    
     }

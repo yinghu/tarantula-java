@@ -5,15 +5,21 @@ import com.icodesoftware.RecoverableFactory;
 public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
 
     public String label;
-
+    public String itemId;
 
     public ConfigurableObjectQuery(String query){
         this.label = query;
     }
 
+    public ConfigurableObjectQuery(String itemId,String query){
+        this.itemId = itemId;
+        this.label = query;
+    }
+
+
     @Override
     public ConfigurableObject create() {
-        return new ConfigurableObject();
+        return this.itemId==null?new ConfigurableObject():new VersionedConfigurableObject();
     }
 
     @Override
@@ -28,6 +34,6 @@ public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableO
 
     @Override
     public String distributionKey() {
-        return null;
+        return itemId;
     }
 }

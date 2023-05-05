@@ -6,6 +6,8 @@ import com.tarantula.game.GameZone;
 
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.VersionedConfigurableObject;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
@@ -48,7 +50,10 @@ public class GameObjectSetup implements ApplicationPreSetup {
         nameIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(nameIndex,true);
 
-        if(dataStore.update(t)) return true;
+        if(dataStore.update(t)){
+            saveVersion(dataStore,(ConfigurableObject)t);
+            return true;
+        }
         if(!dataStore.create(t)) return false;
         categoryIndex.addKey(t.distributionKey());
         dataStore.update(categoryIndex);
@@ -62,6 +67,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
             superCategoryIndex.addKey(t.distributionKey());
             dataStore.update(superCategoryIndex);
         }
+        saveVersion(dataStore,(ConfigurableObject)t);
         return true;
     }
 
@@ -105,7 +111,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
         IndexSet indexSet = new IndexSet(recoverableFactory.label());
-        indexSet.distributionKey(application.distributionKey());
+        indexSet.distributionKey(recoverableFactory.distributionKey()==null?application.distributionKey():recoverableFactory.distributionKey());
         ArrayList<T> arrayList = new ArrayList<>();
         if(!dataStore.load(indexSet)){
             return arrayList;
@@ -162,5 +168,19 @@ public class GameObjectSetup implements ApplicationPreSetup {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+    }
+
+    private void saveVersion(DataStore dataStore,ConfigurableObject configurableObject){
+        IndexSet versionIndex = new IndexSet("version");
+        versionIndex.distributionKey(configurableObject.distributionKey());
+        dataStore.createIfAbsent(versionIndex,true);
+        VersionedConfigurableObject versionedConfigurableObject = new VersionedConfigurableObject(configurableObject);
+        if(dataStore.createIfAbsent(versionedConfigurableObject,true)){
+            versionIndex.addKey(versionedConfigurableObject.key().asString());
+            dataStore.update(versionIndex);
+        }
+        else{
+            dataStore.update(versionedConfigurableObject);
+        }
     }
 }
