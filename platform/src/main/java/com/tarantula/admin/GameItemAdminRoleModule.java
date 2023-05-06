@@ -196,7 +196,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onVersionedStock")){
-            this.context.log(session.name(),OnLog.WARN);
+            //this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();

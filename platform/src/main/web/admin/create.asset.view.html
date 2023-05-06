@@ -19,10 +19,7 @@
             <fieldset class="w3-border-blue"> 
                 <legend class="tx-text-14 w3-text-blue">Version</legend>
                 <select id='tx-asset-update-version' class="w3-select w3-border w3-round tx-text-12" name='version'>
-                    <option value="pve">v1.7</option>
-                    <option value="pvp">v.1.6</option>
-                    <option value="tve">v.1.1</option>
-                    <option value="tvt">v.1.0</option>   
+                      
                 </select>
             </fieldset>
         </div>
@@ -160,6 +157,7 @@
 <script>
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     console.log(selectedItem);
+    let versionedItems =[];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
         document.querySelector('#tx-configuration-asset-type-id').disabled = true;
@@ -182,11 +180,33 @@
     let pendingUpload ={ready:false,progress:1};
     if(TARA_API.query().operation == 'Update'){
         populate(TARA_API.query().pendingUpdate);
+        let vselection = document.querySelector('#tx-asset-version-selection');
+        let vs = document.querySelector('#tx-asset-update-version');
+        let cv = TARA_API.query().pendingUpdate.configurationVersion;
         TARA_API.onGet('role/admin/item',"onVersionedStock",TARA_API.query().gameClusterId+'#'+TARA_API.query().pendingUpdate.itemId,(resp)=>{
-                console.log(resp);
+            let tms =[];
+            resp.itemList.forEach((a,i)=>{
+                tms.push('<option value=\'');
+                tms.push(i);
+                tms.push('\'');
+                if(a.configurationVersion == cv){
+                    tms.push(' selected');
+                }
+                tms.push(' >');
+                tms.push(a.configurationVersion);
+                tms.push('</option>');
+                versionedItems.push(a);
             });
-        document.querySelector('#tx-asset-version-selection').style.display = 'block';
+            vs.innerHTML = tms.join('');
+            vselection.style.display = 'block';    
+        });
+    
     }
+    document.querySelector('#tx-asset-update-version').onchange = ()=>{
+        let v = document.querySelector('#tx-asset-update-version');
+        populate(versionedItems[v.value]);
+        //console.log(v.value);
+    };
     document.querySelectorAll('.tx-list-item-add').forEach(a=>{
         a.onclick = ()=>{
             let pname = a.getAttribute('tx-property-name');
