@@ -360,6 +360,11 @@
             document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';   
             return; 
         }
+        if(_version==null||_version==''){
+            document.querySelector("#tx-create-asset-warning-message").innerHTML = "Version cannot be null";
+            document.querySelector('#tx-create-asset-warning-message-board').style.display = 'block';   
+            return; 
+        }
         let itemTemplate = {header:{},application:{},reference:[]};
         if(TARA_API.query().operation == 'Update'){
             itemTemplate.itemId = TARA_API.query().pendingUpdate.itemId;
