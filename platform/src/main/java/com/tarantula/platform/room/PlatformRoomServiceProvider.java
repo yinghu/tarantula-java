@@ -198,8 +198,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public <T extends Configurable> void register(T t) {
         logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
-        //logger.warn("Game cluster upgrade version->"+gameCluster.upgradeVersion()+">>>"+t.configurationVersion());
-        //this.logger.warn("Game zone is running on game module ["+gameZone.gameModule()+"]["+gameCluster.maxArenaCount()+"]");
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
