@@ -88,7 +88,7 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         String[] ttp = label.split("/");
         jsonObject.addProperty("Type",ttp[1]);
         jsonObject.addProperty("TypeId",ttp[2]);
-        jsonObject.addProperty("Balance",balance);
+        jsonObject.addProperty("Balance",Double.valueOf(balance).intValue());
         jsonObject.addProperty("Rechargeable",rechargeable);
         jsonObject.addProperty("Count",count);
         JsonArray items = new JsonArray();
