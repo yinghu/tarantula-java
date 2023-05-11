@@ -21,6 +21,10 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
             List<GameResource> gameResources = this.platformResourceServiceProvider.list();
             session.write(new GameResourceContext(true,"game resource list",gameResources).toJson().toString().getBytes());
         }
+        if(session.action().equals("onResource")){
+            GameResource gameResource = this.platformResourceServiceProvider.list(session.name());
+            session.write(gameResource.toJson().toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
