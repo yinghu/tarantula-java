@@ -20,13 +20,13 @@ public class GameResourceContext extends ResponseHeader {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",this.successful);
-        jsonObject.addProperty("message",message);
+        jsonObject.addProperty("Successful",this.successful);
+        jsonObject.addProperty("Message",message);
         JsonArray alist = new JsonArray();
         itemList.forEach((v)->{
             alist.add(v.toJson());
         });
-        jsonObject.add("itemList",alist);
+        jsonObject.add("_itemList",alist);
         return jsonObject;
     }
 
