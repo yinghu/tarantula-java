@@ -1,0 +1,11 @@
+{
+  "typeId":"game-service",
+  "name":"Resource",
+  "type":"application",
+  "category":"resource",
+  "tag":"game/resource",
+  "resetEnabled": true,
+  "moduleName":"com.tarantula.game.module.GameResourceModule",
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
+  "disabled": false
+}

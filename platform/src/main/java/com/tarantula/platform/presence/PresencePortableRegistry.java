@@ -16,6 +16,7 @@ import com.tarantula.platform.presence.saves.DeviceIndex;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
+import com.tarantula.platform.resource.GameResource;
 
 public class PresencePortableRegistry extends AbstractRecoverableListener {
 
@@ -57,6 +58,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int ROOM_ITEM_CID = 18;
 
+    public static final int GAME_RESOURCE_CID = 19;
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -116,6 +118,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case ROOM_ITEM_CID:
                 pt = new RoomItem();
+                break;
+            case GAME_RESOURCE_CID:
+                pt = new GameResource();
                 break;
             default:
         }

@@ -18,6 +18,7 @@ import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;
@@ -217,6 +218,10 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         return serviceProvider(PlatformMessagingServiceProvider.NAME);
     }
 
+    public PlatformResourceServiceProvider resourceServiceProvider(){
+        return serviceProvider(PlatformResourceServiceProvider.NAME);
+    }
+
     public <T extends ServiceProvider> T serviceProvider(String name){
         return (T)gameServiceProviders.get(name);
     }
@@ -255,6 +260,9 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         if(serviceName.equals(PlatformConfigurationServiceProvider.NAME)){
             return configurationServiceProvider();
         }
+        if(serviceName.equals(PlatformResourceServiceProvider.NAME)){
+            return resourceServiceProvider();
+        }
         return this;//default empty implementation
     }
 
@@ -265,6 +273,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         if(name.equals("lobby")) return lobbyServiceProvider();
         if(name.equals("tournament")) return tournamentServiceProvider();
         if(name.equals("data")) return configurationServiceProvider();
+        if(name.equals("resource")) return resourceServiceProvider();
         return null;
     }
 

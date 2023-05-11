@@ -65,7 +65,9 @@
         case 'inbox':
             tx_live_inbox_setup();
             break;
-
+            case 'resource':
+            tx_live_resource_setup();
+            break;
     }
    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
@@ -215,6 +217,12 @@
     function tx_live_inbox_setup(){
         console.log(TARA_API.query()); 
         TARA_API.getOnModule(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
+            editor.set(resp);
+        });   
+    }
+    function tx_live_resource_setup(){
+        console.log(TARA_API.query()); 
+        TARA_API.getOnModule(TARA_API.query().serviceTag,'onList',"mills",(resp)=>{
             editor.set(resp);
         });   
     }

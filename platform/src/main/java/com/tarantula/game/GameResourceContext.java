@@ -3,15 +3,15 @@ package com.tarantula.game;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.resource.GameResource;
 
 import java.util.List;
 
-public class ItemContext extends ResponseHeader {
+public class GameResourceContext extends ResponseHeader {
 
-    private List<ConfigurableObject> itemList;
+    private List<GameResource> itemList;
 
-    public ItemContext(boolean successful,String message,List<ConfigurableObject> itemList){
+    public GameResourceContext(boolean successful, String message, List<GameResource> itemList){
         this.successful = successful;
         this.message = message;
         this.itemList = itemList;
