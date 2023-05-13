@@ -73,15 +73,15 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     public boolean onItemRegistered(String category,String itemId){
-        GameResource configurableObject = new GameResource();
-        configurableObject.distributionKey(itemId);
+        GameResource gameResource = new GameResource();
+        gameResource.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(app,configurableObject)){
+        if(!applicationPreSetup.load(app,gameResource)){
             return false;
         }
-        configurableObject.setup();
-        gameResourceIndex.put(configurableObject.name(),configurableObject);
+        gameResource.setup();
+        gameResourceIndex.put(gameResource.name(),gameResource);
         return true;
     }
     public boolean onItemReleased(String category,String itemId){
@@ -111,6 +111,11 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         ArrayList<GameResource> gameResources = new ArrayList<>();
         gameResourceIndex.forEach((k,v)->gameResources.add(v));
         return gameResources;
+    }
+
+    public boolean grant(String itemId){
+        logger.warn("grant->"+itemId);
+        return true;
     }
 
 }

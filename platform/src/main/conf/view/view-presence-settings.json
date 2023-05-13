@@ -24,6 +24,6 @@
     {"type": "live.game.service.dailygiveaway","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.profile","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.save","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.store.view.html"}
+    {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.resource.view.html"}
   ]
 }

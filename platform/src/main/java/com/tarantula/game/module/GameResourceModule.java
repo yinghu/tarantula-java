@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameResourceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -21,9 +22,12 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
             List<GameResource> gameResources = this.platformResourceServiceProvider.list();
             session.write(new GameResourceContext(true,"game resource list",gameResources).toJson().toString().getBytes());
         }
-        if(session.action().equals("onResource")){
+        else if(session.action().equals("onResource")){
             GameResource gameResource = this.platformResourceServiceProvider.list(session.name());
             session.write(gameResource.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onGrant")){
+            session.write(JsonUtil.toSimpleResponse(platformResourceServiceProvider.grant(session.name()), session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
