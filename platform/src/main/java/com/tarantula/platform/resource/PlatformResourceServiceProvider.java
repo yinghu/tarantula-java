@@ -1,7 +1,6 @@
 package com.tarantula.platform.resource;
 
 import com.icodesoftware.Configurable;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
@@ -10,6 +9,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
+import com.tarantula.platform.item.Item;
 import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
@@ -29,13 +29,16 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
     private DistributionItemService distributionItemService;
     //private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
+    //private Descriptor application;
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
+    private ConcurrentHashMap<String,Item> itemIndex;
 
     public PlatformResourceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.gameResourceIndex = new ConcurrentHashMap<>();
+        this.itemIndex = new ConcurrentHashMap<>();
     }
     @Override
     public String name() {
@@ -81,6 +84,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
             return false;
         }
         gameResource.setup();
+        setup(gameResource);
         gameResourceIndex.put(gameResource.name(),gameResource);
         return true;
     }
@@ -98,8 +102,12 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         List<GameResource> items = applicationPreSetup.list(descriptor,new GameResourceQuery("typeId/"+descriptor.category()));
         items.forEach((a)-> {
             a.setup();
-            if(!a.disabled()) gameResourceIndex.put(a.name(),a);
+            if(!a.disabled()) {
+                setup(a);
+                gameResourceIndex.put(a.name(),a);
+            }
         });
+        //this.application = descriptor;
         return null;
     }
 
@@ -113,9 +121,20 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         return gameResources;
     }
 
-    public boolean grant(String itemId){
-        logger.warn("grant->"+itemId);
-        return true;
+    public boolean grant(String systemId,String itemId){
+        Item item = itemIndex.get(itemId);
+        if(item==null){
+            logger.warn("Item not existed->"+itemId);
+            return false;
+        }
+        return this.inventoryServiceProvider.redeem(systemId,item);
+    }
+
+    private void setup(GameResource gameResource){
+        List<Item> items = gameResource.list();
+        items.forEach(c->{
+            itemIndex.put(c.distributionKey(),c);
+        });
     }
 
 }

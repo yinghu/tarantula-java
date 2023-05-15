@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Item extends ConfigurableObject{
@@ -69,6 +70,10 @@ public class Item extends ConfigurableObject{
             }
         }
         return (T)this;
+    }
+
+    public List<ConfigurableObject> list(){
+        return _reference;
     }
 
     private boolean _validate(){

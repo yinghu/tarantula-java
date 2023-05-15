@@ -11,6 +11,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
@@ -310,6 +311,5 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         });
         return json;
     }
-
 
 }

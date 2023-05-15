@@ -27,7 +27,7 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
             session.write(gameResource.toJson().toString().getBytes());
         }
         else if(session.action().equals("onGrant")){
-            session.write(JsonUtil.toSimpleResponse(platformResourceServiceProvider.grant(session.name()), session.name()).getBytes());
+            session.write(JsonUtil.toSimpleResponse(platformResourceServiceProvider.grant(session.systemId(),session.name()), session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

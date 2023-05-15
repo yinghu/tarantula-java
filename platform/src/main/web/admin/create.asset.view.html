@@ -157,11 +157,16 @@
 <script>
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     console.log(selectedItem);
+    console.log('>>>>>>>>'+TARA_API.query().category);
     let versionedItems =[];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
         document.querySelector('#tx-configuration-asset-type-id').disabled = true;
     }
+    //if(TARA_API.query().category == 'item'){
+        //document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().category;
+        //document.querySelector('#tx-configuration-asset-type-id').disabled = true;
+    //}
     document.querySelector('#tx-configuration-asset-header').innerHTML = TARA_API.query().operation+' ['+selectedItem.header.type+']';
     document.querySelector('#tx-configuration-asset-description').innerHTML = tx_first_upcase(selectedItem.header.scope);
     document.querySelector('#tx-configuration-asset-type').innerHTML = 'Category : '+selectedItem.header.type;
