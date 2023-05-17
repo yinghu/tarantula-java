@@ -10,7 +10,8 @@ public class CommodityRedeemer extends ApplicationRedeemer {
     }
 
     public void redeem() {
-        Inventory inventory = this.inventoryServiceProvider.newInventory(this.configurationCategory,this.configurationTypeId);
+        int cindex = this.configurationCategory.indexOf(".");
+        Inventory inventory = this.inventoryServiceProvider.newInventory(cindex<0?this.configurationCategory:this.configurationCategory.substring(0,cindex),this.configurationTypeId);
         inventory.distributionKey(systemId);
         DataStore inventoryDataStore = this.inventoryServiceProvider.inventoryDataStore();
         inventoryDataStore.createIfAbsent(inventory,true);

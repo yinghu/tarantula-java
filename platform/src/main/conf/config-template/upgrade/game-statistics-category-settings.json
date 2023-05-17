@@ -1,0 +1,37 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category component template list",
+  "name": "component-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "component",
+        "type": "NamedValue",
+        "description": "game statistics entry",
+        "version": "1.0",
+        "rechargeable": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Value",
+            "type": "number",
+            "reference": "Float",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

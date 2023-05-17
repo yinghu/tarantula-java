@@ -51,7 +51,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }

@@ -44,9 +44,6 @@
         case 'store':
             tx_live_store_setup();
             break;
-        case 'inventory':
-            tx_live_inventory_setup();
-            break;
         case 'save':
             tx_live_savedgame_setup();
             break;
@@ -64,9 +61,6 @@
             break;
         case 'inbox':
             tx_live_inbox_setup();
-            break;
-            case 'resource':
-            tx_live_resource_setup();
             break;
     }
    
@@ -115,37 +109,7 @@
             }
         });
     }
-    function tx_live_inventory_setup(){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onCategory','',(resp)=>{
-            editor.set(resp);
-            if(resp.successful){
-                shoppingList.innerHTML ='';
-                resp.itemList.forEach((gi,i)=>{
-                    let tem = [];
-                    tem.push('<div class=\'w3-container\'>');
-                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
-                    tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
-                    tem.push(gi.typeId);
-                    tem.push('</span><span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-12\'>');
-                    tem.push(gi.name);
-                    tem.push('</span><span tx-type-id=\''+gi.typeId+'\' tx-category=\''+gi.category);
-                    tem.push('\' class=\'w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-live-store-game-item-list-buy\'>View</span>');
-                    tem.push('</div>'); 
-                    shoppingList.innerHTML += tem.join('');  
-                });
-                document.querySelectorAll('.tx-live-store-game-item-list-buy').forEach(a=>{
-                    a.onclick=()=>{
-                        let tid = a.getAttribute('tx-type-id');
-                        let cat = a.getAttribute('tx-category');
-                        console.log(cat+'#'+tid);
-                        TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',cat+'#'+tid,(resp)=>{
-                            editor.set(resp);
-                        });   
-                    };
-                });             
-            }
-        });
-    }
+   
     function tx_live_savedgame_setup(){
         shoppingList.innerHTML ='';
         let itemList = [{name:'Handset1',deviceId:'handset1'},{name:'Handset2',deviceId:'handset2'},{name:'Handset3',deviceId:'handset3'}];
@@ -220,12 +184,7 @@
             editor.set(resp);
         });   
     }
-    function tx_live_resource_setup(){
-        console.log(TARA_API.query()); 
-        TARA_API.getOnModule(TARA_API.query().serviceTag,'onList',"mills",(resp)=>{
-            editor.set(resp);
-        });   
-    }
+  
     function tx_live_tournament_setup(){
         console.log(TARA_API.query()); 
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"Tami",(resp)=>{

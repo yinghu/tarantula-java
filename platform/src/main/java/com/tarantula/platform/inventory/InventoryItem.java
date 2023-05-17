@@ -57,4 +57,8 @@ public class InventoryItem extends ConfigurableObject {
         return configurableObject.setup();
     }
 
+    public String itemId(){
+        return reference.get(0).getAsString();
+    }
+
 }

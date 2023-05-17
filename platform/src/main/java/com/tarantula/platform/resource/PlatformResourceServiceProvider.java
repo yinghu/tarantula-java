@@ -8,9 +8,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.Item;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
@@ -29,7 +27,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
     private DistributionItemService distributionItemService;
     //private DataStore dataStore;
     private ApplicationPreSetup applicationPreSetup;
-    //private Descriptor application;
+    private Descriptor application;
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
     private ConcurrentHashMap<String,Item> itemIndex;
 
@@ -107,7 +105,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
                 gameResourceIndex.put(a.name(),a);
             }
         });
-        //this.application = descriptor;
+        this.application = descriptor;
         return null;
     }
 
@@ -119,6 +117,17 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         ArrayList<GameResource> gameResources = new ArrayList<>();
         gameResourceIndex.forEach((k,v)->gameResources.add(v));
         return gameResources;
+    }
+
+    public Commodity item(String itemId){
+        Commodity configurable = new Commodity();
+        configurable.distributionKey(itemId);
+        if(!applicationPreSetup.load(application,configurable)){
+            logger.warn("Item not existed->"+itemId);
+            return configurable;
+        }
+        configurable.setup();
+        return configurable;
     }
 
     public boolean grant(String systemId,String itemId){

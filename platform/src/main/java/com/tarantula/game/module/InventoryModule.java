@@ -6,6 +6,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
+import com.tarantula.platform.item.Commodity;
+import com.tarantula.platform.item.Item;
 
 public class InventoryModule implements Module {
 
@@ -31,9 +33,10 @@ public class InventoryModule implements Module {
         else if(session.action().equals("onCommodity")){
             String[] query = session.name().split("#");
             Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0],query[1]);
-            Configurable commodity;
-            if(inventory!=null&&(commodity=inventory.load(query[1]))!=null){
-                session.write(commodity.toJson().toString().getBytes());
+            if(inventory!=null){
+                String itemId = inventory.load(query[2]);
+                Commodity item = gameServiceProvider.resourceServiceProvider().item(itemId);
+                session.write(item.toJson().toString().getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());

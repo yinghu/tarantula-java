@@ -39,13 +39,14 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         count++;
         dataStore.update(this);
     }
-    public Configurable load(String inventoryId){
+    public String load(String inventoryId){
         InventoryItem inventoryItem = itemList.get(inventoryId);
         if(inventoryItem==null){
             return null;
         }
-        return inventoryItem.load();
+        return inventoryItem.itemId();
     }
+
     public void list(){
         keySet.forEach((k)->{
             InventoryItem inventoryItem = new InventoryItem();
