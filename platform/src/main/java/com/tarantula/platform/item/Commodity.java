@@ -53,6 +53,7 @@ public class Commodity extends ConfigurableObject{
         _reference.forEach((cob)->{
             json.add(cob.distributionKey(),cob.toJson());
         });
+        json.addProperty("Successful",true);
         return json;
     }
     @Override
