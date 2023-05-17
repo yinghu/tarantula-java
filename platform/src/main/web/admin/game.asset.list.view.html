@@ -145,7 +145,7 @@
     </div>
 </div>
 <script>
-    console.log(TARA_API.query().gameCluster);
+    //console.log(TARA_API.query().gameCluster);
     let applications ={};
     let assetView = document.querySelector('#tx-category-list-scope-asset');
     let componentView = document.querySelector('#tx-category-list-scope-component');
@@ -234,8 +234,8 @@
                 let app = applications[e.getAttribute('tx-application-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
-                        console.log(a);
-                        console.log(i);
+                        //console.log(a);
+                        //console.log(i);
                         TARA_API.query().itemIndex = i;
                     }
                 });
@@ -251,8 +251,8 @@
                 let app = applications[e.getAttribute('tx-item-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
-                        console.log(a);
-                        console.log(i);
+                        //console.log(a);
+                        //console.log(i);
                         TARA_API.query().itemIndex = i;
                     }
                 });
@@ -292,7 +292,7 @@
     }
     function populateCategories(){
         TARA_API.onGet('role/admin/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             TARA_API.query().itemList = resp.itemList;
             TARA_API.query().types = {};
             resp.types.itemList.forEach(t=>{
@@ -329,7 +329,7 @@
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
             let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
             TARA_API.onGet('role/admin/application','onList',query,(resp)=>{
-                console.log(resp);
+                //console.log(resp);
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
@@ -341,7 +341,7 @@
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
          }else{
             TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
-                console.log(resp);
+                //console.log(resp);
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{

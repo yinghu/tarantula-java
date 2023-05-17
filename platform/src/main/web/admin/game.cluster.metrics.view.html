@@ -75,7 +75,7 @@
     </div>
 </div>
 <script>
-    console.log(TARA_API.query().gameClusterId);
+    //console.log(TARA_API.query().gameClusterId);
     let _metricsBar = document.querySelector('#tx-game-cluster-metrics-data');
     let _metricsType = document.querySelector('#tx-game-cluster-metrics-type');
     let _nodeBar = document.querySelector('#tx-game-cluster-metrics-cluster-node-list');
@@ -235,7 +235,7 @@
     }
     function _register_metrics(){
         TARA_API.onSet('role/admin/metrics','onMetricsRegister','',_command,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(resp.successful) {
                 _command.queryId = resp.message;
                 _tx_empty_arr(data.datasets);
@@ -262,7 +262,7 @@
         else if(_request == 'archive'){ //load archive
             //one time archive load
             TARA_API.onGet('role/admin/metrics','onMetricsArchive',_command.queryId,(resp)=>{
-                console.log(resp);
+                //console.log(resp);
                 _tx_empty_arr(data.datasets);
                 if(resp.successful){
                     _tx_populate_metrics(resp.metrics);

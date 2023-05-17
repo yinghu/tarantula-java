@@ -38,7 +38,7 @@
     let itemTemplate = TARA_API.query().pendingUpdate;
     let editor = new JSONEditor(document.querySelector("#jsoneditor-register-item"),{mode:'tree'},itemTemplate);
     let query = TARA_API.query().gameClusterId+'#'+itemTemplate.itemId+'#'+itemTemplate.configurationTypeId;        
-    console.log(query);
+    //console.log(query);
     let actionBtn = document.querySelector('#tx-register-item-register');
     actionBtn.style.display = 'none';
     let cmd = 'onRelease';

@@ -95,19 +95,6 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return null;
     }
 
-    protected GameZone.RoomProxy joinProxy(String playMode){
-        GameZone.RoomProxy roomProxy = new PVERoomProxy();
-        if(playMode.equals(GameZone.PLAY_MODE_PVP)){
-            roomProxy = new PVPRoomProxy();
-        }
-        else if(playMode.equals(GameZone.PLAY_MODE_TVE)){
-            roomProxy = new TVERoomProxy();
-        }
-        else if(playMode.equals(GameZone.PLAY_MODE_TVT)){
-            roomProxy = new TVTRoomProxy();
-        }
-        return roomProxy;
-    }
 
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
         IndexSet indexSet = new IndexSet(recoverableFactory.label());

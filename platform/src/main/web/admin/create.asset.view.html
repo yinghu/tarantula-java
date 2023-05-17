@@ -156,8 +156,8 @@
 </div>
 <script>
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    console.log(selectedItem);
-    console.log('>>>>>>>>'+TARA_API.query().category);
+    //console.log(selectedItem);
+    //console.log('>>>>>>>>'+TARA_API.query().category);
     let versionedItems =[];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
@@ -272,7 +272,7 @@
             document.querySelector('#tx-create-asset-upload-board').style.display = 'block'; 
             //document.querySelector('#tx-create-asset-upload-ok').style.display = 'none';
             //document.querySelector('#tx-create-asset-upload-view-spin').style.display = 'none'; 
-            console.log("upload ->"+pname);
+            //console.log("upload ->"+pname);
             pendingUpload.property = pname;
             pendingUpload.vendor = "local";
         };    
@@ -313,7 +313,7 @@
         else if(sfx=='jpg'||sfx=='jpeg'){
             ctype = 'image/jpeg';
         }
-        console.log(pendingUpload.vendor);
+        //console.log(pendingUpload.vendor);
         TARA_API.onUpload(pendingUpload.data,f.name,ctype,TARA_API.query().gameClusterId+"#"+pendingUpload.vendor,(resp)=>{
             if(resp.successful){
                 document.querySelector('#tx-asset-property-'+pendingUpload.property).value = resp.message;
@@ -322,7 +322,7 @@
                 document.querySelector('#tx-create-asset-upload-board').style.display = 'none';
 
             }else{
-                console.log(resp);
+                //console.log(resp);
                 if(resp.code == 0 || resp.code == 200){
                     pendingUpload.progress += 20;
                     document.querySelector('#tx-create-asset-upload-progress').style.width = pendingUpload.progress+'%'; 
@@ -388,7 +388,7 @@
         let propertyChecked = '';
         selectedItem.application.properties.forEach(p=> {
             let typeRef = payload.category[p.name]; 
-            console.log(typeRef);
+            //console.log(typeRef);
             if(typeRef.type == 'list' || typeRef.type == 'set' || typeRef.type =='category'){
                 itemTemplate.application[p.name] = [];
                 payload[p.name].forEach((v,k,m)=>{
@@ -446,7 +446,7 @@
         let pv = payload.category[propertyName].reference.split(':');           
         list.innerHTML='<option value="" disabled selected>Choose your option</option>';
         TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             resp.itemList.forEach(item=>{
                 list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
                 payload[item.itemId]=item;
@@ -522,7 +522,7 @@
         });
     }
     function toHtmlInputType(prop){
-        console.log(prop);
+        //console.log(prop);
         let tem = [];
         tem.push('<div class=\'tx-margin-bottom-8\'>');
         tem.push('<label class=\'tx-text-12 tx-margin-left-4\'>');
@@ -622,11 +622,11 @@
         return cmd.substring(0,aix);
     }
     function populate(data){
-        console.log(data);
+        //console.log(data);
         document.querySelector('#tx-configuration-asset-type-id').value = data.configurationTypeId;
         document.querySelector('#tx-configuration-asset-name').value = data.configurationName;
         document.querySelector('#tx-configuration-asset-version').value = data.configurationVersion;
-        console.log(selectedItem);
+        //console.log(selectedItem);
         selectedItem.application.properties.forEach(prop=>{
             let pv = document.querySelector('#tx-asset-property-'+prop.name);
             switch(prop.type){
@@ -643,7 +643,7 @@
                     }
                     else{
                        if(data.application.hasOwnProperty(prop.name) && data.application[prop.name].length>0){
-                           console.log(data.application[prop.name]);
+                           //console.log(data.application[prop.name]);
                            data.application[prop.name].forEach(k=>{
                                txListItemAdd(prop.name,k);
                            });

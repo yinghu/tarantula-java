@@ -131,7 +131,7 @@
 </div>
 <script>
     let scope = TARA_API.query().category;
-    console.log(TARA_API.query().serviceCategory);
+    //console.log(TARA_API.query().serviceCategory);
     document.querySelector('#tx-category-scope-'+scope).checked = true;
     if(scope == 'item'){
         document.querySelector('#tx-category-scope-application').disabled = true;
@@ -154,7 +154,7 @@
     let types = [];
     let pendingProps = new Map();
     TARA_API.onGet('role/admin/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-        console.log(resp);
+        //console.log(resp);
         types = resp.itemList;
         let tp = document.querySelector('#tx-create-category-property-type');
         types.forEach(t => {
@@ -205,7 +205,7 @@
                 }
             }    
         });
-        console.log(cat);
+        //console.log(cat);
     }
     document.querySelector('#tx-create-category-add').onclick=()=>{
         let pname = document.querySelector('#tx-create-category-property-name').value;
@@ -246,7 +246,7 @@
         let item = editor.get();
         let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
         let cmd = 'on'+TARA_API.query().operation+'CategorySettings';
-        console.log(cmd+'>>>'+query);
+        //console.log(cmd+'>>>'+query);
         TARA_API.onSet('role/admin/item',cmd,query,item,(resp)=>{
             editor.set(resp);   
         });

@@ -13,7 +13,7 @@ var TARA_API = (function(){
   };            
   let _toWebSocketUrl = function(connection){       
     //use server connection config for web socket
-    console.log(connection);
+    //console.log(connection);
     return connection.protocol+'://'+connection.host+':'+connection.port+'/'+connection.path+'?connectionId='+connection.connectionId+'&accessKey='+connection.ticket+'&stub='+qdata.stub+'&systemId='+qdata.login;
   };
   let _connect = function(messageListener){
@@ -230,7 +230,7 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let p = JSON.parse(aj.responseText);
-            console.log(p);
+            //console.log(p);
             if(p.Successful){
                 presence.systemId = p.SystemId;
                 presence.token = p.Token;

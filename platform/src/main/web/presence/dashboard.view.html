@@ -478,7 +478,7 @@
     reset_t_action_event();
     function _tx_account(){
         TARA_API.onService(false,{serviceTag:'presence/lobby',command:'onPresence'},(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(resp.successful){
                 TARA_API.query().stripeId = resp.stripeClientId;
                 TARA_API.query().role=resp.access.role;
@@ -512,7 +512,7 @@
     }
     function _tx_game_cluster_list(){
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameClusterList',index:TARA_API.query().gameClusterIndex},(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(resp.successful){
                 let _gameClusterId='';
                 resp.gameClusterList.forEach((g,i)=>{
@@ -568,7 +568,7 @@
                 let sbar = document.querySelector('#tx-game-cluster-service-bar');
                 sbar.innerHTML = '';
                 TARA_API.onGet('role/admin/lobby','onGameServiceList',_gameClusterId,(resp1)=>{
-                    console.log(resp1);
+                    //console.log(resp1);
                     if(resp1.successful){
                         resp1.serviceList.forEach((a)=>{
                             if(a.resetEnabled == true){
@@ -641,7 +641,7 @@
         let query ={nodes:metricsSelected.nodes,categories:metricsSelected.categories};
         //console.log(query);
         TARA_API.onSet('role/admin/metrics','onUpdateServiceView',metricsSelected.name,query,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
             if(!resp.successful) return;
             for(let i=0;i<mChartSize;i++){
                 let dataset = metricsSelected.data[i].datasets; 

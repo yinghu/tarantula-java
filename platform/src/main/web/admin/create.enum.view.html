@@ -96,7 +96,7 @@
     let types = new Map();
     let pendingProps = new Map();
     TARA_API.onGet('role/admin/item','onTypesSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-        console.log(resp);
+        //console.log(resp);
         //payload = resp;
         resp.itemList.forEach(t=>{
             types.set(t.name,t);        
