@@ -8,7 +8,6 @@ import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameUpdateObject;
-import com.tarantula.game.MappingObject;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 
@@ -20,7 +19,10 @@ public class GameServiceProxyModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         String[] query = session.action().split("#");
-        if(query[0].equals("onService")){
+        if(query[0].equals("onList")){
+            session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
+        }
+        else if(query[0].equals("onService")){
             GameServiceProxy proxy = this.gameServiceProvider.gameServiceProxy(Short.parseShort(query[1]));
             byte[] resp = proxy.onService(session,payload);
             session.write(resp!=null?resp:JsonUtil.toSimpleResponse(true,"").getBytes());

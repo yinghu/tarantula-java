@@ -7,23 +7,18 @@
     {"type": "add.email","moduleResourceFile": "presence/add.email.view.html"},
     {"type": "validate.email","moduleResourceFile": "presence/validate.email.view.html"},
     {"type": "change.password","moduleResourceFile": "presence/change.password.view.html"},
-
     {"type": "upgrade.role.account","moduleResourceFile": "presence/upgrade.account.view.html"},
     {"type": "upgrade.role.admin","moduleResourceFile": "presence/upgrade.admin.view.html"},
     {"type": "live.game.lobby.test","moduleResourceFile": "presence/live.game.lobby.test.view.html"},
-    {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.statistics","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.recentlyplaylist","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.friendlist","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.leaderboard","moduleResourceFile": "presence/live.game.service.leaderboard.view.html"},
+    {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
+    {"type": "live.game.service.achievement","moduleResourceFile": "presence/live.game.service.achievement.view.html"},
+    {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.inbox.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.inventory","moduleResourceFile": "presence/live.game.service.inventory.view.html"},
-    {"type": "live.game.service.item","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.dailygiveaway","moduleResourceFile": "presence/live.game.service.store.view.html"},
-    {"type": "live.game.service.profile","moduleResourceFile": "presence/live.game.service.store.view.html"},
+    {"type": "live.game.service.item","moduleResourceFile": "presence/live.game.service.item.view.html"},
+    {"type": "live.game.service.dailygiveaway","moduleResourceFile": "presence/live.game.service.dailygiveaway.view.html"},
     {"type": "live.game.service.save","moduleResourceFile": "presence/live.game.service.save.view.html"},
-    {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.resource.view.html"}
+    {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.resource.view.html"},
+    {"type": "live.game.service.serviceproxy","moduleResourceFile": "presence/live.game.service.proxy.view.html"}
   ]
 }

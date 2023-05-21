@@ -40,27 +40,9 @@
     document.querySelector('#tx-live-store-game-item-list-title').innerHTML = TARA_API.query().category;
     let shoppingList = document.querySelector('#tx-live-store-game-item-list');
     let actionList = document.querySelector('#tx-live-game-service-action-bar');
-    switch(TARA_API.query().category){
-        case 'store':
-            tx_live_store_setup();
-            break;
-        case 'achievement':
-            tx_live_achievement_setup();
-            break;
-        case 'giveaway':
-            tx_live_giveaway_setup();
-            break;
-        case 'statistics':
-            tx_live_statistics_setup();
-            break;
-        case 'tournament':
-            tx_live_tournament_setup();
-            break;
-        case 'inbox':
-            tx_live_inbox_setup();
-            break;
-    }
-   
+    
+    tx_live_store_setup();
+    
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
         editor.destroy();
         let m3 = document.querySelector(TARA_API.query().popup);
@@ -79,7 +61,7 @@
     function tx_live_store_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList','Tami',(resp)=>{
             editor.set(resp);
-            if(resp.Successful){
+            if(resp.Successful && resp.hasOwnProperty('_shoppingItemList')){
                 shoppingList.innerHTML ='';
                 resp._shoppingItemList.forEach((gi,i)=>{
                     let tem = [];
