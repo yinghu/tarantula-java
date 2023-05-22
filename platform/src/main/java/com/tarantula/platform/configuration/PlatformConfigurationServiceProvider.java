@@ -147,7 +147,7 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
-        this.logger.warn("Configuration service provider started on ->"+gameServiceName+">>>"+gameCluster.property(GameCluster.NAME));
+        this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
         if(configurableObject.configurationCategory().equals("AwsS3Configuration")){
