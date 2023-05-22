@@ -2,6 +2,8 @@ package com.icodesoftware;
 
 
 public interface Session extends OnApplication {
+
+    String DataStore = "game_session";
     //standard HTTP headers
     String HTTP_CONTENT_TYPE ="Content-type";
 

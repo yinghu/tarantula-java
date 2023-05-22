@@ -43,7 +43,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     private Configuration configuration;
     private final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
-    private DataStore serviceDataStore;
+
     private MetricsListener metricsListener;
     private Metrics metrics;
 
@@ -116,7 +116,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         this.metrics = serviceContext.metrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
-        this.serviceDataStore = this.applicationPreSetup.dataStore(gameCluster,"player");
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{
             EventListener listener = eventListeners.get(e.trackId());
@@ -162,9 +161,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         });
         gameServiceProviders.clear();
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
-    }
-    public DataStore serviceDataStore(){
-        return this.serviceDataStore;
     }
 
     //room service provider hook calls
