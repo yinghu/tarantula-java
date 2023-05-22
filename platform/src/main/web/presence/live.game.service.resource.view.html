@@ -76,7 +76,8 @@
 
     function tx_resource_grant(itemId){
         TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
-            console.log(resp);
+            //console.log(resp);
+            editor.set(resp);
         });
     }
 </script>

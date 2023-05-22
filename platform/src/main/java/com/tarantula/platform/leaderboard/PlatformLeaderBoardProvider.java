@@ -7,6 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ServerPushEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,8 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     private static int LDB_SIZE = 10;
     private DataStore dataStore;
 
+    private GameCluster gameCluster;
+
     private ServiceContext serviceContext;
     private GsonBuilder gsonBuilder;
 
@@ -29,6 +32,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     public PlatformLeaderBoardProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
+        this.gameCluster = gameServiceProvider.gameCluster();
     }
     public LeaderBoardSync leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
@@ -43,7 +47,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.dataStore = serviceContext.dataStore(gameServiceProvider.gameCluster().serviceType().replace("-","_"),serviceContext.node().partitionNumber());//typeId_service
+        this.dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster,NAME);//typeId_service
         this.gsonBuilder = new GsonBuilder();
         this.gsonBuilder.registerTypeAdapter(LeaderBoardEntry.class,new LeaderBoardEntrySerializer());
         this.gsonBuilder.registerTypeAdapter(LeaderBoardEntry.class,new LeaderBoardEntryDeserializer());
@@ -65,7 +69,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started ["+topic+"]");
+        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with topic ["+topic+"]");
     }
 
     @Override

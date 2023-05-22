@@ -9,10 +9,6 @@ import java.util.List;
 public interface ApplicationPreSetup {
 
     String SET_UP_NAME = "applicationPreSetup";
-    //[game]_service
-    //void setup(ServiceContext serviceContext,Descriptor application,String configName);
-    //<T extends Configurable> T load(Descriptor application);
-
 
     <T extends Configurable> boolean save(Descriptor application,T t);
     <T extends Configurable> boolean load(Descriptor application,T t);
@@ -27,9 +23,13 @@ public interface ApplicationPreSetup {
 
     <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
 
+    //{game}_service data store
     DataStore dataStore(GameCluster gameCluster);
+
+    //{game}_service_{suffix_service}
     DataStore dataStore(GameCluster gameCluster,String service);
 
+    //{game}_service data store
     DataStore dataStore(Descriptor descriptor);
 
     void setup(ServiceContext serviceContext);

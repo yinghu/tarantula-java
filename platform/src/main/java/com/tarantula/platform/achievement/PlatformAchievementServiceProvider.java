@@ -30,7 +30,7 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.achievements = new ConcurrentHashMap<>();
     }
@@ -51,9 +51,9 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
-        this.dataStore = serviceContext.dataStore(gameServiceName.replace("-","_"),serviceContext.node().partitionNumber());
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }

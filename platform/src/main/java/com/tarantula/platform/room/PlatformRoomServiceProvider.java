@@ -39,7 +39,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public static final String NAME = "room";
 
     private TarantulaLogger logger;
-    private final String name;
+    private final String serviceType;
     private final GameCluster gameCluster;
     private final PlatformGameServiceProvider gameServiceProvider;
 
@@ -80,7 +80,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.name = this.gameCluster.serviceType();
+        this.serviceType = this.gameCluster.serviceType();
         this.typeLobby = this.gameCluster.lobbyType();
         this.playMode = this.gameCluster.playMode();
         this.dedicated = this.gameCluster.dedicated();
@@ -95,7 +95,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.clusterProvider = serviceContext.clusterProvider();
-        this.dataStore = serviceContext.dataStore(name.replace("-","_")+DS_SUFFIX,serviceContext.node().partitionNumber());
+        this.dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster,NAME);
         this.gameZoneIndex = new ConcurrentHashMap<>();
         this.gameRoomIndex = new ConcurrentHashMap<>();
         Configuration configuration = serviceContext.configuration(CONFIG);
@@ -135,7 +135,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             onConnectionRegistered(c);
             onConnectionStarted(c);
         });
-        logger.warn("Room service provider started for ["+gameCluster.property(GameCluster.NAME)+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]");
+        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]");
     }
 
     @Override
