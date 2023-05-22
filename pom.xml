@@ -11,6 +11,7 @@
     <name>Game Cluster</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--<maven.plugin.validation>DEFAULT</maven.plugin.validation>-->
     </properties>
     <modules>
         <module>modules/protocol</module>
