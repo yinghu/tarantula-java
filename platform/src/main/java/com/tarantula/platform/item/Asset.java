@@ -1,8 +1,10 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Asset extends ConfigurableObject{
@@ -30,7 +32,7 @@ public class Asset extends ConfigurableObject{
 
     @Override
     public JsonObject toJson() {
-        JsonObject jsonObject = super.toJson();
+        JsonObject jsonObject = super.toJson(super.toJson());
         return jsonObject;
     }
     @Override
@@ -44,6 +46,16 @@ public class Asset extends ConfigurableObject{
     }
     @Override
     public  <T extends Configurable> T setup(){
+        _reference = new ArrayList<>();
+        for(JsonElement je : reference){
+            ConfigurableObject cob = new ConfigurableObject();
+            cob.distributionKey(je.getAsString());
+            cob.dataStore(dataStore);
+            if(this.dataStore.load(cob)){
+                cob.registerListener(this.listener);
+                _reference.add(cob.setup());
+            }
+        }
         return (T)this;
     }
 

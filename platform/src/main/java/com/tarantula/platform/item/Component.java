@@ -32,11 +32,7 @@ public class Component extends ConfigurableObject{
 
     @Override
     public JsonObject toJson() {
-        JsonObject jsonObject = super.toJson(super.toJson());
-        //_reference.forEach((cob)->{
-            //jsonObject.add(cob.distributionKey(),cob.toJson());
-        //});
-        return jsonObject;
+        return super.toJson(super.toJson());
     }
     @Override
     public boolean configureAndValidate(JsonObject config){
@@ -44,7 +40,6 @@ public class Component extends ConfigurableObject{
     }
     @Override
     public  <T extends Configurable> T setup(){
-        //if(this.listener!=null) listener.onLoaded(this);
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();

@@ -49,10 +49,7 @@ public class Commodity extends ConfigurableObject{
     }
     @Override
     public JsonObject toJson() {
-        JsonObject json = super.toJson();
-        _reference.forEach((cob)->{
-            json.add(cob.distributionKey(),cob.toJson());
-        });
+        JsonObject json = super.toJson(super.toJson());
         json.addProperty("Successful",true);
         return json;
     }
