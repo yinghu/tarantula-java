@@ -75,16 +75,19 @@
 
     function tx_inventory_view(itemId){
         TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',itemId,(resp)=>{
+            console.log(itemId);
             editor.set(resp);
-            actionList.innerHTML = '';
-            resp._itemList.forEach(item=>{
-                actionList.innerHTML += TARA_HTML.command(itemId+'#'+item.InventoryId,item.TypeId,item.Name,'inventory-item','View');    
-            });
-            document.querySelectorAll('.tx-live-inventory-item').forEach(a=>{
-                a.onclick = ()=>{
-                    tx_inventory_item_view(a.getAttribute('tx-item-id'));          
-                }
-            });
+            if(resp.Successful){
+                actionList.innerHTML = '';
+                resp._itemList.forEach(item=>{
+                    actionList.innerHTML += TARA_HTML.command(itemId+'#'+item.InventoryId,item.TypeId,item.Name,'inventory-item','View');    
+                });
+                document.querySelectorAll('.tx-live-inventory-item').forEach(a=>{
+                    a.onclick = ()=>{
+                        tx_inventory_item_view(a.getAttribute('tx-item-id'));          
+                    }
+                });
+            }
         });
     }
     function tx_inventory_item_view(itemId){

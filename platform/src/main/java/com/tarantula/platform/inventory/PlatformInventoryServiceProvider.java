@@ -75,7 +75,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
     }
 
     public Inventory inventory(String systemId,String category,String typeId){
-        Inventory inventory = new Inventory(category,typeId);
+        int cindex = category.indexOf(".");
+        Inventory inventory = new Inventory(cindex<0?category:category.substring(0,cindex),typeId);
         inventory.distributionKey(systemId);
         if(!inventoryDataStore.load(inventory)) return null;
         inventory.dataStore(inventoryDataStore);

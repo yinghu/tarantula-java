@@ -32,7 +32,10 @@ public class Component extends ConfigurableObject{
 
     @Override
     public JsonObject toJson() {
-        JsonObject jsonObject = super.toJson();
+        JsonObject jsonObject = super.toJson(super.toJson());
+        //_reference.forEach((cob)->{
+            //jsonObject.add(cob.distributionKey(),cob.toJson());
+        //});
         return jsonObject;
     }
     @Override
@@ -53,7 +56,6 @@ public class Component extends ConfigurableObject{
             }
         }
         return (T)this;
-        //return (T)this;
     }
 
     private boolean _validate(){
