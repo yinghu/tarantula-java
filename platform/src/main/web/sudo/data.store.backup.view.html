@@ -1,7 +1,7 @@
 <div class="w3-modal-content">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <!--<span id="tx-stop-access-index-close"><i class="fa fa-close" style="font-size:12px"></i></span>-->            
+            <span id="tx-backup-store-close"><i class="fa fa-close" style="font-size:12px"></i></span>           
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-database" style="font-size:24px"></i></span>
@@ -11,11 +11,12 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-data-store-backup-message">
-        <p>Backup data store before adding new node</p>
+        <p>Backup data store</p>
     </div> 
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <span id="tx-data-store-backup-cancel" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Cancel</span>
-        <span id="tx-data-store-backup-ok" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Confirm</span>     
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-container w3-center">
+            <span id="tx-data-store-backup-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Backup</span>     
+        </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -27,13 +28,12 @@
     </div>
 </div>
 <script>
-    //document.querySelector("#tx-create-access-key-message").innerHTML = TARA_API.query().gameClusterId;
     document.querySelector('#tx-data-store-backup-ok').onclick=()=>{
         TARA_API.onService(false,{serviceTag:'role/sudo/datastore',command:'onBackupDataStore'},(resp)=>{
             document.querySelector('#tx-data-store-backup-message').innerHTML = resp.message;  
         });    
     };
-    document.querySelector('#tx-data-store-backup-cancel').onclick=()=>{
+    document.querySelector('#tx-backup-store-close').onclick=()=>{
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

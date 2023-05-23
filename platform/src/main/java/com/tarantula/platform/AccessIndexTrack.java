@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
@@ -88,5 +89,13 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     }
     public Key key(){
         return new NaturalKey(this.owner);
+    }
+
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("login",owner);
+        jsonObject.addProperty("distributionKey",distributionKey());
+        jsonObject.addProperty("referenceId",referenceId);
+        return jsonObject;
     }
 }

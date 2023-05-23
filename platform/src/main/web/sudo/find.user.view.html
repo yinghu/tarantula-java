@@ -11,15 +11,20 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-find-user-message"></div>
-    <div><!-- send form -->
-        <div class="w3-panel">
+    <div class="w3-container tx-margin-bottom-8 w3-border-bottom w3-border-red"><!-- send form -->
+        <div class="w3-container">
             <label class="tx-text-12">Index Name</label>
             <input id ="tx-find-user-login" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='index name'/>
         </div>
-        <div class="w3-panel">
+        <div class="w3-container">
             <span id="tx-find-user" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Find</span>     
         </div>
-    </div> 
+    </div>  
+    <div class="w3-container tx-margin-bottom-8">
+        <div class="w3-container">
+            <div id="jsoneditor-find-user-index" style="width: 100%;"></div>
+        </div>
+    </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -30,13 +35,22 @@
     </div>
 </div>
 <script>
+    const options ={
+        mode : 'tree',
+        onCreateMenu : (items, node)=>{
+            return [];
+        }
+    };
+    
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-find-user-index"),options,{});
     document.querySelector('#tx-find-user').onclick=()=>{
         let _c = document.querySelector('#tx-find-user-login').value;
-        TARA_API.onService(true,{serviceTag:'role/sudo',command:'onFindUser',login:_c},(resp)=>{
-            document.querySelector('#tx-find-user-message').innerHTML = resp.message;       
+        TARA_API.onGet('role/sudo','onFindUser',_c,(resp)=>{
+            editor.set(resp);     
         });
     };
     document.querySelector('#tx-find-user-close').onclick=()=>{
+        editor.destroy();
         let m3 = document.querySelector('#tx-popup');
         m3.innerHTML="";
         m3.style.display = 'none';       

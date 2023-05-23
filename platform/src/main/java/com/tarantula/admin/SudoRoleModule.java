@@ -91,13 +91,11 @@ public class SudoRoleModule implements Module {
             session.write(toMessage(session.action(),true).getBytes());
         }
         else if(session.action().equals("onFindUser")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String login = (String)acc.property(OnAccess.LOGIN);
-            AccessIndex accessIndex = accessIndexService.get(login);
+            AccessIndex accessIndex = accessIndexService.get(session.name());
             if(accessIndex!=null){
-                session.write(toMessage(accessIndex.distributionKey(),true).getBytes());
+                session.write(accessIndex.toJson().toString().getBytes());
             }else{
-                session.write(toMessage("["+login+"] not found",false).getBytes());
+                session.write(toMessage("["+session.name()+"] not found",false).getBytes());
             }
         }
 
