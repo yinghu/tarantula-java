@@ -55,7 +55,7 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
-        this.dataStore = this.gameServiceProvider.serviceDataStore();
+        this.dataStore = this.context.dataStore("player");
         this.maxSizeOnSet = this.gameServiceProvider.gameCluster().maxDataSizeCount();
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);

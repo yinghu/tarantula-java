@@ -13,8 +13,19 @@ var TARA_HTML = (function(){
         tem.push('>'+actionName+'</span>');
         tem.push('</div>'); 
         return tem.join('');  
+    };
+    let _option = function(value,view,selected){
+        let tem =[];
+        if(selected){
+            tem.push('<option value=\''+value+'\' selected>'+view+'</option>');
+        }
+        else{
+            tem.push('<option value=\''+value+'\'>'+view+'</option>');
+        }
+        return tem.join('');
     };   
     return{
         command : _command,
+        option : _option,
     };
 })();

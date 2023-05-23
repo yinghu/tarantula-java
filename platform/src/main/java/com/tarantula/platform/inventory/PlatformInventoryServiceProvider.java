@@ -31,7 +31,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
 
     public PlatformInventoryServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();
     }
 
     @Override

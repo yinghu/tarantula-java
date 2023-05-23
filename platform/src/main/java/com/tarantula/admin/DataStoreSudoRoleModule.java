@@ -46,23 +46,42 @@ public class DataStoreSudoRoleModule implements Module {
             List<String> dlist = this.deploymentServiceProvider.listDataStore();
             session.write(toJsonList(dlist).toString().getBytes());
         }
-        else if(session.action().equals("onLoadDataStore")){
+        else if(session.action().equals("onLoadDataStoreKeys")){
             String[] query = session.name().split("#");
             DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             summary.addProperty("name",sum.name());
             summary.addProperty("partitionNumber",sum.partitionNumber());
             summary.addProperty("totalRecords",sum.totalRecords());
-            if(sum.dataStore()!=null&&query[1]!=null){
-                byte[] data = sum.dataStore().load(query[1].getBytes());
-                if(data!=null) {
-                    RevisionObject revisionObject = RevisionObject.fromBinary(data);
-                    JsonObject debug = new JsonObject();
-                    debug.addProperty("local",revisionObject.local);
-                    debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    debug.add("payload",JsonUtil.parse(revisionObject.data));
-                    summary.add("debug",debug);
+            JsonArray keys = new JsonArray();
+            int[] kn = {Integer.parseInt(query[1])};
+            int[] batch = {10};
+            summary.addProperty("keyStartIndex",kn[0]);
+            summary.addProperty("keyEndIndex",kn[0]+batch[0]);
+            sum.dataStore().backup().list((k,v)->{
+                kn[0]--;
+                if(kn[0]<0) {
+                    keys.add(new String(k));
+                    batch[0]--;
                 }
+                //this.context.log("BBB->"+batch[0],OnLog.WARN);
+                return batch[0] > 0;
+            });
+            summary.add("keys",keys);
+            session.write(summary.toString().getBytes());
+        }
+        else if(session.action().equals("onLoadDataStoreValue")){
+            String[] query = session.name().split("#");
+            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
+            byte[] data = sum.dataStore().load(query[1].getBytes());
+            JsonObject summary = new JsonObject();
+            if(data!=null) {
+                RevisionObject revisionObject = RevisionObject.fromBinary(data);
+                JsonObject debug = new JsonObject();
+                debug.addProperty("local",revisionObject.local);
+                debug.addProperty("revision",Long.toString(revisionObject.revision));
+                debug.add("payload",JsonUtil.parse(revisionObject.data));
+                summary.add("debug",debug);
             }
             session.write(summary.toString().getBytes());
         }

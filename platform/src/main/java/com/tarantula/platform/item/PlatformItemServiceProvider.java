@@ -29,7 +29,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
 
     public PlatformItemServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();
     }
 
     public List<ConfigurableObject> list(Descriptor descriptor,String category){

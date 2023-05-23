@@ -135,9 +135,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         //this.gameServiceProvider.roomServiceProvider().register(lobbyItem);
         lobbyItem.zoneList().forEach(zoneItem -> {
             ConfigurableZone configurableZone = new ConfigurableZone(lobbyItem,zoneItem);
-            //configurableZone.configurationTypeId(lobbyItem.configurationName());
-            //configurableZone.configurationName(zoneItem.configurationName());
-            configurableZone.dataStore(gameServiceProvider.serviceDataStore());
+            configurableZone.dataStore(this.context.dataStore(Session.DataStore));
             configurableZone.setup(context,this);
             GameZone.RoomProxy roomProxy = roomProxy(zoneItem.playMode());
             roomProxy.setup(context,this,configurableZone);

@@ -405,12 +405,17 @@ public class PartitionDataStore extends ReplicatedDataStore{
             DatabaseEntry _key = new DatabaseEntry();
             DatabaseEntry _value = new DatabaseEntry();
             try{
+                boolean stopped = false;
                 while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
                     RevisionObject localData = RevisionObject.fromBinary(_value.getData());
                     if(localData.successful){
-                        if(!binary.on(_key.getData(),RevisionObject.toBinary(localData.revision,localData.data,localData.local))) break;
+                        if(!binary.on(_key.getData(),RevisionObject.toBinary(localData.revision,localData.data,localData.local))){
+                            stopped = true;
+                            break;
+                        }
                     }
                 }
+                if(stopped) break;
             } catch (Exception ex) {
                 log.error("error on backup list",ex);
             } finally {
