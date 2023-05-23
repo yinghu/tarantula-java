@@ -20,16 +20,6 @@ public class SystemUtil {
 
     public static String toHexString(byte[] hash){
         return ValidationUtil.toHexString(hash);
-        /**
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < hash.length; i++){
-            int v = hash[i] & 0xff;
-            if (v < 16) {
-                sb.append('0');
-            }
-            sb.append(Integer.toHexString(v));
-        }
-        return sb.toString().toUpperCase();**/
     }
     public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds,String waterMark) {
         LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
@@ -47,20 +37,6 @@ public class SystemUtil {
 
     public static String validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
         return ValidationUtil.validTicket(messageDigest,systemId,stub,ticket);
-        /**
-        String[] tlist = ticket.split(" ");//validate
-        long end = Long.parseLong(tlist[1]);
-        messageDigest.reset();
-        messageDigest.update(systemId.getBytes());
-        messageDigest.update(Integer.toHexString(stub).getBytes());
-        messageDigest.update(Long.toHexString(end).getBytes());
-        if(tlist[2].equals(SystemUtil.toHexString(messageDigest.digest()))){
-            LocalDateTime ending = TimeUtil.fromUTCMilliseconds(end);
-            return ending.isAfter(LocalDateTime.now())?tlist[3]:null;
-        }
-        else{
-            return null;
-        }**/
     }
     public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark,String index) {
         //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
@@ -108,22 +84,6 @@ public class SystemUtil {
         ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
         if(!validated.valid) throw new RuntimeException("Wrong session token");
         return new OnSessionTrack(validated.systemId,validated.stub,validated.ticket,validated.index);
-        /**
-        int sp = token.indexOf(" ");
-        String systemId = token.substring(0,sp);
-        String[] vm = token.substring(sp+1).split("-");
-        //vm[0] - ticket vm[1] - stub vm[2] - start vm[3] --hash  vm[4] -- cluster suffix
-        messageDigest.reset();
-        messageDigest.update(systemId.getBytes());//systemId
-        messageDigest.update(Integer.toHexString(Integer.parseInt(vm[1])).getBytes());//stub
-        messageDigest.update(Long.toHexString(Long.parseLong(vm[2])).getBytes());//start
-        messageDigest.update(vm[3].getBytes());
-        if(SystemUtil.toHexString(messageDigest.digest()).equals(vm[4])){// hash
-            return new OnSessionTrack(systemId,Integer.parseInt(vm[1]),vm[0],vm[3]);
-        }
-        else{
-            throw new RuntimeException("Wrong session token");
-        }**/
     }
     public static String hashPassword(MessageDigest messageDigest,String password) {
         messageDigest.reset();

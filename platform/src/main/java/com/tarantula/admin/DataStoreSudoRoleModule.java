@@ -55,7 +55,7 @@ public class DataStoreSudoRoleModule implements Module {
             summary.addProperty("totalRecords",sum.totalRecords());
             JsonArray keys = new JsonArray();
             int[] kn = {Integer.parseInt(query[1])};
-            int[] batch = {10};
+            int[] batch = {Integer.parseInt(query[2])};
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
             sum.dataStore().backup().list((k,v)->{
@@ -86,19 +86,35 @@ public class DataStoreSudoRoleModule implements Module {
             session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onAccessIndexStore")){
+            String[] query = session.name().split("#");
+            int[] kn = {Integer.parseInt(query[0])};
+            int[] batch = {Integer.parseInt(query[1])};
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
             JsonObject summary = new JsonObject();
             summary.addProperty("name",accessIndexStore.name());
             summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
             summary.addProperty("totalRecords",accessIndexStore.count());
-            for(int i=0;i<accessIndexStore.partitionNumber();i++){
-                summary.addProperty("records on partition["+i+"]",accessIndexStore.count(i));
-            }
+            summary.addProperty("keyStartIndex",kn[0]);
+            summary.addProperty("keyEndIndex",kn[0]+batch[0]);
+            JsonArray keys = new JsonArray();
+            accessIndexStore.list((k,v)->{
+                kn[0]--;
+                if(kn[0]<0) {
+                    keys.add(new String(k));
+                    batch[0]--;
+                }
+                return batch[0] > 0;
+            });
+            summary.add("keys",keys);
             session.write(summary.toString().getBytes());
+        }
+        else if(session.action().equals("onAccessIndexStoreValue")){
+            AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
+            session.write(accessIndexStore.get(session.name().getBytes()));
         }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
-            session.write(toMessage("backup commnad issued",true).toString().getBytes());
+            session.write(toMessage("backup command issued",true).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
             Metrics metrics = context.metrics(Metrics.PERFORMANCE);

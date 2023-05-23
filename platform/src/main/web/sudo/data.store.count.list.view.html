@@ -101,7 +101,8 @@
     function _tx_load_store_keys(){
         keyPanel.innerHTML = '';
         let kindx = document.querySelector('#tx-data-store-key-index').value;
-        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx,(resp)=>{
+        let ksize = document.querySelector('#tx-data-store-key-list-size').value;
+        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx+'#'+ksize,(resp)=>{
             editor.set(resp);
             resp.keys.forEach((k,i)=>{
                 if(i==0) keySelected = k;

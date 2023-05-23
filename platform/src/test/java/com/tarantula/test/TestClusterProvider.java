@@ -99,4 +99,8 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     public void shutdown() throws Exception {
 
     }
+
+    public int partition(byte[] key){
+        return 0;//_cluster.getPartitionService().getPartition(key).getPartitionId();
+    }
 }

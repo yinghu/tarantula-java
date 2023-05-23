@@ -35,6 +35,8 @@ public interface ClusterProvider extends ServiceProvider {
 
     Node roundRobinMember();
 
+    int partition(byte[] key);
+
     Summary summary();
 
     interface ClusterStore{

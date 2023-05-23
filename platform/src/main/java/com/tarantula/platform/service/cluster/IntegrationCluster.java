@@ -53,7 +53,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private int workerSize = 8;
     private final TarantulaContext tarantulaContext;
 
-    private MultiMap<String, byte[]> mIndex;
+    //private MultiMap<String, byte[]> mIndex;
     private IMap<byte[],byte[]> vMap;
     //private IQueue<byte[]> vQueue;
 
@@ -323,6 +323,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this.summary;
     }
 
+    public int partition(byte[] key){
+        return _cluster.getPartitionService().getPartition(key).getPartitionId();
+    }
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
         cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());

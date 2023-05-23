@@ -828,9 +828,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         public void close(){
             this.berkeleyStore.close();
         }
-        public int scope(){
-            return Distributable.INTEGRATION_SCOPE;
-        }
 
         private boolean _set(byte[] key,byte[] value){
             return berkeleyStore.put(null,new DatabaseEntry(key),new DatabaseEntry(value))==OperationStatus.SUCCESS;

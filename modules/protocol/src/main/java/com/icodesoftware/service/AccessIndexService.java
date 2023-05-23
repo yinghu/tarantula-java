@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.DataStore;
 
 public interface AccessIndexService extends ServiceProvider {
 
@@ -29,7 +30,7 @@ public interface AccessIndexService extends ServiceProvider {
         void onStart();
     }
 
-    interface AccessIndexStore{
+    interface AccessIndexStore extends DataStore.Backup {
         String STORE_NAME_PREFIX = "tarantula_";
         String name();
         int partitionNumber();
