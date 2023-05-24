@@ -10,7 +10,7 @@
       "header": {
         "scope": "asset",
         "type": "DisplayCard",
-        "description": "general asset view",
+        "description": "general icon view",
         "version": "1.0",
         "rechargeable": false
       },
@@ -24,11 +24,45 @@
             "downloadable": false
           },
           {
-            "name": "IconURL",
+            "name": "SmallIconURL",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": true
+          },
+          {
+            "name": "MediumIconURL",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          },
+          {
+            "name": "LargeIconURL",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "asset",
+        "type": "GameView",
+        "description": "general game view",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
           }
         ]
       }

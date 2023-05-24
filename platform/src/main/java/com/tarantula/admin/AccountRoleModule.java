@@ -62,7 +62,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             if(accessIndexEnabled.get()){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
                 Access ua =  userService.loadUser(session.systemId());
-                AccessIndex query = accessIndexService.set((String)onAccess.property("login"),0);
+                AccessIndex query = accessIndexService.set((String)onAccess.property("login"),AccessIndex.USER_INDEX);
                 if(query!=null){
                     onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner
                     onAccess.distributionKey(query.distributionKey());

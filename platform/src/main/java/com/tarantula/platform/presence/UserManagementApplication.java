@@ -36,25 +36,21 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         Configuration configuration = this.context.configuration("account");
-        //this.lobbyId = (String)configuration.property("lobbyId");
         this.activated = (boolean)configuration.property("activated");
-        //this.initialBalance = ((Number)configuration.property("initialBalance")).doubleValue();
         this.trialDays = ((Number)configuration.property("trialDays")).intValue();
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        //this.roleList = this.tokenValidatorProvider.list();
         this.onLobbyIndex = new ConcurrentHashMap<>();
-        //this.gameList = new CopyOnWriteArrayList<>();
         String root = this.context.node().clusterNameSuffix()+"/"+(String)configuration.property("root");
         String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);
         onAccess.property("password",pwd);
-        accessIndexService.set("serverPush",0);
-        AccessIndex accessIndex = accessIndexService.set(root,0);
+        accessIndexService.set("serverPush",AccessIndex.SYSTEM_INDEX);
+        AccessIndex accessIndex = accessIndexService.set(root,AccessIndex.USER_INDEX);
         if(accessIndex!=null){
             Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
             LocalDateTime loc = LocalDateTime.now();

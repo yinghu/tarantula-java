@@ -534,11 +534,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _setup() throws Exception{
 
-        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,0);
+        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionKey();
-        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,0);
+        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
         node.nodeId = nid.distributionKey();
-        AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",0);
+        AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
         if(!backupEnabled){//using local deployment id
             node.deploymentId = did.distributionKey();
             log.warn("Using local deployment id ["+node.deploymentId+"]");

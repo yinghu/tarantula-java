@@ -76,7 +76,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                 }
                 else if(onIndex.get()){//third party token exchange first time
                     event.action("onTokenRegister");
-                    AccessIndex _tindex = accessIndexService.set(magicKey,0);
+                    AccessIndex _tindex = accessIndexService.set(magicKey,AccessIndex.THIRD_PARTY_LOGIN_INDEX);
                     if(_tindex!=null){
                         event.systemId(_tindex.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(_tindex.distributionKey(),tag);
@@ -109,7 +109,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
             }
             else if(action.equals("onRegister")){//to server topic
                 if(onIndex.get()){ //register
-                    AccessIndex _aindex = this.accessIndexService.set(magicKey,0);
+                    AccessIndex _aindex = this.accessIndexService.set(magicKey,AccessIndex.USER_INDEX);
                     if(_aindex!=null){
                         event.systemId(_aindex.distributionKey());
                         RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
@@ -135,7 +135,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }else if(onIndex.get()){//device login exchange first time
-                    AccessIndex _dindex = accessIndexService.set(magicKey,0);
+                    AccessIndex _dindex = accessIndexService.set(magicKey,AccessIndex.DEVICE_LOGIN_INDEX);
                     if(_dindex!=null){
                         event.action("onDeviceRegister");
                         event.systemId(_dindex.distributionKey());
@@ -191,7 +191,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }else if(onIndex.get()){//device login exchange first time
-                    AccessIndex _dindex = accessIndexService.set(magicKey,0);
+                    AccessIndex _dindex = accessIndexService.set(magicKey,AccessIndex.DEVELOPER_LOGIN_INDEX);
                     if(_dindex!=null){
                         event.action("onDeveloperRegister");
                         event.trackId(accessKey);
