@@ -87,8 +87,8 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.presenceDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
+        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        this.presenceDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
