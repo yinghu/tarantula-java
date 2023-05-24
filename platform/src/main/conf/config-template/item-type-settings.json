@@ -7,6 +7,10 @@
   [
     {"type": "category","name": "ItemPack"},
     {"type": "category","name": "Sku"},
+    {"type": "category","name": "Sku.Gold"},
+    {"type": "category","name": "Sku.Coin"},
+    {"type": "category","name": "Sku.Gem"},
+    {"type": "category","name": "Sku.Chip"},
     {"type": "category","name": "Zone"}
   ]
 }

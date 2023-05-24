@@ -71,16 +71,16 @@
       "application": {
         "properties": [
           {
-            "name": "Key",
+            "name": "Name",
             "type": "string",
             "reference": "String",
             "nullable": false,
             "downloadable": false
           },
           {
-            "name": "Amount",
+            "name": "Quantity",
             "type": "number",
-            "reference": "Double",
+            "reference": "Integer",
             "nullable": false,
             "downloadable": false
           }

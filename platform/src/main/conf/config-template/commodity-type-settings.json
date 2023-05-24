@@ -7,7 +7,7 @@
   [
     {"type": "category","name": "HardCurrency"},
     {"type": "category","name": "SoftCurrency"},
-    {"type": "category","name": "GameAward"},
+    {"type": "category","name": "GameItem"},
     {"type": "category","name": "Arena"}
   ]
 }

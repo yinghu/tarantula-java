@@ -6,6 +6,7 @@
   "itemList":
   [
     {"type": "category","name": "GameStatistics"},
+    {"type": "category","name": "NamedValue"},
     {"type": "category","name": "Room"}
   ]
 }
