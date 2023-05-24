@@ -58,12 +58,14 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(session.name());
+            String[] query = session.name().split("#");
+            ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(query[1]);
             if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
             Map<String,Object> params = new HashMap<>();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             params.put(OnAccess.TYPE_ID,serviceTypeId);
-            params.put(OnAccess.PROVIDER,OnAccess.APPLICATION_STORE);
+            params.put(OnAccess.PROVIDER,OnAccess.DEVELOPER_STORE);
+            params.put(OnAccess.STORE_RECEIPT,query[0]);
             params.put(OnAccess.STORE_BUNDLE_ID,shoppingItem.distributionKey());
             if(this.context.validator().validateToken(params)){
                 this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());

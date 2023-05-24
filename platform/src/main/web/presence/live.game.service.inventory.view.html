@@ -10,14 +10,18 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div id='tx-live-inventory-item-list' class="w3-panel  w3-border-bottom w3-border-red">
+    <div class="w3-panel">
+        <div id='tx-live-inventory-item-list' class="w3-container  w3-border-bottom w3-border-red">
             
+        </div>
     </div>
-    <div id='tx-live-inventory-action-bar' class="w3-panel  w3-border-bottom w3-border-red">
+    <div class="w3-panel">
+        <div id='tx-live-inventory-action-bar' class="w3-container  w3-border-bottom w3-border-red">
             
+        </div>
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-inventory-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-inventory-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-inventory-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -37,7 +41,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inventory"),{mode:'tree'},{});
-    document.querySelector('#tx-live-inventory-item-list-title').innerHTML = TARA_API.query().category;
+    document.querySelector('#tx-live-inventory-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
     let inventoryList = document.querySelector('#tx-live-inventory-item-list');
     inventoryList.innerHTML = '';
     let actionList = document.querySelector('#tx-live-inventory-action-bar');

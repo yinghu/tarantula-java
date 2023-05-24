@@ -1,4 +1,7 @@
 var TARA_HTML = (function(){
+    let _caption = function(word){
+        return word[0].toUpperCase() + word.slice(1).toLowerCase()
+    }
     let _command = function(itemId,resource,name,className,actionName){
         let tem = [];
         tem.push('<div class=\'w3-container\'>');
@@ -27,5 +30,6 @@ var TARA_HTML = (function(){
     return{
         command : _command,
         option : _option,
+        caption : _caption,
     };
 })();
