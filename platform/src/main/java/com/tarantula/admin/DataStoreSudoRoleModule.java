@@ -80,7 +80,7 @@ public class DataStoreSudoRoleModule implements Module {
                 JsonObject debug = new JsonObject();
                 debug.addProperty("local",revisionObject.local);
                 debug.addProperty("revision",Long.toString(revisionObject.revision));
-                debug.add("payload",JsonUtil.parse(revisionObject.data));
+                debug.add("content",JsonUtil.parse(revisionObject.data));
                 summary.add("debug",debug);
             }
             session.write(summary.toString().getBytes());
