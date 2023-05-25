@@ -10,11 +10,12 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div id='tx-live-tournament-item-list' class="w3-panel  w3-border-bottom w3-border-red">
-            
+    <div class="w3-panel">
+        <div id='tx-live-tournament-item-list' class="w3-container  w3-border-bottom w3-border-red">    
+        </div>
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white  w3-border-bottom w3-border-red'>
             <span id='tx-tournament-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-tournament-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-tournament-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -57,24 +58,23 @@
     
     function tx_live_tournament_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"Mills",(resp)=>{
-            //resp._itemList.forEach(item => {
-              //  item._itemPack._skuList.forEach(
-                //        sku=>{
-                  //          tournamentList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.Name,'tournament-grant','Grant');
-                    //    }
-                    //);    
-            //});
-            //document.querySelectorAll('.tx-live-tournament-grant').forEach(a=>{
-              //  a.onclick = ()=>{
-                //    tx_tournament_grant(a.getAttribute('tx-item-id'));
-                    //console.log(a.getAttribute('tx-item-id'));       
-                //}
-            //});
+            tournamentList.innerHTML ='';
+            if(resp.Successful){
+                resp._tournamentList.forEach(item => {
+                    tournamentList.innerHTML += TARA_HTML.command(item.TournamentId,item.Type,item.Name,'tournament-join','Join');
+                });    
+                document.querySelectorAll('.tx-live-tournament-join').forEach(a=>{
+                      a.onclick = ()=>{
+                        //tx_tournament_join(a.getAttribute('tx-item-id'));
+                        console.log(a.getAttribute('tx-item-id'));       
+                    }
+                });
+            }
             editor.set(resp);
         });   
     }
 
-    function tx_tournament_grant(itemId){
+    function tx_tournament_join(itemId){
         TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
             console.log(resp);
         });

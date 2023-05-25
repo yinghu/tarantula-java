@@ -21,13 +21,16 @@ public class TournamentContext extends ResponseHeader {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",this.successful);
-        jsonObject.addProperty("message",message);
+        jsonObject.addProperty("Successful",this.successful);
+        if(!successful){
+            jsonObject.addProperty("Message",message);
+            return jsonObject;
+        }
         JsonArray alist = new JsonArray();
         itemList.forEach((v)->{
             alist.add(v.toJson());
         });
-        jsonObject.add("tournamentList",alist);
+        jsonObject.add("_tournamentList",alist);
         return jsonObject;
     }
 

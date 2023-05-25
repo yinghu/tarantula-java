@@ -343,11 +343,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("tournamentId",this.distributionKey());
-        jsonObject.addProperty("type",type);
-        jsonObject.addProperty("name",name);
-        jsonObject.addProperty("enterCost",enterCost);
-        jsonObject.addProperty("scheduleId",this.index);
+        jsonObject.addProperty("TournamentId",this.distributionKey());
+        jsonObject.addProperty("Type",type);
+        jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("EnterCost",enterCost);
+        jsonObject.addProperty("ScheduleId",this.index);
         return jsonObject;
     }
 
