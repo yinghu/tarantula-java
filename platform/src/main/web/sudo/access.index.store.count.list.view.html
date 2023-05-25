@@ -101,8 +101,8 @@
         TARA_API.onGet('role/sudo/datastore','onAccessIndexStore',kindx+'#'+ksize,(resp)=>{
             editor.set(resp);
             resp.keys.forEach((k,i)=>{
-                if(i==0) keySelected = k;
-                keyPanel.innerHTML += TARA_HTML.option(k,k,i==0);
+                if(i==0) keySelected = k.key;
+                keyPanel.innerHTML += TARA_HTML.option(k.key,k.key,i==0);
             });                          
         }); 
     }

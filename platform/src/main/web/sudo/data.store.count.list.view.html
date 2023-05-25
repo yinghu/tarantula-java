@@ -120,9 +120,9 @@
         let ksize = document.querySelector('#tx-data-store-key-list-size').value;
         TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx+'#'+ksize,(resp)=>{
             editor.set(resp);
-            resp.keys.forEach((k,i)=>{
-                if(i==0) keySelected = k;
-                keyPanel.innerHTML += TARA_HTML.option(k,k,i==0);
+            resp.keys.forEach((kv,i)=>{
+                if(i==0) keySelected = kv.key;
+                keyPanel.innerHTML += TARA_HTML.option(kv.key,kv.key,i==0);
             });                          
         }); 
     }

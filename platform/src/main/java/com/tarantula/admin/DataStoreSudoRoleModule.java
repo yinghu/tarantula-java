@@ -61,7 +61,11 @@ public class DataStoreSudoRoleModule implements Module {
             sum.dataStore().backup().list((k,v)->{
                 kn[0]--;
                 if(kn[0]<0) {
-                    keys.add(new String(k));
+                    RevisionObject revisionObject = RevisionObject.fromBinary(v);
+                    JsonObject debug = new JsonObject();
+                    debug.addProperty("key",new String(k));
+                    debug.add("content",JsonUtil.parse(revisionObject.data));
+                    keys.add(debug);
                     batch[0]--;
                 }
                 //this.context.log("BBB->"+batch[0],OnLog.WARN);
@@ -100,7 +104,10 @@ public class DataStoreSudoRoleModule implements Module {
             accessIndexStore.list((k,v)->{
                 kn[0]--;
                 if(kn[0]<0) {
-                    keys.add(new String(k));
+                    JsonObject debug = new JsonObject();
+                    debug.addProperty("key",new String(k));
+                    debug.add("content",JsonUtil.parse(v));
+                    keys.add(debug);
                     batch[0]--;
                 }
                 return batch[0] > 0;
