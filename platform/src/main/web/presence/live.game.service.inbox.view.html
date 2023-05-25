@@ -10,11 +10,13 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div id='tx-live-inbox-item-list' class="w3-panel  w3-border-bottom w3-border-red">
+    <div class="w3-panel" style="display: none;">
+        <div id='tx-live-inbox-item-list' class="w3-container  w3-border-bottom w3-border-red">
             
+        </div>
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-inbox-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-inbox-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-inbox-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -34,7 +36,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inbox"),{mode:'tree'},{});
-    document.querySelector('#tx-live-inbox-item-list-title').innerHTML = TARA_API.query().category;
+    document.querySelector('#tx-live-inbox-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
     let inboxList = document.querySelector('#tx-live-inbox-item-list');
     inboxList.innerHTML = '';
     //let actionList = document.querySelector('#tx-live-inbox-action-bar');
@@ -57,26 +59,7 @@
     
     function tx_live_inbox_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"Mills",(resp)=>{
-            //resp._itemList.forEach(item => {
-              //  item._itemPack._skuList.forEach(
-                //        sku=>{
-                  //          inboxList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.Name,'inbox-grant','Grant');
-                    //    }
-                    //);    
-            //});
-            //document.querySelectorAll('.tx-live-inbox-grant').forEach(a=>{
-              //  a.onclick = ()=>{
-                //    tx_inbox_grant(a.getAttribute('tx-item-id'));
-                    //console.log(a.getAttribute('tx-item-id'));       
-                //}
-            //});
             editor.set(resp);
         });   
-    }
-
-    function tx_inbox_grant(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
-            console.log(resp);
-        });
     }
 </script>

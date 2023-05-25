@@ -34,7 +34,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-proxy"),{mode:'tree'},{});
-    document.querySelector('#tx-live-proxy-item-list-title').innerHTML = TARA_API.query().category;
+    document.querySelector('#tx-live-proxy-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
     let proxyList = document.querySelector('#tx-live-proxy-item-list');
     proxyList.innerHTML = '';
     //let actionList = document.querySelector('#tx-live-proxy-action-bar');
