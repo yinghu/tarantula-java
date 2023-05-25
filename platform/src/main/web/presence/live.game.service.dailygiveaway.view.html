@@ -10,11 +10,12 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div id='tx-live-dailygiveaway-item-list' class="w3-panel  w3-border-bottom w3-border-red">
-            
+    <div class="w3-panel">
+        <div id='tx-live-dailygiveaway-item-list' class="w3-container  w3-border-bottom w3-border-red">    
+        </div>
     </div>
-    <div class="w3-panel w3-border-bottom w3-border-red">
-        <div class='w3-bar w3-white'>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-dailygiveaway-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-dailygiveaway-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-dailygiveaway-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -34,7 +35,7 @@
 </div>
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-dailygiveaway"),{mode:'tree'},{});
-    document.querySelector('#tx-live-dailygiveaway-item-list-title').innerHTML = TARA_API.query().category;
+    document.querySelector('#tx-live-dailygiveaway-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
     let dailygiveawayList = document.querySelector('#tx-live-dailygiveaway-item-list');
     dailygiveawayList.innerHTML = '';
     //let actionList = document.querySelector('#tx-live-dailygiveaway-action-bar');
@@ -57,25 +58,24 @@
     
     function tx_live_dailygiveaway_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"Mills",(resp)=>{
-            //resp._itemList.forEach(item => {
-                //item._itemPack._skuList.forEach(
-                  //      sku=>{
-                    //        dailygiveawayList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.Name,'dailygiveaway-grant','Grant');
-                      //  }
-                    //);    
-            //});
-            //document.querySelectorAll('.tx-live-dailygiveaway-grant').forEach(a=>{
-                //a.onclick = ()=>{
-                    //tx_dailygiveaway_grant(a.getAttribute('tx-item-id'));
-       
-                //}
-            //});
+            dailygiveawayList.innerHTML ='';
+            if(resp.Successful){
+                resp._itemList.forEach(item => {
+                    dailygiveawayList.innerHTML += TARA_HTML.command(item.ItemId,'Daily Reward',item.Description,'daily-reward-claim','Claim');
+                });    
+                document.querySelectorAll('.tx-live-daily-reward-claim').forEach(a=>{
+                      a.onclick = ()=>{
+                        tx_dailygiveaway_claim(a.getAttribute('tx-item-id'));
+                        //console.log(a.getAttribute('tx-item-id'));       
+                    }
+                });
+            }
             editor.set(resp);
         });   
     }
 
-    function tx_dailygiveaway_grant(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
+    function tx_dailygiveaway_claim(itemId){
+        TARA_API.onGet(TARA_API.query().serviceTag,'onDailyRewardClaim',itemId,(resp)=>{
             console.log(resp);
         });
     }

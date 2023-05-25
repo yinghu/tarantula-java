@@ -3,8 +3,6 @@ package com.tarantula.platform.achievement;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.item.Application;
-
 import java.util.List;
 
 public class ItemAchievementContext extends ResponseHeader {
@@ -20,13 +18,16 @@ public class ItemAchievementContext extends ResponseHeader {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",this.successful);
-        jsonObject.addProperty("message",message);
+        jsonObject.addProperty("Successful",this.successful);
+        if(!successful){
+            jsonObject.addProperty("Message",message);
+            return jsonObject;
+        }
         JsonArray alist = new JsonArray();
         itemList.forEach((v)->{
             alist.add(v.toJson());
         });
-        jsonObject.add("itemList",alist);
+        jsonObject.add("_itemList",alist);
         return jsonObject;
     }
 
