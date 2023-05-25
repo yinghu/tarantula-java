@@ -1,0 +1,200 @@
+{
+  "list":
+  [
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G80",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G80",
+        "Amount": "80"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G500",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G500",
+        "Amount": "500"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G1200",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G1200",
+        "Amount": "1200"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G2500",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G2500",
+        "Amount": "2500"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G6500",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G6500",
+        "Amount": "6500"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Gem",
+      "configurationName": "G14000",
+      "configurationCategory": "HardCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "G14000",
+        "Amount": "14000"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Coin",
+      "configurationName": "C900",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "C900",
+        "Amount": "900"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Coin",
+      "configurationName": "C4320",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "C4320",
+        "Amount": "4320"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Coin",
+      "configurationName": "C12450",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "C12450",
+        "Amount": "12450"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_gearbox",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_gearbox",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_battery",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_battery",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_shield",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_shield",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_plating",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_plating",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_propeller",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_propeller",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Mill",
+      "configurationName": "mill_resource_frame",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "mill_resource_frame",
+        "Quantity": "1"
+      },
+      "application": {},
+      "reference": []
+    }
+  ]
+}

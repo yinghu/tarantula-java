@@ -1,0 +1,20 @@
+{
+  "list":
+  [
+    {
+      "configurationType": "asset",
+      "configurationTypeId": "IconCard",
+      "configurationName": "IconCard",
+      "configurationCategory": "DisplayCard",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "IconCard",
+        "SmallIconURL": "RobotQuest/portrait1.png",
+        "MediumIconURL": "RobotQuest/portrait2.png",
+        "LargeIconURL": "RobotQuest/portrait3.png"
+      },
+      "application": {},
+      "reference": []
+    }
+  ]
+}

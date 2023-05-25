@@ -1,0 +1,83 @@
+{
+  "list":
+  [
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "Health",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "Health",
+        "Value": "20"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "MeleeDamage",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "MeleeDamage",
+        "Value": "25"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "RangedDamage",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "RangedDamage",
+        "Value": "25"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "CriticalDamagePercent",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "CriticalDamagePercent",
+        "Value": "0"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "Recovery",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "Recovery",
+        "Value": "100"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "component",
+      "configurationTypeId": "Value",
+      "configurationName": "Speed",
+      "configurationCategory": "NamedValue",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "Speed",
+        "Value": "1.5"
+      },
+      "application": {},
+      "reference": []
+    }
+  ]
+}

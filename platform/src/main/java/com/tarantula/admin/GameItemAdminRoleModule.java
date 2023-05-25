@@ -536,7 +536,49 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                     //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
-                this.context.log("expected error",ex,OnLog.ERROR);
+                this.context.log("unexpected error",ex,OnLog.ERROR);
+            }
+        }
+
+        Configuration assetConfiguration = this.context.configuration("asset");
+        if(assetConfiguration!=null){
+            try{
+                JsonArray configs = ((JsonElement)assetConfiguration.property("list")).getAsJsonArray();
+                configs.forEach(config->{
+                    Asset app = new Asset();
+                    createAsset(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    //this.context.log(resp,OnLog.WARN);
+                });
+            }catch (Exception ex){
+                this.context.log("unexpected error",ex,OnLog.ERROR);
+            }
+        }
+
+        Configuration componentConfiguration = this.context.configuration("component");
+        if(componentConfiguration!=null){
+            try{
+                JsonArray configs = ((JsonElement)componentConfiguration.property("list")).getAsJsonArray();
+                configs.forEach(config->{
+                    Component app = new Component();
+                    createComponent(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    //this.context.log(resp,OnLog.WARN);
+                });
+            }catch (Exception ex){
+                this.context.log("unexpected error",ex,OnLog.ERROR);
+            }
+        }
+
+        Configuration commodityConfiguration = this.context.configuration("commodity");
+        if(commodityConfiguration!=null){
+            try{
+                JsonArray configs = ((JsonElement)commodityConfiguration.property("list")).getAsJsonArray();
+                configs.forEach(config->{
+                    Commodity app = new Commodity();
+                    createCommodity(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    //this.context.log(resp,OnLog.WARN);
+                });
+            }catch (Exception ex){
+                this.context.log("unexpected error",ex,OnLog.ERROR);
             }
         }
     }
