@@ -9,13 +9,9 @@ import java.util.List;
 
 public class Shop extends Application {
 
-
-
     public Shop(){
     }
-    public Shop(ConfigurableObject configurableObject){
-        super(configurableObject);
-    }
+
     public Shop(String name){
         this();
         configurationName = name;

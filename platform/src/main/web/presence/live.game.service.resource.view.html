@@ -61,7 +61,7 @@
             resp._itemList.forEach(item => {
                 item._itemPack._skuList.forEach(
                         sku=>{
-                            resourceList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.Name,'resource-grant','Grant');
+                            resourceList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.ItemId,'resource-grant','Grant');
                         }
                     );    
             });
