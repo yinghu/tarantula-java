@@ -276,11 +276,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             if(!masterDataStore().load(lobbyTypeIdIndex)) throw new RuntimeException("no lobby config data");
         }
         GameCluster gameCluster = new GameCluster();
-        if(conf.descriptor.resetEnabled&&conf.descriptor.deployCode==DeployCode.USER_GAME_CLUSTER){
-            gameCluster.distributionKey(lobbyTypeIdIndex.owner());
-            if(!masterDataStore().load(gameCluster)) throw new RuntimeException("no game cluster config data");
+        if(conf.descriptor.resetEnabled && conf.descriptor.deployCode == DeployCode.USER_GAME_CLUSTER){
+            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.owner());
+            if(gameCluster==null) throw new RuntimeException("no game cluster config data");
         }
-        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),(String) gameCluster.property(GameCluster.OWNER));
+        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),gameCluster.owner());
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             if(c.disabled()) {
@@ -1004,8 +1004,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public GameCluster loadGameCluster(String key){
-         return gMap.computeIfAbsent(key,k->{
-             log.warn("Loading game cluster from key ["+key+"]");
+         GameCluster gameCluster = gMap.computeIfAbsent(key,k->{
              GameCluster gc = new GameCluster();
              gc.distributionKey(key);
              gc.dataStore(this.masterDataStore());
@@ -1014,11 +1013,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              gc.serviceLobby = this.lobby(gc.serviceType());
              gc.dataLobby = this.lobby(gc.dataType());
              gc.setup(this);
+             this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,gc);
              return gc;
          });
+         if(gameCluster.disabled()) unloadGameCluster(key);
+         return gameCluster;
     }
     public void unloadGameCluster(String key){
          gMap.remove(key);
-         log.warn("Unloading game cluster from key ["+key+"]");
     }
 }

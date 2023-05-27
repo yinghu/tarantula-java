@@ -26,10 +26,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
     @Override
     public void onGameServiceStarted(String gameClusterId) {
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        if(!this.tarantulaContext.masterDataStore().load(gameCluster)){
-            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
+        if(gameCluster==null){
+            log.warn("No game cluster found ["+gameClusterId+"]");
             return;
         }
         this.tarantulaContext.setGameServiceProvider(gameCluster);
@@ -37,18 +36,19 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     @Override
     public void onGameClusterLaunched(String gameClusterId) {
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        if(!this.tarantulaContext.masterDataStore().load(gameCluster)) return;
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
+        if(gameCluster==null){
+            log.warn("No game cluster found ["+gameClusterId+"]");
+            return;
+        }
         this.tarantulaContext.setGameClusterOnLobby(gameCluster,new OnLobbyListener(this.platformDeploymentServiceProvider));
     }
 
     @Override
     public void onGameClusterShutdown(String gameClusterId) {
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        if(!tarantulaContext.masterDataStore().load(gameCluster)){
-            log.warn("No game cluster found ["+gameCluster.distributionKey()+"]");
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
+        if(gameCluster==null){
+            log.warn("No game cluster found ["+gameClusterId+"]");
             return;
         }
         onModuleShutdown((String)gameCluster.property(GameCluster.GAME_DATA));
@@ -60,11 +60,10 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     @Override
     public void onGameClusterCreated(String gameClusterId) {
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
-        gameCluster.dataStore(this.tarantulaContext.masterDataStore());
-        if(!tarantulaContext.masterDataStore().load(gameCluster)){
-            log.warn("Game cluster ["+gameClusterId+"] not found");
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
+        if(gameCluster==null){
+            log.warn("No game cluster found ["+gameClusterId+"]");
+            return;
         }
         gameCluster.setup(this.tarantulaContext);
     }

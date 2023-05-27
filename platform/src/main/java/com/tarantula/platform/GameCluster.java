@@ -8,6 +8,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -21,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
 
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
@@ -66,6 +67,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
 
     protected ServiceContext serviceContext;
+
+    public GameCluster(){}
 
     @Override
     public int getClassId() {
@@ -237,6 +240,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return (boolean)this.properties.get(DEDICATED);
     }
 
+    @Override
+    public boolean disabled(){
+        return (Boolean)property(GameCluster.DISABLED);
+    }
+
     public int maxLobbyCount(){
         Number number = (Number) properties.get(MAX_LOBBY_COUNT);
         return number!=null? number.intValue():10;
@@ -263,6 +271,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
 
     @Override
+    public String owner(){
+        return (String)this.properties.get(OWNER);
+    }
+
+    @Override
     public <T extends Configurable> void onUpdated(Descriptor application,T t) {
 
     }
@@ -278,5 +291,19 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
 
+    }
+
+    @Override
+    public void onUpdated(OnLobby onLobby) {
+        if(!onLobby.gameClusterId().equals(this.distributionKey())) return;
+        if(onLobby.typeId().equals(lobbyType())){
+            this.gameLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        }
+        else if(onLobby.typeId().equals(dataType())){
+            this.dataLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        }
+        else if(onLobby.typeId().equals(serviceType())){
+            this.serviceLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        }
     }
 }

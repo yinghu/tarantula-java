@@ -157,9 +157,7 @@ public class AdminRoleModule implements Module{
             }
         }
         else if(session.action().equals("onLaunchGameCluster")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(accessId);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Access _u = _user(session.systemId());
             Account acc = userService.loadAccount(_u);
             if(acc.trial()||acc.subscribed()){
@@ -172,9 +170,7 @@ public class AdminRoleModule implements Module{
         }
 
         else if(session.action().equals("onShutdownGameCluster")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String accessId = (String) onAccess.property(OnAccess.ACCESS_ID);
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(accessId);
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }

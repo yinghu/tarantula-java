@@ -572,10 +572,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
-        if(!mds.load(gameCluster)) throw new RuntimeException("["+gameClusterId+"] not existed");
+        if(gameCluster==null) throw new RuntimeException("["+gameClusterId+"] not existed");
         String playMode = (String) properties.property("playMode");
         boolean dedicated = (boolean)properties.property("dedicated");
         String gameIcon = (String) properties.property("gameIcon");
@@ -889,10 +888,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     boolean enableGameCluster(String gameClusterId){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
-        if(!mds.load(gameCluster)){
+        if(gameCluster==null){
             return false;
         }
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
@@ -907,10 +905,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     boolean disableGameCluster(String gameClusterId){
-        GameCluster gameCluster = new GameCluster();
-        gameCluster.distributionKey(gameClusterId);
+        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
-        if(!mds.load(gameCluster)){
+        if(gameCluster==null){
             return false;
         }
         String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1

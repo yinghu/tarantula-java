@@ -161,7 +161,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
 
         @Override
         public void onLobby(Descriptor descriptor) {
-            context.log("Lobby Updated : disable["+descriptor.disabled()+"] rank["+descriptor.accessRank()+"]", OnLog.WARN);
+            context.log("Lobby Updated : disable ["+descriptor.disabled()+"] rank ["+descriptor.accessRank()+"]", OnLog.WARN);
             if(descriptor.accessRank()>0&&descriptor.accessRank()<=maxRank){
                 mLobby.clear();
                 listLobby();

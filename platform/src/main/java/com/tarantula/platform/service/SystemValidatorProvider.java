@@ -349,9 +349,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
         rlist.forEach((k)->{
             OnLobby o = oMap.remove(k);
-            GameCluster g = new GameCluster();
-            g.distributionKey(o.gameClusterId());
-            if(deployDataStore.update(g)){
+            GameCluster g = this.deploymentServiceProvider.gameCluster(k);//new GameCluster();
+            //g.distributionKey(o.gameClusterId());
+            if(g!=null){
                 g.property(GameCluster.DISABLED,true);
                 deployDataStore.update(g);
             }
