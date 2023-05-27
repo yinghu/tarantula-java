@@ -1010,11 +1010,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              gc.distributionKey(key);
              gc.dataStore(this.masterDataStore());
              if(!this.masterDataStore().load(gc)) return null;
-             gc.gameLobby = this.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-             gc.serviceLobby = this.lobby((String) gc.property(GameCluster.GAME_SERVICE));
-             gc.dataLobby = this.lobby((String) gc.property(GameCluster.GAME_DATA));
+             gc.gameLobby = this.lobby(gc.lobbyType());
+             gc.serviceLobby = this.lobby(gc.serviceType());
+             gc.dataLobby = this.lobby(gc.dataType());
              gc.setup(this);
              return gc;
          });
+    }
+    public void unloadGameCluster(String key){
+         gMap.remove(key);
     }
 }
