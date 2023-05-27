@@ -33,4 +33,13 @@ public interface ApplicationPreSetup {
     DataStore dataStore(Descriptor descriptor);
 
     void setup(ServiceContext serviceContext);
+
+    void registerListener(Listener listener);
+    interface Listener{
+        <T extends Configurable> void onUpdated(Descriptor application,T t);
+        <T extends Configurable> void onCreated(Descriptor application,T t);
+
+        <T extends Configurable> void onUpdated(GameCluster application,T t);
+        <T extends Configurable> void onCreated(GameCluster application,T t);
+    }
 }

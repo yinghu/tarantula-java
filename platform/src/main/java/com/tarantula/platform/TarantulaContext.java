@@ -110,6 +110,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
+    private final ConcurrentHashMap<String,GameCluster> gMap = new ConcurrentHashMap<>();
+
     private final MetricsManager metricsManager;
 
     public String dataBucketGroup;
@@ -999,5 +1001,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 this.log.error(message,error);
                 break;
         }
+    }
+
+    public GameCluster loadGameCluster(String key){
+         return gMap.computeIfAbsent(key,k->{
+             log.warn("Loading game cluster from key ["+key+"]");
+             GameCluster gc = new GameCluster();
+             gc.distributionKey(key);
+             gc.dataStore(this.masterDataStore());
+             if(!this.masterDataStore().load(gc)) return null;
+             gc.gameLobby = this.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+             gc.serviceLobby = this.lobby((String) gc.property(GameCluster.GAME_SERVICE));
+             gc.dataLobby = this.lobby((String) gc.property(GameCluster.GAME_DATA));
+             gc.setup(this);
+             return gc;
+         });
     }
 }

@@ -702,17 +702,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (T)this.tarantulaContext.configuration((GameCluster)gameCluster,config);
     }
     public <T extends OnAccess> T gameCluster(String key){
-        GameCluster gc = new GameCluster();
-        gc.distributionKey(key);
-        gc.dataStore(this.tarantulaContext.masterDataStore());
-        if(this.tarantulaContext.masterDataStore().load(gc)){
-            gc.gameLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_LOBBY));
-            gc.serviceLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_SERVICE));
-            gc.dataLobby = this.tarantulaContext.lobby((String) gc.property(GameCluster.GAME_DATA));
-            gc.setup(this.tarantulaContext);
-            return (T)gc;
-        }
-        return null;
+        return (T)tarantulaContext.loadGameCluster(key);
     }
     public Lobby lobby(String typeId){
         DataStore mds = this.tarantulaContext.masterDataStore();

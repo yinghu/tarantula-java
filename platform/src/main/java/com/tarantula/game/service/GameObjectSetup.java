@@ -18,7 +18,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
     protected String DS_CONFIG = "configuration";
 
     protected ServiceContext serviceContext;
-
+    protected Listener listener;
     public <T extends Configurable> boolean save(Descriptor application,T t){
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
         t.dataStore(dataStore);
@@ -51,6 +51,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
         if(dataStore.update(t)){
             saveVersion(dataStore,(ConfigurableObject)t);
+            if(listener!=null) listener.onUpdated(application,t);
             return true;
         }
         if(!dataStore.create(t)) return false;
@@ -67,6 +68,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.update(superCategoryIndex);
         }
         saveVersion(dataStore,(ConfigurableObject)t);
+        if(listener!=null) listener.onCreated(application,t);
         return true;
     }
 
@@ -120,8 +122,13 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     public <T extends Configurable> boolean save(GameCluster gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
-        if(dataStore.update(t)) return true;
-        return dataStore.createIfAbsent(t,false);
+        if(dataStore.update(t)) {
+            if(listener!=null) listener.onUpdated(gameCluster,t);
+            return true;
+        }
+        boolean created = dataStore.createIfAbsent(t,false);
+        if(this.listener!=null) listener.onCreated(gameCluster,t);
+        return created;
     }
 
     public <T extends Configurable> boolean load(GameCluster gameCluster, T t){
@@ -156,6 +163,9 @@ public class GameObjectSetup implements ApplicationPreSetup {
         this.serviceContext = serviceContext;
     }
 
+    public void registerListener(Listener listener){
+        this.listener = listener;
+    }
     private void saveVersion(DataStore dataStore,ConfigurableObject configurableObject){
         IndexSet versionIndex = new IndexSet("version");
         versionIndex.distributionKey(configurableObject.distributionKey());

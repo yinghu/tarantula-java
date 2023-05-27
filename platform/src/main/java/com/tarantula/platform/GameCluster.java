@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -20,7 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener {
 
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
@@ -199,6 +200,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public ApplicationPreSetup applicationPreSetup(){
         ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) properties.get(GameCluster.LOBBY_PRE_SETUP_NAME));
         applicationPreSetup.setup(serviceContext);
+        applicationPreSetup.registerListener(this);
         return applicationPreSetup;
     }
 
@@ -261,4 +263,21 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return number!=null? number.intValue():0;
     }
 
+    @Override
+    public <T extends Configurable> void onUpdated(Descriptor application,T t) {
+
+    }
+
+    @Override
+    public <T extends Configurable> void onCreated(Descriptor application,T t) {
+
+    }
+    @Override
+    public <T extends Configurable> void onUpdated(GameCluster application,T t){
+
+    }
+    @Override
+    public <T extends Configurable> void onCreated(GameCluster application,T t){
+
+    }
 }
