@@ -1019,5 +1019,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void unloadGameCluster(String key){
          gMap.remove(key);
+         log.warn("Unloading game cluster from key ["+key+"]");
     }
 }
