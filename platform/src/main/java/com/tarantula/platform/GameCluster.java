@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
 
@@ -67,6 +69,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
 
     protected ServiceContext serviceContext;
+
+    protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
     public GameCluster(){}
 
@@ -277,20 +281,19 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     @Override
     public <T extends Configurable> void onUpdated(Descriptor application,T t) {
-
+        listeners.forEach(l->l.onUpdated(application,t));
     }
-
     @Override
     public <T extends Configurable> void onCreated(Descriptor application,T t) {
-
+        listeners.forEach(l->l.onCreated(application,t));
     }
     @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
-
+        listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
-
+        listeners.forEach(l->l.onCreated(application,t));
     }
 
     @Override
@@ -305,5 +308,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         else if(onLobby.typeId().equals(serviceType())){
             this.serviceLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
         }
+    }
+
+    public void addListener(ApplicationPreSetup.Listener listener){
+        this.listeners.add(listener);
     }
 }

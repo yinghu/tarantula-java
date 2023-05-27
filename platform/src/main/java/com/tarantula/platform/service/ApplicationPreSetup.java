@@ -36,10 +36,10 @@ public interface ApplicationPreSetup {
 
     void registerListener(Listener listener);
     interface Listener{
-        <T extends Configurable> void onUpdated(Descriptor application,T t);
-        <T extends Configurable> void onCreated(Descriptor application,T t);
+        default <T extends Configurable> void onUpdated(Descriptor application,T t){};
+        default <T extends Configurable> void onCreated(Descriptor application,T t){};
 
-        <T extends Configurable> void onUpdated(GameCluster application,T t);
-        <T extends Configurable> void onCreated(GameCluster application,T t);
+        default <T extends Configurable> void onUpdated(GameCluster application,T t){};
+        default <T extends Configurable> void onCreated(GameCluster application,T t){};
     }
 }

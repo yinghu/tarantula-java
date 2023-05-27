@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback,ApplicationPreSetup.Listener {
 
     public static final String NAME = "item";
 
@@ -50,6 +50,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         items.forEach((a)-> listener.onCreated(a));
         this.rListeners.put(rid,new TypedListener(application.category(),listener));
         logger.warn("Listener registered with ->"+application.category());
+        this.gameCluster.addListener(this);
         return rid;
     }
     @Override
@@ -95,4 +96,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         return false;
     }
 
+    public <T extends Configurable> void onUpdated(Descriptor application,T t){
+        //logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
+    }
 }

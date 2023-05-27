@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformResourceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformResourceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback,ApplicationPreSetup.Listener {
 
     public static final String NAME = "resource";
 
@@ -106,6 +106,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
             }
         });
         this.application = descriptor;
+        this.gameCluster.addListener(this);
         return null;
     }
 
@@ -144,6 +145,10 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         items.forEach(c->{
             itemIndex.put(c.distributionKey(),c);
         });
+    }
+
+    public <T extends Configurable> void onUpdated(Descriptor application,T t){
+        //logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
     }
 
 }
