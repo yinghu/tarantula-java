@@ -233,7 +233,7 @@
     };
  
     document.querySelector('#tx-launch-game-cluster').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onLaunchGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
+        TARA_API.onGet('role/admin','onLaunchGameCluster',TARA_API.query().gameClusterId,(resp)=>{
             document.querySelector('#tx-create-game-cluster-message').innerHTML = resp.message;  
             TARA_API.query().callback(); 
             let m3 = document.querySelector('#tx-popup');
