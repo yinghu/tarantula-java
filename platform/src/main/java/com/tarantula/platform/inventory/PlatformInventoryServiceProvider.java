@@ -159,7 +159,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     private Category category(Category.Filter filter){
         GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = _gameCluster.serviceWithCategory("item");
-        ApplicationPreSetup preSetup = _gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String) _gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        ApplicationPreSetup preSetup = _gameCluster.applicationPreSetup();
         Category category = new Category();
         category.distributionKey(app.distributionKey());
         preSetup.load(app,category);
@@ -195,7 +195,10 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
     @Override
     public void onInventory(Inventory inventory,InventoryItem item) {
-        //logger.warn("Inventory->"+inventory.distributionKey());
-        //logger.warn("Inventory Item->"+item.distributionKey());
+        logger.warn("11111111");
+        logger.warn("Inventory->"+inventory.distributionKey());
+        logger.warn("Inventory Item->"+item.distributionKey());
+        logger.warn("Content->"+item.itemId());
+        logger.warn("222222222");
     }
 }
