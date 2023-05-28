@@ -29,7 +29,7 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         this.rechargeable = rechargeable;
     }
 
-    public void redeem(ApplicationRedeemer commodity){
+    public void redeem(ApplicationRedeemer commodity,InventoryListener inventoryListener){
         InventoryItem inventoryItem = new InventoryItem(commodity);
         dataStore.create(inventoryItem);
         keySet.add(inventoryItem.distributionKey());
@@ -38,6 +38,7 @@ public class Inventory extends IndexSet implements Configurable, Balance, Counta
         }
         count++;
         dataStore.update(this);
+        inventoryListener.onInventory(this,inventoryItem);
     }
     public String load(String inventoryId){
         InventoryItem inventoryItem = itemList.get(inventoryId);

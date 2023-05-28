@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlatformInventoryServiceProvider implements ServiceProvider {
+public class PlatformInventoryServiceProvider implements ServiceProvider,InventoryListener {
 
     public static final String NAME = "inventory";
 
@@ -191,5 +191,11 @@ public class PlatformInventoryServiceProvider implements ServiceProvider {
             applicationPreSetup.save(gameCluster,categories);
         }
         return categories;
+    }
+
+    @Override
+    public void onInventory(Inventory inventory,InventoryItem item) {
+        //logger.warn("Inventory->"+inventory.distributionKey());
+        //logger.warn("Inventory Item->"+item.distributionKey());
     }
 }
