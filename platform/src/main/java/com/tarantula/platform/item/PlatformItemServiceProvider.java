@@ -82,8 +82,8 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory("item");
+        //GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        Descriptor app = gameCluster.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
