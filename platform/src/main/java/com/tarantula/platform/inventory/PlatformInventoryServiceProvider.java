@@ -52,7 +52,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
-        this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,name());
+        this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
     }
     public DataStore inventoryDataStore(){
@@ -86,10 +86,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, Application item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -97,10 +96,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, Item item){
         ItemRedeemer redeemer = new ItemRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationType());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationType());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -108,10 +106,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, Achievement item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -119,10 +116,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, DailyGiveaway item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -130,10 +126,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, ShoppingItem item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -141,10 +136,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public boolean redeem(String systemId, TournamentPrize item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
-        GameCluster _gc = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(item.configurationTypeId());
+        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
         if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = _gc.serviceWithCategory("item");
+        Descriptor itemApp = gameCluster.serviceWithCategory("item");
         redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
         redeemer.redeem();
         return true;
@@ -157,9 +151,8 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     }
 
     private Category category(Category.Filter filter){
-        GameCluster _gameCluster = this.serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gameCluster.serviceWithCategory("item");
-        ApplicationPreSetup preSetup = _gameCluster.applicationPreSetup();
+        Descriptor app = gameCluster.serviceWithCategory("item");
+        ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
         Category category = new Category();
         category.distributionKey(app.distributionKey());
         preSetup.load(app,category);
@@ -195,10 +188,10 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
     @Override
     public void onInventory(Inventory inventory,InventoryItem item) {
-        logger.warn("11111111");
-        logger.warn("Inventory->"+inventory.distributionKey());
-        logger.warn("Inventory Item->"+item.distributionKey());
-        logger.warn("Content->"+item.itemId());
-        logger.warn("222222222");
+        //logger.warn("11111111");
+        //logger.warn("Inventory->"+inventory.distributionKey());
+        //logger.warn("Inventory Item->"+item.distributionKey());
+        //logger.warn("Content->"+item.itemId());
+        //logger.warn("222222222");
     }
 }
