@@ -62,8 +62,7 @@ public class SudoRoleModule implements Module {
             session.write(permissionContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onCreateLabeledKey")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String key = tokenValidatorProvider.createAccessKey(acc.typeId());
+            String key = tokenValidatorProvider.createAccessKey(session.name());
             PermissionContext pc = new PermissionContext(key);
             session.write(pc.toJson().toString().getBytes());
         }
@@ -77,11 +76,7 @@ public class SudoRoleModule implements Module {
             List<OnAccess> keys = tokenValidatorProvider.accessKeyList();
             session.write(new LabeledAccessKeyContext(keys).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onTestLabeledKey")){
-            OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            boolean suc = tokenValidatorProvider.validateAccessKey((String)acc.property(OnAccess.ACCESS_KEY))!=null;
-            session.write(toMessage(suc?"key passed":"key failed",suc).getBytes());
-        }
+       
         else if(session.action().equals("onStopAccessIndex")){
             accessIndexService.onDisable();
             session.write(toMessage(session.action(),true).getBytes());
