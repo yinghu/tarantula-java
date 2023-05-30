@@ -61,6 +61,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.accessRank(this.accessRank);
         _copy.tournamentEnabled(this.tournamentEnabled);
         _copy.resetEnabled(this.resetEnabled);
+        _copy.accessMode(this.accessMode);
         return _copy;
     }
 }

@@ -1,0 +1,12 @@
+{
+  "typeId":"game-service",
+  "name":"Component",
+  "type":"application",
+  "category":"component",
+  "tag":"game/component",
+  "resetEnabled": false,
+  "moduleName":"com.tarantula.game.module.GameComponentModule",
+  "applicationClassName": "com.tarantula.platform.service.deployment.SingletonModuleApplication",
+  "disabled": false,
+  "accessMode": 13
+}

@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Access;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
 import com.tarantula.platform.util.DescriptorSerializer;
@@ -29,7 +30,7 @@ public class LiveGame {
                 JsonArray jlist = new JsonArray();
                 for(Descriptor d : lobby.entryList()){
                     //add application list
-                    jlist.add(fromDescriptor(d));
+                    if(d.accessMode() != Access.PRIVATE_ACCESS_MODE)  jlist.add(fromDescriptor(d));
                 }
                 jlobby.add("applications",jlist);
                 blist.add(jlobby);
