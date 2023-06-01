@@ -126,7 +126,8 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_gearbox",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
       },
       "application": {},
       "reference": []
@@ -139,7 +140,8 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_battery",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
       },
       "application": {},
       "reference": []
@@ -152,7 +154,8 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_shield",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
       },
       "application": {},
       "reference": []
@@ -165,7 +168,8 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_plating",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
       },
       "application": {},
       "reference": []
@@ -178,7 +182,8 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_propeller",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
       },
       "application": {},
       "reference": []
@@ -191,7 +196,218 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "mill_resource_frame",
-        "Quantity": "1"
+        "TypeId": "Mill",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Robot",
+      "configurationName": "robot_pug",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "robot_pug",
+        "TypeId": "Robot",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Robot",
+      "configurationName": "robot_crate",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "robot_crate",
+        "TypeId": "Robot",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Robot",
+      "configurationName": "robot_strider",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "robot_strider",
+        "TypeId": "Robot",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_targeting_system_x",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_targeting_system_x",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_targeting_system_y",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_targeting_system_y",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_targeting_system_z",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_targeting_system_z",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_motherboard_x",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_motherboard_x",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_motherboard_y",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_motherboard_y",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_drone_x",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_drone_x",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_drone_y",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_drone_y",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_drone_z",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_drone_z",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_exoskeleton_x",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_exoskeleton_x",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_exoskeleton_y",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_exoskeleton_y",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_exoskeleton_z",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_exoskeleton_z",
+        "TypeId": "Equipment",
+        "Level": "1"
+      },
+      "application": {},
+      "reference": []
+    },
+    {
+      "configurationType": "commodity",
+      "configurationTypeId": "Equipment",
+      "configurationName": "equipment_armor_x",
+      "configurationCategory": "GameItem",
+      "configurationVersion": "v1.0",
+      "header": {
+        "Name": "equipment_armor_x",
+        "TypeId": "Equipment",
+        "Level": "1"
       },
       "application": {},
       "reference": []

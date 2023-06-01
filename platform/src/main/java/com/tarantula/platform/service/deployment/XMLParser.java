@@ -107,7 +107,7 @@ public class XMLParser extends DefaultHandler{
                 this.applicationDescriptor.deployPriority(Integer.parseInt(value));
             }
             else if(tblock.equals("application-list")&&qname.equals("access-mode")){
-                this.configuration.descriptor.accessMode(Integer.parseInt(value));
+                this.applicationDescriptor.accessMode(Integer.parseInt(value));
             }
             else if(tblock.equals("application-list")&&qname.equals("access-control")){
                 this.applicationDescriptor.accessControl(Integer.parseInt(value));

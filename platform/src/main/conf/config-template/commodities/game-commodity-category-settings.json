@@ -78,7 +78,14 @@
             "downloadable": false
           },
           {
-            "name": "Quantity",
+            "name": "TypeId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Level",
             "type": "number",
             "reference": "Integer",
             "nullable": false,

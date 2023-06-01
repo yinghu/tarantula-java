@@ -17,7 +17,7 @@ public class GameApplicationAdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onList")){
-            this.context.log(session.name(),OnLog.WARN);
+            //this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
