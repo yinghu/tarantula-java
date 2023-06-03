@@ -776,6 +776,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             throw new UnsupportedOperationException();
         }
 
+        public boolean delete(byte[] key){
+
+            return _delete(key);
+        }
         public boolean set(byte[] key,byte[] value){
             try{
 
@@ -841,6 +845,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             else{
                 return null;
             }
+        }
+        private boolean _delete(byte[] key){
+            return berkeleyStore.delete(null,new DatabaseEntry(key)) == OperationStatus.SUCCESS;
         }
     }
 }

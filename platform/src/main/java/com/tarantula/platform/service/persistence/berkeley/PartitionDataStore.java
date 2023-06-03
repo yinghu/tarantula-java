@@ -362,6 +362,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
         return alist;
     }
 
+    public boolean delete(byte[] key){
+        DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+        return _delete(dso,key);
+    }
+
     /**
      * Backup implementation
      * */
@@ -434,5 +439,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
         DatabaseEntry ve = new DatabaseEntry();
         OperationStatus status = dso.database.get(null, new DatabaseEntry(key), ve, null);
         return status==OperationStatus.SUCCESS?RevisionObject.fromBinary(ve.getData()):RevisionObject.FALSE;
+    }
+
+    private boolean _delete(DataBaseOnPartition dso,byte[] key){
+        return dso.database.delete(null, new DatabaseEntry(key)) == OperationStatus.SUCCESS;
     }
 }

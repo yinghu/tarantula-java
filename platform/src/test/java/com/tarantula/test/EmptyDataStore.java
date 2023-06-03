@@ -3,6 +3,8 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.tarantula.platform.service.persistence.DataBaseOnPartition;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 
@@ -68,6 +70,9 @@ public class EmptyDataStore implements DataStore {
         throw new UnsupportedOperationException();
     }
 
+    public boolean delete(byte[] key){
+        return false;
+    }
 
     @Override
     public Backup backup() {

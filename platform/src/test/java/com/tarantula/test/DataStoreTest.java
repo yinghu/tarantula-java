@@ -88,5 +88,4 @@ public class DataStoreTest {
             Assert.assertEquals(output.get(i),input.get(i));
         }
     }
-
 }
