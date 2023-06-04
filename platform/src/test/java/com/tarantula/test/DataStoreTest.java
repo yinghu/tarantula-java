@@ -1,8 +1,10 @@
 package com.tarantula.test;
 
+import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.tarantula.platform.service.DataStoreProvider;
@@ -88,4 +90,25 @@ public class DataStoreTest {
             Assert.assertEquals(output.get(i),input.get(i));
         }
     }
+
+    @Test(groups = { "DataStore" })
+    public void dataStoreDeleteTest() {
+        DataStore dataStore = dataStoreProvider.create("access",serviceContext.node().partitionNumber());
+        AccessIndexTrack accessIndexTrack = new AccessIndexTrack("access100","BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
+        Assert.assertTrue(accessIndexTrack.key().asString().equals("access100"));
+        Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
+        Assert.assertTrue(dataStore.delete(accessIndexTrack.key().asString().getBytes()));
+        Assert.assertFalse(dataStore.load(accessIndexTrack));
+    }
+
+    @Test(groups = { "DataStore" })
+    public void accessIndexTest() {
+        DataStore dataStore = dataStoreProvider.create("access_1");
+        AccessIndexTrack accessIndexTrack = new AccessIndexTrack("access100","BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
+        Assert.assertTrue(accessIndexTrack.key().asString().equals("access100"));
+        Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
+        Assert.assertTrue(dataStore.delete(accessIndexTrack.key().asString().getBytes()));
+        Assert.assertFalse(dataStore.load(accessIndexTrack));
+    }
+
 }

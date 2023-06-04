@@ -29,6 +29,8 @@ public class TestRecoverService implements RecoverService {
 
     }
 
+
+
     @Override
     public void onEndSync(String memberId, String syncKey) {
 
@@ -38,6 +40,7 @@ public class TestRecoverService implements RecoverService {
     public String[] onListModules() {
         return new String[0];
     }
+
 
     @Override
     public byte[] onLoadModuleJarFile(String name) {

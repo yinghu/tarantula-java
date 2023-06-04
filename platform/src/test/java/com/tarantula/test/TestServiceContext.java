@@ -69,7 +69,7 @@ public class TestServiceContext implements ServiceContext {
 
     @Override
     public AccessIndexService accessIndexService() {
-        return null;
+        return new TestAccessIndexService();
     }
 
     @Override

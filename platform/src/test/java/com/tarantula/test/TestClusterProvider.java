@@ -38,7 +38,7 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
 
     @Override
     public AccessIndexService accessIndexService() {
-        return null;
+        return new TestAccessIndexService();
     }
 
     @Override
