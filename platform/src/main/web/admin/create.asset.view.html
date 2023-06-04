@@ -295,12 +295,7 @@
     };
     deleteButton.onclick =()=>{
         TARA_API.onGet('role/admin/item',"onDelete",TARA_API.query().gameClusterId+'#'+TARA_API.query().pendingUpdate.itemId,(resp)=>{
-            console.log(resp);
-            //resp.itemList.forEach(item=>{
-                //list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
-                //payload[item.itemId]=item;
-            //});
-            //callback();
+            editor.set(resp);
         });      
     };
     document.querySelector('#tx-upload-vendor').onchange = ()=>{
