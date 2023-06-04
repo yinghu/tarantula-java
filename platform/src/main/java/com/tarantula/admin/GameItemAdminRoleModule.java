@@ -23,7 +23,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         if(session.action().equals("onCategorySettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             ConfigurableCategories categories = this.configurableCategories(query[1],gameCluster,applicationPreSetup);
             categories.configurableTypes(this.configurableTypes(query[1],gameCluster,applicationPreSetup));
             session.write(categories.toJson().toString().getBytes());
@@ -31,14 +31,14 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         else if(session.action().equals("onTypesSettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             ConfigurableTypes configurableTypes = this.configurableTypes(query[1],gameCluster,applicationPreSetup);
             session.write(configurableTypes.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdateEnumSettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
             boolean updateAllowed = true;
@@ -63,7 +63,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         else if(session.action().equals("onUpdateTypesSettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonArray jtypes = JsonUtil.parse(payload).get("types").getAsJsonArray();
             int send = jtypes.size();
             for(JsonElement je : jtypes){

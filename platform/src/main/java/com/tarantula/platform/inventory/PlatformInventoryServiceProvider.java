@@ -53,7 +53,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
-        this.logger = serviceContext.logger(PlatformItemServiceProvider.class);
+        this.logger = serviceContext.logger(PlatformInventoryServiceProvider.class);
     }
     public DataStore inventoryDataStore(){
         return this.inventoryDataStore;

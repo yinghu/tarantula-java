@@ -13,14 +13,12 @@ import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
@@ -42,7 +40,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     private Configuration configuration;
     private final GameCluster gameCluster;
-    private ApplicationPreSetup applicationPreSetup;
 
     private MetricsListener metricsListener;
     private Metrics metrics;
@@ -115,7 +112,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         serviceContext.registerMetrics(metrics);
         this.metrics = serviceContext.metrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
         this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{
             EventListener listener = eventListeners.get(e.trackId());
@@ -192,9 +188,9 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     //configuration service provider hood calls
-    public PlatformItemServiceProvider itemServiceProvider(){
-        return  serviceProvider(PlatformItemServiceProvider.NAME);
-    }
+    //public PlatformItemServiceProvider itemServiceProvider(){
+        //return  serviceProvider(PlatformItemServiceProvider.NAME);
+    //}
 
     //Achievement service provider
     public PlatformAchievementServiceProvider achievementServiceProvider(){
@@ -235,9 +231,9 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
-        if(serviceName.equals(PlatformItemServiceProvider.NAME)){
-            return itemServiceProvider();
-        }
+        //if(serviceName.equals(PlatformItemServiceProvider.NAME)){
+            //return itemServiceProvider();
+        //}
         if(serviceName.equals(PlatformPresenceServiceProvider.NAME)){
             return presenceServiceProvider();
         }

@@ -1,7 +1,6 @@
 package com.tarantula.platform.resource;
 
 import com.icodesoftware.Configurable;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
@@ -26,7 +25,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
     private ServiceContext serviceContext;
     private DistributionItemService distributionItemService;
-    //private DataStore dataStore;
+
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
@@ -58,7 +57,6 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.logger = serviceContext.logger(PlatformResourceServiceProvider.class);
-        //this.dataStore = applicationPreSetup.dataStore();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
@@ -149,7 +147,7 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
     }
 
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
+        //logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
     }
 
 }

@@ -96,12 +96,12 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     }
 
     public <T extends Configurable> void onCreated(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion());
+        //logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+        //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
+        //logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
     }
 }
