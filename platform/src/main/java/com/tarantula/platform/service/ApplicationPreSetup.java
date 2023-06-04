@@ -20,7 +20,7 @@ public interface ApplicationPreSetup {
     <T extends Configurable> boolean save(GameCluster gameCluster, T t);
 
     <T extends Configurable> boolean load(GameCluster gameCluster, T t);
-
+    <T extends Configurable> boolean delete(GameCluster gameCluster, T t);
     <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory);
 
     //{game}_service data store
@@ -38,8 +38,10 @@ public interface ApplicationPreSetup {
     interface Listener{
         default <T extends Configurable> void onUpdated(Descriptor application,T t){};
         default <T extends Configurable> void onCreated(Descriptor application,T t){};
-
+        default <T extends Configurable> void onDeleted(Descriptor application,T t){};
         default <T extends Configurable> void onUpdated(GameCluster application,T t){};
         default <T extends Configurable> void onCreated(GameCluster application,T t){};
+
+        default <T extends Configurable> void onDeleted(GameCluster application,T t){};
     }
 }

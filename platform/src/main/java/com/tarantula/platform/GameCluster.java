@@ -7,7 +7,6 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -21,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
@@ -288,6 +286,10 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         listeners.forEach(l->l.onCreated(application,t));
     }
     @Override
+    public <T extends Configurable> void onDeleted(Descriptor application,T t) {
+        listeners.forEach(l->l.onDeleted(application,t));
+    }
+    @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
         listeners.forEach(l->l.onUpdated(application,t));
     }
@@ -296,6 +298,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         listeners.forEach(l->l.onCreated(application,t));
     }
 
+    public <T extends Configurable> void onDeleted(GameCluster application,T t){
+        listeners.forEach(l->l.onDeleted(application,t));
+    }
     @Override
     public void onUpdated(OnLobby onLobby) {
         if(!onLobby.gameClusterId().equals(this.distributionKey())) return;

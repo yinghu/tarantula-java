@@ -117,6 +117,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.update(superCategoryIndex);
         }
         deleteVersion(dataStore,(ConfigurableObject)t);
+        if(listener!=null) listener.onDeleted(application,t);
         return true;
     }
     public <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory){
@@ -177,7 +178,11 @@ public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
         return dataStore.load(t);
     }
-
+    public <T extends Configurable> boolean delete(GameCluster gameCluster, T t){
+        DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
+        if(this.listener!=null) listener.onDeleted(gameCluster,t);
+        return dataStore.load(t);
+    }
     public <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
         return dataStore.list(recoverableFactory);

@@ -82,7 +82,6 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
-        //GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = gameCluster.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
@@ -96,7 +95,13 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         return false;
     }
 
+    public <T extends Configurable> void onCreated(Descriptor application,T t){
+        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion());
+    }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        //logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
+        logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onDeleted(Descriptor application,T t){
+        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
     }
 }
