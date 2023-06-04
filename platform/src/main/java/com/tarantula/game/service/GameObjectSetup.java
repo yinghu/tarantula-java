@@ -77,6 +77,48 @@ public class GameObjectSetup implements ApplicationPreSetup {
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
+
+    public  <T extends Configurable> boolean delete(Descriptor application,T t){
+        DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
+        IndexSet superCategoryIndex = null;
+        int superIndex;
+        if((superIndex = t.configurationCategory().indexOf(".")) > 0){
+            superCategoryIndex = new IndexSet(query("category",t.configurationCategory().substring(0,superIndex)));
+            superCategoryIndex.distributionKey(application.distributionKey());
+            dataStore.createIfAbsent(superCategoryIndex,true);
+        }
+        IndexSet categoryIndex = new IndexSet(query("category",t.configurationCategory()));//category/{category}
+        categoryIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(categoryIndex,true);
+
+        superIndex = t.configurationType().indexOf(".");
+        IndexSet typeIndex = new IndexSet(query("type",superIndex>0?t.configurationType().substring(0,superIndex):t.configurationType()));//type/{asset|commodity|item|application}
+        typeIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(typeIndex,true);
+
+        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId app assigned commodity type line Gold
+        typeIdIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(typeIdIndex,true);
+
+        IndexSet nameIndex = new IndexSet(query("name",t.configurationName()));//name app assigned name
+        nameIndex.distributionKey(application.distributionKey());
+        dataStore.createIfAbsent(nameIndex,true);
+        if(!dataStore.delete(t.distributionKey().getBytes())) return false;
+        categoryIndex.removeKey(t.distributionKey());
+        dataStore.update(categoryIndex);
+        typeIndex.removeKey(t.distributionKey());
+        dataStore.update(typeIndex);
+        typeIdIndex.removeKey(t.distributionKey());
+        dataStore.update(typeIdIndex);
+        nameIndex.removeKey(t.distributionKey());
+        dataStore.update(nameIndex);
+        if(superCategoryIndex!=null){
+            superCategoryIndex.removeKey(t.distributionKey());
+            dataStore.update(superCategoryIndex);
+        }
+        deleteVersion(dataStore,(ConfigurableObject)t);
+        return true;
+    }
     public <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = serviceContext.dataStore(serviceDataStore(application),serviceContext.node().partitionNumber());
         return list(dataStore,application,recoverableFactory);
@@ -178,5 +220,14 @@ public class GameObjectSetup implements ApplicationPreSetup {
         else{
             dataStore.update(versionedConfigurableObject);
         }
+    }
+    private void deleteVersion(DataStore dataStore,ConfigurableObject configurableObject){
+        IndexSet versionIndex = new IndexSet("version");
+        versionIndex.distributionKey(configurableObject.distributionKey());
+        dataStore.createIfAbsent(versionIndex,true);
+        versionIndex.keySet().forEach(k->{
+            dataStore.delete(k.getBytes());
+        });
+        dataStore.delete(versionIndex.key().asString().getBytes());
     }
 }

@@ -210,6 +210,20 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(query[1],"version"));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
+        else if(session.action().equals("onDelete")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
+            Descriptor app = gameCluster.serviceWithCategory("item");
+            ConfigurableObject configurableObject = new ConfigurableObject();
+            configurableObject.distributionKey(query[1]);
+            if(preSetup.load(app,configurableObject)){
+                session.write(JsonUtil.toSimpleResponse(preSetup.delete(app,configurableObject),"item deleted ["+query[1]+"]").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"item not existed ["+query[1]+"]").getBytes());
+            }
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

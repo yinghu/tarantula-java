@@ -12,7 +12,7 @@ public interface ApplicationPreSetup {
 
     <T extends Configurable> boolean save(Descriptor application,T t);
     <T extends Configurable> boolean load(Descriptor application,T t);
-
+    <T extends Configurable> boolean delete(Descriptor application,T t);
     <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory);
 
 

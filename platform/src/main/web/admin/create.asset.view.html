@@ -54,7 +54,8 @@
             <div class='w3-bar w3-white'>
                 <span id='tx-asset-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
                 <span id='tx-asset-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
-                <span id='tx-asset-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>                
+                <span id='tx-asset-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span> 
+                <span id='tx-configuration-asset-delete' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Delete</span>               
             </div>            
         </div>        
         <div class="w3-panel w3-center tx-text-14">
@@ -158,17 +159,13 @@
 </div>
 <script>
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
-    //console.log(selectedItem);
-    //console.log('>>>>>>>>'+TARA_API.query().category);
+    let deleteButton = document.querySelector('#tx-configuration-asset-delete');
+    deleteButton.style.display = 'none';
     let versionedItems =[];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
         document.querySelector('#tx-configuration-asset-type-id').disabled = true;
     }
-    //if(TARA_API.query().category == 'item'){
-        //document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().category;
-        //document.querySelector('#tx-configuration-asset-type-id').disabled = true;
-    //}
     document.querySelector('#tx-configuration-asset-header').innerHTML = TARA_API.query().operation+' ['+selectedItem.header.type+']';
     document.querySelector('#tx-configuration-asset-description').innerHTML = tx_first_upcase(selectedItem.header.scope);
     document.querySelector('#tx-configuration-asset-type').innerHTML = 'Category : '+selectedItem.header.type;
@@ -186,6 +183,7 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-configuration-asset"),{mode:'tree'},'{}');
     let pendingUpload ={ready:false,progress:1};
     if(TARA_API.query().operation == 'Update'){
+        deleteButton.style.display = 'block';
         populate(TARA_API.query().pendingUpdate);
         let vselection = document.querySelector('#tx-asset-version-selection');
         let vs = document.querySelector('#tx-asset-update-version');
@@ -294,6 +292,16 @@
     }; 
     document.querySelector('#tx-create-asset-upload-cancel').onclick=()=>{
         document.querySelector('#tx-create-asset-upload-board').style.display = 'none';
+    };
+    deleteButton.onclick =()=>{
+        TARA_API.onGet('role/admin/item',"onDelete",TARA_API.query().gameClusterId+'#'+TARA_API.query().pendingUpdate.itemId,(resp)=>{
+            console.log(resp);
+            //resp.itemList.forEach(item=>{
+                //list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
+                //payload[item.itemId]=item;
+            //});
+            //callback();
+        });      
     };
     document.querySelector('#tx-upload-vendor').onchange = ()=>{
         pendingUpload.vendor = document.querySelector('#tx-upload-vendor').value;
