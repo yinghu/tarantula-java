@@ -1,7 +1,6 @@
 {
   "systemServiceProviders": [
     "com.tarantula.platform.inventory.PlatformInventoryServiceProvider",
-    "com.tarantula.platform.item.PlatformItemServiceProvider",
     "com.tarantula.platform.room.PlatformRoomServiceProvider",
     "com.tarantula.platform.lobby.PlatformLobbyServiceProvider",
     "com.tarantula.platform.configuration.PlatformConfigurationServiceProvider",

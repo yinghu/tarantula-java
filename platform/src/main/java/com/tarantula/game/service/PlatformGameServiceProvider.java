@@ -188,10 +188,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     //configuration service provider hood calls
-    //public PlatformItemServiceProvider itemServiceProvider(){
-        //return  serviceProvider(PlatformItemServiceProvider.NAME);
-    //}
-
     //Achievement service provider
     public PlatformAchievementServiceProvider achievementServiceProvider(){
         return serviceProvider(PlatformAchievementServiceProvider.NAME);
@@ -231,9 +227,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
-        //if(serviceName.equals(PlatformItemServiceProvider.NAME)){
-            //return itemServiceProvider();
-        //}
         if(serviceName.equals(PlatformPresenceServiceProvider.NAME)){
             return presenceServiceProvider();
         }
@@ -259,13 +252,13 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public ConfigurationServiceProvider configurationServiceProvider(String name){
-        if(name.equals("store")) return storeServiceProvider();
-        if(name.equals("achievement")) return achievementServiceProvider();
+        if(name.equals(PlatformStoreServiceProvider.NAME)) return storeServiceProvider();
+        if(name.equals(PlatformAchievementServiceProvider.NAME)) return achievementServiceProvider();
         if(name.equals("giveaway")) return presenceServiceProvider();
-        if(name.equals("lobby")) return lobbyServiceProvider();
-        if(name.equals("tournament")) return tournamentServiceProvider();
+        if(name.equals(PlatformLobbyServiceProvider.NAME)) return lobbyServiceProvider();
+        if(name.equals(PlatformTournamentServiceProvider.NAME)) return tournamentServiceProvider();
         if(name.equals("data")) return configurationServiceProvider();
-        if(name.equals("resource")) return resourceServiceProvider();
+        if(name.equals(PlatformResourceServiceProvider.NAME)) return resourceServiceProvider();
         return null;
     }
 

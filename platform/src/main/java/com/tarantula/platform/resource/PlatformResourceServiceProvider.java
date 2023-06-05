@@ -2,81 +2,43 @@ package com.tarantula.platform.resource;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.ConfigurationServiceProvider;
+
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformResourceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback,ApplicationPreSetup.Listener {
+public class PlatformResourceServiceProvider extends PlatformItemServiceProvider{
 
     public static final String NAME = "resource";
 
-    private TarantulaLogger logger;
-    private final String gameServiceName;
-    private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private ServiceContext serviceContext;
-    private DistributionItemService distributionItemService;
 
-    private ApplicationPreSetup applicationPreSetup;
-    private Descriptor application;
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
     private ConcurrentHashMap<String,Item> itemIndex;
 
     public PlatformResourceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.gameResourceIndex = new ConcurrentHashMap<>();
         this.itemIndex = new ConcurrentHashMap<>();
     }
-    @Override
-    public String name() {
-        return NAME;
-    }
 
-    @Override
-    public void start() throws Exception {
-
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        super.setup(serviceContext);
         this.logger = serviceContext.logger(PlatformResourceServiceProvider.class);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
 
-
-    @Override
-    public <T extends Configurable> void register(T t) {
-        t.registered();
-        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
-    @Override
-    public <T extends Configurable> void release(T t) {
-        t.released();
-        distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
     public boolean onItemRegistered(String category,String itemId){
         GameResource gameResource = new GameResource();
         gameResource.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(category);
+        Descriptor app = gameCluster.serviceWithCategory(category);
         if(!applicationPreSetup.load(app,gameResource)){
             return false;
         }
@@ -146,8 +108,5 @@ public class PlatformResourceServiceProvider implements ConfigurationServiceProv
         });
     }
 
-    public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        //logger.warn(application.distributionKey()+">>"+t.distributionKey()+">>"+t.configurationVersion());
-    }
 
 }
