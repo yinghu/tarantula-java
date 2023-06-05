@@ -1,8 +1,7 @@
-package com.tarantula.platform.presence;
+package com.tarantula.platform.presence.dailygiveaway;
 
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ItemPortableRegistry;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class DailygGiveawayObjectQuery implements RecoverableFactory<DailyGiveaway> {
 

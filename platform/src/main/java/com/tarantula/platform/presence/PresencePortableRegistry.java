@@ -12,6 +12,7 @@ import com.tarantula.platform.lobby.ArenaItem;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
+import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.saves.DeviceIndex;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;

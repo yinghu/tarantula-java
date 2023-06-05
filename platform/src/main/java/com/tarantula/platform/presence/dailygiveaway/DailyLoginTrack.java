@@ -1,9 +1,10 @@
-package com.tarantula.platform.presence;
+package com.tarantula.platform.presence.dailygiveaway;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AssociateKey;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.time.Year;

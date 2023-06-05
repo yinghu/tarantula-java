@@ -11,7 +11,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.achievement.AchievementProgress;
-import com.tarantula.platform.presence.DailyLoginTrack;
+import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.saves.SavedGame;
 
 
@@ -49,7 +49,7 @@ public class SavedGameModule implements Module {
         else if(session.action().equals("onReset")){
             SavedGame savedGame = this.gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
-                DailyLoginTrack dailyLoginTrack = gameServiceProvider.presenceServiceProvider().checkDailyLogin(savedGame.distributionKey());
+                DailyLoginTrack dailyLoginTrack = gameServiceProvider.dailyGiveawayServiceProvider().checkDailyLogin(savedGame.distributionKey());
                 if(dailyLoginTrack!=null) dailyLoginTrack.reset();
                 AchievementProgress achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(savedGame.distributionKey());
                 if(achievementProgress!=null) achievementProgress.reset();
@@ -77,7 +77,7 @@ public class SavedGameModule implements Module {
         }
 
         else if(session.action().equals("onDailyRewardClaim")){
-            boolean rewarded = this.gameServiceProvider.presenceServiceProvider().redeem(session.systemId(),session.name());
+            boolean rewarded = this.gameServiceProvider.dailyGiveawayServiceProvider().redeem(session.systemId(),session.name());
             session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
         else{

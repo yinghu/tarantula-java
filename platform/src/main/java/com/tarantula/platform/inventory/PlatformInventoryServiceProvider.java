@@ -8,7 +8,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.presence.DailyGiveaway;
+import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;

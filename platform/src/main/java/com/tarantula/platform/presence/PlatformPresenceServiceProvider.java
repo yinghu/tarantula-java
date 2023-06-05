@@ -3,14 +3,17 @@ package com.tarantula.platform.presence;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
+import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
+import com.tarantula.platform.presence.dailygiveaway.DailygGiveawayObjectQuery;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformPresenceServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformPresenceServiceProvider implements ServiceProvider {
 
     public static final String NAME = "presence";
 
@@ -34,16 +37,10 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
     private ApplicationPreSetup applicationPreSetup;
 
 
-    private int dailyLoginPendingHours;
-    private int maxConsecutiveDays;
-    private int maxRewardTier;
     private int recentlyPlayListSize;
     private int friendListSize;
 
     private PlayList recentlyPlayList;
-    private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
-    private PlatformInventoryServiceProvider inventoryServiceProvider;
-    private DistributionItemService distributionItemService;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
     private PlatformGameServiceProvider gameServiceProvider;
 
@@ -51,7 +48,6 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
 
     @Override
@@ -61,7 +57,6 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
 
     @Override
     public void start() throws Exception {
-        this.dailyGiveaways = new ConcurrentHashMap<>();
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
         this.presenceDataStore.createIfAbsent(this.recentlyPlayList,true);
@@ -78,9 +73,6 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.platformLeaderBoardProvider = gameServiceProvider.leaderBoardProvider();
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject dailyReward = ((JsonElement)configuration.property("dailyReward")).getAsJsonObject();
-        this.dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
-        this.maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
-        this.maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
         this.recentlyPlayListSize = ((Number)configuration.property("recentlyPlayListSize")).intValue();
         this.friendListSize = ((Number)configuration.property("friendListSize")).intValue();
     }
@@ -89,7 +81,6 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.presenceDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
@@ -141,20 +132,8 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         }));
         return deltaStatistics;
     }
-    public DailyLoginTrack checkDailyLogin(String gameId){
-        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(gameId);
-        dailyLoginTrack.dataStore(presenceDataStore);
-        this.presenceDataStore.createIfAbsent(dailyLoginTrack,true);
-        if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
-        boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
-        return rewarded?dailyLoginTrack:null;
-    }
-    public List<DailyGiveaway> list(){
-        ArrayList<DailyGiveaway> _items = new ArrayList<>();
-        dailyGiveaways.forEach((k,v)-> _items.add(v));
-        return _items;
-    }
+
+
     public List<SavedGame> listSaves(String systemId,String deviceId,String deviceName){
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
@@ -176,60 +155,5 @@ public class PlatformPresenceServiceProvider implements ConfigurationServiceProv
         playerSaveIndex.dataStore(presenceDataStore);
         return playerSaveIndex;
     }
-    public boolean redeem(String systemId,String gameId){
-        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(gameId);
-        dailyLoginTrack.dataStore(presenceDataStore);
-        if(!this.presenceDataStore.load(dailyLoginTrack)) return false;
-        if(!dailyLoginTrack.rewardPending || !dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
-        dailyLoginTrack.rewardPending = !this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
-        dailyLoginTrack.update();
-        return !dailyLoginTrack.rewardPending;
-    }
 
-    @Override
-    public <T extends Configurable> void register(T t) {
-        t.registered();
-        this.distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
-
-    @Override
-    public <T extends Configurable> void release(T t) {
-        t.released();
-        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
-
-
-    public String registerConfigurableListener(Descriptor application,Configurable.Listener listener) {
-        List<DailyGiveaway> items = applicationPreSetup.list(application,new DailygGiveawayObjectQuery("category/DailyGiveaway"));
-        items.forEach((a)-> {
-            if(!a.disabled()) {
-                a.setup();
-                dailyGiveaways.put(a.name(),a);
-            }
-        });
-        return null;
-    }
-
-    @Override
-    public boolean onItemRegistered(String category, String itemId) {
-        DailyGiveaway dailyGiveaway = new DailyGiveaway();
-        dailyGiveaway.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(category);
-        if(!applicationPreSetup.load(app,dailyGiveaway)){
-            return false;
-        }
-        dailyGiveaway.setup();
-        dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
-        return true;
-    }
-    public boolean onItemReleased(String category,String itemId){
-        String[] released ={null};
-        dailyGiveaways.forEach((k,v)->{
-            if(v.distributionKey().equals(itemId)) released[0]=k;
-        });
-        if(released[0]!=null) dailyGiveaways.remove(released[0]);
-        return false;
-    }
 }
