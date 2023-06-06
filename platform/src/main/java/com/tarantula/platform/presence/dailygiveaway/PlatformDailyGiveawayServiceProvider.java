@@ -1,6 +1,9 @@
 package com.tarantula.platform.presence.dailygiveaway;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.ServiceContext;
@@ -26,13 +29,18 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     public PlatformDailyGiveawayServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
-        //this.gameResourceIndex = new ConcurrentHashMap<>();
         this.dailyGiveaways = new ConcurrentHashMap<>();
     }
 
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        Configuration configuration = serviceContext.configuration("game-presence-settings");
+        JsonObject dailyReward = ((JsonElement)configuration.property("dailyReward")).getAsJsonObject();
+        dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
+        maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
+        maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = serviceContext.logger(PlatformDailyGiveawayServiceProvider.class);
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }

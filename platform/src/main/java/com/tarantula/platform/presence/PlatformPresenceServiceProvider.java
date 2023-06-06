@@ -1,29 +1,21 @@
 package com.tarantula.platform.presence;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
-import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
-import com.tarantula.platform.presence.dailygiveaway.DailygGiveawayObjectQuery;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.statistics.UserStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformPresenceServiceProvider implements ServiceProvider {
 
@@ -47,7 +39,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();//(String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.serviceType();
     }
 
     @Override
@@ -72,7 +64,6 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     public void waitForData(){
         this.platformLeaderBoardProvider = gameServiceProvider.leaderBoardProvider();
         Configuration configuration = serviceContext.configuration("game-presence-settings");
-        JsonObject dailyReward = ((JsonElement)configuration.property("dailyReward")).getAsJsonObject();
         this.recentlyPlayListSize = ((Number)configuration.property("recentlyPlayListSize")).intValue();
         this.friendListSize = ((Number)configuration.property("friendListSize")).intValue();
     }
