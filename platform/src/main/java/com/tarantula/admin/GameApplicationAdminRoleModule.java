@@ -43,7 +43,7 @@ public class GameApplicationAdminRoleModule implements Module {
 
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
             app.distributionKey(query[1]);
@@ -60,7 +60,7 @@ public class GameApplicationAdminRoleModule implements Module {
         else if (session.action().equals("onRelease")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider((String) gameCluster.property(GameCluster.GAME_SERVICE));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             Application app = new Application();
             app.distributionKey(query[1]);
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
