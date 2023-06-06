@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.achievement.AchievementProgress;
-import com.tarantula.platform.presence.DailyLoginTrack;
+import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;

@@ -17,6 +17,7 @@ import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider;
 import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
 import com.tarantula.platform.item.ItemDistributionCallback;
@@ -202,8 +203,8 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
 
-    public PlatformMessagingServiceProvider messagingServiceProvider(){
-        return serviceProvider(PlatformMessagingServiceProvider.NAME);
+    public PlatformDailyGiveawayServiceProvider dailyGiveawayServiceProvider(){
+        return serviceProvider(PlatformDailyGiveawayServiceProvider.NAME);
     }
 
     public PlatformResourceServiceProvider resourceServiceProvider(){
@@ -227,8 +228,8 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
-        if(serviceName.equals(PlatformPresenceServiceProvider.NAME)){
-            return presenceServiceProvider();
+        if(serviceName.equals(PlatformDailyGiveawayServiceProvider.NAME)){
+            return dailyGiveawayServiceProvider();
         }
         if(serviceName.equals(PlatformAchievementServiceProvider.NAME)){
             return achievementServiceProvider();
@@ -254,12 +255,11 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     public ConfigurationServiceProvider configurationServiceProvider(String name){
         if(name.equals(PlatformStoreServiceProvider.NAME)) return storeServiceProvider();
         if(name.equals(PlatformAchievementServiceProvider.NAME)) return achievementServiceProvider();
-        if(name.equals("giveaway")) return presenceServiceProvider();
+        if(name.equals(PlatformDailyGiveawayServiceProvider.NAME)) return dailyGiveawayServiceProvider();
         if(name.equals(PlatformLobbyServiceProvider.NAME)) return lobbyServiceProvider();
         if(name.equals(PlatformTournamentServiceProvider.NAME)) return tournamentServiceProvider();
-        if(name.equals("data")) return configurationServiceProvider();
         if(name.equals(PlatformResourceServiceProvider.NAME)) return resourceServiceProvider();
-        return null;
+        return configurationServiceProvider();//anything else goes to configuration provider
     }
 
     @Override

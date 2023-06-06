@@ -1,6 +1,7 @@
-package com.tarantula.platform.presence;
+package com.tarantula.platform.presence.dailygiveaway;
 
 import com.tarantula.platform.item.*;
+import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class DailyGiveaway extends Application {
 
