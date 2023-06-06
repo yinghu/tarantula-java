@@ -4,11 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
@@ -21,7 +19,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     public static final String NAME = "giveaway";
 
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private DataStore dataStore;
+
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
     private int maxRewardTier;
@@ -40,7 +38,6 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
         maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
         maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
-        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = serviceContext.logger(PlatformDailyGiveawayServiceProvider.class);
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
@@ -64,8 +61,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     public boolean onItemRegistered(String category, String itemId) {
         DailyGiveaway dailyGiveaway = new DailyGiveaway();
         dailyGiveaway.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
-        Descriptor app = _gc.serviceWithCategory(category);
+        Descriptor app = gameCluster.serviceWithCategory(category);
         if(!applicationPreSetup.load(app,dailyGiveaway)){
             return false;
         }

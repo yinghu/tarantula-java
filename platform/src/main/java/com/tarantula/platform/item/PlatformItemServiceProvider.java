@@ -18,12 +18,14 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     protected ServiceContext serviceContext;
 
     protected DistributionItemService distributionItemService;
-
+    protected PlatformGameServiceProvider platformGameServiceProvider;
     protected final String gameServiceName;
     protected GameCluster gameCluster;
     protected ApplicationPreSetup applicationPreSetup;
+    protected DataStore dataStore;
     protected Descriptor application;
     public PlatformItemServiceProvider(PlatformGameServiceProvider gameServiceProvider,String name){
+        this.platformGameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
         this.gameServiceName = gameCluster.serviceType();
         this.SERVICE_NAME = name;
@@ -33,6 +35,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,SERVICE_NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
     @Override
@@ -77,4 +80,15 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
     }
+    public <T extends Configurable> void onCreated(GameCluster application,T t){
+        //logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onUpdated(GameCluster application,T t){
+        //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onDeleted(GameCluster application,T t){
+        //logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+
+
 }
