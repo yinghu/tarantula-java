@@ -177,7 +177,9 @@
     let downloadableChecked = document.querySelector('#tx-create-category-property-downloadable');
     document.querySelector('#tx-create-category-version').value = '1.0';
     document.querySelector('#tx-create-category-title').innerHTML = TARA_API.query().category+'/category';
+    document.querySelector('#tx-configuration-category-delete').style.display = 'none';
     if(TARA_API.query().operation=='Update'){
+        document.querySelector('#tx-configuration-category-delete').style.display = 'block'
         let cat = TARA_API.query().itemList[TARA_API.query().itemIndex];
         let ix = cat.header.scope.indexOf('.');
         let _scope = ix>0?cat.header.scope.substring(0,ix):cat.header.scope;
@@ -347,8 +349,9 @@
         editor.setMode('preview');
     };
     document.querySelector('#tx-configuration-category-delete').onclick=()=>{
-        console.log('delete');
-        //editor.setMode('preview');
+        TARA_API.onSet('role/admin/item','onDeleteCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,editor.get(),(resp)=>{
+            editor.set(resp);   
+        });
     };
     function addCategoryProperty(pname,ptype,tname,nullabled,downloadabled,ref){
         ixc++;

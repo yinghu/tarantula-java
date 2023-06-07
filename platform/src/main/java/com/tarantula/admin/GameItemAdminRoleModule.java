@@ -156,6 +156,10 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not existed").getBytes());
             }
         }
+        else if(session.action().equals("onDeleteCategorySettings")){
+            this.context.log(new String(payload),OnLog.WARN);
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+        }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
