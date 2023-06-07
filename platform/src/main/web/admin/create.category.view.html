@@ -346,6 +346,10 @@
     document.querySelector('#tx-category-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    document.querySelector('#tx-configuration-category-delete').onclick=()=>{
+        console.log('delete');
+        //editor.setMode('preview');
+    };
     function addCategoryProperty(pname,ptype,tname,nullabled,downloadabled,ref){
         ixc++;
         switch(ptype){
