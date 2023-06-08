@@ -49,6 +49,8 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int PLAYER_SAVE_INDEX_CID = 13;
 
+    public static final int PERSONAL_DATA_INDEX_CID = 14;
+
     public static final int LOBBY_ITEM_CID = 15;
 
     public static final int ZONE_ITEM_CID = 16;
@@ -59,6 +61,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int GAME_RESOURCE_CID = 19;
 
+    public static final int PERSONAL_DATA_OBJECT_CID = 20;
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public Recoverable create(int i) {
@@ -103,6 +106,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
             case PLAYER_SAVE_INDEX_CID:
                 pt = new PlayerSaveIndex();
                 break;
+            case PERSONAL_DATA_INDEX_CID:
+                pt = new PersonalDataIndex();
+                break;
             case LOBBY_ITEM_CID:
                 pt = new LobbyItem();
                 break;
@@ -117,6 +123,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case GAME_RESOURCE_CID:
                 pt = new GameResource();
+                break;
+            case PERSONAL_DATA_OBJECT_CID:
+                pt = new PersonalDataObject();
                 break;
             default:
         }

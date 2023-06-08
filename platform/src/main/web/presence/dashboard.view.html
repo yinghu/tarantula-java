@@ -188,6 +188,10 @@
                         <span id='live-game-list-name' class="tx-text-18"></span>
                     </div>
                     <div class="w3-panel w3-padding w3-border w3-border-red">
+                        <div id='live-game-data-bar' class='w3-bar w3-white'>
+                        </div>
+                    </div>
+                    <div class="w3-panel w3-padding w3-border w3-border-red">
                         <div id='live-game-service-bar' class='w3-bar w3-white'>
                         </div>
                     </div>
@@ -730,19 +734,20 @@
                     a.applications.forEach((b)=>{
                         //console.log(b);
                         if(b.category !== 'lobby'){
-                            let tem = [];
-                            tem.push('<span tx-service-tag=\'');
-                            tem.push(b.tag);
-                            tem.push('\' view-id=\'');
-                            tem.push('live.game.service.'+b.name.toLowerCase());
-                            tem.push('\' tx-service-category=\''+b.category);
-                            tem.push('\' class=\'w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-game-service-bar\'>');
-                            tem.push(b.name);
-                            tem.push('</span>');
-                            liveGameServiceBar.innerHTML += tem.join('');
+                           
+                            liveGameServiceBar.innerHTML += TARA_HTML.application(b,'service-bar');
+                        }
+                    });       
+                }
+                else if(a.descriptor.typeId == resp.name+'-data'){
+                    let liveGameDataBar = document.querySelector('#live-game-data-bar');
+                    liveGameDataBar.innerHTML = '';
+                    a.applications.forEach((b)=>{
+                        if(b.category !== 'lobby'){
+                            liveGameDataBar.innerHTML += TARA_HTML.application(b,'service-bar');
                         }
                     });
-                    reset_t_action_event();       
+                    reset_t_action_event();
                 }
             });
             lgn.setAttribute('live-game-page',(resp.index+1));

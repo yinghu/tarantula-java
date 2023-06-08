@@ -6,12 +6,14 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.MappingObject;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
+import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 
 
@@ -21,6 +23,8 @@ public class SavedGameModule implements Module {
     private ApplicationContext context;
     private PlatformGameServiceProvider gameServiceProvider;
     private GsonBuilder builder;
+
+    private DataStore dataStore;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
@@ -80,6 +84,34 @@ public class SavedGameModule implements Module {
             boolean rewarded = this.gameServiceProvider.dailyGiveawayServiceProvider().redeem(session.systemId(),session.name());
             session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
+        if(session.action().equals("onSet")){
+            if(bytes.length>4000){
+                session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+4000+"]").getBytes());
+            }else{
+                String[] query = session.name().split("#");
+                PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
+                if(savedGame.addKey(query[1])) savedGame.update();
+                MappingObject mo = new MappingObject();
+                mo.distributionKey(query[0]);
+                mo.label(query[1]);
+                mo.value(bytes);
+                boolean suc = dataStore.update(mo);
+                session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
+            }
+        }
+        else if(session.action().equals("onGet")){
+            String[] query = session.name().split("#");
+            PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
+            if(savedGame.addKey(query[1])) savedGame.update();
+            MappingObject mo = new MappingObject();
+            mo.distributionKey(query[0]);
+            mo.label(query[1]);
+            byte[] v = null;
+            if(dataStore.load(mo)){
+                v = mo.value();
+            }
+            session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -93,6 +125,7 @@ public class SavedGameModule implements Module {
         this.builder.registerTypeAdapter(SavedGame.class,new SavedGameDeserializer());
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        this.dataStore = this.context.dataStore("save");
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 }

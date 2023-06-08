@@ -17,6 +17,19 @@ var TARA_HTML = (function(){
         tem.push('</div>'); 
         return tem.join('');  
     };
+    let _application = function(app,className){
+        let tem = [];
+        tem.push('<span tx-service-tag=\'');
+        tem.push(app.tag);
+        tem.push('\' view-id=\'');
+        tem.push('live.game.service.'+app.name.toLowerCase());
+        tem.push('\' tx-service-category=\''+app.category);
+        tem.push('\' class=\'w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4');
+        tem.push(' tx-game-'+className+'\'>');// tx-game-service-bar\'>');
+        tem.push(app.name);
+        tem.push('</span>');
+        return tem.join('');
+    }
     let _option = function(value,view,selected){
         let tem =[];
         if(selected){
@@ -31,5 +44,6 @@ var TARA_HTML = (function(){
         command : _command,
         option : _option,
         caption : _caption,
+        application : _application
     };
 })();

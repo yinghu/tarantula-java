@@ -3,10 +3,10 @@ package com.tarantula.game.module;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.MappingObject;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.presence.saves.PlayerSaveIndex;
+import com.tarantula.platform.presence.PersonalDataIndex;
+import com.tarantula.platform.presence.PersonalDataObject;
 
 
 public class KeyValueDataStoreModule implements Module,Configurable.Listener<ConfigurableObject>{
@@ -21,29 +21,41 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
             if(payload.length>maxSizeOnSet){
                 session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+maxSizeOnSet+"]").getBytes());
             }else{
-                String[] query = session.name().split("#");
-                PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
-                if(savedGame.addKey(query[1])) savedGame.update();
-                MappingObject mo = new MappingObject();
-                mo.distributionKey(query[0]);
-                mo.label(query[1]);
-                mo.value(payload);
-                boolean suc = dataStore.update(mo);
+                PersonalDataIndex savedIndex = gameServiceProvider.presenceServiceProvider().loadPersonalDataIndex(session.systemId());
+                String key = savedIndex.dataKey(session.name());
+                PersonalDataObject po = new PersonalDataObject();
+                if(key !=null) po.distributionKey(key.split("#")[1]);
+                po.value(payload);
+                boolean suc;
+                if(key==null) {
+                    suc = dataStore.create(po);
+                    if(suc && savedIndex.addKey(session.name()+"#"+po.distributionKey())){
+                        savedIndex.update();
+                    }
+                }
+                else{
+                    dataStore.load(po);
+                    po.value(payload);
+                    suc = dataStore.update(po);
+                }
                 session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
             }
         }
         else if(session.action().equals("onGet")){
-            String[] query = session.name().split("#");
-            PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
-            if(savedGame.addKey(query[1])) savedGame.update();
-            MappingObject mo = new MappingObject();
-            mo.distributionKey(query[0]);
-            mo.label(query[1]);
-            byte[] v = null;
-            if(dataStore.load(mo)){
-                v = mo.value();
+            PersonalDataIndex savedIndex = gameServiceProvider.presenceServiceProvider().loadPersonalDataIndex(session.systemId());
+            String key = savedIndex.dataKey(session.name());
+            if(key == null) {
+                session.write(JsonUtil.toSimpleResponse(false,session.name()+ " not existed").getBytes());
             }
-            session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
+            else{
+                PersonalDataObject po = new PersonalDataObject();
+                po.distributionKey(key.split("#")[1]);
+                byte[] v = null;
+                if(dataStore.load(po)){
+                    v = po.value();
+                }
+                session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());

@@ -147,4 +147,11 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         return playerSaveIndex;
     }
 
+    public PersonalDataIndex loadPersonalDataIndex(String systemId){
+        PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
+        playerSaveIndex.distributionKey(systemId);
+        presenceDataStore.createIfAbsent(playerSaveIndex,true);
+        playerSaveIndex.dataStore(presenceDataStore);
+        return playerSaveIndex;
+    }
 }
