@@ -9,7 +9,7 @@ import com.tarantula.platform.presence.PersonalDataIndex;
 import com.tarantula.platform.presence.PersonalDataObject;
 
 
-public class KeyValueDataStoreModule implements Module,Configurable.Listener<ConfigurableObject>{
+public class PersonalDataStoreModule implements Module,Configurable.Listener<ConfigurableObject>{
 
     private ApplicationContext context;
     private DataStore dataStore;
@@ -55,6 +55,19 @@ public class KeyValueDataStoreModule implements Module,Configurable.Listener<Con
                     v = po.value();
                 }
                 session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
+            }
+        }
+        else if(session.action().equals("onDelete")){
+            PersonalDataIndex savedIndex = gameServiceProvider.presenceServiceProvider().loadPersonalDataIndex(session.systemId());
+            String key = savedIndex.dataKey(session.name());
+            if(key == null) {
+                session.write(JsonUtil.toSimpleResponse(false,session.name()+ " not existed").getBytes());
+            }
+            else{
+                if(dataStore.delete(key.split("#")[1].getBytes()) && savedIndex.removeKey(key)){
+                    savedIndex.update();
+                }
+                session.write(JsonUtil.toSimpleResponse(true,key+" deleted").getBytes());
             }
         }
         else{

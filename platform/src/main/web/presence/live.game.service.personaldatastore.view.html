@@ -47,6 +47,7 @@
     inboxList.innerHTML = '';
     inboxList.innerHTML += TARA_HTML.command('onSet','DataStore','Set','data-store-set','Save');
     inboxList.innerHTML += TARA_HTML.command('onGet','DataStore','Get','data-store-set','Load');
+    inboxList.innerHTML += TARA_HTML.command('onDelete','DataStore','Delete','data-store-set','Delete');
     document.querySelectorAll('.tx-live-data-store-set').forEach(a=>{
         a.onclick=()=>{
             let cmd = a.getAttribute('tx-item-id');
@@ -55,6 +56,9 @@
             }
             else if(cmd=='onGet'){
                 tx_on_get_value();
+            }
+            else if(cmd=='onDelete'){
+                tx_on_delete_value();
             }
             else{
                 let error ={message:cmd+' not supported'};
@@ -87,7 +91,13 @@
     }
     function tx_on_set_value(){
         let dkey = document.querySelector('#tx-data-store-key').value;
-        TARA_API.onSet(TARA_API.query().serviceTag,'onSet',"ShipInfo",editor.get(),(resp)=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,'onSet',dkey,editor.get(),(resp)=>{
+            editor.set(resp);
+        });   
+    }
+    function tx_on_delete_value(){
+        let dkey = document.querySelector('#tx-data-store-key').value;
+        TARA_API.onGet(TARA_API.query().serviceTag,'onDelete',dkey,(resp)=>{
             editor.set(resp);
         });   
     }

@@ -20,6 +20,6 @@
     {"type": "live.game.service.save","moduleResourceFile": "presence/live.game.service.save.view.html"},
     {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.resource.view.html"},
     {"type": "live.game.service.serviceproxy","moduleResourceFile": "presence/live.game.service.proxy.view.html"},
-    {"type": "live.game.service.jsondatastore","moduleResourceFile": "presence/live.game.service.jsondatastore.view.html"}
+    {"type": "live.game.service.personaldatastore","moduleResourceFile": "presence/live.game.service.personaldatastore.view.html"}
   ]
 }
