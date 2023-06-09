@@ -344,9 +344,7 @@
     };
     document.querySelector('#tx-configuration-asset-cancel').onclick=()=>{
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';    
+        tx_close_current_page();   
     };
     document.querySelector('#tx-configuration-asset-save').onclick=()=>{
         document.querySelector('#tx-configuration-asset-save').style.display = 'none';
@@ -429,9 +427,7 @@
     };
     document.querySelector('#tx-configuration-asset-api-close').onclick=()=>{
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();     
     };
     document.querySelector('#tx-create-asset-warning-message-ok').onclick=()=>{
         document.querySelector('#tx-create-asset-warning-message-board').style.display = 'none';

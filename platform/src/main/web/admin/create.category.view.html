@@ -117,7 +117,7 @@
         </div>
         <div id="tx-create-category-warning-message" class="w3-panel w3-center tx-text-14"></div>
         <div class="w3-panel w3-center">
-            <span id="tx-create-category-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">CANCEL</span>     
+            <span id="tx-create-category-warning-message-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">OK</span>     
         </div>
         <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
             <div class="w3-display-topleft w3-padding">
@@ -388,8 +388,6 @@
     }
     function close_create_category_view(){
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';
+        tx_close_current_page();
     }
 </script>

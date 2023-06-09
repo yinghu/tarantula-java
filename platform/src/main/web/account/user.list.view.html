@@ -65,9 +65,7 @@
         document.querySelector('#tx-list-user-enable-access').style.display='none';
     };
     document.querySelector('#tx-user-list-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();       
     };
     function _list_user(){
         TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{

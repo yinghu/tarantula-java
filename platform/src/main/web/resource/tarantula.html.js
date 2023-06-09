@@ -4,7 +4,7 @@ var TARA_HTML = (function(){
     }
     let _command = function(itemId,resource,name,className,actionName){
         let tem = [];
-        tem.push('<div class=\'w3-container\'>');
+        tem.push('<div class=\'w3-container w3-border-bottom w3-border-red\'>');
         tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8\'><i class=\'fa fa-hourglass-1\' style=\'font-size:24px;color:blue\'></i></span>');
         tem.push('<span class=\'w3-left tx-text-14 tx-margin-top-8 tx-margin-left-16\'>');
         tem.push(resource);

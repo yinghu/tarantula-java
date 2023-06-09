@@ -11,7 +11,7 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel">
-        <div id='tx-edit-category-list' class="w3-container  w3-border-bottom w3-border-red">
+        <div id='tx-edit-category-list' class="w3-container">
             
         </div>
     </div>
@@ -30,21 +30,34 @@
     categoryList.innerHTML = '';
     tx_category_list_setup();
     document.querySelector('#tx-edit-category-close').onclick=()=>{
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };    
     function tx_category_list_setup(){
         TARA_API.onGet('role/admin/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
+            console.log(resp);
+            TARA_API.query().typeList = resp.types.itemList;
             TARA_API.query().itemList = resp.itemList;
             resp.itemList.forEach((item,i) => {
-                categoryList.innerHTML += TARA_HTML.command(i,item.header.type,item.header.version,'edit-category','Edit');    
+                categoryList.innerHTML += TARA_HTML.command(i,'category : '+item.header.type,item.header.version,'edit-category','Edit');    
+            });
+            resp.types.itemList.forEach((item,i) => {
+                if(item.type == 'enum'){
+                    categoryList.innerHTML += TARA_HTML.command(i,item.type,item.name,'edit-enum','Edit');
+                }    
             });
             document.querySelectorAll('.tx-live-edit-category').forEach(a=>{
                 a.onclick = ()=>{
                     TARA_API.query().operation = 'Update';
                     TARA_API.query().itemIndex = a.getAttribute('tx-item-id')/1;
                     tx_view({viewId:'create.category',containerId:'#tx-popup-game'});
+                    //console.log(a.getAttribute('tx-item-id'));          
+                }
+            });
+            document.querySelectorAll('.tx-live-edit-enum').forEach(a=>{
+                a.onclick = ()=>{
+                    TARA_API.query().operation = 'Update';
+                    TARA_API.query().itemIndex = a.getAttribute('tx-item-id')/1;
+                    tx_view({viewId:'create.enum',containerId:'#tx-popup-game'});
                     //console.log(a.getAttribute('tx-item-id'));          
                 }
             });

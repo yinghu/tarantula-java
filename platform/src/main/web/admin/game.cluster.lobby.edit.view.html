@@ -35,9 +35,7 @@
     let gameEditMessage = document.querySelector('#tx-game-lobby-edit-message');
     let lobbyIndex = 0;
     document.querySelector('#tx-edit-game-cluster-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();    
     };
     document.querySelector('#tx-add-game-lobby').onclick=()=>{
         TARA_API.onGet('role/admin/lobby','onAddLobby',TARA_API.query().gameClusterId+'#'+(lobbyIndex+1),(resp)=>{

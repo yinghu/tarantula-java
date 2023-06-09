@@ -214,8 +214,6 @@
     }
     function close_create_primitive_view(){
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';
+        tx_close_current_page();
     }
 </script>

@@ -323,9 +323,6 @@
         }
         function tx_on_login(){
             tx_close_current_page();
-            //let m3 = document.querySelector(TARA_API.query().pages.pop());
-            //m3.innerHTML="";
-            //m3.style.display = 'none'; 
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_first_upcase(word){
@@ -337,7 +334,9 @@
             }
         }
         function tx_close_current_page(){
-            let mp = document.querySelector(TARA_API.query().pages.pop());
+            let pn = TARA_API.query().pages.pop();
+            let mp = document.querySelector(pn);
+            //console.log('closing page->'+pn);
             mp.innerHTML="";
             mp.style.display = 'none';
         }

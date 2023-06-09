@@ -71,9 +71,7 @@
     document.querySelector('#tx-enable-jvm-metrics-close').onclick=()=>{
         clearInterval(_timer);
         chart.destroy();
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';
+        tx_close_current_page();
     };
     function _load_service_metrics(){
         TARA_API.onGet('role/sudo','onEnableServiceView',_serviceSelected,(resp)=>{

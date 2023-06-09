@@ -189,9 +189,7 @@
         tx_view({viewId:'create.primitive',containerId:'#tx-popup-api'});
     };
     document.querySelector('#tx-game-asset-list-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };
     document.querySelector('#tx-application-operation-selection-cancel').onclick =()=>{
         operationBoard.style.display = 'none';

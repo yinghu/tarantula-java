@@ -49,9 +49,7 @@
     
     document.querySelector('#tx-gamestore-live-close').onclick=()=>{
         editor.destroy();
-        let m3 = document.querySelector(TARA_API.query().popup);
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };
     document.querySelector('#tx-gamestore-live-service-json-mode-tree').onclick=()=>{
         editor.setMode('tree');

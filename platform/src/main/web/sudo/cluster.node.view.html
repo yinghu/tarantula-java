@@ -67,9 +67,7 @@
     document.querySelector('#tx-cluster-node-member-id').innerHTML = node.memberId;
     document.querySelector('#tx-cluster-node-start-time').innerHTML = node.startTime;
     document.querySelector('#tx-cluster-node-close').onclick=()=>{
-        let m3 = document.querySelector("#tx-popup-api");
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();       
     };
     document.querySelector('#tx-cluster-shutdown').onclick = ()=>{
         TARA_API.onGet('role/sudo','onClusterShutdown','',(resp)=>{

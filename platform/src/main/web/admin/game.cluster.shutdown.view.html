@@ -33,19 +33,13 @@
         TARA_API.onGet('role/admin','onShutdownGameCluster',TARA_API.query().gameClusterId,(resp)=>{
             document.querySelector('#tx-game-cluster-shutdown-message').innerHTML=resp.message; 
             TARA_API.query().callback();      
-            let m3 = document.querySelector('#tx-popup');
-            m3.innerHTML="";
-            m3.style.display = 'none';
+            tx_close_current_page();
         });
     };
     document.querySelector('#tx-game-cluster-shutdown-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };
     document.querySelector('#tx-game-cluster-shutdown-cancel').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };
 </script>

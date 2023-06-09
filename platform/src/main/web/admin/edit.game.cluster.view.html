@@ -241,14 +241,10 @@
         TARA_API.onService(true,{serviceTag:'role/admin',command:'onLaunchGameCluster',accessId:TARA_API.query().gameClusterId},(resp)=>{
             document.querySelector('#tx-edit-game-cluster-message').innerHTML = resp.message;  
             TARA_API.query().callback(); 
-            let m3 = document.querySelector('#tx-popup');
-            m3.innerHTML="";
-            m3.style.display = 'none';   
+            tx_close_current_page(); 
         });
     };
     document.querySelector('#tx-edit-game-cluster-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();       
     };
 </script>

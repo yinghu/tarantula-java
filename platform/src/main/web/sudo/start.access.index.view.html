@@ -36,13 +36,9 @@
         });    
     };
     document.querySelector('#tx-start-access-index-cancel').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();      
     };
     document.querySelector('#tx-start-access-index-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();     
     };
 </script>

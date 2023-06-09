@@ -30,9 +30,7 @@
         tx_service_bar_reset(resp);       
     });
     document.querySelector('#tx-game-service-list-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();       
     }; 
     function tx_service_bar_reset(resp){
         if(resp.successful){

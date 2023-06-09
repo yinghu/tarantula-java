@@ -182,9 +182,7 @@
     document.querySelector('#tx-metrics-list-close').onclick=()=>{
         clearTimeout(_timer);
         chart.destroy();
-        let m3 = document.querySelector('#tx-popup');
-        m3.innerHTML="";
-        m3.style.display = 'none';       
+        tx_close_current_page();     
     };
     //_load_metrics_categories();
     TARA_API.onGet('role/sudo/metrics','onMetricsList','',(resp)=>{
