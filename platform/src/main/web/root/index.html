@@ -265,7 +265,7 @@
         }
         function _view_load(v,cid){
             TARA_API.onResource({name:v.moduleResourceFile,flag:v.flag,type:'text/html'},function(h){
-                //TARA_API.query().popup = cid;
+                TARA_API.query().pages.push(cid);
                 let m0 = document.querySelector(cid);
                 m0.insertAdjacentHTML("afterbegin",h);   
                 _api_script(m0,function(exe){
@@ -322,9 +322,10 @@
             });
         }
         function tx_on_login(){
-            let m3 = document.querySelector('#tx-popup');
-            m3.innerHTML="";
-            m3.style.display = 'none'; 
+            tx_close_current_page();
+            //let m3 = document.querySelector(TARA_API.query().pages.pop());
+            //m3.innerHTML="";
+            //m3.style.display = 'none'; 
             tx_view({viewId:'dashboard',containerId:'#tx-dash-board'});
         }
         function tx_first_upcase(word){
@@ -334,6 +335,11 @@
             while(arr.length>0){
                 arr.pop();
             }
+        }
+        function tx_close_current_page(){
+            let mp = document.querySelector(TARA_API.query().pages.pop());
+            mp.innerHTML="";
+            mp.style.display = 'none';
         }
     </script>
 </body>

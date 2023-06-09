@@ -55,7 +55,7 @@
         });            
     };
     document.querySelector('#tx-sign-on-close').onclick=()=>{
-        let m3 = document.querySelector('#tx-popup');
+        let m3 = document.querySelector(TARA_API.query().pages.pop());
         m3.innerHTML="";
         m3.style.display = 'none';       
     };

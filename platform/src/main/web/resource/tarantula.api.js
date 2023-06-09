@@ -2,7 +2,7 @@ var TARA_API = (function(){
         
   const vmap = new Map();    
   let presence = {};    
-  let qdata ={};
+  let qdata ={pages:[]};
   let lobbyList =[];
   let wsWorker;
     
@@ -366,7 +366,7 @@ var TARA_API = (function(){
     let payload = {serviceTag:'presence/lobby',command:'onAbsence',post:false};
     _service(false,payload,function(resp){
         presence ={};
-        qdata ={};
+        qdata ={pages:[]};
         lobbyList.pop();
         vmap.clear();
         callback(resp);
