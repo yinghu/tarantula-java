@@ -53,6 +53,19 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());
         }
+        removeItem(type).add(type);
+    }
+    public void removeType(JsonObject type){
+        if(!application.has(ITEM_LIST)){
+            return;
+        }
+        removeItem(type);
+    }
+    public Key key(){
+        return new NaturalKey("category/types/"+name);
+    }
+
+    private JsonArray removeItem(JsonObject type){
         JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
         JsonElement existing = null;
         for(JsonElement je : items) {
@@ -64,10 +77,6 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         if(existing !=null){
             items.remove(existing);
         }
-        items.add(type);
+        return items;
     }
-    public Key key(){
-        return new NaturalKey("category/types/"+name);
-    }
-
 }

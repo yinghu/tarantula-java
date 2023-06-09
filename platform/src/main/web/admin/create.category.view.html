@@ -349,7 +349,7 @@
         editor.setMode('preview');
     };
     document.querySelector('#tx-configuration-category-delete').onclick=()=>{
-        TARA_API.onSet('role/admin/item','onDeleteCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,editor.get(),(resp)=>{
+        TARA_API.onSet('role/admin/item','onDeleteCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#category',editor.get(),(resp)=>{
             editor.set(resp);   
         });
     };

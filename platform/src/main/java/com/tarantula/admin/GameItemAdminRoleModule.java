@@ -158,7 +158,19 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         else if(session.action().equals("onDeleteCategorySettings")){
             this.context.log(new String(payload),OnLog.WARN);
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+            if(query[2].equals("category")){
+                session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            }
+            else if(query[2].equals("enum")){
+
+                session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,query[2]+" cannot be deleted").getBytes());
+            }
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
