@@ -176,6 +176,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     public <T extends Configurable> boolean load(GameCluster gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
+        t.dataStore(dataStore);
         return dataStore.load(t);
     }
     public <T extends Configurable> boolean delete(GameCluster gameCluster, T t){

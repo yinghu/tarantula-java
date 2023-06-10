@@ -2,58 +2,30 @@ package com.tarantula.platform.configuration;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.mysql.cj.callback.UsernameCallback;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.store.ApplicationStoreProvider;
-import com.tarantula.platform.item.ItemDistributionCallback;
-import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.ConfigurableObjectQuery;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformConfigurationServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformConfigurationServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "configuration";
 
-    private GameCluster gameCluster;
-    private TarantulaLogger logger;
-    private final String gameServiceName;
     private final String typeId;
-
-    private ApplicationPreSetup applicationPreSetup;
-
-    private DistributionItemService distributionItemService;
-
-    private ServiceContext serviceContext;
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
 
-    private PlatformGameServiceProvider platformGameServiceProvider;
-
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.platformGameServiceProvider = gameServiceProvider;
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
-    }
-
-    @Override
-    public String name() {
-        return NAME;
-    }
-
-    @Override
-    public void start() throws Exception {
-
     }
 
     @Override
@@ -143,10 +115,9 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
-        this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
+        super.setup(serviceContext);
+        gameCluster.addListener(this);
+        this.logger = serviceContext.logger(PlatformConfigurationServiceProvider.class);
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
@@ -175,6 +146,35 @@ public class PlatformConfigurationServiceProvider implements ConfigurationServic
             return googleOAuthTokenValidator;
         }
         return null;
+    }
+
+    public <T extends Configurable> void onCreated(Descriptor application,T t){
+        int index = t.configurationType().indexOf(".");
+        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name(scope);
+        if(!applicationPreSetup.load(gameCluster,categories)){
+            logger.warn("Categories missed from ["+ scope+"]");
+            return;
+        }
+        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
+        logger.warn(configurableSetting.toString());
+        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
+    }
+    public <T extends Configurable> void onUpdated(Descriptor application,T t){
+        logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onDeleted(Descriptor application,T t){
+        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onCreated(GameCluster application,T t){
+        logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onUpdated(GameCluster application,T t){
+        logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
+    }
+    public <T extends Configurable> void onDeleted(GameCluster application,T t){
+        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
     }
 
 }

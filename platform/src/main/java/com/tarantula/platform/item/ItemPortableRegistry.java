@@ -28,7 +28,7 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int CATEGORY_CID = 9;
     public static final int CATEGORY_ITEM_CID = 10;
 
-    public static final int INDEX_CID = 11;
+    public static final int INSTANCE_INDEX_CID = 11;
 
     public static final int SHOPPING_ITEM_CID = 13;
 
@@ -75,8 +75,8 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
             case CATEGORY_ITEM_CID:
                 pt = new CategoryItem();
                 break;
-            case INDEX_CID:
-                pt = new Index();
+            case INSTANCE_INDEX_CID:
+                pt = new InstanceIndex();
                 break;
             case SHOPPING_ITEM_CID:
                 pt = new ShoppingItem();

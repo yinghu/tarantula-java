@@ -37,4 +37,5 @@ public class TypeIndex extends RecoverableObject implements Configurable {
     public Key key(){
         return new NaturalKey(name);
     }
+
 }

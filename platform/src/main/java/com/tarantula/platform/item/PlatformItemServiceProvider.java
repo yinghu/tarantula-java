@@ -24,6 +24,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     protected ApplicationPreSetup applicationPreSetup;
     protected DataStore dataStore;
     protected Descriptor application;
+
     public PlatformItemServiceProvider(PlatformGameServiceProvider gameServiceProvider,String name){
         this.platformGameServiceProvider = gameServiceProvider;
         this.gameCluster = gameServiceProvider.gameCluster();
@@ -69,26 +70,5 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public boolean onItemReleased(String category,String itemId){
         return false;
     }
-
-
-    public <T extends Configurable> void onCreated(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion());
-    }
-    public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
-    }
-    public <T extends Configurable> void onDeleted(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
-    }
-    public <T extends Configurable> void onCreated(GameCluster application,T t){
-        logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
-    }
-    public <T extends Configurable> void onUpdated(GameCluster application,T t){
-        logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
-    }
-    public <T extends Configurable> void onDeleted(GameCluster application,T t){
-        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
-    }
-
 
 }

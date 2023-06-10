@@ -251,12 +251,12 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         category.dataStore(dataStore);
         return category;
     }
-    public Index index(Descriptor app,String query){
-        Index index = new Index(query);
-        index.distributionKey(app.distributionKey());
-        index.dataStore(dataStore);
-        return index;
-    }
+    //public Index index(Descriptor app,String query){
+        //Index index = new Index(query);
+        //index.distributionKey(app.distributionKey());
+        //index.dataStore(dataStore);
+        //return index;
+    //}
 
     public void configurableSetting(ConfigurableSetting configurableSetting){
         configurationScope = configurableSetting.scope;

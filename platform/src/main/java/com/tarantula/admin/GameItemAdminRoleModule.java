@@ -42,12 +42,14 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
             boolean updateAllowed = true;
+            boolean deleted = query[2].equals("delete");
             if(applicationPreSetup.load(gameCluster,typeIndex)){
-                updateAllowed = typeIndex.payload.get("type").getAsString().equals("enum");
+                InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
+                applicationPreSetup.load(gameCluster,instanceIndex);
+                updateAllowed = deleted ?(typeIndex.payload.get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload.get("type").getAsString().equals("enum");
             }
-            if(updateAllowed && jo.get("type").getAsString().equals("enum")){
+            if(updateAllowed){
                 typeIndex.payload = jo;
-                boolean deleted = query[2].equals("delete");
                 if(deleted){
                     applicationPreSetup.delete(gameCluster,typeIndex);
                 }else{
@@ -362,7 +364,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
         app.configurableSetting(conf);
-        if(!gameCluster.applicationPreSetup().save(desc,app)){
+        if(!applicationPreSetup.save(desc,app)){
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
         return new AssetSerializer().serialize(app,Application.class,null).toString();
@@ -378,7 +380,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
         app.configurableSetting(conf);
-        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+        if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
         return new ComponentSerializer().serialize(app,Application.class,null).toString();
@@ -394,7 +396,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
         app.configurableSetting(conf);
-        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+        if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
         Category category = app.category(desc);
@@ -413,7 +415,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
         app.configurableSetting(conf);
-        if(!gameCluster.applicationPreSetup().save(desc,app)) {
+        if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
         return new ItemSerializer().serialize(app,Application.class,null).toString();
@@ -430,7 +432,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
         app.disabled(true);
         app.configurableSetting(conf);
-        if(!gameCluster.applicationPreSetup().save(desc,app)){
+        if(!applicationPreSetup.save(desc,app)){
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
         app.setup();

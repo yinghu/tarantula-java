@@ -7,9 +7,14 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Lobby;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.item.ConfigurableCategories;
+import com.tarantula.platform.item.ConfigurableSetting;
+import com.tarantula.platform.item.InstanceIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -24,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
 
+    private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
     public final static String NAME="1";
@@ -67,6 +73,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
 
     protected ServiceContext serviceContext;
+
+    protected ApplicationPreSetup applicationPreSetup;
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -202,7 +210,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
 
     public ApplicationPreSetup applicationPreSetup(){
-        ApplicationPreSetup applicationPreSetup = SystemUtil.applicationPreSetup((String) properties.get(GameCluster.LOBBY_PRE_SETUP_NAME));
+        if(applicationPreSetup!=null) return applicationPreSetup;
+        applicationPreSetup = SystemUtil.applicationPreSetup((String) properties.get(GameCluster.LOBBY_PRE_SETUP_NAME));
         applicationPreSetup.setup(serviceContext);
         applicationPreSetup.registerListener(this);
         return applicationPreSetup;
@@ -283,6 +292,33 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onCreated(Descriptor application,T t) {
+        int index = t.configurationType().indexOf(".");
+        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name(scope);
+        if(!applicationPreSetup.load(this,categories)){
+            logger.warn("Categories not existed ["+scope+"]");
+            return;
+        }
+        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
+        if(configurableSetting==null){
+            logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
+            return;
+        }
+        InstanceIndex instanceIndex = new InstanceIndex(t.configurationCategory());
+        applicationPreSetup.load(this,instanceIndex);
+        instanceIndex.addKey(t.key().asString());
+        applicationPreSetup.save(this,instanceIndex);
+        configurableSetting.properties.forEach(prop->{
+            JsonObject ctype = prop.getAsJsonObject();
+            String type = ctype.get("type").getAsString();
+            if(type.equals("enum")){
+                InstanceIndex enumIndex = new InstanceIndex(ctype.get("reference").getAsString());
+                applicationPreSetup.load(this,enumIndex);
+                enumIndex.addKey(t.key().asString());
+                applicationPreSetup.save(this,enumIndex);
+            }
+        });
         listeners.forEach(l->l.onCreated(application,t));
     }
     @Override
