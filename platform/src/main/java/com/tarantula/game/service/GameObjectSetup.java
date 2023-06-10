@@ -170,7 +170,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
             return true;
         }
         boolean created = dataStore.createIfAbsent(t,false);
-        if(this.listener!=null) listener.onCreated(gameCluster,t);
+        if(created && this.listener!=null) listener.onCreated(gameCluster,t);
         return created;
     }
 
@@ -180,8 +180,9 @@ public class GameObjectSetup implements ApplicationPreSetup {
     }
     public <T extends Configurable> boolean delete(GameCluster gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());
-        if(this.listener!=null) listener.onDeleted(gameCluster,t);
-        return dataStore.load(t);
+        boolean suc = dataStore.delete(t.key().asString().getBytes());
+        if(suc && this.listener!=null) listener.onDeleted(gameCluster,t);
+        return suc;
     }
     public <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = serviceContext.dataStore(configureDataStore(gameCluster,DS_CONFIG),serviceContext.node().partitionNumber());

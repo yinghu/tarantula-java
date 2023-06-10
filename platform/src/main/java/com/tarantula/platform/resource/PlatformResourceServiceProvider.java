@@ -31,6 +31,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        gameCluster.addListener(this);
         this.logger = serviceContext.logger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }

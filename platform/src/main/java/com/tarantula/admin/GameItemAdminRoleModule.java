@@ -47,11 +47,20 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             }
             if(updateAllowed && jo.get("type").getAsString().equals("enum")){
                 typeIndex.payload = jo;
-                applicationPreSetup.save(gameCluster,typeIndex);
+                boolean deleted = query[2].equals("delete");
+                if(deleted){
+                    applicationPreSetup.delete(gameCluster,typeIndex);
+                }else{
+                    applicationPreSetup.save(gameCluster,typeIndex);
+                }
                 List<String> updates = availableUpdates(query[1]);
                 updates.forEach((update)-> {
                     ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                    configurableTypes.addType(jo);
+                    if(deleted){
+                        configurableTypes.removeType(jo);
+                    }else{
+                        configurableTypes.addType(jo);
+                    }
                     applicationPreSetup.save(gameCluster, configurableTypes);
                     if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
                 });
@@ -154,22 +163,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not existed").getBytes());
-            }
-        }
-        else if(session.action().equals("onDeleteCategorySettings")){
-            this.context.log(new String(payload),OnLog.WARN);
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            if(query[2].equals("category")){
-                session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
-            }
-            else if(query[2].equals("enum")){
-
-                session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,query[2]+" cannot be deleted").getBytes());
             }
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
@@ -309,7 +302,12 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         if(!applicationPreSetup.load(gameCluster,configurableTypes)){
             Configuration commonTypes = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMON_TYPE_TEMPLATE);
             JsonArray ctypes = (JsonArray)commonTypes.property("itemList");
-            ctypes.forEach((c)-> configurableTypes.addType(c.getAsJsonObject()));
+            ctypes.forEach((c)-> {
+                JsonObject jo = c.getAsJsonObject();
+                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),"common",jo);
+                applicationPreSetup.save(gameCluster,typeIndex);
+                configurableTypes.addType(jo);
+            });
             ConfigurableTemplate template = this.categoryTemplateSetting(gameCluster,name);
             JsonArray cct = (JsonArray)template.property("itemList");
             cct.forEach((t)->{

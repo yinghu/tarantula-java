@@ -247,7 +247,7 @@
     document.querySelector('#tx-create-category-save').onclick=()=>{    
         document.querySelector('#tx-create-category-save').style.display ='none';
         let item = editor.get();
-        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
+        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#save';
         let cmd = 'on'+TARA_API.query().operation+'CategorySettings';
         //console.log(cmd+'>>>'+query);
         TARA_API.onSet('role/admin/item',cmd,query,item,(resp)=>{
@@ -349,7 +349,7 @@
         editor.setMode('preview');
     };
     document.querySelector('#tx-configuration-category-delete').onclick=()=>{
-        TARA_API.onSet('role/admin/item','onDeleteCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#category',editor.get(),(resp)=>{
+        TARA_API.onSet('role/admin/item','onUpdateCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#delete',editor.get(),(resp)=>{
             editor.set(resp);   
         });
     };

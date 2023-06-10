@@ -151,7 +151,7 @@
     document.querySelector('#tx-create-enum-save').onclick=()=>{    
         document.querySelector('#tx-create-enum-save').style.display ='none';
         let item = editor.get();
-        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category;
+        let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#save';
         TARA_API.onSet('role/admin/item','onUpdateEnumSettings',query,item,(resp)=>{
             editor.set(resp);   
         });
@@ -195,7 +195,7 @@
         editor.setMode('preview');
     };
     document.querySelector('#tx-configuration-enum-delete').onclick=()=>{
-        TARA_API.onSet('role/admin/item','onDeleteCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#enum',editor.get(),(resp)=>{
+        TARA_API.onSet('role/admin/item','onUpdateEnumSettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category+'#delete',editor.get(),(resp)=>{
             editor.set(resp);   
         });
     };
