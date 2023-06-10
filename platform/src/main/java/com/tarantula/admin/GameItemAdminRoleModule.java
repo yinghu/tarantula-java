@@ -41,7 +41,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
-            boolean updateAllowed = true;
+            boolean updateAllowed = false;
             boolean deleted = query[2].equals("delete");
             if(applicationPreSetup.load(gameCluster,typeIndex)){
                 InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
@@ -68,7 +68,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 });
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"update not allowed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,query[2]+" not allowed").getBytes());
             }
         }
         else if(session.action().equals("onUpdateTypesSettings")){
@@ -140,24 +140,52 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
             String scope = header.get("scope").getAsString();
+            boolean updated = query[2].equals("save");
             TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString());
             if(applicationPreSetup.load(gameCluster,typeIndex)){
                 if(typeIndex.index().equals(scope)){
-                    typeIndex.payload = jo;
-                    applicationPreSetup.save(gameCluster,typeIndex);
-                    String ctype = typeIndex.index();
-                    int aix = ctype.indexOf('.');
-                    if(aix>0){
-                        ctype = ctype.substring(0,aix);
-                    }
-                    List<String> updates = this.availableUpdates(ctype);
-                    updates.forEach(update->{
-                        ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-                        if(categories.updateCategory(jo)){
-                            applicationPreSetup.save(gameCluster,categories);
+                    if(updated){
+                        typeIndex.payload = jo;
+                        applicationPreSetup.save(gameCluster,typeIndex);
+                        String ctype = typeIndex.index();
+                        int aix = ctype.indexOf('.');
+                        if(aix>0){
+                            ctype = ctype.substring(0,aix);
                         }
-                        if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
-                    });
+                        List<String> updates = this.availableUpdates(ctype);
+                        updates.forEach(update->{
+                            ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
+                            if(categories.updateCategory(jo)){
+                                applicationPreSetup.save(gameCluster,categories);
+                            }
+                            if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
+                        });
+                    }
+                    else{
+                        InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
+                        applicationPreSetup.load(gameCluster,instanceIndex);
+                        boolean deleted = query[2].equals("delete") && instanceIndex.keySet().isEmpty();
+                        if(deleted){
+                            applicationPreSetup.delete(gameCluster,typeIndex);
+                            applicationPreSetup.delete(gameCluster,instanceIndex);
+                            String ctype = typeIndex.index();
+                            int aix = ctype.indexOf('.');
+                            if(aix>0){
+                                ctype = ctype.substring(0,aix);
+                            }
+                            List<String> updates = this.availableUpdates(ctype);
+                            updates.forEach(update->{
+                                ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
+                                if(categories.removeCategory(jo)){
+                                    applicationPreSetup.save(gameCluster,categories);
+                                }
+                            });
+                            session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" deleted").getBytes());
+                        }
+                        else{
+                            session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not allowed to delete").getBytes());
+                        }
+                    }
                 }
                 else{
                     session.write(JsonUtil.toSimpleResponse(false,"scope not matched ["+ header.get("scope").getAsString()+"<>"+typeIndex.index()+"]").getBytes());

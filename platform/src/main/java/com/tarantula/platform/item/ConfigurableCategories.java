@@ -88,6 +88,23 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         items.add(type);
         return true;
     }
+    public boolean removeCategory(JsonObject type){
+        if(!application.has(ITEM_LIST)){
+            application.add(ITEM_LIST,new JsonArray());
+        }
+        JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        boolean removed = false;
+        for(Iterator<JsonElement> it = items.iterator(); it.hasNext();){
+            JsonObject jo = it.next().getAsJsonObject();
+            String ex = jo.get("header").getAsJsonObject().get("type").getAsString();
+            String ax = type.get("header").getAsJsonObject().get("type").getAsString();
+            if(ex.equals(ax)){
+                it.remove();
+                removed = true;
+            }
+        }
+        return removed;
+    }
     public void configurableTypes(ConfigurableTypes configurableTypes){
         this.configurableTypes = configurableTypes;
     }
