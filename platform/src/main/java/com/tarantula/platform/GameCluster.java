@@ -15,6 +15,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.ConfigurableCategories;
 import com.tarantula.platform.item.ConfigurableSetting;
 import com.tarantula.platform.item.InstanceIndex;
+import com.tarantula.platform.item.TypeIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -302,10 +303,16 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
+        if(t instanceof TypeIndex){
+            logger.warn(((TypeIndex) t).payload.toString());
+        }
         listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
+        if(t instanceof TypeIndex){
+            logger.warn(((TypeIndex) t).payload.toString());
+        }
         listeners.forEach(l->l.onCreated(application,t));
     }
 

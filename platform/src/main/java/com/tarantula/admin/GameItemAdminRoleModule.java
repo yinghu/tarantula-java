@@ -41,7 +41,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
-            boolean updateAllowed = false;
+            boolean updateAllowed = query[2].equals("save");
             boolean deleted = query[2].equals("delete");
             if(applicationPreSetup.load(gameCluster,typeIndex)){
                 InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
@@ -55,7 +55,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 }else{
                     applicationPreSetup.save(gameCluster,typeIndex);
                 }
-                List<String> updates = availableUpdates(query[1]);
+                List<String> updates = availableUpdates(deleted?Configurable.ASSET_CONFIG_TYPE:query[1]);
                 updates.forEach((update)-> {
                     ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
                     if(deleted){
