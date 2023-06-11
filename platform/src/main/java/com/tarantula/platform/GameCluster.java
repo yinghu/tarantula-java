@@ -292,37 +292,12 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onCreated(Descriptor application,T t) {
-        int index = t.configurationType().indexOf(".");
-        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
-        ConfigurableCategories categories = new ConfigurableCategories();
-        categories.name(scope);
-        if(!applicationPreSetup.load(this,categories)){
-            logger.warn("Categories not existed ["+scope+"]");
-            return;
-        }
-        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
-        if(configurableSetting==null){
-            logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
-            return;
-        }
-        InstanceIndex instanceIndex = new InstanceIndex(t.configurationCategory());
-        applicationPreSetup.load(this,instanceIndex);
-        instanceIndex.addKey(t.key().asString());
-        applicationPreSetup.save(this,instanceIndex);
-        configurableSetting.properties.forEach(prop->{
-            JsonObject ctype = prop.getAsJsonObject();
-            String type = ctype.get("type").getAsString();
-            if(type.equals("enum")){
-                InstanceIndex enumIndex = new InstanceIndex(ctype.get("reference").getAsString());
-                applicationPreSetup.load(this,enumIndex);
-                enumIndex.addKey(t.key().asString());
-                applicationPreSetup.save(this,enumIndex);
-            }
-        });
+        reset(t,true);
         listeners.forEach(l->l.onCreated(application,t));
     }
     @Override
     public <T extends Configurable> void onDeleted(Descriptor application,T t) {
+        reset(t,false);
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
@@ -353,5 +328,35 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public void addListener(ApplicationPreSetup.Listener listener){
         this.listeners.add(listener);
+    }
+
+    private <T extends Configurable> void reset(T t,boolean updated){
+        int index = t.configurationType().indexOf(".");
+        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name(scope);
+        if(!applicationPreSetup.load(this,categories)){
+            logger.warn("Categories not existed ["+scope+"]");
+            return;
+        }
+        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
+        if(configurableSetting==null){
+            logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
+            return;
+        }
+        InstanceIndex instanceIndex = new InstanceIndex(t.configurationCategory());
+        applicationPreSetup.load(this,instanceIndex);
+        boolean px = updated ? instanceIndex.addKey(t.key().asString()) : instanceIndex.removeKey(t.key().asString());
+        if(px) applicationPreSetup.save(this,instanceIndex);
+        configurableSetting.properties.forEach(prop->{
+            JsonObject ctype = prop.getAsJsonObject();
+            String type = ctype.get("type").getAsString();
+            if(type.equals("enum")){
+                InstanceIndex enumIndex = new InstanceIndex(ctype.get("reference").getAsString());
+                applicationPreSetup.load(this,enumIndex);
+                boolean pv = updated? enumIndex.addKey(t.key().asString()) : enumIndex.removeKey(t.key().asString());
+                if(pv) applicationPreSetup.save(this,enumIndex);
+            }
+        });
     }
 }

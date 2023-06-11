@@ -42,6 +42,5 @@ public class InstanceIndex extends IndexSet implements Configurable {
     }
     public void index(String key){
         keySet.add(key);
-        //this.dataStore.update(this);
     }
 }

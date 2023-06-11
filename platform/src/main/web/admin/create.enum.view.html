@@ -164,11 +164,11 @@
             document.querySelector('#tx-create-enum-warning-message-board').style.display = 'block';   
             return;
         }
-        if(types.has(ptype)){
-            document.querySelector("#tx-create-enum-warning-message").innerHTML = "Enum ["+ptype+"] is going to upgrade!";
-            document.querySelector('#tx-create-enum-warning-message-board').style.display = 'block';   
+        //if(types.has(ptype)){
+            //document.querySelector("#tx-create-enum-warning-message").innerHTML = "Enum ["+ptype+"] is going to upgrade!";
+            //document.querySelector('#tx-create-enum-warning-message-board').style.display = 'block';   
             //return;
-        }
+        //}
         let pendingEnum = {type:'enum',name:ptype}
         let value = []
         pendingProps.forEach((v,k,m)=>{
