@@ -40,16 +40,16 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
+            TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Enum,query[1],jo);
             boolean updateAllowed = query[2].equals("save");
             boolean deleted = query[2].equals("delete");
             if(applicationPreSetup.load(gameCluster,typeIndex)){
-                InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
+                ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
                 applicationPreSetup.load(gameCluster,instanceIndex);
-                updateAllowed = deleted ?(typeIndex.payload.get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload.get("type").getAsString().equals("enum");
+                updateAllowed = deleted ?(typeIndex.payload().get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload().get("type").getAsString().equals("enum");
             }
             if(updateAllowed){
-                typeIndex.payload = jo;
+                typeIndex.upgrade(jo);
                 if(deleted){
                     applicationPreSetup.delete(gameCluster,typeIndex);
                 }else{
@@ -79,10 +79,10 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             int send = jtypes.size();
             for(JsonElement je : jtypes){
                 JsonObject jo = je.getAsJsonObject();
-                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),query[1],jo);
+                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Category,query[1],jo);
                 boolean updateAllowed = true;
                 if(applicationPreSetup.load(gameCluster,typeIndex)){
-                    String tpy = typeIndex.payload.get("type").getAsString();
+                    String tpy = typeIndex.payload().get("type").getAsString();
                     updateAllowed = tpy.equals("string") || tpy.equals("number");
                 }
                 String ppt = jo.get("type").getAsString();
@@ -106,7 +106,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
             String scope = header.get("scope").getAsString();
-            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),scope,jo);
+            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),TypeIndex.Typed.Category,scope,jo);
             if(!applicationPreSetup.load(gameCluster,typeIndex)){
                 applicationPreSetup.save(gameCluster,typeIndex);
                 String ctype = typeIndex.index();
@@ -145,7 +145,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             if(applicationPreSetup.load(gameCluster,typeIndex)){
                 if(typeIndex.index().equals(scope)){
                     if(updated){
-                        typeIndex.payload = jo;
+                        typeIndex.upgrade(jo);
                         applicationPreSetup.save(gameCluster,typeIndex);
                         String ctype = typeIndex.index();
                         int aix = ctype.indexOf('.');
@@ -162,7 +162,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                         });
                     }
                     else{
-                        InstanceIndex instanceIndex = new InstanceIndex(typeIndex.name());
+                        ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
                         applicationPreSetup.load(gameCluster,instanceIndex);
                         boolean deleted = query[2].equals("delete") && instanceIndex.keySet().isEmpty();
                         if(deleted){
@@ -279,7 +279,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
     private String createCategory(JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
         JsonObject header = payload.get("header").getAsJsonObject();
         String scope = header.get("scope").getAsString();
-        TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),scope,payload);
+        TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),TypeIndex.Typed.Category,scope,payload);
         if(applicationPreSetup.load(gameCluster,typeIndex)) return JsonUtil.toSimpleResponse(false,"Category already existed");
         applicationPreSetup.save(gameCluster,typeIndex);
         String ctype = typeIndex.index();
@@ -334,7 +334,8 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             JsonArray ctypes = (JsonArray)commonTypes.property("itemList");
             ctypes.forEach((c)-> {
                 JsonObject jo = c.getAsJsonObject();
-                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),"common",jo);
+                TypeIndex.Typed typed = jo.get("type").getAsString().equals("enum")? TypeIndex.Typed.Enum: TypeIndex.Typed.Primitive;
+                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),typed,"common",jo);
                 applicationPreSetup.save(gameCluster,typeIndex);
                 configurableTypes.addType(jo);
             });
@@ -477,7 +478,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         assets.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), TypeIndex.Typed.Category,ho.get("scope").getAsString(), jo);
             applicationPreSetup.save(gameCluster, typeIndex);
             components.addCategory(jo);
             commodities.addCategory(jo);
@@ -487,7 +488,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         components.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),TypeIndex.Typed.Category, ho.get("scope").getAsString(), jo);
             applicationPreSetup.save(gameCluster, typeIndex);
             commodities.addCategory(jo);
             items.addCategory(jo);
@@ -496,7 +497,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         commodities.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),TypeIndex.Typed.Category, ho.get("scope").getAsString(), jo);
             applicationPreSetup.save(gameCluster, typeIndex);
             items.addCategory(jo);
             applications.addCategory(jo);
@@ -504,14 +505,14 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         items.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),TypeIndex.Typed.Category, ho.get("scope").getAsString(), jo);
             applicationPreSetup.save(gameCluster, typeIndex);
             applications.addCategory(jo);
         }));
         applications.toCategories().forEach((c -> {
             JsonObject jo = c.getAsJsonObject();
             JsonObject ho = jo.get("header").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(), ho.get("scope").getAsString(), jo);
+            TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),TypeIndex.Typed.Category, ho.get("scope").getAsString(), jo);
             applicationPreSetup.save(gameCluster, typeIndex);
             //applications.addCategory(jo);
         }));

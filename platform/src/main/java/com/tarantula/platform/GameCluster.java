@@ -14,7 +14,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.ConfigurableCategories;
 import com.tarantula.platform.item.ConfigurableSetting;
-import com.tarantula.platform.item.InstanceIndex;
+import com.tarantula.platform.item.ReferenceIndex;
 import com.tarantula.platform.item.TypeIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
@@ -304,19 +305,48 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
         if(t instanceof TypeIndex){
-            logger.warn(((TypeIndex) t).payload.toString());
+            TypeIndex typeIndex = (TypeIndex) t;
+            if(typeIndex.typed == TypeIndex.Typed.Category){
+                HashMap<String,JsonObject> previous = new HashMap<>();
+                typeIndex.history().get("application").getAsJsonObject().get("properties").getAsJsonArray().forEach(e->{
+                    JsonObject prop = e.getAsJsonObject();
+                    String type = prop.get("type").getAsString();
+                    if(type.equals("enum")){
+                        previous.put(prop.get("reference").getAsString(),prop);
+                    }
+                    else if(type.equals("category")){
+                        previous.put(prop.get("reference").getAsString().split(":")[1],prop);
+                    }
+                    else if(type.equals("list") || type.equals("list")){
+                        String[] ref = prop.get("reference").getAsString().split(":");
+                        if(ref[0].equals("category")){
+                            previous.put(ref[1],prop);
+                        }
+                    }
+                });
+                reset(typeIndex,previous);
+                logger.warn(typeIndex.history().toString());
+                logger.warn(typeIndex.payload().toString());
+            }
         }
         listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
         if(t instanceof TypeIndex){
-            logger.warn(((TypeIndex) t).payload.toString());
+            TypeIndex typeIndex = (TypeIndex)t;
+            if(typeIndex.typed == TypeIndex.Typed.Category){
+                reset(typeIndex,new HashMap<>());
+            }
         }
         listeners.forEach(l->l.onCreated(application,t));
     }
 
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
+        TypeIndex typeIndex = (TypeIndex) t;
+        if(typeIndex.typed == TypeIndex.Typed.Category){
+            logger.warn(((TypeIndex) t).payload().toString());
+        }
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
@@ -351,7 +381,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
             return;
         }
-        InstanceIndex instanceIndex = new InstanceIndex(t.configurationCategory());
+        ReferenceIndex instanceIndex = new ReferenceIndex(t.configurationCategory());
         applicationPreSetup.load(this,instanceIndex);
         boolean px = updated ? instanceIndex.addKey(t.key().asString()) : instanceIndex.removeKey(t.key().asString());
         if(px) applicationPreSetup.save(this,instanceIndex);
@@ -359,11 +389,79 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             JsonObject ctype = prop.getAsJsonObject();
             String type = ctype.get("type").getAsString();
             if(type.equals("enum")){
-                InstanceIndex enumIndex = new InstanceIndex(ctype.get("reference").getAsString());
+                ReferenceIndex enumIndex = new ReferenceIndex(ctype.get("reference").getAsString());
                 applicationPreSetup.load(this,enumIndex);
                 boolean pv = updated? enumIndex.addKey(t.key().asString()) : enumIndex.removeKey(t.key().asString());
                 if(pv) applicationPreSetup.save(this,enumIndex);
             }
         });
     }
+
+    private void reset(TypeIndex typeIndex,HashMap<String,JsonObject> previous){
+        JsonObject header = typeIndex.payload().getAsJsonObject("header");
+        JsonObject app = typeIndex.payload().getAsJsonObject("application");
+        String category = header.get("type").getAsString();
+        app.get("properties").getAsJsonArray().forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            String type = jo.get("type").getAsString();
+            if(type.equals("enum")){
+                String ref = jo.get("reference").getAsString();
+                if(previous.remove(ref)==null){
+                    ReferenceIndex referenceIndex = new ReferenceIndex(ref);
+                    applicationPreSetup.load(this,referenceIndex);
+                    referenceIndex.addKey(category);
+                    applicationPreSetup.save(this,referenceIndex);
+                }
+            }
+            else if(type.equals("category")){
+                String ref = jo.get("reference").getAsString().split(":")[1];
+                if(previous.remove(ref)==null){
+                    int index = ref.indexOf(".");
+                    if(index>0){
+                        ReferenceIndex superIndex = new ReferenceIndex(ref.substring(0,index));
+                        applicationPreSetup.load(this,superIndex);
+                        superIndex.addKey(category);
+                        applicationPreSetup.save(this,superIndex);
+                    }
+                    ReferenceIndex referenceIndex = new ReferenceIndex(ref);
+                    applicationPreSetup.load(this,referenceIndex);
+                    referenceIndex.addKey(category);
+                    applicationPreSetup.save(this,referenceIndex);
+                }
+            }
+            else if(type.equals("list") || type.equals("set")){
+                String[] ref = jo.get("reference").getAsString().split(":");
+                if(ref[0].equals("category")){
+                    if(previous.remove(ref[1])==null){
+                        int index = ref[1].indexOf(".");
+                        if(index>0){
+                            ReferenceIndex superIndex = new ReferenceIndex(ref[1].substring(0,index));
+                            applicationPreSetup.load(this,superIndex);
+                            superIndex.addKey(category);
+                            applicationPreSetup.save(this,superIndex);
+                        }
+                        ReferenceIndex referenceIndex = new ReferenceIndex(ref[1]);
+                        applicationPreSetup.load(this,referenceIndex);
+                        referenceIndex.addKey(category);
+                        applicationPreSetup.save(this,referenceIndex);
+                    }
+                }
+            }
+        });
+        previous.forEach((k,v)->{
+            logger.warn("Remove index ["+category+"] from ["+k+"]");
+            int index = k.indexOf(".");
+            if(index>0){
+                ReferenceIndex superIndex = new ReferenceIndex(k.substring(0,index));
+                applicationPreSetup.load(this,superIndex);
+                superIndex.removeKey(category);
+                applicationPreSetup.save(this,superIndex);
+            }
+            ReferenceIndex referenceIndex = new ReferenceIndex(k);
+            applicationPreSetup.load(this,referenceIndex);
+            referenceIndex.removeKey(category);
+            applicationPreSetup.save(this,referenceIndex);
+        });
+    }
+
 }

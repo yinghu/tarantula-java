@@ -7,12 +7,12 @@ import com.tarantula.platform.IndexSet;
 
 import java.util.Map;
 
-public class InstanceIndex extends IndexSet implements Configurable {
+public class ReferenceIndex extends IndexSet implements Configurable {
 
-    public InstanceIndex(){
-        this.label = "instances";
+    public ReferenceIndex(){
+        this.label = "references";
     }
-    public InstanceIndex(String name){
+    public ReferenceIndex(String name){
         this();
         this.name = name;
     }
@@ -34,7 +34,7 @@ public class InstanceIndex extends IndexSet implements Configurable {
 
     @Override
     public int getClassId() {
-        return ItemPortableRegistry.INSTANCE_INDEX_CID;
+        return ItemPortableRegistry.REFERENCE_INDEX_CID;
     }
 
     public Key key(){
