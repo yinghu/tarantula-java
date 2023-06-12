@@ -325,8 +325,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                     }
                 });
                 reset(typeIndex,previous);
-                logger.warn(typeIndex.history().toString());
-                logger.warn(typeIndex.payload().toString());
+                //logger.warn(typeIndex.history().toString());
+                //logger.warn(typeIndex.payload().toString());
             }
         }
         listeners.forEach(l->l.onUpdated(application,t));
@@ -345,7 +345,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
         TypeIndex typeIndex = (TypeIndex) t;
         if(typeIndex.typed == TypeIndex.Typed.Category){
-            logger.warn(((TypeIndex) t).payload().toString());
+            delete(typeIndex);
+            //logger.warn(((TypeIndex) t).payload().toString());
         }
         listeners.forEach(l->l.onDeleted(application,t));
     }
@@ -381,18 +382,12 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
             return;
         }
-        ReferenceIndex instanceIndex = new ReferenceIndex(t.configurationCategory());
-        applicationPreSetup.load(this,instanceIndex);
-        boolean px = updated ? instanceIndex.addKey(t.key().asString()) : instanceIndex.removeKey(t.key().asString());
-        if(px) applicationPreSetup.save(this,instanceIndex);
+        resetReferenceIndex(t.configurationCategory(),t.key().asString(),!updated);
         configurableSetting.properties.forEach(prop->{
             JsonObject ctype = prop.getAsJsonObject();
             String type = ctype.get("type").getAsString();
             if(type.equals("enum")){
-                ReferenceIndex enumIndex = new ReferenceIndex(ctype.get("reference").getAsString());
-                applicationPreSetup.load(this,enumIndex);
-                boolean pv = updated? enumIndex.addKey(t.key().asString()) : enumIndex.removeKey(t.key().asString());
-                if(pv) applicationPreSetup.save(this,enumIndex);
+                resetReferenceIndex(ctype.get("reference").getAsString(),t.key().asString(),!updated);
             }
         });
     }
@@ -407,10 +402,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             if(type.equals("enum")){
                 String ref = jo.get("reference").getAsString();
                 if(previous.remove(ref)==null){
-                    ReferenceIndex referenceIndex = new ReferenceIndex(ref);
-                    applicationPreSetup.load(this,referenceIndex);
-                    referenceIndex.addKey(category);
-                    applicationPreSetup.save(this,referenceIndex);
+                    resetReferenceIndex(ref,category,false);
                 }
             }
             else if(type.equals("category")){
@@ -418,15 +410,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                 if(previous.remove(ref)==null){
                     int index = ref.indexOf(".");
                     if(index>0){
-                        ReferenceIndex superIndex = new ReferenceIndex(ref.substring(0,index));
-                        applicationPreSetup.load(this,superIndex);
-                        superIndex.addKey(category);
-                        applicationPreSetup.save(this,superIndex);
+                        resetReferenceIndex(ref.substring(0,index),category,false);
                     }
-                    ReferenceIndex referenceIndex = new ReferenceIndex(ref);
-                    applicationPreSetup.load(this,referenceIndex);
-                    referenceIndex.addKey(category);
-                    applicationPreSetup.save(this,referenceIndex);
+                    resetReferenceIndex(ref,category,false);
                 }
             }
             else if(type.equals("list") || type.equals("set")){
@@ -435,15 +421,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                     if(previous.remove(ref[1])==null){
                         int index = ref[1].indexOf(".");
                         if(index>0){
-                            ReferenceIndex superIndex = new ReferenceIndex(ref[1].substring(0,index));
-                            applicationPreSetup.load(this,superIndex);
-                            superIndex.addKey(category);
-                            applicationPreSetup.save(this,superIndex);
+                            resetReferenceIndex(ref[1].substring(0,index),category,false);
                         }
-                        ReferenceIndex referenceIndex = new ReferenceIndex(ref[1]);
-                        applicationPreSetup.load(this,referenceIndex);
-                        referenceIndex.addKey(category);
-                        applicationPreSetup.save(this,referenceIndex);
+                        resetReferenceIndex(ref[1],category,false);
                     }
                 }
             }
@@ -452,16 +432,50 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             logger.warn("Remove index ["+category+"] from ["+k+"]");
             int index = k.indexOf(".");
             if(index>0){
-                ReferenceIndex superIndex = new ReferenceIndex(k.substring(0,index));
-                applicationPreSetup.load(this,superIndex);
-                superIndex.removeKey(category);
-                applicationPreSetup.save(this,superIndex);
+                resetReferenceIndex(k.substring(0,index),category,true);
             }
-            ReferenceIndex referenceIndex = new ReferenceIndex(k);
-            applicationPreSetup.load(this,referenceIndex);
-            referenceIndex.removeKey(category);
-            applicationPreSetup.save(this,referenceIndex);
+            resetReferenceIndex(k,category,true);
         });
+    }
+
+    private void delete(TypeIndex typeIndex){
+        JsonObject header = typeIndex.payload().getAsJsonObject("header");
+        JsonObject app = typeIndex.payload().getAsJsonObject("application");
+        String category = header.get("type").getAsString();
+        app.get("properties").getAsJsonArray().forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            String type = jo.get("type").getAsString();
+            if(type.equals("enum")){
+                String ref = jo.get("reference").getAsString();
+                resetReferenceIndex(ref,category,true);
+            }
+            else if(type.equals("category")){
+                String ref = jo.get("reference").getAsString().split(":")[1];
+                int index = ref.indexOf(".");
+                if(index>0){
+                    resetReferenceIndex(ref.substring(0,index),category,true);
+                }
+                resetReferenceIndex(ref,category,true);
+            }
+            else if(type.equals("list") || type.equals("set")){
+                String[] ref = jo.get("reference").getAsString().split(":");
+                if(ref[0].equals("category")){
+                    int index = ref[1].indexOf(".");
+                    if(index>0){
+                        resetReferenceIndex(ref[1].substring(0,index),category,true);
+                    }
+                    resetReferenceIndex(ref[1],category,true);
+                }
+            }
+        });
+    }
+
+    private void resetReferenceIndex(String reference,String key,boolean deleted){
+        ReferenceIndex referenceIndex = new ReferenceIndex(reference);
+        applicationPreSetup.load(this,referenceIndex);
+        boolean suc = deleted? referenceIndex.removeKey(key):referenceIndex.addKey(key);
+        if(!suc) return;
+        applicationPreSetup.save(this,referenceIndex);
     }
 
 }
