@@ -210,7 +210,7 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "robot_pug",
-        "TypeId": "Robot",
+        "TypeId": "PugPlayerConfig",
         "Level": "1"
       },
       "application": {},
@@ -224,7 +224,7 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "robot_crate",
-        "TypeId": "Robot",
+        "TypeId": "CratePlayerConfig",
         "Level": "1"
       },
       "application": {},
@@ -238,7 +238,7 @@
       "configurationVersion": "v1.0",
       "header": {
         "Name": "robot_strider",
-        "TypeId": "Robot",
+        "TypeId": "StriderPlayerConfig",
         "Level": "1"
       },
       "application": {},

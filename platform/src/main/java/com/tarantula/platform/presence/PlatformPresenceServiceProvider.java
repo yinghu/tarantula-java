@@ -110,6 +110,9 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         rating.distributionKey(systemId);
         this.presenceDataStore.createIfAbsent(rating,true);
         rating.dataStore(this.presenceDataStore);
+        if(rating.granted) return rating;
+        rating.granted = this.gameServiceProvider.resourceServiceProvider().initializeInventory(systemId);
+        rating.update();
         return rating;
     }
     public Statistics statistics(String systemId){

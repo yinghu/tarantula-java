@@ -19,6 +19,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
     public int rank = 1; //rank of lobby
     public int level = 1; //total level
     public double xp =0; //total xp
+    public boolean granted;
     private double levelUpXp =0;  //xp of arena level
 
     public Rating(){
@@ -42,6 +43,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         this.properties.put("2",level);
         this.properties.put("3",levelUpXp);
         this.properties.put("4",xp);
+        this.properties.put("5",granted);
         return this.properties;
     }
     @Override
@@ -50,6 +52,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         this.level =((Number)properties.get("2")).intValue();
         this.levelUpXp = ((Number)properties.get("3")).doubleValue();
         this.xp = ((Number)properties.get("4")).doubleValue();
+        this.granted = ((boolean)properties.getOrDefault("5",false));
     }
 
     @Override
