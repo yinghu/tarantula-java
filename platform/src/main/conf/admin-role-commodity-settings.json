@@ -248,12 +248,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_targeting_system_x",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_targeting_system_x",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -262,12 +263,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_targeting_system_y",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_targeting_system_y",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -276,12 +278,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_targeting_system_z",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_targeting_system_z",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -290,12 +293,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_motherboard_x",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_motherboard_x",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -304,12 +308,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_motherboard_y",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_motherboard_y",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -318,12 +323,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_drone_x",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_drone_x",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -332,12 +338,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_drone_y",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_drone_y",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -346,12 +353,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_drone_z",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_drone_z",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -360,12 +368,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_exoskeleton_x",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_exoskeleton_x",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -374,12 +383,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_exoskeleton_y",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_exoskeleton_y",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -388,12 +398,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_exoskeleton_z",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_exoskeleton_z",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []
@@ -402,12 +413,13 @@
       "configurationType": "commodity",
       "configurationTypeId": "Equipment",
       "configurationName": "equipment_armor_x",
-      "configurationCategory": "GameItem",
+      "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "equipment_armor_x",
         "TypeId": "Equipment",
-        "Level": "1"
+        "Level": "1",
+        "EquipmentType":"0"
       },
       "application": {},
       "reference": []

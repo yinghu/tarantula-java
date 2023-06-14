@@ -64,7 +64,7 @@
       "header": {
         "scope": "commodity",
         "type": "GameItem",
-        "description": "visual game item",
+        "description": "common game item",
         "version": "1.0",
         "rechargeable": false
       },
@@ -88,6 +88,47 @@
             "name": "Level",
             "type": "number",
             "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "commodity",
+        "type": "GameItem.Equipment",
+        "description": "equipment game item",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "TypeId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Level",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "EquipmentType",
+            "type": "enum",
+            "reference": "EquipmentType",
             "nullable": false,
             "downloadable": false
           }
