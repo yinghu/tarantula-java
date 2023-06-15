@@ -133,6 +133,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         if(grantingPolicy.equals(GRANT_POLICY_RANDOM)){
             String itemId;
             synchronized (startingInventory){
+                if(startingInventory.isEmpty()) return false;
                 int index = rng.onNext(startingInventory.size());
                 itemId = startingInventory.get(index);
             }
