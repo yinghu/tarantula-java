@@ -20,9 +20,16 @@
             <span id='tx-asset-primitive-create' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>New Type(primitive)</span>
         </div>            
     </div>
+    <div class="w3-panel  tx-margin-bottom-8">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue">Filter Selection</legend>
+            <select id='tx-item-filter-selection-name' class="w3-select w3-border w3-round tx-text-14" name='filterSelectionName'>
+            </select>
+        </fieldset>
+    </div>  
     <div id='tx-service-template-bar-pane' class="w3-panel">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend id="tx-service-template-bar-pane-title">Service.Items</legend>
+            <legend id="tx-service-template-bar-pane-title" class="tx-text-14 w3-text-blue">Service.Items</legend>
             <div id='tx-service-item-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
@@ -44,35 +51,35 @@
     </div>
     <div id='tx-application-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Application.Categories</legend>
+            <legend class="tx-text-14 w3-text-blue">Application.Categories</legend>
             <div id='tx-application-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
     </div>
     <div id='tx-item-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Item.Categories</legend>
+            <legend class="tx-text-14 w3-text-blue">Item.Categories</legend>
             <div id='tx-item-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
     </div>
     <div id='tx-commodity-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Commodity.Categories</legend>
+            <legend class="tx-text-14 w3-text-blue">Commodity.Categories</legend>
             <div id='tx-commodity-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
     </div>
     <div id='tx-component-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Component.Categories</legend>
+            <legend class="tx-text-14 w3-text-blue">Component.Categories</legend>
             <div id='tx-component-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
     </div>
     <div id='tx-asset-template-bar-pane' class="w3-panel" style="display: none;">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend>Asset.Categories</legend> 
+            <legend class="tx-text-14 w3-text-blue">Asset.Categories</legend> 
             <div id='tx-asset-template-bar' class='w3-bar w3-white'>
             </div>
         </fieldset>            
@@ -159,6 +166,20 @@
     let itemOperationMessage = document.querySelector('#tx-item-operation-selection-message');
     let serviceBar = document.querySelector('#tx-service-item-template-bar');
     let serviceBarTitle = document.querySelector('#tx-service-template-bar-pane-title');
+    let filterSelectionName = document.querySelector('#tx-item-filter-selection-name');
+    let filterMap = new Map();
+    let itemQuery;
+    let queryType;
+    if(TARA_API.query().category == 'application'){
+        itemQuery = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
+        filterMap.set(TARA_API.query().serviceCategory,itemQuery);
+        queryType = TARA_API.query().serviceCategory;
+    }
+    else{
+        itemQuery = TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category;
+        filterMap.set('type/'+TARA_API.query().category,itemQuery);
+        queryType = 'type/'+TARA_API.query().category;
+    }
     populateStock();
     let bars = {};
     bars.assetBar = [document.querySelector('#tx-asset-template-bar'),document.querySelector('#tx-asset-template-bar-pane'),assetView];
@@ -220,7 +241,13 @@
             bars[_scope+'Bar'][1].style.display = a.checked?'block':'none';
         }
     });
+    filterSelectionName.onchange = ()=>{
+        itemQuery = filterSelectionName.value;
+        queryType = filterSelectionName.options[filterSelectionName.selectedIndex].text;
+        populateStock();
+    };
     function hookEvent(){
+        populateFilter(); 
         document.querySelectorAll('.tx-game-asset-template').forEach(a=>{
             a.onclick=()=>{
                 let ix = a.getAttribute('tx-index')/1;
@@ -237,8 +264,7 @@
                 let app = applications[e.getAttribute('tx-application-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
-                        //console.log(a);
-                        //console.log(i);
+                      
                         TARA_API.query().itemIndex = i;
                     }
                 });
@@ -254,8 +280,7 @@
                 let app = applications[e.getAttribute('tx-item-id')];
                 TARA_API.query().itemList.forEach((a,i)=>{
                     if(app.configurationCategory == a.header.type){
-                        //console.log(a);
-                        //console.log(i);
+                     
                         TARA_API.query().itemIndex = i;
                     }
                 });
@@ -276,6 +301,7 @@
     }
 
     function toHtmlServiceBarItem(a,i){
+        addFilter(a);
         applications[a.itemId] = a;
         let tem = [];
         tem.push('<span tx-application-id=\''+a.itemId);
@@ -285,6 +311,7 @@
         return tem.join('');    
     }
     function toHtmlBarStockItem(a,i){
+        addFilter(a);
         applications[a.itemId] = a;
         let tem = [];
         tem.push('<span tx-item-id=\''+a.itemId);
@@ -295,7 +322,7 @@
     }
     function populateCategories(){
         TARA_API.onGet('role/admin/item','onCategorySettings',TARA_API.query().gameClusterId+'#'+TARA_API.query().category,(resp)=>{
-            //console.log(resp);
+           
             TARA_API.query().itemList = resp.itemList;
             TARA_API.query().types = {};
             resp.types.itemList.forEach(t=>{
@@ -330,9 +357,7 @@
     function populateStock(){
         if(TARA_API.query().category == 'application'){
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
-            let query = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
-            TARA_API.onGet('role/admin/application','onStock',query,(resp)=>{
-                //console.log(resp);
+            TARA_API.onGet('role/admin/application','onStock',itemQuery,(resp)=>{
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
@@ -343,8 +368,7 @@
             });
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
          }else{
-            TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category,(resp)=>{
-                //console.log(resp);
+            TARA_API.onGet('role/admin/item',"onStock",itemQuery,(resp)=>{
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
@@ -362,7 +386,19 @@
             });  
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().category)+".Instances";
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().category)+" List";
-        }        
+        }       
+    }
+    function populateFilter(){
+        filterSelectionName.innerHTML = '';
+        filterMap.forEach((v,k,m)=>{
+            filterSelectionName.innerHTML += TARA_HTML.option(v,k,queryType==k);
+        });
+    }
+    function addFilter(a){
+        let pendingQuery =  TARA_API.query().gameClusterId+'#typeId/'+a.configurationTypeId;
+        filterMap.set('typeId/'+a.configurationTypeId,pendingQuery);
+        pendingQuery =  TARA_API.query().gameClusterId+'#category/'+a.configurationCategory;
+        filterMap.set('category/'+a.configurationCategory,pendingQuery);
     }
    
 </script>

@@ -221,7 +221,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
-            //this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
@@ -240,12 +239,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
-            //ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
-            //ConfigurableSetting configurableSetting = categories.configurableSetting(query[1].split("/")[1]);
-            //if(configurableSetting != null && configurableSetting.scope.startsWith("application.")){
-                //String serviceCategory = configurableSetting.scope.substring(12);
-                //app = gameCluster.serviceWithCategory(serviceCategory);
-            //}
             List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(query[1],"version"));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }

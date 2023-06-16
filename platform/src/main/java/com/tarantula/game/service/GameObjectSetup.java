@@ -41,7 +41,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         typeIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIndex,true);
 
-        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId app assigned commodity type line Gold
+        IndexSet typeIdIndex = new IndexSet(query("typeId",t.configurationTypeId()));//typeId app assigned commodity type like Gold
         typeIdIndex.distributionKey(application.distributionKey());
         dataStore.createIfAbsent(typeIdIndex,true);
 
