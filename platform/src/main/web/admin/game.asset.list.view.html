@@ -171,12 +171,12 @@
     let itemQuery;
     let queryType;
     if(TARA_API.query().category == 'application'){
-        itemQuery = TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory;
-        filterMap.set(TARA_API.query().serviceCategory,itemQuery);
-        queryType = TARA_API.query().serviceCategory;
+        itemQuery = 'typeId/'+TARA_API.query().serviceCategory;
+        filterMap.set('typeId/'+TARA_API.query().serviceCategory,itemQuery);
+        queryType = 'typeId'+TARA_API.query().serviceCategory;
     }
     else{
-        itemQuery = TARA_API.query().gameClusterId+'#type/'+TARA_API.query().category;
+        itemQuery = 'type/'+TARA_API.query().category;
         filterMap.set('type/'+TARA_API.query().category,itemQuery);
         queryType = 'type/'+TARA_API.query().category;
     }
@@ -357,7 +357,7 @@
     function populateStock(){
         if(TARA_API.query().category == 'application'){
             document.querySelector('#tx-game-asset-title').innerHTML = TARA_API.query().gameCluster.name+' '+tx_first_upcase(TARA_API.query().serviceCategory)+" List";
-            TARA_API.onGet('role/admin/application','onStock',itemQuery,(resp)=>{
+            TARA_API.onGet('role/admin/application','onStock',TARA_API.query().gameClusterId+'#'+TARA_API.query().serviceCategory+'#'+itemQuery,(resp)=>{
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
@@ -368,7 +368,7 @@
             });
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
          }else{
-            TARA_API.onGet('role/admin/item',"onStock",itemQuery,(resp)=>{
+            TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#'+itemQuery,(resp)=>{
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
@@ -395,9 +395,9 @@
         });
     }
     function addFilter(a){
-        let pendingQuery =  TARA_API.query().gameClusterId+'#typeId/'+a.configurationTypeId;
+        let pendingQuery = 'typeId/'+a.configurationTypeId;
         filterMap.set('typeId/'+a.configurationTypeId,pendingQuery);
-        pendingQuery =  TARA_API.query().gameClusterId+'#category/'+a.configurationCategory;
+        pendingQuery =  'category/'+a.configurationCategory;
         filterMap.set('category/'+a.configurationCategory,pendingQuery);
     }
    
