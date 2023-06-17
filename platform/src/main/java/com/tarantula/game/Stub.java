@@ -3,10 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.Channel;
-import com.tarantula.platform.inbox.Inbox;
-import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.store.Shop;
 
 import java.util.Map;
 
@@ -18,18 +15,11 @@ public class Stub extends PlayerGameObject {
     public String zoneId;
     public String roomId;
 
-    public Shop shop;
-
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
 
-    public Rating rating;
-    public DailyLoginTrack dailyLogin;
-    public Statistics statistics;
-    public Inbox inbox;
     public Channel pushChannel;
-    public PlayerSavedGames playerSavedGames;
 
     public Stub(){
     }
@@ -49,11 +39,8 @@ public class Stub extends PlayerGameObject {
         jo.add("_zone",zone.toJson());
         jo.add("_arena", room.arena().toJson());
         jo.add("_room",room.toJson());
-        if(shop!=null) jo.add("_shop",shop.toJson());
         if(tournament!=null) jo.add("_tournament",tournament.toJson());
         if(pushChannel!=null) jo.add("_pushChannel",pushChannel.toJson());
-        if(inbox!=null) jo.add("_inbox",inbox.toJson());
-        if(playerSavedGames!=null) jo.add("_playerSavedGames", playerSavedGames.toJson());
         jo.addProperty("Tag",tag);
         jo.addProperty("TournamentEnabled",tournament!=null);
         jo.addProperty("PlayMode",zone.playMode());

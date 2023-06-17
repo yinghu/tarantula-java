@@ -17,7 +17,7 @@
       "application": {
         "properties": [
           {
-            "name": "Description",
+            "name": "Name",
             "type": "string",
             "reference": "String",
             "nullable": true,

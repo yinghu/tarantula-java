@@ -38,7 +38,6 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.offline = true;
         stub.tag(application.tag());
         stub.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
-        stub.rating = rating;
         this.dataStore.update(stub);
         return stub;
     }

@@ -32,10 +32,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub !=null && stub.joined) {
             stub.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
-            stub.inbox = this.gameServiceProvider.inboxServiceProvider().inbox(stub.systemId());
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),session.clientId(),this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),session.clientId(),session.name()));
-            playerSavedGames.gameServiceProvider = gameServiceProvider;
-            stub.playerSavedGames = playerSavedGames;
             return stub;
         }
         GameZone _zone = gameZone(rating);
