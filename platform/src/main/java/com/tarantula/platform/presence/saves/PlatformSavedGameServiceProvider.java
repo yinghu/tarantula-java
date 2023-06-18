@@ -6,6 +6,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
@@ -17,6 +18,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public static final String NAME = "save";
 
     private int mappingObjectMaxSize = 4000;
+
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
     }
@@ -30,6 +32,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
+
+
 
     public int mappingObjectMaxSize(){
         return mappingObjectMaxSize;
@@ -45,6 +49,12 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     public <T extends Recoverable> boolean reset(T save){
         return this.dataStore.update(save);
+    }
+
+    public CurrentSaveIndex selectSavedGame(Session session,SavedGame selected){
+        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session,selected.distributionKey());
+        this.dataStore.createIfAbsent(currentSaveIndex,true);
+        return currentSaveIndex;
     }
 
 

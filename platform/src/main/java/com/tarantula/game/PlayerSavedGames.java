@@ -11,12 +11,11 @@ public class PlayerSavedGames{
 
     public PlatformGameServiceProvider gameServiceProvider;
     public String systemId;
-    public String deviceId;
     public List<SavedGame> savedGames;
 
-    public PlayerSavedGames(String systemId,String deviceId,List<SavedGame> savedGames){
+    public PlayerSavedGames(String systemId,List<SavedGame> savedGames){
         this.systemId = systemId;
-        this.deviceId = deviceId;
+
         this.savedGames = savedGames;
     }
     public JsonObject toJson(){
@@ -24,9 +23,9 @@ public class PlayerSavedGames{
         jsonObject.addProperty("Successful",true);
         JsonArray saves = new JsonArray();
         savedGames.forEach(save->{
-            if(save.owner().equals(systemId) && save.index().equals(deviceId)) {
-                jsonObject.add("_currentSavedGame",save.toJson());
-            }
+            //if(save.owner().equals(systemId) && save.index().equals(deviceId)) {
+                //jsonObject.add("_currentSavedGame",save.toJson());
+            //}
             saves.add(save.toJson());
         });
         jsonObject.add("_savedGames",saves);

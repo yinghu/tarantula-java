@@ -12,6 +12,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
@@ -28,10 +29,13 @@ public class SavedGameModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            String[] query = session.name().split("#");
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.presenceServiceProvider.listSaves(session.systemId(),query[0],query[1]));
-            //playerSavedGames.gameServiceProvider = gameServiceProvider;
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
             session.write(playerSavedGames.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onSelect")){
+            String[] query = session.name().split("#");
+            CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,query[0],query[1],query[2]);
+            session.write(savedGame.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdate")){
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
@@ -92,7 +96,7 @@ public class SavedGameModule implements Module {
                 PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
                 if(savedGame.addKey(query[1])) savedGame.update();
                 MappingObject mo = new MappingObject();
-               mo.distributionKey(query[0]);
+                mo.distributionKey(query[0]);
                 mo.label(query[1]);
                 mo.value(bytes);
                 //boolean suc = dataStore.update(mo);

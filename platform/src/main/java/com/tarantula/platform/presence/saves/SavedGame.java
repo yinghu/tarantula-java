@@ -63,6 +63,10 @@ public class SavedGame extends RecoverableObject implements Configurable {
         jsonObject.addProperty("Timestamp",timestamp);
         return jsonObject;
     }
+
+    public boolean onDevice(String systemId,String deviceId){
+        return this.owner.equals(systemId) && this.index.equals(deviceId);
+    }
     @Override
     public boolean equals(Object obj){
         SavedGame savedGame =(SavedGame) obj;

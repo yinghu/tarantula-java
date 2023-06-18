@@ -13,6 +13,7 @@ import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
@@ -38,6 +39,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int SAVED_GAME_CID = 8;
 
+    public static final int CURRENT_SAVE_INDEX_CID = 9;
     public static final int SAVE_GAME_INDEX_CID = 10;
 
     public static final int PENDING_REWARD_CID = 11;
@@ -87,6 +89,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case SAVED_GAME_CID:
                 pt = new SavedGame();
+                break;
+            case CURRENT_SAVE_INDEX_CID:
+                pt = new CurrentSaveIndex();
                 break;
             case SAVE_GAME_INDEX_CID:
                 pt = new SavedGameIndex();

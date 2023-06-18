@@ -10,8 +10,20 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel  tx-margin-bottom-8">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue">Device Selection</legend>
+            <select id='tx-save-device-selection-name' class="w3-select w3-border w3-round tx-text-14" name='deviceIdSelectionName'>
+                <option value="HandSet1" selected>HandSet1</option>
+                <option value="HandSet2">HandSet2</option>
+                <option value="HandSet3">HandSet3</option>
+                <option value="HandSet4">HandSet4</option>
+                <option value="HandSet5">HandSet5</option>
+            </select>
+        </fieldset>
+    </div> 
     <div class="w3-panel">
-        <div id='tx-live-save-item-list' class="w3-container  w3-border-bottom w3-border-red">
+        <div id='tx-live-save-item-list' class="w3-container">
             
         </div>
     </div>
@@ -39,8 +51,8 @@
     document.querySelector('#tx-live-save-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
     let saveList = document.querySelector('#tx-live-save-item-list');
     saveList.innerHTML = '';
+    let deviceId = "HandSet1";
     //let actionList = document.querySelector('#tx-live-save-action-bar');
-    tx_live_save_setup();
     document.querySelector('#tx-save-live-close').onclick=()=>{
         editor.destroy();
         tx_close_current_page();      
@@ -54,27 +66,33 @@
     document.querySelector('#tx-save-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    
+    document.querySelector('#tx-save-device-selection-name').onchange = ()=>{
+        deviceId = document.querySelector('#tx-save-device-selection-name').value;
+        tx_live_save_setup();
+    }; 
+    tx_live_save_setup();
     function tx_live_save_setup(){
-        let itemList = [{name:'Save1',deviceId:'handset1'},{name:'Save2',deviceId:'handset2'},{name:'Save3',deviceId:'handset3'}];
-
-        itemList.forEach(item => {
-            
-            saveList.innerHTML += TARA_HTML.command(item.deviceId+'#'+item.name,item.deviceId,item.name,'save-view','View');
-                
-        });
-        document.querySelectorAll('.tx-live-save-view').forEach(a=>{
-            a.onclick = ()=>{
-                tx_save_grant(a.getAttribute('tx-item-id'));
-                //console.log(a.getAttribute('tx-item-id'));       
+        TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{    
+            if(resp.Successful){
+                saveList.innerHTML = '';
+                resp._savedGames.forEach(item => {
+                    
+                    saveList.innerHTML += TARA_HTML.command(item.GameId,item.DeviceId+'>'+item.Version,item.DeviceName,'save-select','Select');
+                        
+                });
+                document.querySelectorAll('.tx-live-save-select').forEach(a=>{
+                    a.onclick = ()=>{
+                        tx_save_select(a.getAttribute('tx-item-id'));      
+                    }
+                });
             }
+            editor.set(resp);
         });
-        editor.set(itemList);
     }
 
-    function tx_save_grant(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onList',itemId,(resp)=>{
-            //console.log(resp);
+    function tx_save_select(itemId){
+        let selected = itemId+'#'+deviceId+'#Game Save'
+        TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',selected,(resp)=>{
             editor.set(resp);
         });
     }

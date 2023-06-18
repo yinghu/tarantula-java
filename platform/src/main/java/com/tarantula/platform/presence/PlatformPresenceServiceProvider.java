@@ -4,16 +4,19 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.Rating;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameIndex;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.statistics.UserStatistics;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,8 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
 
     private int recentlyPlayListSize;
     private int friendListSize;
+
+    private int saveSize;
 
     private PlayList recentlyPlayList;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
@@ -127,18 +132,45 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         return deltaStatistics;
     }
 
-
-    public List<SavedGame> listSaves(String systemId,String deviceId,String deviceName){
+    public List<SavedGame> listSaves(String systemId,String deviceId){
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
         savedGameIndex.dataStore(this.presenceDataStore);
         this.presenceDataStore.createIfAbsent(savedGameIndex,true);
-        return savedGameIndex.list(deviceId,deviceName);
+        return savedGameIndex.list(deviceId,save->{});
+    }
+
+    public CurrentSaveIndex selectSave(Session session, String saveId, String deviceId, String deviceName){
+        SavedGame[] save = {savedGame(saveId),null};
+        if(save[0]==null) throw new IllegalArgumentException("no such save with ["+saveId+"]");
+        if(save[0].onDevice(session.systemId(),deviceId)){
+            //set current save on save service
+            save[0].name(deviceName);
+            save[0].version++;
+            save[0].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            save[0].update();
+            return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[0]);
+            //return save[0];
+        }
+        SavedGameIndex savedGameIndex = new SavedGameIndex();
+        savedGameIndex.distributionKey(session.systemId());
+        savedGameIndex.dataStore(this.presenceDataStore);
+        this.presenceDataStore.createIfAbsent(savedGameIndex,true);
+        savedGameIndex.list(deviceId,saved->{
+            save[1]=saved;
+        });
+        //merge save[0] into save[1]
+        save[1].name(deviceName);
+        save[1].version = save[0].version;
+        save[1].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        save[1].update();
+        return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[1]);
+        //return save[1];
     }
     public SavedGame loadSavedGame(String systemId,String gameId){
         SavedGame savedGame = new SavedGame();
         savedGame.distributionKey(gameId);
-        if(!this.presenceDataStore.load(savedGame)|| !savedGame.owner().equals(systemId)) return null;
+        if(!this.presenceDataStore.load(savedGame) || !savedGame.owner().equals(systemId)) return null;
         savedGame.dataStore(this.presenceDataStore);
         return  savedGame;
     }
@@ -156,5 +188,12 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         presenceDataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(presenceDataStore);
         return playerSaveIndex;
+    }
+    private SavedGame savedGame(String saveId){
+        SavedGame savedGame = new SavedGame();
+        savedGame.distributionKey(saveId);
+        if(!presenceDataStore.load(savedGame)) return null;
+        savedGame.dataStore(presenceDataStore);
+        return savedGame;
     }
 }
