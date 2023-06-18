@@ -5,8 +5,6 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class StubKey extends RecoverableObject implements Recoverable.Key {
 
-    //private int index;
-
     public StubKey(String systemId,String label,int  stub){
         String[] query = systemId.split("/");
         this.bucket = query[0];

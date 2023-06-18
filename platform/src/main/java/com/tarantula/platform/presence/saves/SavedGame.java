@@ -3,8 +3,6 @@ package com.tarantula.platform.presence.saves;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.achievement.AchievementProgress;
-import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
@@ -13,9 +11,6 @@ public class SavedGame extends RecoverableObject implements Configurable {
 
     //index -- device id
     //version -- game latest update mark
-    public DailyLoginTrack dailyLoginTrack;
-    public AchievementProgress achievementProgress;
-    public PlayerSaveIndex playerSaveIndex;
 
     public int version;
 
@@ -66,9 +61,6 @@ public class SavedGame extends RecoverableObject implements Configurable {
         jsonObject.addProperty("OwnerId",owner);
         jsonObject.addProperty("Version",version);
         jsonObject.addProperty("Timestamp",timestamp);
-        if(dailyLoginTrack!=null) jsonObject.add("_dailyLogin", dailyLoginTrack.toJson());
-        if(achievementProgress!=null) jsonObject.add("_achievement", achievementProgress.toJson());
-        if(playerSaveIndex!=null) jsonObject.add("_playerSaveIndex",playerSaveIndex.toJson());
         return jsonObject;
     }
     @Override

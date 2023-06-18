@@ -7,6 +7,9 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class PlayerSaveIndex extends IndexSet {
 
+    //Save id = > MappingObejct id
+
+
     public PlayerSaveIndex(){
         this.label = "playerSaveIndex";
     }

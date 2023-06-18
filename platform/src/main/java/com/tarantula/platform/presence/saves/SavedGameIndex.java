@@ -68,14 +68,6 @@ public class SavedGameIndex extends IndexSet {
             addSavedGame(savedGame);
             _tem.add(savedGame);
         }
-        DeviceIndex deviceIndex = new DeviceIndex(deviceId);
-        this.dataStore.createIfAbsent(deviceIndex,true);
-        deviceIndex.dataStore(this.dataStore);
-        deviceIndex.list().forEach(save->{
-            if(addSavedGame(save)) _tem.add(save);
-        });
-        deviceIndex.addKey(this.distributionKey());
-        this.dataStore.update(deviceIndex);
         return _tem;
     }
 

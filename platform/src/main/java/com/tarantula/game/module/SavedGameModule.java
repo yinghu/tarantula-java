@@ -11,8 +11,8 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
-import com.tarantula.platform.achievement.AchievementProgress;
-import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
+import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.PlayerSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 
@@ -21,21 +21,21 @@ import java.time.LocalDateTime;
 
 public class SavedGameModule implements Module {
     private ApplicationContext context;
-    private PlatformGameServiceProvider gameServiceProvider;
+    private PlatformSavedGameServiceProvider savedGameServiceProvider;
+    private PlatformPresenceServiceProvider presenceServiceProvider;
     private GsonBuilder builder;
 
-    private DataStore dataStore;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
             String[] query = session.name().split("#");
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.gameServiceProvider.presenceServiceProvider().listSaves(session.systemId(),query[0],query[1]));
-            playerSavedGames.gameServiceProvider = gameServiceProvider;
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),query[0],this.presenceServiceProvider.listSaves(session.systemId(),query[0],query[1]));
+            //playerSavedGames.gameServiceProvider = gameServiceProvider;
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdate")){
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
-            SavedGame savedGame = this.gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(),session.name());
+            SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
                 savedGame.version=(updated.version);
                 savedGame.index(updated.index());
@@ -51,12 +51,12 @@ public class SavedGameModule implements Module {
             }
         }
         else if(session.action().equals("onReset")){
-            SavedGame savedGame = this.gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(),session.name());
+            SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
-                DailyLoginTrack dailyLoginTrack = gameServiceProvider.dailyGiveawayServiceProvider().checkDailyLogin(savedGame.distributionKey());
-                if(dailyLoginTrack!=null) dailyLoginTrack.reset();
-                AchievementProgress achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(savedGame.distributionKey());
-                if(achievementProgress!=null) achievementProgress.reset();
+                //DailyLoginTrack dailyLoginTrack = gameServiceProvider.dailyGiveawayServiceProvider().checkDailyLogin(savedGame.distributionKey());
+                //if(dailyLoginTrack!=null) dailyLoginTrack.reset();
+                //AchievementProgress achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(savedGame.distributionKey());
+                //if(achievementProgress!=null) achievementProgress.reset();
                 savedGame.version=(0);
                 savedGame.update();
                 JsonObject resp = savedGame.toJson();
@@ -69,11 +69,11 @@ public class SavedGameModule implements Module {
         }
         else if(session.action().equals("onMerge")){
             SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
-            SavedGame current = gameServiceProvider.presenceServiceProvider().loadSavedGame(session.systemId(), session.name());
-            SavedGame remote = gameServiceProvider.presenceServiceProvider().loadSavedGame(updated.owner(), updated.distributionKey());
+            SavedGame current =presenceServiceProvider.loadSavedGame(session.systemId(), session.name());
+            SavedGame remote = presenceServiceProvider.loadSavedGame(updated.owner(), updated.distributionKey());
             current.version=(remote.version);
             current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
+            //current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
             JsonObject resp = new JsonObject();
             resp.add("_currentSavedGame", current.toJson());
             resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
@@ -81,35 +81,35 @@ public class SavedGameModule implements Module {
         }
 
         else if(session.action().equals("onDailyRewardClaim")){
-            boolean rewarded = this.gameServiceProvider.dailyGiveawayServiceProvider().redeem(session.systemId(),session.name());
-            session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
+            //boolean rewarded = this.gameServiceProvider.dailyGiveawayServiceProvider().redeem(session.systemId(),session.name());
+            //session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
-        if(session.action().equals("onSet")){
-            if(bytes.length>4000){
+        else if(session.action().equals("onSet")){
+            if(bytes.length > savedGameServiceProvider.mappingObjectMaxSize()){
                 session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+4000+"]").getBytes());
             }else{
                 String[] query = session.name().split("#");
-                PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
+                PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
                 if(savedGame.addKey(query[1])) savedGame.update();
                 MappingObject mo = new MappingObject();
-                mo.distributionKey(query[0]);
+               mo.distributionKey(query[0]);
                 mo.label(query[1]);
                 mo.value(bytes);
-                boolean suc = dataStore.update(mo);
-                session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
+                //boolean suc = dataStore.update(mo);
+                //session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
             }
         }
         else if(session.action().equals("onGet")){
             String[] query = session.name().split("#");
-            PlayerSaveIndex savedGame = gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(session.systemId());
+            PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
             if(savedGame.addKey(query[1])) savedGame.update();
             MappingObject mo = new MappingObject();
             mo.distributionKey(query[0]);
             mo.label(query[1]);
             byte[] v = null;
-            if(dataStore.load(mo)){
-                v = mo.value();
-            }
+            //if(dataStore.load(mo)){
+                //v = mo.value();
+            //}
             session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
         }
         else{
@@ -123,9 +123,11 @@ public class SavedGameModule implements Module {
         this.context = applicationContext;
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(SavedGame.class,new SavedGameDeserializer());
-        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
-        this.dataStore = this.context.dataStore("save");
+        PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        this.savedGameServiceProvider = gameServiceProvider.savedGameServiceProvider();
+        this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
+        //this.dataStore = this.context.dataStore("save");
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 }

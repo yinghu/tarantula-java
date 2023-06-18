@@ -82,7 +82,6 @@ public class Stub extends PlayerGameObject {
         String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
         this.bucket = klist[0];
         this.oid = klist[1];
-        //if(klist.length==3) this.label = klist[2];
     }
     @Override
     public int getFactoryId() {
