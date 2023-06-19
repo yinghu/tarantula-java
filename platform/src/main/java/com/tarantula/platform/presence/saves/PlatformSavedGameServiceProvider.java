@@ -19,6 +19,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     private int mappingObjectMaxSize = 4000;
 
+
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
     }
@@ -52,7 +53,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     }
 
     public CurrentSaveIndex selectSavedGame(Session session,SavedGame selected){
-        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session,selected.distributionKey());
+        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session,selected);
         this.dataStore.createIfAbsent(currentSaveIndex,true);
         return currentSaveIndex;
     }

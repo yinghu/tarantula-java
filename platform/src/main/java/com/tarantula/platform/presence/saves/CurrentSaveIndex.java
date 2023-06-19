@@ -15,22 +15,25 @@ public class CurrentSaveIndex extends RecoverableObject {
 
     }
 
-    public CurrentSaveIndex(Session session,String index){
+    public CurrentSaveIndex(Session session,SavedGame selected){
         String[] query = session.systemId().split(Recoverable.PATH_SEPARATOR);
         this.bucket = query[0];
         this.oid = query[1];
         this.routingNumber = session.stub();
-        this.index = index;
+        this.index = selected.distributionKey();
+        this.name = selected.index();
     }
 
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",index);
+        this.properties.put("2",name);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.index = ((String) properties.get("1"));
+        this.name = ((String) properties.get("2"));
     }
 
     @Override
@@ -50,8 +53,9 @@ public class CurrentSaveIndex extends RecoverableObject {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("SaveId",this.key().asString());
+        jsonObject.addProperty("SessionId",this.key().asString());
         jsonObject.addProperty("GameId",index);
+        jsonObject.addProperty("DeviceId",name);
         return jsonObject;
     }
 
