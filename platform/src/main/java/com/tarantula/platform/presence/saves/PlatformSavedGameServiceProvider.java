@@ -39,7 +39,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return mappingObjectMaxSize;
     }
 
-    public <T extends Recoverable> boolean save(T save){
+    public <T extends Recoverable> boolean save(Session session,T save){
         return this.dataStore.createIfAbsent(save,true);
     }
 

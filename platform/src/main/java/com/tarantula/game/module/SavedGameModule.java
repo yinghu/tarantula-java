@@ -92,29 +92,42 @@ public class SavedGameModule implements Module {
             if(bytes.length > savedGameServiceProvider.mappingObjectMaxSize()){
                 session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+4000+"]").getBytes());
             }else{
-                String[] query = session.name().split("#");
-                PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
-                if(savedGame.addKey(query[1])) savedGame.update();
-                MappingObject mo = new MappingObject();
-                mo.distributionKey(query[0]);
-                mo.label(query[1]);
-                mo.value(bytes);
+                //String[] query = session.name().split("#");
+                //PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
+                //if(savedGame.addKey(query[1])) savedGame.update();
+                //MappingObject mo = new MappingObject();
+                //mo.distributionKey(query[0]);
+                //mo.label(query[1]);
+                //mo.value(bytes);
                 //boolean suc = dataStore.update(mo);
-                //session.write(JsonUtil.toSimpleResponse(suc,suc?"saved":"not saved").getBytes());
+                session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
             }
         }
         else if(session.action().equals("onGet")){
-            String[] query = session.name().split("#");
-            PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
-            if(savedGame.addKey(query[1])) savedGame.update();
-            MappingObject mo = new MappingObject();
-            mo.distributionKey(query[0]);
-            mo.label(query[1]);
-            byte[] v = null;
+            //String[] query = session.name().split("#");
+            //PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
+            //if(savedGame.addKey(query[1])) savedGame.update();
+            //MappingObject mo = new MappingObject();
+            //mo.distributionKey(query[0]);
+            //mo.label(query[1]);
+            //byte[] v = null;
             //if(dataStore.load(mo)){
                 //v = mo.value();
             //}
-            session.write(v!=null?v:JsonUtil.toSimpleResponse(false,"no data saved").getBytes());
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+        }
+        else if(session.action().equals("onDelete")){
+            //String[] query = session.name().split("#");
+            //PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
+            //if(savedGame.addKey(query[1])) savedGame.update();
+            //MappingObject mo = new MappingObject();
+            //mo.distributionKey(query[0]);
+            //mo.label(query[1]);
+            //byte[] v = null;
+            //if(dataStore.load(mo)){
+            //v = mo.value();
+            //}
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
@@ -131,7 +144,6 @@ public class SavedGameModule implements Module {
         gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.savedGameServiceProvider = gameServiceProvider.savedGameServiceProvider();
         this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
-        //this.dataStore = this.context.dataStore("save");
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 }
