@@ -8,21 +8,21 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
 
-public class CurrentSaveIndex extends RecoverableObject {
+public class DeviceSaveIndex extends RecoverableObject {
 
     //systemId <> deviceId mapping for current save selection or default save
-    public CurrentSaveIndex(){
+    public DeviceSaveIndex(){
 
     }
 
-    public CurrentSaveIndex(Session session){
+    public DeviceSaveIndex(Session session){
         String[] query = session.systemId().split(Recoverable.PATH_SEPARATOR);
         this.bucket = query[0];
         this.oid = query[1];
         this.routingNumber = session.stub();
     }
 
-    public CurrentSaveIndex(Session session,SavedGame selected){
+    public DeviceSaveIndex(Session session, SavedGame selected){
         this(session);
         this.index = selected.distributionKey();
         this.name = selected.index();
@@ -50,7 +50,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         return PresencePortableRegistry.OID;
     }
     @Override
-    public Recoverable.Key key(){
+    public Key key(){
         return new SaveKey(this.bucket,this.oid,routingNumber);
     }
 

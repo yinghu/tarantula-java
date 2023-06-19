@@ -41,7 +41,13 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     }
 
     public <T extends Recoverable> boolean save(Session session,T save){
-        return this.dataStore.createIfAbsent(save,true);
+        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session);
+        this.dataStore.createIfAbsent(currentSaveIndex,true);
+        String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
+        save.distributionKey(saveId);
+        this.dataStore.createIfAbsent(save,true);
+        logger.warn(save.key().asString());
+        return true;
     }
 
     public <T extends Recoverable> boolean load(T save){
@@ -55,6 +61,9 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public CurrentSaveIndex selectSavedGame(Session session,SavedGame selected){
         CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session,selected);
         this.dataStore.createIfAbsent(currentSaveIndex,true);
+        if(currentSaveIndex.index()!=null && currentSaveIndex.index().equals(selected.distributionKey())) return currentSaveIndex;
+        currentSaveIndex.index(selected.distributionKey());
+        this.dataStore.update(currentSaveIndex);
         return currentSaveIndex;
     }
 

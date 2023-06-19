@@ -95,11 +95,12 @@ public class SavedGameModule implements Module {
                 //String[] query = session.name().split("#");
                 //PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
                 //if(savedGame.addKey(query[1])) savedGame.update();
-                //MappingObject mo = new MappingObject();
+                MappingObject mo = new MappingObject();
                 //mo.distributionKey(query[0]);
-                //mo.label(query[1]);
-                //mo.value(bytes);
-                //boolean suc = dataStore.update(mo);
+                mo.label(session.name());
+                mo.value(bytes);
+                //boolean suc = dataStore.update(mo)
+                this.savedGameServiceProvider.save(session,mo);
                 session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
             }
         }

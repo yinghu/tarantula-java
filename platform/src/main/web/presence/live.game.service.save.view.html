@@ -30,7 +30,7 @@
             </div>
         </fieldset>
     </div> 
-    <div class="w3-panel" id="tx-live-save-operation-form" style="display: none;">
+    <div class="w3-panel" id="tx-live-save-operation-form">
         <fieldset class="w3-border-blue tx-text-12">
             <legend class="tx-text-14 w3-text-blue">Save Operation</legend>
                 <div class="w3-container">
@@ -100,7 +100,7 @@
     };
     tx_live_save_setup();
     function tx_live_save_setup(){
-        document.querySelector('#tx-live-save-operation-form').style.display = 'none';
+        //document.querySelector('#tx-live-save-operation-form').style.display = 'none';
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{    
             if(resp.Successful){
                 saveList.innerHTML = '';
@@ -123,7 +123,7 @@
         let selected = itemId+'#'+deviceId+'#Game Save'
         TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',selected,(resp)=>{
             editor.set(resp);
-            document.querySelector('#tx-live-save-operation-form').style.display = 'block';
+            //document.querySelector('#tx-live-save-operation-form').style.display = 'block';
         });
     }
 

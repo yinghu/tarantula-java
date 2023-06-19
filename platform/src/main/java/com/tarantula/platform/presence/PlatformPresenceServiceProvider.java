@@ -150,7 +150,6 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
             save[0].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             save[0].update();
             return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[0]);
-            //return save[0];
         }
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(session.systemId());
@@ -165,7 +164,6 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         save[1].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         save[1].update();
         return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[1]);
-        //return save[1];
     }
     public SavedGame loadSavedGame(String systemId,String gameId){
         SavedGame savedGame = new SavedGame();
