@@ -50,7 +50,11 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return true;
     }
 
-    public <T extends Recoverable> boolean load(T save){
+    public <T extends Recoverable> boolean load(Session session,T save){
+        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session);
+        this.dataStore.createIfAbsent(currentSaveIndex,true);
+        String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
+        save.distributionKey(saveId);
         return this.dataStore.load(save);
     }
 

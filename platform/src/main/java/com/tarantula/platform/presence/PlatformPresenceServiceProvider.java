@@ -172,13 +172,6 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         savedGame.dataStore(this.presenceDataStore);
         return  savedGame;
     }
-    public PlayerSaveIndex loadPlayerSaveIndex(String systemId){
-        PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex();
-        playerSaveIndex.distributionKey(systemId);
-        presenceDataStore.createIfAbsent(playerSaveIndex,true);
-        playerSaveIndex.dataStore(presenceDataStore);
-        return playerSaveIndex;
-    }
 
     public PersonalDataIndex loadPersonalDataIndex(String systemId){
         PersonalDataIndex playerSaveIndex = new PersonalDataIndex();

@@ -42,7 +42,7 @@ public class DeviceSaveIndex extends RecoverableObject {
 
     @Override
     public int getClassId() {
-        return PresencePortableRegistry.CURRENT_SAVE_INDEX_CID;
+        return PresencePortableRegistry.DEVICE_SAVE_INDEX_CID;
     }
 
     @Override

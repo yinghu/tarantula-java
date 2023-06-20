@@ -13,10 +13,7 @@ import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
-import com.tarantula.platform.presence.saves.CurrentSaveIndex;
-import com.tarantula.platform.presence.saves.PlayerSaveIndex;
-import com.tarantula.platform.presence.saves.SavedGame;
-import com.tarantula.platform.presence.saves.SavedGameIndex;
+import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
 
 public class PresencePortableRegistry extends AbstractRecoverableListener {
@@ -61,6 +58,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
     public static final int GAME_RESOURCE_CID = 19;
 
     public static final int PERSONAL_DATA_OBJECT_CID = 20;
+
+    public static final int DEVICE_SAVE_INDEX_CID = 21;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public Recoverable create(int i) {
@@ -125,6 +125,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case PERSONAL_DATA_OBJECT_CID:
                 pt = new PersonalDataObject();
+                break;
+            case DEVICE_SAVE_INDEX_CID:
+                pt = new DeviceSaveIndex();
                 break;
             default:
         }
