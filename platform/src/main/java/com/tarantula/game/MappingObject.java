@@ -29,7 +29,7 @@ public class MappingObject extends RecoverableObject {
     }
 
     public byte[] value(){
-        return properties.get(_KEY).toString().getBytes();
+        return properties.getOrDefault(_KEY,"{}").toString().getBytes();
     }
 
 }

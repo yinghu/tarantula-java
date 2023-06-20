@@ -57,10 +57,7 @@ public class SavedGameModule implements Module {
         else if(session.action().equals("onReset")){
             SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
             if(savedGame!=null){
-                //DailyLoginTrack dailyLoginTrack = gameServiceProvider.dailyGiveawayServiceProvider().checkDailyLogin(savedGame.distributionKey());
-                //if(dailyLoginTrack!=null) dailyLoginTrack.reset();
-                //AchievementProgress achievementProgress = gameServiceProvider.achievementServiceProvider().achievementProgress(savedGame.distributionKey());
-                //if(achievementProgress!=null) achievementProgress.reset();
+
                 savedGame.version=(0);
                 savedGame.update();
                 JsonObject resp = savedGame.toJson();
@@ -94,6 +91,7 @@ public class SavedGameModule implements Module {
             }else{
                 MappingObject mo = new MappingObject();
                 mo.label(session.name());
+                savedGameServiceProvider.load(session,mo);
                 mo.value(bytes);
                 boolean suc = this.savedGameServiceProvider.save(session,mo);
                 session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());

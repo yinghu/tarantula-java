@@ -45,8 +45,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.dataStore.createIfAbsent(currentSaveIndex,true);
         String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
         save.distributionKey(saveId);
-        this.dataStore.createIfAbsent(save,true);
-        logger.warn(save.key().asString());
+        if(this.dataStore.update(save)) return true;
+        this.dataStore.createIfAbsent(save,false);
         return true;
     }
 
