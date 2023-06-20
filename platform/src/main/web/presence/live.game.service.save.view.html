@@ -32,17 +32,13 @@
     </div> 
     <div class="w3-panel" id="tx-live-save-operation-form">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend class="tx-text-14 w3-text-blue">Save Operation</legend>
+            <legend class="tx-text-14 w3-text-blue" id='tx-live-save-header'>System</legend>
                 <div class="w3-container">
                     <label class="tx-text-14 tx-margin-right-4">Save Key :</label>
                     <input id='tx-item-save-key' class="w3-input w3-border w3-round tx-text-14 tx-margin-bottom-8" value="Level">
                 </div>
                 <div class="w3-panel">
-                    <div class='w3-bar w3-white'>
-                        <span id='tx-save-live-service-save' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Save</span>
-                        <span id='tx-save-live-service-load' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Load</span>
-                        <span id='tx-save-live-service-delete' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Delete</span>    
-                    </div>    
+                    <div class='w3-bar w3-white' id='tx-save-opt-bar'></div>    
                 </div>
         </fieldset>
     </div> 
@@ -71,7 +67,10 @@
     let saveList = document.querySelector('#tx-live-save-item-list');
     saveList.innerHTML = '';
     let deviceId = "HandSet1";
-    //let actionList = document.querySelector('#tx-live-save-action-bar');
+    document.querySelector('#tx-save-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-save','Save','w3-right');
+    document.querySelector('#tx-save-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-load','Load','w3-right');
+    document.querySelector('#tx-save-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-reset','Reset','w3-left');
+   
     document.querySelector('#tx-save-live-close').onclick=()=>{
         editor.destroy();
         tx_close_current_page();      
@@ -95,10 +94,12 @@
     document.querySelector('#tx-save-live-service-load').onclick=()=>{
         tx_load_operation();
     };
-    document.querySelector('#tx-save-live-service-delete').onclick=()=>{
-        tx_delete_operation();
+    document.querySelector('#tx-save-live-service-reset').onclick=()=>{
+        tx_reset_operation();
     };
+
     tx_live_save_setup();
+    
     function tx_live_save_setup(){
         //document.querySelector('#tx-live-save-operation-form').style.display = 'none';
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',deviceId,(resp)=>{    
@@ -123,7 +124,7 @@
         let selected = itemId+'#'+deviceId+'#Game Save'
         TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',selected,(resp)=>{
             editor.set(resp);
-            //document.querySelector('#tx-live-save-operation-form').style.display = 'block';
+            document.querySelector('#tx-live-save-header').innerHTML = resp.DeviceId;
         });
     }
 
@@ -141,9 +142,9 @@
         });
     }
 
-    function tx_delete_operation(){
+    function tx_reset_operation(){
         let dkey = document.querySelector('#tx-item-save-key').value;
-        TARA_API.onGet(TARA_API.query().serviceTag,'onDelete',dkey,(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onReset',dkey,(resp)=>{
             editor.set(resp);
         });
     }

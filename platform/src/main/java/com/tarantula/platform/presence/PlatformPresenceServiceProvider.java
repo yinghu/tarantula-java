@@ -165,11 +165,14 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         save[1].update();
         return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[1]);
     }
-    public SavedGame loadSavedGame(String systemId,String gameId){
+    public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
         SavedGame savedGame = new SavedGame();
-        savedGame.distributionKey(gameId);
-        if(!this.presenceDataStore.load(savedGame) || !savedGame.owner().equals(systemId)) return null;
-        savedGame.dataStore(this.presenceDataStore);
+        savedGame.distributionKey(currentSaveIndex.index());
+        this.presenceDataStore.load(savedGame);
+        savedGame.version = 0;
+        savedGame.name("New Save");
+        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        this.presenceDataStore.update(savedGame);
         return  savedGame;
     }
 

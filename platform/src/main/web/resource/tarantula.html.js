@@ -39,11 +39,24 @@ var TARA_HTML = (function(){
             tem.push('<option value=\''+value+'\'>'+view+'</option>');
         }
         return tem.join('');
+    };  
+    let _bar_item = function(id,caption,pcss){
+        let tem =[];
+        tem.push('<span class=\'w3-bar-item ');
+        tem.push(pcss)
+        tem.push(' w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4\'');
+        tem.push(' id=\'');
+        tem.push(id);
+        tem.push('\'>');
+        tem.push(caption);
+        tem.push('</span>');
+        return tem.join('');
     };   
     return{
         command : _command,
         option : _option,
         caption : _caption,
-        application : _application
+        application : _application,
+        BarItem: _bar_item
     };
 })();

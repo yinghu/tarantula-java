@@ -37,54 +37,6 @@ public class SavedGameModule implements Module {
             CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,query[0],query[1],query[2]);
             session.write(savedGame.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onUpdate")){
-            SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
-            SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
-            if(savedGame!=null){
-                savedGame.version=(updated.version);
-                savedGame.index(updated.index());
-                savedGame.owner(updated.owner());
-                savedGame.name(updated.name());
-                savedGame.update();
-                JsonObject resp = savedGame.toJson();
-                resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
-                session.write(resp.toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"no such saved game").getBytes());
-            }
-        }
-        else if(session.action().equals("onReset")){
-            SavedGame savedGame = this.presenceServiceProvider.loadSavedGame(session.systemId(),session.name());
-            if(savedGame!=null){
-
-                savedGame.version=(0);
-                savedGame.update();
-                JsonObject resp = savedGame.toJson();
-                resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
-                session.write(resp.toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"no such saved game").getBytes());
-            }
-        }
-        else if(session.action().equals("onMerge")){
-            SavedGame updated = builder.create().fromJson(new String(bytes),SavedGame.class);
-            SavedGame current =presenceServiceProvider.loadSavedGame(session.systemId(), session.name());
-            SavedGame remote = presenceServiceProvider.loadSavedGame(updated.owner(), updated.distributionKey());
-            current.version=(remote.version);
-            current.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            //current.playerSaveIndex = this.gameServiceProvider.presenceServiceProvider().loadPlayerSaveIndex(remote.owner());
-            JsonObject resp = new JsonObject();
-            resp.add("_currentSavedGame", current.toJson());
-            resp.addProperty(Response.RESPONSE_SUCCESSFUL,true);
-            session.write(resp.toString().getBytes());
-        }
-
-        else if(session.action().equals("onDailyRewardClaim")){
-            //boolean rewarded = this.gameServiceProvider.dailyGiveawayServiceProvider().redeem(session.systemId(),session.name());
-            //session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
-        }
         else if(session.action().equals("onSet")){
             if(bytes.length > savedGameServiceProvider.mappingObjectMaxSize()){
                 session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+4000+"]").getBytes());
@@ -103,18 +55,15 @@ public class SavedGameModule implements Module {
             boolean suc = savedGameServiceProvider.load(session,mo);
             session.write(suc ? mo.value() : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
         }
-        else if(session.action().equals("onDelete")){
-            //String[] query = session.name().split("#");
-            //PlayerSaveIndex savedGame = presenceServiceProvider.loadPlayerSaveIndex(session.systemId());
-            //if(savedGame.addKey(query[1])) savedGame.update();
-            //MappingObject mo = new MappingObject();
-            //mo.distributionKey(query[0]);
-            //mo.label(query[1]);
-            //byte[] v = null;
-            //if(dataStore.load(mo)){
-            //v = mo.value();
-            //}
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+        else if(session.action().equals("onReset")){
+            CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
+            if(selected.index()!=null){
+                SavedGame savedGame = presenceServiceProvider.resetSavedGame(selected);
+                session.write(savedGame.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
+            }
         }
         else{
             throw new UnsupportedOperationException(session.action());
