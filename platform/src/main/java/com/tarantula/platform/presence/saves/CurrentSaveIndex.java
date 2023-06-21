@@ -10,7 +10,10 @@ import java.util.Map;
 
 public class CurrentSaveIndex extends RecoverableObject {
 
-    //systemId <> deviceId mapping for current save selection or default save
+    //session  <> save Id mapping for current save selection or default save
+
+    public int version;
+
     public CurrentSaveIndex(){
 
     }
@@ -25,19 +28,22 @@ public class CurrentSaveIndex extends RecoverableObject {
     public CurrentSaveIndex(Session session,SavedGame selected){
         this(session);
         this.index = selected.distributionKey();
-        this.name = selected.index();
+        this.name = selected.name();
+        this.version = selected.version;
     }
 
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",index);
         this.properties.put("2",name);
+        this.properties.put("3",version);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.index = ((String) properties.get("1"));
         this.name = ((String) properties.get("2"));
+        this.version =  ((Number)properties.getOrDefault("3",0)).intValue();
     }
 
     @Override
@@ -59,7 +65,8 @@ public class CurrentSaveIndex extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("SessionId",this.key().asString());
         jsonObject.addProperty("GameId",index);
-        jsonObject.addProperty("DeviceId",name);
+        jsonObject.addProperty("SaveName",name);
+        jsonObject.addProperty("Version",version);
         return jsonObject;
     }
 

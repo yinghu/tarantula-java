@@ -45,24 +45,32 @@ public class SavedGameIndex extends IndexSet {
         dataStore.update(this);
         return true;
     }
-    public List<SavedGame> list(String deviceId,SaveSelected saveSelected){
+    public List<SavedGame> list(int saveSize){
         ArrayList<SavedGame> _tem = new ArrayList<>();
         int[] create = {0};
         savedGames.forEach(save-> {
             save.load();
-            if(save.index().equals(deviceId)){
-                create[0]++;
-                saveSelected.selected(save);
-            }
             _tem.add(save);
+            create[0]++;
         });
-        if(create[0]==0){//always create one if no save associated with deviceId
-            SavedGame savedGame = new SavedGame(this.distributionKey(),deviceId,"New Save");
+        while (create[0]<saveSize){//always create one if no save associated with deviceId
+            SavedGame savedGame = new SavedGame(this.distributionKey(),"New Save ["+create[0]+"]");
             dataStore.create(savedGame);
             addSavedGame(savedGame);
             _tem.add(savedGame);
-            saveSelected.selected(savedGame);
+            create[0]++;
         }
         return _tem;
+    }
+
+    public SavedGame select(String saveId){
+        SavedGame[] selected = {null};
+        savedGames.forEach(save-> {
+            save.load();
+            if (save.distributionKey().equals(saveId)){
+                selected[0]=save;
+            }
+        });
+        return selected[0];
     }
 }

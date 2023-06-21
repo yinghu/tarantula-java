@@ -12,6 +12,7 @@
       "grantNumber": 1
   },
   "savedGame":{
+      "saveSize": 3,
       "mappingObjectMaxSize": 4000
   },
   "recentlyPlayListSize": 10,

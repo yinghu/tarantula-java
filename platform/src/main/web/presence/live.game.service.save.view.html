@@ -107,7 +107,7 @@
                 saveList.innerHTML = '';
                 resp._savedGames.forEach(item => {
                     
-                    saveList.innerHTML += TARA_HTML.command(item.GameId,item.DeviceId+'>'+item.GameId,item.Version,'save-select','Select');
+                    saveList.innerHTML += TARA_HTML.command(item.GameId,item.SaveName+'>'+item.GameId,item.Version,'save-select','Select');
                         
                 });
                 document.querySelectorAll('.tx-live-save-select').forEach(a=>{
@@ -121,8 +121,8 @@
     }
 
     function tx_save_select(itemId){
-        let selected = itemId+'#'+deviceId+'#Game Save'
-        TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',selected,(resp)=>{
+        //let selected = itemId+'#'+deviceId+'#Game Save'
+        TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',itemId,(resp)=>{
             editor.set(resp);
             document.querySelector('#tx-live-save-header').innerHTML = resp.DeviceId;
         });

@@ -131,37 +131,14 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
 
     public List<SavedGame> listSaves(String systemId,String deviceId){
         deviceIndex(systemId,deviceId);
-        SavedGameIndex savedGameIndex = new SavedGameIndex();
-        savedGameIndex.distributionKey(systemId);
-        savedGameIndex.dataStore(this.presenceDataStore);
-        this.presenceDataStore.createIfAbsent(savedGameIndex,true);
-        return savedGameIndex.list(deviceId,save->{});
+        SavedGameIndex savedGameIndex = savedGameIndex(systemId);
+        return savedGameIndex.list(gameServiceProvider.savedGameServiceProvider().saveSize());
     }
 
-    public CurrentSaveIndex selectSave(Session session, String saveId, String deviceId, String deviceName){
-        SavedGame[] save = {savedGame(saveId),null};
-        if(save[0]==null) throw new IllegalArgumentException("no such save with ["+saveId+"]");
-        if(save[0].onDevice(session.systemId(),deviceId)){
-            //set current save on save service
-            save[0].name(deviceName);
-            save[0].version++;
-            save[0].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            save[0].update();
-            return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[0]);
-        }
-        SavedGameIndex savedGameIndex = new SavedGameIndex();
-        savedGameIndex.distributionKey(session.systemId());
-        savedGameIndex.dataStore(this.presenceDataStore);
-        this.presenceDataStore.createIfAbsent(savedGameIndex,true);
-        savedGameIndex.list(deviceId,saved->{
-            save[1]=saved;
-        });
-        //merge save[0] into save[1]
-        save[1].name(deviceName);
-        save[1].version = save[0].version;
-        save[1].timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        save[1].update();
-        return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[1]);
+    public CurrentSaveIndex selectSave(Session session, String saveId){
+        SavedGameIndex savedGameIndex = savedGameIndex(session.systemId());
+        SavedGame selected = savedGameIndex.select(saveId);
+        return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected);
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
         if(currentSaveIndex.index()==null) return null;
@@ -187,6 +164,14 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         presenceDataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(presenceDataStore);
         return playerSaveIndex;
+    }
+
+    private SavedGameIndex savedGameIndex(String systemId){
+        SavedGameIndex savedGameIndex = new SavedGameIndex();
+        savedGameIndex.distributionKey(systemId);
+        savedGameIndex.dataStore(this.presenceDataStore);
+        this.presenceDataStore.createIfAbsent(savedGameIndex,true);
+        return savedGameIndex;
     }
     private SavedGame savedGame(String saveId){
         SavedGame savedGame = new SavedGame();

@@ -19,14 +19,12 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public SavedGame(){
 
     }
-    public SavedGame(String owner,String deviceId,String deviceName){
+    public SavedGame(String owner,String saveName){
         this.owner = owner;
-        this.index = deviceId;
-        this.name = deviceName;
+        this.name = saveName;
     }
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",index);
         this.properties.put("2",name);
         this.properties.put("3",owner);
         this.properties.put("4",version);
@@ -35,7 +33,6 @@ public class SavedGame extends RecoverableObject implements Configurable {
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.index = ((String) properties.get("1"));
         this.name = ((String) properties.get("2"));
         this.owner = ((String) properties.get("3"));
         this.version = ((Number)properties.getOrDefault("4",0)).intValue();
@@ -56,8 +53,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("GameId",this.distributionKey());
-        jsonObject.addProperty("DeviceId",index);
-        jsonObject.addProperty("DeviceName",name);
+        jsonObject.addProperty("SaveName",name);
         jsonObject.addProperty("OwnerId",owner);
         jsonObject.addProperty("Version",version);
         jsonObject.addProperty("Timestamp",timestamp);

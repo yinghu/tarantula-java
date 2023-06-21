@@ -33,8 +33,7 @@ public class SavedGameModule implements Module {
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else if(session.action().equals("onSelect")){
-            String[] query = session.name().split("#");
-            CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,query[0],query[1],query[2]);
+            CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,session.name());
             session.write(savedGame.toJson().toString().getBytes());
         }
         else if(session.action().equals("onSet")){

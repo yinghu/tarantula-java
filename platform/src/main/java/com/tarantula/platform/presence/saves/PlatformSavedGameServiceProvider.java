@@ -18,6 +18,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public static final String NAME = "save";
 
     private int mappingObjectMaxSize = 4000;
+    private int saveSize = 3;
 
 
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
@@ -30,6 +31,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
         mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
+        saveSize = saveGame.get("saveSize").getAsInt();
         this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
@@ -39,7 +41,9 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public int mappingObjectMaxSize(){
         return mappingObjectMaxSize;
     }
-
+    public int saveSize(){
+        return saveSize;
+    }
     public <T extends Recoverable> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
@@ -80,7 +84,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.dataStore.createIfAbsent(currentSaveIndex,true);
         if(currentSaveIndex.index()!=null && currentSaveIndex.index().equals(selected.distributionKey())) return currentSaveIndex;
         currentSaveIndex.index(selected.distributionKey());
-        currentSaveIndex.name(selected.index());
+        currentSaveIndex.name(selected.name());
+        currentSaveIndex.version = selected.version;
         this.dataStore.update(currentSaveIndex);
         return currentSaveIndex;
     }
