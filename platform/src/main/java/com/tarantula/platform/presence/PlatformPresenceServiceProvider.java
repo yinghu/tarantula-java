@@ -9,10 +9,7 @@ import com.tarantula.game.Rating;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.presence.saves.CurrentSaveIndex;
-import com.tarantula.platform.presence.saves.PlayerSaveIndex;
-import com.tarantula.platform.presence.saves.SavedGame;
-import com.tarantula.platform.presence.saves.SavedGameIndex;
+import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.statistics.UserStatistics;
 
@@ -133,6 +130,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     }
 
     public List<SavedGame> listSaves(String systemId,String deviceId){
+        deviceIndex(systemId,deviceId);
         SavedGameIndex savedGameIndex = new SavedGameIndex();
         savedGameIndex.distributionKey(systemId);
         savedGameIndex.dataStore(this.presenceDataStore);
@@ -166,14 +164,21 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,save[1]);
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
-        SavedGame savedGame = new SavedGame();
-        savedGame.distributionKey(currentSaveIndex.index());
-        this.presenceDataStore.load(savedGame);
+        if(currentSaveIndex.index()==null) return null;
+        SavedGame savedGame = savedGame(currentSaveIndex.index());
         savedGame.version = 0;
         savedGame.name("New Save");
         savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         this.presenceDataStore.update(savedGame);
         return  savedGame;
+    }
+
+    public void updateSavedGame(CurrentSaveIndex currentSaveIndex){
+        if(currentSaveIndex.index()==null) return;
+        SavedGame savedGame = savedGame(currentSaveIndex.index());
+        savedGame.version = savedGame.version+1;
+        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        savedGame.update();
     }
 
     public PersonalDataIndex loadPersonalDataIndex(String systemId){
@@ -189,5 +194,11 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         if(!presenceDataStore.load(savedGame)) return null;
         savedGame.dataStore(presenceDataStore);
         return savedGame;
+    }
+    private void deviceIndex(String systemId,String deviceId){
+        AccessIndex accessIndex = serviceContext.accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
+        DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
+        this.presenceDataStore.createIfAbsent(deviceSaveIndex,true);
+        if(deviceSaveIndex.addKey(systemId)) this.presenceDataStore.update(deviceSaveIndex);
     }
 }

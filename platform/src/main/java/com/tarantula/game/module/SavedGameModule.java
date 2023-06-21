@@ -45,8 +45,8 @@ public class SavedGameModule implements Module {
                 mo.label(session.name());
                 savedGameServiceProvider.load(session,mo);
                 mo.value(bytes);
-                boolean suc = this.savedGameServiceProvider.save(session,mo);
-                session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
+                this.savedGameServiceProvider.save(session,mo);
+                session.write(JsonUtil.toSimpleResponse(true,mo.key().asString()).getBytes());
             }
         }
         else if(session.action().equals("onGet")){

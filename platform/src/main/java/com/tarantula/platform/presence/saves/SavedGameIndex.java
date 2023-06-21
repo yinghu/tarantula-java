@@ -65,23 +65,4 @@ public class SavedGameIndex extends IndexSet {
         }
         return _tem;
     }
-    public List<SavedGame> list(String deviceId,String deviceName){
-        ArrayList<SavedGame> _tem = new ArrayList<>();
-        int[] created = {0};
-        savedGames.forEach(save->{
-            save.load();
-            if(save.index().equals(deviceId) && save.owner().equals(this.distributionKey())) created[0]++;
-            _tem.add(save);
-        });
-        if(created[0]==0){//
-            SavedGame savedGame = new SavedGame(this.distributionKey(),deviceId,deviceName);
-            savedGame.dataStore(dataStore);
-            this.dataStore.create(savedGame);
-            addSavedGame(savedGame);
-            _tem.add(savedGame);
-        }
-        return _tem;
-    }
-
-
 }

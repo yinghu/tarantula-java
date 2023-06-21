@@ -13,6 +13,11 @@ public class PlayerSaveIndex extends IndexSet {
         this.label = "playerSaveIndex";
     }
 
+    public PlayerSaveIndex(String indexId){
+        this();
+        this.distributionKey(indexId);
+    }
+
     @Override
     public int getClassId() {
         return PresencePortableRegistry.PLAYER_SAVE_INDEX_CID;

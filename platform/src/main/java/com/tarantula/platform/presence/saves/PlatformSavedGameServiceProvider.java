@@ -40,13 +40,15 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return mappingObjectMaxSize;
     }
 
-    public <T extends Recoverable> boolean save(Session session,T save){
+    public <T extends Recoverable> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
-        save.distributionKey(saveId);
-        if(this.dataStore.update(save)) return true;
-        this.dataStore.createIfAbsent(save,false);
-        return true;
+        PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
+        save.distributionKey(saveIndex.distributionKey());
+        if(!this.dataStore.update(save)) {
+            this.dataStore.createIfAbsent(save, false);
+        }
+        if(saveIndex.addKey(save.key().asString())) saveIndex.update();
+        platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
     public <T extends Recoverable> boolean load(Session session,T save){
@@ -59,6 +61,11 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public CurrentSaveIndex reset(Session session){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         //reset or delete saved data associated with the save
+        PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
+        saveIndex.keySet().forEach(k->{
+            this.dataStore.delete(k.getBytes());
+        });
+        saveIndex.clear();
         return currentSaveIndex;
     }
 
@@ -73,8 +80,15 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.dataStore.createIfAbsent(currentSaveIndex,true);
         if(currentSaveIndex.index()!=null && currentSaveIndex.index().equals(selected.distributionKey())) return currentSaveIndex;
         currentSaveIndex.index(selected.distributionKey());
+        currentSaveIndex.name(selected.index());
         this.dataStore.update(currentSaveIndex);
         return currentSaveIndex;
+    }
+    private PlayerSaveIndex playerSaveIndex(String indexId){
+        PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex(indexId);
+        this.dataStore.createIfAbsent(playerSaveIndex,true);
+        playerSaveIndex.dataStore(this.dataStore);
+        return playerSaveIndex;
     }
 
 
