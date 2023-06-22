@@ -4,8 +4,11 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class CurrentSaveIndex extends RecoverableObject {
@@ -23,6 +26,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         this.bucket = query[0];
         this.oid = query[1];
         this.routingNumber = session.stub();
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
     }
 
     public CurrentSaveIndex(Session session,SavedGame selected){
@@ -37,6 +41,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         this.properties.put("1",index);
         this.properties.put("2",name);
         this.properties.put("3",version);
+        this.properties.put("4",timestamp);
         return this.properties;
     }
     @Override
@@ -44,6 +49,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         this.index = ((String) properties.get("1"));
         this.name = ((String) properties.get("2"));
         this.version =  ((Number)properties.getOrDefault("3",0)).intValue();
+        this.timestamp =  ((Number)properties.getOrDefault("4",0)).longValue();
     }
 
     @Override
@@ -68,6 +74,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         jsonObject.addProperty("GameId",index);
         jsonObject.addProperty("SaveName",name);
         jsonObject.addProperty("Version",version);
+        jsonObject.addProperty("StartTime", TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.BASIC_ISO_DATE));
         return jsonObject;
     }
 

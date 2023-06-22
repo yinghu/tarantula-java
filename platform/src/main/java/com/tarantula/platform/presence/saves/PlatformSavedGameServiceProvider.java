@@ -8,9 +8,12 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+
+import java.time.LocalDateTime;
 
 
 public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvider {
@@ -20,6 +23,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     private int mappingObjectMaxSize = 4000;
     private int saveSize = 3;
 
+    private long saveTimeout = 600000; //10 minutes
 
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -32,6 +36,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
         mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
+        saveTimeout = saveGame.get("").getAsInt()*60*1000;
         this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
@@ -87,6 +92,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         currentSaveIndex.index(selected.distributionKey());
         currentSaveIndex.name(selected.name());
         currentSaveIndex.version = selected.version;
+        currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         this.dataStore.update(currentSaveIndex);
         return currentSaveIndex;
     }
