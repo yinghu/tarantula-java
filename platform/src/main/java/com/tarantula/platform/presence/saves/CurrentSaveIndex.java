@@ -63,6 +63,7 @@ public class CurrentSaveIndex extends RecoverableObject {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("SessionId",this.key().asString());
         jsonObject.addProperty("GameId",index);
         jsonObject.addProperty("SaveName",name);

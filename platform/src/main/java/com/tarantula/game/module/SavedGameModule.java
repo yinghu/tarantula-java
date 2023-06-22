@@ -34,7 +34,7 @@ public class SavedGameModule implements Module {
         }
         else if(session.action().equals("onSelect")){
             CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,session.name());
-            session.write(savedGame.toJson().toString().getBytes());
+            session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
         else if(session.action().equals("onSet")){
             if(bytes.length > savedGameServiceProvider.mappingObjectMaxSize()){

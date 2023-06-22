@@ -138,11 +138,16 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     public CurrentSaveIndex selectSave(Session session, String saveId){
         SavedGameIndex savedGameIndex = savedGameIndex(session.systemId());
         SavedGame selected = savedGameIndex.select(saveId);
-        return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected);
+        if(!selected.onSession(session)) return null;
+        return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
+            SavedGame released = savedGame(currentSaveIndex.index());
+            released.offSession(session);
+        });
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
         if(currentSaveIndex.index()==null) return null;
         SavedGame savedGame = savedGame(currentSaveIndex.index());
+        savedGame.stub = 0;
         savedGame.version = 0;
         savedGame.name("New Save");
         savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));

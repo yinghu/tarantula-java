@@ -79,10 +79,11 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return currentSaveIndex;
     }
 
-    public CurrentSaveIndex selectSavedGame(Session session,SavedGame selected){
+    public CurrentSaveIndex selectSavedGame(Session session,SavedGame selected,SavedGameSelected previousSelected){
         CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session,selected);
         this.dataStore.createIfAbsent(currentSaveIndex,true);
         if(currentSaveIndex.index()!=null && currentSaveIndex.index().equals(selected.distributionKey())) return currentSaveIndex;
+        previousSelected.selected(currentSaveIndex);
         currentSaveIndex.index(selected.distributionKey());
         currentSaveIndex.name(selected.name());
         currentSaveIndex.version = selected.version;

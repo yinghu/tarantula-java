@@ -121,10 +121,11 @@
     }
 
     function tx_save_select(itemId){
-        //let selected = itemId+'#'+deviceId+'#Game Save'
         TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',itemId,(resp)=>{
             editor.set(resp);
-            document.querySelector('#tx-live-save-header').innerHTML = resp.DeviceId;
+            if(resp.Successful){
+                document.querySelector('#tx-live-save-header').innerHTML = resp.DeviceId;
+            }
         });
     }
 
