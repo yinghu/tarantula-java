@@ -112,6 +112,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public boolean leave(Stub stub) {
+
         return roomProxy.leave(stub);
     }
 

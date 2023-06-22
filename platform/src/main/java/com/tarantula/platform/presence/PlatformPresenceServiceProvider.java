@@ -142,6 +142,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
             SavedGame released = savedGame(currentSaveIndex.index());
             released.offSession(session);
+            return false;
         });
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
@@ -190,5 +191,16 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
         this.presenceDataStore.createIfAbsent(deviceSaveIndex,true);
         if(deviceSaveIndex.addKey(systemId)) this.presenceDataStore.update(deviceSaveIndex);
+    }
+    public void onJoin(Session session){
+        logger.warn("Join->"+session.systemId()+">>"+session.stub());
+    }
+    public void onLeave(Session session){
+        gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,currentSaveIndex -> {
+            if(currentSaveIndex.index()==null) return false;
+            SavedGame savedGame = savedGame(currentSaveIndex.index());
+            savedGame.offSession(session);
+            return true;
+        });
     }
 }

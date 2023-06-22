@@ -1,5 +1,5 @@
 package com.tarantula.platform.presence.saves;
 
 public interface SavedGameSelected {
-    void selected(CurrentSaveIndex currentSaveIndex);
+    boolean selected(CurrentSaveIndex currentSaveIndex);
 }

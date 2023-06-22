@@ -2,7 +2,6 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 
 import com.icodesoftware.Recoverable;
@@ -23,7 +22,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     private int mappingObjectMaxSize = 4000;
     private int saveSize = 3;
 
-    private long saveTimeout = 600000; //10 minutes
+    private long saveTimeout = 60000; //1 minute
 
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -36,7 +35,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
         mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
-        saveTimeout = saveGame.get("").getAsInt()*60*1000;
+        saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
@@ -96,12 +95,16 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.dataStore.update(currentSaveIndex);
         return currentSaveIndex;
     }
+    public void selectSavedGame(Session session,SavedGameSelected selected){
+        CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
+        if(!selected.selected(currentSaveIndex)) return;
+        this.dataStore.delete(currentSaveIndex.key().asString().getBytes());
+    }
     private PlayerSaveIndex playerSaveIndex(String indexId){
         PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex(indexId);
         this.dataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(this.dataStore);
         return playerSaveIndex;
     }
-
 
 }

@@ -189,6 +189,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public void leave(Stub stub){
+        gameServiceProvider.presenceServiceProvider().onLeave(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         localLeave(stub.systemId(),index,stub.roomId,(room,entry)->{});
