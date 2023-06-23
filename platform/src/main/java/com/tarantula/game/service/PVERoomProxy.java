@@ -39,7 +39,6 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.tag(application.tag());
         stub.ticket(this.context.validator().ticket(session.systemId(),session.stub()));
         this.dataStore.update(stub);
-        this.gameServiceProvider.presenceServiceProvider().onJoin(session);
         return stub;
     }
     public boolean leave(Stub stub){

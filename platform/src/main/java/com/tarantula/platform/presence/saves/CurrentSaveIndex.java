@@ -74,7 +74,7 @@ public class CurrentSaveIndex extends RecoverableObject {
         jsonObject.addProperty("GameId",index);
         jsonObject.addProperty("SaveName",name);
         jsonObject.addProperty("Version",version);
-        jsonObject.addProperty("StartTime", TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.BASIC_ISO_DATE));
+        jsonObject.addProperty("StartTime", TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         return jsonObject;
     }
 

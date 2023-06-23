@@ -61,6 +61,8 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int DEVICE_SAVE_INDEX_CID = 21;
 
+    public static final int PLAYER_SESSION_INDEX_CID = 22;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public Recoverable create(int i) {
@@ -128,6 +130,9 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             case DEVICE_SAVE_INDEX_CID:
                 pt = new DeviceSaveIndex();
+                break;
+            case PLAYER_SESSION_INDEX_CID:
+                pt = new PlayerSessionIndex();
                 break;
             default:
         }
