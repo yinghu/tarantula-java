@@ -36,7 +36,7 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int ON_VIEW_OID = 28;
 
-
+    public static final int PROPERTY_INDEX_SET_CID = 29;
 
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
@@ -90,7 +90,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
             case INDEX_SET_CID:
                 _ins = new IndexSet();
                 break;
-
+            case PROPERTY_INDEX_SET_CID:
+                _ins = new PropertyIndexSet();
+                break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;

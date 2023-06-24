@@ -3,11 +3,11 @@ package com.tarantula.platform.presence.saves;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -26,14 +26,14 @@ public class CurrentSaveIndex extends RecoverableObject {
         this.bucket = query[0];
         this.oid = query[1];
         this.routingNumber = session.stub();
-        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
     }
 
-    public CurrentSaveIndex(Session session,SavedGame selected){
-        this(session);
-        this.index = selected.distributionKey();
-        this.name = selected.name();
-        this.version = selected.version;
+
+    public CurrentSaveIndex(String key){
+        String[] query = key.split(Recoverable.PATH_SEPARATOR);
+        this.bucket = query[0];
+        this.oid = query[1];
+        this.routingNumber = Integer.parseInt(query[2]);
     }
 
     @Override
@@ -76,6 +76,28 @@ public class CurrentSaveIndex extends RecoverableObject {
         jsonObject.addProperty("Version",version);
         jsonObject.addProperty("StartTime", TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         return jsonObject;
+    }
+
+    @Override
+    public String toString(){
+        JsonObject jsonObject = new JsonObject();
+        if(index!=null) jsonObject.addProperty("1",index);
+        if(name!=null) jsonObject.addProperty("2",name);
+        jsonObject.addProperty("3",version);
+        jsonObject.addProperty("4",timestamp);
+        return jsonObject.toString();
+    }
+
+    public void parse(String json){
+        JsonObject jsonObject = JsonUtil.parse(json);
+        this.index = jsonObject.has("1")?jsonObject.get("1").getAsString():null;
+        this.name = jsonObject.has("2")?jsonObject.get("2").getAsString():null;
+        this.version = jsonObject.get("3").getAsInt();
+        this.timestamp = jsonObject.get("4").getAsLong();
+    }
+
+    public boolean expired(long hours){
+        return TimeUtil.expired(TimeUtil.fromUTCMilliseconds(timestamp).plusHours(hours));
     }
 
 }

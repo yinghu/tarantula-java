@@ -13,7 +13,7 @@
   },
   "savedGame":{
       "saveSize": 3,
-      "saveTimeout": 12,
+      "saveTimeout": 1,
       "mappingObjectMaxSize": 4000
   },
   "recentlyPlayListSize": 10,

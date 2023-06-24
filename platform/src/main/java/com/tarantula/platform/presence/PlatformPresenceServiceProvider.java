@@ -32,8 +32,6 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     private int recentlyPlayListSize;
     private int friendListSize;
 
-    private int saveSize;
-
     private PlayList recentlyPlayList;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
     private PlatformGameServiceProvider gameServiceProvider;
@@ -130,7 +128,11 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     }
 
     public List<SavedGame> listSaves(String systemId,String deviceId){
-        gameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId);
+        gameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId,expired->{
+            if(expired.index()==null) return;
+            SavedGame savedGame = savedGame(expired.index());
+            savedGame.expireSession(expired.routingNumber());
+        });
         deviceIndex(systemId,deviceId);
         SavedGameIndex savedGameIndex = savedGameIndex(systemId);
         return savedGameIndex.list(gameServiceProvider.savedGameServiceProvider().saveSize());
@@ -141,6 +143,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         SavedGame selected = savedGameIndex.select(saveId);
         if(!selected.onSession(session)) return null;
         return this.gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
+            if(currentSaveIndex.index()==null) return;
             SavedGame released = savedGame(currentSaveIndex.index());
             released.offSession(session);
         });

@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence.saves;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 
 public class SaveKey extends RecoverableObject implements Recoverable.Key {
@@ -10,6 +11,12 @@ public class SaveKey extends RecoverableObject implements Recoverable.Key {
         this.bucket = bucket;
         this.oid = oid;
         this.routingNumber = stub;
+    }
+    public SaveKey(Session session){
+        String[] query = session.systemId().split(Recoverable.PATH_SEPARATOR);
+        this.bucket = query[0];
+        this.oid = query[1];
+        this.routingNumber = session.stub();
     }
     @Override
     public String asString() {

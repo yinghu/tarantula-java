@@ -2,15 +2,18 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.SimpleProperty;
+import com.tarantula.platform.PropertyIndexSet;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class PlayerSessionIndex extends IndexSet {
 
-    //Save id or system ID if no save selected = > Data ID
+public class PlayerSessionIndex extends PropertyIndexSet {
+
+    //SystemId ==> activeSave
 
     public PlayerSessionIndex(){
-        this.label = "playerSessionIndex";
+        super("playerSessionIndex");
+
     }
 
     public PlayerSessionIndex(String systemId){
@@ -32,8 +35,25 @@ public class PlayerSessionIndex extends IndexSet {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         JsonArray keys = new JsonArray();
-        keySet().forEach(k->keys.add(k));
+        keySet().forEach(k->keys.add(k.toJson()));
         jsonObject.add("_keys",keys);
         return jsonObject;
+    }
+    public boolean load(CurrentSaveIndex pending){
+        Object value = value(pending.key().asString());
+        if(value==null) return false;
+        pending.parse((String) value);
+        return true;
+    }
+    public void update(CurrentSaveIndex pending){
+        SimpleProperty property = new SimpleProperty(pending.key().asString(),pending);
+        removeKey(property);
+        addKey(property);
+        this.update();
+    }
+    public void delete(CurrentSaveIndex pending){
+        SimpleProperty property = new SimpleProperty(pending.key().asString(),pending);
+        removeKey(property);
+        this.update();
     }
 }

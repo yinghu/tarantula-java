@@ -103,4 +103,11 @@ public class SavedGame extends RecoverableObject implements Configurable {
         this.update();
     }
 
+    public void expireSession(int expired){
+        if(stub != expired) return;
+        stub = 0;
+        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.update();
+    }
+
 }
