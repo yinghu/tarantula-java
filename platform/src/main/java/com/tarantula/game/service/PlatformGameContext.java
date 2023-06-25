@@ -66,6 +66,7 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
     }
     public void updateExperience(Room room,String systemId,int stub,double delta){
         Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(systemId,stub));
+        logger.warn("SystemId->"+systemId+">>>STUB>"+stub);
         logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
         rating.update(delta,room.arena().xp()).update();
     }
