@@ -34,11 +34,17 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     }
     public AchievementProgress achievementProgress(Session session){
         AchievementProgress achievementProgress = new AchievementProgress();
+        if(!platformGameServiceProvider.savedGameServiceProvider().load(session,achievementProgress)){
+            platformGameServiceProvider.savedGameServiceProvider().save(session,achievementProgress);
+        }
         if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
         return achievementProgress.disabled()?null:achievementProgress;
     }
     public AchievementProgress onProgress(Session session,double delta){
         AchievementProgress achievementProgress = new AchievementProgress();
+        if(!platformGameServiceProvider.savedGameServiceProvider().load(session,achievementProgress)){
+            platformGameServiceProvider.savedGameServiceProvider().save(session,achievementProgress);
+        }
         if(achievementProgress.onProgress(delta)){
             Achievement achievement = achievements.get(achievementProgress.name());
             if(!tryNextAchievement(achievementProgress)){

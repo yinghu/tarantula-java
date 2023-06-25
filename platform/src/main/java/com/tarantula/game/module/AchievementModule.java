@@ -14,6 +14,7 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
+            achievementServiceProvider.achievementProgress(session);
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onProgress")){
