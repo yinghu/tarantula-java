@@ -23,6 +23,10 @@ public class MappingObject extends RecoverableObject {
         return new AssociateKey(this.bucket,this.oid,this.label);
     }
 
+    @Override
+    public void label(String label){
+        this.label = "mo_"+label;
+    }
 
     public void value(byte[] json){
         properties.put(_KEY, JsonUtil.parseAsJsonElement(json));

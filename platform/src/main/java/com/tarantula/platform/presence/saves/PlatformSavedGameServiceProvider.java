@@ -7,6 +7,7 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
@@ -38,6 +39,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
+        dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
@@ -50,21 +52,23 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public int saveSize(){
         return saveSize;
     }
-    public <T extends Recoverable> void save(Session session,T save){
+    public <T extends RecoverableObject> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
         save.distributionKey(saveIndex.distributionKey());
         if(!this.dataStore.update(save)) {
             this.dataStore.createIfAbsent(save, false);
         }
+        save.dataStore(dataStore);
         if(saveIndex.addKey(save.key().asString())) saveIndex.update();
         platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
-    public <T extends Recoverable> boolean load(Session session,T save){
+    public <T extends RecoverableObject> boolean load(Session session, T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
         save.distributionKey(saveId);
+        save.dataStore(dataStore);
         return this.dataStore.load(save);
     }
 

@@ -1,84 +1,53 @@
 package com.tarantula.platform.achievement;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformAchievementServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformAchievementServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "achievement";
 
-    private TarantulaLogger logger;
-    private final String gameServiceName;
-    private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private ServiceContext serviceContext;
-    private DistributionItemService distributionItemService;
-    private DataStore dataStore;
-    private ApplicationPreSetup applicationPreSetup;
+
     private ConcurrentHashMap<String,Achievement> achievements;
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.achievements = new ConcurrentHashMap<>();
     }
-    @Override
-    public String name() {
-        return NAME;
-    }
 
-    @Override
-    public void start() throws Exception {
-
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        super.setup(serviceContext);
         this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
-        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
-    public AchievementProgress achievementProgress(String gameId){
+    public AchievementProgress achievementProgress(Session session){
         AchievementProgress achievementProgress = new AchievementProgress();
-        achievementProgress.distributionKey(gameId);
-        this.dataStore.createIfAbsent(achievementProgress,true);
-        achievementProgress.dataStore(this.dataStore);
         if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
         return achievementProgress.disabled()?null:achievementProgress;
     }
-    public AchievementProgress onProgress(String systemId,String gameId,double delta){
+    public AchievementProgress onProgress(Session session,double delta){
         AchievementProgress achievementProgress = new AchievementProgress();
-        achievementProgress.distributionKey(gameId);
-        this.dataStore.createIfAbsent(achievementProgress,true);
-        achievementProgress.dataStore(this.dataStore);
         if(achievementProgress.onProgress(delta)){
             Achievement achievement = achievements.get(achievementProgress.name());
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);
-                this.dataStore.update(achievementProgress);
+                achievementProgress.update();
             }
             return achievementProgress;
         }
-        this.dataStore.update(achievementProgress);
+        achievementProgress.update();
         return achievementProgress;
     }
     public List<Achievement> list(){
@@ -131,14 +100,14 @@ public class PlatformAchievementServiceProvider implements ConfigurationServiceP
         Achievement achievement = achievements.get(key);
         if(achievement!=null){
             achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
-            this.dataStore.update(achievementProgress);
+            achievementProgress.update();
             return true;
         }
         key = "tier_"+(achievementProgress.tier()+1)+"_target_1"; //tier up 1
         achievement = achievements.get(key);
         if(achievement!=null){
             achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
-            this.dataStore.update(achievementProgress);
+            achievementProgress.update();
             return true;
         }
         return false;

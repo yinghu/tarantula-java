@@ -124,7 +124,7 @@
         TARA_API.onGet(TARA_API.query().serviceTag,'onSelect',itemId,(resp)=>{
             editor.set(resp);
             if(resp.Successful){
-                document.querySelector('#tx-live-save-header').innerHTML = resp.DeviceId;
+                document.querySelector('#tx-live-save-header').innerHTML = resp.SaveName;
             }
         });
     }

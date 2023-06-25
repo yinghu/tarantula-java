@@ -9,15 +9,16 @@ import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServic
 
 public class DailyGiveawayModule implements Module, Configurable.Listener {
     private ApplicationContext context;
-    private PlatformDailyGiveawayServiceProvider presenceServiceProvider;
+    private PlatformDailyGiveawayServiceProvider dailyGiveawayServiceProvider;
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new ItemDailyGiveawayContext(true, "daily giveaway list", this.presenceServiceProvider.list()).toJson().toString().getBytes());
+            this.dailyGiveawayServiceProvider.checkDailyLogin(session);
+            session.write(new ItemDailyGiveawayContext(true, "daily giveaway list", this.dailyGiveawayServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onDailyRewardClaim")){
-            boolean rewarded = this.presenceServiceProvider.redeem(session.systemId(),session.name());
+            boolean rewarded = this.dailyGiveawayServiceProvider.redeem(session.systemId());
             session.write(JsonUtil.toSimpleResponse(rewarded,session.name()).getBytes());
         }
         else{
@@ -30,8 +31,8 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.presenceServiceProvider = gameServiceProvider.dailyGiveawayServiceProvider();
-        this.presenceServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
+        this.dailyGiveawayServiceProvider = gameServiceProvider.dailyGiveawayServiceProvider();
+        this.dailyGiveawayServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Daily Giveaway module started", OnLog.WARN);
     }
 }

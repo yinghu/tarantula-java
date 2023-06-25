@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -42,11 +43,11 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
-    public DailyLoginTrack checkDailyLogin(String gameId){
+    public DailyLoginTrack checkDailyLogin(Session session){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(gameId);
-        dailyLoginTrack.dataStore(dataStore);
-        this.dataStore.createIfAbsent(dailyLoginTrack,true);
+        if(!platformGameServiceProvider.savedGameServiceProvider().load(session,dailyLoginTrack)){
+            platformGameServiceProvider.savedGameServiceProvider().save(session,dailyLoginTrack);
+        }
         if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         return rewarded?dailyLoginTrack:null;
@@ -89,11 +90,11 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         return null;
     }
 
-    public boolean redeem(String systemId,String gameId){
+    public boolean redeem(String systemId){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        dailyLoginTrack.distributionKey(gameId);
-        dailyLoginTrack.dataStore(dataStore);
-        if(!this.dataStore.load(dailyLoginTrack)) return false;
+        //dailyLoginTrack.distributionKey(gameId);
+        //dailyLoginTrack.dataStore(dataStore);
+        //if(!this.dataStore.load(dailyLoginTrack)) return false;
         if(!dailyLoginTrack.rewardPending || !dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
         dailyLoginTrack.rewardPending = !this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
         dailyLoginTrack.update();
