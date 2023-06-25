@@ -6,6 +6,7 @@ import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.Rating;
+import com.tarantula.game.SimpleStub;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -59,13 +60,13 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
 
-    public void updateStatistics(Room room,String systemId,String name,double delta){
-        Statistics statistics = this.platformGameServiceProvider.presenceServiceProvider().statistics(systemId);
+    public void updateStatistics(Room room,String systemId,int stub,String name,double delta){
+        Statistics statistics = this.platformGameServiceProvider.presenceServiceProvider().statistics(new SimpleStub(systemId,stub));
         statistics.entry(name).update(delta).update();
     }
-    public void updateExperience(Room room,String systemId,double delta){
-        Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(systemId);
-        //logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
+    public void updateExperience(Room room,String systemId,int stub,double delta){
+        Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(systemId,stub));
+        logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
         rating.update(delta,room.arena().xp()).update();
     }
 }

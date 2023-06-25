@@ -15,7 +15,7 @@ public class CommitAchievementCommand extends GameServiceProxyHeader {
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         String name = messageBuffer.readUTF8();
         double delta = messageBuffer.readInt();
-        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(stub.systemId());
+        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(stub);
         statistics.entry(name).update(delta).update();
         return null;
     }

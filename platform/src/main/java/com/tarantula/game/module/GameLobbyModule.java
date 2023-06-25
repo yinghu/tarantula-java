@@ -26,7 +26,7 @@ public class GameLobbyModule implements Module{
             session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             return;
         }
-        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session.systemId());
+        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
     }
@@ -45,7 +45,7 @@ public class GameLobbyModule implements Module{
             if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            Rating rating = gameServiceProvider.presenceServiceProvider().rating(session.systemId());
+            Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
             rating.level = this.context.descriptor().accessRank()*100-99;
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());

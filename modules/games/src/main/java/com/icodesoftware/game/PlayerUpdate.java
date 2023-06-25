@@ -12,17 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerUpdate implements JsonSerializable {
 
     public String systemId;
+    public int stub;
     public GameExperience[] gameExperiences;
 
     public Channel channel;
 
     private ConcurrentHashMap<String,GameExperience> pendingUpdates;
-    public PlayerUpdate(String systemId, GameExperience[] gameExperiences){
+    public PlayerUpdate(String systemId,int stub, GameExperience[] gameExperiences){
         this.systemId = systemId;
+        this.stub = stub;
         this.gameExperiences = gameExperiences;
     }
     public PlayerUpdate(Channel channel){
         this.systemId = channel.owner();
+        this.stub = channel.routingNumber();
         this.channel = channel;
         this.pendingUpdates = new ConcurrentHashMap<>();
     }
@@ -48,6 +51,7 @@ public class PlayerUpdate implements JsonSerializable {
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("systemId",systemId);
+        jsonObject.addProperty("stub",stub);
         JsonArray updates = new JsonArray();
         for(GameExperience gameExperience : gameExperiences){
             updates.add(gameExperience.toJson());
@@ -58,12 +62,13 @@ public class PlayerUpdate implements JsonSerializable {
 
     public static PlayerUpdate fromJson(JsonObject payload){
         String systemId = payload.get("systemId").getAsString();
+        int stub = payload.get("stub").getAsInt();
         JsonArray updates = payload.getAsJsonArray("updates");
         GameExperience[] gameExperiences = new GameExperience[updates.size()];
         int index = 0;
         for(JsonElement update : payload.getAsJsonArray("updates")){
             gameExperiences[index++]=GameExperience.fromJson(update.getAsJsonObject());
         }
-        return new PlayerUpdate(systemId,gameExperiences);
+        return new PlayerUpdate(systemId,stub,gameExperiences);
     }
 }

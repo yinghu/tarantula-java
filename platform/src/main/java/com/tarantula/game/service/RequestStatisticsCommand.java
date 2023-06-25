@@ -13,7 +13,7 @@ public class RequestStatisticsCommand extends GameServiceProxyHeader {
     //From http endpoint
     @Override
     public byte[] onService(Session session, byte[] payload){
-        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(session.systemId());
+        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(session);
         return statistics.toJson().toString().getBytes();
     }
 
@@ -21,7 +21,7 @@ public class RequestStatisticsCommand extends GameServiceProxyHeader {
     @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //messageHeader.encrypted = true;
-        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(stub.systemId());
+        Statistics statistics = gameServiceProvider.presenceServiceProvider().statistics(stub);
         return statistics.toJson().toString().getBytes();
     }
 }

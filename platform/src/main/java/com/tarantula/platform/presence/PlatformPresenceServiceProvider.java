@@ -105,21 +105,17 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         profile.dataStore(this.presenceDataStore);
         return profile;
     }
-    public Rating rating(String systemId){
+    public Rating rating(Session session){
         Rating rating = new Rating();
-        rating.distributionKey(systemId);
-        this.presenceDataStore.createIfAbsent(rating,true);
-        rating.dataStore(this.presenceDataStore);
+        this.gameServiceProvider.savedGameServiceProvider().createIfAbsent(session,rating);
         if(rating.granted) return rating;
-        rating.granted = this.gameServiceProvider.resourceServiceProvider().initializeInventory(systemId);
+        rating.granted = this.gameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
         rating.update();
         return rating;
     }
-    public Statistics statistics(String systemId){
+    public Statistics statistics(Session session){
         UserStatistics deltaStatistics = new UserStatistics();
-        deltaStatistics.distributionKey(systemId);
-        deltaStatistics.dataStore(this.presenceDataStore);
-        this.presenceDataStore.createIfAbsent(deltaStatistics,true);
+        this.gameServiceProvider.savedGameServiceProvider().createIfAbsent(session,deltaStatistics);
         deltaStatistics.registerListener((entry -> {
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);

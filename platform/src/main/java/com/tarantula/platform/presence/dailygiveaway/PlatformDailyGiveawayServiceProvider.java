@@ -45,9 +45,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
 
     public DailyLoginTrack checkDailyLogin(Session session){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        if(!platformGameServiceProvider.savedGameServiceProvider().load(session,dailyLoginTrack)){
-            platformGameServiceProvider.savedGameServiceProvider().save(session,dailyLoginTrack);
-        }
+        platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,dailyLoginTrack);
         if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         return rewarded?dailyLoginTrack:null;

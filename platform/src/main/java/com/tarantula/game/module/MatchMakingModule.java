@@ -34,7 +34,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
-            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session.systemId());
+            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             int mix = rating.rank > maxRank? maxRank : rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby != null) {
@@ -60,7 +60,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
             session.clientId("device_"+session.stub());
             session.name("web_device");
             session.action("onPlay");
-            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session.systemId());
+            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby!=null) {
