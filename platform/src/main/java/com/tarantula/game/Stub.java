@@ -3,8 +3,10 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.room.GameRoom;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 //per stub/game by playerId + lobby tag
@@ -22,6 +24,7 @@ public class Stub extends PlayerGameObject {
     public Channel pushChannel;
 
     public Stub(){
+        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
     }
 
     public Stub(String error){
@@ -54,6 +57,7 @@ public class Stub extends PlayerGameObject {
         properties.put("roomId",roomId);
         properties.put("tournamentId",tournamentId);
         properties.put("trackId",trackId); //tournament instance id
+        properties.put("timestamp",timestamp);
         return properties;
     }
     @Override
@@ -63,6 +67,7 @@ public class Stub extends PlayerGameObject {
         roomId = ((String)properties.getOrDefault("roomId",null));
         tournamentId = ((String)properties.getOrDefault("tournamentId",null));
         trackId = ((String)properties.getOrDefault("trackId",null));
+        timestamp = ((Number)properties.getOrDefault("timestamp",0)).longValue();
     }
     @Override
     public Recoverable.Key key(){
