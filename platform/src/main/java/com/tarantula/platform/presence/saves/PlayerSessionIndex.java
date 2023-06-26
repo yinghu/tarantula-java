@@ -6,6 +6,8 @@ import com.icodesoftware.util.SimpleProperty;
 import com.tarantula.platform.PropertyIndexSet;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.util.ArrayList;
+
 
 public class PlayerSessionIndex extends PropertyIndexSet {
 
@@ -51,9 +53,20 @@ public class PlayerSessionIndex extends PropertyIndexSet {
         addKey(property);
         this.update();
     }
-    public void delete(CurrentSaveIndex pending){
+    private void delete(CurrentSaveIndex pending){
         SimpleProperty property = new SimpleProperty(pending.key().asString(),pending);
         removeKey(property);
         this.update();
+    }
+    public void check(long timeout,SavedGameSelected deleted){
+        ArrayList<CurrentSaveIndex> expired = new ArrayList<>();
+        keySet().forEach(k->{
+            CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(k.name());
+            if(load(currentSaveIndex) && currentSaveIndex.expired(timeout)){
+                deleted.selected(currentSaveIndex);
+                expired.add(currentSaveIndex);
+            }
+        });
+        expired.forEach(c->delete(c));
     }
 }

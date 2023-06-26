@@ -98,6 +98,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session);
         PlayerSessionIndex playerSessionIndex = playerSessionIndex(session.systemId());
         if(playerSessionIndex.load(currentSaveIndex)) return currentSaveIndex;
+        currentSaveIndex.version = 1;
+        currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         playerSessionIndex.update(currentSaveIndex);
         return currentSaveIndex;
     }
@@ -113,24 +115,11 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         playerSessionIndex(session.systemId()).update(currentSaveIndex);
         return currentSaveIndex;
     }
-    public void selectSavedGame(Session session,SavedGameSelected selected){
-        CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        selected.selected(currentSaveIndex);
-        PlayerSessionIndex playerSessionIndex = playerSessionIndex(session.systemId());
-        playerSessionIndex.delete(currentSaveIndex);
-    }
-    public void checkSavedGame(String systemId,SavedGameSelected selected){
+
+    public void checkSavedGame(String systemId){
         PlayerSessionIndex playerSessionIndex = playerSessionIndex(systemId);
-        ArrayList<CurrentSaveIndex> expired = new ArrayList<>();
-        playerSessionIndex.keySet().forEach(k->{
-            CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(k.name());
-            if(playerSessionIndex.load(currentSaveIndex) && currentSaveIndex.expired(saveTimeout)){
-                selected.selected(currentSaveIndex);
-                expired.add(currentSaveIndex);
-            }
-        });
-        expired.forEach(c->playerSessionIndex.delete(c));
-        //free previous failed save selection
+        playerSessionIndex.check(saveTimeout,selected-> platformGameServiceProvider.presenceServiceProvider().expireSavedGame(selected));
+        //free previous save selection
     }
     private PlayerSaveIndex playerSaveIndex(String indexId){
         PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex(indexId);

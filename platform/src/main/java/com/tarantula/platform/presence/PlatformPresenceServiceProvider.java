@@ -6,6 +6,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.Rating;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.GameCluster;
@@ -124,11 +125,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     }
 
     public List<SavedGame> listSaves(String systemId,String deviceId){
-        gameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId,expired->{
-            if(expired.index()==null) return;
-            SavedGame savedGame = savedGame(expired.index());
-            savedGame.expireSession(expired.routingNumber());
-        });
+        gameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId);
         deviceIndex(systemId,deviceId);
         SavedGameIndex savedGameIndex = savedGameIndex(systemId);
         return savedGameIndex.list(gameServiceProvider.savedGameServiceProvider().saveSize());
@@ -162,6 +159,11 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
         savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         savedGame.update();
     }
+    public void expireSavedGame(CurrentSaveIndex currentSaveIndex){
+        if(currentSaveIndex.index()==null) return;
+        SavedGame savedGame = savedGame(currentSaveIndex.index());
+        savedGame.expireSession(currentSaveIndex.routingNumber());
+    }
 
     public PersonalDataIndex loadPersonalDataIndex(String systemId){
         PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
@@ -193,10 +195,7 @@ public class PlatformPresenceServiceProvider implements ServiceProvider {
     }
 
     public void onLeave(Session session){
-        gameServiceProvider.savedGameServiceProvider().selectSavedGame(session,currentSaveIndex -> {
-            if(currentSaveIndex.index()==null) return;
-            SavedGame savedGame = savedGame(currentSaveIndex.index());
-            savedGame.offSession(session);
-        });
+        gameServiceProvider.savedGameServiceProvider().checkSavedGame(session.systemId());
     }
+
 }
