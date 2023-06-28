@@ -74,7 +74,7 @@ public class GameLobbyModule implements Module{
         this.gameLobby.setup(context);
         this.gameLobby.start();
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this.gameLobby);
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game lobby started on tag ["+context.descriptor().tag()+"]",OnLog.WARN);
     }
     @Override
@@ -82,6 +82,10 @@ public class GameLobbyModule implements Module{
         this.gameServiceProvider.lobbyServiceProvider().unregisterConfigurableListener(context.descriptor().tag());
         try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
+    }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
     }
 
 

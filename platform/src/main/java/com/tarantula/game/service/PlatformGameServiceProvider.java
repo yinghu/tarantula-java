@@ -224,6 +224,11 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         moduleExported.putIfAbsent(tag,serviceModule);
     }
 
+    public void exportServiceModule(ModuleExport moduleExport){
+        moduleExported.forEach((k,m)->{
+            moduleExport.export(m);
+        });
+    }
     public Module serviceModule(String module){
         return moduleExported.getOrDefault(module, ErrorModule.ERROR_MODULE);
     }

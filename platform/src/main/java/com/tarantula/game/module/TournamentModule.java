@@ -42,7 +42,7 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerTournamentListener(this);
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
 
@@ -61,5 +61,8 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
         this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
     }
 
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 
 }

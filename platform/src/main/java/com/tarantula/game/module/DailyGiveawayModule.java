@@ -35,4 +35,8 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
         this.dailyGiveawayServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Daily Giveaway module started", OnLog.WARN);
     }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 }

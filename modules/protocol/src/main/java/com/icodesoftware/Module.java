@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 import java.io.InputStream;
 
-public interface Module {
+public interface Module{
 
     default void onJoin(Session session) throws Exception{}
 
@@ -11,6 +11,8 @@ public interface Module {
     void setup(ApplicationContext context) throws Exception;
 
     default void clear(){}
+
+    default Descriptor descriptor(){ return null;}
 
     interface OnResource{
         void on(InputStream in);

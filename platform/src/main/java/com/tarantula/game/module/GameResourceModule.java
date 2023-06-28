@@ -48,4 +48,8 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
     public void onCreated(ConfigurableObject item){
         this.context.log(item.toJson().toString(),OnLog.WARN);
     }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 }

@@ -10,6 +10,14 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel" id="tx-live-proxy-operation-form">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue" id='tx-live-proxy-header'>Module</legend>
+                <div class="w3-panel">
+                    <div class='w3-bar w3-white' id='tx-proxy-opt-bar'></div>    
+                </div>
+        </fieldset>
+    </div> 
     <div id='tx-live-proxy-item-list' class="w3-panel  w3-border-bottom w3-border-red">
             
     </div>
@@ -52,7 +60,9 @@
     document.querySelector('#tx-proxy-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    
+    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-save','Save','w3-right');
+    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-load','Load','w3-right');
+    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-reset','Reset','w3-left');
     function tx_live_proxy_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList#service',"Mills",(resp)=>{
             //resp._itemList.forEach(item => {

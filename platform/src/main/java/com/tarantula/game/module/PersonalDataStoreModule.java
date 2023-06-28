@@ -91,4 +91,8 @@ public class PersonalDataStoreModule implements Module,Configurable.Listener<Con
     public void clear(){
 
     }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 }

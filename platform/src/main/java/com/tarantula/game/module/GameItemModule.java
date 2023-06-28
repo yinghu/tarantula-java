@@ -17,4 +17,7 @@ public class GameItemModule implements Module{
         this.context.log("Game item module started", OnLog.WARN);
     }
 
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 }

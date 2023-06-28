@@ -94,7 +94,11 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.serviceTypeId = this.context.descriptor().typeId().replace("-service","");
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
+    }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
     }
 }

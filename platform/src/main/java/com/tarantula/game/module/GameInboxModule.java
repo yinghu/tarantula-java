@@ -31,4 +31,7 @@ public class GameInboxModule implements Module{
         this.context.log("Game inbox module started -"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
+    public Descriptor descriptor(){
+        return this.context.descriptor();
+    }
 }

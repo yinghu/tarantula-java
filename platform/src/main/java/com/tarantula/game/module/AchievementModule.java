@@ -32,7 +32,11 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
         PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.achievementServiceProvider = gameServiceProvider.achievementServiceProvider();
         this.achievementServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        //gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Achievement module started->"+this.context.descriptor().tag(), OnLog.WARN);
+    }
+
+    public Descriptor descriptor(){
+        return this.context.descriptor();
     }
 }

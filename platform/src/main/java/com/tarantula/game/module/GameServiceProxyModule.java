@@ -1,5 +1,7 @@
 package com.tarantula.game.module;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.Module;
 import com.icodesoftware.OnLog;
@@ -20,7 +22,13 @@ public class GameServiceProxyModule implements Module {
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         String[] query = session.action().split("#");
         if(query[0].equals("onList")){
-            session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
+            JsonObject resp = new JsonObject();
+            JsonArray mds = new JsonArray();
+            gameServiceProvider.exportServiceModule(module -> {
+                if(module!=null) mds.add(module.descriptor().toJson());
+            });
+            resp.add("modules",mds);
+            session.write(resp.toString().getBytes());
         }
         else if(query[0].equals("onService")){
             GameServiceProxy proxy = this.gameServiceProvider.gameServiceProxy(Short.parseShort(query[1]));
