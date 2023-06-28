@@ -12,10 +12,22 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel" id="tx-live-proxy-operation-form">
         <fieldset class="w3-border-blue tx-text-12">
-            <legend class="tx-text-14 w3-text-blue" id='tx-live-proxy-header'>Module</legend>
-                <div class="w3-panel">
-                    <div class='w3-bar w3-white' id='tx-proxy-opt-bar'></div>    
-                </div>
+            <legend class="tx-text-14 w3-text-blue" id='tx-live-proxy-header'>Module Selection</legend>
+            <div class="w3-container">
+                <label class="tx-text-14 tx-margin-right-4">Module :</label>
+                <select id='tx-module-selection-name' class="w3-select w3-border w3-round tx-text-14" name='moduleSelectionName'>
+                    
+                </select>
+            </div>
+            <div class="w3-container">
+                <label class="tx-text-14 tx-margin-right-4">Operation :</label>
+                <input id='tx-module-operation-name' class="w3-input w3-border w3-round tx-text-14 tx-margin-bottom-8" value="onList">
+                <label class="tx-text-14 tx-margin-right-4">Key Name :</label>
+                <input id='tx-module-operation-key-name' class="w3-input w3-border w3-round tx-text-14 tx-margin-bottom-8" value="name">
+            </div>    
+            <div class="w3-panel">
+                <div class='w3-bar w3-white' id='tx-proxy-opt-bar'></div>    
+            </div>
         </fieldset>
     </div> 
     <div id='tx-live-proxy-item-list' class="w3-panel  w3-border-bottom w3-border-red">
@@ -43,9 +55,9 @@
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-proxy"),{mode:'tree'},{});
     document.querySelector('#tx-live-proxy-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
-    let proxyList = document.querySelector('#tx-live-proxy-item-list');
+    let proxyList = document.querySelector('#tx-module-selection-name');
     proxyList.innerHTML = '';
-    //let actionList = document.querySelector('#tx-live-proxy-action-bar');
+    let proxyTag='error';
     tx_live_proxy_setup();
     document.querySelector('#tx-proxy-live-close').onclick=()=>{
         editor.destroy();
@@ -60,31 +72,40 @@
     document.querySelector('#tx-proxy-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-save','Save','w3-right');
-    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-load','Load','w3-right');
-    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-save-live-service-reset','Reset','w3-left');
+    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-proxy-live-service-get','Get','w3-right');
+    document.querySelector('#tx-proxy-opt-bar').innerHTML += TARA_HTML.BarItem('tx-proxy-live-service-post','Post','w3-right');
+    
+    document.querySelector('#tx-proxy-live-service-get').onclick=()=>{
+        tx_proxy_get_operation();
+    };
+    document.querySelector('#tx-proxy-live-service-post').onclick=()=>{
+        tx_proxy_post_operation();
+    };
+    document.querySelector('#tx-module-selection-name').onchange = ()=>{
+        proxyTag = document.querySelector('#tx-module-selection-name').value;
+        //tx_live_save_setup();
+    }; 
     function tx_live_proxy_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList#service',"Mills",(resp)=>{
-            //resp._itemList.forEach(item => {
-              //  item._itemPack._skuList.forEach(
-                //        sku=>{
-                  //          proxyList.innerHTML += TARA_HTML.command(sku.ItemId,item.Name,sku.Name,'proxy-grant','Grant');
-                    //    }
-                    //);    
-            //});
-            //document.querySelectorAll('.tx-live-proxy-grant').forEach(a=>{
-              //  a.onclick = ()=>{
-                //    tx_proxy_grant(a.getAttribute('tx-item-id'));
-                    //console.log(a.getAttribute('tx-item-id'));       
-                //}
-            //});
+            resp.modules.forEach((item ,i)=> {
+                proxyList.innerHTML += TARA_HTML.option(item.tag,item.name,i==0);
+            });
             editor.set(resp);
         });   
     }
-
-    function tx_proxy_grant(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
-            console.log(resp);
+    function tx_proxy_get_operation(){
+        let opt = document.querySelector('#tx-module-operation-name').value;
+        let oname = document.querySelector('#tx-module-operation-key-name').value;  
+        TARA_API.onGet(TARA_API.query().serviceTag,'onModule#'+opt+'#'+proxyTag,oname,(resp)=>{
+            editor.set(resp);
         });
+    }
+    function tx_proxy_post_operation(){
+        let opt = document.querySelector('#tx-module-operation-name').value;
+        let oname = document.querySelector('#tx-module-operation-key-name').value;
+        let ovalue = editor.get();  
+        TARA_API.onSet(TARA_API.query().serviceTag,'onModule#'+opt+'#'+proxyTag,oname,ovalue,(resp)=>{
+            editor.set(resp);
+        });        
     }
 </script>

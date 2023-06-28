@@ -20,6 +20,7 @@ public class GameServiceProxyModule implements Module {
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
+        //this.context.log("CMD->"+session.action(),OnLog.WARN);
         String[] query = session.action().split("#");
         if(query[0].equals("onList")){
             JsonObject resp = new JsonObject();
@@ -37,7 +38,7 @@ public class GameServiceProxyModule implements Module {
         }
         else if(query[0].equals("onModule")){
             session.action(query[1]);
-            Module serviceProxy = this.gameServiceProvider.serviceModule(session.trackId());
+            Module serviceProxy = this.gameServiceProvider.serviceModule(query[2]);
             serviceProxy.onRequest(session,payload);
         }
         return false;
