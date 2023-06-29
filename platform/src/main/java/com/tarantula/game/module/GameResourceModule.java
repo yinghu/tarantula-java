@@ -42,7 +42,7 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
         PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.platformResourceServiceProvider = gameServiceProvider.resourceServiceProvider();
         this.platformResourceServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        if(this.context.descriptor().accessMode()==Access.PRIVATE_ACCESS_MODE) gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game resource module started", OnLog.WARN);
     }
     public void onCreated(ConfigurableObject item){

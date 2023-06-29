@@ -83,7 +83,7 @@ public class PersonalDataStoreModule implements Module,Configurable.Listener<Con
         this.dataStore = this.context.dataStore("player");
         this.maxSizeOnSet = this.gameServiceProvider.gameCluster().maxDataSizeCount();
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        if(this.descriptor().accessMode() == Access.PRIVATE_ACCESS_MODE) this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Data store module ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
     }
 

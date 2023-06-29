@@ -5,6 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.achievement.ItemAchievementContext;
 
@@ -14,10 +15,11 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            achievementServiceProvider.achievementProgress(session);
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onProgress")){
+            AchievementProgress progress = achievementServiceProvider.achievementProgress(session);
+            progress.onProgress(10);
             session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
         }
         else{
@@ -32,7 +34,6 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
         PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
         this.achievementServiceProvider = gameServiceProvider.achievementServiceProvider();
         this.achievementServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        //gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Achievement module started->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 

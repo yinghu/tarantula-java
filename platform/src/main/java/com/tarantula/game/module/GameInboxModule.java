@@ -27,7 +27,7 @@ public class GameInboxModule implements Module{
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        if(this.descriptor().accessMode() == Access.PRIVATE_ACCESS_MODE) this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game inbox module started -"+this.context.descriptor().tag(), OnLog.WARN);
     }
 

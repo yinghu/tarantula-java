@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class AchievementProgress extends RecoverableObject {
 
-    private int tier;
-    private int target;
+    private int tier;//start 1
+    private int target;//start 1
     private double progress;
     private double objective;
 

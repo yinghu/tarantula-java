@@ -88,6 +88,7 @@
     function tx_live_proxy_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList#service',"Mills",(resp)=>{
             resp.modules.forEach((item ,i)=> {
+                if(i==0) proxyTag = item.tag;
                 proxyList.innerHTML += TARA_HTML.option(item.tag,item.name,i==0);
             });
             editor.set(resp);
