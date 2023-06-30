@@ -74,7 +74,7 @@
             achievementList.innerHTML = '';
             if(resp.Successful){
                 resp._itemList.forEach(item => {
-                   achievementList.innerHTML += TARA_HTML.command(item.ItemId,'Achievement',item.Description,'achievement-grant','Grant');
+                   achievementList.innerHTML += TARA_HTML.command(item.ItemId,'Tier : '+item.Tier+' Target : '+item.Target,' Objective : '+item.Objective,'achievement-grant','----');
                 });    
                 //document.querySelectorAll('.tx-live-achievement-grant').forEach(a=>{
                       //a.onclick = ()=>{
