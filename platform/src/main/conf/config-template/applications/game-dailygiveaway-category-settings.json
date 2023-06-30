@@ -40,33 +40,6 @@
           {
             "name": "Reward",
             "type": "category",
-            "reference": "category:DailyRewardItem",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "application.giveaway",
-        "type": "DailyRewardItem",
-        "description": "application category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "ItemPack",
-            "type": "category",
             "reference": "category:ItemPack",
             "nullable": false,
             "downloadable": false

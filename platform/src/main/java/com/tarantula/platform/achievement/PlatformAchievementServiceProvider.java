@@ -32,19 +32,12 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
-    public AchievementProgress achievementProgress(Session session){
-        AchievementProgress achievementProgress = new AchievementProgress();
 
-        platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,achievementProgress);
-
-        if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
-        return achievementProgress.disabled()?null:achievementProgress;
-    }
     public AchievementProgress onProgress(Session session,double delta){
         AchievementProgress achievementProgress = new AchievementProgress();
-
         platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,achievementProgress);
-
+        if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
+        if(achievementProgress.disabled()) return null;
         if(achievementProgress.onProgress(delta)){
             //tier_{tier}_target_{target}
             Achievement achievement = achievements.get(achievementProgress.name());
@@ -55,7 +48,6 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
             }
             return achievementProgress;
         }
-        achievementProgress.update();
         return achievementProgress;
     }
     public List<Achievement> list(){
@@ -108,14 +100,12 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         Achievement achievement = achievements.get(key);
         if(achievement!=null){
             achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
-            achievementProgress.update();
             return true;
         }
         key = "tier_"+(achievementProgress.tier()+1)+"_target_1"; //tier up 1
         achievement = achievements.get(key);
         if(achievement!=null){
             achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
-            achievementProgress.update();
             return true;
         }
         return false;

@@ -18,9 +18,8 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onProgress")){
-            AchievementProgress progress = achievementServiceProvider.achievementProgress(session);
-            progress.onProgress(10);
-            session.write(JsonUtil.toSimpleResponse(true,"").getBytes());
+            AchievementProgress progress = achievementServiceProvider.onProgress(session,Double.parseDouble(session.name()));
+            session.write(progress!=null?progress.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"achievement not available").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

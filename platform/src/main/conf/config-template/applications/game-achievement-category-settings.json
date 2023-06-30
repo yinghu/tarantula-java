@@ -47,33 +47,6 @@
           {
             "name": "Award",
             "type": "category",
-            "reference": "category:AchievementAwardItem",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "application.achievement",
-        "type": "AchievementAwardItem",
-        "description": "achievement category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Name",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "ItemPack",
-            "type": "category",
             "reference": "category:ItemPack",
             "nullable": false,
             "downloadable": false

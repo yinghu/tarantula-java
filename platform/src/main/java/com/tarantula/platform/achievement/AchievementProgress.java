@@ -18,6 +18,7 @@ public class AchievementProgress extends RecoverableObject {
 
     public AchievementProgress(){
         this.label = "achievementProgress";
+        this.tier = 1;
         this.disabled = true;
     }
     public int getFactoryId() {
@@ -62,15 +63,16 @@ public class AchievementProgress extends RecoverableObject {
         if(progress>=objective){
             return true;
         }
+        update();
         return false;
     }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("tier",tier);
-        jsonObject.addProperty("target",target);
-        jsonObject.addProperty("progress",progress);
-        jsonObject.addProperty("objective",objective);
+        jsonObject.addProperty("Tier",tier);
+        jsonObject.addProperty("Target",target);
+        jsonObject.addProperty("Progress",progress);
+        jsonObject.addProperty("Objective",objective);
         return jsonObject;
     }
     @Override
@@ -87,8 +89,9 @@ public class AchievementProgress extends RecoverableObject {
         this.objective = objective;
         this.progress = 0;
         this.disabled = false;
+        update();
     }
     public void reset(){
-        reset(0,0,0);
+        reset(1,0,0);
     }
 }
