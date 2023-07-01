@@ -17,14 +17,12 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     public static final String NAME = "achievement";
 
-    private final PlatformInboxServiceProvider inboxServiceProvider;
 
     private ConcurrentHashMap<String,Achievement> achievements;
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        this.inboxServiceProvider = gameServiceProvider.inboxServiceProvider();
-        this.achievements = new ConcurrentHashMap<>();
+         this.achievements = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -42,7 +40,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         if(achievementProgress.onProgress(delta)){
             //tier_{tier}_target_{target}
             Achievement achievement = achievements.get(achievementProgress.name());
-            inboxServiceProvider.claim(session.systemId(),achievement);
+            platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),achievement);
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);
                 achievementProgress.update();

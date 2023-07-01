@@ -8,7 +8,7 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.util.ArrayList;
@@ -19,16 +19,13 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
 
     public static final String NAME = "giveaway";
 
-    private final PlatformInventoryServiceProvider inventoryServiceProvider;
-
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
     private int maxRewardTier;
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
     public PlatformDailyGiveawayServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
-        this.dailyGiveaways = new ConcurrentHashMap<>();
+       this.dailyGiveaways = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -50,7 +47,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         if(!rewarded) return null;
         DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
-        inventoryServiceProvider.redeem(session.systemId(),dailyGiveaway);
+        platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),dailyGiveaway);
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
         return dailyLoginTrack;

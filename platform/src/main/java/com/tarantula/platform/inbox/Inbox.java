@@ -10,7 +10,7 @@ import java.util.List;
 public class Inbox extends RecoverableObject {
 
     public List<Inventory> inventoryList;
-
+    public List<PendingReward> rewardList;
 
 
     @Override
@@ -20,6 +20,9 @@ public class Inbox extends RecoverableObject {
         JsonArray inventories = new JsonArray();
         inventoryList.forEach((inventory -> inventories.add(inventory.toJson())));
         jsonObject.add("_inventoryList",inventories);
+        JsonArray rewards = new JsonArray();
+        rewardList.forEach((reward -> rewards.add(reward.toJson())));
+        jsonObject.add("_rewardList",rewards);
         return jsonObject;
     }
 }

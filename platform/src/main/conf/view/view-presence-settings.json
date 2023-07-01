@@ -15,7 +15,6 @@
     {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.inbox.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.inventory","moduleResourceFile": "presence/live.game.service.inventory.view.html"},
-    {"type": "live.game.service.item","moduleResourceFile": "presence/live.game.service.item.view.html"},
     {"type": "live.game.service.dailygiveaway","moduleResourceFile": "presence/live.game.service.dailygiveaway.view.html"},
     {"type": "live.game.service.save","moduleResourceFile": "presence/live.game.service.save.view.html"},
     {"type": "live.game.service.resource","moduleResourceFile": "presence/live.game.service.resource.view.html"},

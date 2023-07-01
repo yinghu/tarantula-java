@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inbox.Inbox;
 
@@ -15,6 +16,9 @@ public class GameInboxModule implements Module{
         if(session.action().equals("onInbox")){
             Inbox inbox = this.gameServiceProvider.inboxServiceProvider().inbox(session.systemId());
             session.write(inbox.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onRedeem")){
+            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

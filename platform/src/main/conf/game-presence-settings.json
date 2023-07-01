@@ -16,6 +16,9 @@
       "saveTimeout": 1,
       "mappingObjectMaxSize": 4000
   },
+  "inbox": {
+      "pendingReward": true
+  },
   "recentlyPlayListSize": 10,
   "friendListSize": 10
 }

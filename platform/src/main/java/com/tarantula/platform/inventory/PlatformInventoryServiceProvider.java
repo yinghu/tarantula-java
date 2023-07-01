@@ -103,26 +103,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         redeemer.redeem();
         return true;
     }
-    public boolean redeem(String systemId, Achievement item){
-        ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
-        redeemer.distributionKey(item.distributionKey());
-        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = gameCluster.serviceWithCategory("item");
-        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
-        redeemer.redeem();
-        return true;
-    }
-    public boolean redeem(String systemId, DailyGiveaway item){
-        ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
-        redeemer.distributionKey(item.distributionKey());
-        Descriptor app = gameCluster.serviceWithCategory(item.configurationTypeId());
-        if(app==null||!applicationPreSetup.load(app,redeemer)) return false;
-        Descriptor itemApp = gameCluster.serviceWithCategory("item");
-        redeemer.dataStore(applicationPreSetup.dataStore(itemApp));
-        redeemer.redeem();
-        return true;
-    }
+
     public boolean redeem(String systemId, ShoppingItem item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);
         redeemer.distributionKey(item.distributionKey());
@@ -188,10 +169,6 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
     @Override
     public void onInventory(Inventory inventory,InventoryItem item) {
-        //logger.warn("11111111");
-        //logger.warn("Inventory->"+inventory.distributionKey());
-        //logger.warn("Inventory Item->"+item.distributionKey());
-        //logger.warn("Content->"+item.itemId());
-        //logger.warn("222222222");
+        //callback on adding inventory
     }
 }
