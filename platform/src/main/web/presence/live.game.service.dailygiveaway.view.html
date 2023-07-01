@@ -84,8 +84,8 @@
     }
 
     function tx_dailygiveaway_claim(){
-        //TARA_API.onGet(TARA_API.query().serviceTag,'onDailyRewardClaim',itemId,(resp)=>{
-            console.log("claim");
-        //});
+        TARA_API.onGet(TARA_API.query().serviceTag,'onClaim','',(resp)=>{
+            editor.set(resp);
+        });
     }
 </script>

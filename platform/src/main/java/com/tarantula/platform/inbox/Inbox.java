@@ -11,6 +11,8 @@ public class Inbox extends RecoverableObject {
 
     public List<Inventory> inventoryList;
 
+
+
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

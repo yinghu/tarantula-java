@@ -7,7 +7,7 @@ import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
-import com.tarantula.platform.inventory.PendingReward;
+import com.tarantula.platform.inbox.PendingReward;
 import com.tarantula.platform.lobby.ArenaItem;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;

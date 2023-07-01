@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
@@ -16,13 +17,13 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     public static final String NAME = "achievement";
 
-    private final PlatformInventoryServiceProvider inventoryServiceProvider;
+    private final PlatformInboxServiceProvider inboxServiceProvider;
 
     private ConcurrentHashMap<String,Achievement> achievements;
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
+        this.inboxServiceProvider = gameServiceProvider.inboxServiceProvider();
         this.achievements = new ConcurrentHashMap<>();
     }
 
@@ -41,7 +42,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         if(achievementProgress.onProgress(delta)){
             //tier_{tier}_target_{target}
             Achievement achievement = achievements.get(achievementProgress.name());
-            inventoryServiceProvider.redeem(session.systemId(),achievement);
+            inboxServiceProvider.claim(session.systemId(),achievement);
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);
                 achievementProgress.update();

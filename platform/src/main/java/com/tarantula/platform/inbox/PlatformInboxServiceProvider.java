@@ -6,6 +6,7 @@ import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.Application;
 
 public class PlatformInboxServiceProvider implements ServiceProvider {
 
@@ -44,5 +45,9 @@ public class PlatformInboxServiceProvider implements ServiceProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.logger = this.serviceContext.logger(PlatformInboxServiceProvider.class);
+    }
+
+    public <T extends Application> void claim(String systemId,T item){
+
     }
 }

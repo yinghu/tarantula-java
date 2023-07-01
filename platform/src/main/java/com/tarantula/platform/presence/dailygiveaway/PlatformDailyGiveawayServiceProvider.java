@@ -43,12 +43,17 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
-    public DailyLoginTrack checkDailyLogin(Session session){
+    public DailyLoginTrack claim(Session session){
         DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
         platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,dailyLoginTrack);
         if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
-        return rewarded?dailyLoginTrack:null;
+        if(!rewarded) return null;
+        DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
+        inventoryServiceProvider.redeem(session.systemId(),dailyGiveaway);
+        dailyLoginTrack.rewardPending = false;
+        dailyLoginTrack.update();
+        return dailyLoginTrack;
     }
     public List<DailyGiveaway> list(){
         ArrayList<DailyGiveaway> _items = new ArrayList<>();
@@ -88,14 +93,4 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         return null;
     }
 
-    public boolean redeem(String systemId){
-        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        //dailyLoginTrack.distributionKey(gameId);
-        //dailyLoginTrack.dataStore(dataStore);
-        //if(!this.dataStore.load(dailyLoginTrack)) return false;
-        if(!dailyLoginTrack.rewardPending || !dailyGiveaways.containsKey(dailyLoginTrack.rewardKey())) return false;
-        dailyLoginTrack.rewardPending = !this.inventoryServiceProvider.redeem(systemId,dailyGiveaways.get(dailyLoginTrack.rewardKey()));
-        dailyLoginTrack.update();
-        return !dailyLoginTrack.rewardPending;
-    }
 }

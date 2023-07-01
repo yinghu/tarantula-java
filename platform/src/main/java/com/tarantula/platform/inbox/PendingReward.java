@@ -1,4 +1,4 @@
-package com.tarantula.platform.inventory;
+package com.tarantula.platform.inbox;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;

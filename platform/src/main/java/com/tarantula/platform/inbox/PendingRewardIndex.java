@@ -1,4 +1,4 @@
-package com.tarantula.platform.inventory;
+package com.tarantula.platform.inbox;
 
 import com.tarantula.platform.IndexSet;
 

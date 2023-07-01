@@ -58,7 +58,7 @@ public class DailyLoginTrack extends RecoverableObject {
             LocalDateTime cur = LocalDateTime.now();
             timestamp = TimeUtil.toUTCMilliseconds(cur);
             rewardPending = true;
-            dataStore.update(this);
+            update();
             nextRewardTime(cur,pendingHours);
             return true;
         }
@@ -75,7 +75,7 @@ public class DailyLoginTrack extends RecoverableObject {
                     }
                     timestamp = TimeUtil.toUTCMilliseconds(current);
                     rewardPending = true;
-                    this.dataStore.update(this);
+                    update();
                     nextRewardTime(current,pendingHours);
                     return true;
                 }
@@ -87,7 +87,7 @@ public class DailyLoginTrack extends RecoverableObject {
             tier = tier<maxTier?(tier+1):1;
             timestamp = TimeUtil.toUTCMilliseconds(current);
             rewardPending = true;
-            this.dataStore.update(this);
+            update();
             nextRewardTime(current,pendingHours);
             return true;
         }
@@ -105,19 +105,18 @@ public class DailyLoginTrack extends RecoverableObject {
             }
             rewardPending = true;
             timestamp = TimeUtil.toUTCMilliseconds(current);
-            dataStore.update(this);
+            update();
             nextRewardTime(current,pendingHours);
             return true;
         }
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        //jsonObject.addProperty("gameId",distributionKey());
-        jsonObject.addProperty("lastLoginDay",lastLoginDay);
-        jsonObject.addProperty("rewardTier",tier);
-        jsonObject.addProperty("rewardKey",rewardKey());
-        jsonObject.addProperty("nextLoginInSeconds",nextRewardTimeSeconds);
-        jsonObject.addProperty("rewardPending",rewardPending);
+        jsonObject.addProperty("LastLoginDay",lastLoginDay);
+        jsonObject.addProperty("RewardTier",tier);
+        jsonObject.addProperty("RewardKey",rewardKey());
+        jsonObject.addProperty("NextLoginInSeconds",nextRewardTimeSeconds);
+        jsonObject.addProperty("RewardPending",rewardPending);
         return jsonObject;
     }
     public String rewardKey(){
@@ -126,7 +125,7 @@ public class DailyLoginTrack extends RecoverableObject {
     public void reset(){
         lastLoginDay = 0;
         tier = 0;
-        this.dataStore.update(this);
+        update();
     }
     private void nextRewardTime(LocalDateTime current,int pendingHours){
         int remainingSeconds = 24*60*60-current.getSecond();
