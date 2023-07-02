@@ -11,10 +11,16 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel">
-        <div id='tx-live-inventory-item-list' class="w3-container ">
-            
-        </div>
-    </div>
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue" id='tx-live-inventory-header'>Inventory Selection</legend>
+            <div class="w3-container">
+                <label class="tx-text-14 tx-margin-right-4">Inventory :</label>
+                <select id='tx-inventory-selection-name' class="w3-select w3-border w3-round tx-text-14" name='inventorySelectionName'>
+                    
+                </select>
+            </div>
+        </fieldset>
+    </div> 
     <div class="w3-panel">
         <div id='tx-live-inventory-action-bar' class="w3-container">
             
@@ -42,8 +48,8 @@
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inventory"),{mode:'tree'},{});
     document.querySelector('#tx-live-inventory-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
-    let inventoryList = document.querySelector('#tx-live-inventory-item-list');
-    inventoryList.innerHTML = '';
+    let selectionList = document.querySelector('#tx-inventory-selection-name');
+    selectionList.innerHTML = '';
     let actionList = document.querySelector('#tx-live-inventory-action-bar');
     actionList.innerHTML = '';
     tx_live_inventory_setup();
@@ -60,27 +66,24 @@
     document.querySelector('#tx-inventory-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    
+    document.querySelector('#tx-inventory-selection-name').onchange = ()=>{
+        let iquery = document.querySelector('#tx-inventory-selection-name').value;
+        tx_inventory_view(iquery);
+    };   
     function tx_live_inventory_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onCategory',"Mills",(resp)=>{
             editor.set(resp);
-            resp.itemList.forEach(item => {
-                inventoryList.innerHTML += TARA_HTML.command(item.category+'#'+item.typeId,item.category,item.typeId,'inventory-category','View');    
-            });
-            document.querySelectorAll('.tx-live-inventory-category').forEach(a=>{
-                a.onclick = ()=>{
-                    tx_inventory_view(a.getAttribute('tx-item-id'));          
-                }
+            resp.itemList.forEach((item,i) => {  
+                selectionList.innerHTML += TARA_HTML.option(item.category+'#'+item.typeId,item.category,i==0);
             });
         });   
     }
 
     function tx_inventory_view(itemId){
         TARA_API.onGet(TARA_API.query().serviceTag,'onInventory',itemId,(resp)=>{
-            console.log(itemId);
+            actionList.innerHTML = '';
             editor.set(resp);
             if(resp.Successful){
-                actionList.innerHTML = '';
                 resp._itemList.forEach(item=>{
                     actionList.innerHTML += TARA_HTML.command(itemId+'#'+item.InventoryId,item.TypeId,item.Name,'inventory-item','View');    
                 });

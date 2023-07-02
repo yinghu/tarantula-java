@@ -18,7 +18,8 @@ public class GameInboxModule implements Module{
             session.write(inbox.toJson().toString().getBytes());
         }
         else if(session.action().equals("onRedeem")){
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            boolean suc = this.gameServiceProvider.inboxServiceProvider().redeem(session,session.name());
+            session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

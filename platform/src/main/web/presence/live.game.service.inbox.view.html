@@ -10,8 +10,8 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel" style="display: none;">
-        <div id='tx-live-inbox-item-list' class="w3-container  w3-border-bottom w3-border-red">
+    <div class="w3-panel">
+        <div id='tx-live-inbox-item-list' class="w3-container">
             
         </div>
     </div>
@@ -56,8 +56,25 @@
     };
     
     function tx_live_inbox_setup(){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"Mills",(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
             editor.set(resp);
+            if(resp.Successful){
+                inboxList.innerHTML = '';
+                resp._rewardList.forEach(item => {
+                    inboxList.innerHTML += TARA_HTML.command(item.RewardKey,'Pending Reward',item.Name,'pending-reward-claim','Claim');
+                });    
+                document.querySelectorAll('.tx-live-pending-reward-claim').forEach(a=>{
+                      a.onclick = ()=>{
+                        tx_pending_reward_redeem(a.getAttribute('tx-item-id'));
+                        //console.log(a.getAttribute('tx-item-id'));       
+                    }
+                });
+            }
         });   
+    }
+    function tx_pending_reward_redeem(itemId){
+        TARA_API.onGet(TARA_API.query().serviceTag,'onRedeem',itemId,(resp)=>{
+            editor.set(resp);
+        });
     }
 </script>

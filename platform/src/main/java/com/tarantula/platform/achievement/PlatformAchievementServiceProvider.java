@@ -40,6 +40,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         if(achievementProgress.onProgress(delta)){
             //tier_{tier}_target_{target}
             Achievement achievement = achievements.get(achievementProgress.name());
+            if(achievement==null) return null;
             platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),achievement);
             if(!tryNextAchievement(achievementProgress)){
                 achievementProgress.disabled(true);

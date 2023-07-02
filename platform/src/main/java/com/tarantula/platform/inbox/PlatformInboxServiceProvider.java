@@ -50,9 +50,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
             PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
             pendingRewardIndex.distributionKey(systemId);
             this.dataStore.createIfAbsent(pendingRewardIndex,true);
-            PendingReward pending = new PendingReward();
-            pending.index(item.distributionKey());
-            pending.name(item.configurationCategory());
+            PendingReward pending = new PendingReward(item);
             this.dataStore.create(pending);
             pendingRewardIndex.addKey(pending.distributionKey());
             this.dataStore.update(pendingRewardIndex);
@@ -60,7 +58,22 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         }
         this.inventoryServiceProvider.redeem(systemId,item);
     }
-    public List<PendingReward> rewardList(String systemId){
+
+    public boolean redeem(Session session,String rewardKey){
+        PendingReward reward = new PendingReward();
+        reward.distributionKey(rewardKey);
+        if(!this.dataStore.load(reward) || reward.disabled()) return false;
+        if(!inventoryServiceProvider.redeem(session.systemId(),reward.toApplication())) return false;
+        reward.disabled(true);
+        dataStore.update(reward);
+        PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
+        pendingRewardIndex.distributionKey(session.systemId());
+        this.dataStore.createIfAbsent(pendingRewardIndex,true);
+        pendingRewardIndex.removeKey(rewardKey);
+        dataStore.update(pendingRewardIndex);
+        return true;
+    }
+    private List<PendingReward> rewardList(String systemId){
         ArrayList<PendingReward> rewards = new ArrayList();
         PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
         pendingRewardIndex.distributionKey(systemId);

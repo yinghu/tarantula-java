@@ -72,12 +72,6 @@
                 resp._itemList.forEach(item => {
                     dailygiveawayList.innerHTML += TARA_HTML.command(item.ItemId,'Daily Reward',item.Name,'daily-reward-claim','----');
                 });    
-                //document.querySelectorAll('.tx-live-daily-reward-claim').forEach(a=>{
-                      //a.onclick = ()=>{
-                        //tx_dailygiveaway_claim(a.getAttribute('tx-item-id'));
-                        //console.log(a.getAttribute('tx-item-id'));       
-                    //}
-                //});
             }
             editor.set(resp);
         });   
