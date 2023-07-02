@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -23,6 +24,8 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected MetricsListener metricsListener;
     protected MetricsListener applicationMetricsListener;
     protected TokenValidatorProvider tokenValidatorProvider;
+
+    protected TarantulaLogger logger;
 
     public AuthObject(String typeId,String clientId){
         this.typeId = typeId;

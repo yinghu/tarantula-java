@@ -37,6 +37,7 @@ public class FacebookAuthProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
+        logger = serviceContext.logger(FacebookAuthProvider.class);
         try{
             if(!serverToken()) throw new RuntimeException("invalid token");
         }catch (Exception ex){
@@ -60,7 +61,7 @@ public class FacebookAuthProvider extends AuthObject{
             onMetrics(GameClusterMetrics.ACCESS_FACEBOOK_LOGIN_COUNT);
             return validated;
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("facebook validate error ["+typeId+"]",ex);
             return false;
         }
     }

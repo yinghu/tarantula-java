@@ -16,7 +16,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 public class AmazonAWSProvider extends AuthObject{
 
-    private TarantulaLogger logger;
     private S3Client s3Client;
     private String region;
     private String bucket;

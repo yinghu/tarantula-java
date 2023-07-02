@@ -35,7 +35,6 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     private String applicationId;
     private String secureKey;
 
-    private TarantulaLogger logger;
 
     public GoogleOAuthTokenValidator(GooglePlayConfiguration googlePlayConfiguration, MetricsListener metricsListener){
         this(googlePlayConfiguration.typeId(),googlePlayConfiguration.clientId(),googlePlayConfiguration.clientSecret(),googlePlayConfiguration.applicationId(),googlePlayConfiguration.accessKey());
@@ -73,7 +72,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
             return verifyPlayer(response.getAccessToken(),params);
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("error on validate type ["+typeId+"]",ex);
             return false;
         }
     }

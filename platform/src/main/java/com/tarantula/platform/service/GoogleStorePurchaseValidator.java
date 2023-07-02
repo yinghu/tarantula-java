@@ -27,7 +27,6 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private String accessKey;
     private String packageName;
 
-    private TarantulaLogger logger;
 
     public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
         this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());

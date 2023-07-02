@@ -48,6 +48,7 @@ public class AppleStoreProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
+        logger = serviceContext.logger(AppleStoreProvider.class);
         String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
 
@@ -76,7 +77,7 @@ public class AppleStoreProvider extends AuthObject{
             onMetrics(GameClusterMetrics.PAYMENT_APPLE_STORE_AMOUNT);
             return checkResponsePayload(responseData.dataAsString,params);
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("apple store error ["+typeId+"]",ex);
             return false;
         }
     }

@@ -35,6 +35,7 @@ public class GameCenterAuthProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
+        logger = serviceContext.logger(GameCenterAuthProvider.class);
     }
     @Override
     public boolean validate(Map<String,Object> params){
@@ -43,7 +44,7 @@ public class GameCenterAuthProvider extends AuthObject{
             onMetrics(GameClusterMetrics.ACCESS_GAME_CENTER_LOGIN_COUNT);
             return verified;
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("game center error ["+typeId+"]",ex);
             return false;
         }
     }
