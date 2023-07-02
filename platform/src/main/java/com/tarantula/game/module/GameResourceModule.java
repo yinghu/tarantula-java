@@ -32,7 +32,6 @@ public class GameResourceModule implements Module,Configurable.Listener<Configur
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
-
         return false;
     }
 

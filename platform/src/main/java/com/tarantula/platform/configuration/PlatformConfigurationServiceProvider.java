@@ -4,7 +4,6 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.mysql.cj.callback.UsernameCallback;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
@@ -158,8 +157,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             return;
         }
         ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
-        //logger.warn(configurableSetting.toString());
-        //logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
+        logger.warn(configurableSetting.toString());
+        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());

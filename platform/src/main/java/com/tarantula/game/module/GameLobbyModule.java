@@ -28,6 +28,7 @@ public class GameLobbyModule implements Module{
         }
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         Stub stub = gameLobby.join(session,rating);
+        gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
         session.write(stub.toJson().toString().getBytes());
     }
 

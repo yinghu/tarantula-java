@@ -63,9 +63,9 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         playList.playListIndex.push(friendSystemId);
         this.dataStore.update(playList);
     }
-    public void onPlay(String systemId){//blocked
+    public void onPlay(String systemId){
         this.recentlyPlayList.playListIndex.push(systemId);
-        this.recentlyPlayList.update();
+        //this.recentlyPlayList.update();
     }
     public List<String> friendList(String systemId){
         PlayList playList = new PlayList(friendListSize);

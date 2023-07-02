@@ -83,7 +83,6 @@
     };
     document.querySelector('#tx-module-selection-name').onchange = ()=>{
         proxyTag = document.querySelector('#tx-module-selection-name').value;
-        //tx_live_save_setup();
     }; 
     function tx_live_proxy_setup(){
         TARA_API.onGet(TARA_API.query().serviceTag,'onList#service',"Mills",(resp)=>{
