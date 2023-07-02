@@ -2,13 +2,13 @@
   "checkInterval": 10000,
   "dedicatedCheckInterval": 1000,
   "pve": {
-    "maxRoomPoolSizePerZone": 10,
-    "minRoomPoolSizePerZone": 1,
+    "maxRoomPoolSizePerZone": 100,
+    "minRoomPoolSizePerZone": 10,
     "maxDedicatedServerConnections": 10
   },
   "pvp": {
-    "maxRoomPoolSizePerZone": 10,
-    "minRoomPoolSizePerZone": 1,
+    "maxRoomPoolSizePerZone": 100,
+    "minRoomPoolSizePerZone": 10,
     "maxDedicatedServerConnections": 10
   },
   "tve": {
