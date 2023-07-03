@@ -15,4 +15,6 @@ public interface MapStoreListener {
     //recover cluster operation
     byte[] onRecovering(Metadata metadata,byte[] key);
 
+    void onDeleting(Metadata metadata,byte[] key);
+
 }

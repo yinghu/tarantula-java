@@ -5,7 +5,7 @@ public interface RecoverService extends ServiceProvider{
     String NAME = "RecoverService";
 
     //operates master or member node
-
+    void onDelete(String source,byte[] key);
     byte[] onRecover(String source,byte[] key);
     int onReplicate(String source,byte[] key,byte[] value,int nodeNumber);
     int onReplicate(OnReplication[] batch,int size,int nodeNumber);

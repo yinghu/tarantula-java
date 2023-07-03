@@ -488,6 +488,16 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         return null;
     }
+
+    @Override
+    public void onDeleting(Metadata metadata,byte[] key){
+        if(metadata.scope()==Distributable.DATA_SCOPE){
+            this.integrationCluster.recoverService().onDelete(metadata.source(),key);
+        }
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            //this.integrationCluster.accessIndexService().ond(metadata.partition(),key);
+        }
+    }
     //end of map store listener
 
     public void backup(int scope){
@@ -777,8 +787,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
 
         public boolean delete(byte[] key){
-
-            return _delete(key);
+            if(!_delete(key)) return false;
+            mapStoreListener.onDeleting(metadata1,key);
+            return true;
         }
         public boolean set(byte[] key,byte[] value){
             try{
@@ -814,6 +825,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             } finally {
                 cursor.close();
             }
+        }
+
+        @Override
+        public void unset(byte[] key) {
+            _delete(key);
         }
 
         @Override

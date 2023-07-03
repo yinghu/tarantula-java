@@ -39,6 +39,9 @@ public interface DataStore {
     interface Backup{
         boolean set(byte[] key,byte[] value);
         byte[] get(byte[] key);
+
+        void unset(byte[] key);
+
         void list(Binary binary);
     }
 

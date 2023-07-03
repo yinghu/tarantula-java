@@ -86,8 +86,24 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
         return ret;
-
-
+    }
+    public void onDelete(String source,byte[] key){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m : mlist){
+            if(!m.localMember()){
+                DeleteOperation operation = new DeleteOperation(source,key);
+                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+                final Future<byte[]> future = builder.invoke();
+                try {
+                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    future.cancel(true);
+                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
+                    //goes to next node if failed
+                }
+            }
+        }
     }
     @Override
     public int onReplicate(String source,byte[] key,byte[] value,int nodeNumber){

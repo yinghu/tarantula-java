@@ -61,6 +61,11 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         }
     }
 
+    @Override
+    public void unset(byte[] key) {
+
+    }
+
     private DataStore dataStore(int partition){
         return this.tarantulaContext.dataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);
     }

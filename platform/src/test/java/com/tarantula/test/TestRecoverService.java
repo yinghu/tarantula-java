@@ -29,7 +29,10 @@ public class TestRecoverService implements RecoverService {
 
     }
 
-
+    @Override
+    public void onDelete(String source, byte[] key) {
+        
+    }
 
     @Override
     public void onEndSync(String memberId, String syncKey) {

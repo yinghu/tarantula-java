@@ -364,7 +364,9 @@ public class PartitionDataStore extends ReplicatedDataStore{
 
     public boolean delete(byte[] key){
         DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
-        return _delete(dso,key);
+        if(!_delete(dso,key)) return false;
+        mapStoreListener.onDeleting(dso.metadata,key);
+        return true;
     }
 
     /**
@@ -427,6 +429,11 @@ public class PartitionDataStore extends ReplicatedDataStore{
                 cursor.close();
             }
         }
+    }
+
+    public void unset(byte[] key){
+        DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
+        _delete(dso,key);
     }
     // End of Backup implementation
 

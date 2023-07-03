@@ -81,6 +81,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     }
 
+    public void delete(String  source,byte[] key){
+        this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().unset(key);
+    }
     public byte[] load(String source,byte[] key){
         return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
     }
