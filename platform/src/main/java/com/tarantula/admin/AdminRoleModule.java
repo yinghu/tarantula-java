@@ -201,17 +201,20 @@ public class AdminRoleModule implements Module{
     private byte[] toJson(Map<String,Descriptor> existed,List<Descriptor> exposedGameServices){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("successful",true);
-        JsonArray array = new JsonArray();
+        JsonArray pending = new JsonArray();
+        JsonArray listing = new JsonArray();
         exposedGameServices.forEach((a)->{
             if(!existed.containsKey(a.name())){
                 JsonObject js = a.toJson();
                 String applicationId = SystemUtil.oid();
                 js.addProperty("applicationId", applicationId);
                 pendingGameServices.put(applicationId,a);
-                array.add(js);
+                pending.add(js);
             }
         });
-        jsonObject.add("gameServiceList",array);
+        existed.forEach((k,v)->listing.add(v.toJson()));
+        jsonObject.add("runningList",listing);
+        jsonObject.add("pendingList",pending);
         return jsonObject.toString().getBytes();
     }
     private boolean checkGameClusterName(String name){

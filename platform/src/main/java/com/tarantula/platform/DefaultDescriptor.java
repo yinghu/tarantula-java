@@ -1,6 +1,7 @@
 package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Access;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.util.JsonUtil;
@@ -229,6 +230,7 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         jsonObject.addProperty("typeId",typeId);
         jsonObject.addProperty("category",category);
         jsonObject.addProperty("resetEnabled",resetEnabled);
+        jsonObject.addProperty("privateAccess",accessMode== Access.PRIVATE_ACCESS_MODE);
         return jsonObject;
     }
 }
