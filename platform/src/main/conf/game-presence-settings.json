@@ -19,6 +19,10 @@
   "inbox": {
       "pendingReward": true
   },
-  "recentlyPlayListSize": 10,
-  "friendListSize": 10
+
+  "playList":{
+    "recentlyListSize" :10,
+    "friendListSize": 10,
+    "syncIntervalSeconds": 10
+  }
 }

@@ -67,9 +67,8 @@ public class Profile extends RecoverableObject implements Configurable {
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("displayName",displayName);
-        jsonObject.addProperty("iconUrl",iconUrl);
-        jsonObject.add("payload",payload);
+        jsonObject.addProperty("DisplayName",displayName);
+        jsonObject.addProperty("IconUrl",iconUrl);
         return jsonObject;
     }
 

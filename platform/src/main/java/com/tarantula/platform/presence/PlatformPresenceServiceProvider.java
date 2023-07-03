@@ -1,9 +1,12 @@
 package com.tarantula.platform.presence;
 
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.Rating;
 
@@ -18,6 +21,7 @@ import com.tarantula.platform.statistics.UserStatistics;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
@@ -25,11 +29,17 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private int recentlyPlayListSize;
     private int friendListSize;
+
+    private long syncIntervalSeconds;
     private PlayList recentlyPlayList;
+
+    private AtomicInteger updates;
+    private ScheduleRunner scheduleRunner;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
 
     public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
+        updates = new AtomicInteger(0);
     }
 
 
@@ -39,19 +49,24 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.recentlyPlayList.distributionKey(this.gameCluster.distributionKey());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
         this.recentlyPlayList.dataStore(this.dataStore);
-        logger.warn("Presence service provider started->"+gameServiceName);
+        this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{
+            syncPlayList();
+        });
+        this.serviceContext.schedule(scheduleRunner);
     }
 
     @Override
     public void waitForData(){
         this.platformLeaderBoardProvider = platformGameServiceProvider.leaderBoardProvider();
-        Configuration configuration = serviceContext.configuration("game-presence-settings");
-        this.recentlyPlayListSize = ((Number)configuration.property("recentlyPlayListSize")).intValue();
-        this.friendListSize = ((Number)configuration.property("friendListSize")).intValue();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        Configuration configuration = serviceContext.configuration("game-presence-settings");
+        JsonObject plist = ((JsonElement)configuration.property("playList")).getAsJsonObject();
+        this.recentlyPlayListSize = plist.get("recentlyListSize").getAsInt();
+        this.friendListSize = plist.get("friendListSize").getAsInt();
+        this.syncIntervalSeconds = plist.get("syncIntervalSeconds").getAsLong();
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
@@ -65,7 +80,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
     public void onPlay(String systemId){
         this.recentlyPlayList.playListIndex.push(systemId);
-        //this.recentlyPlayList.update();
+        updates.incrementAndGet();
     }
     public List<String> friendList(String systemId){
         PlayList playList = new PlayList(friendListSize);
@@ -172,6 +187,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
         this.dataStore.createIfAbsent(deviceSaveIndex,true);
         if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);
+    }
+
+    private void syncPlayList(){
+        if(updates.getAndSet(0)>0) recentlyPlayList.update();
+        this.serviceContext.schedule(scheduleRunner);
     }
 
     public void onLeave(Session session){
