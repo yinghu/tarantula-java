@@ -34,6 +34,11 @@ public class PlayListModule implements Module{
         this.context.log("Play list module started", OnLog.WARN);
     }
 
+    @Override
+    public void clear() {
+        this.gameServiceProvider.removeServiceModule(this.descriptor().tag());
+    }
+
     public Descriptor descriptor(){
         return this.context.descriptor();
     }

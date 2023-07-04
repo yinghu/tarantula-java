@@ -343,14 +343,17 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
         }
-        //if(postSetup!=null){
-            //ApplicationPreSetup setup = SystemUtil.applicationPreSetup(postSetup);
-            //setup.setup(tarantulaContext,descriptor,configName);
-        //}
         this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionKey());
         return true;
     }
-
+    public boolean updateApplication(Descriptor descriptor,OnAccess properties){
+        DataStore dataStore = this.tarantulaContext.masterDataStore();
+        if(!dataStore.load(descriptor)) return false;
+        descriptor.resetEnabled((boolean)properties.property("resetEnabled"));
+        boolean privateAccess = (boolean)properties.property("privateAccess");
+        descriptor.accessMode(privateAccess?Access.PRIVATE_ACCESS_MODE:0);
+        return dataStore.update(descriptor);
+    }
     public boolean enableApplication(String applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();

@@ -62,9 +62,11 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     //game cluster operation APIs
     boolean createApplication(Descriptor descriptor,String postSetup,String configName,boolean launching);
+
+    boolean updateApplication(Descriptor descriptor,OnAccess properties);
     boolean enableApplication(String applicationId);
     boolean disableApplication(String applicationId);
-    //<T extends OnAccess> T createGameCluster(String owner,String name,String mode,boolean tournamentEnabled);
+
     <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties);
     <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);
 

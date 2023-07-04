@@ -85,12 +85,20 @@
         tx_game_service_edit_setup();
     }; 
     document.querySelector('#tx-game-service-edit-bar').innerHTML += TARA_HTML.BarItem('tx-game-service-edit-update','Update','w3-right');
+    document.querySelector('#tx-game-service-edit-update').onclick=()=>{
+        let _resetEnabled = document.querySelector('#tx-game-service-reset-enabled').checked;
+        let _privateAccess = document.querySelector('#tx-game-service-private-access').checked;
+        let payload ={resetEnabled:_resetEnabled,privateAccess:_privateAccess};
+        let editing = runningList[editingIndex];
+        TARA_API.onSet('role/admin','onUpdateService',TARA_API.query().gameClusterId+'#'+editing.tag,payload,(resp)=>{
+            editor.set(resp);      
+        });    
+    };
     function tx_game_service_edit_setup(){
         let editing = runningList[editingIndex];
         document.querySelector('#tx-game-service-selected').innerHTML = editing.name;
         document.querySelector('#tx-game-service-reset-enabled').checked = editing.resetEnabled;
         document.querySelector('#tx-game-service-private-access').checked = editing.privateAccess;
-        
     }
     function tx_service_bar_reset(resp){
         editor.set(resp);

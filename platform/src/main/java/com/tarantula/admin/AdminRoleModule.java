@@ -156,6 +156,22 @@ public class AdminRoleModule implements Module{
                 session.write(JsonUtil.toSimpleResponse(false,"game service not existed").getBytes());
             }
         }
+        else if(session.action().equals("onUpdateService")){
+            String[] query = session.name().split("#");
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
+            boolean[] suc ={false};
+            gameCluster.serviceLobby.entryList().forEach(descriptor -> {
+                if(descriptor.tag().equals(query[1])){
+                    suc[0]=this.deploymentServiceProvider.updateApplication(descriptor,onAccess);
+                    if(suc[0]){
+                        this.deploymentServiceProvider.disableApplication(descriptor.distributionKey());
+                        this.deploymentServiceProvider.enableApplication(descriptor.distributionKey());
+                    }
+                }
+            });
+            session.write(JsonUtil.toSimpleResponse(suc[0],session.name()).getBytes());
+        }
         else if(session.action().equals("onLaunchGameCluster")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
             Access _u = _user(session.systemId());
