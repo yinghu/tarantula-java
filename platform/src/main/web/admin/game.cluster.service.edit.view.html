@@ -21,12 +21,7 @@
                     
                 </select>
             </div>
-        </fieldset>
-    </div>
-    <div class="w3-panel">
-        <fieldset class="w3-border-blue tx-text-12">
-            <legend class="tx-text-14 w3-text-blue" id='tx-game-service-selected'>Game Service Edit</legend>
-            <div class="w3-container">
+            <div class="w3-panel">
                 <label class="tx-text-12 tx-margin-right-4">Reset Enabled</label>
                 <input id='tx-game-service-reset-enabled' class="w3-check tx-text-12" type="checkbox">
                 <label class="tx-text-12 tx-margin-right-4">Private Access</label>
@@ -36,7 +31,8 @@
                 <div class='w3-bar w3-white' id='tx-game-service-edit-bar'></div> 
             </div>
         </fieldset>
-    </div>  
+    </div>
+     
     <div class="w3-panel">
         <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-game-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
@@ -96,7 +92,7 @@
     };
     function tx_game_service_edit_setup(){
         let editing = runningList[editingIndex];
-        document.querySelector('#tx-game-service-selected').innerHTML = editing.name;
+        //document.querySelector('#tx-game-service-selected').innerHTML = editing.name;
         document.querySelector('#tx-game-service-reset-enabled').checked = editing.resetEnabled;
         document.querySelector('#tx-game-service-private-access').checked = editing.privateAccess;
     }
