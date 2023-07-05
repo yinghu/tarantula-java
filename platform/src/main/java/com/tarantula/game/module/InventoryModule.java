@@ -1,18 +1,14 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
+
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.item.Category;
 import com.tarantula.platform.item.Commodity;
-import com.tarantula.platform.item.Item;
 
-public class InventoryModule implements Module {
 
-    private ApplicationContext context;
-    private PlatformGameServiceProvider gameServiceProvider;
+public class InventoryModule extends ModuleHeader {
 
 
     @Override
@@ -50,18 +46,8 @@ public class InventoryModule implements Module {
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        super.setup(applicationContext);
         this.context.log("Inventory module started on tag ->"+this.context.descriptor().tag(), OnLog.WARN);
-    }
-    @Override
-    public void clear(){
-
-    }
-
-    public Descriptor descriptor(){
-        return this.context.descriptor();
     }
 
 }

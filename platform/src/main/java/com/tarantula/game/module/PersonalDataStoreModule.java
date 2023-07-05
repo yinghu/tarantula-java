@@ -9,11 +9,9 @@ import com.tarantula.platform.presence.PersonalDataIndex;
 import com.tarantula.platform.presence.PersonalDataObject;
 
 
-public class PersonalDataStoreModule implements Module,Configurable.Listener<ConfigurableObject>{
+public class PersonalDataStoreModule extends ModuleHeader implements Configurable.Listener<ConfigurableObject>{
 
-    private ApplicationContext context;
     private DataStore dataStore;
-    private PlatformGameServiceProvider gameServiceProvider;
     private int maxSizeOnSet;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -78,21 +76,10 @@ public class PersonalDataStoreModule implements Module,Configurable.Listener<Con
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
-        this.context = context;
-        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("-data","-service"));
+        super.setup(context);
         this.dataStore = this.context.dataStore("player");
         this.maxSizeOnSet = this.gameServiceProvider.gameCluster().maxDataSizeCount();
         this.gameServiceProvider.configurationServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
-        if(this.descriptor().accessMode() == Access.PRIVATE_ACCESS_MODE) this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Data store module ["+this.context.descriptor().typeId()+" started with max size on set call ["+maxSizeOnSet+"]", OnLog.WARN);
-    }
-
-    @Override
-    public void clear(){
-
-    }
-
-    public Descriptor descriptor(){
-        return this.context.descriptor();
     }
 }

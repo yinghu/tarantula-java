@@ -20,8 +20,8 @@ import com.tarantula.platform.presence.saves.SavedGame;
 
 import java.time.LocalDateTime;
 
-public class SavedGameModule implements Module {
-    private ApplicationContext context;
+public class SavedGameModule extends ModuleHeader {
+
     private PlatformSavedGameServiceProvider savedGameServiceProvider;
     private PlatformPresenceServiceProvider presenceServiceProvider;
     private GsonBuilder builder;
@@ -72,17 +72,12 @@ public class SavedGameModule implements Module {
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
+        super.setup(applicationContext);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(SavedGame.class,new SavedGameDeserializer());
-        PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        //gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.savedGameServiceProvider = gameServiceProvider.savedGameServiceProvider();
         this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
         this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
 }

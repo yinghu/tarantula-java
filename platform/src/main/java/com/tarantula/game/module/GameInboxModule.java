@@ -1,15 +1,11 @@
 package com.tarantula.game.module;
 
-import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inbox.Inbox;
 
 
-public class GameInboxModule implements Module{
-    private ApplicationContext context;
-    private PlatformGameServiceProvider gameServiceProvider;
+public class GameInboxModule extends ModuleHeader{
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -30,13 +26,8 @@ public class GameInboxModule implements Module{
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        this.gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
-        if(this.descriptor().accessMode() == Access.PRIVATE_ACCESS_MODE) this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
+        super.setup(applicationContext);
         this.context.log("Game inbox module started -"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
 }

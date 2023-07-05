@@ -1,15 +1,14 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
+
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.dailygiveaway.ItemDailyGiveawayContext;
 import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider;
 
-public class DailyGiveawayModule implements Module, Configurable.Listener {
-    private ApplicationContext context;
+public class DailyGiveawayModule extends ModuleHeader implements Configurable.Listener {
+
     private PlatformDailyGiveawayServiceProvider dailyGiveawayServiceProvider;
 
     @Override
@@ -29,14 +28,10 @@ public class DailyGiveawayModule implements Module, Configurable.Listener {
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        super.setup(applicationContext);
         this.dailyGiveawayServiceProvider = gameServiceProvider.dailyGiveawayServiceProvider();
         this.dailyGiveawayServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Daily Giveaway module started", OnLog.WARN);
     }
 
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
 }

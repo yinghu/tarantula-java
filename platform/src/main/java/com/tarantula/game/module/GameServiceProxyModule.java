@@ -10,13 +10,11 @@ import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameUpdateObject;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 
 
-public class GameServiceProxyModule implements Module {
 
-    private ApplicationContext context;
-    private PlatformGameServiceProvider gameServiceProvider;
+public class GameServiceProxyModule extends ModuleHeader {
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -46,8 +44,7 @@ public class GameServiceProxyModule implements Module {
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
+        super.setup(applicationContext);
         this.gameServiceProvider.registerServiceProxyModule(this.context.descriptor());
         this.context.registerRecoverableListener(new GamePortableRegistry()).addRecoverableFilter(GamePortableRegistry.GAME_UPDATE_OBJECT_CID,(o)->{
             GameUpdateObject gameUpdateObject  = (GameUpdateObject)o;
@@ -55,8 +52,5 @@ public class GameServiceProxyModule implements Module {
         });
         this.context.log("Game Service Module Started", OnLog.WARN);
     }
-    @Override
-    public void clear(){
 
-    }
 }

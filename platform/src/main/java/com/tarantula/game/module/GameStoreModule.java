@@ -1,10 +1,8 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
-import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
@@ -15,11 +13,11 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameStoreModule implements Module,Configurable.Listener<ShoppingItem>{
-    private ApplicationContext context;
+public class GameStoreModule extends ModuleHeader implements Configurable.Listener<ShoppingItem>{
+
     private PlatformStoreServiceProvider storeServiceProvider;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
-    private PlatformGameServiceProvider gameServiceProvider;
+
     private GsonBuilder builder;
     private String serviceTypeId;
     @Override
@@ -86,19 +84,14 @@ public class GameStoreModule implements Module,Configurable.Listener<ShoppingIte
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
+        super.setup(applicationContext);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId());
         this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.serviceTypeId = this.context.descriptor().typeId().replace("-service","");
-        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
     }
 
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
 }

@@ -1,16 +1,14 @@
 package com.tarantula.game.module;
 
-import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.achievement.ItemAchievementContext;
 
-public class AchievementModule implements Module,Configurable.Listener<Achievement> {
-    private ApplicationContext context;
+public class AchievementModule extends ModuleHeader implements Configurable.Listener<Achievement> {
+
     private PlatformAchievementServiceProvider achievementServiceProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -29,14 +27,10 @@ public class AchievementModule implements Module,Configurable.Listener<Achieveme
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(context.descriptor().typeId());
+        super.setup(applicationContext);
         this.achievementServiceProvider = gameServiceProvider.achievementServiceProvider();
         this.achievementServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Achievement module started->"+this.context.descriptor().tag(), OnLog.WARN);
     }
 
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
 }

@@ -2,20 +2,16 @@ package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class GameLobbyModule implements Module{
+public class GameLobbyModule extends ModuleHeader{
 
-    private ApplicationContext context;
-    private PlatformGameServiceProvider gameServiceProvider;
     private GameLobbyProxy gameLobby;
     private GsonBuilder builder;
     private Descriptor application;
@@ -66,11 +62,10 @@ public class GameLobbyModule implements Module{
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
+        super.setup(applicationContext);
         this.application = this.context.descriptor();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
-        this.gameServiceProvider = applicationContext.serviceProvider(context.descriptor().typeId().replace("lobby","service"));
         this.gameLobby = new GameLobbyProxy();
         this.gameLobby.setup(context);
         this.gameLobby.start();
@@ -80,14 +75,10 @@ public class GameLobbyModule implements Module{
     }
     @Override
     public void clear() {
+        super.clear();
         this.gameServiceProvider.lobbyServiceProvider().unregisterConfigurableListener(context.descriptor().tag());
         try{ gameLobby.shutdown();}catch (Exception ex){}
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
-
-    public Descriptor descriptor(){
-        return this.context.descriptor();
-    }
-
 
 }

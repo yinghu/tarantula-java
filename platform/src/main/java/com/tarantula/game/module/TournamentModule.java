@@ -1,17 +1,15 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
 
-public class TournamentModule implements Module , Tournament.Listener,Configurable.Listener {
-    private ApplicationContext context;
+public class TournamentModule extends ModuleHeader implements Tournament.Listener,Configurable.Listener {
+
     private TournamentServiceProvider tournamentServiceProvider;
-    private PlatformGameServiceProvider gameServiceProvider;
+
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
@@ -37,12 +35,10 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
 
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
-        this.context = applicationContext;
-        gameServiceProvider = context.serviceProvider(context.descriptor().typeId());
+        super.setup(applicationContext);
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerTournamentListener(this);
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        //this.gameServiceProvider.exportServiceModule(this.context.descriptor().tag(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
 
@@ -59,10 +55,6 @@ public class TournamentModule implements Module , Tournament.Listener,Configurab
     @Override
     public void tournamentEnded(Tournament tournament) {
         this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
-    }
-
-    public Descriptor descriptor(){
-        return this.context.descriptor();
     }
 
 }

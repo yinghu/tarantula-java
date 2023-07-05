@@ -7,7 +7,6 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
@@ -20,11 +19,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem>,Tournament.Listener {
+public class MatchMakingModule extends ModuleHeader implements Configurable.Listener<LobbyItem>,Tournament.Listener {
 
-    private ApplicationContext context;
+
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
-    private PlatformGameServiceProvider gameServiceProvider;
+
     private GsonBuilder builder;
     private String lobbyId;
     private int maxRank;
@@ -80,12 +79,11 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
-        this.context = context;
+        super.setup(context);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.mLobby = new ConcurrentHashMap<>();//max matching level
         lobbyId = this.context.descriptor().typeId().replace("data","lobby");
-        this.gameServiceProvider = this.context.serviceProvider(this.context.descriptor().typeId().replace("data","service"));
         this.maxRank = this.gameServiceProvider.gameCluster().maxLobbyCount();//((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
@@ -95,6 +93,7 @@ public class MatchMakingModule implements Module,Configurable.Listener<LobbyItem
     }
     @Override
     public void clear() {
+        super.clear();
         this.deploymentServiceProvider.unregisterConfigurableListener(registerKey);
         this.context.log("clear->"+this.context.descriptor().tag(),OnLog.WARN);
     }
