@@ -67,6 +67,7 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onLoadGameCluster")){
             GameCluster g = this.deploymentServiceProvider.gameCluster(session.name());
+            g.successful(true);
             session.write(g.toJson().toString().getBytes());
         }
         else if(session.action().equals("onEditGameCluster")){

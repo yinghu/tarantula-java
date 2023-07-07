@@ -59,10 +59,17 @@
     serviceSelectionList.innerHTML = '';
     let editingIndex = 0;
     let runningList;
-    document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
-    TARA_API.onGet('role/admin','availableGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
-        tx_service_bar_reset(resp);       
+    //document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
+    TARA_API.onGet('role/admin',"onLoadGameCluster",TARA_API.query().gameClusterId,(resp)=>{    
+        if(resp.successful){
+            document.querySelector("#tx-game-service-list-message").innerHTML = resp.name +' ['+TARA_API.query().gameClusterId+']';
+            tx_service_bar_load();
+        }
+        else{
+            editor.set(resp);
+        }
     });
+    
     document.querySelector('#tx-game-service-list-close').onclick=()=>{
         editor.destroy();
         tx_close_current_page();       
@@ -90,6 +97,11 @@
             editor.set(resp);      
         });    
     };
+    function tx_service_bar_load(){
+        TARA_API.onGet('role/admin','availableGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
+            tx_service_bar_reset(resp);       
+        });
+    }
     function tx_game_service_edit_setup(){
         let editing = runningList[editingIndex];
         //document.querySelector('#tx-game-service-selected').innerHTML = editing.name;

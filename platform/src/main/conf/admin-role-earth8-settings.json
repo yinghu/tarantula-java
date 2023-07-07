@@ -1,0 +1,75 @@
+{
+  "validators": [
+    {
+      "header": {
+        "Region": "us-west-2",
+        "Bucket": "yinghutestbucket",
+        "AccessKeyId": "AKIAXFCYWT3U2D77MNWM",
+        "SecretAccessKey": "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"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "application.data",
+      "configurationTypeId": "data",
+      "configurationName": "S3",
+      "configurationCategory": "AwsS3Configuration",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "SecretKey": "ed606a8135064745b7434b85e4606f7e",
+        "IsSandbox": true
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "application.data",
+      "configurationTypeId": "data",
+      "configurationName": "IAP",
+      "configurationCategory": "AppleStoreConfiguration",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "AppName": "RogueBotQuest",
+        "AppId": "261381142790450",
+        "SecretKey": "5a52db83ee764bf499fb308835845785"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "application.data",
+      "configurationTypeId": "data",
+      "configurationName": "App",
+      "configurationCategory": "FacebookConfiguration",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "PackageName": "com.PerfectDayGame.RogueBotPrototype",
+        "SecretKey": "AIzaSyDL9vEOIIxyGN-kUAiKI4MKBSoBFG_VnJU"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "application.data",
+      "configurationTypeId": "data",
+      "configurationName": "IAP",
+      "configurationCategory": "GoogleStoreConfiguration",
+      "configurationVersion": "1.0"
+    },
+    {
+      "header": {
+        "AccessKey": "AIzaSyDL9vEOIIxyGN-kUAiKI4MKBSoBFG_VnJU",
+        "ApplicationId": "275358503604",
+        "WebClientId": "275358503604-6mjv5kblb88absd2vi38bquuvtmq911b.apps.googleusercontent.com",
+        "WebProjectId": "earth8-94793262",
+        "WebClientSecret": "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"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "application.data",
+      "configurationTypeId": "data",
+      "configurationName": "Login",
+      "configurationCategory": "GooglePlayConfiguration",
+      "configurationVersion": "1.0"
+    }
+  ]
+}
