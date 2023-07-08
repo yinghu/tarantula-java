@@ -555,7 +555,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         JsonObject zonePayload = ((JsonElement)lobbyConfiguration.property(mode+"Zone")).getAsJsonObject();
         Component room = new Component();
         createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
-        //this.context.log(room.distributionKey(), OnLog.WARN);
+
         zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.distributionKey());
         JsonArray refs = zonePayload.get("reference").getAsJsonArray();
         refs.add(room.distributionKey());
@@ -564,19 +564,16 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         arenas.forEach(arenaPayload -> {
             Commodity arena = new Commodity();
             createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
-            //this.context.log(arena.distributionKey(),OnLog.WARN);
             aset.add(arena.distributionKey());
             refs.add(arena.distributionKey());
         });
         Item zone = new Item();
         createItem(zone,zonePayload,gameCluster,applicationPreSetup);
-        //this.context.log(zone.distributionKey(),OnLog.WARN);
         JsonObject lobbyPayload = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
         lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionKey());
         lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionKey());
         Application lobby = new Application();
         createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
-        //this.context.log(lobby.distributionKey(),OnLog.WARN);
         //pre-defined third party validators
         Configuration configuration = this.context.configuration(((String) gameCluster.property(GameCluster.NAME)).toLowerCase());
         if(configuration!=null) {
@@ -585,7 +582,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 validators.forEach(validator->{
                     Application app = new Application();
                     createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
-                    //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);
@@ -599,7 +595,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 configs.forEach(config->{
                     Asset app = new Asset();
                     createAsset(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
-                    //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);
@@ -613,7 +608,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 configs.forEach(config->{
                     Component app = new Component();
                     createComponent(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
-                    //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);
@@ -627,7 +621,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 configs.forEach(config->{
                     Commodity app = new Commodity();
                     createCommodity(app,config.getAsJsonObject(),gameCluster,applicationPreSetup);
-                    //this.context.log(resp,OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);
