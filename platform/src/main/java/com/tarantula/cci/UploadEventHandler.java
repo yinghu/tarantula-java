@@ -66,11 +66,12 @@ public class UploadEventHandler extends AbstractRequestHandler {
             String path = exchange.path();
             InputStream in = exchange.onStream();
             byte[] data = in.readAllBytes();
-            String fn = gameClusterName+ path.substring(path.lastIndexOf("/"));
+            String fn = gameClusterName + path.substring(path.lastIndexOf("/"));
             TokenValidatorProvider.AuthVendor authVendor = tokenValidator.authVendor(query[1]);
             if(authVendor != null){
                 authVendor.upload(gameClusterName.toLowerCase()+"#"+fn,data);
             }
+            fn = gameClusterName +"/"+SystemUtil.oid()+path.substring(path.lastIndexOf(".")-1);
             //log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
             boolean suc = deployService.onUpload("web/"+fn,data);
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
