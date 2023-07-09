@@ -19,7 +19,6 @@ public class ServiceEventHandler extends AbstractRequestHandler {
     private String serverTopic;
     private String bucket;
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
-    //private DeploymentServiceProvider deploymentServiceProvider;
 
     public ServiceEventHandler(){
 
@@ -89,7 +88,6 @@ public class ServiceEventHandler extends AbstractRequestHandler {
     public void setup(ServiceContext tcx){
         this.eventService = tcx.eventService();
         TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        //this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.auth = tp.tokenValidator();
         this.bucket = tcx.node().bucketName();
     }
