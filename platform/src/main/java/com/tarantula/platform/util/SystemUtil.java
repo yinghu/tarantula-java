@@ -129,6 +129,9 @@ public class SystemUtil {
         else if(path.endsWith(".map")){
             contentType = "application/octet-stream";
         }
+        else if(path.endsWith(".json")){
+            contentType = "application/json";
+        }
         return contentType;
     }
 

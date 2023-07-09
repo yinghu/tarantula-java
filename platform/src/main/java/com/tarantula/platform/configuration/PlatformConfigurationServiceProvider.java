@@ -2,6 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -85,6 +86,18 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(configurableObject.configurationCategory().equals("MySQLConfiguration")){
             MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,configurableObject));
             this.serviceContext.registerBackupProvider(mysqlBackupProvider);
+            return true;
+        }
+        if(configurableObject.configurationCategory().equals("VendorConfiguration")){
+            VendorConfiguration vendorConfiguration = new VendorConfiguration(this.typeId,configurableObject);
+            logger.warn(vendorConfiguration.name());
+            logger.warn("VID->"+vendorConfiguration.vendorId());
+            logger.warn("FILE->"+vendorConfiguration.configurationFile());
+            logger.warn("DESC->"+vendorConfiguration.description());
+            Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.configurationFile());
+            if(conf.existed()){
+                logger.warn("FILE SIZE->"+conf.data().length);
+            }
             return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
