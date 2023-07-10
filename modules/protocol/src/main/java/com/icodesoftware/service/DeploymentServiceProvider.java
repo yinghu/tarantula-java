@@ -43,7 +43,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     Response deployResource(String contentUrl,String resourceName);
 
     Content resource(String name);
-
+    void deleteResource(String name);
     String resetCode(String key);
     String checkCode(String resetCode);
     //end

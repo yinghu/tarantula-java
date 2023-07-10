@@ -91,12 +91,17 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(configurableObject.configurationCategory().equals("VendorConfiguration")){
             VendorConfiguration vendorConfiguration = new VendorConfiguration(this.typeId,configurableObject);
             logger.warn(vendorConfiguration.name());
-            logger.warn("VID->"+vendorConfiguration.vendorId());
-            logger.warn("FILE->"+vendorConfiguration.configurationFile());
-            logger.warn("DESC->"+vendorConfiguration.description());
+            //logger.warn("VID->"+vendorConfiguration.vendorId());
+            //logger.warn("FILE->"+vendorConfiguration.configurationFile());
+            //logger.warn("DESC->"+vendorConfiguration.description());
             Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.configurationFile());
             if(conf.existed()){
-                logger.warn("FILE SIZE->"+conf.data().length);
+                //logger.warn("FILE SIZE->"+conf.data().length);
+                ConfigurationObject configurationObject = new ConfigurationObject();
+                configurationObject.distributionKey(configurableObject.distributionKey());
+                configurationObject.value(conf.data());
+                this.dataStore.createIfAbsent(configurationObject,false);
+                serviceContext.deploymentServiceProvider().deleteResource(vendorConfiguration.configurationFile());
             }
             return true;
         }
@@ -118,6 +123,10 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             this.serviceContext.unregisterBackupProvider(mysqlBackupProvider);
             return true;
         }
+        if(configurableObject.configurationCategory().equals("VendorConfiguration")){
+
+            return true;
+        }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
         this.serviceContext.unregisterAuthVendor(authVendor);
         this.registered.remove(authVendor.name());
@@ -129,6 +138,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         gameCluster.addListener(this);
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
         this.logger = serviceContext.logger(PlatformConfigurationServiceProvider.class);
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }

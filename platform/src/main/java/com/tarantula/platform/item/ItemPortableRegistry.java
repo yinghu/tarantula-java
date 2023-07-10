@@ -2,6 +2,7 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.tarantula.platform.configuration.ConfigurationObject;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.inventory.InventoryItem;
 import com.tarantula.platform.store.Shop;
@@ -42,6 +43,7 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int SHOP_CID = 18;
 
+    public static final int CONFIGURATION_OBJECT_CID = 19;
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
@@ -95,6 +97,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case SHOP_CID:
                 pt = new Shop();
+                break;
+            case CONFIGURATION_OBJECT_CID:
+                pt = new ConfigurationObject();
                 break;
 
             default:

@@ -160,6 +160,12 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         //log.warn("load resource ["+name+"]");
         return fromContext(name);
     }
+
+    public void deleteResource(String name){
+        rMap.remove(name);
+        File deleting = new File(this.contentDir+"/"+name);
+        if(deleting.exists()) deleting.delete();
+    }
     public void resource(Descriptor descriptor, String name, Module.OnResource onResource){
         DynamicModuleClassLoader dyn = cMap.get(descriptor.moduleId());
         dyn.loadResource(name,onResource);
