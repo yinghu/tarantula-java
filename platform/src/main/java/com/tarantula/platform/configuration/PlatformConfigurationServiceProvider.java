@@ -91,18 +91,24 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(configurableObject.configurationCategory().equals("VendorConfiguration")){
             VendorConfiguration vendorConfiguration = new VendorConfiguration(this.typeId,configurableObject);
             logger.warn(vendorConfiguration.name());
-            //logger.warn("VID->"+vendorConfiguration.vendorId());
-            //logger.warn("FILE->"+vendorConfiguration.configurationFile());
-            //logger.warn("DESC->"+vendorConfiguration.description());
             Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.configurationFile());
+            ConfigurationObject configurationObject = new ConfigurationObject();
+            configurationObject.distributionKey(configurableObject.distributionKey());
             if(conf.existed()){
-                //logger.warn("FILE SIZE->"+conf.data().length);
-                ConfigurationObject configurationObject = new ConfigurationObject();
-                configurationObject.distributionKey(configurableObject.distributionKey());
-                configurationObject.value(conf.data());
-                this.dataStore.createIfAbsent(configurationObject,false);
+                if(this.dataStore.load(configurationObject)){
+                    configurationObject.value(conf.data());
+                    this.dataStore.update(configurationObject);
+                }
+                else{
+                    configurationObject.value(conf.data());
+                    this.dataStore.createIfAbsent(configurationObject,false);
+                }
                 serviceContext.deploymentServiceProvider().deleteResource(vendorConfiguration.configurationFile());
             }
+            else{
+                this.dataStore.load(configurationObject);
+            }
+            //setup vendor auth provider
             return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);

@@ -30,6 +30,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String APPLICATION_STORE = "applicationStore";
 
+
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
 

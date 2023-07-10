@@ -7,7 +7,7 @@ import com.tarantula.platform.item.ConfigurableObject;
 
 public class VendorConfiguration extends Application {
 
-    private enum VendorId {AppleStore,GoogleStore,Amazon,Facebook,GooglePlay,MySQL}
+    private enum VendorId {AppleStore,GoogleStore,Amazon,Facebook,GooglePlay,MySQL,WebHook}
 
     private String typeId;
     public VendorConfiguration(String typeId, ConfigurableObject configurableObject){
@@ -48,6 +48,9 @@ public class VendorConfiguration extends Application {
                 break;
             case MySQL:
                 vendorName = OnAccess.MYSQL;
+                break;
+            case WebHook:
+                vendorName = OnAccess.WEB_HOOK;
                 break;
 
         }
