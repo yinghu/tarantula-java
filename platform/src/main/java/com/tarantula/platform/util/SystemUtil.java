@@ -158,5 +158,10 @@ public class SystemUtil {
         return Base64.getDecoder().decode(data);
     }
 
+    public static byte[] fromPemString(String base64Key){
+        String privateKeyPEM = base64Key.replace("-----BEGIN PRIVATE KEY-----", "").replaceAll("\n", "").replace("-----END PRIVATE KEY-----", "");
+        return Base64.getDecoder().decode(privateKeyPEM);
+    }
+
 
 }

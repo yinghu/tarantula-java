@@ -1,17 +1,27 @@
 package com.tarantula.platform.configuration;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.JWTUtil;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.store.ApplicationStoreProvider;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
+import com.tarantula.platform.util.SystemUtil;
 
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -108,6 +118,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             else{
                 this.dataStore.load(configurationObject);
             }
+            jwt(configurationObject);
             //setup vendor auth provider
             return true;
         }
@@ -191,9 +202,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+        ConfigurationObject configurationObject = new ConfigurationObject();
+        configurationObject.distributionKey(t.distributionKey());
+        this.dataStore.delete(configurationObject.key().asString().getBytes());
     }
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
-        //logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
+        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onCreated(GameCluster application,T t){
         //logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
@@ -202,7 +216,34 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         //logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
-        //logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
+        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
+        ConfigurationObject configurationObject = new ConfigurationObject();
+        configurationObject.distributionKey(t.distributionKey());
+        this.dataStore.delete(configurationObject.key().asString().getBytes());
+    }
+
+    void jwt(ConfigurationObject configurationObject){
+        try{
+            JsonObject credential = JsonUtil.parse(configurationObject.value());
+            byte[] key = SystemUtil.fromPemString(credential.get("private_key").getAsString());
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
+            PrivateKey pkey = keyFactory.generatePrivate(keySpec);
+            JWTUtil.JWT jwt = JWTUtil.init(pkey);
+            String token = jwt.token((h,p)->{
+                h.addProperty("kid",credential.get("private_key_id").getAsString());
+                p.addProperty("aud","https://www.googleapis.com/auth/androidpublisher");
+                p.addProperty("ias", TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                p.addProperty("exp",TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(1000)));
+                p.addProperty("iss",credential.get("client_email").getAsString());
+                p.addProperty("sub",credential.get("client_email").getAsString());
+                p.addProperty("email",credential.get("client_email").getAsString());
+                return true;
+            });
+            logger.warn(token);
+        }catch (Exception ex){
+            logger.error("err",ex);
+        }
     }
 
 }

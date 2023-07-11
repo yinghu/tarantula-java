@@ -87,7 +87,7 @@ public class JWTUtil {
                 this.signer = null;
                 this.verifier = signature;
             }
-            this.alg = "RSA";
+            this.alg = "RS256";
             this.mac = null ;
         }
 
