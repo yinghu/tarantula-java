@@ -61,13 +61,20 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public boolean validate(Map<String,Object> params) {
         try{
-            ArrayList<String> scopes = new ArrayList<>();
-            scopes.add("https://www.googleapis.com/auth/androidpublisher");
+            //POST /token HTTP/1.1
+            //Host: oauth2.googleapis.com
+            //Content-Type: application/x-www-form-urlencoded
+
+            //code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7&
+              //      client_id=your_client_id&
+                //    client_secret=your_client_secret&
+                 //   redirect_uri=https%3A//oauth2.example.com/code&
+                  //  grant_type=authorization_code
+
             String token = (String) params.get("token");
             String typeId = (String) params.get("typeId");
             GoogleAuthorizationCodeTokenRequest request =
                     new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,TOKEN_URI,clientId(typeId),secureKey,token,"");
-            request.setScopes(scopes);
             GoogleTokenResponse response = request.execute();
             onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
             return verifyPlayer(response.getAccessToken(),params);
@@ -97,9 +104,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             JsonObject payload = JsonUtil.parse(responseData.dataAsString);
             if(!payload.has("player_id")) return false;
             String pendingPlayerId = (String) params.get(OnAccess.LOGIN);
-            boolean verifying = pendingPlayerId.endsWith(payload.get("player_id").getAsString());
-            if(verifying) tokenValidatorProvider.updateVendorAccessToken((String)params.get(OnAccess.SYSTEM_ID),accessToken);
-            return verifying;
+            return pendingPlayerId.endsWith(payload.get("player_id").getAsString());
         }catch (Exception ex){
             logger.error("Error on google auth ["+typeId+"]",ex);
             return false;

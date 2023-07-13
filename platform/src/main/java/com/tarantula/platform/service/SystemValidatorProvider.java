@@ -100,10 +100,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
 
-    public void updateVendorAccessToken(String systemId,String accessToken){
-        PresenceIndex presenceIndex = (PresenceIndex)presence(systemId);
-        presenceIndex.vendorToken(accessToken);
-    }
     public byte[] clusterKey(String clusterNameSuffix){
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
         return presenceKey.toKey();

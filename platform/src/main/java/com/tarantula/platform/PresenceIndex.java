@@ -13,7 +13,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     private boolean local = true;
     private EventService eventService;
-    private String vendorToken;
+    //private String vendorToken;
 
     public PresenceIndex(int stub,String index){
         this();
@@ -107,12 +107,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         return local;
     }
 
-    public String vendorToken(){
-        return vendorToken;
-    }
-    public void vendorToken(String vendorToken){
-        this.vendorToken = vendorToken;
-    }
     @Override
     public String toString(){
         return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+counter+"/"+disabled+"]";

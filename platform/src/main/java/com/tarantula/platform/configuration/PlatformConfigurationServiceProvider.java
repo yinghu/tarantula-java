@@ -1,11 +1,17 @@
 package com.tarantula.platform.configuration;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
@@ -17,11 +23,19 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +46,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     private final String typeId;
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
-
+    private ConfigurationObject configurationObject;
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -118,7 +132,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             else{
                 this.dataStore.load(configurationObject);
             }
-            jwt(configurationObject);
+            this.configurationObject = configurationObject;
             //setup vendor auth provider
             return true;
         }
@@ -177,6 +191,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         else if(configurableObject.configurationCategory().equals("GoogleStoreConfiguration")){
             GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(new GoogleStoreConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
             googleStorePurchaseValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
+            googleStorePurchaseValidator.configurationServiceProvider = platformGameServiceProvider.configurationServiceProvider();
             return googleStorePurchaseValidator;
         }
         else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
@@ -222,7 +237,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         this.dataStore.delete(configurationObject.key().asString().getBytes());
     }
 
-    void jwt(ConfigurationObject configurationObject){
+    public String jwt(){
         try{
             JsonObject credential = JsonUtil.parse(configurationObject.value());
             byte[] key = SystemUtil.fromPemString(credential.get("private_key").getAsString());
@@ -232,17 +247,51 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             JWTUtil.JWT jwt = JWTUtil.init(pkey);
             String token = jwt.token((h,p)->{
                 h.addProperty("kid",credential.get("private_key_id").getAsString());
-                p.addProperty("aud","https://www.googleapis.com/auth/androidpublisher");
-                p.addProperty("ias", TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                p.addProperty("exp",TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(1000)));
+                p.addProperty("aud",credential.get("token_uri").getAsString());
+                //Instant cc = Instant.now();
+                //LocalDateTime localDateTime = LocalDateTime.now();
+                long x = Instant.now().getEpochSecond();//TimeUtil.toUTCSeconds(localDateTime);
+                p.addProperty("iat",x);
+                long y = x+3600;//TimeUtil.toUTCSeconds(localDateTime.plusMinutes(60));
+                logger.warn("IAT->"+(x));
+                logger.warn("EXP->"+(y));
+                p.addProperty("exp",y);
                 p.addProperty("iss",credential.get("client_email").getAsString());
+                p.addProperty("scope","https://www.googleapis.com/auth/androidpublisher");
                 p.addProperty("sub",credential.get("client_email").getAsString());
-                p.addProperty("email",credential.get("client_email").getAsString());
+                logger.warn(h.toString());
+                logger.warn(p.toString());
                 return true;
             });
+            StringBuffer query = new StringBuffer(credential.get("token_uri").getAsString());
+            query.append("?");
+            query.append("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=");
+            query.append(token);
+            String ACCEPT = "Accept";
+            String ACCEPT_JSON = "application/json";
+            String CONTENT_TYPE = "Content-type";
+            String CONTENT_FORM = "application/x-www-form-urlencoded";
+            HttpRequest _request = HttpRequest.newBuilder()
+                    .uri(URI.create(query.toString()))
+                    .timeout(Duration.ofSeconds(10))
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .header(CONTENT_TYPE, CONTENT_FORM)
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = this.serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = _response.body();
+                return _response.statusCode();
+            });
             logger.warn(token);
+            logger.warn("code->"+code);
+            logger.warn("resp->"+responseData.dataAsString);
+            JsonObject resp = JsonUtil.parse(responseData.dataAsString);
+            return resp.get("access_token").getAsString();
         }catch (Exception ex){
             logger.error("err",ex);
+            throw new RuntimeException(ex);
         }
     }
 

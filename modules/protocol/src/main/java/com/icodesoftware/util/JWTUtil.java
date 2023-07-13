@@ -12,7 +12,7 @@ public class JWTUtil {
     private final static String ALG_HMAC = "HmacSHA256";
 
     //private public key pair algorithm RSA or ECDSA
-    private final static String ALG_RSA = "SHA1WithRSA";
+    private final static String ALG_RSA = "SHA256WithRSA";
     //private final static String ALG_ECDSA = "ECDSA";
     private final static int KEY_SIZE = 32;
     private static SecureRandom secureRandom;

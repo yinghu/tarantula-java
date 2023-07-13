@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.configuration.GoogleStoreConfiguration;
+import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.net.URI;
@@ -27,7 +28,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private String accessKey;
     private String packageName;
 
-
+    public PlatformConfigurationServiceProvider configurationServiceProvider;
     public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
         this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
         this.applicationMetricsListener = metricsListener;
@@ -51,7 +52,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     }
     public boolean validate(Map<String,Object> params){
         try{
-            Session session = (Session)params.get(OnAccess.SESSION);
+            //Session session = (Session)params.get(OnAccess.SESSION);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
             String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
@@ -61,7 +62,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                     .header(AUTHORIZATION,"Bearer "+ tokenValidatorProvider.presence(session).vendorToken())
+                     .header(AUTHORIZATION,"Bearer "+ configurationServiceProvider.jwt())
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();

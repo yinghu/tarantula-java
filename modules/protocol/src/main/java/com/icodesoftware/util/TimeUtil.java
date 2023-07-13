@@ -2,12 +2,12 @@ package com.icodesoftware.util;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 
 public class TimeUtil {
     public static long toUTCMilliseconds(LocalDateTime dateTime){
         return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
+
     public static LocalDateTime fromUTCMilliseconds(long milliseconds){
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneOffset.UTC);
     }
