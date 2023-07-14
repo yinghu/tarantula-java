@@ -33,17 +33,6 @@
 	  </dependency>
 
 	  <dependency>
-		  <groupId>com.google.api-client</groupId>
-		  <artifactId>google-api-client</artifactId>
-		  <version>1.30.9</version>
-	  </dependency>
-
-	  <dependency>
-		  <groupId>com.google.auth</groupId>
-		  <artifactId>google-auth-library-oauth2-http</artifactId>
-		  <version>1.16.1</version>
-	  </dependency>
-	  <dependency>
 		  <groupId>com.je</groupId>
 		  <artifactId>je</artifactId>
 		  <version>7.5.11</version>

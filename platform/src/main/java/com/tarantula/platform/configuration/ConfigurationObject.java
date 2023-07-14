@@ -37,11 +37,5 @@ public class ConfigurationObject extends RecoverableObject {
         return properties.getOrDefault(_KEY,"{}").toString().getBytes();
     }
 
-    @Override
-    public void distributionKey(String distributionKey) {
-        String[] query = distributionKey.split(RecoverableObject.PATH_SEPARATOR);
-        this.bucket = query[0];
-        this.oid = query[1];
-        this.label = query[2];
-    }
+
 }

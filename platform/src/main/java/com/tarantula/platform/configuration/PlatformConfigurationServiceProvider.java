@@ -1,20 +1,15 @@
 package com.tarantula.platform.configuration;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
@@ -23,19 +18,17 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.io.ByteArrayInputStream;
+
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.interfaces.RSAPrivateKey;
+
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,6 +39,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     private final String typeId;
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String,Application> vendorCredentials = new ConcurrentHashMap<>();
 
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -68,6 +63,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                     MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLConfiguration(typeId,a));
                     this.serviceContext.registerBackupProvider(mysqlBackupProvider);
                 }
+                else if(a.configurationCategory().equals("GoogleCredentialConfiguration")){
+                    GoogleCredentialConfiguration googleCredentialConfiguration = new GoogleCredentialConfiguration(typeId,a);
+                    googleCredentialConfiguration.setup(serviceContext.deploymentServiceProvider(),dataStore);
+                    jwt(googleCredentialConfiguration.serviceAccount());
+                    vendorCredentials.put(OnAccess.GOOGLE,googleCredentialConfiguration);
+                }
                 else{
                     TokenValidatorProvider.AuthVendor vendor = toAuthVendor(a);
                     if(vendor!=null){
@@ -86,6 +87,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         DeveloperStoreProvider developerStoreProvider = new DeveloperStoreProvider(typeId);
         this.serviceContext.registerAuthVendor(developerStoreProvider);
         registered.put(developerStoreProvider.name(),developerStoreProvider);
+        GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
+        this.serviceContext.registerAuthVendor(googleOAuthTokenValidator);
+        registered.put(googleOAuthTokenValidator.name(),gameCenterAuthProvider);
         return null;
     }
     @Override
@@ -114,26 +118,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         }
         if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
             GoogleCredentialConfiguration vendorConfiguration = new GoogleCredentialConfiguration(this.typeId,configurableObject);
-            logger.warn(vendorConfiguration.name());
-            Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.webClient());
-            ConfigurationObject configurationObject = new ConfigurationObject();
-            configurationObject.distributionKey(configurableObject.distributionKey());
-            if(conf.existed()){
-                if(this.dataStore.load(configurationObject)){
-                    configurationObject.value(conf.data());
-                    this.dataStore.update(configurationObject);
-                }
-                else{
-                    configurationObject.value(conf.data());
-                    this.dataStore.createIfAbsent(configurationObject,false);
-                }
-                serviceContext.deploymentServiceProvider().deleteResource(vendorConfiguration.webClient());
-            }
-            else{
-                this.dataStore.load(configurationObject);
-            }
-
-            //setup vendor auth provider
+            vendorConfiguration.setup(serviceContext.deploymentServiceProvider(),dataStore);
+            vendorCredentials.put(OnAccess.GOOGLE,vendorConfiguration);
+            jwt(vendorConfiguration.serviceAccount());
             return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
@@ -159,7 +146,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             return true;
         }
         if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
-
+            vendorCredentials.remove(OnAccess.GOOGLE);
             return true;
         }
         TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
@@ -198,11 +185,11 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             googleStorePurchaseValidator.configurationServiceProvider = platformGameServiceProvider.configurationServiceProvider();
             return googleStorePurchaseValidator;
         }
-        else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
-            GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
-            googleOAuthTokenValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
-            return googleOAuthTokenValidator;
-        }
+        //else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
+            //GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
+            //googleOAuthTokenValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
+            //return googleOAuthTokenValidator;
+        //}
         return null;
     }
 
@@ -241,17 +228,21 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         this.dataStore.delete(configurationObject.key().asString().getBytes());
     }
 
-    public String jwt(ConfigurationObject configurationObject){
+    public GoogleCredentialConfiguration googleCredentialConfiguration(){
+        return (GoogleCredentialConfiguration)vendorCredentials.get(OnAccess.GOOGLE);
+    }
+
+    public String jwt(GoogleServiceAccount serviceAccount){
         try{
-            JsonObject credential = JsonUtil.parse(configurationObject.value());
-            byte[] key = SystemUtil.fromPemString(credential.get("private_key").getAsString());
+            //JsonObject credential = JsonUtil.parse(configurationObject.value());
+            byte[] key = SystemUtil.fromPemString(serviceAccount.privateKey());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
             PrivateKey pkey = keyFactory.generatePrivate(keySpec);
             JWTUtil.JWT jwt = JWTUtil.init(pkey);
             String token = jwt.token((h,p)->{
-                h.addProperty("kid",credential.get("private_key_id").getAsString());
-                p.addProperty("aud",credential.get("token_uri").getAsString());
+                h.addProperty("kid",serviceAccount.privateKeyId());
+                p.addProperty("aud",serviceAccount.tokenUri());
                 //Instant cc = Instant.now();
                 //LocalDateTime localDateTime = LocalDateTime.now();
                 long x = Instant.now().getEpochSecond();//TimeUtil.toUTCSeconds(localDateTime);
@@ -260,14 +251,14 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                 logger.warn("IAT->"+(x));
                 logger.warn("EXP->"+(y));
                 p.addProperty("exp",y);
-                p.addProperty("iss",credential.get("client_email").getAsString());
+                p.addProperty("iss",serviceAccount.clientEmail());
                 p.addProperty("scope","https://www.googleapis.com/auth/androidpublisher");
-                p.addProperty("sub",credential.get("client_email").getAsString());
+                p.addProperty("sub",serviceAccount.clientEmail());
                 logger.warn(h.toString());
                 logger.warn(p.toString());
                 return true;
             });
-            StringBuffer query = new StringBuffer(credential.get("token_uri").getAsString());
+            StringBuffer query = new StringBuffer(serviceAccount.tokenUri());
             query.append("?");
             query.append("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=");
             query.append(token);

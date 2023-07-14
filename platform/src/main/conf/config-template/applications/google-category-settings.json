@@ -17,6 +17,13 @@
         "application": {
           "properties": [
             {
+              "name": "PackageName",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
               "name": "WebClient",
               "type": "string",
               "reference": "String",
@@ -29,13 +36,6 @@
               "reference": "String",
               "nullable": false,
               "downloadable": true
-            },
-            {
-              "name": "Description",
-              "type": "string",
-              "reference": "String",
-              "nullable": false,
-              "downloadable": false
             }
           ]
         }

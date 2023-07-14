@@ -2,12 +2,14 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.Session;
-import com.icodesoftware.TarantulaLogger;
+
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.GoogleCredentialConfiguration;
+import com.tarantula.platform.configuration.GoogleServiceAccount;
 import com.tarantula.platform.configuration.GoogleStoreConfiguration;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
@@ -26,9 +28,13 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     //"acknowledge_uri": "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge"
 
     private String accessKey;
-    private String packageName;
+    private String packageName ="com.perfectday.robotquest";
 
     public PlatformConfigurationServiceProvider configurationServiceProvider;
+
+    public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider){
+        super(gameServiceProvider.gameCluster().typeId(),"");
+    }
     public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
         this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
         this.applicationMetricsListener = metricsListener;
@@ -36,8 +42,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     public GoogleStorePurchaseValidator(String typeId, String packageName, String accessKey) {
         super(typeId,"");
-        this.packageName = packageName;
-        this.accessKey = accessKey;
+        //this.packageName = packageName;
+        //this.accessKey = accessKey;
     }
 
     @Override
@@ -53,6 +59,13 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     public boolean validate(Map<String,Object> params){
         try{
             //Session session = (Session)params.get(OnAccess.SESSION);
+            GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.googleCredentialConfiguration();
+            if(googleCredentialConfiguration==null){
+                logger.warn("No credential available ["+typeId+"]");
+                return false;
+            }
+            GoogleServiceAccount serviceAccount  =googleCredentialConfiguration.serviceAccount();
+            String _tk = configurationServiceProvider.jwt(serviceAccount);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
             String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
@@ -62,7 +75,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                     .header(AUTHORIZATION,"Bearer ")//+ configurationServiceProvider.jwt())
+                     .header(AUTHORIZATION,"Bearer "+_tk)
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();
