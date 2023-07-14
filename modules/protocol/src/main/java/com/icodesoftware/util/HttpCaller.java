@@ -16,11 +16,13 @@ import java.time.Duration;
 
 final public class HttpCaller implements HttpClientProvider {
 
-    private static int TIME_OUT = 10;
-    private static String ACCEPT = "Accept";
-    private static String ACCEPT_JSON = "application/json";
-    private static String CONTENT_TYPE = "Content-type";
-    private static String CONTENT_FORM = "application/x-www-form-urlencoded";
+    public final static int TIME_OUT = 10;
+    public final static String ACCEPT = "Accept";
+    public final static String ACCEPT_JSON = "application/json";
+    public final static String CONTENT_TYPE = "Content-type";
+    public final static String CONTENT_FORM = "application/x-www-form-urlencoded";
+
+    public static String AUTHORIZATION = "Authorization";
     private HttpClient client;
     protected String host;
 

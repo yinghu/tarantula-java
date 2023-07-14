@@ -5,17 +5,18 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.util.HttpCaller;
 
 import java.util.Map;
 
 public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
-    protected static String ACCEPT = "Accept";
-    protected static String ACCEPT_JSON = "application/json";
-    protected static int TIMEOUT = 10;
-    protected static String CONTENT_TYPE = "Content-type";
-    protected static String CONTENT_FORM = "application/x-www-form-urlencoded";
-    protected static String AUTHORIZATION = "Authorization";
+    protected static String ACCEPT = HttpCaller.ACCEPT;
+    protected static String ACCEPT_JSON = HttpCaller.ACCEPT_JSON;
+    protected static int TIMEOUT = HttpCaller.TIME_OUT;
+    protected static String CONTENT_TYPE = HttpCaller.CONTENT_TYPE;
+    protected static String CONTENT_FORM = HttpCaller.CONTENT_FORM;
+    protected static String AUTHORIZATION = HttpCaller.AUTHORIZATION;
     protected final String typeId;
 
     protected   String clientId;

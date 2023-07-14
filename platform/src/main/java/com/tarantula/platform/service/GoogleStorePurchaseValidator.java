@@ -62,7 +62,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                     .header(AUTHORIZATION,"Bearer "+ configurationServiceProvider.jwt())
+                     .header(AUTHORIZATION,"Bearer ")//+ configurationServiceProvider.jwt())
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();

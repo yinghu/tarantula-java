@@ -7,6 +7,40 @@
   "itemList":
   [
     {
+        "header": {
+          "scope": "application.data",
+          "type": "GoogleCredentialConfiguration",
+          "description": "google credential config",
+          "version": "v1.0",
+          "rechargeable": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "WebClient",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": true
+            },
+            {
+              "name": "ServiceAccount",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": true
+            },
+            {
+              "name": "Description",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+    },
+    {
       "header": {
         "scope": "application.data",
         "type": "GoogleStoreConfiguration",

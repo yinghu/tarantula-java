@@ -11,7 +11,9 @@ public class ConfigurationObject extends RecoverableObject {
     private final static String _KEY = "_key";
 
     public ConfigurationObject(){
-        this.label = "configurationObject";
+    }
+    public ConfigurationObject(String label){
+        this.label = label;
     }
     @Override
     public int getFactoryId() {
@@ -35,4 +37,11 @@ public class ConfigurationObject extends RecoverableObject {
         return properties.getOrDefault(_KEY,"{}").toString().getBytes();
     }
 
+    @Override
+    public void distributionKey(String distributionKey) {
+        String[] query = distributionKey.split(RecoverableObject.PATH_SEPARATOR);
+        this.bucket = query[0];
+        this.oid = query[1];
+        this.label = query[2];
+    }
 }

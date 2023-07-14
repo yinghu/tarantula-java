@@ -46,7 +46,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     private final String typeId;
 
     private ConcurrentHashMap<String, TokenValidatorProvider.AuthVendor> registered = new ConcurrentHashMap<>();
-    private ConfigurationObject configurationObject;
+
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -112,10 +112,10 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             this.serviceContext.registerBackupProvider(mysqlBackupProvider);
             return true;
         }
-        if(configurableObject.configurationCategory().equals("VendorConfiguration")){
-            VendorConfiguration vendorConfiguration = new VendorConfiguration(this.typeId,configurableObject);
+        if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
+            GoogleCredentialConfiguration vendorConfiguration = new GoogleCredentialConfiguration(this.typeId,configurableObject);
             logger.warn(vendorConfiguration.name());
-            Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.configurationFile());
+            Content conf = serviceContext.deploymentServiceProvider().resource(vendorConfiguration.webClient());
             ConfigurationObject configurationObject = new ConfigurationObject();
             configurationObject.distributionKey(configurableObject.distributionKey());
             if(conf.existed()){
@@ -127,12 +127,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                     configurationObject.value(conf.data());
                     this.dataStore.createIfAbsent(configurationObject,false);
                 }
-                serviceContext.deploymentServiceProvider().deleteResource(vendorConfiguration.configurationFile());
+                serviceContext.deploymentServiceProvider().deleteResource(vendorConfiguration.webClient());
             }
             else{
                 this.dataStore.load(configurationObject);
             }
-            this.configurationObject = configurationObject;
+
             //setup vendor auth provider
             return true;
         }
@@ -155,6 +155,10 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             return true;
         }
         if(configurableObject.configurationCategory().equals("VendorConfiguration")){
+
+            return true;
+        }
+        if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
 
             return true;
         }
@@ -237,7 +241,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         this.dataStore.delete(configurationObject.key().asString().getBytes());
     }
 
-    public String jwt(){
+    public String jwt(ConfigurationObject configurationObject){
         try{
             JsonObject credential = JsonUtil.parse(configurationObject.value());
             byte[] key = SystemUtil.fromPemString(credential.get("private_key").getAsString());

@@ -61,6 +61,14 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public boolean validate(Map<String,Object> params) {
         try{
+            String token = (String) params.get("token");
+            String typeId = (String) params.get("typeId");
+            StringBuffer query = new StringBuffer(TOKEN_URI);
+            query.append("?client_id=").append(clientId(typeId));
+            query.append("&client_secret=").append(secureKey);
+            query.append("&grant_type=authorization_code");
+            query.append("&code=").append(token);
+            query.append("&redirect_uri=\"\"");
             //POST /token HTTP/1.1
             //Host: oauth2.googleapis.com
             //Content-Type: application/x-www-form-urlencoded
@@ -70,9 +78,27 @@ public class GoogleOAuthTokenValidator extends AuthObject {
                 //    client_secret=your_client_secret&
                  //   redirect_uri=https%3A//oauth2.example.com/code&
                   //  grant_type=authorization_code
-
-            String token = (String) params.get("token");
-            String typeId = (String) params.get("typeId");
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            HttpRequest _request = HttpRequest.newBuilder()
+                    .uri(URI.create(query.toString()))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
+                    //.header(AUTHORIZATION,"Bearer "+ accessToken)
+                    .header(CONTENT_TYPE, CONTENT_FORM)
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            int code = this.serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = _response.body();
+                return _response.statusCode();
+            });
+            logger.warn(token);
+            logger.warn("code->"+code);
+            logger.warn("resp->"+responseData.dataAsString);
+            JsonObject resp = JsonUtil.parse(responseData.dataAsString);
+            //return resp.get("access_token").getAsString();
+            //String token = (String) params.get("token");
+            //String typeId = (String) params.get("typeId");
             GoogleAuthorizationCodeTokenRequest request =
                     new GoogleAuthorizationCodeTokenRequest(transport,jsonFactory,TOKEN_URI,clientId(typeId),secureKey,token,"");
             GoogleTokenResponse response = request.execute();
