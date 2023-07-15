@@ -41,35 +41,6 @@
       "configurationName": "App",
       "configurationCategory": "FacebookConfiguration",
       "configurationVersion": "1.0"
-    },
-    {
-      "header": {
-        "PackageName": "com.PerfectDayGame.RogueBotPrototype",
-        "SecretKey": "AIzaSyDL9vEOIIxyGN-kUAiKI4MKBSoBFG_VnJU"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "application.data",
-      "configurationTypeId": "data",
-      "configurationName": "IAP",
-      "configurationCategory": "GoogleStoreConfiguration",
-      "configurationVersion": "1.0"
-    },
-    {
-      "header": {
-        "AccessKey": "AIzaSyDL9vEOIIxyGN-kUAiKI4MKBSoBFG_VnJU",
-        "ApplicationId": "211720092556",
-        "WebClientId": "211720092556-vk5ijrouklfatr0v91v2k79adhmeovr6.apps.googleusercontent.com",
-        "WebProjectId": "robot-quest-30298876",
-        "WebClientSecret": "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"
-      },
-      "application": {},
-      "reference": [],
-      "configurationType": "application.data",
-      "configurationTypeId": "data",
-      "configurationName": "Login",
-      "configurationCategory": "GooglePlayConfiguration",
-      "configurationVersion": "1.0"
     }
   ]
 }

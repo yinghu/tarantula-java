@@ -21,7 +21,6 @@
     {"type": "enum","name": "ItemType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"Bundle","value":2}]},
     {"type": "enum","name": "PurchaseType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"IAP","value":2}]},
     {"type": "enum","name": "VirtualCurrency","value": [{"name":"Gold","value":0},{"name":"Gem","value":1},{"name":"Coin","value":2},{"name":"Chip","value":3},{"name":"None","value":4}]},
-    {"type": "enum","name": "EquipmentType","value": [{"name":"TargetingSystem","value":0},{"name":"Motherboard","value":1},{"name":"Drone","value":2}]},
-    {"type": "enum","name": "VendorId","value": [{"name":"AppleStore","value":0},{"name":"GoogleStore","value":1},{"name":"Amazon","value":2},{"name":"Facebook","value":3},{"name":"GooglePlay","value":4},{"name":"MySql;","value":5},{"name":"WebHook;","value":6}]}
+    {"type": "enum","name": "EquipmentType","value": [{"name":"TargetingSystem","value":0},{"name":"Motherboard","value":1},{"name":"Drone","value":2}]}
   ]
 }

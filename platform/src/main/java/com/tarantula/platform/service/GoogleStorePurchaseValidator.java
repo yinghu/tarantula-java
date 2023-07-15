@@ -10,7 +10,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.GoogleCredentialConfiguration;
 import com.tarantula.platform.configuration.GoogleServiceAccount;
-import com.tarantula.platform.configuration.GoogleStoreConfiguration;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
@@ -27,25 +26,14 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     //"acknowledge_uri": "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge"
 
-    private String accessKey;
-    private String packageName ="com.perfectday.robotquest";
 
-    public PlatformConfigurationServiceProvider configurationServiceProvider;
+    private PlatformConfigurationServiceProvider configurationServiceProvider;
 
-    public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider){
+    public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider,MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
-    }
-    public GoogleStorePurchaseValidator(GoogleStoreConfiguration googleStoreConfiguration, MetricsListener metricsListener){
-        this(googleStoreConfiguration.typeId(),googleStoreConfiguration.packageName(),googleStoreConfiguration.secretKey());
+        this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
-
-    public GoogleStorePurchaseValidator(String typeId, String packageName, String accessKey) {
-        super(typeId,"");
-        //this.packageName = packageName;
-        //this.accessKey = accessKey;
-    }
-
     @Override
     public String name(){
         return OnAccess.GOOGLE_STORE;
@@ -70,7 +58,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
             //{packageName}/purchases/products/{productId}/tokens/{token}",
-            String query = new StringBuffer(VALIDATION_URI).append(packageName).append("/purchases/products/").append(sku)
+            String query = new StringBuffer(VALIDATION_URI).append(googleCredentialConfiguration.packageName()).append("/purchases/products/").append(sku)
                     .append("/tokens/").append(token).toString();
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))

@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
@@ -90,6 +89,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
         this.serviceContext.registerAuthVendor(googleOAuthTokenValidator);
         registered.put(googleOAuthTokenValidator.name(),gameCenterAuthProvider);
+        GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
+        this.serviceContext.registerAuthVendor(googleStorePurchaseValidator);
+        registered.put(googleStorePurchaseValidator.name(),googleStorePurchaseValidator);
         return null;
     }
     @Override
@@ -141,10 +143,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             this.serviceContext.unregisterBackupProvider(mysqlBackupProvider);
             return true;
         }
-        if(configurableObject.configurationCategory().equals("VendorConfiguration")){
-
-            return true;
-        }
         if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
             vendorCredentials.remove(OnAccess.GOOGLE);
             return true;
@@ -179,17 +177,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             facebookAuthProvider.registerMetricsLister(serviceContext.metrics(gameServiceName));
             return facebookAuthProvider;
         }
-        else if(configurableObject.configurationCategory().equals("GoogleStoreConfiguration")){
-            GoogleStorePurchaseValidator googleStorePurchaseValidator = new GoogleStorePurchaseValidator(new GoogleStoreConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
-            googleStorePurchaseValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
-            googleStorePurchaseValidator.configurationServiceProvider = platformGameServiceProvider.configurationServiceProvider();
-            return googleStorePurchaseValidator;
-        }
-        //else if(configurableObject.configurationCategory().equals("GooglePlayConfiguration")){
-            //GoogleOAuthTokenValidator googleOAuthTokenValidator = new GoogleOAuthTokenValidator(new GooglePlayConfiguration(typeId,configurableObject),serviceContext.metrics(gameServiceName));
-            //googleOAuthTokenValidator.registerMetricsLister(serviceContext.metrics(gameServiceName));
-            //return googleOAuthTokenValidator;
-        //}
         return null;
     }
 

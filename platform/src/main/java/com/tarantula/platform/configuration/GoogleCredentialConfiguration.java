@@ -25,8 +25,8 @@ public class GoogleCredentialConfiguration extends Application {
         return OnAccess.GOOGLE;
     }
 
-    public String description(){
-        return header.get("Description").getAsString();
+    public String packageName(){
+        return header.get("PackageName").getAsString();
     }
 
     public void setup(DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
