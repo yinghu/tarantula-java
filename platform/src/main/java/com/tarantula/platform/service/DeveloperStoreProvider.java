@@ -3,8 +3,10 @@ package com.tarantula.platform.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.store.Transaction;
 
@@ -17,8 +19,10 @@ public class DeveloperStoreProvider extends AuthObject{
     private TokenValidatorProvider tokenValidatorProvider;
 
     private TarantulaLogger logger;
-    public DeveloperStoreProvider(String typeId){
-        super(typeId,"");
+    public DeveloperStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
+        super(gameServiceProvider.gameCluster().typeId(),"");
+        //this.platformGameServiceProvider = platformGameServiceProvider;
+        this.applicationMetricsListener = metricsListener;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.tarantula.platform.store;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
@@ -17,9 +18,10 @@ public class ApplicationStoreProvider extends AuthObject {
     private PlatformGameServiceProvider platformGameServiceProvider;
 
     private TarantulaLogger logger;
-    public ApplicationStoreProvider(String typeId,PlatformGameServiceProvider platformGameServiceProvider){
-        super(typeId,"");
+    public ApplicationStoreProvider(PlatformGameServiceProvider platformGameServiceProvider, MetricsListener metricsListener){
+        super(platformGameServiceProvider.gameCluster().typeId(),"");
         this.platformGameServiceProvider = platformGameServiceProvider;
+        this.applicationMetricsListener = metricsListener;
     }
 
     @Override

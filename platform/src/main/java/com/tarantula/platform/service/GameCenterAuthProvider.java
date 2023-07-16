@@ -4,6 +4,7 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.io.ByteArrayInputStream;
@@ -22,8 +23,8 @@ public class GameCenterAuthProvider extends AuthObject{
 
 
 
-    public GameCenterAuthProvider(String typeId, MetricsListener metricsListener){
-        super(typeId,"");
+    public GameCenterAuthProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
+        super(gameServiceProvider.gameCluster().typeId(),"");
         this.applicationMetricsListener = metricsListener;
     }
 

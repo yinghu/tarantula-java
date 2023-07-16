@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AwsS3Configuration",
+        "type": "AwsCredentialConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false

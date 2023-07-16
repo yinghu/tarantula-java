@@ -9,7 +9,7 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.configuration.MySQLConfiguration;
+import com.tarantula.platform.configuration.MySQLCredentialConfiguration;
 import com.icodesoftware.util.JsonUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -29,13 +29,13 @@ public class MysqlBackupProvider implements BackupProvider {
 
     private BasicDataSource dataSource;
 
-    private MySQLConfiguration mySQLConfiguration;
+    private MySQLCredentialConfiguration mySQLConfiguration;
 
     public MysqlBackupProvider(){
 
     }
 
-    public MysqlBackupProvider(MySQLConfiguration mySQLConfiguration){
+    public MysqlBackupProvider(MySQLCredentialConfiguration mySQLConfiguration){
         this.mySQLConfiguration = mySQLConfiguration;
     }
 

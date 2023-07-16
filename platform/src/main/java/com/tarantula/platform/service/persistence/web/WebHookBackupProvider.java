@@ -9,7 +9,7 @@ import com.icodesoftware.service.BackupProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.configuration.WebHookConfiguration;
+import com.tarantula.platform.configuration.WebHookCredentialConfiguration;
 
 
 import java.util.Map;
@@ -18,7 +18,7 @@ public class WebHookBackupProvider implements BackupProvider {
 
     private static JDKLogger log = JDKLogger.getLogger(WebHookBackupProvider.class);
 
-    private WebHookConfiguration webHookConfiguration;
+    private WebHookCredentialConfiguration webHookConfiguration;
     private String accessKey;
     private String path;
     private String host;
@@ -28,7 +28,7 @@ public class WebHookBackupProvider implements BackupProvider {
     public WebHookBackupProvider(){
     }
 
-    public WebHookBackupProvider(WebHookConfiguration webHookConfiguration){
+    public WebHookBackupProvider(WebHookCredentialConfiguration webHookConfiguration){
         this.webHookConfiguration = webHookConfiguration;
     }
 

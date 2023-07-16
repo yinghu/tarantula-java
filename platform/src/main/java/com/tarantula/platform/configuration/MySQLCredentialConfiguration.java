@@ -1,24 +1,16 @@
 package com.tarantula.platform.configuration;
 
 import com.icodesoftware.OnAccess;
-import com.tarantula.platform.item.Application;
+
 import com.tarantula.platform.item.ConfigurableObject;
 
-public class MySQLConfiguration extends Application {
+public class MySQLCredentialConfiguration extends CredentialConfiguration {
 
-    private String typeId;
 
-    public MySQLConfiguration(String typeId, ConfigurableObject configurableObject){
-        super(configurableObject);
+
+    public MySQLCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
+        super(typeId, OnAccess.MYSQL,configurableObject);
         this.typeId = typeId;
-    }
-
-    public String typeId(){
-        return typeId;
-    }
-
-    public String name(){
-        return OnAccess.MYSQL;
     }
 
     public String url(){

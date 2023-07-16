@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AppleStoreConfiguration",
+        "type": "AppleCredentialConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false

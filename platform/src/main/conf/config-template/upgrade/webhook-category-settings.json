@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "WebHookConfiguration",
+        "type": "WebHookCredentialConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false

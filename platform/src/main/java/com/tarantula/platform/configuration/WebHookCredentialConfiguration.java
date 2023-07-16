@@ -4,21 +4,13 @@ import com.icodesoftware.OnAccess;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
-public class WebHookConfiguration extends Application {
+public class WebHookCredentialConfiguration extends CredentialConfiguration {
 
-    private String typeId;
 
-    public WebHookConfiguration(String typeId, ConfigurableObject configurableObject){
-        super(configurableObject);
-        this.typeId = typeId;
-    }
 
-    public String typeId(){
-        return typeId;
-    }
+    public WebHookCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
+        super(typeId,OnAccess.WEB_HOOK,configurableObject);
 
-    public String name(){
-        return OnAccess.WEB_HOOK;
     }
 
     public String host(){

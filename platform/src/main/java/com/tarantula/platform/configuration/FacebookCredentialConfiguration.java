@@ -1,25 +1,15 @@
 package com.tarantula.platform.configuration;
 
 import com.icodesoftware.OnAccess;
-import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
-public class FacebookConfiguration extends Application {
+public class FacebookCredentialConfiguration extends CredentialConfiguration {
 
-    private String typeId;
 
-    public FacebookConfiguration(String typeId, ConfigurableObject configurableObject){
-        super(configurableObject);
-        this.typeId = typeId;
+    public FacebookCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
+        super(typeId,OnAccess.FACEBOOK,configurableObject);
     }
 
-    public String typeId(){
-        return typeId;
-    }
-
-    public String name(){
-        return OnAccess.FACEBOOK;
-    }
 
     public String appName(){
         return header.get("AppName").getAsString();

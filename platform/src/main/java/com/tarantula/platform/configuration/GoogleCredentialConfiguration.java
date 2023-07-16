@@ -6,34 +6,27 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.item.Application;
+
 import com.tarantula.platform.item.ConfigurableObject;
 
-public class GoogleCredentialConfiguration extends Application {
+public class GoogleCredentialConfiguration extends CredentialConfiguration {
 
-    private String typeId;
     private GoogleWebClient webClient;
     private GoogleServiceAccount serviceAccount;
     public GoogleCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
-        super(configurableObject);
-        this.typeId = typeId;
-    }
-    public String typeId(){
-        return typeId;
-    }
-    public String name(){
-        return OnAccess.GOOGLE;
+        super(typeId,OnAccess.GOOGLE,configurableObject);
     }
 
     public String packageName(){
         return header.get("PackageName").getAsString();
     }
 
-    public void setup(DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
+    public boolean setup(DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
         ConfigurationObject web = _setup("WebClient",deploymentServiceProvider,dataStore);
         ConfigurationObject service = _setup("ServiceAccount",deploymentServiceProvider,dataStore);
         webClient = new GoogleWebClient(JsonUtil.parse(web.value()));
         serviceAccount = new GoogleServiceAccount(JsonUtil.parse(service.value()));
+        return true;
     }
 
     public GoogleWebClient webClient(){

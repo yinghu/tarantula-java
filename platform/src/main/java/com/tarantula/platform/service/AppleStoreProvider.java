@@ -10,7 +10,9 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 
-import com.tarantula.platform.configuration.AppleStoreConfiguration;
+import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.AppleCredentialConfiguration;
+import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.Transaction;
 
@@ -30,17 +32,13 @@ public class AppleStoreProvider extends AuthObject{
 
     private String secureKey;
     private boolean isSandbox;
-
-    public AppleStoreProvider(AppleStoreConfiguration appleStoreConfiguration, MetricsListener metricsListener){
-        this(appleStoreConfiguration.typeId(),appleStoreConfiguration.secureKey(),appleStoreConfiguration.isSandbox());
+    private PlatformConfigurationServiceProvider configurationServiceProvider;
+    public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
+        super(gameServiceProvider.gameCluster().typeId(),"");
+        this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
 
-    public AppleStoreProvider(String typeId,String key,boolean isSandbox){
-        super(typeId,"");
-        this.secureKey = key;
-        this.isSandbox = isSandbox;
-    }
     @Override
     public String name(){
         return OnAccess.APPLE_STORE;

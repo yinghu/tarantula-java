@@ -1,25 +1,16 @@
 package com.tarantula.platform.configuration;
 
 import com.icodesoftware.OnAccess;
-import com.tarantula.platform.item.Application;
+
 import com.tarantula.platform.item.ConfigurableObject;
 
-public class AwsS3Configuration extends Application {
+public class AmazonCredentialConfiguration extends CredentialConfiguration {
 
-    private String typeId;
 
-    public AwsS3Configuration(String typeId,ConfigurableObject configurableObject){
-        super(configurableObject);
-        this.typeId = typeId;
+    public AmazonCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
+        super(typeId,OnAccess.AMAZON,configurableObject);
     }
 
-    public String typeId(){
-        return typeId;
-    }
-
-    public String name(){
-        return OnAccess.AMAZON;
-    }
     public String region(){
         return header.get("Region").getAsString();
     }

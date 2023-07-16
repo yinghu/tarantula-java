@@ -5,7 +5,9 @@ import com.google.gson.JsonParser;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.configuration.FacebookConfiguration;
+import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.FacebookCredentialConfiguration;
+import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.net.URI;
@@ -25,24 +27,23 @@ public class FacebookAuthProvider extends AuthObject{
     private String accessToken;
     private String secureKey;
 
-    public FacebookAuthProvider(FacebookConfiguration facebookConfiguration, MetricsListener metricsListener){
-        this(facebookConfiguration.typeId(),facebookConfiguration.appId(),facebookConfiguration.secretKey());
+    private PlatformConfigurationServiceProvider configurationServiceProvider;
+
+    public FacebookAuthProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
+        super(gameServiceProvider.gameCluster().typeId(),"");
+        this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
 
-    public FacebookAuthProvider(String typeId,String clientId, String secureKey) {
-        super(typeId, clientId);
-        this.secureKey = secureKey;
-    }
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         logger = serviceContext.logger(FacebookAuthProvider.class);
-        try{
-            if(!serverToken()) throw new RuntimeException("invalid token");
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
+        //try{
+            //if(!serverToken()) throw new RuntimeException("invalid token");
+        //}catch (Exception ex){
+            //throw new RuntimeException(ex);
+        //}
     }
     @Override
     public String name(){
