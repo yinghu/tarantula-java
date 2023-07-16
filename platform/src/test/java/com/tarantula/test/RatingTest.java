@@ -1,9 +1,13 @@
 package com.tarantula.test;
 
 import com.tarantula.game.Rating;
+import com.tarantula.platform.configuration.AWSSigner;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class RatingTest {
 
@@ -70,6 +74,5 @@ public class RatingTest {
         Assert.assertEquals(r.rank, 2);
         Assert.assertEquals(r.xp, 100*levelUpLimit+10d);
         Assert.assertEquals(r.level,101);
-
     }
 }

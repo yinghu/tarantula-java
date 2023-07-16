@@ -47,11 +47,7 @@
 		  <artifactId>commons-dbcp2</artifactId>
 		  <version>2.9.0</version>
 	  </dependency>
-	  <dependency>
-		  <groupId>software.amazon.awssdk</groupId>
-		  <artifactId>s3</artifactId>
-		  <version>2.16.1</version>
-	  </dependency>
+
 	  <dependency>
 		  <groupId>com.icodesoftware</groupId>
 		  <artifactId>gec-protocol</artifactId>

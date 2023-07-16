@@ -1,25 +1,26 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.HttpCaller;
+import com.tarantula.platform.configuration.AWSSigner;
 import com.tarantula.platform.configuration.AwsS3Configuration;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.*;
+
 
 public class AmazonAWSProvider extends AuthObject{
 
-    private S3Client s3Client;
     private String region;
     private String bucket;
     private String secretKey;
+
+    private AWSSigner awsSigner;
 
     public AmazonAWSProvider(AwsS3Configuration configuration, MetricsListener metricsListener){
         this(configuration.typeId(),configuration.region(),configuration.bucket(),configuration.accessKeyId(),configuration.secretAccessKey());
@@ -31,6 +32,12 @@ public class AmazonAWSProvider extends AuthObject{
         this.region = region;
         this.bucket = bucket;
         this.secretKey = secretKey;
+        try{
+            awsSigner = new AWSSigner();
+            awsSigner.init(this.secretKey);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public String name(){
@@ -39,25 +46,67 @@ public class AmazonAWSProvider extends AuthObject{
 
     @Override
     public void setup(ServiceContext serviceContext){
+        super.setup(serviceContext);
         logger = serviceContext.logger(AmazonAWSProvider.class);
-        s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(()-> AwsBasicCredentials.create(this.clientId(),this.secretKey))
-                .build();
-        int[] bucketCreate ={0};
-        s3Client.listBuckets().buckets().forEach(b->{
-            if(b.name().equals(bucket)) bucketCreate[0]++;
-        });
-        if(bucketCreate[0]==0){
-            logger.warn("Creating bucket->"+bucket);
-            CreateBucketRequest request = CreateBucketRequest.builder().bucket(bucket).build();
-            s3Client.createBucket(request);
+        String h = "https://s3."+region+".amazonaws.com";
+        try{
+            String date = AWSSigner.signingDate();
+            String signature = awsSigner.sign("GET",date,"/");
+            String token = new StringBuffer("AWS ").append(this.clientId()).append(":").append(signature).toString();
+            HttpRequest _request = HttpRequest.newBuilder()
+                    .uri(URI.create(h))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
+                    .header(AUTHORIZATION,token)
+                    .header("Date",date)
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .GET()
+                    .build();
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = _response.body();
+                return _response.statusCode();
+            });
+            logger.warn(token);
+            logger.warn("CODE->"+code);
+            //if(code != 200) {
+            logger.warn(responseData.dataAsString);
+            //}
+        }catch (Exception ex){
+            logger.warn("error on setup",ex);
         }
     }
+
+
     public boolean upload(String name,byte[] content){
         onMetrics(GameClusterMetrics.ACCESS_AMAZON_S3_COUNT);
-        PutObjectRequest request = PutObjectRequest.builder().bucket(bucket).key(name).build();
-        PutObjectResponse response = s3Client.putObject(request, RequestBody.fromBytes(content));
-        return response.sdkHttpResponse().isSuccessful();
+        try{
+            String h = "https://"+bucket+".s3."+region+".amazonaws.com/"+name;
+            logger.warn("URL->"+h);
+            String date = AWSSigner.signingDate();
+            String signature = awsSigner.sign("PUT",date,"/"+bucket+"/"+name);
+            String token = new StringBuffer("AWS ").append(this.clientId()).append(":").append(signature).toString();
+            HttpRequest _request = HttpRequest.newBuilder()
+                    .uri(URI.create(h))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
+                    .header(AUTHORIZATION,token)
+                    .header("Date",date)
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .PUT(HttpRequest.BodyPublishers.ofByteArray(content))
+                    .build();
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = serviceContext.httpClientProvider().request(client->{
+                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+                responseData.dataAsString = _response.body();
+                return _response.statusCode();
+            });
+            logger.warn(token);
+            logger.warn("CODE->"+code);
+            //if(code != 200) {
+            logger.warn(responseData.dataAsString);
+        }catch (Exception ex){
+            logger.error("upload error",ex);
+        }
+        return true;
     }
 }
