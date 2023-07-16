@@ -12,7 +12,7 @@
       "configurationType": "application.data",
       "configurationTypeId": "data",
       "configurationName": "S3",
-      "configurationCategory": "AwsS3Configuration",
+      "configurationCategory": "AmazonCredentialConfiguration",
       "configurationVersion": "1.0"
     },
     {
@@ -25,7 +25,7 @@
       "configurationType": "application.data",
       "configurationTypeId": "data",
       "configurationName": "IAP",
-      "configurationCategory": "AppleStoreConfiguration",
+      "configurationCategory": "AppleCredentialConfiguration",
       "configurationVersion": "1.0"
     },
     {
@@ -39,7 +39,7 @@
       "configurationType": "application.data",
       "configurationTypeId": "data",
       "configurationName": "App",
-      "configurationCategory": "FacebookConfiguration",
+      "configurationCategory": "FacebookCredentialConfiguration",
       "configurationVersion": "1.0"
     }
   ]

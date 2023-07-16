@@ -155,6 +155,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        this.logger = serviceContext.logger(PlatformConfigurationServiceProvider.class);
         gameCluster.addListener(this);
         Configuration configuration = serviceContext.configuration("game-vendor-credential-settings");
         JsonArray vlist = ((JsonElement)configuration.property("vendors")).getAsJsonArray();
@@ -164,7 +165,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
-        this.logger = serviceContext.logger(PlatformConfigurationServiceProvider.class);
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
     private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){

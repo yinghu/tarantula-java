@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "AwsCredentialConfiguration",
+        "type": "AmazonCredentialConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false
