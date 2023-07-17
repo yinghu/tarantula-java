@@ -17,18 +17,11 @@
       "application": {
         "properties": [
           {
-            "name": "SecretKey",
+            "name": "StoreKey",
             "type": "string",
             "reference": "String",
             "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "IsSandbox",
-            "type": "boolean",
-            "reference": "Boolean",
-            "nullable": false,
-            "downloadable": false
+            "downloadable": true
           }
         ]
       }

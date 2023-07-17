@@ -3,7 +3,6 @@ package com.tarantula.platform.configuration;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 
@@ -22,8 +21,8 @@ public class GoogleCredentialConfiguration extends CredentialConfiguration {
     }
 
     public boolean setup(DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
-        ConfigurationObject web = _setup("WebClient",deploymentServiceProvider,dataStore);
-        ConfigurationObject service = _setup("ServiceAccount",deploymentServiceProvider,dataStore);
+        ConfigurationObject web = saveConfigurationObject("WebClient",deploymentServiceProvider,dataStore);
+        ConfigurationObject service = saveConfigurationObject("ServiceAccount",deploymentServiceProvider,dataStore);
         webClient = new GoogleWebClient(JsonUtil.parse(web.value()));
         serviceAccount = new GoogleServiceAccount(JsonUtil.parse(service.value()));
         return true;
@@ -35,6 +34,8 @@ public class GoogleCredentialConfiguration extends CredentialConfiguration {
     public GoogleServiceAccount serviceAccount(){
         return serviceAccount;
     }
+
+    /**
     private ConfigurationObject _setup(String label,DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
         String fileName = header.get(label).getAsString();
         Content conf = deploymentServiceProvider.resource(fileName);
@@ -56,5 +57,5 @@ public class GoogleCredentialConfiguration extends CredentialConfiguration {
         }
         return configurationObject;
     }
-
+    **/
 }

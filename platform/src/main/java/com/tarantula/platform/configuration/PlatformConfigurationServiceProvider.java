@@ -64,7 +64,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             if(!a.disabled()){
                 try{
                     JsonObject vendor = vendors.get(a.configurationCategory());
-                    String cname = vendor.get("package")+"."+a.configurationCategory();
+                    String cname = vendor.get("package").getAsString()+"."+a.configurationCategory();
                     CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class,ConfigurableObject.class).newInstance(this.typeId,a);
                     if(credentialConfiguration.setup(serviceContext.deploymentServiceProvider(),dataStore)){
                         vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
@@ -94,6 +94,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     @Override
     public <T extends Configurable> void register(T t) {
+        JsonObject vendor = vendors.get(t.configurationCategory());
+        if(vendor==null|| vendor.get("disabled").getAsBoolean()) throw new RuntimeException(t.configurationCategory()+" disabled");
         t.registered();
         distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
@@ -116,7 +118,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             logger.warn(configurableObject.configurationCategory()+" is disabled");
             return false;
         }
-        String cname = vendor.get("package")+"."+configurableObject.configurationCategory();
+        String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();
         try {
             CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, ConfigurableObject.class).newInstance(this.typeId,configurableObject);
             if (credentialConfiguration.setup(serviceContext.deploymentServiceProvider(), dataStore)) {
@@ -136,18 +138,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
-        if(configurableObject.configurationCategory().equals("MySQLConfiguration")){
-            MysqlBackupProvider mysqlBackupProvider = new MysqlBackupProvider(new MySQLCredentialConfiguration(typeId,configurableObject));
-            this.serviceContext.unregisterBackupProvider(mysqlBackupProvider);
-            return true;
-        }
-        if(configurableObject.configurationCategory().equals("GoogleCredentialConfiguration")){
-            vendorCredentials.remove(OnAccess.GOOGLE);
-            return true;
-        }
-        TokenValidatorProvider.AuthVendor authVendor = toAuthVendor(configurableObject);
-        this.serviceContext.unregisterAuthVendor(authVendor);
-        this.registered.remove(authVendor.name());
         return true;
     }
 

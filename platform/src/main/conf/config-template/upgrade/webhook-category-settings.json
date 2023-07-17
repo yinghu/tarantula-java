@@ -17,25 +17,11 @@
       "application": {
         "properties": [
           {
-            "name": "Host",
+            "name": "Endpoint",
             "type": "string",
             "reference": "String",
             "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AccessKey",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Path",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
+            "downloadable": true
           }
         ]
       }

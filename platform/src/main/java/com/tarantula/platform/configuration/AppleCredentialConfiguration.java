@@ -7,7 +7,6 @@ public class AppleCredentialConfiguration extends CredentialConfiguration {
 
     public AppleCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
         super(typeId,OnAccess.APPLE_STORE,configurableObject);
-
     }
 
     public boolean isSandbox(){

@@ -17,25 +17,11 @@
       "application": {
         "properties": [
           {
-            "name": "AppName",
+            "name": "Login",
             "type": "string",
             "reference": "String",
             "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AppId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SecretKey",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
+            "downloadable": true
           }
         ]
       }

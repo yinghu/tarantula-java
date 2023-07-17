@@ -17,39 +17,11 @@
       "application": {
         "properties": [
           {
-            "name": "Url",
+            "name": "ConnectionPool",
             "type": "string",
             "reference": "String",
             "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Database",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "User",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Password",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "PoolSize",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
+            "downloadable": true
           }
         ]
       }

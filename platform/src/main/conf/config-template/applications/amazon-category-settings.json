@@ -17,32 +17,11 @@
       "application": {
         "properties": [
           {
-            "name": "Region",
+            "name": "S3Client",
             "type": "string",
             "reference": "String",
             "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Bucket",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "AccessKeyId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SecretAccessKey",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
+            "downloadable": true
           }
         ]
       }
