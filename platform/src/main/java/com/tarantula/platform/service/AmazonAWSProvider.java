@@ -8,6 +8,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.AWSSigner;
 import com.tarantula.platform.configuration.AmazonCredentialConfiguration;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
+import com.tarantula.platform.configuration.S3Client;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.net.URI;
@@ -71,21 +72,21 @@ public class AmazonAWSProvider extends AuthObject{
 
 
     public boolean upload(String name,byte[] content){
-        AmazonCredentialConfiguration credentialConfiguration = configurationServiceProvider.awsCredentialConfiguration();
+        AmazonCredentialConfiguration credentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.AMAZON);
         if(credentialConfiguration==null){
             logger.warn("no aws credential available ["+typeId+"]");
             return false;
         }
         onMetrics(GameClusterMetrics.ACCESS_AMAZON_S3_COUNT);
         try{
-
-            String h = "https://"+credentialConfiguration.bucket()+".s3."+credentialConfiguration.region()+".amazonaws.com/"+name;
+            S3Client s3Client = credentialConfiguration.s3Client();
+            String h = "https://"+credentialConfiguration.bucket()+".s3."+credentialConfiguration.s3Client()+".amazonaws.com/"+name;
             logger.warn("URL->"+h);
             String date = AWSSigner.signingDate();
             AWSSigner awsSigner = new AWSSigner();
-            awsSigner.init(credentialConfiguration.secretAccessKey());
+            awsSigner.init(s3Client.secretAccessKey());
             String signature = awsSigner.sign("PUT",date,"/"+credentialConfiguration.bucket()+"/"+name);
-            String token = new StringBuffer("AWS ").append(credentialConfiguration.accessKeyId()).append(":").append(signature).toString();
+            String token = new StringBuffer("AWS ").append(s3Client.accessKeyId()).append(":").append(signature).toString();
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(h))
                     .timeout(Duration.ofSeconds(TIMEOUT))

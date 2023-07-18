@@ -47,7 +47,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     public boolean validate(Map<String,Object> params){
         try{
             //Session session = (Session)params.get(OnAccess.SESSION);
-            GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.googleCredentialConfiguration();
+            GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.GOOGLE);
             if(googleCredentialConfiguration==null){
                 logger.warn("No credential available ["+typeId+"]");
                 return false;

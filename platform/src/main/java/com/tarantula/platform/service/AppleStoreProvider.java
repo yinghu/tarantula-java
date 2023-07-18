@@ -11,7 +11,9 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.AmazonCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleCredentialConfiguration;
+import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.Transaction;
@@ -30,8 +32,8 @@ public class AppleStoreProvider extends AuthObject{
 
     private DataStore dataStore;
 
-    private String secureKey;
-    private boolean isSandbox;
+    //private String secureKey;
+    //private boolean isSandbox;
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
@@ -53,17 +55,23 @@ public class AppleStoreProvider extends AuthObject{
     }
     @Override
     public boolean validate(Map<String,Object> params){
+        AppleCredentialConfiguration credentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.APPLE);
+        if(credentialConfiguration==null){
+            logger.warn("no aws credential available ["+typeId+"]");
+            return false;
+        }
         try{
+            AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
             if(checkTransactionExisted(params)) return false;
             String receipt = (String)params.get("receipt");
             String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(isSandbox?SANDBOX_VERIFY_URI:PRODUCTION_VERIFY_URI))
+                    .uri(URI.create(appleStoreKey.isSandbox()?SANDBOX_VERIFY_URI:PRODUCTION_VERIFY_URI))
                     .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)
                     .header(CONTENT_TYPE,ACCEPT_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(serviceTypeId,receipt).toString().getBytes()))
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(appleStoreKey,serviceTypeId,receipt).toString().getBytes()))
                     .build();
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
             int code = serviceContext.httpClientProvider().request(client->{
@@ -127,10 +135,10 @@ public class AppleStoreProvider extends AuthObject{
         //this.metricsListener.onUpdated(VendorMetrics.APPLE_STORE_COUNT,1);
         return validated;
     }
-    private JsonObject toRequestPayload(String serviceTypeId,String receipt){
+    private JsonObject toRequestPayload(AppleStoreKey appleStoreKey,String serviceTypeId,String receipt){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("receipt-data",receipt);
-        jsonObject.addProperty("password",secureKey);
+        jsonObject.addProperty("password",appleStoreKey.secureKey());
         jsonObject.addProperty("exclude-old-transactions",true);
         return jsonObject;
     }

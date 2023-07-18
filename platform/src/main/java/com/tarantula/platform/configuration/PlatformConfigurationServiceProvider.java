@@ -15,6 +15,7 @@ import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
 import com.tarantula.platform.util.SystemUtil;
@@ -178,12 +179,16 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
-        ConfigurationObject configurationObject = new ConfigurationObject();
-        configurationObject.distributionKey(t.distributionKey());
-        this.dataStore.delete(configurationObject.key().asString().getBytes());
     }
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>DDD"+t.distributionKey()+">>"+t.configurationVersion());
+        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
+        IndexSet indexSet = new IndexSet("keys");
+        indexSet.distributionKey(t.distributionKey());
+        if(!dataStore.load(indexSet)) return;
+        indexSet.keySet().forEach((k->{
+            this.dataStore.delete(k.getBytes());
+        }));
+        this.dataStore.delete(indexSet.key().asString().getBytes());
     }
     public <T extends Configurable> void onCreated(GameCluster application,T t){
         //logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
@@ -193,18 +198,16 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
         logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
-        ConfigurationObject configurationObject = new ConfigurationObject();
-        configurationObject.distributionKey(t.distributionKey());
-        this.dataStore.delete(configurationObject.key().asString().getBytes());
+        IndexSet indexSet = new IndexSet("keys");
+        indexSet.distributionKey(t.distributionKey());
+        if(!dataStore.load(indexSet)) return;
+        indexSet.keySet().forEach((k->{
+            this.dataStore.delete(k.getBytes());
+        }));
+        this.dataStore.delete(indexSet.key().asString().getBytes());
     }
 
-    public GoogleCredentialConfiguration googleCredentialConfiguration(){
-        return (GoogleCredentialConfiguration)vendorCredentials.get(OnAccess.GOOGLE);
-    }
-    public AmazonCredentialConfiguration awsCredentialConfiguration(){
-        return (AmazonCredentialConfiguration)vendorCredentials.get(OnAccess.AMAZON);
-    }
-    public <T extends CredentialConfiguration> CredentialConfiguration credentialConfiguration(String vendor){
+    public <T extends CredentialConfiguration> T credentialConfiguration(String vendor){
         return (T)vendorCredentials.get(vendor);
     }
 

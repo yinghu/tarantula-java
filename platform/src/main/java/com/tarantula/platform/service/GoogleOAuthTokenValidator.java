@@ -46,7 +46,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public boolean validate(Map<String,Object> params) {
         try{
-            GoogleCredentialConfiguration configuration = configurationServiceProvider.googleCredentialConfiguration();
+            GoogleCredentialConfiguration configuration = configurationServiceProvider.credentialConfiguration(OnAccess.GOOGLE);
             if(configuration==null){
                 logger.warn("No validation available ["+typeId+"]");
                 return true;

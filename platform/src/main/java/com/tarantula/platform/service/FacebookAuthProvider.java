@@ -27,6 +27,7 @@ public class FacebookAuthProvider extends AuthObject{
     private String accessToken;
     private String secureKey;
 
+    //appId => clientId
     private PlatformConfigurationServiceProvider configurationServiceProvider;
 
     public FacebookAuthProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){

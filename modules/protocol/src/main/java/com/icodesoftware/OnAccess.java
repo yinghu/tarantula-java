@@ -12,9 +12,10 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String PRIMARY_USER = "primary";
     String VALIDATED = "validated";
     String ACTIVATED = "activated";
-    //String BALANCE = "balance";
+
     String EMAIL_ADDRESS = "emailAddress";
 
+    String APPLE = "apple";
     String GOOGLE = "google";
     String STRIPE = "stripe";
     String FACEBOOK = "facebook";

@@ -3,6 +3,7 @@ package com.tarantula.platform.configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
@@ -42,6 +43,12 @@ public class CredentialConfiguration extends Application {
         }
         else{
             dataStore.load(configurationObject);
+        }
+        IndexSet index = new IndexSet("keys");
+        index.distributionKey(this.distributionKey());
+        dataStore.createIfAbsent(index,true);
+        if(index.addKey(configurationObject.key().asString())){
+            dataStore.update(index);
         }
         return configurationObject;
     }
