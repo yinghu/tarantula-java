@@ -2,7 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
 
-public class GoogleWebClient {
+public class GoogleWebClient implements VendorValidator{
 
     private final JsonObject webClient;
 

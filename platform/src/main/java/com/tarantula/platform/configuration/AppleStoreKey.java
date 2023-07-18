@@ -2,7 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
 
-public class AppleStoreKey {
+public class AppleStoreKey implements VendorValidator{
 
     private JsonObject header;
     public AppleStoreKey(JsonObject payload){

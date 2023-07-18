@@ -67,7 +67,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                     JsonObject vendor = vendors.get(a.configurationCategory());
                     String cname = vendor.get("package").getAsString()+"."+a.configurationCategory();
                     CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class,ConfigurableObject.class).newInstance(this.typeId,a);
-                    if(credentialConfiguration.setup(serviceContext.deploymentServiceProvider(),dataStore)){
+                    if(credentialConfiguration.setup(serviceContext,dataStore)){
                         vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
                     }
                 }catch (Exception nex){
@@ -122,7 +122,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();
         try {
             CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, ConfigurableObject.class).newInstance(this.typeId,configurableObject);
-            if (credentialConfiguration.setup(serviceContext.deploymentServiceProvider(), dataStore)) {
+            if (credentialConfiguration.setup(serviceContext, dataStore)) {
                 vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
             }
             return true;

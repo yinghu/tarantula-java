@@ -1,8 +1,9 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.service.ServiceContext;
 
-public class GoogleServiceAccount {
+public class GoogleServiceAccount implements VendorValidator{
 
     private final JsonObject serviceAccount;
 
@@ -45,5 +46,11 @@ public class GoogleServiceAccount {
 
     public String universeDomain(){
         return serviceAccount.get("universe_domain").getAsString();
+    }
+
+    @Override
+    public boolean validate(ServiceContext serviceContext) {
+
+        return true;
     }
 }

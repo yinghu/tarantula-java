@@ -3,6 +3,7 @@ package com.tarantula.platform.configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -21,7 +22,7 @@ public class CredentialConfiguration extends Application {
         return typeId;
     }
 
-    public boolean setup(DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
+    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
         return true;
     }
 
