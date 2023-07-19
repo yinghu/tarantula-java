@@ -7,6 +7,7 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.FacebookCredentialConfiguration;
+import com.tarantula.platform.configuration.FacebookLogin;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
@@ -23,11 +24,6 @@ public class FacebookAuthProvider extends AuthObject{
     private final static String ME_URI = "https://graph.facebook.com/me";
     private final static String GRAPH_URI = "https://graph.facebook.com";
 
-
-    private String accessToken;
-    private String secureKey;
-
-    //appId => clientId
     private PlatformConfigurationServiceProvider configurationServiceProvider;
 
     public FacebookAuthProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
@@ -40,11 +36,6 @@ public class FacebookAuthProvider extends AuthObject{
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         logger = serviceContext.logger(FacebookAuthProvider.class);
-        //try{
-            //if(!serverToken()) throw new RuntimeException("invalid token");
-        //}catch (Exception ex){
-            //throw new RuntimeException(ex);
-        //}
     }
     @Override
     public String name(){
@@ -52,10 +43,16 @@ public class FacebookAuthProvider extends AuthObject{
     }
     @Override
     public boolean validate(Map<String,Object> params){
+        FacebookCredentialConfiguration facebookCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.FACEBOOK);
+        if(facebookCredentialConfiguration==null){
+            logger.warn("no facebook credential available->"+typeId);
+            return false;
+        }
+        FacebookLogin facebookLogin = facebookCredentialConfiguration.facebookLogin();
         try{
             boolean validated;
-            if(validateToken(params)){
-                validated = validateUser(params);
+            if(validateToken(facebookLogin,params)){
+                validated = validateUser(facebookLogin,params);
             }
             else{
                 validated = validateMe(params);
@@ -68,6 +65,7 @@ public class FacebookAuthProvider extends AuthObject{
         }
     }
 
+    /**
     private boolean serverToken() throws Exception{
         String query = new StringBuffer("?client_id=").append(clientId("typeId")).append("&client_secret=")
                 .append(secureKey).append("&grant_type=client_credentials").toString();
@@ -92,7 +90,7 @@ public class FacebookAuthProvider extends AuthObject{
 
         return true;
     }
-
+    **/
     private boolean validateMe(Map<String,Object> params) throws Exception{
         String uid = params.get("login").toString().split("_")[1];
         String token = params.get("token").toString();
@@ -114,10 +112,10 @@ public class FacebookAuthProvider extends AuthObject{
         return j.has("id") && j.get("id").getAsString().equals(uid);
     }
 
-    private boolean validateToken(Map<String,Object> params) throws Exception{
+    private boolean validateToken(FacebookLogin facebookLogin,Map<String,Object> params) throws Exception{
         String token = params.get("token").toString();
         String query = new StringBuffer("?input_token=").append(token).append("&access_token=")
-                .append(clientId("")).append("%7C").append(accessToken).toString();
+                .append(facebookLogin.appId()).append("%7C").append(facebookLogin.accessToken()).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(TOKEN_DEBUG_URI+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))
@@ -134,10 +132,10 @@ public class FacebookAuthProvider extends AuthObject{
         JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
         return !j.has("error");
     }
-    private boolean validateUser(Map<String,Object> params) throws Exception{
+    private boolean validateUser(FacebookLogin facebookLogin,Map<String,Object> params) throws Exception{
         String uid = params.get("login").toString().split("_")[1];
         String query = new StringBuffer(uid).append("?access_token=")
-                .append(clientId("")).append("%7C").append(accessToken).toString();
+                .append(facebookLogin.appId()).append("%7C").append(facebookLogin.accessToken()).toString();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(GRAPH_URI+query))
                 .timeout(Duration.ofSeconds(TIMEOUT))

@@ -11,7 +11,6 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.configuration.AmazonCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
@@ -57,7 +56,7 @@ public class AppleStoreProvider extends AuthObject{
     public boolean validate(Map<String,Object> params){
         AppleCredentialConfiguration credentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.APPLE);
         if(credentialConfiguration==null){
-            logger.warn("no aws credential available ["+typeId+"]");
+            logger.warn("no apple credential available ["+typeId+"]");
             return false;
         }
         try{
