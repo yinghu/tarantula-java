@@ -3,7 +3,6 @@ package com.tarantula.platform.configuration;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 

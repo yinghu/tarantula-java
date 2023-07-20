@@ -53,7 +53,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 return false;
             }
             GoogleServiceAccount serviceAccount  =googleCredentialConfiguration.serviceAccount();
-            String _tk = configurationServiceProvider.jwt(serviceAccount);
+            String _tk = serviceAccount.token(serviceContext);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
             String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);

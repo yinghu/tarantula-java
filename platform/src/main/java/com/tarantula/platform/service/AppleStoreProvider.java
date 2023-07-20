@@ -31,8 +31,6 @@ public class AppleStoreProvider extends AuthObject{
 
     private DataStore dataStore;
 
-    //private String secureKey;
-    //private boolean isSandbox;
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");

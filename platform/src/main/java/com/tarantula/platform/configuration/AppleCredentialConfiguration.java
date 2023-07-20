@@ -16,7 +16,7 @@ public class AppleCredentialConfiguration extends CredentialConfiguration {
     public boolean setup(ServiceContext serviceContext, DataStore dataStore){
         ConfigurationObject configurationObject = saveConfigurationObject("StoreKey",serviceContext.deploymentServiceProvider(),dataStore);
         appleStoreKey = new AppleStoreKey(JsonUtil.parse(configurationObject.value()));
-        return true;
+        return appleStoreKey.validate(serviceContext);
     }
 
     public AppleStoreKey appleStoreKey(){

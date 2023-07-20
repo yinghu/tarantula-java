@@ -20,7 +20,7 @@ import java.util.Map;
 public class FacebookAuthProvider extends AuthObject{
 
     private final static String TOKEN_DEBUG_URI = "https://graph.facebook.com/debug_token";
-    private final static String ACCESS_TOKEN_URI = "https://graph.facebook.com/oauth/access_token";
+    //private final static String ACCESS_TOKEN_URI = "https://graph.facebook.com/oauth/access_token";
     private final static String ME_URI = "https://graph.facebook.com/me";
     private final static String GRAPH_URI = "https://graph.facebook.com";
 
@@ -65,32 +65,6 @@ public class FacebookAuthProvider extends AuthObject{
         }
     }
 
-    /**
-    private boolean serverToken() throws Exception{
-        String query = new StringBuffer("?client_id=").append(clientId("typeId")).append("&client_secret=")
-                .append(secureKey).append("&grant_type=client_credentials").toString();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ACCESS_TOKEN_URI+query))
-                .timeout(Duration.ofSeconds(TIMEOUT))
-                .header(ACCEPT, ACCEPT_JSON)
-                .GET()
-                .build();
-        String[] resp = new String[1];
-        int code = serviceContext.httpClientProvider().request(client->{
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            resp[0]=response.body();
-            return response.statusCode();
-        });
-        if(code!=200) return false;
-        JsonObject j = JsonParser.parseString(resp[0]).getAsJsonObject();
-        if(!j.has("access_token")) return false;
-        String acc = j.get("access_token").getAsString();
-        int ix = acc.lastIndexOf('|');
-        accessToken = acc.substring(ix+1);
-
-        return true;
-    }
-    **/
     private boolean validateMe(Map<String,Object> params) throws Exception{
         String uid = params.get("login").toString().split("_")[1];
         String token = params.get("token").toString();

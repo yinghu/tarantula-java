@@ -35,10 +35,13 @@ public class S3Client implements VendorValidator{
             signer = new AWSSigner();
             signer.init(secretAccessKey());
             S3ListBucket s3ListBucket = new S3ListBucket();
+            int[] bucketExisted = {0};
             s3ListBucket.request(this,serviceContext,bucket -> {
-                logger.warn("BUCKET->"+bucket);
+                if(bucket.equals(bucket())){
+                    bucketExisted[0]++;
+                }
             });
-            return true;
+            return bucketExisted[0]==1;
         }catch (Exception ex){
             logger.error("validation failed",ex);
             return false;

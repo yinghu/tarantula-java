@@ -2,6 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 
@@ -13,6 +14,8 @@ import java.time.Duration;
 public class FacebookLogin implements VendorValidator{
 
     private final static String ACCESS_TOKEN_URI = "https://graph.facebook.com/oauth/access_token";
+
+    private TarantulaLogger logger;
     private JsonObject header;
     private String accessToken;
     public FacebookLogin(JsonObject payload){
@@ -34,6 +37,7 @@ public class FacebookLogin implements VendorValidator{
     @Override
     public boolean validate(ServiceContext serviceContext) {
         try{
+            logger = serviceContext.logger(FacebookLogin.class);
             String query = new StringBuffer("?client_id=").append(appId()).append("&client_secret=")
                     .append(secretKey()).append("&grant_type=client_credentials").toString();
             HttpRequest request = HttpRequest.newBuilder()
@@ -56,7 +60,7 @@ public class FacebookLogin implements VendorValidator{
             accessToken = acc.substring(ix+1);
             return true;
         }catch (Exception ex){
-            //logger.error("validation failed",ex);
+            logger.error("facebook validation failed",ex);
             return false;
         }
     }

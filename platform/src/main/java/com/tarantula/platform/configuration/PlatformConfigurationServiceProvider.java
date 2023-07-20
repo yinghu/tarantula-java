@@ -6,30 +6,15 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
-import com.icodesoftware.OnAccess;
+
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JWTUtil;
-import com.icodesoftware.util.JsonUtil;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.service.persistence.mysql.MysqlBackupProvider;
-import com.tarantula.platform.util.SystemUtil;
-
-
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.time.Duration;
-import java.time.Instant;
 
 import java.util.HashMap;
 import java.util.List;
@@ -158,11 +143,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
-    private TokenValidatorProvider.AuthVendor toAuthVendor(ConfigurableObject configurableObject){
-
-
-        return null;
-    }
 
     public <T extends Configurable> void onCreated(Descriptor application,T t){
         int index = t.configurationType().indexOf(".");
@@ -209,64 +189,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     public <T extends CredentialConfiguration> T credentialConfiguration(String vendor){
         return (T)vendorCredentials.get(vendor);
-    }
-
-    public String jwt(GoogleServiceAccount serviceAccount){
-        try{
-            //JsonObject credential = JsonUtil.parse(configurationObject.value());
-            byte[] key = SystemUtil.fromPemString(serviceAccount.privateKey());
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
-            PrivateKey pkey = keyFactory.generatePrivate(keySpec);
-            JWTUtil.JWT jwt = JWTUtil.init(pkey);
-            String token = jwt.token((h,p)->{
-                h.addProperty("kid",serviceAccount.privateKeyId());
-                p.addProperty("aud",serviceAccount.tokenUri());
-                //Instant cc = Instant.now();
-                //LocalDateTime localDateTime = LocalDateTime.now();
-                long x = Instant.now().getEpochSecond();//TimeUtil.toUTCSeconds(localDateTime);
-                p.addProperty("iat",x);
-                long y = x+3600;//TimeUtil.toUTCSeconds(localDateTime.plusMinutes(60));
-                logger.warn("IAT->"+(x));
-                logger.warn("EXP->"+(y));
-                p.addProperty("exp",y);
-                p.addProperty("iss",serviceAccount.clientEmail());
-                p.addProperty("scope","https://www.googleapis.com/auth/androidpublisher");
-                p.addProperty("sub",serviceAccount.clientEmail());
-                logger.warn(h.toString());
-                logger.warn(p.toString());
-                return true;
-            });
-            StringBuffer query = new StringBuffer(serviceAccount.tokenUri());
-            query.append("?");
-            query.append("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=");
-            query.append(token);
-            String ACCEPT = "Accept";
-            String ACCEPT_JSON = "application/json";
-            String CONTENT_TYPE = "Content-type";
-            String CONTENT_FORM = "application/x-www-form-urlencoded";
-            HttpRequest _request = HttpRequest.newBuilder()
-                    .uri(URI.create(query.toString()))
-                    .timeout(Duration.ofSeconds(10))
-                    .header(ACCEPT, ACCEPT_JSON)
-                    .header(CONTENT_TYPE, CONTENT_FORM)
-                    .POST(HttpRequest.BodyPublishers.noBody())
-                    .build();
-            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
-            int code = this.serviceContext.httpClientProvider().request(client->{
-                HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
-                responseData.dataAsString = _response.body();
-                return _response.statusCode();
-            });
-            logger.warn(token);
-            logger.warn("code->"+code);
-            logger.warn("resp->"+responseData.dataAsString);
-            JsonObject resp = JsonUtil.parse(responseData.dataAsString);
-            return resp.get("access_token").getAsString();
-        }catch (Exception ex){
-            logger.error("err",ex);
-            throw new RuntimeException(ex);
-        }
     }
 
 }

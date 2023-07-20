@@ -22,7 +22,9 @@ public class AWSSigner {
     }
     public String sign(String httpMethod,String date,String url) throws Exception{
         StringBuffer data = new StringBuffer(httpMethod).append("\n\n\n").append(date).append("\n").append(url);
-        return Base64.getEncoder().encodeToString(mac.doFinal(data.toString().getBytes()));
+        synchronized (mac){
+            return Base64.getEncoder().encodeToString(mac.doFinal(data.toString().getBytes()));
+        }
     }
 
 }
