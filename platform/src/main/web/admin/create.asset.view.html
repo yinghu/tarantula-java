@@ -161,6 +161,7 @@
     let selectedItem = TARA_API.query().itemList[TARA_API.query().itemIndex];
     let deleteButton = document.querySelector('#tx-configuration-asset-delete');
     deleteButton.style.display = 'none';
+    let saveButton = document.querySelector('#tx-configuration-asset-save');
     let versionedItems =[];
     if(TARA_API.query().category == 'application'){
         document.querySelector('#tx-configuration-asset-type-id').value = TARA_API.query().serviceCategory;
@@ -296,6 +297,8 @@
     deleteButton.onclick =()=>{
         TARA_API.onGet('role/admin/item',"onDelete",TARA_API.query().gameClusterId+'#'+TARA_API.query().pendingUpdate.itemId,(resp)=>{
             editor.set(resp);
+            deleteButton.style.display ='none';
+            saveButton.style.display ='none';
         });      
     };
     document.querySelector('#tx-upload-vendor').onchange = ()=>{
@@ -351,7 +354,8 @@
         let item = editor.get();   
         let cmd = toCmd(selectedItem.header.scope);
         TARA_API.onSet('role/admin/item',cmd,TARA_API.query().gameClusterId,item,(resp)=>{
-            editor.set(resp);   
+            editor.set(resp); 
+            saveButton.style.display ='none';  
         });
     };
     document.querySelector('#tx-configuration-asset-preview').onclick=()=>{
