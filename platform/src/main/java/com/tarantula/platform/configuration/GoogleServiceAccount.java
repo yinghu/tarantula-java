@@ -2,6 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JWTUtil;
@@ -65,7 +66,7 @@ public class GoogleServiceAccount implements VendorValidator{
 
     @Override
     public boolean validate(ServiceContext serviceContext) {
-        logger = serviceContext.logger(GoogleServiceAccount.class);
+        logger = JDKLogger.getLogger(GoogleServiceAccount.class);
         try {
             return token(serviceContext) != null;
         }catch (Exception ex){

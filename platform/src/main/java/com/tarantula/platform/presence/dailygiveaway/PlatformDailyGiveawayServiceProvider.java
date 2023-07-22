@@ -6,6 +6,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
@@ -36,7 +37,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
         maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
         maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
-        this.logger = serviceContext.logger(PlatformDailyGiveawayServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformDailyGiveawayServiceProvider.class);
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 

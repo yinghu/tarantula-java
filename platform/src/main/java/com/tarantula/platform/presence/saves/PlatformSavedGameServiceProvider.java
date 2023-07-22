@@ -6,6 +6,7 @@ import com.icodesoftware.Configuration;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
@@ -40,7 +41,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
-        this.logger = serviceContext.logger(PlatformSavedGameServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformSavedGameServiceProvider.class);
         this.logger.warn("Saved game service provider started on ->"+gameServiceName);
     }
 

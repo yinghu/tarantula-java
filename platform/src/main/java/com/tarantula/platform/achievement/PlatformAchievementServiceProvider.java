@@ -1,6 +1,7 @@
 package com.tarantula.platform.achievement;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
@@ -28,7 +29,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        this.logger = serviceContext.logger(PlatformAchievementServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformAchievementServiceProvider.class);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 

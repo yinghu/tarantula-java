@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -35,7 +36,7 @@ public class FacebookAuthProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        logger = serviceContext.logger(FacebookAuthProvider.class);
+        logger = JDKLogger.getLogger(FacebookAuthProvider.class);
     }
     @Override
     public String name(){

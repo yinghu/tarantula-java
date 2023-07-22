@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.game.PendingReleaseRoom;
 import com.icodesoftware.game.PlayerUpdate;
 import com.icodesoftware.game.UpdateBatch;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
@@ -116,7 +117,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             this.scheduledFuture = this.serviceContext.schedule(this.schedulingTask);
         });
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
-        this.logger = serviceContext.logger(PlatformRoomServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
         this.gameUpdateContext = new PlatformGameContext(serviceContext,gameServiceProvider,this.logger);
         this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
     }

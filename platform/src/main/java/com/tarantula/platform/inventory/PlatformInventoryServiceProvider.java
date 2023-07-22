@@ -2,6 +2,7 @@ package com.tarantula.platform.inventory;
 
 import com.google.gson.JsonArray;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -53,7 +54,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
-        this.logger = serviceContext.logger(PlatformInventoryServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformInventoryServiceProvider.class);
     }
     public DataStore inventoryDataStore(){
         return this.inventoryDataStore;

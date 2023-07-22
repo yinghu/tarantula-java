@@ -1,6 +1,7 @@
 package com.tarantula.platform.store;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -54,7 +55,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.shopIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        this.logger = serviceContext.logger(PlatformStoreServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformStoreServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 

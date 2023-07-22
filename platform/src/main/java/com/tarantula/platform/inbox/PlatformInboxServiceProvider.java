@@ -3,6 +3,7 @@ package com.tarantula.platform.inbox;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
@@ -41,7 +42,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject inbox = ((JsonElement)configuration.property("inbox")).getAsJsonObject();
         pendingReward = inbox.get("pendingReward").getAsBoolean();
-        this.logger = this.serviceContext.logger(PlatformInboxServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformInboxServiceProvider.class);
         logger.warn("Platform inbox started->"+gameServiceName);
     }
 

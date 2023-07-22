@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -161,7 +162,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);
         this.lookupTournamentKey.dataStore(this.dataStore);
         this.lookupScheduleKey.dataStore(this.dataStore);
-        this.logger = this.serviceContext.logger(PlatformTournamentServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);

@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.user;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexSet;
@@ -226,7 +227,7 @@ public class PlatformUserService implements UserService {
 
     @Override
     public void setup(ServiceContext serviceContext){
-        logger = serviceContext.logger(PlatformUserService.class);
+        logger = JDKLogger.getLogger(PlatformUserService.class);
         tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         userDataStore = serviceContext.dataStore(User.DataStore,serviceContext.node().partitionNumber());
         presenceDataStore = serviceContext.dataStore(Presence.DataStore,serviceContext.node().partitionNumber());

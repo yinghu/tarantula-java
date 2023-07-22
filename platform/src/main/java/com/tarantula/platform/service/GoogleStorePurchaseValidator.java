@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
@@ -42,7 +43,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        logger = serviceContext.logger(GoogleStorePurchaseValidator.class);
+        logger = JDKLogger.getLogger(GoogleStorePurchaseValidator.class);
     }
     public boolean validate(Map<String,Object> params){
         try{

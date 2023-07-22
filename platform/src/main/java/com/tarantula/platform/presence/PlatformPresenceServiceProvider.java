@@ -4,6 +4,7 @@ package com.tarantula.platform.presence;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
@@ -68,7 +69,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.friendListSize = plist.get("friendListSize").getAsInt();
         this.syncIntervalSeconds = plist.get("syncIntervalSeconds").getAsLong();
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
-        this.logger = serviceContext.logger(PlatformPresenceServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
     public void onFriendList(String systemId,String friendSystemId){

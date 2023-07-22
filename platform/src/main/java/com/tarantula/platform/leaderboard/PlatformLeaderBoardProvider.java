@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -59,7 +60,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
             }
             return false;
         });
-        this.logger = serviceContext.logger(PlatformLeaderBoardProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformLeaderBoardProvider.class);
     }
 
     @Override

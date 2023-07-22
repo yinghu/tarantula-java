@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 
@@ -13,7 +14,7 @@ public class SystemMetrics extends AbstractMetrics{
         this.accessIncluded = true;
         this.gameIncluded = true;
         this.paymentIncluded = true;
-        this.logger = serviceContext.logger(SystemMetrics.class);
+        this.logger = JDKLogger.getLogger(SystemMetrics.class);
         this.dataStore = serviceContext.dataStore("tarantula_system_metrics",serviceContext.node().partitionNumber());
     }
 }

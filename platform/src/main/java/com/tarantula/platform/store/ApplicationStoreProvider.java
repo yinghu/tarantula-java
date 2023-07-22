@@ -3,6 +3,7 @@ package com.tarantula.platform.store;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -35,7 +36,7 @@ public class ApplicationStoreProvider extends AuthObject {
         super.setup(serviceContext);
         String ds = typeId.replaceAll("-","_")+"_application_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
-        this.logger = serviceContext.logger(ApplicationStoreProvider.class);
+        this.logger = JDKLogger.getLogger(ApplicationStoreProvider.class);
         logger.warn("application store validator->"+typeId);
     }
     @Override

@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -37,7 +38,7 @@ public class DeveloperStoreProvider extends AuthObject{
         String ds = typeId.replaceAll("-","_")+"_developer_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
         this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
-        this.logger = serviceContext.logger(DeveloperStoreProvider.class);
+        this.logger = JDKLogger.getLogger(DeveloperStoreProvider.class);
         this.logger.warn("Developer Store Registered on->"+typeId);
     }
     @Override

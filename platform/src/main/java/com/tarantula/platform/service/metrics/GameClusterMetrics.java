@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 
 public class GameClusterMetrics extends AbstractMetrics{
@@ -14,7 +15,7 @@ public class GameClusterMetrics extends AbstractMetrics{
         this.gameIncluded = true;
         this.paymentIncluded = true;
         this.accessIncluded = true;
-        this.logger = serviceContext.logger(GameClusterMetrics.class);
+        this.logger = JDKLogger.getLogger(GameClusterMetrics.class);
         this.dataStore = serviceContext.dataStore(name.replaceAll("-","_")+"_game_cluster_metrics",serviceContext.node().partitionNumber());
     }
 }

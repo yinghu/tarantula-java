@@ -7,6 +7,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -80,15 +81,13 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     @Override
     public <T extends Configurable> void register(T t) {
-        JsonObject vendor = vendors.get(t.configurationCategory());
-        if(vendor==null|| vendor.get("disabled").getAsBoolean()) throw new RuntimeException(t.configurationCategory()+" disabled");
+        if(!distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey())) throw new RuntimeException("failed to register config");
         t.registered();
-        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
+        if(!this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey())) throw new RuntimeException("failed to release config");
         t.released();
-        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
 
     public boolean onItemRegistered(String category,String itemId){
@@ -131,7 +130,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        this.logger = serviceContext.logger(PlatformConfigurationServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformConfigurationServiceProvider.class);
         gameCluster.addListener(this);
         Configuration configuration = serviceContext.configuration("game-vendor-credential-settings");
         JsonArray vlist = ((JsonElement)configuration.property("vendors")).getAsJsonArray();

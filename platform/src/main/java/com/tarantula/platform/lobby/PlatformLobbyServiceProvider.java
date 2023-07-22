@@ -4,6 +4,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
@@ -44,7 +45,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
-        this.logger = serviceContext.logger(PlatformLobbyServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformLobbyServiceProvider.class);
         this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
     }
     @Override

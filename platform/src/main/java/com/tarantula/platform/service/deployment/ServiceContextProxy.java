@@ -45,10 +45,6 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.accessIndexService();
     }
 
-    @Override
-    public TarantulaLogger logger(Class c) {
-        return this.tarantulaContext.logger(c);
-    }
 
     @Override
     public OnPartition[] partitions() {

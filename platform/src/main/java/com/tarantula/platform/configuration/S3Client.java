@@ -2,6 +2,7 @@ package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 
 public class S3Client implements VendorValidator{
@@ -31,7 +32,7 @@ public class S3Client implements VendorValidator{
     @Override
     public boolean validate(ServiceContext serviceContext) {
         try{
-            logger = serviceContext.logger(S3Client.class);
+            logger = JDKLogger.getLogger(S3Client.class);
             signer = new AWSSigner();
             signer.init(secretAccessKey());
             S3ListBucket s3ListBucket = new S3ListBucket();

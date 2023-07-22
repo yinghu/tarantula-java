@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
@@ -45,7 +46,7 @@ public class AppleStoreProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        logger = serviceContext.logger(AppleStoreProvider.class);
+        logger = JDKLogger.getLogger(AppleStoreProvider.class);
         String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
         dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
 

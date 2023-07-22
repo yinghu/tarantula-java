@@ -1,6 +1,7 @@
 package com.tarantula.platform.messaging;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -40,7 +41,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.logger = this.serviceContext.logger(PlatformMessagingServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformMessagingServiceProvider.class);
         topic = this.gameServiceProvider.registerEventListener(NAME,e->{
             return true;
         });

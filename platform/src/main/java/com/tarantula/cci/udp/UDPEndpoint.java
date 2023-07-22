@@ -1,6 +1,7 @@
 package com.tarantula.cci.udp;
 
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
@@ -80,7 +81,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         this.packetRemoveInterval = ((Number)cfg.property("packetRemoveInterval")).longValue();
         this.packetRemoveTimer = this.packetRemoveInterval;
         this.tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
-        logger = serviceContext.logger(UDPEndpoint.class);
+        logger = JDKLogger.getLogger(UDPEndpoint.class);
         String udpProvider = (String)cfg.property("udpEndpointServiceProvider");
         this.udpEndpointServiceProvider = createInstance(udpProvider);
         this.udpEndpointServiceProvider.address(host);

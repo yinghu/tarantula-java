@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 
@@ -25,7 +26,7 @@ public class AmazonAWSProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        logger = serviceContext.logger(AmazonAWSProvider.class);
+        logger = JDKLogger.getLogger(AmazonAWSProvider.class);
     }
 
 

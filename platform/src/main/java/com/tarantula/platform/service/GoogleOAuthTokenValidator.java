@@ -3,6 +3,7 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
@@ -41,7 +42,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        logger = serviceContext.logger(GoogleOAuthTokenValidator.class);
+        logger = JDKLogger.getLogger(GoogleOAuthTokenValidator.class);
     }
     @Override
     public boolean validate(Map<String,Object> params) {

@@ -72,11 +72,7 @@ public class TestServiceContext implements ServiceContext {
         return new TestAccessIndexService();
     }
 
-    @Override
-    public TarantulaLogger logger(Class aClass) {
 
-        return new EmptyLogger();
-    }
 
     @Override
     public OnPartition[] partitions() {

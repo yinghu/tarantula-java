@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
@@ -75,7 +76,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.logger = serviceContext.logger(PlatformGameServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformGameServiceProvider.class);
         gameCluster.setup(serviceContext);
         this.configuration = serviceContext.configuration("game-cluster-settings");
         JsonElement sp = (JsonElement)this.configuration.property("systemServiceProviders");
@@ -302,7 +303,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public PlatformGameContext gameContext(Class module){
-        return new PlatformGameContext(this.serviceContext,this,this.serviceContext.logger(module));
+        return new PlatformGameContext(this.serviceContext,this,JDKLogger.getLogger(module));
     }
 
     public void registerServiceProxyModule(Descriptor descriptor){

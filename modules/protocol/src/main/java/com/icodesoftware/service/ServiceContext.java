@@ -10,7 +10,6 @@ public interface ServiceContext extends Context{
     //create data scope partitioned data store
     DataStore dataStore(String name, int partition);
 
-    //ScheduledFuture<?> schedule(SchedulingTask task);
     EventService eventService();
     ClusterProvider clusterProvider();
     ServiceProvider serviceProvider(String name);
@@ -18,12 +17,10 @@ public interface ServiceContext extends Context{
     HttpClientProvider httpClientProvider();
     BackupProvider backupProvider();
     AccessIndexService accessIndexService();
-    TarantulaLogger logger(Class c);
+    //TarantulaLogger logger(Class c);
     OnPartition[] partitions();
 
-
     ClusterProvider.Node node();
-
 
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);

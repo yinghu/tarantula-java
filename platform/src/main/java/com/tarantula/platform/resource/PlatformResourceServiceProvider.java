@@ -6,6 +6,7 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JvmRNG;
@@ -57,7 +58,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         grantingPolicy = startingInventory.get("grantPolicy").getAsString();
         if(grantingPolicy.equals(GRANT_POLICY_RANDOM)) rng = new JvmRNG();
         grantingNumber = startingInventory.get("grantNumber").getAsInt();
-        this.logger = serviceContext.logger(PlatformResourceServiceProvider.class);
+        this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
 
