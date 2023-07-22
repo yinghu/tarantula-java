@@ -17,11 +17,12 @@ public interface ServiceContext extends Context{
     HttpClientProvider httpClientProvider();
     BackupProvider backupProvider();
     AccessIndexService accessIndexService();
-    //TarantulaLogger logger(Class c);
+
     OnPartition[] partitions();
 
     ClusterProvider.Node node();
 
+    <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name);
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);

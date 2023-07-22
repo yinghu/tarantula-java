@@ -1022,4 +1022,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void unloadGameCluster(String key){
          gMap.remove(key);
     }
+
+    public <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name){
+         return null;
+    }
 }

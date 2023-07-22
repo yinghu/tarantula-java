@@ -143,4 +143,7 @@ public class TestServiceContext implements ServiceContext {
     public PostOffice postOffice(){
         return null;
     }
+    public <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name){
+        return null;
+    }
 }
