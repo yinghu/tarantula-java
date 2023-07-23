@@ -20,13 +20,22 @@ public class PlatformServiceEventLogger implements ServiceEventLogger {
     }
     @Override
     public void log(ServiceEvent event) {
-        pendingEvents.add(event);
+        if(!pendingEvents.add(event)){
+            flush();
+            create(event);
+        }
     }
-
+    public boolean load(ServiceEvent event){
+        return this.dataStore.load(event);
+    }
     @Override
     public void flush(){
         ArrayList<ServiceEvent> pending = new ArrayList<>();
         pendingEvents.drainTo(pending);
-        pending.forEach(e->dataStore.create(e));
+        pending.forEach(e->create(e));
+    }
+    private void create(ServiceEvent event){
+        if(dataStore.create(event)) return;
+        dataStore.createIfAbsent(event,false);
     }
 }

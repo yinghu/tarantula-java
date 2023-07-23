@@ -11,27 +11,34 @@ import java.util.Map;
 
 public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
 
-    private int code;
-    private Level level;
-    private String source;
+    protected String code;
+    protected Level level;
+    protected String source;
 
-    private String message;
+    protected String message;
 
-    private String stackTrace;
+    protected String stackTrace;
 
-    private Exception exception;
+    protected Exception exception;
 
     public ServiceEventLog(){
 
     }
 
-    public ServiceEventLog(Level level,String source,Exception exception){
-        this.level = level;
+    public ServiceEventLog(String code,String source,Exception exception){
+        this.code = code;
+        this.level = Level.CRITICAL;
         this.source = source;
         this.exception = exception;
     }
-
-    public int code(){
+    public ServiceEventLog(String code,Level level,String source,String message,String stackTrace){
+        this.code = code;
+        this.level = level;
+        this.source = source;
+        this.message = message;
+        this.stackTrace = stackTrace;
+    }
+    public String code(){
         return code;
     }
     @Override
@@ -55,13 +62,19 @@ public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
         this.properties.put("level",level.ordinal());
         this.properties.put("source",source);
         this.properties.put("timestamp", TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        this.properties.put("message",exception.getMessage());
-        this.properties.put("stackTrace", SystemUtil.toString(exception));
+        if(exception!=null){
+            this.properties.put("message",exception.getMessage());
+            this.properties.put("stackTrace", SystemUtil.toString(exception));
+        }
+        else{
+            this.properties.put("message",message);
+            this.properties.put("stackTrace",stackTrace);
+        }
         return properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.code = ((Number)properties.getOrDefault("code",0)).intValue();
+        this.code = (String) properties.get("code");
         this.level = Level.values()[((Number)properties.getOrDefault("level",0)).intValue()];
         this.source = (String) properties.get("source");
         this.timestamp = ((Number)properties.getOrDefault("timestamp",0)).longValue();

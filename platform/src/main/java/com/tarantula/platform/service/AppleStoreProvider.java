@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -30,7 +30,7 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  SANDBOX_VERIFY_URI = "https://sandbox.itunes.apple.com/verifyReceipt";
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
-    private DataStore dataStore;
+    private ServiceEventLogger serviceEventLogger;
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
@@ -47,9 +47,7 @@ public class AppleStoreProvider extends AuthObject{
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
         logger = JDKLogger.getLogger(AppleStoreProvider.class);
-        String ds = typeId.replaceAll("-","_")+"_apple_store_transaction";
-        dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
-
+        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_apple_store");
     }
     @Override
     public boolean validate(Map<String,Object> params){
@@ -92,7 +90,7 @@ public class AppleStoreProvider extends AuthObject{
         Transaction transaction = new Transaction();
         transaction.index(transactionId);
         transaction.owner(systemId);
-        if(dataStore.load(transaction)){
+        if(serviceEventLogger.load(transaction)){
             params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
             return true;
         }
@@ -125,11 +123,11 @@ public class AppleStoreProvider extends AuthObject{
         if(!validated){
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
-        Transaction transaction = new Transaction();
+        Transaction transaction = new Transaction(systemId,(String)params.get(OnAccess.STORE_BUNDLE_ID),resp);
         transaction.index(pendingTransactionId);
-        transaction.owner(systemId);
-        transaction.originalPayload = resp;
-        this.dataStore.create(transaction);
+        serviceEventLogger.log(transaction);
+        //transaction.originalPayload = resp;
+        //this.dataStore.createIfAbsent(transaction,false);
         //this.metricsListener.onUpdated(VendorMetrics.APPLE_STORE_COUNT,1);
         return validated;
     }

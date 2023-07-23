@@ -102,8 +102,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         JsonObject vendor = vendors.get(configurableObject.configurationCategory());
         if(vendor==null || vendor.get("disabled").getAsBoolean()){
             logger.warn(configurableObject.configurationCategory()+" is disabled");
-            serviceEventLogger.log(new ServiceEventLog(ServiceEvent.Level.WARN,gameServiceName,new RuntimeException(configurableObject.configurationCategory()+" is disabled")));
-            serviceEventLogger.flush();
             return false;
         }
         String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();

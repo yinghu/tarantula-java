@@ -4,9 +4,8 @@ import com.icodesoftware.Recoverable;
 
 public interface ServiceEvent extends Recoverable {
 
-    enum Level{CRITICAL,SEVERE,WARN}
-
-    int code();
+    enum Level{CRITICAL,WARN,INFO}
+    String code();
     Level level();
     String source();
     String message();

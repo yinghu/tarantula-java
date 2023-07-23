@@ -37,6 +37,7 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
+        this.distributionItemService.setup(serviceContext);
     }
     @Override
     public String name() {

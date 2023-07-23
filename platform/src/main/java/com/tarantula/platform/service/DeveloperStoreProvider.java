@@ -6,6 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 public class DeveloperStoreProvider extends AuthObject{
 
-    private DataStore dataStore;
+    private ServiceEventLogger serviceEventLogger;
     private TokenValidatorProvider tokenValidatorProvider;
 
     private TarantulaLogger logger;
@@ -35,8 +36,7 @@ public class DeveloperStoreProvider extends AuthObject{
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        String ds = typeId.replaceAll("-","_")+"_developer_store_transaction";
-        dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
+        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_developer_store");
         this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         this.logger = JDKLogger.getLogger(DeveloperStoreProvider.class);
         this.logger.warn("Developer Store Registered on->"+typeId);
@@ -51,10 +51,9 @@ public class DeveloperStoreProvider extends AuthObject{
         String tid = UUID.randomUUID().toString();
         params.put(OnAccess.STORE_TRANSACTION_ID,tid);
         params.put(OnAccess.STORE_QUANTITY,1);
-        Transaction transaction = new Transaction();
+        Transaction transaction = new Transaction((String)params.get(OnAccess.SYSTEM_ID),(String)params.get(OnAccess.STORE_BUNDLE_ID),"token access");
         transaction.index(tid);
-        transaction.owner((String)params.get(OnAccess.SYSTEM_ID));
-        dataStore.create(transaction);
+        serviceEventLogger.log(transaction);
         return true;
     }
 
