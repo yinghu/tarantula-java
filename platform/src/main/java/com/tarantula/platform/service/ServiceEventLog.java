@@ -25,9 +25,9 @@ public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
 
     }
 
-    public ServiceEventLog(String code,String source,Exception exception){
+    public ServiceEventLog(String code,Level level,String source,Exception exception){
         this.code = code;
-        this.level = Level.CRITICAL;
+        this.level = level;
         this.source = source;
         this.exception = exception;
     }
@@ -59,7 +59,7 @@ public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("code",code);
-        this.properties.put("level",level.ordinal());
+        this.properties.put("level",level.name());
         this.properties.put("source",source);
         this.properties.put("timestamp", TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         if(exception!=null){
@@ -75,7 +75,7 @@ public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
     @Override
     public void fromMap(Map<String,Object> properties){
         this.code = (String) properties.get("code");
-        this.level = Level.values()[((Number)properties.getOrDefault("level",0)).intValue()];
+        this.level = Level.valueOf((String)properties.get("level"));
         this.source = (String) properties.get("source");
         this.timestamp = ((Number)properties.getOrDefault("timestamp",0)).longValue();
         this.message = (String) properties.get("message");

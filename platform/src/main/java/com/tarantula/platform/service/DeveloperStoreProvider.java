@@ -1,6 +1,5 @@
 package com.tarantula.platform.service;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;

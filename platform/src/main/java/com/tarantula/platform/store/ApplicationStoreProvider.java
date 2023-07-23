@@ -1,11 +1,11 @@
 package com.tarantula.platform.store;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.service.AuthObject;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class ApplicationStoreProvider extends AuthObject {
 
-    private DataStore dataStore;
+    private ServiceEventLogger serviceEventLogger;
     private PlatformGameServiceProvider platformGameServiceProvider;
 
     private TarantulaLogger logger;
@@ -34,8 +34,7 @@ public class ApplicationStoreProvider extends AuthObject {
     @Override
     public void setup(ServiceContext serviceContext){
         super.setup(serviceContext);
-        String ds = typeId.replaceAll("-","_")+"_application_store_transaction";
-        dataStore = serviceContext.dataStore(ds,serviceContext.node().partitionNumber());
+        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_application_store");
         this.logger = JDKLogger.getLogger(ApplicationStoreProvider.class);
         logger.warn("application store validator->"+typeId);
     }
@@ -58,10 +57,9 @@ public class ApplicationStoreProvider extends AuthObject {
             return false;
         }
         String tid = UUID.randomUUID().toString();
-        Transaction transaction = new Transaction();
+        Transaction transaction = new Transaction(systemId,"soft purchase",bundleId);
         transaction.index(tid);
-        transaction.owner(systemId);
-        dataStore.create(transaction);
+        serviceEventLogger.log(transaction);
         return true;
     }
 

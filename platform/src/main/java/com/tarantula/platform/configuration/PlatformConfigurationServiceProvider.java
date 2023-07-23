@@ -15,6 +15,9 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ServiceEventLog;
+import com.tarantula.platform.service.cluster.ClusterFailureEvent;
+import com.tarantula.platform.store.Transaction;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +105,10 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         JsonObject vendor = vendors.get(configurableObject.configurationCategory());
         if(vendor==null || vendor.get("disabled").getAsBoolean()){
             logger.warn(configurableObject.configurationCategory()+" is disabled");
+            serviceEventLogger.save(new ClusterFailureEvent("onItem",new RuntimeException("DISABLE")));
+            Transaction transaction = new Transaction(itemId,"message","payload");
+            transaction.index(SystemUtil.oid());
+            serviceEventLogger.save(transaction);
             return false;
         }
         String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();
@@ -141,7 +148,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
-        this.serviceEventLogger = serviceContext.serviceEventLogger(gameCluster.typeId());
+        this.serviceEventLogger = serviceContext.serviceEventLogger(gameCluster.typeId()+"_configuration");
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
 

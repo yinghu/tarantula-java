@@ -27,6 +27,8 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     private ServiceContext serviceContext;
     private MetricsListener metricsListener;
 
+    private ServiceEventLogger serviceEventLogger;
+
     public AccessIndexServiceProxy(String objectName, NodeEngine nodeEngine,AccessIndexClusterService accessIndexService){
         super(nodeEngine,accessIndexService);
         this.objectName = objectName;
@@ -75,6 +77,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+        this.serviceEventLogger = serviceContext.serviceEventLogger(NAME);
     }
     public void waitForData(){}
     @Override

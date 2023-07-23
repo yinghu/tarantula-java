@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceEvent;
+import com.icodesoftware.service.ServiceEventListener;
 import com.icodesoftware.service.ServiceEventLogger;
 
 import java.util.ArrayList;
@@ -25,6 +26,12 @@ public class PlatformServiceEventLogger implements ServiceEventLogger {
             create(event);
         }
     }
+
+    @Override
+    public void save(ServiceEvent event) {
+        create(event);
+    }
+
     public boolean load(ServiceEvent event){
         return this.dataStore.load(event);
     }
@@ -33,6 +40,10 @@ public class PlatformServiceEventLogger implements ServiceEventLogger {
         ArrayList<ServiceEvent> pending = new ArrayList<>();
         pendingEvents.drainTo(pending);
         pending.forEach(e->create(e));
+    }
+
+    public void registerServiceEventListener(ServiceEventListener listener){
+
     }
     private void create(ServiceEvent event){
         if(dataStore.create(event)) return;

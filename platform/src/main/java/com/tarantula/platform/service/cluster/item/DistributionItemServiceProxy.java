@@ -10,6 +10,7 @@ import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ServiceEventLog;
+import com.tarantula.platform.service.cluster.ClusterFailureEvent;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -52,7 +53,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             } catch (Exception e) {
                 future.cancel(true);
                 ret = false;
-                serviceEventLogger.log(new ServiceEventLog("cluster","onRegisterItem",e));
+                serviceEventLogger.log(new ClusterFailureEvent("onRegisterItem",e));
                 break; //stop to next node if failed
             }
         }
@@ -75,7 +76,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             } catch (Exception e) {
                 future.cancel(true);
                 ret = false;
-                serviceEventLogger.log(new ServiceEventLog("cluster","onReleaseItem",e));
+                serviceEventLogger.log(new ClusterFailureEvent("onReleaseItem",e));
                 break; //stop to next node if failed
             }
         }
