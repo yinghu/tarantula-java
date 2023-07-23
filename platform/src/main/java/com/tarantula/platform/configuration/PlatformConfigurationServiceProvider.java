@@ -8,14 +8,13 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.*;
+import com.tarantula.platform.service.ServiceEventLog;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +31,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     private ConcurrentHashMap<String,CredentialConfiguration> vendorCredentials = new ConcurrentHashMap<>();
 
     private HashMap<String,JsonObject> vendors = new HashMap<>();
+
+    private ServiceEventLogger serviceEventLogger;
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -101,6 +102,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         JsonObject vendor = vendors.get(configurableObject.configurationCategory());
         if(vendor==null || vendor.get("disabled").getAsBoolean()){
             logger.warn(configurableObject.configurationCategory()+" is disabled");
+            serviceEventLogger.log(new ServiceEventLog(ServiceEvent.Level.WARN,gameServiceName,new RuntimeException(configurableObject.configurationCategory()+" is disabled")));
+            serviceEventLogger.flush();
             return false;
         }
         String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();
@@ -140,6 +143,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
+        this.serviceEventLogger = serviceContext.serviceEventLogger(gameCluster.typeId());
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
 

@@ -22,7 +22,7 @@ public interface ServiceContext extends Context{
 
     ClusterProvider.Node node();
 
-    <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name);
+    ServiceEventLogger serviceEventLogger(String name);
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);

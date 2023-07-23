@@ -154,6 +154,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private HttpClientProvider httpClientProvider;
 
+    private String serviceEventStorePrefix = "tarantula_service_event_";
+    private int maxPendingEventSize = 10;
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
@@ -1023,7 +1025,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          gMap.remove(key);
     }
 
-    public <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name){
-         return null;
+    public ServiceEventLogger serviceEventLogger(String name){
+         DataStore dataStore = dataStore(serviceEventStorePrefix+name,node.partitionNumber);
+         return new PlatformServiceEventLogger(dataStore,maxPendingEventSize);
     }
 }

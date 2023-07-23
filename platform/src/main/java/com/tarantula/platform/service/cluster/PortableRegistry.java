@@ -8,6 +8,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.PresenceKey;
+import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.*;
 
@@ -37,6 +38,8 @@ public class PortableRegistry extends AbstractRecoverableListener {
     public static final int ON_VIEW_OID = 28;
 
     public static final int PROPERTY_INDEX_SET_CID = 29;
+
+    public static final int SERVICE_EVENT_LOG_CID = 30;
 
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
@@ -110,6 +113,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case FIFO_INDEX_SET_CID:
                 _ins = new FIFOIndexSet();
+                break;
+            case SERVICE_EVENT_LOG_CID:
+                _ins = new ServiceEventLog();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

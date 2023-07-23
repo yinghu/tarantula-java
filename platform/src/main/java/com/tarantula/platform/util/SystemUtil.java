@@ -7,6 +7,8 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.service.ApplicationPreSetup;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.time.*;
 import java.util.Arrays;
@@ -161,6 +163,13 @@ public class SystemUtil {
     public static byte[] fromPemString(String base64Key){
         String privateKeyPEM = base64Key.replace("-----BEGIN PRIVATE KEY-----", "").replaceAll("\n", "").replace("-----END PRIVATE KEY-----", "");
         return Base64.getDecoder().decode(privateKeyPEM);
+    }
+
+    public static String toString(Exception ex){
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, true);
+        ex.printStackTrace(pw);
+        return sw.getBuffer().toString();
     }
 
 

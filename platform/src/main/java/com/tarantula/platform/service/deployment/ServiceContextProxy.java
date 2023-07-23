@@ -121,7 +121,7 @@ public class ServiceContextProxy implements ServiceContext {
         this.tarantulaContext.log(message,error,level);
     }
 
-    public <T extends OnAccess> ServiceEventLogger serviceEventLogger(T gameCluster,String name){
-        return this.tarantulaContext.serviceEventLogger(gameCluster,name);
+    public ServiceEventLogger serviceEventLogger(String name){
+        return this.tarantulaContext.serviceEventLogger(name);
     }
 }
