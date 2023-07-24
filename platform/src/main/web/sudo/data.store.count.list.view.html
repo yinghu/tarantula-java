@@ -11,6 +11,13 @@
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div> 
     <div class="w3-panel  tx-margin-bottom-8">
         <div class="w3-container">
+            <label class="tx-text-14 tx-margin-right-4">Cluster Node Selection :</label>
+            <select id='tx-cluster-node-name' class="w3-select w3-border w3-round tx-text-14" name='clusterNodeName'>
+            </select>
+        </div>
+    </div> 
+    <div class="w3-panel  tx-margin-bottom-8">
+        <div class="w3-container">
             <label class="tx-text-14 tx-margin-right-4">Data Store Selection :</label>
             <select id='tx-data-store-name' class="w3-select w3-border w3-round tx-text-14" name='dataStoreName'>
             </select>
@@ -75,21 +82,35 @@
     let dataStoreSelected ='tarantula';
     let keyPanel = document.querySelector('#tx-data-store-key-list');
     let keySelected = '';
+    let nodeBar = document.querySelector('#tx-cluster-node-name');
+    let nodeSelected ='';
+    nodeBar.innerHTML = '';
     dataStoreBar.innerHTML = '';
     dataStoreBar.onchange = ()=>{
         dataStoreSelected = dataStoreBar.value;
         _tx_load_store_keys();
     };
+    nodeBar.onchange = ()=>{
+        nodeSelected = nodeBar.value;
+        _tx_load_store_keys();
+    };
     keyPanel.onchange = ()=>{
         keySelected = keyPanel.value;
     };
-    TARA_API.onService(false,{serviceTag:'role/sudo/datastore',command:'onListDataStore'},(resp)=>{
-        editor.set(resp);                      
-        resp.list.forEach((n,i) => {
-            if(i==0) dataStoreSelected = n;
-            dataStoreBar.innerHTML += TARA_HTML.option(n,n,i==0);
+    TARA_API.onGet('role/sudo','onClusterList','',(resp)=>{
+        console.log(resp);
+        resp.nodeList.forEach((n,i) => {
+            if(i==0) nodeSelected = n.memberId;
+            nodeBar.innerHTML += TARA_HTML.option(n.memberId,n.address,i==0);
         });
-        _tx_load_store_keys();
+        TARA_API.onGet('role/sudo/datastore','onListDataStore','',(resp)=>{
+            editor.set(resp);                      
+            resp.list.forEach((n,i) => {
+                if(i==0) dataStoreSelected = n;
+                dataStoreBar.innerHTML += TARA_HTML.option(n,n,i==0);
+            });
+            _tx_load_store_keys();
+        });
     });
     document.querySelector('#tx-data-store-key-reload').onclick =()=>{
         _tx_load_store_keys();
@@ -116,7 +137,7 @@
         keyPanel.innerHTML = '';
         let kindx = document.querySelector('#tx-data-store-key-index').value;
         let ksize = document.querySelector('#tx-data-store-key-list-size').value;
-        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx+'#'+ksize,(resp)=>{
+        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx+'#'+ksize+'#'+nodeSelected,(resp)=>{
             editor.set(resp);
             resp.keys.forEach((kv,i)=>{
                 if(i==0) keySelected = kv.key;

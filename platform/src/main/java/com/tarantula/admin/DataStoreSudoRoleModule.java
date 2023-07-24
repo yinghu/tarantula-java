@@ -47,6 +47,7 @@ public class DataStoreSudoRoleModule implements Module {
             session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStoreKeys")){
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
@@ -68,7 +69,6 @@ public class DataStoreSudoRoleModule implements Module {
                     keys.add(debug);
                     batch[0]--;
                 }
-                //this.context.log("BBB->"+batch[0],OnLog.WARN);
                 return batch[0] > 0;
             });
             summary.add("keys",keys);
