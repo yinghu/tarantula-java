@@ -105,10 +105,10 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         JsonObject vendor = vendors.get(configurableObject.configurationCategory());
         if(vendor==null || vendor.get("disabled").getAsBoolean()){
             logger.warn(configurableObject.configurationCategory()+" is disabled");
-            serviceEventLogger.save(new ClusterFailureEvent("onItem",new RuntimeException("DISABLE")));
-            Transaction transaction = new Transaction(itemId,"message","payload");
-            transaction.index(SystemUtil.oid());
-            serviceEventLogger.save(transaction);
+            //serviceEventLogger.save(new ClusterFailureEvent("onItem",new RuntimeException("DISABLE")));
+            //Transaction transaction = new Transaction(itemId,"message","payload");
+            //transaction.index(SystemUtil.oid());
+            //serviceEventLogger.save(transaction);
             return false;
         }
         String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();

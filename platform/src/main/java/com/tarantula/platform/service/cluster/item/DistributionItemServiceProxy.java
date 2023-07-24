@@ -5,11 +5,9 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEvent;
 import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.service.cluster.ClusterFailureEvent;
 
 import java.util.Set;
@@ -53,7 +51,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             } catch (Exception e) {
                 future.cancel(true);
                 ret = false;
-                serviceEventLogger.log(new ClusterFailureEvent("onRegisterItem",e));
+                serviceEventLogger.log(new ClusterFailureEvent("onRegisterItem",m.getAddress().toString(),e));
                 break; //stop to next node if failed
             }
         }
@@ -76,7 +74,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             } catch (Exception e) {
                 future.cancel(true);
                 ret = false;
-                serviceEventLogger.log(new ClusterFailureEvent("onReleaseItem",e));
+                serviceEventLogger.log(new ClusterFailureEvent("onReleaseItem",m.getAddress().toString(),e));
                 break; //stop to next node if failed
             }
         }

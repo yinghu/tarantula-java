@@ -25,10 +25,11 @@ public class ServiceEventLog extends RecoverableObject implements ServiceEvent {
 
     }
 
-    public ServiceEventLog(String code,Level level,String source,Exception exception){
+    public ServiceEventLog(String code,Level level,String source,String message,Exception exception){
         this.code = code;
         this.level = level;
         this.source = source;
+        this.message = message;
         this.exception = exception;
     }
     public ServiceEventLog(String code,Level level,String source,String message,String stackTrace){
