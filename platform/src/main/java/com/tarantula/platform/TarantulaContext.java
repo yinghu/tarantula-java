@@ -154,8 +154,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private HttpClientProvider httpClientProvider;
 
-    private String serviceEventStorePrefix = "tarantula_service_event_";
+    public boolean tarantulaServiceEventLogPersistenceEnable;
+    private String serviceEventLogStore = "tarantula_service_event_log";
     private int maxPendingEventSize = 10;
+
+    private ServiceEventLogger serviceEventLogger;
+
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
@@ -603,6 +607,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.accessIndexService().onEnable();
         this.schedule(new MidnightCheck(this));
         metricsManager.start();
+        DataStore dataStore = this.dataStore(serviceEventLogStore,node.partitionNumber);
+        serviceEventLogger = new PlatformServiceEventLogger(dataStore,tarantulaServiceEventLogPersistenceEnable);
  	}
 
 
@@ -1025,8 +1031,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          gMap.remove(key);
     }
 
-    public ServiceEventLogger serviceEventLogger(String name){
-         DataStore dataStore = dataStore(serviceEventStorePrefix+name,node.partitionNumber);
-         return new PlatformServiceEventLogger(dataStore,maxPendingEventSize);
+    public ServiceEventLogger serviceEventLogger(){
+        return serviceEventLogger;
     }
+
 }

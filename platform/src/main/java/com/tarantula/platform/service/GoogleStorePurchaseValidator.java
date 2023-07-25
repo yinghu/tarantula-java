@@ -3,9 +3,10 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
+
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 public class GoogleStorePurchaseValidator extends AuthObject {
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(GoogleStorePurchaseValidator.class);
     private final static String VALIDATION_URI = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/";
 
     //"acknowledge_uri": "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge"
@@ -40,11 +42,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         return OnAccess.GOOGLE_STORE;
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(GoogleStorePurchaseValidator.class);
-    }
+
     public boolean validate(Map<String,Object> params){
         try{
             //Session session = (Session)params.get(OnAccess.SESSION);

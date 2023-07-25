@@ -47,7 +47,7 @@ public class DataStoreSudoRoleModule implements Module {
             session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStoreKeys")){
-            this.context.log(session.name(),OnLog.WARN);
+            //this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();

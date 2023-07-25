@@ -42,12 +42,12 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         throw new RuntimeException("Operation not support");
     }
 
-    @Override
-    public String clientId(String typeId) {
-        TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
-        if(vendor == null) throw new RuntimeException("No auth vendor associated with ["+typeId+"]");
-        return vendor.clientId();
-    }
+    //@Override
+    //public String clientId(String typeId) {
+        //TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
+        //if(vendor == null) throw new RuntimeException("No auth vendor associated with ["+typeId+"]");
+        //return vendor.clientId();
+    //}
 
 
     @Override

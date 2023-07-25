@@ -3,9 +3,9 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -24,6 +24,7 @@ import java.util.Map;
 
 public class GoogleOAuthTokenValidator extends AuthObject {
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(GoogleOAuthTokenValidator.class);
     private final static String VERIFY_URI = "https://games.googleapis.com/games/v1/applications/";
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
@@ -39,11 +40,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
     public String name(){
         return OnAccess.GOOGLE;
     }
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(GoogleOAuthTokenValidator.class);
-    }
+
     @Override
     public boolean validate(Map<String,Object> params) {
         try{

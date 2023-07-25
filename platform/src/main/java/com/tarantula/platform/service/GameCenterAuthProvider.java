@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class GameCenterAuthProvider extends AuthObject{
 
-
+    private static final TarantulaLogger logger = JDKLogger.getLogger(GameCenterAuthProvider.class);
 
     public GameCenterAuthProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
@@ -34,11 +34,7 @@ public class GameCenterAuthProvider extends AuthObject{
         return OnAccess.GAME_CENTER;
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(GameCenterAuthProvider.class);
-    }
+
     @Override
     public boolean validate(Map<String,Object> params){
         try{

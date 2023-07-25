@@ -4,8 +4,6 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.service.AuthObject;
@@ -15,10 +13,10 @@ import java.util.UUID;
 
 public class ApplicationStoreProvider extends AuthObject {
 
-    private ServiceEventLogger serviceEventLogger;
+    private static final TarantulaLogger logger = JDKLogger.getLogger(ApplicationStoreProvider.class);
     private PlatformGameServiceProvider platformGameServiceProvider;
 
-    private TarantulaLogger logger;
+
     public ApplicationStoreProvider(PlatformGameServiceProvider platformGameServiceProvider, MetricsListener metricsListener){
         super(platformGameServiceProvider.gameCluster().typeId(),"");
         this.platformGameServiceProvider = platformGameServiceProvider;
@@ -31,13 +29,7 @@ public class ApplicationStoreProvider extends AuthObject {
     }
 
 
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_application_store");
-        this.logger = JDKLogger.getLogger(ApplicationStoreProvider.class);
-        logger.warn("application store validator->"+typeId);
-    }
+
     @Override
     public boolean validate(Map<String,Object> params){
         String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);

@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.*;
@@ -12,6 +12,7 @@ import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 public class AmazonAWSProvider extends AuthObject{
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(AmazonAWSProvider.class);
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     public AmazonAWSProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
@@ -21,12 +22,6 @@ public class AmazonAWSProvider extends AuthObject{
 
     public String name(){
         return OnAccess.AMAZON;
-    }
-
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(AmazonAWSProvider.class);
     }
 
 

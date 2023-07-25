@@ -10,7 +10,6 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -129,9 +128,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     userService.createLoginProvider(thirdPartyLogin);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
                     createLogin(acc,session.systemId(),AccessControl.player.name(),true,acc.name(),true);
-                    //user.emailAddress((String) params.get("email"));
-                    //user.activated(true);
-                    //userDatastore.update(user);
                     OnSession onSession = login(session.systemId(),thirdPartyLogin.password(),session);
                     onSession(onSession,session);
                 }
@@ -269,7 +265,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
         if(access!=null){
             access.routingNumber(session.routingNumber());
-            _onSession=this.context.validator().validatePassword(access,password);
+            _onSession = this.context.validator().validatePassword(access,password);
             _onSession.systemId(systemId);
         }
         return _onSession;
@@ -280,7 +276,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.VALIDATOR,validator);
         payload.property(OnAccess.VALIDATED,validated);
         payload.property(OnAccess.PRIMARY_USER,primary);
-        //payload.property(OnAccess.BALANCE,initialBalance);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(accountId,payload);
     }
@@ -290,7 +285,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.VALIDATOR,validator);
         payload.property(OnAccess.VALIDATED,validated);
         payload.property(OnAccess.PRIMARY_USER,primary);
-        //payload.property(OnAccess.BALANCE,initialBalance);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(payload);
     }

@@ -143,7 +143,7 @@ public class TestServiceContext implements ServiceContext {
     public PostOffice postOffice(){
         return null;
     }
-    public ServiceEventLogger serviceEventLogger(String name){
+    public ServiceEventLogger serviceEventLogger(){
         return null;
     }
 }

@@ -77,7 +77,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
-        this.serviceEventLogger = serviceContext.serviceEventLogger(NAME);
+        this.serviceEventLogger = serviceContext.serviceEventLogger();
     }
     public void waitForData(){}
     @Override

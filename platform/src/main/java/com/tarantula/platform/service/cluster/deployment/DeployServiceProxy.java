@@ -44,7 +44,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        serviceEventLogger = serviceContext.serviceEventLogger(NAME);
+        serviceEventLogger = serviceContext.serviceEventLogger();
     }
 
     @Override

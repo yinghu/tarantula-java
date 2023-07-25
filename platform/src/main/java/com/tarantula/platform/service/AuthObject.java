@@ -1,9 +1,9 @@
 package com.tarantula.platform.service;
 
 
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
 
@@ -26,7 +26,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     protected MetricsListener applicationMetricsListener;
     protected TokenValidatorProvider tokenValidatorProvider;
 
-    protected TarantulaLogger logger;
+    protected ServiceEventLogger serviceEventLogger;
 
     public AuthObject(String typeId,String clientId){
         this.typeId = typeId;
@@ -50,15 +50,10 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     }
 
     @Override
-    public String clientId(String typeId) {
-        return this.clientId;
-    }
-
-
-    @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
         tokenValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        serviceEventLogger = serviceContext.serviceEventLogger();
     }
     public void registerMetricsLister(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

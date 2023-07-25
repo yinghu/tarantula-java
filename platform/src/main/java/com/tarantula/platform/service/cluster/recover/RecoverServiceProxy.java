@@ -47,7 +47,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.serviceEventLogger = serviceContext.serviceEventLogger(NAME);
+        this.serviceEventLogger = serviceContext.serviceEventLogger();
     }
 
     @Override

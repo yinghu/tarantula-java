@@ -5,10 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEventLogger;
+
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -27,10 +27,9 @@ import java.util.Map;
 
 public class AppleStoreProvider extends AuthObject{
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(AppleStoreProvider.class);
     private final static String  SANDBOX_VERIFY_URI = "https://sandbox.itunes.apple.com/verifyReceipt";
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
-
-    private ServiceEventLogger serviceEventLogger;
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
@@ -43,12 +42,7 @@ public class AppleStoreProvider extends AuthObject{
     public String name(){
         return OnAccess.APPLE_STORE;
     }
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(AppleStoreProvider.class);
-        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_apple_store");
-    }
+
     @Override
     public boolean validate(Map<String,Object> params){
         AppleCredentialConfiguration credentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.APPLE);
@@ -90,10 +84,10 @@ public class AppleStoreProvider extends AuthObject{
         Transaction transaction = new Transaction();
         transaction.index(transactionId);
         transaction.owner(systemId);
-        if(serviceEventLogger.load(transaction)){
-            params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
-            return true;
-        }
+        //if(serviceEventLogger.load(transaction)){
+            //params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
+            //return true;
+        //}
         return false;
     }
     private boolean checkResponsePayload(String resp,Map<String,Object> params){

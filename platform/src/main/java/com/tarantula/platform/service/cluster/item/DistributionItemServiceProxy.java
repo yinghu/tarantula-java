@@ -97,6 +97,6 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
 
     @Override
     public void setup(ServiceContext serviceContext){
-        this.serviceEventLogger = serviceContext.serviceEventLogger(NAME);
+        this.serviceEventLogger = serviceContext.serviceEventLogger();
     }
 }

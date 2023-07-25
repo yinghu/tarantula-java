@@ -54,7 +54,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
         String name();
         String typeId();
         String clientId();
-        String clientId(String typeId);
+
         void registerMetricsLister(MetricsListener metricsListener);
         void setup(ServiceContext serviceContext);
         boolean validate(Map<String,Object> params);

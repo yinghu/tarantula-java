@@ -4,49 +4,36 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceEvent;
 import com.icodesoftware.service.ServiceEventListener;
 import com.icodesoftware.service.ServiceEventLogger;
+import com.tarantula.platform.util.SystemUtil;
 
-import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformServiceEventLogger implements ServiceEventLogger {
 
+
+    private ConcurrentHashMap<String,ServiceEventListener> listeners = new ConcurrentHashMap<>();
+
+
     private DataStore dataStore;
-
-    private ArrayBlockingQueue<ServiceEvent> pendingEvents;
-
-
-    public PlatformServiceEventLogger(DataStore dataStore,int maxPendingEvents){
+    private boolean persistenceEnabled;
+    public PlatformServiceEventLogger(DataStore dataStore,boolean persistenceEnable){
         this.dataStore = dataStore;
-        this.pendingEvents = new ArrayBlockingQueue<>(maxPendingEvents);
+        this.persistenceEnabled = persistenceEnable;
     }
     @Override
     public void log(ServiceEvent event) {
-        if(!pendingEvents.add(event)){
-            flush();
-            create(event);
-        }
+        if(persistenceEnabled) dataStore.create(event);
+        listeners.forEach((k,l)->l.onEvent(event));
     }
 
-    @Override
-    public void save(ServiceEvent event) {
-        create(event);
+
+    public String registerServiceEventListener(ServiceEventListener listener){
+        String registerKey = SystemUtil.oid();
+        listeners.put(registerKey,listener);
+        return registerKey;
     }
 
-    public boolean load(ServiceEvent event){
-        return this.dataStore.load(event);
-    }
-    @Override
-    public void flush(){
-        ArrayList<ServiceEvent> pending = new ArrayList<>();
-        pendingEvents.drainTo(pending);
-        pending.forEach(e->create(e));
-    }
-
-    public void registerServiceEventListener(ServiceEventListener listener){
-
-    }
-    private void create(ServiceEvent event){
-        if(dataStore.create(event)) return;
-        dataStore.createIfAbsent(event,false);
+    public void unregisterServiceEventListener(String registerKey){
+        listeners.remove(registerKey);
     }
 }

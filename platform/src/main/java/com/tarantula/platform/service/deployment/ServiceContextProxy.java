@@ -121,7 +121,7 @@ public class ServiceContextProxy implements ServiceContext {
         this.tarantulaContext.log(message,error,level);
     }
 
-    public ServiceEventLogger serviceEventLogger(String name){
-        return this.tarantulaContext.serviceEventLogger(name);
+    public ServiceEventLogger serviceEventLogger(){
+        return this.tarantulaContext.serviceEventLogger();
     }
 }

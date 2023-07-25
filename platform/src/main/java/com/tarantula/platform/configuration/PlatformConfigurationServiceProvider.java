@@ -144,7 +144,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
-        this.serviceEventLogger = serviceContext.serviceEventLogger(gameCluster.typeId()+"_configuration");
+        this.serviceEventLogger = serviceContext.serviceEventLogger();
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
 

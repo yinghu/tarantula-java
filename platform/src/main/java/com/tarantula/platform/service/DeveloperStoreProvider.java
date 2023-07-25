@@ -4,9 +4,6 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEventLogger;
-import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.store.Transaction;
@@ -16,10 +13,8 @@ import java.util.UUID;
 
 public class DeveloperStoreProvider extends AuthObject{
 
-    private ServiceEventLogger serviceEventLogger;
-    private TokenValidatorProvider tokenValidatorProvider;
+    private static final TarantulaLogger logger = JDKLogger.getLogger(DeveloperStoreProvider.class);
 
-    private TarantulaLogger logger;
     public DeveloperStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
         //this.platformGameServiceProvider = platformGameServiceProvider;
@@ -32,14 +27,6 @@ public class DeveloperStoreProvider extends AuthObject{
     }
 
 
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        serviceEventLogger = serviceContext.serviceEventLogger(typeId+"_developer_store");
-        this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
-        this.logger = JDKLogger.getLogger(DeveloperStoreProvider.class);
-        this.logger.warn("Developer Store Registered on->"+typeId);
-    }
     @Override
     public boolean validate(Map<String,Object> params){
         GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey((String)params.get(OnAccess.STORE_RECEIPT));

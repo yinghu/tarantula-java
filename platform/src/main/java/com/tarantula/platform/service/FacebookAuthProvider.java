@@ -3,9 +3,10 @@ package com.tarantula.platform.service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.FacebookCredentialConfiguration;
 import com.tarantula.platform.configuration.FacebookLogin;
@@ -20,6 +21,8 @@ import java.util.Map;
 
 public class FacebookAuthProvider extends AuthObject{
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(FacebookAuthProvider.class);
+
     private final static String TOKEN_DEBUG_URI = "https://graph.facebook.com/debug_token";
     //private final static String ACCESS_TOKEN_URI = "https://graph.facebook.com/oauth/access_token";
     private final static String ME_URI = "https://graph.facebook.com/me";
@@ -33,11 +36,6 @@ public class FacebookAuthProvider extends AuthObject{
         this.applicationMetricsListener = metricsListener;
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext){
-        super.setup(serviceContext);
-        logger = JDKLogger.getLogger(FacebookAuthProvider.class);
-    }
     @Override
     public String name(){
         return OnAccess.FACEBOOK;
