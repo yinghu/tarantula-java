@@ -9,6 +9,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 
+import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -32,8 +33,10 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
+    private ServiceEventLogger transactionLogger;
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
+        transactionLogger = gameServiceProvider.transactionEventLogger("apple_store");
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
@@ -52,7 +55,6 @@ public class AppleStoreProvider extends AuthObject{
         }
         try{
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
-            if(checkTransactionExisted(params)) return false;
             String receipt = (String)params.get("receipt");
             String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
@@ -76,19 +78,6 @@ public class AppleStoreProvider extends AuthObject{
             logger.error("apple store error ["+typeId+"]",ex);
             return false;
         }
-    }
-    private boolean checkTransactionExisted(Map<String,Object> params){
-        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
-        String transactionId = (String) params.get("transactionId");
-        //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
-        Transaction transaction = new Transaction();
-        transaction.index(transactionId);
-        transaction.owner(systemId);
-        //if(serviceEventLogger.load(transaction)){
-            //params.put(OnAccess.STORE_MESSAGE,"duplicated transaction");
-            //return true;
-        //}
-        return false;
     }
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
         String systemId = (String) params.get(OnAccess.SYSTEM_ID);
@@ -118,10 +107,8 @@ public class AppleStoreProvider extends AuthObject{
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
         Transaction transaction = new Transaction(systemId,(String)params.get(OnAccess.STORE_BUNDLE_ID),resp);
-        transaction.index(pendingTransactionId);
+        transaction.distributionKey(pendingTransactionId);
         serviceEventLogger.log(transaction);
-        //transaction.originalPayload = resp;
-        //this.dataStore.createIfAbsent(transaction,false);
         //this.metricsListener.onUpdated(VendorMetrics.APPLE_STORE_COUNT,1);
         return validated;
     }

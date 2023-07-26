@@ -7,6 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 
+import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -31,11 +32,13 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
+    private ServiceEventLogger transactionLogger;
 
     public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider,MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
+        this.transactionLogger = gameServiceProvider.transactionEventLogger("google_store");
     }
     @Override
     public String name(){

@@ -26,6 +26,7 @@ import com.tarantula.platform.item.ItemDistributionCallback;
 
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
+import com.tarantula.platform.store.TransactionEventLogger;
 import com.tarantula.platform.tournament.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -321,5 +322,11 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             this.logger.warn("Service Proxy ["+className+"] Without Implementation");
             return ErrorCommand.ERROR_COMMAND;
         }
+    }
+
+    public ServiceEventLogger transactionEventLogger(String storeName){
+        DataStore dataStore = this.serviceContext.dataStore(gameCluster.typeId()+"_transaction_"+storeName,serviceContext.node().partitionNumber());
+        TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
+        return transactionEventLogger;
     }
 }
