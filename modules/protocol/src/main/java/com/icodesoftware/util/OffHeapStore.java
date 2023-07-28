@@ -9,12 +9,10 @@ public class OffHeapStore {
     private ConcurrentHashMap<String,OffHeapIndex> offHeapIndex = new ConcurrentHashMap<>();
     private Unsafe unsafe;
 
-    //private volatile long balance;
-    //private long offset;
+
 
     public OffHeapStore(){
         unsafe = UnsafeUtil.useUnsafe();
-        //offset = unsafe.objectFieldOffset(OffHeapStore.class.getDeclaredField("balance"));
     }
 
     public byte[] get(String key){
@@ -61,15 +59,6 @@ public class OffHeapStore {
         });
         offHeapIndex.clear();
     }
-
-    //public double transact(double delta){
-        //long before = balance;
-        //while (!unsafe.compareAndSwapLong(this,offset,before,before+Double.doubleToRawLongBits(delta))){
-            //before = balance;
-        //}
-        //return Double.longBitsToDouble(balance);
-    //}
-
 
     private static class OffHeapIndex{
         public long address;

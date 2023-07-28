@@ -682,7 +682,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
 
     //partial implementation of createIfAbsent and load for access index persistence
-    private static class AccessIndexDataStore extends ReplicatedDataStore {
+    private static class AccessIndexDataStore implements ReplicatedDataStore {
 
         private final Database berkeleyStore;
         private final ClusterNode node;

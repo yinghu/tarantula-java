@@ -1,8 +1,8 @@
 package com.tarantula.platform.service.persistence;
 
 
+import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 
-public abstract class ReplicatedDataStore implements DataStore,DataStore.Backup {
-    abstract public void close();
+public interface ReplicatedDataStore extends DataStore,DataStore.Backup, Closable {
 }

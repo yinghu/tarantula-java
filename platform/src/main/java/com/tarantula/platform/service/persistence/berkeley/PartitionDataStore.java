@@ -19,7 +19,7 @@ import java.util.List;
  * However, the recoverable T itself is not thread-safe. Callers need to take care of the concurrent access.
  * */
 
-public class PartitionDataStore extends ReplicatedDataStore{
+public class PartitionDataStore implements ReplicatedDataStore{
 
     private final DataBaseOnPartition[] partitions;
     private final int partition;
