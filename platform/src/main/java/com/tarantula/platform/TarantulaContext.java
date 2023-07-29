@@ -596,7 +596,17 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	        _syncLatch.remove(_pk);
         }
  	    log.warn("Access index data sync has finished");
-
+        //sync data store
+        List<String> dataStoreList = this.deploymentDataStoreProvider.list();
+        for (String ds : dataStoreList){
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            String syncKey = "sync_"+ds;
+            _syncLatch.put(syncKey,countDownLatch);
+            this.integrationCluster.recoverService().onStartSync(ds,syncKey);
+            countDownLatch.await();
+            log.warn("Data store sync ended->"+syncKey);
+            _syncLatch.remove(syncKey);
+        }
         for(String s : this.integrationCluster.recoverService().onListModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().onLoadModuleJarFile(s);

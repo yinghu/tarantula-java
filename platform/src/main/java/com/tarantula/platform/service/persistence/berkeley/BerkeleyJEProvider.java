@@ -12,7 +12,6 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
-import com.tarantula.platform.statistics.StatisticsUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -70,7 +69,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private MetricsListener metricsListener = (k,v)->{};
 
-    //private boolean running = true;
     private ServiceContext serviceContext;
     private DiskSynchronizer diskSynchronizer;
     private CacheSynchronizer cacheSynchronizer;
@@ -194,7 +192,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     }
     @Override
     public void waitForData() {
-
     }
     @Override
     public void start() throws Exception {
