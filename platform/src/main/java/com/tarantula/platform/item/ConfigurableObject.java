@@ -32,6 +32,8 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected static String SCOPE_KEY = "11";
 
+    protected static String COMMODITY_PAYLOAD = "12";
+
 
     protected String configurationType;
     protected String configurationTypeId;

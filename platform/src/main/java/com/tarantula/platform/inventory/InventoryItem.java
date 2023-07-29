@@ -10,6 +10,8 @@ import java.util.Map;
 
 public class InventoryItem extends ConfigurableObject {
 
+
+    private JsonObject commodity;
     public InventoryItem(){
 
     }
@@ -17,6 +19,7 @@ public class InventoryItem extends ConfigurableObject {
         this.configurationName = commodity.configurationName();
         this.configurationTypeId = commodity.configurationTypeId();
         this.reference.add(commodity.distributionKey());
+        this.commodity = commodity.toJson();
     }
 
     @Override
@@ -24,6 +27,7 @@ public class InventoryItem extends ConfigurableObject {
         this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
         this.properties.put(NAME_KEY, this.configurationName);
         this.properties.put(REFERENCE_KEY,reference.toString());
+        this.properties.put(COMMODITY_PAYLOAD,commodity.toString());
         return this.properties;
     }
     @Override
@@ -31,6 +35,7 @@ public class InventoryItem extends ConfigurableObject {
         this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
         this.configurationName = (String) properties.get(NAME_KEY);
         this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
+        this.commodity = JsonUtil.parse((String)properties.getOrDefault(COMMODITY_PAYLOAD, "{}"));
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -46,6 +51,7 @@ public class InventoryItem extends ConfigurableObject {
         jsonObject.addProperty("InventoryId",distributionKey());
         jsonObject.addProperty("TypeId",configurationTypeId);
         jsonObject.addProperty("Name",configurationName);
+        jsonObject.add("Commodity",commodity);
         return jsonObject;
     }
 
