@@ -78,6 +78,8 @@ public interface ClusterProvider extends ServiceProvider {
         String clusterName();
         int partitionNumber();
         List<Node> clusterNodes();
+
+        Node node(String name);
     }
 
     interface Node extends Recoverable {

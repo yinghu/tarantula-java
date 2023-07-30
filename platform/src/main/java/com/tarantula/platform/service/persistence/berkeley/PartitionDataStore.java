@@ -112,7 +112,8 @@ public class PartitionDataStore implements ReplicatedDataStore{
         byte[] key = akey.getBytes();
         DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
         RevisionObject pendingData = dso.lock(key,()->_getRevisionObject(dso,key));
-        if(!pendingData.successful || !pendingData.local){
+        if(!pendingData.successful || !pendingData.local
+        ){
             byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
             if(data != null){
                 RevisionObject remoteData = RevisionObject.fromBinary(data);

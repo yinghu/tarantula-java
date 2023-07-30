@@ -74,6 +74,7 @@ public class TarantulaMain {
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
 			btx.clusterInitialSize = Integer.parseInt(override(overriding,"tarantula.platform.cluster.initial.size",_user,_config));
+			btx.clusterMaxSize = Integer.parseInt(override(overriding,"tarantula.platform.cluster.max.size",_user,_config));
 			btx.clusterNameSuffix = override(overriding,"tarantula.cluster.name.suffix",_user,_config);
 			btx.dataBucketGroup = override(!overriding,"tarantula.data.bucket.group",_user,_config);
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);
@@ -125,11 +126,7 @@ public class TarantulaMain {
 			fw.write(""+ProcessHandle.current().pid());
 			fw.close();
 		}
-		public void reboot() throws Exception{
-			Runtime.getRuntime().removeShutdownHook(hook);
-			hook.run();
-			bootstrap();
-		}
+
 		public void shutdown() throws Exception{
 			Runtime.getRuntime().removeShutdownHook(hook);
 			hook.run();

@@ -128,7 +128,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String clusterNameSuffix;
     public int clusterInitialSize;
-
+    public int clusterMaxSize;
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
@@ -156,7 +156,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public boolean tarantulaServiceEventLogPersistenceEnable;
     private String serviceEventLogStore = "tarantula_service_event_log";
-    private int maxPendingEventSize = 10;
+    //private int maxPendingEventSize = 10;
 
     private ServiceEventLogger serviceEventLogger;
 
@@ -170,7 +170,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 	}
 
 	public void start() throws Exception {
- 	    this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
+ 	    if(this.dataBucketNode.length() != 3) throw new RuntimeException("Node name must be 3 letters");
+         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
  	     _storageInstanceStarted = new CountDownLatch(1);
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);

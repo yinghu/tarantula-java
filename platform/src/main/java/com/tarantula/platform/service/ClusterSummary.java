@@ -44,6 +44,9 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
         nodeList.remove(node.nodeName());
     }
 
+    public ClusterProvider.Node node(String nodeName){
+        return nodeList.get(nodeName);
+    }
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

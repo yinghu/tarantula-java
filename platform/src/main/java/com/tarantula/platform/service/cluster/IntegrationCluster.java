@@ -52,10 +52,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
     private final TarantulaContext tarantulaContext;
-
-    //private MultiMap<String, byte[]> mIndex;
     private IMap<byte[],byte[]> vMap;
-    //private IQueue<byte[]> vQueue;
 
     private AccessIndexService accessIndexService;
     private DeployService deployService;
@@ -68,7 +65,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
 
-    private LinkedList<Node> roundRobinQueue = new LinkedList<>();
+    private final ArrayBlockingQueue<Node> roundRobinQueue;
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -80,6 +77,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             this.partitionStates[i]=new PartitionState(i,false);
         }
         _integrationInstanceStarted = new CountDownLatch(1);
+        roundRobinQueue = new ArrayBlockingQueue<>(tcx.clusterMaxSize);
     }
     public String name(){
         return "IntegrationCluster";
@@ -109,9 +107,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.config.getListenerConfigs().add(new ListenerConfig(this));
         _cluster = Hazelcast.newHazelcastInstance(this.config);
         _integrationInstanceStarted.await();
-        //mIndex = this._cluster.getMultiMap(INDEX_MAP_PREFIX+"Master");
         vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
-        //vQueue = this._cluster.getQueue(DATA_QUEUE_PREFIX+"Master");
         this.accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.accessIndexService.setup(this.tarantulaContext);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
@@ -211,16 +207,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.unsubscribe(topic);
     }
 
-    public void onMerging(){
-        log.warn("Node is rebooting due to cluster split");
-        new Thread(()->{
-            try{
-                TarantulaMain.runtime.reboot();
-            }catch (Exception ex){
-                log.error("Filed to reboot",ex);
-            }
-        }).start();
-    }
+
     public void onPartition(int pt,boolean opening){
         //log.warn("Partition ["+pt+"] with opening ["+opening+"]");
         this.partitionStates[pt].opening = opening;
@@ -322,7 +309,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public ClusterSummary summary(){
         return this.summary;
     }
-
+    
     public int partition(byte[] key){
         return _cluster.getPartitionService().getPartition(key).getPartitionId();
     }
@@ -367,9 +354,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         String memberId = mEvent.getMember().getUuid();
-        synchronized (roundRobinQueue){
-            roundRobinQueue.remove(new ClusterNode(memberId));
-        }
+        roundRobinQueue.remove(new ClusterNode(memberId));
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
         this.summary.unregister(new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber));
@@ -377,16 +362,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
     public void onNodeAdded(String memberId){
-        synchronized (roundRobinQueue){
-            roundRobinQueue.offer(new ClusterNode(memberId));
-        }
+        roundRobinQueue.offer(new ClusterNode(memberId));
     }
     public Node roundRobinMember(){
-        synchronized (roundRobinQueue){
-            Node node = roundRobinQueue.poll();
-            if(node!=null) roundRobinQueue.offer(node);
-            return node;
-        }
+        Node node = roundRobinQueue.poll();
+        if(node!=null) roundRobinQueue.offer(node);
+        return node;
     }
     private Node fromCluster(String nodeId){
         Node n = new ClusterNode();
