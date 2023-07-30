@@ -309,7 +309,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public ClusterSummary summary(){
         return this.summary;
     }
-    
+
     public int partition(byte[] key){
         return _cluster.getPartitionService().getPartition(key).getPartitionId();
     }
