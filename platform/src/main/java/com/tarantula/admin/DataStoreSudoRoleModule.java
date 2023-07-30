@@ -65,6 +65,8 @@ public class DataStoreSudoRoleModule implements Module {
                     RevisionObject revisionObject = RevisionObject.fromBinary(v);
                     JsonObject debug = new JsonObject();
                     debug.addProperty("key",new String(k));
+                    debug.addProperty("local",revisionObject.local);
+                    debug.addProperty("revision",Long.toString(revisionObject.revision));
                     debug.add("content",JsonUtil.parse(revisionObject.data));
                     keys.add(debug);
                     batch[0]--;
