@@ -61,7 +61,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private Environment environment;
     private Environment integrationEnvironment;
-
+    private Environment indexEnvironment;
     private BackupRouter iBackupProvider;
     private BackupRouter dBackupProvider;
     private List<String> dataStoreList;
@@ -127,10 +127,17 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
 
     @Override
-    public DataStore create(String name) {
+    public DataStore createAccessIndexDataStore(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
             this.iBackupProvider.registerDataStore(Distributable.INTEGRATION_SCOPE,name);
+            return  new AccessIndexDataStore(this.node,db,this);
+        });
+    }
+    @Override
+    public DataStore createKeyIndexDataStore(String name) {
+        return this.dMap.computeIfAbsent(name,(k)->{
+            Database db = this.createDatabase(name,Distributable.LOCAL_SCOPE);
             return  new AccessIndexDataStore(this.node,db,this);
         });
     }
@@ -146,9 +153,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             else if(scope==Distributable.INTEGRATION_SCOPE){
                 return this.integrationEnvironment.openDatabase(null,name,dbConfig);
             }
-            else{
-                throw new UnsupportedOperationException("scope ["+scope+"] not supported");
-            }
+            return this.indexEnvironment.openDatabase(null,name,dbConfig);
         }catch (Exception ex){
             throw new RuntimeException(name,ex);
         }
@@ -224,21 +229,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         File f = new File(dataPath+FileSystems.getDefault().getSeparator()+"last.dat");
         if(!f.exists()){
-            f.createNewFile();
-            DataOutputStream fo = new DataOutputStream(new FileOutputStream(f));
-            fo.writeLong(0);
-            fo.writeLong(0);
-            fo.writeUTF(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            fo.close();
+            DataStoreUtil.createLastDataFile(f);
         }
         File fi = new File(integrationPath+FileSystems.getDefault().getSeparator()+"last.dat");
         if(!fi.exists()){
-            fi.createNewFile();
-            DataOutputStream fo = new DataOutputStream(new FileOutputStream(fi));
-            fo.writeLong(0);
-            fo.writeLong(0);
-            fo.writeUTF(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            fo.close();
+            DataStoreUtil.createLastDataFile(fi);
+        }
+        File fix = new File(indexPath+FileSystems.getDefault().getSeparator()+"last.dat");
+        if(!fix.exists()){
+            DataStoreUtil.createLastDataFile(fix);
         }
         this.dataStoreList = new CopyOnWriteArrayList<>();
         Properties props = new Properties();
@@ -254,6 +253,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             }
         }
         this.integrationEnvironment = new Environment(new File(integrationPath),envConfig);
+        this.indexEnvironment = new Environment(new File(indexPath),envConfig);
         //log.info("Waiting for loading data on first member from data scope store");
         HashSet<String> ln = new HashSet<>();
         for(String dn : this.environment.getDatabaseNames()){
@@ -266,11 +266,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         });
         //log.info("Waiting for loading data on first member from integration scope store");
         for(String dn : this.integrationEnvironment.getDatabaseNames()){
-            DataStore ds = this.create(dn);
+            DataStore ds = this.createAccessIndexDataStore(dn);
+            ds.count();
+        }
+        for(String dn : this.indexEnvironment.getDatabaseNames()){
+            DataStore ds = this.createAccessIndexDataStore(dn);
             ds.count();
         }
         this.create(this.database,this.partitionNumber);
-
         log.info("Tarantula data store started on ["+node.toString()+"]");
     }
     public void _sync(){
@@ -426,8 +429,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         });
         this.environment.cleanLog();
         this.integrationEnvironment.cleanLog();
+        this.indexEnvironment.cleanLog();
         this.environment.close();
         this.integrationEnvironment.close();
+        this.indexEnvironment.close();
         log.info("Berkeley JE data store shut down on ["+node.toString()+"]");
     }
 

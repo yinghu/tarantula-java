@@ -491,7 +491,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
     public DataStore dataStore(String name){
-        return this.deploymentDataStoreProvider.create(name);
+        return this.deploymentDataStoreProvider.createAccessIndexDataStore(name);
     }
     public DataStore dataStore(String name,int partition){
         return this.deploymentDataStoreProvider.create(name,partition);

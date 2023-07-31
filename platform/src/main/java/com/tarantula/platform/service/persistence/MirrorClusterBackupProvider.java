@@ -58,7 +58,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
                 this.dataStoreProvider.create(name,serviceContext.node().partitionNumber());
             }
             else if(scope==Distributable.INTEGRATION_SCOPE){
-                this.dataStoreProvider.create(name);
+                this.dataStoreProvider.createAccessIndexDataStore(name);
             }
             return;
         }
@@ -98,7 +98,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
                             DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
                             ds.backup().set(key.getBytes(),RevisionObject.toBinary(revision,payload.toString().getBytes(),true,null));                    }
                         else if(scope == Distributable.INTEGRATION_SCOPE){
-                            DataStore ds = this.dataStoreProvider.create(source);
+                            DataStore ds = this.dataStoreProvider.createAccessIndexDataStore(source);
                             ds.backup().set(key.getBytes(),payload.toString().getBytes());
                         }
                     });
