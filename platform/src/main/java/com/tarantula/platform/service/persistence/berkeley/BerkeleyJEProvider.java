@@ -31,9 +31,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private String dataPath;
     private String integrationPath;
-
+    private String indexPath;
     private String backupPath;
     private String integrationBackupPath;
+    private String indexBackupPath;
     private String database;
     private boolean trimming;
     private int partitionNumber;
@@ -90,6 +91,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.trimming =((JsonElement) properties.get("truncated")).getAsBoolean();
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
+        String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
         this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
         this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
@@ -105,9 +107,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.cacheUpdateThreshold =  ((JsonElement)properties.get("cacheUpdateThreshold")).getAsInt();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
+        this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
         this.backupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_integrationPath;
-
+        this.indexBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_indexPath;
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
         this.node = (ClusterNode) properties.get("node");
@@ -203,6 +206,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         if(!Files.exists(_ipath)){
             Files.createDirectories(_ipath);
         }
+        Path _xpath = Paths.get(this.indexPath);
+        if(!Files.exists(_xpath)){
+            Files.createDirectories(_xpath);
+        }
         Path _pback = Paths.get(this.backupPath);
         if(!Files.exists(_pback)){
             Files.createDirectories(_pback);
@@ -210,6 +217,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         Path _piback = Paths.get(this.integrationBackupPath);
         if(!Files.exists(_piback)){
             Files.createDirectories(_piback);
+        }
+        Path _pxback = Paths.get(this.indexBackupPath);
+        if(!Files.exists(_pxback)){
+            Files.createDirectories(_pxback);
         }
         File f = new File(dataPath+FileSystems.getDefault().getSeparator()+"last.dat");
         if(!f.exists()){
