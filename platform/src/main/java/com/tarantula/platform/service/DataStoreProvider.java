@@ -21,6 +21,8 @@ public interface DataStoreProvider extends ServiceProvider {
 
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);
+
+    //create none-partitioned local scope data store
     DataStore createKeyIndexDataStore(String name);
     //create partitioned data scope data store
     DataStore create(String name,int partition);

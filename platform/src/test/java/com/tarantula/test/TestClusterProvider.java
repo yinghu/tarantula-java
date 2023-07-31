@@ -42,6 +42,11 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     }
 
     @Override
+    public KeyIndexService keyIndexService() {
+        return null;
+    }
+
+    @Override
     public DeployService deployService() {
         return null;
     }
