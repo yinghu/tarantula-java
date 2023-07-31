@@ -7,6 +7,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.service.AccessKey;
+import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.service.deployment.*;
@@ -53,6 +54,8 @@ public class PortableRegistry extends AbstractRecoverableListener {
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
+
+    public static final int KEY_INDEX_CID = PortableEventRegistry.KEY_INDEX_CID;
 
 
     public Recoverable create(int cid) {
@@ -116,6 +119,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
                 break;
             case SERVICE_EVENT_LOG_CID:
                 _ins = new ServiceEventLog();
+                break;
+            case KEY_INDEX_CID:
+                _ins = new KeyIndexTrack();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type");

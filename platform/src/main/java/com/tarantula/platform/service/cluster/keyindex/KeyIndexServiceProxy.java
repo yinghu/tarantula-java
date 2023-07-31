@@ -3,12 +3,17 @@ package com.tarantula.platform.service.cluster.keyindex;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.AbstractDistributedObject;
 
+import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.TarantulaContext;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 
 public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClusterService> implements KeyIndexService, DistributedObject {
@@ -30,8 +35,19 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     }
 
     @Override
-    public KeyIndex setIfAbsent(String key) {
-        return null;
+    public KeyIndex setIfAbsent(String key,KeyIndex pending) {
+        NodeEngine nodeEngine = getNodeEngine();
+        KeyIndexSetIfAbsentOperation operation = new KeyIndexSetIfAbsentOperation(key,pending);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(key);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,partitionId);
+        final Future<KeyIndex> future = builder.invoke();
+        try {
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

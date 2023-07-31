@@ -813,6 +813,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public List<String> listDataStore(){
+        KeyIndexTrack track = new KeyIndexTrack();
+        track.owner("xkey");
+        KeyIndex ret = this.integrationCluster.keyIndexService().setIfAbsent("key",track);
+        log.warn(ret.owner()+">>>"+ret.created());
         return this.tarantulaContext.dataStoreProvider().list();
     }
 

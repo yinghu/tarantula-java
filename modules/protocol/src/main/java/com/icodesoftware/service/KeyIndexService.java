@@ -4,5 +4,5 @@ public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
 
-    KeyIndex setIfAbsent(String key);
+    KeyIndex setIfAbsent(String key,KeyIndex pending);
 }
