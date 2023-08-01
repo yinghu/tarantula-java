@@ -45,8 +45,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
-                            RevisionObject ro = RevisionObject.fromBinary(r.value());
-                            log.warn("Owner->"+new String(ro.node));
                             this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
                         });
                         updates.clear();
@@ -101,7 +99,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         synchronized (pendingUpdates){
             pendingUpdates.add(new ReplicationData(source,key,value));
         }
-        //this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().set(key,value);
     }
     public int syncStart(String memberId,String source,String syncKey){
         RecoverService recoverService = tarantulaContext.integrationCluster().recoverService();

@@ -808,6 +808,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return new AccessIndexStoreViewer(this.tarantulaContext);
     }
 
+    public  KeyIndexService.KeyIndexStore keyIndexStore(){
+        return new KeyIndexStoreViewer(tarantulaContext);
+    }
+
     public void issueDataStoreBackup(){
 
     }
