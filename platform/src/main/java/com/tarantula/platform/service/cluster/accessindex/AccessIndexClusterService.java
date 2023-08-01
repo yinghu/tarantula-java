@@ -134,7 +134,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
-            dso.dataStore = this.tarantulaContext.dataStore(dso.name);
+            dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);
         }
         TarantulaContext._access_index_syc_finished.countDown();
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"]");

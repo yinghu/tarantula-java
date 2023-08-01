@@ -67,6 +67,6 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
     }
 
     private DataStore dataStore(int partition){
-        return this.tarantulaContext.dataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);
+        return this.tarantulaContext.deploymentDataStoreProvider.lookup(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);
     }
 }

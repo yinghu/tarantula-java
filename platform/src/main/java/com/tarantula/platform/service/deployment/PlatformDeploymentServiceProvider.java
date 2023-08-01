@@ -813,10 +813,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public List<String> listDataStore(){
-        KeyIndexTrack track = new KeyIndexTrack();
-        track.owner("xkey");
-        KeyIndex ret = this.integrationCluster.keyIndexService().setIfAbsent("key",track);
-        log.warn(ret.owner()+">>>"+ret.created());
         return this.tarantulaContext.dataStoreProvider().list();
     }
 
@@ -825,8 +821,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         summary.name = dataStore;
         summary.partitionNumber = 0;
         summary.totalRecords = 0;
-        if(!this.tarantulaContext.dataStoreProvider().existed(dataStore)) return summary;
-        DataStore ds = this.tarantulaContext.dataStore(dataStore);
+        DataStore ds = this.tarantulaContext.deploymentDataStoreProvider.lookup(dataStore);
+        if(ds==null) return summary;
         summary.partitionNumber = ds.partitionNumber();
         summary.totalRecords = ds.count();
         summary.dataStore = ds;

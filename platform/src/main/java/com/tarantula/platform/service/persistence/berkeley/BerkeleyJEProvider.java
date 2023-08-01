@@ -176,8 +176,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
        alist.addAll(dataStoreList);
        return alist;
     }
-    public boolean existed(String name){
-        return dMap.containsKey(name);
+    public DataStore lookup(String name){
+        return dMap.get(name);
     }
     @Override
     public String name() {
@@ -270,7 +270,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             ds.count();
         }
         for(String dn : this.indexEnvironment.getDatabaseNames()){
-            DataStore ds = this.createAccessIndexDataStore(dn);
+            DataStore ds = this.createKeyIndexDataStore(dn);
             ds.count();
         }
         this.create(this.database,this.partitionNumber);

@@ -29,8 +29,9 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
         this.node = node;
         this.berkeleyStore = database;
         this.dataStore = this.berkeleyStore.getDatabaseName();
-        this.partition = Integer.parseInt(this.dataStore.split("_")[1]);
-        this.metadata1 = new RecoverableMetadata(dataStore,partition, Distributable.INTEGRATION_SCOPE);
+        int  index = this.dataStore.lastIndexOf("_");
+        this.partition = Integer.parseInt(this.dataStore.substring(index+1));
+        this.metadata1 = new RecoverableMetadata(dataStore,partition, Distributable.LOCAL_SCOPE);
         this.mapStoreListener = mapStoreListener;
     }
 

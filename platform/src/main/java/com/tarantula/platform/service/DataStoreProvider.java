@@ -28,7 +28,7 @@ public interface DataStoreProvider extends ServiceProvider {
     DataStore create(String name,int partition);
 
     List<String> list();
-    boolean existed(String name);
+    DataStore lookup(String name);
 
     //incremental back up
     void backup(int scope);

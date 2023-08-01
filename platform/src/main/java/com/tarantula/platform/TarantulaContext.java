@@ -176,11 +176,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          _integrationClusterStarted = new CountDownLatch(1);
          _tarantulaApplicationStarted = new CountDownLatch(1);
         _tarantulaInstanceStarted = new CountDownLatch(1);
-        _accessIndexServiceStarted = new CountDownLatch(1);
+        _accessIndexServiceStarted = new CountDownLatch(2);
         _storageStarted = new CountDownLatch(1);
         _deployServiceStarted = new CountDownLatch(1);
         _systemServiceStarted = new CountDownLatch(1);
-        _access_index_syc_finished = new CountDownLatch(1);
+        _access_index_syc_finished = new CountDownLatch(2);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
         this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
@@ -490,13 +490,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	        ex.printStackTrace();
         }
     }
-    public DataStore dataStore(String name){
-        return this.deploymentDataStoreProvider.createAccessIndexDataStore(name);
-    }
+
     public DataStore dataStore(String name,int partition){
         return this.deploymentDataStoreProvider.create(name,partition);
     }
-
 
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
