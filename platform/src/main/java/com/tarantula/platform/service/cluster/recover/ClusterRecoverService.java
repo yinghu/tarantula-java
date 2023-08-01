@@ -11,6 +11,7 @@ import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.persistence.RevisionObject;
 
 import java.util.ArrayList;
 import java.util.Properties;
@@ -44,6 +45,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
+                            RevisionObject ro = RevisionObject.fromBinary(r.value());
+                            log.warn("Owner->"+new String(ro.node));
                             this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
                         });
                         updates.clear();
