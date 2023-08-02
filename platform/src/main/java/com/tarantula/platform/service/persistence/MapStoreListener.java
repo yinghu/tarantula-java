@@ -17,4 +17,6 @@ public interface MapStoreListener {
 
     void onDeleting(Metadata metadata,byte[] key);
 
+    byte[] nodeList();
+
 }

@@ -42,7 +42,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private boolean dailyBackup;
 
-    private int replicationNodeNumber = 3;
 
     private ClusterNode node;
 
@@ -93,7 +92,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
-        this.replicationNodeNumber = ((JsonElement)properties.get("maxReplicationNumber")).getAsInt();
         this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
         this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
         this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
@@ -324,7 +322,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     integrationSize++;
                 }
                 if (integrationSize > 0) {
-                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, replicationNodeNumber);
+                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, RevisionObject.MAX_REPLICATION_NODE_NUMBER);
                     operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
                 }
                 integrationSize = 0;
@@ -352,7 +350,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     dataSize++;
                 }
                 if (dataSize > 0) {
-                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, replicationNodeNumber);
+                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, RevisionObject.MAX_REPLICATION_NODE_NUMBER);
                     operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
                 }
                 dataSize = 0;
@@ -465,7 +463,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         int keySize = key.length;
         int valueSize = value.length;
-        if(metadata.scope()==Distributable.DATA_SCOPE && replicationNodeNumber>0){
+        if(metadata.scope()==Distributable.DATA_SCOPE && RevisionObject.MAX_REPLICATION_NODE_NUMBER>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
             operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
@@ -477,7 +475,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return new ReplicationData(metadata.source(),key,value);
             });
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && replicationNodeNumber>0){
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && RevisionObject.MAX_REPLICATION_NODE_NUMBER>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
             operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
@@ -510,6 +508,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             //this.integrationCluster.accessIndexService().ond(metadata.partition(),key);
         }
+    }
+
+    public byte[] nodeList(){
+        ByteBuffer buffer = ByteBuffer.allocate(RevisionObject.NODE_DATA_SIZE);
+        buffer.put(node.nodeName().getBytes());
+        buffer.put(node.nodeName().getBytes());
+        buffer.put(node.nodeName().getBytes());
+        return buffer.array();
     }
     //end of map store listener
 

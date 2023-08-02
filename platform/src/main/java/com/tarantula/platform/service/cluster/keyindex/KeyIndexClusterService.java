@@ -53,9 +53,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService {
     }
 
     public KeyIndex setIfAbsent(String key,KeyIndex pending){
-        logger.warn("set if absent ["+key+"]");
-        pending.index(key);
-        pending.disabled(true);
+        DataStoreOnPartition dso = onPartition(key);
+        dso.lock(key.getBytes(),()->
+            dso.dataStore.createIfAbsent(pending,false)
+        );
         return pending;
     }
 
@@ -67,5 +68,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService {
         }
         TarantulaContext._access_index_syc_finished.countDown();
         logger.warn("Key index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]");
+    }
+
+    private DataStoreOnPartition onPartition(String accessKey){
+        int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
+        return this.dataStoreOnPartitions[partition];
     }
 }

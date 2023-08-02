@@ -8,7 +8,6 @@
             {"integrationPath":"tarantula/integration"},
             {"indexPath":"tarantula/index"},
             {"backupPath":"backup"},
-            {"maxReplicationNumber": 3},
             {"maxTimerLoop": 10},
             {"timerCount": 3},
             {"maxBytesPerBatch": 10000},

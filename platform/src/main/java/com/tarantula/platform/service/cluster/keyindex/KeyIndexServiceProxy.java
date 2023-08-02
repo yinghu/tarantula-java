@@ -35,19 +35,23 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     }
 
     @Override
-    public KeyIndex setIfAbsent(String key,KeyIndex pending) {
+    public void set(KeyIndex pending) {
         NodeEngine nodeEngine = getNodeEngine();
-        KeyIndexSetIfAbsentOperation operation = new KeyIndexSetIfAbsentOperation(key,pending);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(key);
+        KeyIndexSetOperation operation = new KeyIndexSetOperation(pending);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(pending.key().asString());
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,partitionId);
-        final Future<KeyIndex> future = builder.invoke();
+        final Future<Void> future = builder.invoke();
         try {
-            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
             e.printStackTrace();
-            return null;
+            //return null;
         }
+    }
+
+    public KeyIndex get(String key){
+        return null;
     }
 
     @Override

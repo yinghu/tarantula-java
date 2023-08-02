@@ -6,7 +6,9 @@ public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
 
-    KeyIndex setIfAbsent(String key,KeyIndex pending);
+    void set(KeyIndex pending);
+    KeyIndex get(String key);
+
 
 
     interface KeyIndexStore extends DataStore.Backup {

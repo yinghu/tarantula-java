@@ -13,23 +13,23 @@ public class RevisionObjectTest {
 
     @Test(groups = { "RevisionObject" })
     public void localTest() {
-        byte[] node ="n01".getBytes();
+        byte[] node ="n01n02n03".getBytes();
         byte[] data = RevisionObject.toBinary(100,"abc".getBytes(),true,node);
         RevisionObject fromData =  RevisionObject.fromBinary(data);
         Assert.assertEquals(fromData.revision == 100,true);
         Assert.assertEquals(new String(fromData.data).equals("abc"),true);
         Assert.assertEquals(fromData.local,true);
-        Assert.assertEquals(fromData.node,node);
+        Assert.assertEquals(fromData.nodeList,node);
     }
 
     @Test(groups = { "RevisionObject" })
     public void remoteTest() {
-        byte[] node ="n01".getBytes();
+        byte[] node ="n01n02n03".getBytes();
         byte[] data = RevisionObject.toBinary(100,"abc".getBytes(),false,node);
         RevisionObject fromData =  RevisionObject.fromBinary(data);
         Assert.assertEquals(fromData.revision == 100,true);
         Assert.assertEquals(new String(fromData.data).equals("abc"),true);
         Assert.assertEquals(fromData.local,false);
-        Assert.assertEquals(fromData.node,node);
+        Assert.assertEquals(fromData.nodeList,node);
     }
 }

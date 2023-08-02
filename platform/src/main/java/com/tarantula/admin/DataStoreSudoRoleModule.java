@@ -3,11 +3,8 @@ package com.tarantula.admin;
 import com.google.gson.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.*;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.service.*;
 
-import com.icodesoftware.service.Metrics;
-import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.persistence.RevisionObject;
@@ -67,7 +64,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("key",new String(k));
                     debug.addProperty("local",revisionObject.local);
                     debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    debug.addProperty("node",new String(revisionObject.node));
+                    debug.addProperty("node",new String(revisionObject.nodeList));
                     debug.add("content",JsonUtil.parse(revisionObject.data));
                     keys.add(debug);
                     batch[0]--;
@@ -87,7 +84,7 @@ public class DataStoreSudoRoleModule implements Module {
                 JsonObject debug = new JsonObject();
                 debug.addProperty("local",revisionObject.local);
                 debug.addProperty("revision",Long.toString(revisionObject.revision));
-                debug.addProperty("node",new String(revisionObject.node));
+                debug.addProperty("node",new String(revisionObject.nodeList));
                 debug.add("content",JsonUtil.parse(revisionObject.data));
                 summary.add("debug",debug);
             }
@@ -122,6 +119,32 @@ public class DataStoreSudoRoleModule implements Module {
         else if(session.action().equals("onAccessIndexStoreValue")){
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
             session.write(accessIndexStore.get(session.name().getBytes()));
+        }
+        else if(session.action().equals("onKeyIndexStore")){
+            String[] query = session.name().split("#");
+            int[] kn = {Integer.parseInt(query[0])};
+            int[] batch = {Integer.parseInt(query[1])};
+            KeyIndexService.KeyIndexStore accessIndexStore = this.deploymentServiceProvider.keyIndexStore();
+            JsonObject summary = new JsonObject();
+            summary.addProperty("name",accessIndexStore.name());
+            summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
+            summary.addProperty("totalRecords",accessIndexStore.count());
+            summary.addProperty("keyStartIndex",kn[0]);
+            summary.addProperty("keyEndIndex",kn[0]+batch[0]);
+            JsonArray keys = new JsonArray();
+            accessIndexStore.list((k,v)->{
+                kn[0]--;
+                if(kn[0]<0) {
+                    JsonObject debug = new JsonObject();
+                    debug.addProperty("key",new String(k));
+                    debug.add("content",JsonUtil.parse(v));
+                    keys.add(debug);
+                    batch[0]--;
+                }
+                return batch[0] > 0;
+            });
+            summary.add("keys",keys);
+            session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
