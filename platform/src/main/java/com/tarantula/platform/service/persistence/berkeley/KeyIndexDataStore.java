@@ -66,7 +66,27 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
-        throw new UnsupportedOperationException();
+        try{
+            String akey = t.key().asString();
+            if(akey==null) return false;
+            byte[] k = akey.getBytes();
+            byte[] v = _get(k);//get local
+            if(v==null){
+                v = mapStoreListener.onRecovering(metadata1,k);//get cluster
+                if(v!=null) _set(k,v);//local set
+            }
+            if(v==null){
+                return false;
+            }
+            v = t.toBinary();
+            if(!_set(k,v)) return false;
+            mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
+            if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
+            return true;
+        }catch (Exception ex){
+            log.error("error on createIfAbsent",ex);
+            return false;
+        }
     }
 
 
