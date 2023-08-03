@@ -64,7 +64,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("key",new String(k));
                     debug.addProperty("local",revisionObject.local);
                     debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    debug.addProperty("node",new String(revisionObject.nodeList));
+                    debug.addProperty("node",new String(revisionObject.node));
                     debug.add("content",JsonUtil.parse(revisionObject.data));
                     keys.add(debug);
                     batch[0]--;
@@ -84,7 +84,7 @@ public class DataStoreSudoRoleModule implements Module {
                 JsonObject debug = new JsonObject();
                 debug.addProperty("local",revisionObject.local);
                 debug.addProperty("revision",Long.toString(revisionObject.revision));
-                debug.addProperty("node",new String(revisionObject.nodeList));
+                debug.addProperty("node",new String(revisionObject.node));
                 debug.add("content",JsonUtil.parse(revisionObject.data));
                 summary.add("debug",debug);
             }

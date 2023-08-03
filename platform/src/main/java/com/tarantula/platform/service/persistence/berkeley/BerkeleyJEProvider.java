@@ -85,6 +85,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private long nextReplicationInterval;
     private long nextBackupInterval;
 
+    private int maxReplicationNumber = 3;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
@@ -112,6 +114,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.indexBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_indexPath;
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
+        this.maxReplicationNumber = (Integer)properties.get("maxReplicationNumber");
         this.node = (ClusterNode) properties.get("node");
         ServiceContext serviceContext = (ServiceContext) properties.get("serviceContext");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
@@ -323,7 +326,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     integrationSize++;
                 }
                 if (integrationSize > 0) {
-                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize, RevisionObject.MAX_REPLICATION_NODE_NUMBER);
+                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize,maxReplicationNumber);
                     operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
                 }
                 integrationSize = 0;
@@ -351,7 +354,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     dataSize++;
                 }
                 if (dataSize > 0) {
-                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize, RevisionObject.MAX_REPLICATION_NODE_NUMBER);
+                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize,maxReplicationNumber);
                     operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
                 }
                 dataSize = 0;
@@ -464,8 +467,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         int keySize = key.length;
         int valueSize = value.length;
-        integrationCluster.publisher().publish(new KeyIndexEvent(stringKey,node.nodeName));
-        if(metadata.scope()==Distributable.DATA_SCOPE && RevisionObject.MAX_REPLICATION_NODE_NUMBER>0){
+        //integrationCluster.publisher().publish(new KeyIndexEvent(stringKey,node.nodeName));
+        if(metadata.scope()==Distributable.DATA_SCOPE && maxReplicationNumber>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
             operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
@@ -477,7 +480,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return new ReplicationData(metadata.source(),key,value);
             });
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && RevisionObject.MAX_REPLICATION_NODE_NUMBER>0){
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && maxReplicationNumber>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
             operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
@@ -512,13 +515,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
 
-    public byte[] nodeList(){
-        ByteBuffer buffer = ByteBuffer.allocate(RevisionObject.NODE_DATA_SIZE);
-        buffer.put(node.nodeName().getBytes());
-        buffer.put(node.nodeName().getBytes());
-        buffer.put(node.nodeName().getBytes());
-        return buffer.array();
-    }
     //end of map store listener
 
     public void backup(int scope){
@@ -690,7 +686,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void updateSummary(Summary summary){
         summary.update(DataStoreOperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
         summary.update(DataStoreOperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        //summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,replicationNodeNumber);
+        summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,maxReplicationNumber);
         long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
         long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
         summary.update(DataStoreOperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);

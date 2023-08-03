@@ -15,7 +15,7 @@ public class DataStoreTestEvn {
 
     public static void setUp() {
         serviceContext = new TestServiceContext();
-        DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, dataStoreProvider->{
+        DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, 3,dataStoreProvider->{
             try{
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
                 DataStoreTestEvn.dataStoreProvider.start();

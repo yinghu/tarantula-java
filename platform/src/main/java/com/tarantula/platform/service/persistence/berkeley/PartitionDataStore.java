@@ -37,7 +37,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         this.partition = partition;
         this.bucket = bucket;
         this.node = node;
-        this._node = mapStoreListener.nodeList();
+        this._node = node.getBytes();
         this.prefix = prefix;
         this.mapStoreListener = mapStoreListener;
         this.partitions = new DataBaseOnPartition[this.partition];

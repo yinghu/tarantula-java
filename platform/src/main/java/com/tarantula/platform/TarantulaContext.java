@@ -132,6 +132,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int platformRoutingNumber;
     public int accessIndexRoutingNumber;
 
+    public int maxReplicationNumber = 3;
+
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
@@ -203,7 +205,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
-        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,dataStoreProvider -> {
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.maxReplicationNumber,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.start();

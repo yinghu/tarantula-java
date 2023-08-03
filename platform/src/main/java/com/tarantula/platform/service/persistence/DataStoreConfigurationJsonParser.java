@@ -27,6 +27,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
     private int partitionNumber;
 
+    private int maxReplicationNumber;
+
     private boolean dataStoreDailyBackup;
 
 
@@ -34,7 +36,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private DataStoreProvider.OnStart onStart;
     private ClusterProvider.Node node;
 
-    public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx, DataStoreProvider.OnStart onStart){
+    public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx,int maxReplicationNumber, DataStoreProvider.OnStart onStart){
         this.dataStoreProviderConfiguration = dconfig;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
@@ -44,7 +46,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataStoreDailyBackup = node.dailyBackupEnabled();//tx.dataStoreDailyBackup;
         this.serviceContext = tx;
         this.onStart = onStart;
-        this.node = node;
+        this.maxReplicationNumber = maxReplicationNumber;
     }
     private void parse(InputStream json){
         HashMap<String,Object> properties = new HashMap();
@@ -57,6 +59,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
         properties.put("partitionNumber",this.partitionNumber);
+        properties.put("maxReplicationNumber",this.maxReplicationNumber);
         properties.put("dir",this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);
