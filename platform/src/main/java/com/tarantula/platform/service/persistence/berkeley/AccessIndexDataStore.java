@@ -7,10 +7,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metadata;
 import com.sleepycat.je.*;
-import com.tarantula.platform.service.persistence.ClusterNode;
-import com.tarantula.platform.service.persistence.MapStoreListener;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
-import com.tarantula.platform.service.persistence.ReplicatedDataStore;
+import com.tarantula.platform.service.persistence.*;
 
 import java.util.List;
 
@@ -19,6 +16,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
     private static TarantulaLogger log = JDKLogger.getLogger(AccessIndexDataStore.class);
     private final Database berkeleyStore;
     private final ClusterNode node;
+    private final byte[] _node;
     private final MapStoreListener mapStoreListener;
     private final String dataStore;
     private final int partition;
@@ -27,6 +25,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
 
     public AccessIndexDataStore(ClusterNode node, Database database, MapStoreListener mapStoreListener){
         this.node = node;
+        this._node = node.nodeName().getBytes();
         this.berkeleyStore = database;
         this.dataStore = this.berkeleyStore.getDatabaseName();
         int  index = this.dataStore.lastIndexOf("_");
@@ -82,10 +81,11 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
                 if(v!=null) _set(k,v);//local set
             }
             if(v!=null){
-                if(loading) t.fromBinary(v);
+                RevisionObject ro = RevisionObject.fromBinary(v);
+                if(loading) t.fromBinary(ro.data);
                 return false;
             }
-            v = t.toBinary();
+            v = RevisionObject.toBinary(0,t.toBinary(),true,_node);
             if(!_set(k,v)) return false;
             mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
             if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
@@ -104,11 +104,13 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
             byte[] key = akey.getBytes();
             byte[] value;
             if((value=_get(key))!=null){//from local
-                t.fromBinary(value);
+                RevisionObject ro = RevisionObject.fromBinary(value);
+                t.fromBinary(ro.data);
                 return true;
             }
             if((value=mapStoreListener.onRecovering(metadata1,key))==null) return false;
-            t.fromBinary(value);
+            RevisionObject ro = RevisionObject.fromBinary(value);
+            t.fromBinary(ro.data);
             _set(key,value);
             return true;
         }catch (Exception ex){
@@ -128,7 +130,6 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
     }
     public boolean set(byte[] key,byte[] value){
         try{
-
             return _set(key,value);
         }
         catch (Exception ex){

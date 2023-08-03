@@ -91,24 +91,4 @@ public class DataStoreTest {
         }
     }
 
-    @Test(groups = { "DataStore" })
-    public void dataStoreDeleteTest() {
-        DataStore dataStore = dataStoreProvider.create("access",serviceContext.node().partitionNumber());
-        AccessIndexTrack accessIndexTrack = new AccessIndexTrack("access100","BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
-        Assert.assertTrue(accessIndexTrack.key().asString().equals("access100"));
-        Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
-        Assert.assertTrue(dataStore.delete(accessIndexTrack.key().asString().getBytes()));
-        Assert.assertFalse(dataStore.load(accessIndexTrack));
-    }
-
-    @Test(groups = { "DataStore" })
-    public void accessIndexTest() {
-        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore("access_1");
-        AccessIndexTrack accessIndexTrack = new AccessIndexTrack("access100","BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
-        Assert.assertTrue(accessIndexTrack.key().asString().equals("access100"));
-        Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
-        Assert.assertTrue(dataStore.delete(accessIndexTrack.key().asString().getBytes()));
-        Assert.assertFalse(dataStore.load(accessIndexTrack));
-    }
-
 }

@@ -107,7 +107,11 @@ public class DataStoreSudoRoleModule implements Module {
                 if(kn[0]<0) {
                     JsonObject debug = new JsonObject();
                     debug.addProperty("key",new String(k));
-                    debug.add("content",JsonUtil.parse(v));
+                    RevisionObject ro = RevisionObject.fromBinary(v);
+                    debug.addProperty("local",ro.local);
+                    debug.addProperty("node",new String(ro.node));
+                    debug.addProperty("revision",ro.revision);
+                    debug.add("content",JsonUtil.parse(ro.data));
                     keys.add(debug);
                     batch[0]--;
                 }
@@ -118,7 +122,13 @@ public class DataStoreSudoRoleModule implements Module {
         }
         else if(session.action().equals("onAccessIndexStoreValue")){
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
-            session.write(accessIndexStore.get(session.name().getBytes()));
+            RevisionObject ro = RevisionObject.fromBinary(accessIndexStore.get(session.name().getBytes()));
+            JsonObject debug = new JsonObject();
+            debug.addProperty("local",ro.local);
+            debug.addProperty("node",new String(ro.node));
+            debug.addProperty("revision",ro.revision);
+            debug.add("content",JsonUtil.parse(ro.data));
+            session.write(debug.toString().getBytes());
         }
         else if(session.action().equals("onKeyIndexStore")){
             String[] query = session.name().split("#");
