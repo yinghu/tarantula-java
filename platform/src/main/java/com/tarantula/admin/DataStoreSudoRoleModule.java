@@ -146,6 +146,10 @@ public class DataStoreSudoRoleModule implements Module {
             summary.add("keys",keys);
             session.write(summary.toString().getBytes());
         }
+        else if(session.action().equals("onKeyIndexStoreValue")){
+            KeyIndexService.KeyIndexStore keyIndexStore = this.deploymentServiceProvider.keyIndexStore();
+            session.write(keyIndexStore.get(session.name().getBytes()));
+        }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();
             session.write(toMessage("backup command issued",true).toString().getBytes());

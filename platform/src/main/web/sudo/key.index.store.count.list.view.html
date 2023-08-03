@@ -75,7 +75,7 @@
     };
     document.querySelector('#tx-key-index-data-store-view').onclick =()=>{
         //console.log(key-index-dataStoreSelected+'#'+keySelected);
-        TARA_API.onGet('role/sudo/datastore','onAccessIndexStoreValue',keySelected,(resp)=>{
+        TARA_API.onGet('role/sudo/datastore','onKeyIndexStoreValue',keySelected,(resp)=>{
             editor.set(resp);                          
         }); 
     };

@@ -33,6 +33,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int SERVER_PUSH_EVENT_CID = 21;
 
+    public static final int KEY_INDEX_EVENT_CID = 22;
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -105,6 +106,11 @@ public class PortableEventRegistry implements PortableFactory {
             case MODULE_RESET_EVENT_CID:
                 _ins = new ModuleResetEvent();
                 break;
+
+            case KEY_INDEX_EVENT_CID:
+                _ins = new KeyIndexEvent();
+                break;
+
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;

@@ -1,6 +1,8 @@
 package com.tarantula.test;
 
+import com.icodesoftware.Event;
 import com.icodesoftware.EventListener;
+import com.icodesoftware.RoutingKey;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaApplicationHeader;
 
@@ -23,7 +25,52 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
 
     @Override
     public EventService publisher() {
-        return null;
+        return new EventService() {
+            @Override
+            public void publish(Event out) {
+
+            }
+
+            @Override
+            public void retry(String retryKey) {
+
+            }
+
+            @Override
+            public void registerEventListener(String topic, EventListener callback) {
+
+            }
+
+            @Override
+            public void unregisterEventListener(String topic) {
+
+            }
+
+            @Override
+            public RoutingKey routingKey(String magicKey, String tag) {
+                return null;
+            }
+
+            @Override
+            public RoutingKey routingKey(String magicKey, String tag, int routingNumber) {
+                return null;
+            }
+
+            @Override
+            public boolean onEvent(Event event) {
+                return false;
+            }
+
+            @Override
+            public void start() throws Exception {
+
+            }
+
+            @Override
+            public void shutdown() throws Exception {
+
+            }
+        };
     }
 
     @Override

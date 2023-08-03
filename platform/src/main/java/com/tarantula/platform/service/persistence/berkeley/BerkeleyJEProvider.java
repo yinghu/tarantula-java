@@ -8,6 +8,7 @@ import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
+import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
@@ -463,6 +464,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         int keySize = key.length;
         int valueSize = value.length;
+        integrationCluster.publisher().publish(new KeyIndexEvent(stringKey,node.nodeName));
         if(metadata.scope()==Distributable.DATA_SCOPE && RevisionObject.MAX_REPLICATION_NODE_NUMBER>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();

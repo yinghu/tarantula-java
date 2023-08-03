@@ -10,6 +10,7 @@ import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 
 import java.util.Properties;
@@ -63,6 +64,16 @@ public class KeyIndexClusterService implements ManagedService, RemoteService {
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         //this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
+        tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
+            logger.warn(event.toString());
+            DataStoreOnPartition dso = onPartition(event.index());
+            byte[] key = event.index().getBytes();
+            KeyIndex keyIndex = new KeyIndexTrack();
+            keyIndex.index(event.index());
+            keyIndex.owner(event.label());
+            dso.lock(key,()-> dso.dataStore.createIfAbsent(keyIndex,false));
+            return true;
+        });
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createKeyIndexDataStore(dso.name);
         }
