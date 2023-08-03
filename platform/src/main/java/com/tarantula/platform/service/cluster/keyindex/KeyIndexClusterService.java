@@ -53,25 +53,30 @@ public class KeyIndexClusterService implements ManagedService, RemoteService {
 
     }
 
-    public KeyIndex setIfAbsent(String key,KeyIndex pending){
+    public KeyIndex get(String key){
         DataStoreOnPartition dso = onPartition(key);
-        dso.lock(key.getBytes(),()->
-            dso.dataStore.createIfAbsent(pending,false)
-        );
-        return pending;
+        KeyIndex keyIndex = new KeyIndexTrack();
+        boolean loaded = dso.lock(key.getBytes(),()-> {
+            byte[] ret = dso.dataStore.backup().get(key.getBytes());
+            if(ret!=null){
+                keyIndex.fromBinary(ret);
+            }
+            return ret!=null;
+        });
+        return loaded?keyIndex:null;
     }
 
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         //this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
-            logger.warn(event.toString());
+            //logger.warn(event.toString());
             DataStoreOnPartition dso = onPartition(event.index());
-            byte[] key = event.index().getBytes();
-            KeyIndex keyIndex = new KeyIndexTrack();
-            keyIndex.index(event.index());
-            keyIndex.owner(event.label());
-            dso.lock(key,()-> dso.dataStore.createIfAbsent(keyIndex,false));
+            //byte[] key = event.index().getBytes();
+            //KeyIndex keyIndex = new KeyIndexTrack();
+            //keyIndex.index(event.index());
+            //keyIndex.owner(event.label());
+            //dso.lock(key,()-> dso.dataStore.createIfAbsent(keyIndex,false));
             return true;
         });
         for(DataStoreOnPartition dso : dataStoreOnPartitions){

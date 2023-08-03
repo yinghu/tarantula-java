@@ -34,25 +34,21 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         return KeyIndexService.NAME;
     }
 
-    @Override
-    public void set(KeyIndex pending) {
+
+    public KeyIndex lookup(String pending) {
         NodeEngine nodeEngine = getNodeEngine();
-        KeyIndexSetOperation operation = new KeyIndexSetOperation(pending);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(pending.key().asString());
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,partitionId);
-        final Future<Void> future = builder.invoke();
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(pending);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
+        final Future<KeyIndex> future = builder.invoke();
         try {
-            future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            e.printStackTrace();
-            //return null;
+            logger.error("error on lookup",e);
+            return null;
         }
     }
 
-    public KeyIndex get(String key){
-        return null;
-    }
 
     @Override
     public String name() {
@@ -71,6 +67,6 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
 
     @Override
     public void setup(ServiceContext serviceContext){
-        logger.warn("Key index service started");
+        logger.warn("Key index service proxy started");
     }
 }

@@ -6,8 +6,7 @@ public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
 
-    void set(KeyIndex pending);
-    KeyIndex get(String key);
+    KeyIndex lookup(String key);
 
 
 

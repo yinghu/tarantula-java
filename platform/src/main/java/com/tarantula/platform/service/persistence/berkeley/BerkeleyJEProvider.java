@@ -467,7 +467,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         int keySize = key.length;
         int valueSize = value.length;
-        //integrationCluster.publisher().publish(new KeyIndexEvent(stringKey,node.nodeName));
         if(metadata.scope()==Distributable.DATA_SCOPE && maxReplicationNumber>0){
             String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
