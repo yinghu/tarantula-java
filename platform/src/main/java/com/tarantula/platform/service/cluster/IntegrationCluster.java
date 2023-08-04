@@ -59,7 +59,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private KeyIndexService keyIndexService;
     private DeployService deployService;
     private RecoverService recoverService;
-    private CountDownLatch _integrationInstanceStarted ;
+    private CountDownLatch _integrationInstanceStarted;
+    private CountDownLatch _serviceReady;
     private MetricsListener metricsListener =(n,d)->{};
 
     private ClusterSummary summary;
@@ -79,6 +80,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             this.partitionStates[i]=new PartitionState(i,false);
         }
         _integrationInstanceStarted = new CountDownLatch(1);
+        _serviceReady = new CountDownLatch(1);
         roundRobinQueue = new ArrayBlockingQueue<>(tcx.clusterMaxSize);
     }
     public String name(){
@@ -118,6 +120,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.deployService.setup(this.tarantulaContext);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         this.recoverService.setup(this.tarantulaContext);
+        _serviceReady.countDown();
         new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(this.tarantulaContext._accessIndexServiceStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
     }
@@ -330,6 +333,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
+        try{_serviceReady.await();}catch (Exception ex){}
         String[] node = mEvent.getValue().toString().split("#");
         String nodeName = node[0];
         String nodeId = node[1];
