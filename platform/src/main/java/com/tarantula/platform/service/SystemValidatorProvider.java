@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
 
@@ -54,6 +55,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private PresenceKey presenceKey;
     private Cipher encrypt;
     private ClusterProvider.ClusterStore clusterStore;
+
+    private CountDownLatch _serviceReady = new CountDownLatch(1);
 
     public MessageDigest messageDigest(){
         try{
@@ -101,6 +104,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public byte[] clusterKey(String clusterNameSuffix){
+        try{_serviceReady.await();}catch (Exception ex){}
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
         return presenceKey.toKey();
     }
@@ -428,6 +432,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }
         //map only store
         clusterStore = serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,TokenValidatorProvider.NAME,true,false,false);
+        _serviceReady.countDown();
     }
 
     @Override
