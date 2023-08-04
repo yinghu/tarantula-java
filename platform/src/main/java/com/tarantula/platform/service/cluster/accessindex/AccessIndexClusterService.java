@@ -123,9 +123,11 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         return accessIndex;
     }
     public void enable(){
+        if(deploymentServiceProvider==null) return;
         this.deploymentServiceProvider.distributionCallback().onAccessIndexEnabled();
     }
     public void disable(){
+        if(deploymentServiceProvider==null) return;
         this.deploymentServiceProvider.distributionCallback().onAccessIndexDisabled();
     }
 
@@ -142,7 +144,11 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     private DataStoreOnPartition onPartition(String accessKey){
         int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
-        return this.dataStoreOnPartitions[partition];
+        DataStoreOnPartition dso = this.dataStoreOnPartitions[partition];
+        if(dso.dataStore==null) {
+            dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);
+        }
+        return dso;
     }
 
     public void replicate(int partition,byte[] key,byte[] value){
