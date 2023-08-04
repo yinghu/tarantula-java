@@ -333,12 +333,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
+        try{_serviceReady.await();}catch (Exception ex){}
         String[] node = mEvent.getValue().toString().split("#");
         String nodeName = node[0];
         String nodeId = node[1];
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
-         //memberId => nodeId index
+        this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
         summary.register(fromCluster(nodeId));
         for(int i=0;i<10;i++){
             try{
@@ -360,8 +361,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         }
-        try{_serviceReady.await();}catch (Exception ex){}
-        this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes());
     }
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
