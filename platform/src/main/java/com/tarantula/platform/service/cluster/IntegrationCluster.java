@@ -179,18 +179,27 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public AccessIndexService accessIndexService(){
+        if(this.accessIndexService!=null) return this.accessIndexService;
+        _wait();
         return this.accessIndexService;
     }
     public KeyIndexService keyIndexService(){
+        if(keyIndexService!=null) return keyIndexService;
+        _wait();
         return keyIndexService;
     }
     public DeployService deployService(){
+        if(deployService!=null) return deployService;
+        _wait();
         return this.deployService;
     }
     public RecoverService recoverService(){
+        if(recoverService!=null) return recoverService;
+        _wait();
         return this.recoverService;
     }
     public <T extends ServiceProvider> T serviceProvider(String name){
+        _wait();
         return this._cluster.getDistributedObject(name,name);
     }
     private void onDispatch(Event event){
@@ -333,7 +342,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
-        try{_serviceReady.await();}catch (Exception ex){}
+        _wait();
         String[] node = mEvent.getValue().toString().split("#");
         String nodeName = node[0];
         String nodeId = node[1];
@@ -394,6 +403,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     @Override
     public void updateSummary(ServiceProvider.Summary summary){
         summary.update(PENDING_EVENT_NUMBER,replicationQueue.size());
+    }
+
+    private void _wait(){
+        try{
+            _serviceReady.await();
+        }catch (Exception ex){
+            log.error("waiting error",ex);
+        }
     }
 
 }
