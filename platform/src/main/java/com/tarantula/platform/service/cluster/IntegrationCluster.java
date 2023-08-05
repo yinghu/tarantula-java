@@ -350,7 +350,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
         Node n = fromCluster(nodeId);
-        nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
+        //nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
         summary.register(n);
         for(int i=0;i<10;i++){
             try{
@@ -388,8 +388,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         nList.forEach(nodeListener -> nodeListener.nodeRemoved(new ClusterNode("",node[0],1)));
     }
     public void onNodeAdded(String memberId){
-        //Node node = fromCluster(memberId);
-        //nList.forEach(nodeListener -> nodeListener.nodeAdded(node));
         roundRobinQueue.offer(new ClusterNode(memberId));
     }
     public Node roundRobinMember(){
