@@ -24,6 +24,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String deploymentId;
     public String clusterNameSuffix;
     public int partitionNumber;
+    public int clusterPartitionNumber;
 
     public String deployDirectory;
     public String servicePushAddress;
@@ -33,10 +34,11 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
 
-    public ClusterNode(String bucketName, String nodeName,int partitionNumber){
+    public ClusterNode(String bucketName, String nodeName,int partitionNumber,int clusterPartitionNumber){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
+        this.clusterPartitionNumber = clusterPartitionNumber;
     }
     public ClusterNode(){
     }
@@ -96,6 +98,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return this.clusterNameSuffix;
     }
 
+    public int clusterPartitionNumber(){
+        return this.clusterPartitionNumber;
+    }
     public String deployDirectory(){
         return deployDirectory;
     }

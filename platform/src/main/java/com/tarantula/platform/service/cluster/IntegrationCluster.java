@@ -380,7 +380,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         roundRobinQueue.remove(new ClusterNode(memberId));
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
-        ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
+        ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber,tarantulaContext.accessIndexRoutingNumber);
         nList.forEach(nodeListener -> nodeListener.nodeRemoved(removed));
         this.summary.unregister(removed);
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node

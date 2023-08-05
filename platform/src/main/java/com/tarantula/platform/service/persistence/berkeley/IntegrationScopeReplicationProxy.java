@@ -3,18 +3,19 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.platform.service.persistence.MapStoreListener;
+import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.KeyIndexTrack;
+import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.RevisionObject;
 
-public class IntegrationScopeReplicationProxy implements MapStoreListener, ServiceProvider, ClusterProvider.NodeListener {
+public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
-    private ServiceContext serviceContext;
 
+    public IntegrationScopeReplicationProxy(DataStoreProvider dataStoreProvider){
+        super(dataStoreProvider);
+    }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
@@ -28,10 +29,26 @@ public class IntegrationScopeReplicationProxy implements MapStoreListener, Servi
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
         logger.warn("distributing ["+stringKey+"]");
+        DataStoreOnPartition dso = onPartition(key);
+        dso.lock(key,()->{
+                KeyIndexTrack keyIndex = new KeyIndexTrack();
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(new String(value.node));
+                return dso.dataStore.createIfAbsent(keyIndex,false);
+            }
+        );
     }
 
     @Override
-    public byte[] onRecovering(Metadata metadata, byte[] key) {
+    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
+        DataStoreOnPartition dso = onPartition(key);
+        KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
+        keyIndexTrack.index(stringKey);
+        if(dso.lock(key,()->dso.dataStore.load(keyIndexTrack))){
+            serviceContext.accessIndexService().get(stringKey);
+            //serviceContext.clusterProvider().accessIndexService().get()
+            //return
+        }
         return null;
     }
 
@@ -40,35 +57,6 @@ public class IntegrationScopeReplicationProxy implements MapStoreListener, Servi
 
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        serviceContext.clusterProvider().registerNodeListener(this);
-    }
 
 
-    @Override
-    public String name() {
-        return null;
-    }
-
-    @Override
-    public void start() throws Exception {
-
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-
-    @Override
-    public void nodeAdded(ClusterProvider.Node node) {
-        logger.warn("Node added>"+node.nodeName()+">>"+node.memberId());
-    }
-
-    @Override
-    public void nodeRemoved(ClusterProvider.Node node) {
-        logger.warn("Node removed>"+node.nodeName());
-    }
 }

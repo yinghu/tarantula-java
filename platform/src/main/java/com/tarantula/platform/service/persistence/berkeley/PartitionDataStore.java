@@ -117,7 +117,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         RevisionObject pendingData = dso.lock(key,()->_getRevisionObject(dso,key));
         if(!pendingData.successful || !pendingData.local
         ){
-            byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+            byte[] data = mapStoreListener.onRecovering(dso.metadata,akey,key);
             if(data != null){
                 RevisionObject remoteData = RevisionObject.fromBinary(data);
                 if(!pendingData.successful || remoteData.revision >= pendingData.revision){
@@ -167,7 +167,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                 return RevisionObject.FALSE;
             });
             if(!suc.successful){//remote recovery
-                byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+                byte[] data = mapStoreListener.onRecovering(dso.metadata,akey,key);
                 if(data != null){
                     RevisionObject remoteData = RevisionObject.fromBinary(data);
                     suc = dso.lock(key,()->{
@@ -218,7 +218,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                 return RevisionObject.FALSE;
             });
             if(!suc.successful){//remote recovery
-               byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+               byte[] data = mapStoreListener.onRecovering(dso.metadata,akey,key);
                if(data != null){
                    RevisionObject remoteData = RevisionObject.fromBinary(data);
                    suc = dso.lock(key,()->{
@@ -274,7 +274,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                 t.revision(pendingData.revision);
                 return true;
             }
-            byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+            byte[] data = mapStoreListener.onRecovering(dso.metadata,akey,key);
             if(data==null) return false;
             RevisionObject remoteData = RevisionObject.fromBinary(data);
             pendingData = dso.lock(key,()->{
@@ -303,7 +303,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         if(pendingData.successful && pendingData.local){
             return RevisionObject.toBinary(pendingData.revision,pendingData.data,pendingData.local,_node);
         }
-        byte[] data = mapStoreListener.onRecovering(dso.metadata,key);
+        byte[] data = mapStoreListener.onRecovering(dso.metadata,new String(key),key);
         if(data==null) return null;
         RevisionObject remoteData = RevisionObject.fromBinary(data);
         pendingData = dso.lock(key,()->{
@@ -325,7 +325,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             RevisionObject pendingData = _getRevisionObject(dso,owner);
             if(!pendingData.successful || !pendingData.local){
                 //recovering from remote
-                byte[] data = mapStoreListener.onRecovering(dso.metadata,owner);
+                byte[] data = mapStoreListener.onRecovering(dso.metadata,akey,owner);
                 if(data!=null){
                     RevisionObject remoteData = RevisionObject.fromBinary(data);
                     pendingData = dso.lock(owner,()->{

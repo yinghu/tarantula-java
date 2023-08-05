@@ -72,7 +72,7 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
             byte[] k = akey.getBytes();
             byte[] v = _get(k);//get local
             if(v==null){
-                v = mapStoreListener.onRecovering(metadata1,k);//get cluster
+                v = mapStoreListener.onRecovering(metadata1,akey,k);//get cluster
                 if(v!=null) _set(k,v);//local set
             }
             if(v==null){
@@ -98,7 +98,7 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
             byte[] k = akey.getBytes();
             byte[] v = _get(k);//get local
             if(v==null){
-                v = mapStoreListener.onRecovering(metadata1,k);//get cluster
+                v = mapStoreListener.onRecovering(metadata1,akey,k);//get cluster
                 if(v!=null) _set(k,v);//local set
             }
             if(v!=null){
@@ -127,7 +127,7 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
                 t.fromBinary(value);
                 return true;
             }
-            if((value=mapStoreListener.onRecovering(metadata1,key))==null) return false;
+            if((value=mapStoreListener.onRecovering(metadata1,akey,key))==null) return false;
             t.fromBinary(value);
             _set(key,value);
             return true;

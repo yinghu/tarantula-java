@@ -20,6 +20,7 @@ public class DataStoreTestEvn {
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
                 DataStoreTestEvn.dataStoreProvider.start();
                 DataStoreTestEvn.dataStoreProvider.setup(serviceContext);
+                DataStoreTestEvn.dataStoreProvider.waitForData();
             }catch (Exception exx){
                 exx.printStackTrace();
                 throw new RuntimeException(exx);

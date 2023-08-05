@@ -110,6 +110,8 @@ public interface ClusterProvider extends ServiceProvider {
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
 
+        int clusterPartitionNumber();
+
     }
 
     interface NodeListener{

@@ -77,7 +77,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
             byte[] k = akey.getBytes();
             byte[] v = _get(k);//get local
             if(v==null){
-                v = mapStoreListener.onRecovering(metadata1,k);//get cluster
+                v = mapStoreListener.onRecovering(metadata1,akey,k);//get cluster
                 if(v!=null) _set(k,v);//local set
             }
             if(v!=null){
@@ -108,7 +108,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
                 t.fromBinary(ro.data);
                 return true;
             }
-            if((value=mapStoreListener.onRecovering(metadata1,key))==null) return false;
+            if((value=mapStoreListener.onRecovering(metadata1,akey,key))==null) return false;
             RevisionObject ro = RevisionObject.fromBinary(value);
             t.fromBinary(ro.data);
             _set(key,value);

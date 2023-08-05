@@ -199,9 +199,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
         }
-        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
+        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy(this);
         this.integrationScopeReplicationProxy.setup(serviceContext);
-        this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
+        this.dataScopeReplicationProxy = new DataScopeReplicationProxy(this);
         this.dataScopeReplicationProxy.setup(serviceContext);
     }
     @Override
@@ -508,12 +508,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
     @Override
-    public byte[] onRecovering(Metadata metadata,byte[] key){
+    public byte[] onRecovering(Metadata metadata,String stringKey,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
             return this.integrationCluster.recoverService().onRecover(metadata.source(),key);
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            return this.integrationCluster.accessIndexService().onRecover(metadata.partition(),key);
+            return this.integrationScopeReplicationProxy.onRecovering(metadata,stringKey,key);
+            //return this.integrationCluster.accessIndexService().onRecover(metadata.partition(),key);
         }
         return null;
     }

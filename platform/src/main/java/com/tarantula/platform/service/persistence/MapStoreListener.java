@@ -13,7 +13,7 @@ public interface MapStoreListener {
     void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
     void onDistributing(Metadata metadata,String stringKey, byte[] key, RevisionObject value);
     //recover cluster operation
-    byte[] onRecovering(Metadata metadata,byte[] key);
+    byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 
     void onDeleting(Metadata metadata,byte[] key);
 

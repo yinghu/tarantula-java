@@ -3,16 +3,16 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.platform.service.persistence.MapStoreListener;
+import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.RevisionObject;
 
-public class DataScopeReplicationProxy implements MapStoreListener, ServiceProvider, ClusterProvider.NodeListener {
+public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
-    private ServiceContext serviceContext;
+
+    public DataScopeReplicationProxy(DataStoreProvider dataStoreProvider){
+        super(dataStoreProvider);
+    }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
@@ -29,7 +29,7 @@ public class DataScopeReplicationProxy implements MapStoreListener, ServiceProvi
     }
 
     @Override
-    public byte[] onRecovering(Metadata metadata, byte[] key) {
+    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return new byte[0];
     }
 
@@ -38,34 +38,5 @@ public class DataScopeReplicationProxy implements MapStoreListener, ServiceProvi
 
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        serviceContext.clusterProvider().registerNodeListener(this);
-    }
 
-    @Override
-    public String name() {
-        return null;
-    }
-
-    @Override
-    public void start() throws Exception {
-
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-
-    @Override
-    public void nodeAdded(ClusterProvider.Node node) {
-        logger.warn("Node added>"+node.nodeName()+">>"+node.memberId());
-    }
-
-    @Override
-    public void nodeRemoved(ClusterProvider.Node node) {
-        logger.warn("Node removed>"+node.nodeName());
-    }
 }
