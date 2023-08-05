@@ -421,7 +421,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void registerNodeListener(NodeListener nodeListener){
         nList.add(nodeListener);
-        summary.clusterNodes().forEach(n->nodeListener.nodeAdded(n));
+        //summary.clusterNodes().forEach(n->nodeListener.nodeAdded(n));
     }
 
 }

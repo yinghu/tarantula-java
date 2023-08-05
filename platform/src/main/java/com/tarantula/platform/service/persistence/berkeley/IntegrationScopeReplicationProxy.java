@@ -45,7 +45,7 @@ public class IntegrationScopeReplicationProxy implements MapStoreListener, Servi
         this.serviceContext = serviceContext;
         serviceContext.clusterProvider().registerNodeListener(this);
     }
-    
+
 
     @Override
     public String name() {
