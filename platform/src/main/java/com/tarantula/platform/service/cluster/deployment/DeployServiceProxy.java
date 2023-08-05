@@ -411,10 +411,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 expected = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
                 break;
             } catch (Exception e) {
-                logger.warn("re-trying ["+i+"]");
+                logger.warn("re-trying ["+i+"]",e);
                 _wait();
             }
         }
+        if(expected==null) throw new RuntimeException("no master key existed");
         return expected;
     }
 
