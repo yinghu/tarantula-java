@@ -67,7 +67,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
-
+    private CopyOnWriteArrayList<NodeListener> nList = new CopyOnWriteArrayList<>();
     private final ArrayBlockingQueue<Node> roundRobinQueue;
 
 
@@ -349,14 +349,19 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
-        summary.register(fromCluster(nodeId));
+        Node n = fromCluster(nodeId);
+        nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
+        summary.register(n);
         for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
                         String[] pnode = m.getStringAttribute("node").split("#");
                         Node exstingNode = fromCluster(pnode[1]);
-                        if(exstingNode != null) this.summary.register(fromCluster(pnode[1]));
+                        if(exstingNode != null){
+                            nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
+                            this.summary.register(fromCluster(pnode[1]));
+                        }
                     }
                 }
                 break;
@@ -380,8 +385,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.summary.unregister(new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber));
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
+        nList.forEach(nodeListener -> nodeListener.nodeRemoved(new ClusterNode("",node[1],1)));
     }
     public void onNodeAdded(String memberId){
+        Node node = fromCluster(memberId);
+        nList.forEach(nodeListener -> nodeListener.nodeAdded(node));
         roundRobinQueue.offer(new ClusterNode(memberId));
     }
     public Node roundRobinMember(){
@@ -411,6 +419,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }catch (Exception ex){
             log.error("waiting error",ex);
         }
+    }
+
+    public void registerNodeListener(NodeListener nodeListener){
+        nList.add(nodeListener);
+        summary.clusterNodes().forEach(n->nodeListener.nodeAdded(n));
     }
 
 }

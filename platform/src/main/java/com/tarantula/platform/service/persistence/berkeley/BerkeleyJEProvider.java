@@ -8,7 +8,6 @@ import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
@@ -87,6 +86,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private int maxReplicationNumber = 3;
 
+    private IntegrationScopeReplicationProxy integrationScopeReplicationProxy;
+    private DataScopeReplicationProxy dataScopeReplicationProxy;
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
@@ -133,7 +134,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
             this.iBackupProvider.registerDataStore(Distributable.INTEGRATION_SCOPE,name);
-            return  new AccessIndexDataStore(this.node,db,this);
+            return  new AccessIndexDataStore(this.node,db,this.integrationScopeReplicationProxy);
         });
     }
     @Override
@@ -198,10 +199,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
             this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
         }
-
+        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
+        this.integrationScopeReplicationProxy.setup(serviceContext);
+        this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
+        this.dataScopeReplicationProxy.setup(serviceContext);
     }
     @Override
     public void waitForData() {
+        this.integrationScopeReplicationProxy.waitForData();
+        this.dataScopeReplicationProxy.waitForData();
     }
     @Override
     public void start() throws Exception {
@@ -494,7 +500,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         onMetrics();
     }
     public void onDistributing(Metadata metadata,String stringKey, byte[] key, RevisionObject value){
-        
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            integrationScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
+        }
+        else if(metadata.scope()==Distributable.DATA_SCOPE){
+            dataScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
+        }
     }
     @Override
     public byte[] onRecovering(Metadata metadata,byte[] key){

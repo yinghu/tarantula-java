@@ -38,7 +38,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
     }
-
     public ClusterNode(){
     }
 

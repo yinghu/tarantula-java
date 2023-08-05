@@ -35,6 +35,7 @@ public interface ClusterProvider extends ServiceProvider {
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
 
+    void registerNodeListener(NodeListener nodeListener);
     Node roundRobinMember();
 
     int partition(byte[] key);
@@ -111,4 +112,8 @@ public interface ClusterProvider extends ServiceProvider {
 
     }
 
+    interface NodeListener{
+        void nodeAdded(Node node);
+        void nodeRemoved(Node node);
+    }
 }

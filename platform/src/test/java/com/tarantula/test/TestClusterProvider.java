@@ -131,7 +131,7 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     public void unregisterReloadListener(String registerKey) {
 
     }
-
+    public void registerNodeListener(NodeListener nodeListener){}
     @Override
     public Node roundRobinMember() {
         return null;
