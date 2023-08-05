@@ -356,6 +356,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
+                        log.warn(m.getUuid()+">>"+m.getAddress().toString()+">>"+m.getStringAttribute("node"));
                         String[] pnode = m.getStringAttribute("node").split("#");
                         Node exstingNode = fromCluster(pnode[1]);
                         if(exstingNode != null){
