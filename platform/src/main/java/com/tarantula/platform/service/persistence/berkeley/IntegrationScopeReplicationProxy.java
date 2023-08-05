@@ -68,11 +68,11 @@ public class IntegrationScopeReplicationProxy implements MapStoreListener, Servi
 
     @Override
     public void nodeAdded(ClusterProvider.Node node) {
-        logger.warn("Node added>"+node.nodeName());
+        logger.warn("Node added>"+node.nodeName()+">>"+node.memberId());
     }
 
     @Override
     public void nodeRemoved(ClusterProvider.Node node) {
-
+        logger.warn("Node removed>"+node.nodeName());
     }
 }
