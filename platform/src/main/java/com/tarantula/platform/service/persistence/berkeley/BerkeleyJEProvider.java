@@ -134,7 +134,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         return this.dMap.computeIfAbsent(name,(k)->{
             Database db = this.createDatabase(name,Distributable.INTEGRATION_SCOPE);
             this.iBackupProvider.registerDataStore(Distributable.INTEGRATION_SCOPE,name);
-            return  new AccessIndexDataStore(this.node,db,this.integrationScopeReplicationProxy);
+            return  new AccessIndexDataStore(this.node,db,this);
         });
     }
     @Override

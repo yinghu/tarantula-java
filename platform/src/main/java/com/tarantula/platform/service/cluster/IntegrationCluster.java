@@ -385,11 +385,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.summary.unregister(new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber));
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
-        nList.forEach(nodeListener -> nodeListener.nodeRemoved(new ClusterNode("",node[1],1)));
+        nList.forEach(nodeListener -> nodeListener.nodeRemoved(new ClusterNode("",node[0],1)));
     }
     public void onNodeAdded(String memberId){
-        Node node = fromCluster(memberId);
-        nList.forEach(nodeListener -> nodeListener.nodeAdded(node));
+        //Node node = fromCluster(memberId);
+        //nList.forEach(nodeListener -> nodeListener.nodeAdded(node));
         roundRobinQueue.offer(new ClusterNode(memberId));
     }
     public Node roundRobinMember(){
