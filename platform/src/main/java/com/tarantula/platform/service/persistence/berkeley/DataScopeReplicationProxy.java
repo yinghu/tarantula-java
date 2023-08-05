@@ -41,10 +41,6 @@ public class DataScopeReplicationProxy implements MapStoreListener, ServiceProvi
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-    }
-    @Override
-    public void waitForData() {
-        logger.warn("WAITING FOR DATA");
         serviceContext.clusterProvider().registerNodeListener(this);
     }
 
@@ -65,7 +61,7 @@ public class DataScopeReplicationProxy implements MapStoreListener, ServiceProvi
 
     @Override
     public void nodeAdded(ClusterProvider.Node node) {
-        logger.warn("Node added>"+node.nodeName());
+        logger.warn("Node added>"+node.nodeName()+">>"+node.memberId());
     }
 
     @Override

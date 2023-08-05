@@ -43,13 +43,9 @@ public class IntegrationScopeReplicationProxy implements MapStoreListener, Servi
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-    }
-
-    @Override
-    public void waitForData() {
-        logger.warn("WAITING FOR DATA");
         serviceContext.clusterProvider().registerNodeListener(this);
     }
+    
 
     @Override
     public String name() {
