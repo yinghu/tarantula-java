@@ -67,6 +67,8 @@ public class TarantulaMain {
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
 			TarantulaContext.lobbySubscriptionEnabled  = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
+			TarantulaContext.operationRetries = Integer.parseInt(override(overriding,"tarantula.operation.retries",_user,_config));
+			TarantulaContext.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 			btx.runAsMirror = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.run.as.mirror",_user,_config));
 			btx.backupEnabled = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.backup.enabled",_user,_config));
 			btx.backupUrl = override(overriding,"tarantula.platform.cluster.backup.url",_user,_config);
@@ -85,8 +87,7 @@ public class TarantulaMain {
             btx.eventThreadPoolSetting = override(overriding,"tarantula.event.pool.setting",_user,_config);
             btx.retries  = Integer.parseInt(override(overriding,"tarantula.event.max.retries",_user,_config));
             btx.retryInterval = Long.parseLong(override(overriding,"tarantula.event.retry.interval",_user,_config));
-			btx.operationRetries = Integer.parseInt(override(overriding,"tarantula.operation.retries",_user,_config));
-			btx.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
+
 		    btx.tarantulaServerValidator = override(overriding,"tarantula.service.authenticator.provider",_user,_config);
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
 		    btx.singleModuleApplication = override(overriding,"tarantula.service.deployment.module.singleton.application",_user,_config);

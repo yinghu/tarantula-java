@@ -99,8 +99,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public long retryInterval; //event retry interval time
     public int recoverBatchSize = 10;
 
-    public int operationRetries;
-    public long operationRejectInterval;
+    public static int operationRetries;
+    public static long operationRejectInterval;
 
 
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();

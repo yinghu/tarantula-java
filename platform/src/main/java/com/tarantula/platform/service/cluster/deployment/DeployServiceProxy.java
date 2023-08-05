@@ -404,12 +404,18 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         ClusterKeyOperation operation = new ClusterKeyOperation();
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
+        byte[] expected = null;
+        for(int i=0; i <TarantulaContext.operationRetries; i++){
+            try {
+                final Future<byte[]> future = builder.invoke();
+                expected = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+                break;
+            } catch (Exception e) {
+                logger.warn("re-trying ["+i+"]");
+                _wait();
+            }
         }
+        return expected;
     }
 
     public void onResetClusterKey(){
@@ -461,6 +467,14 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 logger.error("disable presence service error on node->"+m.getAddress(),e);
                 //goes to next node if failed
             }
+        }
+    }
+
+    private void _wait(){
+        try {
+            Thread.sleep(TarantulaContext.operationRejectInterval);
+        }catch (Exception ex){
+            logger.error("error on _wait",ex);
         }
     }
 }
