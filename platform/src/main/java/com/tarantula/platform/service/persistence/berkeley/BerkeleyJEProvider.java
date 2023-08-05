@@ -493,6 +493,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         onMetrics();
     }
+    public void onDistributing(Metadata metadata,String stringKey, byte[] key, RevisionObject value){
+        
+    }
     @Override
     public byte[] onRecovering(Metadata metadata,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
