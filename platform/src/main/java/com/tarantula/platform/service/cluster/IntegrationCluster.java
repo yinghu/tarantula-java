@@ -349,19 +349,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
-        Node n = fromCluster(nodeId);
-        //nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
-        summary.register(n);
+        summary.register(fromCluster(nodeId));
         for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
-                        log.warn(m.getUuid()+">>"+m.getAddress().toString()+">>"+m.getStringAttribute("node"));
                         String[] pnode = m.getStringAttribute("node").split("#");
                         Node exstingNode = fromCluster(pnode[1]);
                         if(exstingNode != null){
-                            nList.forEach(nodeListener -> nodeListener.nodeAdded(n));
-                            this.summary.register(fromCluster(pnode[1]));
+                            nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
+                            this.summary.register(exstingNode);
                         }
                     }
                 }
