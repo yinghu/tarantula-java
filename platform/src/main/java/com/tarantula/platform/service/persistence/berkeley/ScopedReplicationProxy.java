@@ -9,7 +9,7 @@ import com.tarantula.platform.service.persistence.RevisionObject;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScopedReplicationProxy implements MapStoreListener, ServiceProvider, ClusterProvider.NodeListener {
+public class ScopedReplicationProxy implements MapStoreListener, KeyIndexService, ClusterProvider.NodeListener {
 
     protected ServiceContext serviceContext;
     protected  DataStoreOnPartition[] dataStoreOnPartitions;
@@ -62,7 +62,7 @@ public class ScopedReplicationProxy implements MapStoreListener, ServiceProvider
 
     @Override
     public String name() {
-        return null;
+        return KeyIndexService.NAME;
     }
 
     @Override
@@ -88,5 +88,10 @@ public class ScopedReplicationProxy implements MapStoreListener, ServiceProvider
     public DataStoreOnPartition onPartition(byte[] key){
         int partition = this.serviceContext.clusterProvider().partition(key);
         return this.dataStoreOnPartitions[partition];
+    }
+
+    @Override
+    public KeyIndex lookup(String key) {
+        return null;
     }
 }

@@ -124,4 +124,7 @@ public class ServiceContextProxy implements ServiceContext {
     public ServiceEventLogger serviceEventLogger(){
         return this.tarantulaContext.serviceEventLogger();
     }
+    public KeyIndexService keyIndexService(){
+        return this.tarantulaContext.keyIndexService();
+    }
 }

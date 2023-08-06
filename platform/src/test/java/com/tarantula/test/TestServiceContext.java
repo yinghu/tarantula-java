@@ -146,4 +146,7 @@ public class TestServiceContext implements ServiceContext {
     public ServiceEventLogger serviceEventLogger(){
         return null;
     }
+    public KeyIndexService keyIndexService(){
+        return null;
+    }
 }

@@ -22,6 +22,7 @@ public interface ClusterProvider extends ServiceProvider {
     AccessIndexService accessIndexService();
 
     KeyIndexService keyIndexService();
+
     DeployService deployService();
     RecoverService recoverService();
 
