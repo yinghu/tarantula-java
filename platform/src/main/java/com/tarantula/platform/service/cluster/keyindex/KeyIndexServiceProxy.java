@@ -11,6 +11,7 @@ import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.ClusterUtil;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -39,14 +40,12 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         NodeEngine nodeEngine = getNodeEngine();
         KeyIndexLookupOperation operation = new KeyIndexLookupOperation(pending);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
-        final Future<KeyIndex> future = builder.invoke();
-        try {
-            return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            future.cancel(true);
-            logger.error("error on lookup",e);
-            return null;
-        }
+        ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
+            Future<KeyIndex> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!ret.successful) throw new RuntimeException(ret.exception);
+        return (KeyIndex)ret.result;
     }
 
 

@@ -11,6 +11,7 @@ import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.ClusterUtil;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -404,19 +405,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         ClusterKeyOperation operation = new ClusterKeyOperation();
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        byte[] expected = null;
-        for(int i=0; i <TarantulaContext.operationRetries; i++){
-            try {
-                final Future<byte[]> future = builder.invoke();
-                expected = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-                break;
-            } catch (Exception e) {
-                logger.warn("re-trying ["+i+"]",e);
-                _wait();
-            }
-        }
-        if(expected==null) throw new RuntimeException("no master key existed");
-        return expected;
+        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
+        });
+        if(callResult.result == null) throw new RuntimeException("no master key existed");
+        return (byte[]) callResult.result;
     }
 
     public void onResetClusterKey(){
