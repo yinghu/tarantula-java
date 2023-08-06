@@ -1,8 +1,10 @@
 package com.tarantula.test;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
+import com.tarantula.platform.service.persistence.MapStoreListener;
 
 public class DataStoreTestEvn {
 
@@ -13,6 +15,7 @@ public class DataStoreTestEvn {
     static DataStoreProvider dataStoreProvider;
     static ServiceContext serviceContext;
 
+    static MapStoreListener mapStoreListener = new TestMapStoreListener();
     public static void setUp() {
         serviceContext = new TestServiceContext();
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, 3,dataStoreProvider->{
@@ -20,7 +23,11 @@ public class DataStoreTestEvn {
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
                 DataStoreTestEvn.dataStoreProvider.start();
                 DataStoreTestEvn.dataStoreProvider.setup(serviceContext);
+                DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.LOCAL_SCOPE,mapStoreListener);
+                DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,mapStoreListener);
+                DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.waitForData();
+
             }catch (Exception exx){
                 exx.printStackTrace();
                 throw new RuntimeException(exx);

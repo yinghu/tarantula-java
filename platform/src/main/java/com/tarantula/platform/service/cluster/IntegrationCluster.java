@@ -56,7 +56,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private AccessIndexService accessIndexService;
 
-    private KeyIndexService keyIndexService;
+    //private KeyIndexService keyIndexService;
     private DeployService deployService;
     private RecoverService recoverService;
     private CountDownLatch _integrationInstanceStarted;
@@ -114,8 +114,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
         this.accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.accessIndexService.setup(this.tarantulaContext);
-        this.keyIndexService = _cluster.getDistributedObject(KeyIndexService.NAME,KeyIndexService.NAME);
-        this.keyIndexService.setup(this.tarantulaContext);
+        //this.keyIndexService = _cluster.getDistributedObject(KeyIndexService.NAME,KeyIndexService.NAME);
+        //this.keyIndexService.setup(this.tarantulaContext);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.deployService.setup(this.tarantulaContext);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
@@ -183,11 +183,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _wait();
         return this.accessIndexService;
     }
-    public KeyIndexService keyIndexService(){
-        if(keyIndexService!=null) return keyIndexService;
-        _wait();
-        return keyIndexService;
-    }
+    //public KeyIndexService keyIndexService(){
+        //if(keyIndexService!=null) return keyIndexService;
+        //_wait();
+        //return keyIndexService;
+    //}
     public DeployService deployService(){
         if(deployService!=null) return deployService;
         _wait();

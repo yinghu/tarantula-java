@@ -86,8 +86,10 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private int maxReplicationNumber = 3;
 
-    private IntegrationScopeReplicationProxy integrationScopeReplicationProxy;
-    private DataScopeReplicationProxy dataScopeReplicationProxy;
+    private MapStoreListener integrationScopeReplicationProxy;
+    private MapStoreListener dataScopeReplicationProxy;
+
+    private MapStoreListener localScopeReplicationProxy;
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
@@ -128,6 +130,20 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.cacheSynchronizer = new CacheSynchronizer(this,nextEvictInterval);
     }
 
+    public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener){
+        if(scope==Distributable.DATA_SCOPE){
+            this.dataScopeReplicationProxy = mapStoreListener;
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            this.integrationScopeReplicationProxy = mapStoreListener;
+            return;
+        }
+        if(scope==Distributable.LOCAL_SCOPE){
+            this.localScopeReplicationProxy = mapStoreListener;
+        }
+
+    }
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
@@ -203,9 +219,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.integrationScopeReplicationProxy.setup(serviceContext);
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy(this);
         this.dataScopeReplicationProxy.setup(serviceContext);
+        this.localScopeReplicationProxy = new LocalScopeReplicationProxy(this);
+        this.localScopeReplicationProxy.setup(serviceContext);
     }
     @Override
     public void waitForData() {
+        this.localScopeReplicationProxy.waitForData();
         this.integrationScopeReplicationProxy.waitForData();
         this.dataScopeReplicationProxy.waitForData();
     }
@@ -515,6 +534,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return this.integrationScopeReplicationProxy.onRecovering(metadata,stringKey,key);
             //return this.integrationCluster.accessIndexService().onRecover(metadata.partition(),key);
+        }
+        else if(metadata.scope()==Distributable.LOCAL_SCOPE){
+            return this.localScopeReplicationProxy.onRecovering(metadata,stringKey,key);
         }
         return null;
     }

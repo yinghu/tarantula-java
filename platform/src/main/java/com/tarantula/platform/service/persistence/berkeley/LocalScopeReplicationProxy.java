@@ -3,18 +3,18 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.KeyIndexTrack;
-import com.tarantula.platform.service.persistence.DataStoreOnPartition;
+import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 import com.tarantula.platform.service.persistence.RevisionObject;
 
-public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
+public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(LocalScopeReplicationProxy.class);
 
-    public IntegrationScopeReplicationProxy(DataStoreProvider dataStoreProvider){
+    private DistributionKeyIndexService distributionKeyIndexService;
+
+    public LocalScopeReplicationProxy(DataStoreProvider dataStoreProvider){
         super(dataStoreProvider);
     }
     @Override
@@ -42,7 +42,6 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        //KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(stringKey);
         //DataStoreOnPartition dso = onPartition(key);
         //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
         //keyIndexTrack.index(stringKey);
@@ -51,7 +50,9 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             //serviceContext.clusterProvider().accessIndexService().get()
             //return
         //}
-        return null;
+        //return this.serviceContext.clusterProvider().keyIndexService().lookup(stringKey);
+        return this.distributionKeyIndexService.recover(key);
+        //return null;
     }
 
     @Override
@@ -59,6 +60,8 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-
-
+    @Override
+    public void waitForData() {
+        this.distributionKeyIndexService = serviceContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+    }
 }

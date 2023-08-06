@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
-public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClusterService> implements KeyIndexService, DistributedObject {
+public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClusterService> implements DistributionKeyIndexService, DistributedObject {
     private static TarantulaLogger logger = JDKLogger.getLogger(KeyIndexServiceProxy.class);
     private final String objectName;
     public KeyIndexServiceProxy(String objectName, NodeEngine nodeEngine, KeyIndexClusterService keyIndexService){
@@ -32,20 +32,20 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
 
     @Override
     public String getServiceName() {
-        return KeyIndexService.NAME;
+        return DistributionKeyIndexService.NAME;
     }
 
 
-    public KeyIndex lookup(String pending) {
+    public byte[] recover(byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
-        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(pending);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(KeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(key);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<KeyIndex> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         });
         if(!ret.successful) throw new RuntimeException(ret.exception);
-        return (KeyIndex)ret.result;
+        return (byte[]) ret.result;
     }
 
 

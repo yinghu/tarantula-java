@@ -11,19 +11,19 @@ import java.io.IOException;
 
 public class KeyIndexLookupOperation extends Operation implements PartitionAwareOperation {
 
-    private KeyIndex keyIndex;
-    private String key;
+    private byte[] keyIndex;
+    private byte[] key;
 
     public KeyIndexLookupOperation() {
     }
 
-    public KeyIndexLookupOperation(String pending) {
+    public KeyIndexLookupOperation(byte[] pending) {
         this.key = pending;
     }
     @Override
     public void run() throws Exception {
         KeyIndexClusterService ais = this.getService();
-        this.keyIndex = ais.lookup(key);
+        this.keyIndex = ais.get(key);
     }
 
     @Override
@@ -34,13 +34,13 @@ public class KeyIndexLookupOperation extends Operation implements PartitionAware
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(key);
+        out.writeByteArray(key);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.key = in.readUTF();
+        this.key = in.readByteArray();
     }
 
 }

@@ -2,9 +2,10 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.ServiceProvider;
 
 
-public interface MapStoreListener {
+public interface MapStoreListener extends ServiceProvider {
 
     //dispatch backup operation
     <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t);

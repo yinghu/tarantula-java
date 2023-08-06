@@ -35,6 +35,21 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new KeyIndexServiceBootstrap(this),"key-index-service",true).start();
     }
 
+    public byte[] get(byte[] key) {
+        //DataStoreOnPartition dso = onPartition(key);
+        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
+        //keyIndexTrack.index(key);
+        //byte[] _key = key.getBytes();
+        //boolean loaded = dso.lock(_key,()-> {
+            //byte[] data = dso.dataStore.backup().get(_key);
+            //if(data==null) return false;
+            //keyIndexTrack.fromBinary(data);
+            //return true;
+        //});
+        return null;
+        //return loaded?keyIndexTrack:null;
+    }
+
     @Override
     public void reset() {
 

@@ -48,7 +48,7 @@
             <class-name>com.tarantula.platform.service.cluster.accessindex.AccessIndexClusterService</class-name>
         </service>
         <service enabled="true">
-            <name>KeyIndexService</name>
+            <name>DistributionKeyIndexService</name>
             <class-name>com.tarantula.platform.service.cluster.keyindex.KeyIndexClusterService</class-name>
         </service>
         <service enabled="true">

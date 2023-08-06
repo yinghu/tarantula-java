@@ -4,6 +4,7 @@ package com.tarantula.platform.service;
 import com.icodesoftware.DataStore;
 
 import com.icodesoftware.service.ServiceProvider;
+import com.tarantula.platform.service.persistence.MapStoreListener;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
@@ -17,7 +18,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     void configure(Map<String,Object> properties);
 
-    //void registerBackupProvider(int scope, BackupProvider mapStoreListener);
+    void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);
