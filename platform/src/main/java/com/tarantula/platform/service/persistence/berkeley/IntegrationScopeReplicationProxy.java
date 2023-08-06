@@ -29,26 +29,26 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
         logger.warn("distributing ["+stringKey+"]");
-        DataStoreOnPartition dso = onPartition(key);
-        dso.lock(key,()->{
-                KeyIndexTrack keyIndex = new KeyIndexTrack();
-                keyIndex.index(stringKey);
-                keyIndex.placeMasterNode(new String(value.node));
-                return dso.dataStore.createIfAbsent(keyIndex,false);
-            }
-        );
+        //DataStoreOnPartition dso = onPartition(key);
+        //dso.lock(key,()->{
+          //      KeyIndexTrack keyIndex = new KeyIndexTrack();
+            //    keyIndex.index(stringKey);
+              //  keyIndex.placeMasterNode(new String(value.node));
+               // return dso.dataStore.createIfAbsent(keyIndex,false);
+            //}
+        //);
     }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        DataStoreOnPartition dso = onPartition(key);
-        KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
-        keyIndexTrack.index(stringKey);
-        if(dso.lock(key,()->dso.dataStore.load(keyIndexTrack))){
-            serviceContext.accessIndexService().get(stringKey);
+        //DataStoreOnPartition dso = onPartition(key);
+        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
+        //keyIndexTrack.index(stringKey);
+        //if(dso.lock(key,()->dso.dataStore.load(keyIndexTrack))){
+            //serviceContext.clusterProvider().accessIndexService().get(stringKey);
             //serviceContext.clusterProvider().accessIndexService().get()
             //return
-        }
+        //}
         return null;
     }
 

@@ -244,7 +244,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         this.eventService = tcx.eventService();
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
         this.deploymentServiceProvider.registerAccessIndexListener(this);
-        this.accessIndexService = tcx.accessIndexService();
+        this.accessIndexService = tcx.clusterProvider().accessIndexService();
         this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         this.bucket = tcx.node().bucketName();
     }

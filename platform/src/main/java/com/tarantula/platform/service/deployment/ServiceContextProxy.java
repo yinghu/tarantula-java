@@ -40,10 +40,6 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.serviceProvider(name);
     }
 
-    @Override
-    public AccessIndexService accessIndexService() {
-        return this.tarantulaContext.accessIndexService();
-    }
 
 
     @Override

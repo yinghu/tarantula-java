@@ -70,7 +70,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     @Override
     public void onModuleLaunched(String typeId) {
-        AccessIndex accessIndex = this.tarantulaContext.accessIndexService().get(typeId);
+        AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().get(typeId);
         this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener(platformDeploymentServiceProvider));
     }
 

@@ -9,7 +9,7 @@ import com.tarantula.platform.service.persistence.RevisionObject;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScopedReplicationProxy implements MapStoreListener, KeyIndexService, ClusterProvider.NodeListener {
+public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, ClusterProvider.NodeListener {
 
     protected ServiceContext serviceContext;
     protected  DataStoreOnPartition[] dataStoreOnPartitions;
@@ -46,34 +46,19 @@ public class ScopedReplicationProxy implements MapStoreListener, KeyIndexService
     }
 
     @Override
+    public String name() {
+        return null;
+    }
+
+    @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         serviceContext.clusterProvider().registerNodeListener(this);
     }
 
-    @Override
-    public void waitForData() {
-        this.dataStoreOnPartitions = new DataStoreOnPartition[serviceContext.node().clusterPartitionNumber()];
-        for(int i=0;i<this.dataStoreOnPartitions.length;i++){
-            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX +i);
-            this.dataStoreOnPartitions[i].dataStore = dataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX+i);
-        }
-    }
 
-    @Override
-    public String name() {
-        return KeyIndexService.NAME;
-    }
 
-    @Override
-    public void start() throws Exception {
 
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
 
     @Override
     public void nodeAdded(ClusterProvider.Node node) {
@@ -91,7 +76,12 @@ public class ScopedReplicationProxy implements MapStoreListener, KeyIndexService
     }
 
     @Override
-    public KeyIndex lookup(String key) {
-        return null;
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
     }
 }

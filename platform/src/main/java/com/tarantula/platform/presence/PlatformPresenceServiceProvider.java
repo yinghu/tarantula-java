@@ -184,7 +184,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return savedGame;
     }
     private void deviceIndex(String systemId,String deviceId){
-        AccessIndex accessIndex = serviceContext.accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
+        AccessIndex accessIndex = serviceContext.clusterProvider().accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
         DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
         this.dataStore.createIfAbsent(deviceSaveIndex,true);
         if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);

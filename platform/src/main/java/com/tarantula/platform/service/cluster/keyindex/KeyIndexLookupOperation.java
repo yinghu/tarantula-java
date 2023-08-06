@@ -23,7 +23,7 @@ public class KeyIndexLookupOperation extends Operation implements PartitionAware
     @Override
     public void run() throws Exception {
         KeyIndexClusterService ais = this.getService();
-        this.keyIndex = ais.get(key);
+        this.keyIndex = ais.lookup(key);
     }
 
     @Override

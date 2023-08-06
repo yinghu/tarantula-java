@@ -162,6 +162,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private ServiceEventLogger serviceEventLogger;
 
+    public KeyIndexService keyIndexService;
+
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
@@ -509,13 +511,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public EventService eventService(){
  	    return integrationCluster.publisher();
     }
-    @Override
-    public AccessIndexService accessIndexService(){
+    //@Override
+    private AccessIndexService accessIndexService(){
         return this.integrationCluster.accessIndexService();
     }
 
     public KeyIndexService keyIndexService(){
-        return null;
+        return keyIndexService;
     }
     @Override
     public DeploymentServiceProvider deploymentServiceProvider(){
