@@ -1,6 +1,7 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Event;
 
 public interface KeyIndexService extends ServiceProvider{
 
@@ -8,6 +9,7 @@ public interface KeyIndexService extends ServiceProvider{
 
     KeyIndex lookup(String source,String key);
 
+    void onReplicated(Event event);
 
     interface KeyIndexStore extends DataStore.Backup {
         String STORE_NAME_PREFIX = "tarantula_key_index_";
