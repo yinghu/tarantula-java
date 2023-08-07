@@ -3,9 +3,11 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.RevisionObject;
+
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
@@ -20,17 +22,26 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
+        KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        if(keyIndex==null){
+            logger.warn("Index Key->"+metadata.source()+"#"+stringKey);
+            ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+            int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodes);
+            logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
+        }
+        else{
 
+        }
     }
 
-    @Override
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
 
-    }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return new byte[0];
+        logger.warn("recovering from key->"+metadata.source()+"#"+stringKey);
+        KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        if(keyIndexTrack==null) return null;
+        return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key);
     }
 
     @Override

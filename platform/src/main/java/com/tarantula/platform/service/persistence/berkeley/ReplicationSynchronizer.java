@@ -31,10 +31,10 @@ public class ReplicationSynchronizer implements SchedulingTask {
     @Override
     public void run() {
         if(this.scope == Distributable.DATA_SCOPE){
-            berkeleyJEProvider._replicateOnDataScope(this);
+            //berkeleyJEProvider._replicateOnDataScope(this);
         }
         else if(this.scope == Distributable.INTEGRATION_SCOPE){
-            berkeleyJEProvider._replicateOnIntegrationScope(this);
+            //berkeleyJEProvider._replicateOnIntegrationScope(this);
         }
     }
 }

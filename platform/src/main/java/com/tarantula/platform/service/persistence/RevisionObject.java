@@ -1,8 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
 
-import com.icodesoftware.Recoverable;
-
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -57,14 +55,4 @@ public class RevisionObject {
         return new RevisionObject(revision,update,false,node);
     }
 
-    public static RevisionObject fromRecoverable(Recoverable recoverable, byte[] node){
-        return new RevisionObject(recoverable.revision(),recoverable.toBinary(),false,node);
-    }
-    public byte[] toBinary(){
-        if(!successful) return new byte[0];
-        ByteBuffer buffer = ByteBuffer.allocate(data.length+META_SIZE);
-        buffer.put(local?(byte)1:(byte)0);
-        buffer.putLong(revision).put(node).put(data);
-        return buffer.array();
-    }
 }

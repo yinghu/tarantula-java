@@ -7,8 +7,6 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.RevisionObject;
-
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -21,24 +19,19 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-
-    }
-
-    @Override
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
         KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
-            int expected = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value.toBinary(),nodes);
-            logger.warn("Replication number ->"+expected);
+            int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value,nodes);
+            logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
         }
         else{
 
         }
     }
+
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

@@ -34,10 +34,6 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
 
     }
 
-    @Override
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
-
-    }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

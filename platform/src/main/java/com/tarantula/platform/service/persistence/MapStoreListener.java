@@ -12,7 +12,7 @@ public interface MapStoreListener extends ServiceProvider {
 
     //dispatch cluster operation
     void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
-    void onDistributing(Metadata metadata,String stringKey, byte[] key, RevisionObject value);
+
     //recover cluster operation
     byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 

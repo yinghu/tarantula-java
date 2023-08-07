@@ -1,5 +1,6 @@
 package com.tarantula.test;
 
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 
@@ -10,7 +11,7 @@ public class TestRecoverService implements RecoverService {
     }
 
     @Override
-    public int onReplicate(String source, byte[] key, byte[] value, int nodeNumber) {
+    public int onReplicate(String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes) {
         return 0;
     }
 

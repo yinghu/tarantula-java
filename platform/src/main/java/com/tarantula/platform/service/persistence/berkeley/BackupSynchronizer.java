@@ -31,10 +31,10 @@ public class BackupSynchronizer implements SchedulingTask {
     @Override
     public void run() {
         if(scope == Distributable.DATA_SCOPE){
-            berkeleyJEProvider._backupOnDataScope(this);
+            //berkeleyJEProvider._backupOnDataScope(this);
         }
         else if(scope==Distributable.INTEGRATION_SCOPE){
-            berkeleyJEProvider._backupOnIntegrationScope(this);
+            //berkeleyJEProvider._backupOnIntegrationScope(this);
         }
     }
 }

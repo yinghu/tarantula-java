@@ -6,8 +6,11 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -15,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
 
+    private TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
     private String objectName;
 
 
@@ -108,26 +112,24 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
     }
     @Override
-    public int onReplicate(String source,byte[] key,byte[] value,int nodeNumber){
+    public int onReplicate(String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
-        int cz = nodeEngine.getClusterService().getSize();
-        if(cz==1) return nodeNumber;
-        int expected = cz>nodeNumber? nodeNumber : cz-1;
-        for(int i=0;i<expected;i++){
-            ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
-            if(roundRobinNode==null) break;
-            Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
+        int expected = 0;
+        for(ClusterProvider.Node node : nodes){
+            if(node==null){
+                logger.warn("No cluster node available to replicate");
+                break;
+            }
+            Member m = nodeEngine.getClusterService().getMember(node.memberId());
+            if(m==null) continue;
             ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-                metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected++;
+            if(result.retries>0)  metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,result.retries);
         }
         return expected;
     }

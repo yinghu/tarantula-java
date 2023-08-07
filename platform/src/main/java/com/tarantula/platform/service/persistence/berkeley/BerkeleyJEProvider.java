@@ -9,7 +9,6 @@ import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
 
@@ -48,15 +47,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
-    private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
-    private ConcurrentLinkedDeque<String> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
+    //private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
+    //private ConcurrentLinkedDeque<String> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
 
-    private ConcurrentLinkedDeque<String> pendingBackupDataQueue = new ConcurrentLinkedDeque<>();
-    private ConcurrentLinkedDeque<String> pendingBackupIntegrationQueue = new ConcurrentLinkedDeque<>();
+    //private ConcurrentLinkedDeque<String> pendingBackupDataQueue = new ConcurrentLinkedDeque<>();
+    //private ConcurrentLinkedDeque<String> pendingBackupIntegrationQueue = new ConcurrentLinkedDeque<>();
 
 
-    private ConcurrentHashMap<String,OnReplication> pendingReplicationIndex = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String,OnReplication> pendingBackupIndex = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,OnReplication> pendingReplicationIndex = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<String,OnReplication> pendingBackupIndex = new ConcurrentHashMap<>();
 
     private Environment environment;
     private Environment integrationEnvironment;
@@ -209,12 +208,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.integrationCluster = serviceContext.clusterProvider();
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.cacheSynchronizer);
-        for(int i=0;i<timerCount;i++){
-            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+10,Distributable.INTEGRATION_SCOPE));
-            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
-            this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
-        }
+        //for(int i=0;i<timerCount;i++){
+            //this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
+            //this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+10,Distributable.INTEGRATION_SCOPE));
+            //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
+            //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
+        //}
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy(this);
         this.integrationScopeReplicationProxy.setup(serviceContext);
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy(this);
@@ -333,6 +332,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(this.cacheSynchronizer);
     }
+    /**
     public void _replicateOnIntegrationScope(ReplicationSynchronizer caller){
         try{
             int integrationSize = 0;
@@ -441,7 +441,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(caller);
     }
-
+    **/
     @Override
     public void shutdown() throws Exception {
         //running = false;
@@ -467,6 +467,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     public <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t){
         if(metadata.scope()==Distributable.DATA_SCOPE){
+            /**
             String pendingId = metadata.source()+"#"+key;
             pendingBackupIndex.compute(pendingId,(k,v)->{
                 if(v==null){
@@ -474,9 +475,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     operationSummary.pendingBackups.incrementAndGet();
                 }
                 return new ReplicationData(metadata.source(),key,t);
-            });
+            });**/
+            dataScopeReplicationProxy.onBackingUp(metadata,key,t);
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            /**
             String pendingId = metadata.source()+"#"+key;
             pendingBackupIndex.compute(pendingId,(k,v)->{
                 if(v==null){
@@ -484,7 +487,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                     operationSummary.pendingBackups.incrementAndGet();
                 }
                 return new ReplicationData(metadata.source(),key,t);
-            });
+            });**/
+            integrationScopeReplicationProxy.onBackingUp(metadata,key,t);
         }
     }
 
@@ -493,47 +497,44 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         int keySize = key.length;
         int valueSize = value.length;
         if(metadata.scope()==Distributable.DATA_SCOPE && maxReplicationNumber>0){
-            String pendingId = metadata.source()+"#"+stringKey;
+            //String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
             operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
+            dataScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
+            /**
             pendingReplicationIndex.compute(pendingId,(k,v)->{
                 if(v==null){
                     pendingReplicationDataQueue.offer(pendingId);
                     operationSummary.pendingUpdates.incrementAndGet();
                 }
                 return new ReplicationData(metadata.source(),key,value);
-            });
+            });**/
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && maxReplicationNumber>0){
-            String pendingId = metadata.source()+"#"+stringKey;
+            //String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
             operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
+            integrationScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
+            /**
             pendingReplicationIndex.compute(pendingId,(k,v)->{
                 if(v==null){
                     pendingReplicationIntegrationQueue.offer(pendingId);
                     operationSummary.pendingUpdates.incrementAndGet();
                 }
                 return new ReplicationData(metadata.partition(),key,value);
-            });
+            });**/
         }
         onMetrics();
     }
-    public void onDistributing(Metadata metadata,String stringKey, byte[] key, RevisionObject value){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            integrationScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
-        }
-        else if(metadata.scope()==Distributable.DATA_SCOPE){
-            dataScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
-        }
-    }
+
     @Override
     public byte[] onRecovering(Metadata metadata,String stringKey,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            return this.integrationCluster.recoverService().onRecover(metadata.source(),key);
+            //return this.integrationCluster.recoverService().onRecover(metadata.source(),key);
+            return this.dataScopeReplicationProxy.onRecovering(metadata,stringKey,key);
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return this.integrationScopeReplicationProxy.onRecovering(metadata,stringKey,key);
-            //return this.integrationCluster.accessIndexService().onRecover(metadata.partition(),key);
         }
         else if(metadata.scope()==Distributable.LOCAL_SCOPE){
             return this.localScopeReplicationProxy.onRecovering(metadata,stringKey,key);
@@ -544,10 +545,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void onDeleting(Metadata metadata,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            this.integrationCluster.recoverService().onDelete(metadata.source(),key);
+            dataScopeReplicationProxy.onDeleting(metadata,key);
+            //this.integrationCluster.recoverService().onDelete(metadata.source(),key);
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            //this.integrationCluster.accessIndexService().ond(metadata.partition(),key);
+            integrationScopeReplicationProxy.onDeleting(metadata,key);
+            //this.integrationCluster.accessIndexService().(metadata.partition(),key);
         }
     }
 
