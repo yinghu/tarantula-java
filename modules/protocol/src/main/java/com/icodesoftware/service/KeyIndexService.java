@@ -10,6 +10,10 @@ public interface KeyIndexService extends ServiceProvider{
     KeyIndex lookup(String source,String key);
 
     void onReplicated(Event event);
+    boolean createIfAbsent(KeyIndex keyIndex);
+
+    boolean update(KeyIndex keyIndex);
+
 
     interface KeyIndexStore extends DataStore.Backup {
         String STORE_NAME_PREFIX = "tarantula_key_index_";

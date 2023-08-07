@@ -104,6 +104,19 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         this.tarantulaContext.clusterProvider().publisher().publish(event);
     }
 
+    public boolean createIfAbsent(KeyIndex keyIndex){
+        String key = keyIndex.key().asString();
+        DataStoreOnPartition dso = onPartition(key);
+        return dso.lock(key.getBytes(),()-> dso.dataStore.createIfAbsent(keyIndex,true));
+    }
+
+    public boolean update(KeyIndex keyIndex){
+        String key = keyIndex.key().asString();
+        DataStoreOnPartition dso = onPartition(key);
+        return dso.lock(key.getBytes(),()-> dso.dataStore.update(keyIndex));
+    }
+
+
     @Override
     public String name() {
         return KeyIndexService.NAME;

@@ -6,7 +6,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
-import com.tarantula.platform.service.persistence.RevisionObject;
+
 
 public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
 

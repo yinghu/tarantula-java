@@ -4,11 +4,11 @@ import java.util.concurrent.Callable;
 
 public class ClusterUtil {
 
-    public static CallResult call(int retries,long retryInterval,Callable<Object> runnable){
+    public static CallResult call(int retries,long retryInterval,Callable<Object> callable){
         CallResult ret = new CallResult();
         for(int i=0;i<retries;i++){
             try{
-                ret.result = runnable.call();
+                ret.result = callable.call();
                 ret.successful = true;
                 break;
             }catch (Exception ex){
@@ -19,7 +19,7 @@ public class ClusterUtil {
         }
         return ret;
     }
-    public static void waitForRetry(long retryInterval){
+    private static void waitForRetry(long retryInterval){
         try{Thread.sleep(retryInterval);}catch (Exception ex){}
     }
 

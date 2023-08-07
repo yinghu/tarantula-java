@@ -80,8 +80,8 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
             }
             v = t.toBinary();
             if(!_set(k,v)) return false;
-            mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
-            if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
+            //mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
+            //if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
             return true;
         }catch (Exception ex){
             log.error("error on createIfAbsent",ex);
@@ -107,8 +107,8 @@ public class KeyIndexDataStore implements ReplicatedDataStore {
             }
             v = t.toBinary();
             if(!_set(k,v)) return false;
-            mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
-            if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
+            //mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
+            //if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);
             return true;
         }catch (Exception ex){
             log.error("error on createIfAbsent",ex);

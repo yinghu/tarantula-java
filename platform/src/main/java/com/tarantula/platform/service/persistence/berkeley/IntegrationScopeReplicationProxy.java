@@ -7,6 +7,7 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.KeyIndexTrack;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -21,14 +22,18 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        KeyIndex keyIndex = this.keyIndexService.lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value,nodes);
-            logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
-        }
-        else{
-
+            if(replicated==0) {
+                logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+                keyIndex = new KeyIndexTrack();
+                keyIndex.owner(metadata.source());
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(localNode.nodeName());
+                this.keyIndexService.createIfAbsent(keyIndex);
+            }
         }
     }
 
@@ -37,7 +42,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
         if(keyIndexTrack==null) return null;
-        return serviceContext.clusterProvider().accessIndexService().onRecover(metadata.partition(),key);
+        return serviceContext.clusterProvider().accessIndexService().onRecover(metadata.partition(),key,nodeList(keyIndexTrack));
     }
 
     @Override

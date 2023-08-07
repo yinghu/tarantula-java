@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.cluster.ClusterFailureEvent;
+import com.tarantula.platform.service.cluster.ClusterUtil;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -38,47 +39,31 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
     public boolean onRegisterItem(String gameServiceName,String serviceName,String category,String itemId) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        boolean ret = true;
         ItemRegisterOperation operation = new ItemRegisterOperation(gameServiceName,serviceName,category,itemId);
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
-            final Future<Boolean> future = builder.invoke();
-            try {
-                boolean flag = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-                if(!flag){
-                    ret = false;
-                }
-            } catch (Exception e) {
-                future.cancel(true);
-                ret = false;
-                serviceEventLogger.log(new ClusterFailureEvent("onRegisterItem",m.getAddress().toString(),e));
-                break; //stop to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Boolean> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
-        return ret;
+        return true;
     }
     @Override
     public boolean onReleaseItem(String gameServiceName,String serviceName,String category,String itemId) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        boolean ret = true;
         ItemReleaseOperation operation = new ItemReleaseOperation(gameServiceName,serviceName,category,itemId);
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
-            final Future<Boolean> future = builder.invoke();
-            try {
-                boolean flag = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-                if(!flag){
-                    ret = false;
-                }
-            } catch (Exception e) {
-                future.cancel(true);
-                ret = false;
-                serviceEventLogger.log(new ClusterFailureEvent("onReleaseItem",m.getAddress().toString(),e));
-                break; //stop to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Boolean> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
-        return ret;
+        return true;
     }
     @Override
     public String name() {

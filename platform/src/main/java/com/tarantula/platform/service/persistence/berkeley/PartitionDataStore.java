@@ -90,7 +90,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             t.oid(SystemUtil.oid());
             akey = t.key().asString();
             byte[] key = akey.getBytes();
-            t.revision(0);
+            t.revision(Long.MIN_VALUE);
             byte[] value = RevisionObject.toBinary(t.revision(),t.toBinary(),true,_node);
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()-> _put(dso,key,value)? RevisionObject.TRUE : RevisionObject.FALSE).successful;
@@ -110,7 +110,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         IndexSet indexSet = new IndexSet();
         indexSet.distributionKey(t.owner());
         indexSet.label(t.label());
-        indexSet.revision(0);
+        indexSet.revision(Long.MIN_VALUE);
         String akey = indexSet.key().asString();
         byte[] key = akey.getBytes();
         DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
@@ -206,7 +206,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             if(akey==null) throw new IllegalArgumentException("Key must be assigned first");
             byte[] key = akey.getBytes();
             final String okey = akey;
-            t.revision(0);
+            t.revision(Long.MIN_VALUE);
             byte[] pendingValue = RevisionObject.toBinary(t.revision(),t.toBinary(),true,_node);
             boolean[] created = {false};
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];

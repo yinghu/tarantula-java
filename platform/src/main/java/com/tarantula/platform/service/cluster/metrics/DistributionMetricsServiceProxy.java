@@ -5,6 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.metrics.DistributionMetricsService;
 
 import java.time.LocalDateTime;
@@ -41,14 +42,11 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         for(Member m : mlist){
             ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
-            final Future<String> future = builder.invoke();
-            try {
-                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                ret[i]="{}";
-            }
-            i++;
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<String> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
     }
@@ -60,14 +58,11 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         for(Member m : mlist){
             MetricsViewOperation serviceViewOperation = new MetricsViewOperation(name,category,classifier);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
-            final Future<String> future = builder.invoke();
-            try {
-                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                ret[i]="{}";
-            }
-            i++;
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<String> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
     }
@@ -79,14 +74,11 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         for(Member m : mlist){
             MetricsArchiveViewOperation serviceViewOperation = new MetricsArchiveViewOperation(name,category,classifier,end);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
-            final Future<String> future = builder.invoke();
-            try {
-                ret[i] = future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                ret[i]="{}";
-            }
-            i++;
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<String> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
     }

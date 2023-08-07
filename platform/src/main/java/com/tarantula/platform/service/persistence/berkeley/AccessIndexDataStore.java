@@ -85,7 +85,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
                 if(loading) t.fromBinary(ro.data);
                 return false;
             }
-            v = RevisionObject.toBinary(0,t.toBinary(),true,_node);
+            v = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true,_node);
             if(!_set(k,v)) return false;
             mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
             if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);

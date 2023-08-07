@@ -5,15 +5,20 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.MapStoreListener;
-import com.tarantula.platform.service.persistence.RevisionObject;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, ClusterProvider.NodeListener {
 
     protected ServiceContext serviceContext;
 
+    protected KeyIndexService keyIndexService;
+
+    protected ClusterProvider.Node localNode;
+
     private ClusterProvider.Node[] pendingNodes;
+    private ConcurrentHashMap<String, ClusterProvider.Node> nodeMappings;
 
     private AtomicInteger limit;
 
@@ -22,6 +27,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
         this.dataStoreProvider = dataStoreProvider;
         limit = new AtomicInteger(-1);
         pendingNodes = new ClusterProvider.Node[0];
+        nodeMappings = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -53,12 +59,15 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        serviceContext.clusterProvider().registerNodeListener(this);
+        this.keyIndexService = serviceContext.keyIndexService();
+        this.localNode = serviceContext.node();
+        this.serviceContext.clusterProvider().registerNodeListener(this);
     }
 
     @Override
     public void nodeAdded(ClusterProvider.Node node) {
         limit.getAndAccumulate(0,(x,y)->{
+            nodeMappings.put(node.nodeName(),node);//mapping index
             if(pendingNodes.length==0){
                 pendingNodes = new ClusterNode[1];
                 pendingNodes[0]=node;
@@ -66,8 +75,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
             }
             //check if node exist
             boolean existed = false;
-            for(ClusterProvider.Node n : pendingNodes){
-                if(n.nodeName().equals(node.nodeName())){
+            for(int i=0;i<pendingNodes.length;i++){
+                if(pendingNodes[i].nodeName().equals(node.nodeName())){
+                    pendingNodes[i]=node;//replacement
                     existed = true;
                     break;
                 }
@@ -86,6 +96,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     @Override
     public void nodeRemoved(ClusterProvider.Node node) {
         limit.getAndAccumulate(0,(x,y)->{
+            nodeMappings.remove(node.nodeName());//remove index
             if(pendingNodes.length==1){
                 pendingNodes = new ClusterNode[0];
                 return -1;
@@ -135,6 +146,21 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
             return (x+y)<pendingNodes.length? (x+y):0;
         });
         return next;
+    }
+
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex){
+        boolean masterIncluded = !keyIndex.masterNode().equals(localNode.nodeName());
+        String[] names = keyIndex.slaveNodes();
+        ClusterProvider.Node[] slaves = new ClusterProvider.Node[masterIncluded?names.length+1:names.length];
+        int start = 0;
+        if(masterIncluded) {
+            slaves[0] = nodeMappings.get(keyIndex.masterNode());
+            start = 1;
+        }
+        for(int i=start; i<names.length;i++){
+            slaves[i] = nodeMappings.get(names[i]);
+        }
+        return slaves;
     }
 
     @Override

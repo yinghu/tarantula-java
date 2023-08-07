@@ -69,13 +69,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
 
@@ -87,14 +85,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -107,15 +102,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("startGameService error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -126,15 +117,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("launchGameCluster error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -145,15 +132,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("launchApplication error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -164,15 +147,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("launchUpdateResource error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -183,15 +162,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("deployModule error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -202,15 +177,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("shutdownApplication error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -221,14 +192,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -239,15 +207,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("shutdownGameCluster error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -258,15 +222,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("shutdownModule error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -277,15 +237,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("updateModule error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -297,15 +253,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("upload error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -317,15 +269,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         int expected = mlist.size();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                expected--;
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("sync error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(result.successful) expected--;
         }
         return expected==0;
     }
@@ -337,14 +285,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("registerConnection error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
     public void onVerifyConnection(String typeId,String serverId){
@@ -353,14 +298,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("ping error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
     public void onStartConnection(Connection connection){
@@ -369,14 +311,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("startConnection error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
     public void onReleaseConnection(Connection connection){
@@ -385,14 +324,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("releaseConnection error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
 
@@ -419,14 +355,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("reset cluster key error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
 
@@ -437,14 +370,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         for(Member m :mlist){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("enable presence service error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
     public void onDisablePresenceService(String clusterNameSuffix){
@@ -454,22 +384,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         for(Member m :mlist){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            final Future<Void> future = builder.invoke();
-            try {
-                future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            } catch (Exception e) {
-                future.cancel(true);
-                logger.error("disable presence service error on node->"+m.getAddress(),e);
-                //goes to next node if failed
-            }
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!result.successful) throw new RuntimeException(result.exception);
         }
     }
 
-    private void _wait(){
-        try {
-            Thread.sleep(TarantulaContext.operationRejectInterval);
-        }catch (Exception ex){
-            logger.error("error on _wait",ex);
-        }
-    }
 }

@@ -8,7 +8,6 @@ import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.KeyIndex;
-import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
