@@ -13,7 +13,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
 
     protected ServiceContext serviceContext;
 
-    protected KeyIndexService keyIndexService;
+    //protected KeyIndexService keyIndexService;
 
     protected ClusterProvider.Node localNode;
 
@@ -59,8 +59,6 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.keyIndexService = serviceContext.keyIndexService();
-        this.localNode = serviceContext.node();
         this.serviceContext.clusterProvider().registerNodeListener(this);
     }
 
@@ -171,5 +169,11 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     @Override
     public void shutdown() throws Exception {
 
+    }
+
+    @Override
+    public void waitForData() {
+        //this.keyIndexService = serviceContext.keyIndexService();
+        this.localNode = serviceContext.node();
     }
 }

@@ -22,7 +22,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        KeyIndex keyIndex = this.keyIndexService.lookup(metadata.source(),stringKey);
+        KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value,nodes);
@@ -32,7 +32,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                 keyIndex.owner(metadata.source());
                 keyIndex.index(stringKey);
                 keyIndex.placeMasterNode(localNode.nodeName());
-                this.keyIndexService.createIfAbsent(keyIndex);
+                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
             }
         }
     }
