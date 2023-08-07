@@ -45,7 +45,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     private ClusterNode node;
 
-    private ClusterProvider integrationCluster;
+    //private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
     //private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
@@ -206,7 +206,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.integrationCluster = serviceContext.clusterProvider();
+        //this.integrationCluster = serviceContext.clusterProvider();
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.cacheSynchronizer);
         //for(int i=0;i<timerCount;i++){
