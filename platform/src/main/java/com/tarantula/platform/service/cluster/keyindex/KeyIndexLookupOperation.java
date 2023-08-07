@@ -13,17 +13,19 @@ public class KeyIndexLookupOperation extends Operation implements PartitionAware
 
     private byte[] keyIndex;
     private byte[] key;
+    private int partition;
 
     public KeyIndexLookupOperation() {
     }
 
-    public KeyIndexLookupOperation(byte[] pending) {
+    public KeyIndexLookupOperation(int partition,byte[] pending) {
+        this.partition = partition;
         this.key = pending;
     }
     @Override
     public void run() throws Exception {
         KeyIndexClusterService ais = this.getService();
-        this.keyIndex = ais.get(key);
+        this.keyIndex = ais.get(partition,key);
     }
 
     @Override
@@ -34,12 +36,14 @@ public class KeyIndexLookupOperation extends Operation implements PartitionAware
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
+        out.writeInt(partition);
         out.writeByteArray(key);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
+        this.partition = in.readInt();
         this.key = in.readByteArray();
     }
 

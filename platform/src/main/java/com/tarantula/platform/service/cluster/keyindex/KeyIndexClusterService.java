@@ -35,19 +35,9 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new KeyIndexServiceBootstrap(this),"key-index-service",true).start();
     }
 
-    public byte[] get(byte[] key) {
-        //DataStoreOnPartition dso = onPartition(key);
-        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
-        //keyIndexTrack.index(key);
-        //byte[] _key = key.getBytes();
-        //boolean loaded = dso.lock(_key,()-> {
-            //byte[] data = dso.dataStore.backup().get(_key);
-            //if(data==null) return false;
-            //keyIndexTrack.fromBinary(data);
-            //return true;
-        //});
-        return null;
-        //return loaded?keyIndexTrack:null;
+    public byte[] get(int partition,byte[] key) {
+        DataStoreOnPartition dso = onPartition(partition);
+        return dso.dataStore.backup().get(key);
     }
 
     @Override
@@ -76,14 +66,23 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createKeyIndexDataStore(dso.name);
         }
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
-            //logger.warn(event.toString());
-            //DataStoreOnPartition dso = onPartition(event.index());
-            //byte[] key = event.index().getBytes();
-            //KeyIndex keyIndex = new KeyIndexTrack();
-            //keyIndex.index(event.index());
-            //keyIndex.owner(event.label());
-            //dso.lock(key,()-> dso.dataStore.createIfAbsent(keyIndex,false));
-            return true;
+            KeyIndex keyIndex = new KeyIndexTrack();
+            keyIndex.owner(event.owner());
+            keyIndex.index(event.index());
+            String ckey = keyIndex.key().asString();
+            DataStoreOnPartition dso = onPartition(ckey);
+            byte[] key = ckey.getBytes();
+            return dso.lock(key,()->{
+                if(dso.dataStore.load(keyIndex)){
+                    if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
+                        dso.dataStore.update(keyIndex);
+                    }
+                    return true;
+                }
+                keyIndex.placeMasterNode(event.source());
+                keyIndex.placeSlaveNode(event.label());
+                return dso.dataStore.createIfAbsent(keyIndex,false);
+            });
         });
         tarantulaContext.keyIndexService = this;
         TarantulaContext._access_index_syc_finished.countDown();
@@ -91,9 +90,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     @Override
-    public KeyIndex lookup(String key) {
+    public KeyIndex lookup(String source,String key) {
         DataStoreOnPartition dso = onPartition(key);
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
+        keyIndexTrack.owner(source);
         keyIndexTrack.index(key);
         if(dso.lock(key.getBytes(),()-> dso.dataStore.load(keyIndexTrack))) return keyIndexTrack;
         return null;
@@ -116,6 +116,13 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     private DataStoreOnPartition onPartition(String accessKey){
         int partition = this.nodeEngine.getPartitionService().getPartitionId(accessKey);
+        DataStoreOnPartition dso = this.dataStoreOnPartitions[partition];
+        if(dso.dataStore==null) {
+            dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);
+        }
+        return dso;
+    }
+    private DataStoreOnPartition onPartition(int partition){
         DataStoreOnPartition dso = this.dataStoreOnPartitions[partition];
         if(dso.dataStore==null) {
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);

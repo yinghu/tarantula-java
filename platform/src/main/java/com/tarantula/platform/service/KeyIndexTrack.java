@@ -5,8 +5,8 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.KeyIndex;
-import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     }
 
     public Key key(){
-        return new NaturalKey(this.index);
+        return new CompositeKey(this.owner,this.index);
     }
 
     public boolean placeMasterNode(String node){

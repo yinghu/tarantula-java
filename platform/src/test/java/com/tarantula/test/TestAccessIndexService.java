@@ -2,6 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
 
 public class TestAccessIndexService implements AccessIndexService {
@@ -48,7 +49,7 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public int onReplicate(int partition, byte[] key, byte[] value, int nodeNumber) {
+    public int onReplicate(int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes) {
         return 0;
     }
 

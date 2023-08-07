@@ -17,7 +17,12 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     public int scope() {
         return 0;
     }
-
+    public int maxSize(){
+        return 10;
+    }
+    public int maxReplicationNumber(){
+        return 10;
+    }
     @Override
     public String bucket() {
         return null;

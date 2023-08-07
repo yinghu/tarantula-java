@@ -7,5 +7,5 @@ public interface DistributionKeyIndexService extends ServiceProvider {
 
     String NAME = "DistributionKeyIndexService";
 
-    byte[] recover(byte[] key);
+    byte[] recover(int partition,byte[] key);
 }

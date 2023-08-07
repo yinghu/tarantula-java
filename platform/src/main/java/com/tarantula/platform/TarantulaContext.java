@@ -187,7 +187,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         _access_index_syc_finished = new CountDownLatch(2);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
-        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber,this.accessIndexRoutingNumber);
+        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
@@ -511,7 +511,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public EventService eventService(){
  	    return integrationCluster.publisher();
     }
-    //@Override
+
     private AccessIndexService accessIndexService(){
         return this.integrationCluster.accessIndexService();
     }

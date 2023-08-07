@@ -11,12 +11,14 @@ import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.OnReplication;
+import com.tarantula.cci.ResourceEventHandler;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.service.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
+import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -61,6 +63,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     if(updates.size()>0){
                         updates.forEach(r->{
                             this.onPartition(r.partition()).dataStore.backup().set(r.key(),r.value());
+                            RevisionObject ro = RevisionObject.fromBinary(r.value());
+                            log.warn("master->"+new String(ro.node));
+                            log.warn("slave->"+tarantulaContext.node().nodeName());
                         });
                         updates.clear();
                     }

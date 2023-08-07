@@ -70,6 +70,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
         Member lm = nodeEngine.getLocalMember();
+        //log.warn(">>>>>>>>>>>>>>>>>>>>>"+nodeEngine.getClusterService().getMember(lm.getUuid()).getUuid());
         if(!lm.getUuid().equals(membershipServiceEvent.getMember().getUuid())){
             this.tarantulaContext.integrationCluster().onNodeAdded(membershipServiceEvent.getMember().getUuid());
         }

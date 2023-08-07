@@ -29,30 +29,12 @@ public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
-        logger.warn("distributing ["+stringKey+"]");
-        //DataStoreOnPartition dso = onPartition(key);
-        //dso.lock(key,()->{
-          //      KeyIndexTrack keyIndex = new KeyIndexTrack();
-            //    keyIndex.index(stringKey);
-              //  keyIndex.placeMasterNode(new String(value.node));
-               // return dso.dataStore.createIfAbsent(keyIndex,false);
-            //}
-        //);
+
     }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        //DataStoreOnPartition dso = onPartition(key);
-        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
-        //keyIndexTrack.index(stringKey);
-        //if(dso.lock(key,()->dso.dataStore.load(keyIndexTrack))){
-            //serviceContext.clusterProvider().accessIndexService().get(stringKey);
-            //serviceContext.clusterProvider().accessIndexService().get()
-            //return
-        //}
-        //return this.serviceContext.clusterProvider().keyIndexService().lookup(stringKey);
-        return this.distributionKeyIndexService.recover(key);
-        //return null;
+        return this.distributionKeyIndexService.recover(metadata.partition(),key);
     }
 
     @Override
@@ -63,5 +45,6 @@ public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public void waitForData() {
         this.distributionKeyIndexService = serviceContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        logger.warn("Local scope replication proxy is ready");
     }
 }

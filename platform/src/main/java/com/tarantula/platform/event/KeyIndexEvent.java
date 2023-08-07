@@ -11,20 +11,26 @@ public class KeyIndexEvent extends Data implements Event {
 
     public KeyIndexEvent(){}
 
-    public KeyIndexEvent(String key,String node){
+    public KeyIndexEvent(String owner,String key,String master,String slave){
+        this.owner = owner;
         this.index = key;
-        this.label = node;
+        this.source = master;
+        this.label = slave;
     }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",index);
-        portableWriter.writeUTF("2",label);
+        portableWriter.writeUTF("1",owner);
+        portableWriter.writeUTF("2",index);
+        portableWriter.writeUTF("3",source);
+        portableWriter.writeUTF("4",label);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        index = portableReader.readUTF("1");
-        label = portableReader.readUTF("2");
+        owner = portableReader.readUTF("1");
+        index = portableReader.readUTF("2");
+        source = portableReader.readUTF("3");
+        label = portableReader.readUTF("4");
     }
 
     @Override
@@ -42,6 +48,6 @@ public class KeyIndexEvent extends Data implements Event {
 
     @Override
     public String toString(){
-        return "Key ["+index+"] on ["+label+"]";
+        return "Key ["+owner+"_"+index+"] on ["+label+"]";
     }
 }

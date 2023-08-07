@@ -7,10 +7,13 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 
+import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import java.util.Set;
@@ -19,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService, DistributedObject {
 
-
+    private TarantulaLogger logger = JDKLogger.getLogger(AccessIndexServiceProxy.class);
     private final String objectName;//unique proxy name
     private ServiceContext serviceContext;
     private MetricsListener metricsListener;
@@ -156,26 +159,25 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             return nodeNumber;
         }
     }
-    public int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber){
+    public int onReplicate(int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = nodeNumber;
-        for(Member m :mlist){
-            if(!m.localMember()){
-                ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
-                final Future<Void> future = builder.invoke();
-                try {
-                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    expected--;
-                    if(expected==0) break;
-                } catch (Exception e) {
-                    future.cancel(true);
-                    //goes to next node if failed
-                }
+        int replicated = 0;
+        for(ClusterProvider.Node node : nodes){
+            if(node==null){
+                logger.warn("No cluster node available to replicate");
+                break;
             }
+            Member m = nodeEngine.getClusterService().getMember(node.memberId());
+            if(m==null) continue;
+            ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(callResult.successful) replicated++;
         }
-        return expected;
+        return replicated;
     }
     public byte[] onRecover(int partition,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();

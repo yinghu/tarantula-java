@@ -16,7 +16,6 @@ public interface ServiceContext extends Context{
     DeploymentServiceProvider deploymentServiceProvider();
     HttpClientProvider httpClientProvider();
     BackupProvider backupProvider();
-    //AccessIndexService accessIndexService();
 
     KeyIndexService keyIndexService();
     OnPartition[] partitions();

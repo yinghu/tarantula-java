@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class KeyIndexTest {
 
@@ -37,6 +38,7 @@ public class KeyIndexTest {
         String slaveNode1 = "n02";
         String slaveNode2 = "n03";
         KeyIndexTrack index = new KeyIndexTrack();
+        index.owner("px1");
         index.index("testkey");
         Assert.assertTrue(index.placeMasterNode(masterNode));
         Assert.assertFalse(index.placeMasterNode(masterNode));
@@ -46,11 +48,13 @@ public class KeyIndexTest {
         Assert.assertTrue(index.placeSlaveNode(slaveNode2));
         dataStore.update(index);
         KeyIndexTrack load = new KeyIndexTrack();
+        load.owner("px1");
         load.index("testkey");
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.masterNode(),index.masterNode());
         Assert.assertEquals(load.slaveNodes().length,index.slaveNodes().length);
         Assert.assertEquals(load.slaveNodes()[0],slaveNode2);
+
     }
 
 

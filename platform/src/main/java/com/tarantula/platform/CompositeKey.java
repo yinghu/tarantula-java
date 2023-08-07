@@ -12,7 +12,7 @@ public class CompositeKey extends RecoverableObject implements Recoverable.Key {
     }
 
     public String asString(){
-        return this.owner+"_"+this.key;
+        return this.owner+"#"+this.key;
     }
     @Override
     public String toString(){

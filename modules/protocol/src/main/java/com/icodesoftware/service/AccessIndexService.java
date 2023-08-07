@@ -20,7 +20,7 @@ public interface AccessIndexService extends ServiceProvider {
     boolean onEnable();
     boolean onDisable();
 
-    int onReplicate(int partition,byte[] key,byte[] value,int nodeNumber);
+    int onReplicate(int partition, byte[] key, byte[] value, ClusterProvider.Node[] nodes);
     int onReplicate(OnReplication[] batch,int size,int nodeNumber);
     byte[] onRecover(int partition,byte[] key);
 

@@ -10,6 +10,10 @@ import java.util.concurrent.TimeUnit;
 public interface ClusterProvider extends ServiceProvider {
 
     String name();
+
+    int maxSize();
+
+    int maxReplicationNumber();
     int scope();
     String bucket();
 
@@ -21,7 +25,6 @@ public interface ClusterProvider extends ServiceProvider {
     //CLUSTERING SERVICE
     AccessIndexService accessIndexService();
 
-    //KeyIndexService keyIndexService();
 
     DeployService deployService();
     RecoverService recoverService();
@@ -51,6 +54,7 @@ public interface ClusterProvider extends ServiceProvider {
 
         //map operations
         String name();
+
         byte[] mapGet(byte[] key);
         boolean mapExists(byte[] key);
         byte[] mapSetIfAbsent(byte[] key,byte[] pending);
@@ -111,12 +115,11 @@ public interface ClusterProvider extends ServiceProvider {
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
 
-        int clusterPartitionNumber();
-
     }
 
     interface NodeListener{
         void nodeAdded(Node node);
         void nodeRemoved(Node node);
     }
+
 }

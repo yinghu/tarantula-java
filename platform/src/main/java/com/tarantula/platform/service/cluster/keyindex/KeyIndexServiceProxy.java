@@ -36,9 +36,12 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     }
 
 
-    public byte[] recover(byte[] key) {
+    public byte[] recover(int partition,byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
-        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(key);
+        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
+            return null;
+        }
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(partition,key);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<KeyIndex> future = builder.invoke();

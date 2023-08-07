@@ -15,7 +15,7 @@ public class TestServiceContext implements ServiceContext {
 
 
     public TestServiceContext(){
-        this.node = new ClusterNode("BSD","T01",31,271);
+        this.node = new ClusterNode("BSD","T01",31);
         this.node.clusterNameSuffix = "test";
         this.node.deployDirectory = "deploy";
         this.node.servicePushAddress = "127.0.0.1";

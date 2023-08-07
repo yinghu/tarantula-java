@@ -6,8 +6,7 @@ public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
 
-    KeyIndex lookup(String key);
-
+    KeyIndex lookup(String source,String key);
 
 
     interface KeyIndexStore extends DataStore.Backup {

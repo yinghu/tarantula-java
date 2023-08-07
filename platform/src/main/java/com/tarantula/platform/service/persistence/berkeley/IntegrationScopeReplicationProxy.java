@@ -3,12 +3,12 @@ package com.tarantula.platform.service.persistence.berkeley;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.KeyIndexTrack;
-import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.RevisionObject;
+
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -29,29 +29,22 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, RevisionObject value) {
-        logger.warn("distributing ["+stringKey+"]");
-        //DataStoreOnPartition dso = onPartition(key);
-        //dso.lock(key,()->{
-          //      KeyIndexTrack keyIndex = new KeyIndexTrack();
-            //    keyIndex.index(stringKey);
-              //  keyIndex.placeMasterNode(new String(value.node));
-               // return dso.dataStore.createIfAbsent(keyIndex,false);
-            //}
-        //);
+        KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        if(keyIndex==null){
+            ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+            int expected = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value.toBinary(),nodes);
+            logger.warn("Replication number ->"+expected);
+        }
+        else{
+
+        }
     }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        //KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(stringKey);
-        //DataStoreOnPartition dso = onPartition(key);
-        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
-        //keyIndexTrack.index(stringKey);
-        //if(dso.lock(key,()->dso.dataStore.load(keyIndexTrack))){
-            //serviceContext.clusterProvider().accessIndexService().get(stringKey);
-            //serviceContext.clusterProvider().accessIndexService().get()
-            //return
-        //}
-        return null;
+        KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        if(keyIndexTrack==null) return null;
+        return serviceContext.clusterProvider().accessIndexService().onRecover(metadata.partition(),key);
     }
 
     @Override
