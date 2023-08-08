@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.AssociateKey;
@@ -22,6 +23,12 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     public SystemStatistics(){
         this.label = LABEL;
     }
+
+    @Override
+    public int scope() {
+        return Distributable.LOCAL_SCOPE;
+    }
+
 
     public Entry entry(String key) {
         SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{

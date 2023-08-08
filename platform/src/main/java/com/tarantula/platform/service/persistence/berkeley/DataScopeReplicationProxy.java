@@ -23,6 +23,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
+        logger.warn(metadata.source()+"#"+stringKey);
         KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());

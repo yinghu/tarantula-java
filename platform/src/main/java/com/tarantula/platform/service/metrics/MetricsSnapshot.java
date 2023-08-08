@@ -2,6 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
@@ -27,6 +28,11 @@ public class MetricsSnapshot extends RecoverableObject  {
 
     public MetricsSnapshot(){
 
+    }
+
+    @Override
+    public int scope() {
+        return Distributable.LOCAL_SCOPE;
     }
 
     @Override

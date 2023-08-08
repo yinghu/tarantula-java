@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metrics;
@@ -31,6 +32,10 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         this.metrics = new Property[HOURLY_HISTORY_BUFFER_SIZE];
     }
 
+    @Override
+    public int scope() {
+        return Distributable.LOCAL_SCOPE;
+    }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("dailyGain",dailyGain);

@@ -111,7 +111,7 @@ public class RecoverableObject implements Recoverable {
         this.index = index;
     }
     public boolean distributable(){
-        return true;
+        return scope() != Distributable.LOCAL_SCOPE;
     }
     public String index(){
         return this.index;

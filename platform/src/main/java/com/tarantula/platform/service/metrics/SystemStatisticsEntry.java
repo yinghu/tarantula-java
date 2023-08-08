@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
@@ -43,6 +44,11 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.monthly = entry.monthly();
         this.yearly = entry.yearly();
         this.total = entry.total();
+    }
+
+    @Override
+    public int scope() {
+        return Distributable.LOCAL_SCOPE;
     }
 
     @Override
