@@ -1,18 +1,19 @@
 package com.tarantula.test;
 
 import com.icodesoftware.service.ClusterProvider;
+import com.tarantula.platform.service.cluster.keyindex.ClusterNodeManager;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.berkeley.ScopedReplicationProxy;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
-public class ScopedReplicationProxyTest {
+public class ClusterNodeManagerTest {
 
 
     @Test(groups = { "ScopedReplicationProxy" })
     public void atomicOperationTest() {
-        ScopedReplicationProxy proxy = new ScopedReplicationProxy(null);
+        ClusterNodeManager proxy = new ClusterNodeManager(new ClusterNode("","n12",17));
         ClusterProvider.Node node = proxy.nextNode();
         Assert.assertNull(node);
         ClusterNode node1 = new ClusterNode("BDS","N01",17);

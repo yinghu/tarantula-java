@@ -20,6 +20,8 @@ public interface DataStoreProvider extends ServiceProvider {
 
     void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
+    MapStoreListener mapStoreListener(int scope);
+
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);
 

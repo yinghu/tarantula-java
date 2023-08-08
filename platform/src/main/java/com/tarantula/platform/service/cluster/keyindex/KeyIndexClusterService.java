@@ -25,7 +25,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     private DataStoreOnPartition[] dataStoreOnPartitions;
 
-
+    private ClusterNodeManager clusterNodeManager;
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         tarantulaContext = TarantulaContext.getInstance();
@@ -34,6 +34,8 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
             this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX +i);
         }
+        clusterNodeManager = new ClusterNodeManager(tarantulaContext.node());
+        tarantulaContext.clusterProvider().registerNodeListener(clusterNodeManager);
         new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new KeyIndexServiceBootstrap(this),"key-index-service",true).start();
     }
 
@@ -102,7 +104,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public ClusterProvider.Node[] recoveringNodeList(String source, String key){
-        return null;
+       return null;
     }
 
     public void onReplicated(Event event){
@@ -119,6 +121,17 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         String key = keyIndex.key().asString();
         DataStoreOnPartition dso = onPartition(key);
         return dso.lock(key.getBytes(),()-> dso.dataStore.update(keyIndex));
+    }
+
+    public ClusterProvider.Node nextNode(){
+        return clusterNodeManager.nextNode();
+    }
+    public ClusterProvider.Node[] nextNodeList(int expected){
+        return clusterNodeManager.nextNodeList(expected);
+    }
+
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex){
+        return clusterNodeManager.nodeList(keyIndex);
     }
 
 
@@ -152,4 +165,5 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         }
         return dso;
     }
+
 }

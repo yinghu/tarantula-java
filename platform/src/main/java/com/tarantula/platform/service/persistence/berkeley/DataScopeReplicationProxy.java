@@ -23,7 +23,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodes);
@@ -45,7 +45,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
+        KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
         if(keyIndexTrack==null) return null;
         return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }

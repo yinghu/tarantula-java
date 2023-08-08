@@ -144,6 +144,19 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     }
 
+    public MapStoreListener mapStoreListener(int scope){
+        if(scope==Distributable.DATA_SCOPE){
+            return this.dataScopeReplicationProxy;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return this.integrationScopeReplicationProxy;
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            return this.indexScopeReplicationProxy;
+        }
+        return null;
+    }
+
     @Override
     public DataStore createAccessIndexDataStore(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
