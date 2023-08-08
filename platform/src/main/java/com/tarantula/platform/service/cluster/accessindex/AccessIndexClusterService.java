@@ -64,9 +64,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
-                            this.onPartition(r.partition()).dataStore.backup().set(r.key(),r.value());
+                            DataStoreOnPartition dso = this.onPartition(r.partition());
+                            dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
                             RevisionObject ro = RevisionObject.fromBinary(r.value());
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+r.partition(),new String(r.key()),new String(ro.node),this.tarantulaContext.node().nodeName());
+                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),new String(ro.node),this.tarantulaContext.node().nodeName());
                             tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
                         });
                         updates.clear();

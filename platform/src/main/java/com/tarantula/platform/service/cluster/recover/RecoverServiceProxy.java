@@ -116,10 +116,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         NodeEngine nodeEngine = getNodeEngine();
         int expected = 0;
         for(ClusterProvider.Node node : nodes){
-            if(node==null){
-                //logger.warn("No cluster node available to replicate");
-                break;
-            }
+            if(node==null) break;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
             if(m==null) continue;
             ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
