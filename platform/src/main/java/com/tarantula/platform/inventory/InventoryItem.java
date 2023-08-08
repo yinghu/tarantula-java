@@ -51,7 +51,7 @@ public class InventoryItem extends ConfigurableObject {
         jsonObject.addProperty("InventoryId",distributionKey());
         jsonObject.addProperty("TypeId",configurationTypeId);
         jsonObject.addProperty("Name",configurationName);
-        jsonObject.add("Commodity",commodity);
+        jsonObject.add("_commodity",commodity);
         return jsonObject;
     }
 
