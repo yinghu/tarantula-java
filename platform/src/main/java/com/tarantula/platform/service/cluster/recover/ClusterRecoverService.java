@@ -8,6 +8,7 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
+import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.service.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -46,6 +47,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     if(updates.size()>0){
                         updates.forEach(r->{
                             this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
+                            RevisionObject ro = RevisionObject.fromBinary(r.value());
+                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),new String(ro.node),this.tarantulaContext.node().nodeName());
+                            this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
                         });
                         updates.clear();
                     }

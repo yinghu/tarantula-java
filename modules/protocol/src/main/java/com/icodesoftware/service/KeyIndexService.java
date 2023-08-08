@@ -8,7 +8,7 @@ public interface KeyIndexService extends ServiceProvider{
     String NAME = "KeyIndexService";
 
     KeyIndex lookup(String source,String key);
-
+    ClusterProvider.Node[] recoveringNodeList(String source,String key);
     void onReplicated(Event event);
     boolean createIfAbsent(KeyIndex keyIndex);
 

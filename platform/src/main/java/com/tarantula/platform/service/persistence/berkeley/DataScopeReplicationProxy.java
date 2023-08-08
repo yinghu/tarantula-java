@@ -7,6 +7,7 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.service.DataStoreProvider;
+import com.tarantula.platform.service.KeyIndexTrack;
 
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
@@ -24,24 +25,29 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         KeyIndex keyIndex = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
         if(keyIndex==null){
-            //logger.warn("Index Key->"+metadata.source()+"#"+stringKey);
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodes);
-            //logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
+            logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
+            if(replicated==0){
+                keyIndex = new KeyIndexTrack();
+                keyIndex.owner(metadata.source());
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(localNode.nodeName());
+                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
+            }
+            return;
         }
-        else{
-
-        }
+        int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodeList(keyIndex));
+        logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
     }
 
 
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        //logger.warn("recovering from key->"+metadata.source()+"#"+stringKey);
         KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),stringKey);
         if(keyIndexTrack==null) return null;
-        return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key);
+        return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }
 
     @Override

@@ -4,9 +4,7 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Property;
 
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.RecoverService;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.ArrayList;
@@ -85,7 +83,8 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
     @Override
     public void updated(ServiceContext serviceContext){
         RecoverService rsp = serviceContext.clusterProvider().recoverService();
-        byte[] _data = rsp.onRecover(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes());
+        ClusterProvider.Node[] nodes = serviceContext.keyIndexService().recoveringNodeList(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey());
+        byte[] _data = rsp.onRecover(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes(),nodes);
         this.fromBinary((_data));
         this._listeners.forEach((a)->a.onUpdated(this));
     }

@@ -6,7 +6,7 @@ import com.icodesoftware.service.RecoverService;
 
 public class TestRecoverService implements RecoverService {
     @Override
-    public byte[] onRecover(String source, byte[] key) {
+    public byte[] onRecover(String source, byte[] key,ClusterProvider.Node[] nodes) {
         return null;
     }
 

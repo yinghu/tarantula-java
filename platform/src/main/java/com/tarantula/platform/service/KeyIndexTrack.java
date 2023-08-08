@@ -36,7 +36,7 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     }
 
     public int scope(){
-        return Distributable.LOCAL_SCOPE;
+        return Distributable.INDEX_SCOPE;
     }
     @Override
     public boolean backup(){

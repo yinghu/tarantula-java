@@ -3,8 +3,10 @@ package com.icodesoftware;
 public interface Distributable {
 
     int LOCAL_SCOPE = 0; //NO REPLICATION
-    int DATA_SCOPE = 1; //REPLICATION WITHIN DATA CLUSTER
-    int INTEGRATION_SCOPE = 2; //REPLICATION WITHIN INTEGRATION CLUSTER
+
+    int DATA_SCOPE = 1; //USER DATA REPLICATION SCOPE
+    int INTEGRATION_SCOPE = 2; //ACCESS REPLICATION SCOPE
+    int INDEX_SCOPE = 3; //KEY INDEX REPLICATION SCOPE
 
     String bucket();
     void bucket(String bucket);

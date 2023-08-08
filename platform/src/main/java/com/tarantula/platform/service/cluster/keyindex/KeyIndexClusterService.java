@@ -7,6 +7,7 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.Event;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
@@ -97,6 +98,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         keyIndexTrack.owner(source);
         keyIndexTrack.index(key);
         if(dso.lock(key.getBytes(),()-> dso.dataStore.load(keyIndexTrack))) return keyIndexTrack;
+        return null;
+    }
+
+    public ClusterProvider.Node[] recoveringNodeList(String source, String key){
         return null;
     }
 

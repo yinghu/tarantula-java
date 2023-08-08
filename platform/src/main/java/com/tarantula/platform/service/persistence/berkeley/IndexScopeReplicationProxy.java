@@ -8,13 +8,13 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 
 
-public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
+public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(LocalScopeReplicationProxy.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(IndexScopeReplicationProxy.class);
 
     private DistributionKeyIndexService distributionKeyIndexService;
 
-    public LocalScopeReplicationProxy(DataStoreProvider dataStoreProvider){
+    public IndexScopeReplicationProxy(DataStoreProvider dataStoreProvider){
         super(dataStoreProvider);
     }
     @Override
@@ -42,6 +42,6 @@ public class LocalScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public void waitForData() {
         this.distributionKeyIndexService = serviceContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
-        logger.warn("Local scope replication proxy is ready");
+        logger.warn("Index scope replication proxy is ready");
     }
 }

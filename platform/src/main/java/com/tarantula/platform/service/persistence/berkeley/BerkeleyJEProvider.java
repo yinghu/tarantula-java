@@ -8,7 +8,6 @@ import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
@@ -89,7 +88,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private MapStoreListener integrationScopeReplicationProxy;
     private MapStoreListener dataScopeReplicationProxy;
 
-    private MapStoreListener localScopeReplicationProxy;
+    private MapStoreListener indexScopeReplicationProxy;
     @Override
     public void configure(Map<String, Object> properties) {
         this.database = (String)properties.get("name");
@@ -139,8 +138,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             this.integrationScopeReplicationProxy = mapStoreListener;
             return;
         }
-        if(scope==Distributable.LOCAL_SCOPE){
-            this.localScopeReplicationProxy = mapStoreListener;
+        if(scope==Distributable.INDEX_SCOPE){
+            this.indexScopeReplicationProxy = mapStoreListener;
         }
 
     }
@@ -219,12 +218,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.integrationScopeReplicationProxy.setup(serviceContext);
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy(this);
         this.dataScopeReplicationProxy.setup(serviceContext);
-        this.localScopeReplicationProxy = new LocalScopeReplicationProxy(this);
-        this.localScopeReplicationProxy.setup(serviceContext);
+        this.indexScopeReplicationProxy = new IndexScopeReplicationProxy(this);
+        this.indexScopeReplicationProxy.setup(serviceContext);
     }
     @Override
     public void waitForData() {
-        this.localScopeReplicationProxy.waitForData();
+        this.indexScopeReplicationProxy.waitForData();
         this.integrationScopeReplicationProxy.waitForData();
         this.dataScopeReplicationProxy.waitForData();
     }
@@ -478,8 +477,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return new ReplicationData(metadata.source(),key,t);
             });**/
             dataScopeReplicationProxy.onBackingUp(metadata,key,t);
+            return;
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             /**
             String pendingId = metadata.source()+"#"+key;
             pendingBackupIndex.compute(pendingId,(k,v)->{
@@ -531,14 +531,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public byte[] onRecovering(Metadata metadata,String stringKey,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            //return this.integrationCluster.recoverService().onRecover(metadata.source(),key);
             return this.dataScopeReplicationProxy.onRecovering(metadata,stringKey,key);
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             return this.integrationScopeReplicationProxy.onRecovering(metadata,stringKey,key);
         }
-        else if(metadata.scope()==Distributable.LOCAL_SCOPE){
-            return this.localScopeReplicationProxy.onRecovering(metadata,stringKey,key);
+        if(metadata.scope()==Distributable.INDEX_SCOPE){
+            return this.indexScopeReplicationProxy.onRecovering(metadata,stringKey,key);
         }
         return null;
     }
@@ -547,11 +546,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDeleting(Metadata metadata,byte[] key){
         if(metadata.scope()==Distributable.DATA_SCOPE){
             dataScopeReplicationProxy.onDeleting(metadata,key);
-            //this.integrationCluster.recoverService().onDelete(metadata.source(),key);
+            return;
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             integrationScopeReplicationProxy.onDeleting(metadata,key);
-            //this.integrationCluster.accessIndexService().(metadata.partition(),key);
+            return;
+        }
+        if(metadata.scope()==Distributable.INDEX_SCOPE){
+            indexScopeReplicationProxy.onDeleting(metadata,key);
         }
     }
 

@@ -70,7 +70,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
 
     @Override
-    public byte[] onRecover(String source, byte[] key) {
+    public byte[] onRecover(String source, byte[] key,ClusterProvider.Node[] nodes) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
