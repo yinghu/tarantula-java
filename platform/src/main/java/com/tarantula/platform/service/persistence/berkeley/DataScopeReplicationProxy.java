@@ -47,7 +47,15 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
-        if(keyIndexTrack==null) return null;
+        if(keyIndexTrack==null){
+            //if(metadata.source().equals("tarantula_user")){
+            logger.warn("kindex null->"+metadata.source()+"#"+stringKey);
+            //}
+            return null;
+        }
+        if(metadata.source().equals("tarantula_user")){
+            logger.warn("kindex->"+keyIndexTrack.masterNode());
+        }
         return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }
 

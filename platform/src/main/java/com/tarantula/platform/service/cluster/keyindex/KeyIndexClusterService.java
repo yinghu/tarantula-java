@@ -95,11 +95,12 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     @Override
     public KeyIndex lookup(String source,String key) {
-        DataStoreOnPartition dso = onPartition(key);
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack();
         keyIndexTrack.owner(source);
         keyIndexTrack.index(key);
-        if(dso.lock(key.getBytes(),()-> dso.dataStore.load(keyIndexTrack))) return keyIndexTrack;
+        byte[] _key = keyIndexTrack.key().asString().getBytes();
+        DataStoreOnPartition dso = onPartition(keyIndexTrack.key().asString());
+        if(dso.lock(_key,()-> dso.dataStore.load(keyIndexTrack))) return keyIndexTrack;
         return null;
     }
 
