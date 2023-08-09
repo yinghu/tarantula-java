@@ -23,7 +23,7 @@ public class DataStoreTestEvn {
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
                 DataStoreTestEvn.dataStoreProvider.start();
                 DataStoreTestEvn.dataStoreProvider.setup(serviceContext);
-                DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.LOCAL_SCOPE,mapStoreListener);
+                DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.waitForData();

@@ -168,7 +168,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public DataStore createKeyIndexDataStore(String name) {
         return this.dMap.computeIfAbsent(name,(k)->{
-            Database db = this.createDatabase(name,Distributable.LOCAL_SCOPE);
+            Database db = this.createDatabase(name,Distributable.INDEX_SCOPE);
             return  new KeyIndexDataStore(this.node,db,this);
         });
     }
@@ -181,10 +181,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             if(scope==Distributable.DATA_SCOPE){
                 return this.environment.openDatabase(null,name,dbConfig);
             }
-            else if(scope==Distributable.INTEGRATION_SCOPE){
+            if(scope==Distributable.INTEGRATION_SCOPE){
                 return this.integrationEnvironment.openDatabase(null,name,dbConfig);
             }
-            return this.indexEnvironment.openDatabase(null,name,dbConfig);
+            if(scope==Distributable.INDEX_SCOPE){
+                return this.indexEnvironment.openDatabase(null,name,dbConfig);
+            }
+            throw new RuntimeException("Scope ["+scope+"] not supported");
         }catch (Exception ex){
             throw new RuntimeException(name,ex);
         }
