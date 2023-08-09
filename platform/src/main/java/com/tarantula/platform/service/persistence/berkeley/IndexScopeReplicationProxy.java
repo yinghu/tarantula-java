@@ -31,7 +31,6 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        logger.warn(metadata.partition()+">"+stringKey);
         return this.distributionKeyIndexService.recover(metadata.partition(),key);
     }
 

@@ -42,20 +42,10 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
     }
 
-
-
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
-        if(keyIndexTrack==null){
-            //if(metadata.source().equals("tarantula_user")){
-            logger.warn("kindex null->"+metadata.source()+"#"+stringKey);
-            //}
-            return null;
-        }
-        if(metadata.source().equals("tarantula_user")){
-            logger.warn("kindex->"+keyIndexTrack.masterNode());
-        }
+        if(keyIndexTrack==null) return null;
         return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }
 
