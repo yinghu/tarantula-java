@@ -608,6 +608,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
         _syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
         countDownLatch.await();
+        _syncLatch.remove(DistributionKeyIndexService.NAME);
  	    log.warn("Key index data sync has finished");
 
         //sync data store

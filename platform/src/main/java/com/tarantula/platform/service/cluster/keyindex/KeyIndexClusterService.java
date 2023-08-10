@@ -173,7 +173,21 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         new Thread(()->{
             for(int i=0;i<tarantulaContext.accessIndexRoutingNumber;i++){
                 DataStoreOnPartition dso = onPartition(i);
-                logger.warn("doing load key index");
+                int[] batch={0,i};
+                byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
+                byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
+                dso.dataStore.backup().list((k,v)->{
+                    if(batch[0] == tarantulaContext.recoverBatchSize){
+                        distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
+                        batch[0] = 0;
+                    }
+                    keys[batch[0]]=k;
+                    values[batch[0]]=v;
+                    batch[0]++;
+                    //total[0]++;
+                    return true;
+                });
+                distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
             }
             distributionKeyIndexService.endSync(memberId,syncKey);
         }).start();
@@ -186,7 +200,11 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public void sync(byte[][] keys,byte[][] values,int partition){
-        logger.warn("sync...");
+        logger.warn("sync..."+partition);
+        for(int i=0;i<keys.length;i++){
+            logger.warn(new String(keys[i]));
+            logger.warn(new String(values[i]));
+        }
     }
 
 }
