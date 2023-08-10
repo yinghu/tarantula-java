@@ -50,16 +50,23 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider 
     }
 
 
-
+    public int maxReplicationNumber(){
+        return serviceContext.clusterProvider().maxReplicationNumber();
+    }
     protected ClusterProvider.Node nextNode(){
         return serviceContext.keyIndexService().nextNode();
     }
+
     protected ClusterProvider.Node[] nextNodeList(int expected){
         return serviceContext.keyIndexService().nextNodeList(expected);
     }
 
     protected ClusterProvider.Node[] nodeList(KeyIndex keyIndex){
         return serviceContext.keyIndexService().nodeList(keyIndex);
+    }
+
+    protected ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){
+        return serviceContext.keyIndexService().nodeList(keyIndex,expected);
     }
 
     protected KeyIndex lookup(String source,String key){

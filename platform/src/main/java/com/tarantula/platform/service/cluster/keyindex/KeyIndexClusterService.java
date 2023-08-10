@@ -136,6 +136,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         return clusterNodeManager.nodeList(keyIndex);
     }
 
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){
+        return clusterNodeManager.nodeList(keyIndex,tarantulaContext.clusterProvider().maxReplicationNumber());
+    }
+
 
     @Override
     public String name() {
@@ -187,7 +191,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
                     //total[0]++;
                     return true;
                 });
-                distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
+                if(batch[0]>0) distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
             }
             distributionKeyIndexService.endSync(memberId,syncKey);
         }).start();
@@ -195,12 +199,10 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
     public boolean endSync(String syncKey){
         tarantulaContext._syncLatch.get(syncKey).countDown();
-        logger.warn("end sync");
         return true;
     }
 
     public void sync(byte[][] keys,byte[][] values,int partition){
-        logger.warn("sync..."+partition);
         for(int i=0;i<keys.length;i++){
             logger.warn(new String(keys[i]));
             logger.warn(new String(values[i]));

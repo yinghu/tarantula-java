@@ -20,6 +20,8 @@ public interface KeyIndexService extends ServiceProvider{
 
     ClusterProvider.Node[] nodeList(KeyIndex keyIndex);
 
+    ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected);
+
     ClusterProvider.Node[] recoveringNodeList(String source,String key);
 
     interface KeyIndexStore extends DataStore.Backup {

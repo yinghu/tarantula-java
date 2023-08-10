@@ -201,7 +201,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     return true;
                 });
                 //last batch
-                recoverService.onSync(batch[0],keys,values,memberId,partition);
+                if(batch[0]>0) recoverService.onSync(batch[0],keys,values,memberId,partition);
             }
             recoverService.onEndSync(memberId,syncKey);
         }).start();

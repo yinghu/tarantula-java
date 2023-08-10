@@ -26,7 +26,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         logger.warn(metadata.source()+"#"+stringKey);
         KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
         if(keyIndex==null){
-            ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+            ClusterProvider.Node[] nodes = nextNodeList(this.maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodes);
             logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
             if(replicated==0){
@@ -38,7 +38,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             }
             return;
         }
-        int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodeList(keyIndex));
+        int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(metadata.source(),key,value,nodeList(keyIndex,this.maxReplicationNumber()));
         logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
     }
 

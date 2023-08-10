@@ -9,9 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClusterNodeManager implements ClusterProvider.NodeListener {
 
-    //protected ServiceContext serviceContext;
 
-    //protected KeyIndexService keyIndexService;
 
     private ClusterProvider.Node localNode;
 
@@ -25,6 +23,10 @@ public class ClusterNodeManager implements ClusterProvider.NodeListener {
         limit = new AtomicInteger(-1);
         pendingNodes = new ClusterProvider.Node[0];
         nodeMappings = new ConcurrentHashMap<>();
+    }
+
+    public ClusterProvider.Node[] pendingNodes(){
+        return pendingNodes;
     }
 
 
@@ -121,8 +123,23 @@ public class ClusterNodeManager implements ClusterProvider.NodeListener {
             slaves[0] = nodeMappings.get(keyIndex.masterNode());
             start = 1;
         }
-        for(int i=start; i<names.length;i++){
-            slaves[i] = nodeMappings.get(names[i]);
+        for(int i=0; i<names.length;i++){
+            slaves[i+start] = nodeMappings.get(names[i]);
+        }
+        return slaves;
+    }
+
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){
+        boolean masterIncluded = !keyIndex.masterNode().equals(localNode.nodeName());
+        String[] names = keyIndex.slaveNodes();
+        ClusterProvider.Node[] slaves = new ClusterProvider.Node[masterIncluded?names.length+1:names.length];
+        int start = 0;
+        if(masterIncluded) {
+            slaves[0] = nodeMappings.get(keyIndex.masterNode());
+            start = 1;
+        }
+        for(int i=0; i<names.length;i++){
+            slaves[i+start] = nodeMappings.get(names[i]);
         }
         return slaves;
     }
