@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.cluster.keyindex;
 
 import com.hazelcast.core.DistributedObject;
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
@@ -50,6 +51,42 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         return (byte[]) ret.result;
     }
 
+    public boolean startSync(String syncKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        KeyIndexSyncStartOperation operation = new KeyIndexSyncStartOperation(nodeEngine.getLocalMember().getUuid(),syncKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
+        ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
+            Future<Boolean> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!ret.successful) throw new RuntimeException(ret.exception);
+        return (boolean)ret.result;
+    }
+
+    public void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
+        NodeEngine nodeEngine = getNodeEngine();
+        Member m = nodeEngine.getClusterService().getMember(memberId);
+        KeyIndexSyncOperation operation = new KeyIndexSyncOperation(size,keys,values,partition);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,m.getAddress());
+        ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!ret.successful) throw new RuntimeException(ret.exception);
+    }
+
+    public boolean endSync(String memberId,String syncKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        Member m = nodeEngine.getClusterService().getMember(memberId);
+        KeyIndexSyncEndOperation operation = new KeyIndexSyncEndOperation(syncKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,m.getAddress());
+        ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
+            Future<Boolean> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!ret.successful) throw new RuntimeException(ret.exception);
+        return (boolean)ret.result;
+    }
 
     @Override
     public String name() {

@@ -4,6 +4,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -165,6 +166,27 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);
         }
         return dso;
+    }
+
+    public boolean startSync(String memberId,String syncKey){
+        DistributionKeyIndexService distributionKeyIndexService = this.tarantulaContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        new Thread(()->{
+            for(int i=0;i<tarantulaContext.accessIndexRoutingNumber;i++){
+                DataStoreOnPartition dso = onPartition(i);
+                logger.warn("doing load key index");
+            }
+            distributionKeyIndexService.endSync(memberId,syncKey);
+        }).start();
+        return true;
+    }
+    public boolean endSync(String syncKey){
+        tarantulaContext._syncLatch.get(syncKey).countDown();
+        logger.warn("end sync");
+        return true;
+    }
+
+    public void sync(byte[][] keys,byte[][] values,int partition){
+        logger.warn("sync...");
     }
 
 }

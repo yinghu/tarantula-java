@@ -25,6 +25,7 @@ import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
+import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.JVMMonitor;
@@ -591,7 +592,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         _systemServiceStarted.await();
  	    this.accessIndexService().onDisable();
  	    _access_index_syc_finished.await();
- 	    for(int i=0;i<accessIndexRoutingNumber;i++){
+ 	    /**
+         for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
  	        String _pk = "p"+i;
  	        _syncLatch.put(_pk,countDownLatch);
@@ -600,8 +602,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
  	        countDownLatch.await();
  	        _syncLatch.remove(_pk);
-        }
- 	    log.warn("Access index data sync has finished");
+        }**/
+        DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
+        _syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
+        countDownLatch.await();
+ 	    log.warn("Key index data sync has finished");
+
         //sync data store
         /**
         List<String> dataStoreList = this.deploymentDataStoreProvider.list();
@@ -960,7 +968,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         metricsManager.removeMetrics(metrics);
     }
     public List<String> metricsList(){
- 	    return metricsManager.listMestrics();
+ 	    return metricsManager.listMetrics();
     }
 
     private void initMetricsProvider() throws Exception{

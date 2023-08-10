@@ -59,7 +59,7 @@ public class MetricsManager implements SchedulingTask, Serviceable {
         metricsMap.remove(metrics.name());
     }
 
-    public List<String> listMestrics(){
+    public List<String> listMetrics(){
         ArrayList<String> list = new ArrayList<>();
         metricsMap.forEach((k,v)->list.add(k));
         return list;
