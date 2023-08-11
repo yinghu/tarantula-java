@@ -41,6 +41,7 @@ public class DataStoreViewer implements DataStore.Summary {
         ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
         DistributionDataViewer distributionDataViewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
         for(ClusterProvider.Node node : nodes){
+            System.out.println(node.memberId()+"#"+node.nodeName());
             byte[] ret = distributionDataViewer.load(dataStore.name(),key,node);
             if(ret!=null) view.on(node,key,ret);
         }
