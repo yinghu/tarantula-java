@@ -79,13 +79,12 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             byte[] key = ckey.getBytes();
             return dso.lock(key,()->{
                 if(dso.dataStore.load(keyIndex)){
-                    logger.warn("Loaded");
                     if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
-                        dso.dataStore.update(keyIndex);
+                        logger.warn("key index updating->"+dso.dataStore.update(keyIndex));
+                        //dso.dataStore.update(keyIndex);
                     }
                     return true;
                 }
-                logger.warn("Un Loaded");
                 keyIndex.placeMasterNode(event.source());
                 keyIndex.placeSlaveNode(event.label());
                 return dso.dataStore.createIfAbsent(keyIndex,false);

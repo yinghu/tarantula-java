@@ -58,6 +58,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
         DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
         for(ClusterProvider.Node node : nodes){
+            if(node==null) continue;
             byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
             if(ret!=null) view.on(node,key,ret);
         }
