@@ -30,11 +30,8 @@ public interface AccessIndexService extends ServiceProvider {
         void onStart();
     }
 
-    interface AccessIndexStore extends DataStore.Backup {
+    interface AccessIndexStore extends DataStore.Summary {
         String STORE_NAME_PREFIX = "tarantula_access_index_";
-        String name();
-        int partitionNumber();
-        long count();
-        long count(int partition);
+
     }
 }

@@ -26,4 +26,13 @@ public class DataStoreSummary implements DataStore.Summary {
     public DataStore dataStore(){
         return dataStore;
     }
+
+
+    public void list(DataStore.Binary binary){
+        dataStore.backup().list(binary);
+    }
+
+    public void load(byte[] key, DataStore.Binary binary){
+        binary.on(key,dataStore.backup().get(key));
+    }
 }

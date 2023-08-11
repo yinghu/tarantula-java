@@ -60,10 +60,13 @@ public interface DataStore {
 
     interface Summary{
         String name();
+
         int partitionNumber();
 
         long totalRecords();
 
-        DataStore dataStore();
+        void list(Binary binary);
+
+        void load(byte[] key,Binary binary);
     }
 }

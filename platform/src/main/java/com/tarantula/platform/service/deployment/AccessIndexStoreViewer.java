@@ -23,8 +23,8 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return tarantulaContext.accessIndexRoutingNumber;
     }
 
-    @Override
-    public long count() {
+    //@Override
+    public long totalRecords() {
         long rt = 0;
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
@@ -33,21 +33,6 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return rt;
     }
 
-    @Override
-    public long count(int partition) {
-        if(partition<0||partition>= tarantulaContext.accessIndexRoutingNumber) return 0;
-        DataStore ds = dataStore(partition);
-        return ds.count();
-    }
-
-    public boolean set(byte[] key,byte[] value){
-        return false;
-    }
-    public byte[] get(byte[] key){
-        int partition = this.tarantulaContext.clusterProvider().partition(key);
-        DataStore ds = dataStore(partition);
-        return ds.backup().get(key);
-    }
     public void list(DataStore.Binary binary){
         boolean[] done = {false};
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
@@ -61,11 +46,10 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         }
     }
 
-    @Override
-    public void unset(byte[] key) {
-
+    public void load(byte[] key, DataStore.Binary binary){
+        int partition = this.tarantulaContext.clusterProvider().partition(key);
+        binary.on(key,dataStore(partition).backup().get(key));
     }
-
     private DataStore dataStore(int partition){
         return this.tarantulaContext.deploymentDataStoreProvider.lookup(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);
     }
