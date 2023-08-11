@@ -151,11 +151,11 @@ public class DataStoreSudoRoleModule implements Module {
             JsonObject summary = new JsonObject();
             summary.addProperty("name",accessIndexStore.name());
             summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
-            summary.addProperty("totalRecords",accessIndexStore.count());
+            summary.addProperty("totalRecords",accessIndexStore.totalRecords());
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
             JsonArray keys = new JsonArray();
-            accessIndexStore.list((k,v)->{
+            accessIndexStore.list((n,k,v)->{
                 kn[0]--;
                 if(kn[0]<0) {
                     JsonObject debug = new JsonObject();
@@ -171,7 +171,17 @@ public class DataStoreSudoRoleModule implements Module {
         }
         else if(session.action().equals("onKeyIndexStoreValue")){
             KeyIndexService.KeyIndexStore keyIndexStore = this.deploymentServiceProvider.keyIndexStore();
-            session.write(keyIndexStore.get(session.name().getBytes()));
+            JsonArray data = new JsonArray();
+            keyIndexStore.load(session.name().getBytes(),(n,k,v)->{
+                JsonObject debug = new JsonObject();
+                debug.addProperty("address",n.address());
+                debug.add("content",JsonUtil.parse(v));
+                data.add(debug);
+                return true;
+            });
+            JsonObject summary = new JsonObject();
+            summary.add("list",data);
+            session.write(summary.toString().getBytes());
         }
         else if(session.action().equals("onBackupDataStore")){
             this.deploymentServiceProvider.issueDataStoreBackup();

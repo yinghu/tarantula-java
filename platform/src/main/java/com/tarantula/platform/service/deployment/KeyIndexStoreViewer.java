@@ -1,8 +1,12 @@
 package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.DataStoreSummary;
+import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
 
 public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
 
@@ -24,7 +28,7 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
     }
 
     @Override
-    public long count() {
+    public long totalRecords() {
         long rt = 0;
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
@@ -33,37 +37,44 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
         return rt;
     }
 
-    @Override
-    public long count(int partition) {
-        if(partition<0||partition>= tarantulaContext.accessIndexRoutingNumber) return 0;
-        DataStore ds = dataStore(partition);
-        return ds.count();
-    }
+    //@Override
+    //public long count(int partition) {
+        //if(partition<0||partition>= tarantulaContext.accessIndexRoutingNumber) return 0;
+        ///DataStore ds = dataStore(partition);
+        //return ds.count();
+    //}
 
-    public boolean set(byte[] key,byte[] value){
-        return false;
-    }
+
     public byte[] get(byte[] key){
         int partition = this.tarantulaContext.clusterProvider().partition(key);
         DataStore ds = dataStore(partition);
         return ds.backup().get(key);
     }
-    public void list(DataStore.Binary binary){
+    public void list(DataStoreSummary.View view){
         boolean[] done = {false};
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
             ds.backup().list((k,v)->{
-                if(binary.on(k,v)) return true;
+                if(view.on(tarantulaContext.node(),k,v)) return true;
                 done[0] = true;
                 return false;
             });
             if(done[0]) break;
         }
     }
-
-    @Override
-    public void unset(byte[] key) {
-
+    public void load(byte[] key, DataStoreSummary.View view){
+        DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
+        view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
+        /**
+        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
+        if(keyIndex==null) return;
+        ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
+        DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
+        for(ClusterProvider.Node node : nodes){
+            if(node==null) continue;
+            byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
+            if(ret!=null) view.on(node,key,ret);
+        }**/
     }
 
     private DataStore dataStore(int partition){

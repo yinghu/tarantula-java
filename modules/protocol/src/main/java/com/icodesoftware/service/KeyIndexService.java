@@ -24,11 +24,11 @@ public interface KeyIndexService extends ServiceProvider{
 
     ClusterProvider.Node[] recoveringNodeList(String source,String key);
 
-    interface KeyIndexStore extends DataStore.Backup {
+    interface KeyIndexStore extends DataStoreSummary {
         String STORE_NAME_PREFIX = "tarantula_key_index_";
-        String name();
-        int partitionNumber();
-        long count();
-        long count(int partition);
+        //String name();
+        //int partitionNumber();
+        //long count();
+        //long count(int partition);
     }
 }
