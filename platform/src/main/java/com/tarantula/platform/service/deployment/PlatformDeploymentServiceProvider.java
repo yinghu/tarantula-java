@@ -12,6 +12,8 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
+import com.tarantula.platform.service.persistence.AccessIndexStoreViewer;
+import com.tarantula.platform.service.persistence.DataStoreViewer;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -821,16 +823,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public DataStore.Summary validDataStore(String dataStore){
-        DataStoreSummary summary = new DataStoreSummary();
-        summary.name = dataStore;
-        summary.partitionNumber = 0;
-        summary.totalRecords = 0;
+
         DataStore ds = this.tarantulaContext.deploymentDataStoreProvider.lookup(dataStore);
-        if(ds==null) return summary;
-        summary.partitionNumber = ds.partitionNumber();
-        summary.totalRecords = ds.count();
-        summary.dataStore = ds;
-        return summary;
+        return ds!=null? new DataStoreViewer(tarantulaContext,ds): null;
     }
 
     public ClusterProvider.Summary clusterSummary(){

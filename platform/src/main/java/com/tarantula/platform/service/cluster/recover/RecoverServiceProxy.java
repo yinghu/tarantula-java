@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService {
+public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService,DistributionDataViewer {
 
     private TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
     private String objectName;
@@ -224,4 +224,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
 
 
+    //DistributionDataViewer method
+    @Override
+    public byte[] load(String source, byte[] key, ClusterProvider.Node node) {
+        NodeEngine nodeEngine = getNodeEngine();
+        Member m = nodeEngine.getClusterService().getMember(node.memberId());
+        if(m==null) return null;
+        LoadDataOperation operation = new LoadDataOperation(source,key);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        return callResult.successful?(byte[])callResult.result:null;
+    }
 }

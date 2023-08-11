@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.deployment;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.AccessIndexService;
@@ -33,12 +33,12 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return rt;
     }
 
-    public void list(DataStore.Binary binary){
+    public void list(DataStore.View view){
         boolean[] done = {false};
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
             ds.backup().list((k,v)->{
-                if(binary.on(k,v)) return true;
+                if(view.on(tarantulaContext.node(),k,v)) return true;
                 done[0] = true;
                 return false;
             });
@@ -46,9 +46,9 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         }
     }
 
-    public void load(byte[] key, DataStore.Binary binary){
+    public void load(byte[] key, DataStore.View view){
         int partition = this.tarantulaContext.clusterProvider().partition(key);
-        binary.on(key,dataStore(partition).backup().get(key));
+        view.on(tarantulaContext.node(),key,dataStore(partition).backup().get(key));
     }
     private DataStore dataStore(int partition){
         return this.tarantulaContext.deploymentDataStoreProvider.lookup(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);

@@ -1,6 +1,8 @@
 package com.icodesoftware;
 
 
+import com.icodesoftware.service.ClusterProvider;
+
 import java.util.List;
 
 public interface DataStore {
@@ -53,6 +55,10 @@ public interface DataStore {
         boolean on(byte[] key,byte[] value);
     }
 
+    interface View{
+        boolean on(ClusterProvider.Node node,byte[] key, byte[] value);
+    }
+
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();
@@ -65,8 +71,8 @@ public interface DataStore {
 
         long totalRecords();
 
-        void list(Binary binary);
+        void list(View view);
 
-        void load(byte[] key,Binary binary);
+        void load(byte[] key,View view);
     }
 }
