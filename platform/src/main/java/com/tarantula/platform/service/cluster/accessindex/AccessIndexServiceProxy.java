@@ -5,12 +5,11 @@ import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
-import com.tarantula.platform.AccessIndexTrack;
+
 import com.tarantula.platform.TarantulaContext;
 
 import com.tarantula.platform.service.cluster.ClusterUtil;
@@ -20,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService, DistributedObject {
+public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService,DistributionAccessIndexViewer, DistributedObject {
 
     private TarantulaLogger logger = JDKLogger.getLogger(AccessIndexServiceProxy.class);
     private final String objectName;//unique proxy name
@@ -239,4 +238,19 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         this.metricsListener = (k,v)->{};
     }
 
+
+    //DistributionAccessIndexViewer methods
+    @Override
+    public byte[] load(int partition, byte[] key, ClusterProvider.Node node) {
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexLoadOperation operation = new AccessIndexLoadOperation(partition,key);
+        Member m = nodeEngine.getClusterService().getMember(node.memberId());
+        if(m==null) return null;
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        return callResult.successful?(byte[])callResult.result:null;
+    }
 }

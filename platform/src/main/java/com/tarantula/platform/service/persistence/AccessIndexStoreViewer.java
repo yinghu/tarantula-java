@@ -2,7 +2,11 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.KeyIndex;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
+import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
 
 public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexStore {
 
@@ -23,7 +27,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return tarantulaContext.accessIndexRoutingNumber;
     }
 
-    //@Override
+
     public long totalRecords() {
         long rt = 0;
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
@@ -47,8 +51,16 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
     }
 
     public void load(byte[] key, DataStore.View view){
-        int partition = this.tarantulaContext.clusterProvider().partition(key);
-        view.on(tarantulaContext.node(),key,dataStore(partition).backup().get(key));
+        DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
+        view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
+        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
+        if(keyIndex==null) return;
+        ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
+        DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
+        for(ClusterProvider.Node node : nodes){
+            byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
+            if(ret!=null) view.on(node,key,ret);
+        }
     }
     private DataStore dataStore(int partition){
         return this.tarantulaContext.deploymentDataStoreProvider.lookup(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+partition);
