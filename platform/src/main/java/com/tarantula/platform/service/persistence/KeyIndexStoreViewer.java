@@ -1,12 +1,9 @@
-package com.tarantula.platform.service.deployment;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
-import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
 
 public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
 
@@ -36,14 +33,6 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
         }
         return rt;
     }
-
-    //@Override
-    //public long count(int partition) {
-        //if(partition<0||partition>= tarantulaContext.accessIndexRoutingNumber) return 0;
-        ///DataStore ds = dataStore(partition);
-        //return ds.count();
-    //}
-
 
     public byte[] get(byte[] key){
         int partition = this.tarantulaContext.clusterProvider().partition(key);

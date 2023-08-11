@@ -14,6 +14,7 @@ import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.persistence.AccessIndexStoreViewer;
 import com.tarantula.platform.service.persistence.DataStoreViewer;
+import com.tarantula.platform.service.persistence.KeyIndexStoreViewer;
 import com.tarantula.platform.util.*;
 
 import java.io.*;
