@@ -114,7 +114,7 @@ public class ClusterNodeManager implements ClusterProvider.NodeListener {
         return next;
     }
 
-    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex){
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex){//for recovery operation
         boolean masterIncluded = !keyIndex.masterNode().equals(localNode.nodeName());
         String[] names = keyIndex.slaveNodes();
         ClusterProvider.Node[] slaves = new ClusterProvider.Node[masterIncluded?names.length+1:names.length];
@@ -129,17 +129,15 @@ public class ClusterNodeManager implements ClusterProvider.NodeListener {
         return slaves;
     }
 
-    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){
-        boolean masterIncluded = !keyIndex.masterNode().equals(localNode.nodeName());
+    public ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){//for replication
+        boolean sameMaster = keyIndex.masterNode().equals(localNode.nodeName());
+        if(!sameMaster) nextNodeList(expected);
         String[] names = keyIndex.slaveNodes();
-        ClusterProvider.Node[] slaves = new ClusterProvider.Node[masterIncluded?names.length+1:names.length];
-        int start = 0;
-        if(masterIncluded) {
-            slaves[0] = nodeMappings.get(keyIndex.masterNode());
-            start = 1;
-        }
+        if(names.length<expected) return nextNodeList(expected);
+        ClusterProvider.Node[] slaves = new ClusterProvider.Node[names.length];
         for(int i=0; i<names.length;i++){
-            slaves[i+start] = nodeMappings.get(names[i]);
+            slaves[i] = nodeMappings.get(names[i]);
+            if(slaves[i]==null) return nextNodeList(expected);
         }
         return slaves;
     }
