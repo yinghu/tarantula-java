@@ -43,7 +43,7 @@ public class DataStoreViewer implements DataStore.Summary {
         for(ClusterProvider.Node node : nodes){
             System.out.println(node.memberId()+"#"+node.nodeName());
             byte[] ret = distributionDataViewer.load(dataStore.name(),key,node);
-            System.out.println(node.memberId()+"#"+node.nodeName()+">>"+new String(ret));
+            //System.out.println(node.memberId()+"#"+node.nodeName()+">>"+new String(ret));
             if(ret!=null) view.on(node,key,ret);
         }
     }

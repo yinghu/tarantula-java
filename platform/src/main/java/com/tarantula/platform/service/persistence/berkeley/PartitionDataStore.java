@@ -403,7 +403,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         try{
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             RevisionObject localData = dso.lock(key,()->_getRevisionObject(dso,key));
-            if(!localData.successful || !localData.local) return null;
+            if(!localData.successful) return null;// || !localData.local) return null;
             return RevisionObject.toBinary(localData.revision,localData.data,localData.local,_node);
         }catch (Exception ex){
             log.error("error on backup get",ex);
