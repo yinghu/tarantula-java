@@ -131,6 +131,7 @@ public class DataStoreSudoRoleModule implements Module {
             accessIndexStore.load(session.name().getBytes(),(n,k,v)->{
                 JsonObject debug = new JsonObject();
                 RevisionObject ro = RevisionObject.fromBinary(v);
+                debug.addProperty("address",n.address());
                 debug.addProperty("local",ro.local);
                 debug.addProperty("node",new String(ro.node));
                 debug.addProperty("revision",ro.revision);
