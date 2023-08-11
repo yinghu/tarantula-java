@@ -46,7 +46,7 @@ public class DataStoreSudoRoleModule implements Module {
         else if(session.action().equals("onLoadDataStoreKeys")){
             //this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
-            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
+            DataStoreSummary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             summary.addProperty("name",sum.name());
             summary.addProperty("partitionNumber",sum.partitionNumber());
@@ -76,7 +76,7 @@ public class DataStoreSudoRoleModule implements Module {
         }
         else if(session.action().equals("onLoadDataStoreValue")){
             String[] query = session.name().split("#");
-            DataStore.Summary sum = this.deploymentServiceProvider.validDataStore(query[0]);
+            DataStoreSummary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             JsonArray data = new JsonArray();
             if(sum!=null){

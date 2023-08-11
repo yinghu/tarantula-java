@@ -89,7 +89,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     List<String> listDataStore();
     List<String> listServiceView();
     List<String> listMetricsView();
-    DataStore.Summary validDataStore(String dataStore);
+    DataStoreSummary validDataStore(String dataStore);
     ClusterProvider.Summary clusterSummary();
 
     DistributionCallback distributionCallback();

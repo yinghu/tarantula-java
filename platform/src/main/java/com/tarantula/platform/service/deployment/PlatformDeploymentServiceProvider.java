@@ -822,8 +822,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return this.tarantulaContext.dataStoreProvider().list();
     }
 
-    public DataStore.Summary validDataStore(String dataStore){
-
+    public DataStoreSummary validDataStore(String dataStore){
         DataStore ds = this.tarantulaContext.deploymentDataStoreProvider.lookup(dataStore);
         return ds!=null? new DataStoreViewer(tarantulaContext,ds): null;
     }

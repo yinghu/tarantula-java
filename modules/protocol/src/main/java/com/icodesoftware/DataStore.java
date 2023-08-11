@@ -55,24 +55,10 @@ public interface DataStore {
         boolean on(byte[] key,byte[] value);
     }
 
-    interface View{
-        boolean on(ClusterProvider.Node node,byte[] key, byte[] value);
-    }
 
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();
     }
 
-    interface Summary{
-        String name();
-
-        int partitionNumber();
-
-        long totalRecords();
-
-        void list(View view);
-
-        void load(byte[] key,View view);
-    }
 }

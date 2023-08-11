@@ -3,10 +3,11 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndex;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
-import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
+
 
 public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexStore {
 
@@ -37,7 +38,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return rt;
     }
 
-    public void list(DataStore.View view){
+    public void list(DataStoreSummary.View view){
         boolean[] done = {false};
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
@@ -50,7 +51,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         }
     }
 
-    public void load(byte[] key, DataStore.View view){
+    public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
         view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
         KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));

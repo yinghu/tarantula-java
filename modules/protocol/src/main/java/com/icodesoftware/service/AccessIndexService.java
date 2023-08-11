@@ -30,7 +30,7 @@ public interface AccessIndexService extends ServiceProvider {
         void onStart();
     }
 
-    interface AccessIndexStore extends DataStore.Summary {
+    interface AccessIndexStore extends DataStoreSummary {
         String STORE_NAME_PREFIX = "tarantula_access_index_";
 
     }
