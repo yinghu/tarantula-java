@@ -8,11 +8,14 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClusterService> implements DistributionKeyIndexService, DistributedObject {
     private static TarantulaLogger logger = JDKLogger.getLogger(KeyIndexServiceProxy.class);
     private final String objectName;
+    private ServiceContext serviceContext;
     public KeyIndexServiceProxy(String objectName, NodeEngine nodeEngine, KeyIndexClusterService keyIndexService){
         super(nodeEngine,keyIndexService);
         this.objectName = objectName;
@@ -88,6 +92,23 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         return (boolean)ret.result;
     }
 
+    public void load(int partition,byte[] key, DataStoreSummary.View view){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> memberSet = nodeEngine.getClusterService().getMembers();
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(partition,key);
+        for(Member m : memberSet){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(callResult.successful){
+                ClusterProvider.Node node = serviceContext.clusterProvider().summary().node(m.getUuid());
+                view.on(node,key,(byte[]) callResult.result);
+            }
+        }
+    }
     @Override
     public String name() {
         return objectName;
@@ -105,6 +126,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
 
     @Override
     public void setup(ServiceContext serviceContext){
-        logger.warn("Key index service proxy started");
+        this.serviceContext = serviceContext;
+        logger.warn("Distribution Key index service proxy started");
     }
 }

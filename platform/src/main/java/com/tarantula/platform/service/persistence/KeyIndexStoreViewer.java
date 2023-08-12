@@ -4,6 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 
 public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
 
@@ -54,16 +55,8 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
     public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
         view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        /**
-        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
-        if(keyIndex==null) return;
-        ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
-        DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
-        for(ClusterProvider.Node node : nodes){
-            if(node==null) continue;
-            byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
-            if(ret!=null) view.on(node,key,ret);
-        }**/
+        DistributionKeyIndexService distributionKeyIndexService = tarantulaContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        distributionKeyIndexService.load(dataStore.partitionNumber(),key,view);
     }
 
     private DataStore dataStore(int partition){

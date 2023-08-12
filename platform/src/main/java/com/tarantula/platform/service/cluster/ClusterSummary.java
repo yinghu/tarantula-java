@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform.service.cluster;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -39,9 +39,12 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
     //operations
     public void register(ClusterProvider.Node node){
         nodeList.put(node.nodeName(),node);
+        nodeList.put(node.memberId(),node);
     }
     public void unregister(ClusterProvider.Node node){
-        nodeList.remove(node.nodeName());
+        ClusterProvider.Node removed = nodeList.remove(node.nodeName());
+        if(removed==null) return;
+        nodeList.remove(removed.memberId());
     }
 
     public ClusterProvider.Node node(String nodeName){

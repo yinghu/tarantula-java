@@ -15,7 +15,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
@@ -56,7 +55,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private AccessIndexService accessIndexService;
 
-    //private KeyIndexService keyIndexService;
     private DeployService deployService;
     private RecoverService recoverService;
     private CountDownLatch _integrationInstanceStarted;
@@ -189,11 +187,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _wait();
         return this.accessIndexService;
     }
-    //public KeyIndexService keyIndexService(){
-        //if(keyIndexService!=null) return keyIndexService;
-        //_wait();
-        //return keyIndexService;
-    //}
+
     public DeployService deployService(){
         if(deployService!=null) return deployService;
         _wait();
@@ -206,7 +200,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public <T extends ServiceProvider> T serviceProvider(String name){
         _wait();
-        return this._cluster.getDistributedObject(name,name);
+        T serviceProvider = this._cluster.getDistributedObject(name,name);
+        serviceProvider.setup(tarantulaContext);
+        return serviceProvider;
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback

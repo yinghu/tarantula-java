@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster.keyindex;
 
+import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.ServiceProvider;
 
 
@@ -13,4 +14,5 @@ public interface DistributionKeyIndexService extends ServiceProvider {
     void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition);
     boolean endSync(String memberId,String syncKey);
 
+    void load(int partition,byte[] key,DataStoreSummary.View view);
 }
