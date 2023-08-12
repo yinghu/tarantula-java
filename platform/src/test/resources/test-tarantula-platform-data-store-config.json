@@ -8,15 +8,8 @@
             {"integrationPath":"tarantula/integration"},
             {"indexPath":"tarantula/index"},
             {"backupPath":"backup"},
-            {"maxTimerLoop": 10},
-            {"timerCount": 3},
-            {"maxBytesPerBatch": 10000},
-            {"replicationBatchSize": 10},
-            {"backupBatchSize": 10},
-            {"replicationSyncIntervalSeconds": 1},
             {"cacheSyncIntervalMinutes": 60},
             {"cacheUpdateThreshold": 10000},
-            {"backupSyncIntervalSeconds": 1},
             {"diskSyncIntervalSeconds": 60},
             {"syncUpdateThreshold": 10000}
         ]

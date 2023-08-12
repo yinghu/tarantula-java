@@ -1,20 +1,22 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
-import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.KeyIndexTrack;
+
+import java.util.ArrayList;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
 
     public IntegrationScopeReplicationProxy(){
-        super();
+        super(Distributable.INTEGRATION_SCOPE);
     }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
@@ -22,18 +24,26 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
-        if(keyIndex==null){
+        if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
-            int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value,nodes);
-            if(replicated==0) {
-                logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
-                keyIndex = new KeyIndexTrack();
-                keyIndex.owner(metadata.source());
-                keyIndex.index(stringKey);
-                keyIndex.placeMasterNode(localNode.nodeName());
-                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
+            for(ClusterProvider.Node node : nodes){
+                OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication(metadata.partition(),key,value);
+                if(!pendingReplication.offer(offHeapOnReplication)){
+                    offHeapOnReplication.drop();
+                    replicate();
+                }
             }
+            return;
+        }
+        ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+        int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(metadata.partition(),key,value,nodes);
+        if(replicated==0) {
+            logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+            KeyIndex keyIndex = new KeyIndexTrack();
+            keyIndex.owner(metadata.source());
+            keyIndex.index(stringKey);
+            keyIndex.placeMasterNode(localNode.nodeName());
+            this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
         }
     }
 
@@ -50,6 +60,9 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-
+    protected void replicate(){
+        ArrayList<ScopedOnReplication> drop = new ArrayList<>();
+        pendingReplication.drainTo(drop);
+    }
 
 }

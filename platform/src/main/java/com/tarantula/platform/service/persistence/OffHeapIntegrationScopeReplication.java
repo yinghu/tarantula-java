@@ -4,26 +4,22 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.UnsafeUtil;
 import sun.misc.Unsafe;
 
-public class OffHeapOnReplication {
+public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
 
     private Unsafe unsafe;
     private long memoryAddress;
-    private int sourceLength;
+    private int partition;
     private int keyLength;
     private int valueLength;
 
 
-    public OffHeapOnReplication(String source,byte[] key,byte[] value){
+    public OffHeapIntegrationScopeReplication(int partition,byte[] key, byte[] value){
         unsafe = UnsafeUtil.useUnsafe();
-        byte[] src = source.getBytes();
-        sourceLength = src.length;
+        this.partition = partition;
         keyLength = key.length;
         valueLength = value.length;
-        memoryAddress = unsafe.allocateMemory(sourceLength+keyLength+valueLength);
+        memoryAddress = unsafe.allocateMemory(keyLength+valueLength);
         long mp = memoryAddress;
-        for(byte b : src){
-            unsafe.putByte(mp++,b);
-        }
         for(byte b : key){
             unsafe.putByte(mp++,b);
         }
@@ -32,14 +28,10 @@ public class OffHeapOnReplication {
         }
     }
 
-    public OnReplication readOffHeap(){
-        byte[] src = new byte[sourceLength];
+    public OnReplication read(){
         byte[] key = new byte[keyLength];
         byte[] value = new byte[valueLength];
         long mp = memoryAddress;
-        for(int i=0;i<sourceLength;i++){
-            src[i]=unsafe.getByte(mp++);
-        }
         for(int i=0;i<keyLength;i++){
             key[i]=unsafe.getByte(mp++);
         }
@@ -47,7 +39,7 @@ public class OffHeapOnReplication {
             value[i]=unsafe.getByte(mp++);
         }
         unsafe.freeMemory(memoryAddress);
-        return new ReplicationData(new String(src),key,value);
+        return new ReplicationData(partition,key,value);
     }
 
     public void drop(){

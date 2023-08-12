@@ -2,11 +2,13 @@ package com.tarantula.test;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 public class TestServiceContext implements ServiceContext {
@@ -88,8 +90,15 @@ public class TestServiceContext implements ServiceContext {
     }
 
     @Override
-    public Configuration configuration(String s) {
-        return new ApplicationConfiguration();
+    public Configuration configuration(String conf) {
+        try{
+            Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(conf+".json"));
+            ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration();
+            kv.forEach((k,v)->applicationConfiguration.property(k,v));
+            return applicationConfiguration;
+        }catch (Exception ex){
+            return new ApplicationConfiguration();
+        }
     }
 
     @Override

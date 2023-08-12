@@ -64,15 +64,15 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int updateThreshold;
     private int cacheUpdateThreshold;
 
-    private int replicationBatchSize;
-    private int backupBatchSize;
-    private int maxTimerLoop;
-    private int maxBytesPerBatch;
-    private int timerCount;
-    private long nextReplicationInterval;
-    private long nextBackupInterval;
+    //private int replicationBatchSize;
+    //private int backupBatchSize;
+    //private int maxTimerLoop;
+    //private int maxBytesPerBatch;
+    //private int timerCount;
+    //private long nextReplicationInterval;
+    //private long nextBackupInterval;
 
-    private int maxReplicationNumber = 3;
+    //private int maxReplicationNumber = 3;
 
     private MapStoreListener integrationScopeReplicationProxy;
     private MapStoreListener dataScopeReplicationProxy;
@@ -86,14 +86,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
-        this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
-        this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
-        this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
-        this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
-        this.timerCount = ((JsonElement)properties.get("timerCount")).getAsInt();
+        //this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
+        //this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
+        //this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
+        //this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
+        //this.timerCount = ((JsonElement)properties.get("timerCount")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
-        this.nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
-        this.nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
+        //this.nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
+        //this.nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
         long nextEvictInterval = 1000*60*((JsonElement)properties.get("cacheSyncIntervalMinutes")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.cacheUpdateThreshold =  ((JsonElement)properties.get("cacheUpdateThreshold")).getAsInt();
@@ -105,7 +105,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.indexBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_indexPath;
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
-        this.maxReplicationNumber = (Integer)properties.get("maxReplicationNumber");
+        //this.maxReplicationNumber = (Integer)properties.get("maxReplicationNumber");
         this.node = (ClusterNode) properties.get("node");
         ServiceContext serviceContext = (ServiceContext) properties.get("serviceContext");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
@@ -505,7 +505,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void onDistributing(Metadata metadata, String stringKey,byte[] key, byte[] value) {
         int keySize = key.length;
         int valueSize = value.length;
-        if(metadata.scope()==Distributable.DATA_SCOPE && maxReplicationNumber>0){
+        if(metadata.scope()==Distributable.DATA_SCOPE){
             //String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
             operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
@@ -519,7 +519,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
                 return new ReplicationData(metadata.source(),key,value);
             });**/
         }
-        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE && maxReplicationNumber>0){
+        else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             //String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
             operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
@@ -736,7 +736,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     public void updateSummary(Summary summary){
         summary.update(DataStoreOperationSummary.PENDING_UPDATE_SIZE,operationSummary.pendingUpdates.get());
         summary.update(DataStoreOperationSummary.PENDING_BACKUP_SIZE,operationSummary.pendingBackups.get());
-        summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,maxReplicationNumber);
+        //summary.update(DataStoreOperationSummary.REPLICATION_NODE_NUMBER,maxReplicationNumber);
         long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get()+operationSummary.dailyTotalIntegrationBytesUpdated.get();
         long totalUpdates = operationSummary.dailyTotalDataUpdates.get()+operationSummary.dailyTotalIntegrationUpdates.get();
         summary.update(DataStoreOperationSummary.DAILY_TOTAL_UPDATES,totalUpdates);

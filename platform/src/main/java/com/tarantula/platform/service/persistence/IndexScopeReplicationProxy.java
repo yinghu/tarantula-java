@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -15,7 +16,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     private DistributionKeyIndexService distributionKeyIndexService;
 
     public IndexScopeReplicationProxy(){
-        super();
+        super(Distributable.INDEX_SCOPE);
     }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {

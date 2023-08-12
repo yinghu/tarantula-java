@@ -1,5 +1,9 @@
 package com.tarantula.platform.service.persistence;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
 
@@ -9,13 +13,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
+    private final static String CONFIG = "replication-service-settings";
     protected ServiceContext serviceContext;
 
     protected ClusterProvider.Node localNode;
 
-    protected ArrayBlockingQueue<OffHeapOnReplication> pendingReplication;
-    public ScopedReplicationProxy(){
-        pendingReplication = new ArrayBlockingQueue<>(10);
+    protected ArrayBlockingQueue<ScopedOnReplication> pendingReplication;
+
+    private final int scope;
+    protected boolean asyncDistributing;
+    protected long syncInterval;
+
+    protected int maxBatchSize;
+    public ScopedReplicationProxy(int scope){
+        this.scope = scope;
     }
 
     @Override
@@ -47,6 +58,19 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        Configuration configuration = serviceContext.configuration(CONFIG);
+        JsonObject conf = null;
+        if(scope== Distributable.INTEGRATION_SCOPE){
+            conf = ((JsonElement)configuration.property("integration")).getAsJsonObject();
+        }
+        else if(scope==Distributable.DATA_SCOPE){
+            conf = ((JsonElement)configuration.property("data")).getAsJsonObject();
+        }
+        if(conf==null) return;
+        asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
+        pendingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
+        syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
+        maxBatchSize = conf.get("maxBatchSize").getAsInt();
     }
 
 
@@ -73,6 +97,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return this.serviceContext.keyIndexService().lookup(source,key);
     }
 
+    protected void replicate(){
+
+    }
+
+    public void sync(){
+        replicate();
+    }
+
     @Override
     public void start() throws Exception {
 
@@ -80,7 +112,8 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        ArrayList<OffHeapOnReplication> dropList = new ArrayList<>();
+        if(pendingReplication==null) return;
+        ArrayList<ScopedOnReplication> dropList = new ArrayList<>();
         this.pendingReplication.drainTo(dropList);
         dropList.forEach(offHeapOnReplication -> offHeapOnReplication.drop());
     }
