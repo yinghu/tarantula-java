@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.UnsafeUtil;
 import sun.misc.Unsafe;
@@ -8,18 +9,22 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
 
     private Unsafe unsafe;
     private long memoryAddress;
-    private int partition;
-    private int keyLength;
-    private int valueLength;
 
+    private ClusterProvider.Node node;
 
-    public OffHeapIntegrationScopeReplication(int partition,byte[] key, byte[] value){
+    public OffHeapIntegrationScopeReplication(ClusterProvider.Node node,int partition, byte[] key, byte[] value){
+        this.node = node;
         unsafe = UnsafeUtil.useUnsafe();
-        this.partition = partition;
-        keyLength = key.length;
-        valueLength = value.length;
-        memoryAddress = unsafe.allocateMemory(keyLength+valueLength);
+        int keyLength = key.length;
+        int valueLength = value.length;
+        memoryAddress = unsafe.allocateMemory(keyLength+valueLength+12);
         long mp = memoryAddress;
+        unsafe.putInt(mp,partition);
+        mp += 4;
+        unsafe.putInt(mp,keyLength);
+        mp += 4;
+        unsafe.putInt(mp,valueLength);
+        mp += 4;
         for(byte b : key){
             unsafe.putByte(mp++,b);
         }
@@ -29,13 +34,17 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
     }
 
     public OnReplication read(){
-        byte[] key = new byte[keyLength];
-        byte[] value = new byte[valueLength];
         long mp = memoryAddress;
-        for(int i=0;i<keyLength;i++){
+        int partition = unsafe.getInt(mp);
+        mp += 4;
+        byte[] key = new byte[unsafe.getInt(mp)];
+        mp += 4;
+        byte[] value = new byte[unsafe.getInt(mp)];
+        mp += 4;
+        for(int i=0;i< key.length;i++){
             key[i]=unsafe.getByte(mp++);
         }
-        for(int i=0;i<valueLength;i++){
+        for(int i=0;i<value.length;i++){
             value[i]=unsafe.getByte(mp++);
         }
         unsafe.freeMemory(memoryAddress);
@@ -46,4 +55,11 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
         unsafe.freeMemory(memoryAddress);
     }
 
+    public void node(ClusterProvider.Node node){
+        this.node = node;
+    }
+    @Override
+    public ClusterProvider.Node node() {
+        return node;
+    }
 }

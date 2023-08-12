@@ -1,7 +1,9 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.service.persistence.OffHeapDataScopeReplication;
 import com.tarantula.platform.service.persistence.OffHeapIntegrationScopeReplication;
 import com.tarantula.platform.util.SystemUtil;
@@ -22,7 +24,7 @@ public class OffHeapOnReplicationTest {
         int max = 100;
         ArrayBlockingQueue<OffHeapDataScopeReplication> queue = new ArrayBlockingQueue(max);
         String source = "tarantula_presence";
-
+        ClusterProvider.Node node = new ClusterNode("","",12);
         byte[] key = ("bds/" + SystemUtil.oid()).getBytes();
         JsonObject json = new JsonObject();
         json.addProperty("name", "name");
@@ -30,10 +32,10 @@ public class OffHeapOnReplicationTest {
         byte[] value = json.toString().getBytes();
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
-            OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication(source, key, value);
+            OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication(node,source, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
-        OffHeapDataScopeReplication unqueued = new OffHeapDataScopeReplication(source, key, value);
+        OffHeapDataScopeReplication unqueued = new OffHeapDataScopeReplication(node,source, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
@@ -54,7 +56,7 @@ public class OffHeapOnReplicationTest {
         int max = 100;
         ArrayBlockingQueue<OffHeapIntegrationScopeReplication> queue = new ArrayBlockingQueue(max);
         int partition = 10;
-
+        ClusterProvider.Node node = new ClusterNode("","",12);
         byte[] key = ("bds/" + SystemUtil.oid()).getBytes();
         JsonObject json = new JsonObject();
         json.addProperty("name", "name");
@@ -62,10 +64,10 @@ public class OffHeapOnReplicationTest {
         byte[] value = json.toString().getBytes();
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
-            OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication(partition, key, value);
+            OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication(node,partition, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
-        OffHeapIntegrationScopeReplication unqueued = new OffHeapIntegrationScopeReplication(partition, key, value);
+        OffHeapIntegrationScopeReplication unqueued = new OffHeapIntegrationScopeReplication(node,partition, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
