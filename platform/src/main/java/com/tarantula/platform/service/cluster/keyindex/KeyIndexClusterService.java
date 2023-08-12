@@ -205,8 +205,9 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     public void sync(byte[][] keys,byte[][] values,int partition){
         for(int i=0;i<keys.length;i++){
-            logger.warn(new String(keys[i]));
-            logger.warn(new String(values[i]));
+            DataStoreOnPartition dso = onPartition(partition);
+            int ix = i;
+            dso.lock(keys[i],()->dso.dataStore.backup().set(keys[ix],values[ix]));
         }
     }
 
