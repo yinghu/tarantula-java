@@ -9,10 +9,11 @@ import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexServi
 public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
 
     private TarantulaContext tarantulaContext;
+    private DistributionKeyIndexService distributionKeyIndexService;
 
     public KeyIndexStoreViewer(TarantulaContext tarantulaContext){
         this.tarantulaContext = tarantulaContext;
-
+        distributionKeyIndexService = tarantulaContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
     }
 
     @Override
@@ -55,7 +56,6 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
     public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
         view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        DistributionKeyIndexService distributionKeyIndexService = tarantulaContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
         distributionKeyIndexService.load(dataStore.partitionNumber(),key,view);
     }
 
