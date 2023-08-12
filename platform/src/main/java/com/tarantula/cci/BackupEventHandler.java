@@ -1,8 +1,6 @@
 package com.tarantula.cci;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
@@ -11,7 +9,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.service.ReplicationData;
+import com.tarantula.platform.service.persistence.ReplicationData;
 
 
 public class BackupEventHandler extends AbstractRequestHandler {

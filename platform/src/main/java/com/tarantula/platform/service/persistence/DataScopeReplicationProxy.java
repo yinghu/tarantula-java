@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.persistence.berkeley;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
@@ -6,15 +6,14 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
-import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.KeyIndexTrack;
 
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
 
-    public DataScopeReplicationProxy(DataStoreProvider dataStoreProvider){
-        super(dataStoreProvider);
+    public DataScopeReplicationProxy(){
+        super();
     }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {

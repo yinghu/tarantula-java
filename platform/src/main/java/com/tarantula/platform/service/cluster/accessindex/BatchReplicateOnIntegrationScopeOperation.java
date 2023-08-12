@@ -4,7 +4,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.icodesoftware.service.OnReplication;
-import com.tarantula.platform.service.ReplicationData;
+import com.tarantula.platform.service.persistence.ReplicationData;
 
 import java.io.IOException;
 

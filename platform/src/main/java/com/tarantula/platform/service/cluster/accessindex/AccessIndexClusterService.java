@@ -10,15 +10,13 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.OnReplication;
-import com.tarantula.cci.ResourceEventHandler;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.KeyIndexEvent;
-import com.tarantula.platform.service.ReplicationData;
+import com.tarantula.platform.service.persistence.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.util.SystemUtil;

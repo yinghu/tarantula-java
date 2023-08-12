@@ -1,9 +1,10 @@
-package com.tarantula.platform.service.persistence.berkeley;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
-import com.tarantula.platform.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.MapStoreListener;
+
+import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
@@ -12,10 +13,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected ClusterProvider.Node localNode;
 
-    protected DataStoreProvider dataStoreProvider;
-    public ScopedReplicationProxy(DataStoreProvider dataStoreProvider){
-        this.dataStoreProvider = dataStoreProvider;
-
+    protected ArrayBlockingQueue<OffHeapOnReplication> pendingReplication;
+    public ScopedReplicationProxy(){
+        pendingReplication = new ArrayBlockingQueue<>(10);
     }
 
     @Override
@@ -80,7 +80,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-
+        ArrayList<OffHeapOnReplication> dropList = new ArrayList<>();
+        this.pendingReplication.drainTo(dropList);
+        dropList.forEach(offHeapOnReplication -> offHeapOnReplication.drop());
     }
 
     @Override

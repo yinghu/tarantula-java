@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.OnReplication;

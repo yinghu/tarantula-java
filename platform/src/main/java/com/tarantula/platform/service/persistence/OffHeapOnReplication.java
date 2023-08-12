@@ -1,8 +1,7 @@
-package com.tarantula.platform.service.persistence.berkeley;
+package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.UnsafeUtil;
-import com.tarantula.platform.service.ReplicationData;
 import sun.misc.Unsafe;
 
 public class OffHeapOnReplication {
@@ -49,6 +48,10 @@ public class OffHeapOnReplication {
         }
         unsafe.freeMemory(memoryAddress);
         return new ReplicationData(new String(src),key,value);
+    }
+
+    public void drop(){
+        unsafe.freeMemory(memoryAddress);
     }
 
 }

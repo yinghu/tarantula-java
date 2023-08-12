@@ -38,24 +38,13 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private boolean trimming;
     private int partitionNumber;
 
-
     private boolean dailyBackup;
 
 
     private ClusterNode node;
 
-    //private ClusterProvider integrationCluster;
     private ConcurrentHashMap<String,ReplicatedDataStore> dMap = new ConcurrentHashMap<>();
 
-    //private ConcurrentLinkedDeque<String> pendingReplicationDataQueue = new ConcurrentLinkedDeque<>();
-    //private ConcurrentLinkedDeque<String> pendingReplicationIntegrationQueue = new ConcurrentLinkedDeque<>();
-
-    //private ConcurrentLinkedDeque<String> pendingBackupDataQueue = new ConcurrentLinkedDeque<>();
-    //private ConcurrentLinkedDeque<String> pendingBackupIntegrationQueue = new ConcurrentLinkedDeque<>();
-
-
-    //private ConcurrentHashMap<String,OnReplication> pendingReplicationIndex = new ConcurrentHashMap<>();
-    //private ConcurrentHashMap<String,OnReplication> pendingBackupIndex = new ConcurrentHashMap<>();
 
     private Environment environment;
     private Environment integrationEnvironment;
@@ -230,11 +219,11 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
             //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
         //}
-        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy(this);
+        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
         this.integrationScopeReplicationProxy.setup(serviceContext);
-        this.dataScopeReplicationProxy = new DataScopeReplicationProxy(this);
+        this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.dataScopeReplicationProxy.setup(serviceContext);
-        this.indexScopeReplicationProxy = new IndexScopeReplicationProxy(this);
+        this.indexScopeReplicationProxy = new IndexScopeReplicationProxy();
         this.indexScopeReplicationProxy.setup(serviceContext);
     }
     @Override
@@ -461,6 +450,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void shutdown() throws Exception {
         //running = false;
+        indexScopeReplicationProxy.shutdown();
+        dataScopeReplicationProxy.shutdown();
+        integrationScopeReplicationProxy.shutdown();
         iBackupProvider.shutdown();
         dBackupProvider.shutdown();
         dMap.forEach((k,v)->{

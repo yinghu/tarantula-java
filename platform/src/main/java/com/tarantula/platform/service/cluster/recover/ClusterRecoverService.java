@@ -9,7 +9,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.event.KeyIndexEvent;
-import com.tarantula.platform.service.ReplicationData;
+import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.persistence.RevisionObject;

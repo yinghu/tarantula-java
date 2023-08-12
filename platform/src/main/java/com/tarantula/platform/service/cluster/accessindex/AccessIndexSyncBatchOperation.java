@@ -3,8 +3,7 @@ package com.tarantula.platform.service.cluster.accessindex;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.tarantula.platform.service.ReplicationData;
-import com.tarantula.platform.service.cluster.recover.ClusterRecoverService;
+import com.tarantula.platform.service.persistence.ReplicationData;
 
 import java.io.IOException;
 import java.util.Arrays;

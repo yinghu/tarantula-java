@@ -2,7 +2,7 @@ package com.tarantula.test;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.OnReplication;
-import com.tarantula.platform.service.persistence.berkeley.OffHeapOnReplication;
+import com.tarantula.platform.service.persistence.OffHeapOnReplication;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

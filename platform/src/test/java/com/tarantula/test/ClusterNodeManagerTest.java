@@ -5,7 +5,6 @@ import com.icodesoftware.service.KeyIndex;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.keyindex.ClusterNodeManager;
 import com.tarantula.platform.service.persistence.ClusterNode;
-import com.tarantula.platform.service.persistence.berkeley.ScopedReplicationProxy;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
