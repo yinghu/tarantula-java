@@ -82,7 +82,6 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
     }
 
 
-
     public Tournament.RaceBoard onListTournament(String serviceName,String tournamentId,String instanceId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,instanceId);

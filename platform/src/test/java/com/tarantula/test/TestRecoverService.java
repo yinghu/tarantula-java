@@ -16,8 +16,8 @@ public class TestRecoverService implements RecoverService {
     }
 
     @Override
-    public int onReplicate(OnReplication[] batch, int size, int nodeNumber) {
-        return 0;
+    public void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node) {
+
     }
 
     @Override

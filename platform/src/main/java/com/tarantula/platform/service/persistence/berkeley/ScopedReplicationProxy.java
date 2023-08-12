@@ -6,7 +6,7 @@ import com.tarantula.platform.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.MapStoreListener;
 
 
-public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider {
+public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected ServiceContext serviceContext;
 

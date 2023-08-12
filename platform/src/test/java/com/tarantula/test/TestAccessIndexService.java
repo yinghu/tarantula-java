@@ -54,8 +54,8 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public int onReplicate(OnReplication[] batch, int size, int nodeNumber) {
-        return 0;
+    public void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node) {
+        //return 0;
     }
 
     @Override

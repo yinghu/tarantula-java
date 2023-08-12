@@ -72,23 +72,19 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public byte[] onRecover(String source, byte[] key,ClusterProvider.Node[] nodes) {
         NodeEngine nodeEngine = getNodeEngine();
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         byte[] ret = null;
-        for(Member m : mlist){
-            if(!m.localMember()){
-                RecoverOperation operation = new RecoverOperation(source,key);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-                final Future<byte[]> future = builder.invoke();
-                try {
-                    ret = future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    if(ret!=null){
-                        break;
-                    }
-                } catch (Exception e) {
-                    future.cancel(true);
-                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
-                    //goes to next node if failed
-                }
+        RecoverOperation operation = new RecoverOperation(source,key);
+        for(ClusterProvider.Node node : nodes){
+            Member m = nodeEngine.getClusterService().getMember(node.memberId());
+            if(m==null) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(callResult.successful&&callResult.result!=null){
+                ret = (byte[]) callResult.result;
+                break;
             }
         }
         return ret;
@@ -96,18 +92,16 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     public void onDelete(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        DeleteOperation operation = new DeleteOperation(source,key);
         for(Member m : mlist){
-            if(!m.localMember()){
-                DeleteOperation operation = new DeleteOperation(source,key);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-                final Future<byte[]> future = builder.invoke();
-                try {
-                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                } catch (Exception e) {
-                    future.cancel(true);
-                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
-                    //goes to next node if failed
-                }
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!callResult.successful){
+                //metricsListener.onUpdated();
             }
         }
     }
@@ -116,7 +110,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         NodeEngine nodeEngine = getNodeEngine();
         int expected = 0;
         for(ClusterProvider.Node node : nodes){
-            if(node==null) break;
+            if(node==null) continue;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
             if(m==null) continue;
             ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
@@ -130,90 +124,74 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
-    public int onReplicate(OnReplication[] batch,int size,int nodeNumber){
-        try{
-            NodeEngine nodeEngine = getNodeEngine();
-            int cz = nodeEngine.getClusterService().getSize();
-            if(cz==1) return nodeNumber;
-            int expected = cz>nodeNumber? nodeNumber : cz-1;
-            for(int i=0;i<expected;i++){
-                ClusterProvider.Node roundRobinNode = this.serviceContext.clusterProvider().roundRobinMember();
-                if(roundRobinNode==null) break;
-                Member m = nodeEngine.getClusterService().getMember(roundRobinNode.memberId());
-                BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch,size);
-                InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-                final Future<Void> future = builder.invoke();
-                try {
-                    future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-                    expected--;
-                } catch (Exception e) {
-                    future.cancel(true);
-                    //goes to next node if failed
-                    metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
-                }
-            }
-            return expected;
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return nodeNumber;
+    public void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node){
+
+        NodeEngine nodeEngine = getNodeEngine();
+        Member m = nodeEngine.getClusterService().getMember(node.memberId());
+        if(m==null) return;
+        BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch,size);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!result.successful){
+
         }
     }
     public int onStartSync(String source,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source,syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<Integer> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-            //return 0;
-        }
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Integer> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        return result.successful? (int) result.result:0;
+
     }
     public void onSync(int partition,byte[][] keys,byte[][] values,String memberId,String source){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncBatchOperation operation = new DataStoreSyncBatchOperation(partition,keys,values,source);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!result.successful) throw new RuntimeException(result.exception);
     }
     public void onEndSync(String memberId,String syncKey){
         NodeEngine nodeEngine = getNodeEngine();
         DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation(syncKey);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        try {
-            final Future<Void> future = builder.invoke();
-            future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!result.successful) throw new RuntimeException(result.exception);
     }
 
     public String[] onListModules(){
         NodeEngine nodeEngine = getNodeEngine();
         ListModulesOperation operation = new ListModulesOperation();
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<String[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<String[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!result.successful) throw new RuntimeException(result.exception);
+        return (String[]) result.result;
     }
     public byte[] onLoadModuleJarFile(String fileName){
         NodeEngine nodeEngine = getNodeEngine();
         LoadModuleJarFileOperation operation = new LoadModuleJarFileOperation(fileName);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        try {
-            final Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        } catch (Exception e) {
-            throw ExceptionUtil.rethrow(e);
-        }
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        });
+        if(!result.successful) throw new RuntimeException(result.exception);
+        return (byte[]) result.result;
     }
 
     public void registerMetricsListener(MetricsListener metricsListener){
