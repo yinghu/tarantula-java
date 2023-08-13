@@ -17,6 +17,7 @@ public class ReplicationData implements OnReplication {
     private Recoverable recoverable;
 
     public ReplicationData(String nodeName,String source,byte[] key, byte[] value){
+        this.nodeName = nodeName;
         this.source = source;
         this.key = key;
         this.value = value;

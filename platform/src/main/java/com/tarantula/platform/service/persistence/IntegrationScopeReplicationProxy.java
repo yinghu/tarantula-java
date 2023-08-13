@@ -38,10 +38,6 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
         int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),metadata.partition(),key,value,nodes);
         if(replicated==0) {
-            OnReplication[] data = new OnReplication[1];
-            data[0] = new ReplicationData(localNode.nodeName(),metadata.partition(),key,value);
-            IntegrationReplicationEvent integrationReplicationEvent = new IntegrationReplicationEvent(localNode,data,localNode);
-            this.serviceContext.clusterProvider().publisher().publish(integrationReplicationEvent);
             logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
             KeyIndex keyIndex = new KeyIndexTrack();
             keyIndex.owner(metadata.source());
