@@ -48,7 +48,7 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
             value[i]=unsafe.getByte(mp++);
         }
         unsafe.freeMemory(memoryAddress);
-        return new ReplicationData(partition,key,value);
+        return new ReplicationData(node.nodeName(),partition,key,value);
     }
 
     public void drop(){

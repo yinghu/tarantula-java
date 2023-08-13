@@ -65,7 +65,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                             DataStoreOnPartition dso = this.onPartition(r.partition());
                             dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
                             RevisionObject ro = RevisionObject.fromBinary(r.value());
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),new String(ro.node),this.tarantulaContext.node().nodeName());
+                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
                         });
                         updates.clear();
@@ -164,9 +164,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         return dso;
     }
 
-    public void replicate(int partition,byte[] key,byte[] value){
+    public void replicate(String nodeName,int partition,byte[] key,byte[] value){
         synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(partition,key,value));
+            pendingUpdates.add(new ReplicationData(nodeName,partition,key,value));
         }
     }
     public void replicate(OnReplication[] onReplications){
@@ -205,9 +205,9 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }).start();
         return this.tarantulaContext.node().partitionNumber();
     }
-    public void replicateAsBatch(OnReplication[] batch){
+    public void replicateAsBatch(String nodeName,OnReplication[] batch){
         for(OnReplication d : batch) {
-            replicate(d.partition(), d.key(), d.value());
+            replicate(nodeName,d.partition(), d.key(), d.value());
         }
     }
     public void syncEnd(String syncKey){

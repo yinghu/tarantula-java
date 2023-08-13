@@ -64,7 +64,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("key",new String(k));
                     debug.addProperty("local",revisionObject.local);
                     debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    debug.addProperty("node",new String(revisionObject.node));
+                    //debug.addProperty("node",new String(revisionObject.node));
                     debug.add("content",JsonUtil.parse(revisionObject.data));
                     keys.add(debug);
                     batch[0]--;
@@ -86,7 +86,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("address",n.address());
                     debug.addProperty("local",revisionObject.local);
                     debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    debug.addProperty("node",new String(revisionObject.node));
+                    //debug.addProperty("node",new String(revisionObject.node));
                     debug.add("content",JsonUtil.parse(revisionObject.data));
                     data.add(debug);
                     return true;
@@ -114,7 +114,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("key",new String(k));
                     RevisionObject ro = RevisionObject.fromBinary(v);
                     debug.addProperty("local",ro.local);
-                    debug.addProperty("node",new String(ro.node));
+                    //debug.addProperty("node",new String(ro.node));
                     debug.addProperty("revision",ro.revision);
                     debug.add("content",JsonUtil.parse(ro.data));
                     keys.add(debug);
@@ -133,7 +133,7 @@ public class DataStoreSudoRoleModule implements Module {
                 RevisionObject ro = RevisionObject.fromBinary(v);
                 debug.addProperty("address",n.address());
                 debug.addProperty("local",ro.local);
-                debug.addProperty("node",new String(ro.node));
+                //debug.addProperty("node",new String(ro.node));
                 debug.addProperty("revision",ro.revision);
                 debug.add("content",JsonUtil.parse(ro.data));
                 data.add(debug);

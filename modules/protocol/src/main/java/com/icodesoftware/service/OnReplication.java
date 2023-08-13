@@ -6,6 +6,7 @@ public interface OnReplication {
     int scope();
     int factoryId();
     int classId();
+    String nodeName();
     String source();
     int partition();
     byte[] key();

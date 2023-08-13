@@ -47,8 +47,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     if(updates.size()>0){
                         updates.forEach(r->{
                             this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
-                            RevisionObject ro = RevisionObject.fromBinary(r.value());
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),new String(ro.node),this.tarantulaContext.node().nodeName());
+                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
                         });
                         updates.clear();
@@ -99,9 +98,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
             }
         }
     }
-    public void replicate(String source,byte[] key,byte[] value){
+    public void replicate(String nodeName,String source,byte[] key,byte[] value){
         synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(source,key,value));
+            pendingUpdates.add(new ReplicationData(nodeName,source,key,value));
         }
     }
     public int syncStart(String memberId,String source,String syncKey){
@@ -134,7 +133,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){
-            replicate(d.source,d.key,d.value);
+            replicate(d.nodeName(),d.source(),d.key(),d.value());
         }
         _total.addAndGet(batch.length);
     }

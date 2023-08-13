@@ -32,9 +32,9 @@ public class AccessIndexSyncBatchOperation extends Operation {
         AccessIndexClusterService cds = this.getService();
         ReplicationData[] data = new ReplicationData[length];
         for(int i=0;i<length;i++){
-            data[i]=new ReplicationData(source,keys[i],values[i]);
+            data[i]=new ReplicationData("",source,keys[i],values[i]);
         }
-        cds.replicateAsBatch(data);
+        cds.replicateAsBatch("",data);
     }
 
     @Override

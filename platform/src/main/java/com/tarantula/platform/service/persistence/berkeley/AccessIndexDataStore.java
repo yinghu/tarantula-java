@@ -16,7 +16,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
     private static TarantulaLogger log = JDKLogger.getLogger(AccessIndexDataStore.class);
     private final Database berkeleyStore;
     private final ClusterNode node;
-    private final byte[] _node;
+    //private final byte[] _node;
     private final MapStoreListener mapStoreListener;
     private final String dataStore;
     private final int partition;
@@ -25,7 +25,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
 
     public AccessIndexDataStore(ClusterNode node, Database database, MapStoreListener mapStoreListener){
         this.node = node;
-        this._node = node.nodeName().getBytes();
+        //this._node = node.nodeName().getBytes();
         this.berkeleyStore = database;
         this.dataStore = this.berkeleyStore.getDatabaseName();
         int  index = this.dataStore.lastIndexOf("_");
@@ -85,7 +85,7 @@ public class AccessIndexDataStore implements ReplicatedDataStore {
                 if(loading) t.fromBinary(ro.data);
                 return false;
             }
-            v = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true,_node);
+            v = RevisionObject.toBinary(Long.MIN_VALUE,t.toBinary(),true);
             if(!_set(k,v)) return false;
             mapStoreListener.onDistributing(metadata1,akey,k,v);//set cluster
             if(t.backup()) mapStoreListener.onBackingUp(metadata1,akey,t);

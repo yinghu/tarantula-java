@@ -106,14 +106,14 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
     }
     @Override
-    public int onReplicate(String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
+    public int onReplicate(String nodeName,String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
         int expected = 0;
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
             if(m==null) continue;
-            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(source,key,value);
+            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(nodeName,source,key,value);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
@@ -124,12 +124,12 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
-    public void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node){
+    public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node){
 
         NodeEngine nodeEngine = getNodeEngine();
         Member m = nodeEngine.getClusterService().getMember(node.memberId());
         if(m==null) return;
-        BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(batch,size);
+        BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(nodeName,batch,size);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();

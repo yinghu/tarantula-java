@@ -7,8 +7,8 @@ public interface RecoverService extends ServiceProvider{
     //operates master or member node
     void onDelete(String source,byte[] key);
     byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes);
-    int onReplicate(String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes);
-    void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node);
+    int onReplicate(String nodeName,String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes);
+    void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node);
 
     //operates on master node
     int onStartSync(String source,String syncKey);

@@ -26,7 +26,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
     private final String bucket;
     private final String node;
 
-    private final byte[] _node;
+    //private final byte[] _node;
     private final String prefix;
 
     private final MapStoreListener mapStoreListener;
@@ -37,7 +37,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         this.partition = partition;
         this.bucket = bucket;
         this.node = node;
-        this._node = node.getBytes();
+        //this._node = node.getBytes();
         this.prefix = prefix;
         this.mapStoreListener = mapStoreListener;
         this.partitions = new DataBaseOnPartition[this.partition];
@@ -91,7 +91,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             akey = t.key().asString();
             byte[] key = akey.getBytes();
             t.revision(Long.MIN_VALUE);
-            byte[] value = RevisionObject.toBinary(t.revision(),t.toBinary(),true,_node);
+            byte[] value = RevisionObject.toBinary(t.revision(),t.toBinary(),true);
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             boolean suc = dso.lock(key,()-> _put(dso,key,value)? RevisionObject.TRUE : RevisionObject.FALSE).successful;
             if(!suc) return false;
@@ -137,8 +137,8 @@ public class PartitionDataStore implements ReplicatedDataStore{
             }
             indexSet.addKey(okey);
             indexSet.revision(indexSet.revision()+1);
-            byte[] pendingUpdate = RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true,_node);
-            return (_put(dso,key,pendingUpdate)) ? RevisionObject.fromUpdate(indexSet.revision(),pendingUpdate,_node) : RevisionObject.FALSE;
+            byte[] pendingUpdate = RevisionObject.toBinary(indexSet.revision(),indexSet.toBinary(),true);
+            return (_put(dso,key,pendingUpdate)) ? RevisionObject.fromUpdate(indexSet.revision(),pendingUpdate) : RevisionObject.FALSE;
         });
         if(suc.successful){
             if(t.backup())this.mapStoreListener.onBackingUp(dso.metadata.fromRevision(indexSet.revision()),akey,indexSet);
@@ -153,14 +153,14 @@ public class PartitionDataStore implements ReplicatedDataStore{
             String akey = t.key().asString();
             if(akey==null) return false;
             byte[] key = akey.getBytes();
-            byte[] pendingUpdate = RevisionObject.toBinary(t.revision()+1,t.toBinary(),true,_node);
+            byte[] pendingUpdate = RevisionObject.toBinary(t.revision()+1,t.toBinary(),true);
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             RevisionObject suc = dso.lock(key,()->{//local update
                 RevisionObject localData = _getRevisionObject(dso,key);
                 if(localData.successful && localData.local && localData.revision == t.revision()){
                     if(_put(dso,key,pendingUpdate)){
                         t.revision(t.revision()+1);
-                        return RevisionObject.fromUpdate(t.revision()+1,pendingUpdate,_node);
+                        return RevisionObject.fromUpdate(t.revision()+1,pendingUpdate);
                     }
                     return RevisionObject.FALSE;
                 }
@@ -173,9 +173,9 @@ public class PartitionDataStore implements ReplicatedDataStore{
                     suc = dso.lock(key,()->{
                         RevisionObject localData = _getRevisionObject(dso,key);
                         if(!localData.successful || !localData.local || localData.revision <= remoteData.revision ){
-                            byte[] remoteValue = RevisionObject.toBinary(remoteData.revision+1,remoteData.data,true,_node);
+                            byte[] remoteValue = RevisionObject.toBinary(remoteData.revision+1,remoteData.data,true);
                             if(_put(dso,key,remoteValue)){
-                                return RevisionObject.fromUpdate(remoteData.revision+1,remoteValue,_node);
+                                return RevisionObject.fromUpdate(remoteData.revision+1,remoteValue);
                             }
                             return RevisionObject.FALSE;
                         }
@@ -207,7 +207,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             byte[] key = akey.getBytes();
             final String okey = akey;
             t.revision(Long.MIN_VALUE);
-            byte[] pendingValue = RevisionObject.toBinary(t.revision(),t.toBinary(),true,_node);
+            byte[] pendingValue = RevisionObject.toBinary(t.revision(),t.toBinary(),true);
             boolean[] created = {false};
             DataBaseOnPartition dso = this.partitions[SystemUtil.partition(key,partition)];
             RevisionObject suc = dso.lock(key,()->{
@@ -301,7 +301,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
         DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
         RevisionObject pendingData = dso.lock(key,()->_getRevisionObject(dso,key));
         if(pendingData.successful && pendingData.local){
-            return RevisionObject.toBinary(pendingData.revision,pendingData.data,pendingData.local,_node);
+            return RevisionObject.toBinary(pendingData.revision,pendingData.data,pendingData.local);
         }
         byte[] data = mapStoreListener.onRecovering(dso.metadata,new String(key),key);
         if(data==null) return null;
@@ -314,7 +314,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             return localData;
         });
         if(!pendingData.successful) return null;
-        return RevisionObject.toBinary(pendingData.revision,pendingData.data,true,_node);
+        return RevisionObject.toBinary(pendingData.revision,pendingData.data,true);
     }
 
     public  <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> binary){
@@ -331,7 +331,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                     pendingData = dso.lock(owner,()->{
                         RevisionObject localData = _getRevisionObject(dso,owner);
                         if(!localData.successful || remoteData.revision >= localData.revision ){
-                            return _put(dso,owner,RevisionObject.toBinary(remoteData.revision,remoteData.data,true,_node))? remoteData: RevisionObject.FALSE;
+                            return _put(dso,owner,RevisionObject.toBinary(remoteData.revision,remoteData.data,true))? remoteData: RevisionObject.FALSE;
                         }
                         return RevisionObject.FALSE;
                     });
@@ -388,7 +388,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                 RevisionObject localData = _getRevisionObject(dso,key);
                 RevisionObject remoteData = RevisionObject.fromBinary(value);
                 if(!localData.successful || localData.revision < remoteData.revision){
-                    _put(dso,key,RevisionObject.toBinary(remoteData.revision,remoteData.data,false,_node));
+                    _put(dso,key,RevisionObject.toBinary(remoteData.revision,remoteData.data,false));
                     return RevisionObject.TRUE;
                 }
                 return RevisionObject.FALSE;
@@ -404,7 +404,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
             DataBaseOnPartition dso = partitions[SystemUtil.partition(key,partition)];
             RevisionObject localData = dso.lock(key,()->_getRevisionObject(dso,key));
             if(!localData.successful) return null;// || !localData.local) return null;
-            return RevisionObject.toBinary(localData.revision,localData.data,localData.local,_node);
+            return RevisionObject.toBinary(localData.revision,localData.data,localData.local);
         }catch (Exception ex){
             log.error("error on backup get",ex);
             return null;
@@ -420,7 +420,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
                 while (cursor.getNext(_key, _value, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
                     RevisionObject localData = RevisionObject.fromBinary(_value.getData());
                     if(localData.successful){
-                        if(!binary.on(_key.getData(),RevisionObject.toBinary(localData.revision,localData.data,localData.local,_node))){
+                        if(!binary.on(_key.getData(),RevisionObject.toBinary(localData.revision,localData.data,localData.local))){
                             stopped = true;
                             break;
                         }

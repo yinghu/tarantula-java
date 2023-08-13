@@ -4,22 +4,25 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.OnReplication;
 
 public class ReplicationData implements OnReplication {
-    public int scope;
-    public String source;
-    public int partition;
-    public byte[] key;
-    public byte[] value;
-    public int factoryId;
-    public int classId;
-    public String keyAsString;
-    public Recoverable recoverable;
 
-    public ReplicationData(String source,byte[] key, byte[] value){
+    private String nodeName;
+    private int scope;
+    private String source;
+    private int partition;
+    private byte[] key;
+    private byte[] value;
+    private int factoryId;
+    private int classId;
+    private String keyAsString;
+    private Recoverable recoverable;
+
+    public ReplicationData(String nodeName,String source,byte[] key, byte[] value){
         this.source = source;
         this.key = key;
         this.value = value;
     }
-    public ReplicationData(int partition,byte[] key, byte[] value){
+    public ReplicationData(String nodeName,int partition,byte[] key, byte[] value){
+        this.nodeName = nodeName;
         this.partition = partition;
         this.key = key;
         this.value = value;
@@ -37,6 +40,10 @@ public class ReplicationData implements OnReplication {
     @Override
     public int scope(){
         return this.scope;
+    }
+
+    public String nodeName(){
+        return nodeName;
     }
     @Override
     public String source() {

@@ -120,12 +120,12 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return expected==0;
     }
-    public void onReplicate(OnReplication[] batch, int size, ClusterProvider.Node node){
+    public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node){
 
         NodeEngine nodeEngine = getNodeEngine();
         Member m = nodeEngine.getClusterService().getMember(node.memberId());
         if(m==null) return;
-        BatchReplicateOnIntegrationScopeOperation operation = new BatchReplicateOnIntegrationScopeOperation(batch,size);
+        BatchReplicateOnIntegrationScopeOperation operation = new BatchReplicateOnIntegrationScopeOperation(nodeName,batch,size);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
@@ -135,10 +135,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
         }
     }
-    public int onReplicate(int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
+    public int onReplicate(String nodeName,int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
         int replicated = 0;
-        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(partition,key,value);
+        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(nodeName,partition,key,value);
         for(ClusterProvider.Node node : nodes){
             if(node==null) break;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
