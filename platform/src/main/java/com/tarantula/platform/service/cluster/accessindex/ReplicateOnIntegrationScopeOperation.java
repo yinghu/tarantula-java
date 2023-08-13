@@ -18,6 +18,7 @@ public class ReplicateOnIntegrationScopeOperation extends Operation {
 
 
     public ReplicateOnIntegrationScopeOperation(String nodeName, int partition,byte[] key, byte[] value) {
+        this.nodeName = nodeName;
         this.partition = partition;
         this.key = key;
         this.value = value;
