@@ -6,13 +6,16 @@ import com.icodesoftware.Event;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
+import com.tarantula.platform.service.persistence.OffHeapIntegrationScopeReplication;
 import com.tarantula.platform.service.persistence.ReplicationData;
+import com.tarantula.platform.service.persistence.ScopedOnReplication;
 
 import java.io.IOException;
 
 public class IntegrationReplicationEvent extends Data implements Event {
 
     public OnReplication[] data;
+    //public ScopedOnReplication[] mp;
     public IntegrationReplicationEvent(){
 
     }
@@ -38,8 +41,11 @@ public class IntegrationReplicationEvent extends Data implements Event {
         this.source = in.readUTF("2");
         int size = in.readInt("3");
         data = new OnReplication[size];
+        //mp = new ScopedOnReplication[size];
         for(int i=0;i<data.length;i++){
             data[i]=new ReplicationData(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
+            //mp[i]=new OffHeapIntegrationScopeReplication();
+            //mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
         }
     }
     @Override

@@ -24,7 +24,7 @@ public class OffHeapOnReplicationTest {
         int max = 100;
         ArrayBlockingQueue<OffHeapDataScopeReplication> queue = new ArrayBlockingQueue(max);
         String source = "tarantula_presence";
-        ClusterProvider.Node node = new ClusterNode("","",12);
+        ClusterProvider.Node node = new ClusterNode("","N05",12);
         byte[] key = ("bds/" + SystemUtil.oid()).getBytes();
         JsonObject json = new JsonObject();
         json.addProperty("name", "name");
@@ -33,11 +33,11 @@ public class OffHeapOnReplicationTest {
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
             OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication();
-            offHeapOnReplication.write(node,source, key, value);
+            offHeapOnReplication.write(node.nodeName(),source, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
         OffHeapDataScopeReplication unqueued = new OffHeapDataScopeReplication();
-        unqueued.write(node,source, key, value);
+        unqueued.write(node.nodeName(),source, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
@@ -46,6 +46,7 @@ public class OffHeapOnReplicationTest {
             OffHeapDataScopeReplication offHeapOnReplication = queue.poll();
             Assert.assertNotNull(offHeapOnReplication);
             OnReplication onReplication = offHeapOnReplication.read();
+            Assert.assertEquals(onReplication.nodeName(),node.nodeName());
             Assert.assertEquals(onReplication.source(),source);
             Assert.assertEquals(onReplication.key(),key);
             Assert.assertEquals(onReplication.value(),value);
@@ -58,7 +59,7 @@ public class OffHeapOnReplicationTest {
         int max = 100;
         ArrayBlockingQueue<OffHeapIntegrationScopeReplication> queue = new ArrayBlockingQueue(max);
         int partition = 10;
-        ClusterProvider.Node node = new ClusterNode("","",12);
+        ClusterProvider.Node node = new ClusterNode("","N05",12);
         byte[] key = ("bds/" + SystemUtil.oid()).getBytes();
         JsonObject json = new JsonObject();
         json.addProperty("name", "name");
@@ -67,11 +68,11 @@ public class OffHeapOnReplicationTest {
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
             OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
-            offHeapOnReplication.write(node,partition, key, value);
+            offHeapOnReplication.write(node.nodeName(),partition, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
         OffHeapIntegrationScopeReplication unqueued = new OffHeapIntegrationScopeReplication();
-        unqueued.write(node,partition, key, value);
+        unqueued.write(node.nodeName(),partition, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
@@ -81,6 +82,7 @@ public class OffHeapOnReplicationTest {
             Assert.assertNotNull(offHeapOnReplication);
             OnReplication onReplication = offHeapOnReplication.read();
             Assert.assertEquals(onReplication.partition(),partition);
+            Assert.assertEquals(onReplication.nodeName(),node.nodeName());
             Assert.assertEquals(onReplication.key(),key);
             Assert.assertEquals(onReplication.value(),value);
         }

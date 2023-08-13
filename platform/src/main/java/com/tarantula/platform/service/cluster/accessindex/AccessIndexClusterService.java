@@ -17,9 +17,9 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
+import com.tarantula.platform.service.persistence.OffHeapIntegrationScopeReplication;
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
-import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -148,6 +148,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
             if(event instanceof IntegrationReplicationEvent){
                 IntegrationReplicationEvent integrationReplicationEvent = (IntegrationReplicationEvent)event;
+                //integrationReplicationEvent.mp[0].read();
                 log.warn(new String(integrationReplicationEvent.data[0].key()));
                 log.warn(new String(integrationReplicationEvent.data[0].value()));
             }
@@ -175,6 +176,8 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     public void replicate(String nodeName,int partition,byte[] key,byte[] value){
         synchronized (pendingUpdates){
+            //OffHeapIntegrationScopeReplication offHeapIntegrationScopeReplication = new OffHeapIntegrationScopeReplication();
+            //offHeapIntegrationScopeReplication.write(null,partition,key,value);
             pendingUpdates.add(new ReplicationData(nodeName,partition,key,value));
         }
     }
