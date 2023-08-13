@@ -43,26 +43,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 	
 	private static final TarantulaContext BC = new TarantulaContext();
 
-	public static  CountDownLatch _storageInstanceStarted ;
- 	
- 	public static  CountDownLatch _integrationClusterStarted ;
- 	
- 	public static  CountDownLatch _tarantulaApplicationStarted ;
-
-    public static  CountDownLatch _tarantulaInstanceStarted;
-
-    public static  CountDownLatch _accessIndexServiceStarted ;
-
-    public static  CountDownLatch _storageStarted;
-
-    public static  CountDownLatch _deployServiceStarted;
-
-    public static CountDownLatch _systemServiceStarted;
+	public final static  CountDownLatch _storageInstanceStarted = new CountDownLatch(1);
+    public final static  CountDownLatch _storageStarted = new CountDownLatch(1); //data store provider waitForData call finished;
+ 	public final static  CountDownLatch _integrationClusterStarted = new CountDownLatch(1);
+    public final static  CountDownLatch _keyIndexServiceStarted = new CountDownLatch(1);
+    public final static  CountDownLatch _accessIndexServiceStarted = new CountDownLatch(1);
+    public final static  CountDownLatch _deployServiceStarted = new CountDownLatch(1);
+    public final static  CountDownLatch _recoverServiceStarted = new CountDownLatch(1);
+    public final static CountDownLatch _cluster_service_ready = new CountDownLatch(4);
+    public final static CountDownLatch _systemServiceStarted = new CountDownLatch(1);
+ 	public final static  CountDownLatch _tarantulaApplicationStarted = new CountDownLatch(1);
 
 
     public AtomicBoolean node_started;
 
-    public static CountDownLatch _access_index_syc_finished;
 
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
 
@@ -176,16 +170,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 	public void start() throws Exception {
  	    if(this.dataBucketNode.length() != 3) throw new RuntimeException("Node name must be 3 letters");
-         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
- 	     _storageInstanceStarted = new CountDownLatch(1);
-         _integrationClusterStarted = new CountDownLatch(1);
-         _tarantulaApplicationStarted = new CountDownLatch(1);
-        _tarantulaInstanceStarted = new CountDownLatch(1);
-        _accessIndexServiceStarted = new CountDownLatch(2);
-        _storageStarted = new CountDownLatch(1);
-        _deployServiceStarted = new CountDownLatch(1);
-        _systemServiceStarted = new CountDownLatch(1);
-        _access_index_syc_finished = new CountDownLatch(2);
+        this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
         this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
@@ -226,7 +211,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         gcfg.getGroupConfig().setName("tarantula-integration-"+this.clusterNameSuffix);
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
         new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
-        new ServiceBootstrap(_accessIndexServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
+        new ServiceBootstrap(_systemServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
         this.tokenValidatorProvider = (TokenValidatorProvider)Class.forName(this.tarantulaServerValidator).getConstructor().newInstance();
         this.tokenValidatorProvider.timeout(this.tokenTimeout,this.ticketTimeout);
         this.tokenValidatorProvider.start();
@@ -548,7 +533,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
-
+        //Waiting for all distribution service ready
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionKey();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
@@ -589,9 +574,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
     }
     public void _syncNodeData() throws Exception{
-        _systemServiceStarted.await();
  	    this.accessIndexService().onDisable();
- 	    _access_index_syc_finished.await();
+ 	    //_cluster_service_ready.await();
  	    /**
          for(int i=0;i<accessIndexRoutingNumber;i++){
  	        CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -933,7 +917,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
- 	    try{_systemServiceStarted.await();}catch (Exception ex){}
+ 	    //try{_systemServiceStarted.await();}catch (Exception ex){}
         TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider)this.serviceProvider(TokenValidatorProvider.NAME);
  	    ThirdPartyServiceProvider thirdPartyServiceProvider = (ThirdPartyServiceProvider)tokenValidatorProvider.authVendor(authVendor.name());
         if(thirdPartyServiceProvider == null) throw new RuntimeException("third party provider not existed ["+authVendor.name()+"]");

@@ -118,15 +118,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         vMap = this._cluster.getMap(DATA_MAP_PREFIX+"Master");
         this.accessIndexService =_cluster.getDistributedObject(AccessIndexService.NAME,AccessIndexService.NAME);
         this.accessIndexService.setup(this.tarantulaContext);
-        //this.keyIndexService = _cluster.getDistributedObject(KeyIndexService.NAME,KeyIndexService.NAME);
-        //this.keyIndexService.setup(this.tarantulaContext);
         this.deployService = this._cluster.getDistributedObject(DeployService.NAME,DeployService.NAME);
         this.deployService.setup(this.tarantulaContext);
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         this.recoverService.setup(this.tarantulaContext);
         _serviceReady.countDown();
-        new ServiceBootstrap(this.tarantulaContext._deployServiceStarted,this.tarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
-        new ServiceBootstrap(this.tarantulaContext._accessIndexServiceStarted,this.tarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
+        new ServiceBootstrap(TarantulaContext._cluster_service_ready,TarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
+        new ServiceBootstrap(TarantulaContext._storageStarted,TarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
     }
     public void shutdown() throws Exception {
         try{

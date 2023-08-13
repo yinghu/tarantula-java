@@ -35,6 +35,9 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int KEY_INDEX_EVENT_CID = 22;
 
+    public static final int INTEGRATION_ON_REPLICATION_EVENT_CID = 23;
+    public static final int DATA_ON_REPLICATION_EVENT_CID = 24;
+
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
@@ -109,6 +112,14 @@ public class PortableEventRegistry implements PortableFactory {
 
             case KEY_INDEX_EVENT_CID:
                 _ins = new KeyIndexEvent();
+                break;
+
+            case INTEGRATION_ON_REPLICATION_EVENT_CID:
+                _ins = new IntegrationReplicationEvent();
+                break;
+
+            case DATA_ON_REPLICATION_EVENT_CID:
+                _ins = new DataReplicationEvent();
                 break;
 
             case SINGLETON_FORWARD_CID:

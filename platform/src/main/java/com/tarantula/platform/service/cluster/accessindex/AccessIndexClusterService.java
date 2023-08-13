@@ -15,6 +15,7 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
+import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
@@ -64,7 +65,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                         updates.forEach(r->{
                             DataStoreOnPartition dso = this.onPartition(r.partition());
                             dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
-                            RevisionObject ro = RevisionObject.fromBinary(r.value());
                             KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
                         });
@@ -78,7 +78,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
             log.warn("Stopping access index replication thread");
         },"tarantula-access-index-replication-writer");
         replicationWriter.start();
-        new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new AccessIndexServiceBootstrap(this),"access-index-service",true).start();
+        new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._accessIndexServiceStarted,new AccessIndexServiceBootstrap(this),"access-index-service",true).start();
     }
 
     @Override
@@ -144,7 +144,16 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         for(DataStoreOnPartition dso : dataStoreOnPartitions){
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createAccessIndexDataStore(dso.name);
         }
-        TarantulaContext._access_index_syc_finished.countDown();
+
+        this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
+            if(event instanceof IntegrationReplicationEvent){
+                IntegrationReplicationEvent integrationReplicationEvent = (IntegrationReplicationEvent)event;
+                log.warn(new String(integrationReplicationEvent.data[0].key()));
+                log.warn(new String(integrationReplicationEvent.data[0].value()));
+            }
+            return false;
+        });
+        TarantulaContext._cluster_service_ready.countDown();
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"]");
     }
 

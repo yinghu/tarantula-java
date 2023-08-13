@@ -37,7 +37,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         }
         clusterNodeManager = new ClusterNodeManager(tarantulaContext.node());
         tarantulaContext.clusterProvider().registerNodeListener(clusterNodeManager);
-        new ServiceBootstrap(tarantulaContext._storageStarted,tarantulaContext._accessIndexServiceStarted,new KeyIndexServiceBootstrap(this),"key-index-service",true).start();
+        new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._keyIndexServiceStarted,new KeyIndexServiceBootstrap(this),"key-index-service",true).start();
     }
 
     public byte[] get(int partition,byte[] key) {
@@ -80,8 +80,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             return dso.lock(key,()->{
                 if(dso.dataStore.load(keyIndex)){
                     if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
-                        logger.warn("key index updating->"+dso.dataStore.update(keyIndex));
-                        //dso.dataStore.update(keyIndex);
+                        dso.dataStore.update(keyIndex);
                     }
                     return true;
                 }
@@ -91,7 +90,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             });
         });
         tarantulaContext.keyIndexService = this;
-        TarantulaContext._access_index_syc_finished.countDown();
+        TarantulaContext._cluster_service_ready.countDown();
         logger.warn("Key index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]");
     }
 

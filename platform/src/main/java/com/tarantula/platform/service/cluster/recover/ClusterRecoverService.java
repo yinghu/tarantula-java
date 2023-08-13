@@ -8,7 +8,9 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
+import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.KeyIndexEvent;
+import com.tarantula.platform.service.cluster.accessindex.AccessIndexServiceBootstrap;
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -61,9 +63,13 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
             log.warn("Stopping data replication thread");
         },"tarantula-data-replication-writer");
         replicationWriter.start();
+        new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._recoverServiceStarted,new RecoverServiceBootstrap(this),"recover-service",true).start();
         log.warn("Cluster Recover Service Started on scope ["+scope+"]");
     }
 
+    public void setup() throws Exception{
+        TarantulaContext._cluster_service_ready.countDown();
+    }
     @Override
     public void reset() {
 

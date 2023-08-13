@@ -35,9 +35,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider = this.tarantulaContext.deploymentService();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        new ServiceBootstrap(tarantulaContext._integrationClusterStarted,tarantulaContext._deployServiceStarted,new DeployServiceBootstrap(this),"deploy-service",true).start();
+        new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._deployServiceStarted,new DeployServiceBootstrap(this),"deploy-service",true).start();
     }
     public void setup(){
+        TarantulaContext._cluster_service_ready.countDown();
         log.info("Clustering deployment service started ["+nodeEngine.getConfig().getGroupConfig().getName()+"] on scope ["+this.scope+"]");
     }
     @Override

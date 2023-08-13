@@ -1,6 +1,6 @@
 {
   "integration" :{
-     "asyncDistributing": true,
+     "asyncDistributing": false,
      "maxPendingSize": 100,
      "syncIntervalSeconds": 5,
      "maxBatchSize": 50
