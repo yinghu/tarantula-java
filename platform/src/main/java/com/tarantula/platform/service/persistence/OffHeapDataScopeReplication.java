@@ -10,7 +10,11 @@ public class OffHeapDataScopeReplication implements ScopedOnReplication{
     private Unsafe unsafe;
     private long memoryAddress;
     private ClusterProvider.Node node;
-    public OffHeapDataScopeReplication(ClusterProvider.Node node,String source, byte[] key, byte[] value){
+
+    public OffHeapDataScopeReplication(){
+        unsafe = UnsafeUtil.useUnsafe();
+    }
+    public void write(ClusterProvider.Node node,String source, byte[] key, byte[] value){
         this.node = node;
         unsafe = UnsafeUtil.useUnsafe();
         byte[] src = source.getBytes();
@@ -60,9 +64,7 @@ public class OffHeapDataScopeReplication implements ScopedOnReplication{
     public void drop(){
         unsafe.freeMemory(memoryAddress);
     }
-    public void node(ClusterProvider.Node node){
-        this.node = node;
-    }
+
     @Override
     public ClusterProvider.Node node() {
         return node;

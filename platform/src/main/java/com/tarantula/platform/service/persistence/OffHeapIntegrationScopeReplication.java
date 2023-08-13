@@ -12,9 +12,12 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
 
     private ClusterProvider.Node node;
 
-    public OffHeapIntegrationScopeReplication(ClusterProvider.Node node,int partition, byte[] key, byte[] value){
-        this.node = node;
+    public OffHeapIntegrationScopeReplication(){
         unsafe = UnsafeUtil.useUnsafe();
+    }
+
+    public void write(ClusterProvider.Node node,int partition, byte[] key, byte[] value){
+        this.node = node;
         int keyLength = key.length;
         int valueLength = value.length;
         memoryAddress = unsafe.allocateMemory(keyLength+valueLength+12);

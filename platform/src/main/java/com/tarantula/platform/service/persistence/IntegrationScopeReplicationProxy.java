@@ -27,7 +27,8 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
             for(ClusterProvider.Node node : nodes){
-                OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication(node,metadata.partition(),key,value);
+                OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
+                offHeapOnReplication.write(node,metadata.partition(),key,value);
                 if(!pendingReplication.offer(offHeapOnReplication)){
                     offHeapOnReplication.drop();
                     replicate();

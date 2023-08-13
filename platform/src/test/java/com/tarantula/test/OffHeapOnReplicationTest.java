@@ -32,10 +32,12 @@ public class OffHeapOnReplicationTest {
         byte[] value = json.toString().getBytes();
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
-            OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication(node,source, key, value);
+            OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication();
+            offHeapOnReplication.write(node,source, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
-        OffHeapDataScopeReplication unqueued = new OffHeapDataScopeReplication(node,source, key, value);
+        OffHeapDataScopeReplication unqueued = new OffHeapDataScopeReplication();
+        unqueued.write(node,source, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
@@ -64,10 +66,12 @@ public class OffHeapOnReplicationTest {
         byte[] value = json.toString().getBytes();
         //long st = System.currentTimeMillis();
         for(int i=0;i<max;i++) {
-            OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication(node,partition, key, value);
+            OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
+            offHeapOnReplication.write(node,partition, key, value);
             Assert.assertTrue(queue.offer(offHeapOnReplication));
         }
-        OffHeapIntegrationScopeReplication unqueued = new OffHeapIntegrationScopeReplication(node,partition, key, value);
+        OffHeapIntegrationScopeReplication unqueued = new OffHeapIntegrationScopeReplication();
+        unqueued.write(node,partition, key, value);
         Assert.assertFalse(queue.offer(unqueued));
         unqueued.read();
         //long st1 = System.currentTimeMillis();
