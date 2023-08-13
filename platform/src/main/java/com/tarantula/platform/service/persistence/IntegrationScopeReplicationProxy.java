@@ -7,6 +7,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.OnReplication;
 import com.tarantula.platform.service.KeyIndexTrack;
 
 import java.util.ArrayList;
@@ -63,7 +64,12 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     protected void replicate(){
         ArrayList<ScopedOnReplication> drop = new ArrayList<>();
-        pendingReplication.drainTo(drop);
+        pendingReplication.drainTo(drop,maxBatchSize);
+        drop.forEach(d->{
+            OnReplication onReplication = d.read();
+            reusingReplication.offer(d);
+            //serviceContext.clusterProvider().accessIndexService().onReplicate(onReplication.nodeName(),onReplication.partition(),onReplication.key(),onReplication.value())
+        });
     }
 
 }

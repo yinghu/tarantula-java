@@ -19,6 +19,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected ClusterProvider.Node localNode;
 
     protected ArrayBlockingQueue<ScopedOnReplication> pendingReplication;
+    protected ArrayBlockingQueue<ScopedOnReplication> reusingReplication;
 
     private final int scope;
     protected boolean asyncDistributing;
@@ -68,9 +69,12 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         }
         if(conf==null) return;
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
-        pendingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
-        syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
-        maxBatchSize = conf.get("maxBatchSize").getAsInt();
+        if(asyncDistributing){
+            pendingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
+            reusingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
+            syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
+            maxBatchSize = conf.get("maxBatchSize").getAsInt();
+        }
     }
 
 
