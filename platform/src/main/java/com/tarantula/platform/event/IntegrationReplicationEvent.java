@@ -27,11 +27,11 @@ public class IntegrationReplicationEvent extends Data implements Event {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
+        System.out.println(">>"+destination+"");
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
         ArrayList<ScopedOnReplication> list = new ArrayList<>();
-        pendingQueue.drainTo(list);
-        int sz = list.size();
+        int sz = pendingQueue.drainTo(list);
         System.out.println("SIZE->"+sz);
         out.writeInt("3",sz);
         for(int i=0;i<sz;i++){
