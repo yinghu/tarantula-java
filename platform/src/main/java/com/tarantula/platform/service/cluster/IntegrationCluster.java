@@ -166,15 +166,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             eventSubscriber.callback = callback;
             eventSubscriber.topic = this._cluster.getTopic(topic);
             this.topicList.put(topic,eventSubscriber.topic);
-            String sid = eventSubscriber.topic.addMessageListener(
-                    (Message<Event> m) -> {
-                        try{
-                            this.onDispatch(m.getMessageObject());
-                        }catch (Exception ex){
-                            ex.printStackTrace();
-                        }
-                    }
-            );
+            String sid = eventSubscriber.topic.addMessageListener((Message<Event> m) -> this.onDispatch(m.getMessageObject()));
             eventSubscriber.registrationKey = sid;
             return eventSubscriber;
         });
