@@ -69,7 +69,6 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         if(asyncDistributing){
             maxPendingSize = conf.get("maxPendingSize").getAsInt();
             syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
-            maxBatchSize = conf.get("maxBatchSize").getAsInt();
         }
         setup();
     }
