@@ -84,7 +84,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     protected void setup(){
         if(asyncDistributing) {
-            logger.warn("Integration replication proxy running asynchronously");
+            logger.warn("Integration replication proxy running asynchronously with pending size ["+maxPendingSize+"]");
             this.pendingEvents = new ConcurrentHashMap<>();
         }
     }
@@ -92,6 +92,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     protected void replicate(ClusterProvider.Node target){
         IntegrationReplicationEvent event = pendingEvents.remove(target);
         if(event==null) return;
+        logger.warn("publishing event->"+event.destination());
         serviceContext.clusterProvider().publisher().publish(event);
     }
 

@@ -4,10 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Event;
+
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
-import com.tarantula.platform.event.IntegrationReplicationEvent;
 
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
@@ -22,7 +21,6 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected long syncInterval;
 
     protected int maxPendingSize;
-    protected int maxBatchSize;
     public ScopedReplicationProxy(int scope){
         this.scope = scope;
     }
