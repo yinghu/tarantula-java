@@ -36,6 +36,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                 return;
             }
             for(ClusterProvider.Node node : nodes){
+                logger.warn("Target->"+node.nodeName());
                 pendingEvents.compute(node,(n,e)->{
                     if(e==null) {
                         e = new IntegrationReplicationEvent(maxPendingSize, localNode.nodeName(), node.nodeName());
