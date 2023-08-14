@@ -92,8 +92,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     protected void replicate(ClusterProvider.Node target){
         IntegrationReplicationEvent event = pendingEvents.remove(target);
         if(event==null) return;
-        event.pendingQueue.drainTo(event.list);
-        logger.warn("publishing event->"+event.destination());
+        event.drain();
         serviceContext.clusterProvider().publisher().publish(event);
     }
 

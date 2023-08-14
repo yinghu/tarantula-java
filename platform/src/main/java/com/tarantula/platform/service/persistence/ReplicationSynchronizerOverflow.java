@@ -3,7 +3,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.Event;
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
 
 public class ReplicationSynchronizerOverflow implements SchedulingTask {
