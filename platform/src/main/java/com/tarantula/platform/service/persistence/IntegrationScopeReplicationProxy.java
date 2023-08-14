@@ -5,15 +5,14 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.event.EventOnReplication;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
-import java.util.concurrent.ConcurrentHashMap;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
-    private ConcurrentHashMap<ClusterProvider.Node,IntegrationReplicationEvent> pendingEvents;
 
     public IntegrationScopeReplicationProxy(){
         super(Distributable.INTEGRATION_SCOPE);
@@ -26,20 +25,12 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
-            if(nodes.length==0){
-                logger.warn("Replication number [" + 0 + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
-                KeyIndex keyIndex = new KeyIndexTrack();
-                keyIndex.owner(metadata.source());
-                keyIndex.index(stringKey);
-                keyIndex.placeMasterNode(localNode.nodeName());
-                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
-                return;
-            }
+            int replicated = 0;
             for(ClusterProvider.Node node : nodes){
                 if(node==null){
-                    logger.warn("Node is null");
                     continue;
                 }
+                replicated++;
                 pendingEvents.compute(node,(n,e)->{
                     if(e==null) {
                         e = new IntegrationReplicationEvent(maxPendingSize, localNode.nodeName(), node.nodeName());
@@ -47,13 +38,22 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                     }
                     OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
                     offHeapOnReplication.write(node.nodeName(),metadata.partition(),key,value);
-                    if(e.pendingQueue.offer(offHeapOnReplication)) return e;
-                    serviceContext.schedule(new ReplicationSynchronizerOverflow(serviceContext,100,e));
+                    if(e.offer(offHeapOnReplication)) return e;
+                    serviceContext.schedule(new ReplicationSynchronizerOverflow(serviceContext,OVERFLOW_TIMER,e));
                     IntegrationReplicationEvent ex = new IntegrationReplicationEvent(maxPendingSize,localNode.nodeName(),node.nodeName());
-                    ex.pendingQueue.offer(offHeapOnReplication);
+                    ex.offer(offHeapOnReplication);
                     serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
                     return ex;
                 });
+            }
+            if(replicated==0){
+                logger.warn("Replication number [" + 0 + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+                KeyIndex keyIndex = new KeyIndexTrack();
+                keyIndex.owner(metadata.source());
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(localNode.nodeName());
+                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
+                return;
             }
             return;
         }
@@ -82,15 +82,8 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-    protected void setup(){
-        if(asyncDistributing) {
-            logger.warn("Integration replication proxy running asynchronously with pending size ["+maxPendingSize+"]");
-            this.pendingEvents = new ConcurrentHashMap<>();
-        }
-    }
-
     protected void replicate(ClusterProvider.Node target){
-        IntegrationReplicationEvent event = pendingEvents.remove(target);
+        EventOnReplication event = pendingEvents.remove(target);
         if(event==null) return;
         event.drain();
         serviceContext.clusterProvider().publisher().publish(event);

@@ -17,10 +17,11 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
-import com.tarantula.platform.service.persistence.OffHeapIntegrationScopeReplication;
+import com.tarantula.platform.event.OnReplicationEvent;
+
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
-import com.tarantula.platform.service.persistence.ScopedOnReplication;
+
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.ArrayList;
@@ -148,13 +149,12 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
             if(event instanceof IntegrationReplicationEvent){
-                IntegrationReplicationEvent integrationReplicationEvent = (IntegrationReplicationEvent)event;
-                for(OnReplication onReplication : integrationReplicationEvent.data){
-                    //OnReplication onReplication = m.read();
-                    log.warn("SOURCE->"+onReplication.nodeName());
-                    log.warn("PARTITION->"+onReplication.partition());
-                    log.warn(new String(onReplication.key()));
-                    log.warn(new String(onReplication.value()));
+                OnReplicationEvent integrationReplicationEvent = (OnReplicationEvent)event;
+                for(OnReplication r : integrationReplicationEvent.data()){
+                    DataStoreOnPartition dso = this.onPartition(r.partition());
+                    dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
+                    KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
+                    tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
                 }
             }
             return false;
@@ -181,8 +181,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     public void replicate(String nodeName,int partition,byte[] key,byte[] value){
         synchronized (pendingUpdates){
-            //OffHeapIntegrationScopeReplication offHeapIntegrationScopeReplication = new OffHeapIntegrationScopeReplication();
-            //offHeapIntegrationScopeReplication.write(null,partition,key,value);
             pendingUpdates.add(new ReplicationData(nodeName,partition,key,value));
         }
     }

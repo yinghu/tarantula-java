@@ -7,17 +7,23 @@ import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.event.EventOnReplication;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     private final static String CONFIG = "replication-service-settings";
+    protected final static long OVERFLOW_TIMER = 100;
     protected ServiceContext serviceContext;
 
     protected ClusterProvider.Node localNode;
 
     private final int scope;
     protected boolean asyncDistributing;
+
+    protected ConcurrentHashMap<ClusterProvider.Node, EventOnReplication> pendingEvents;
     protected long syncInterval;
 
     protected int maxPendingSize;
@@ -67,8 +73,8 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         if(asyncDistributing){
             maxPendingSize = conf.get("maxPendingSize").getAsInt();
             syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
+            pendingEvents = new ConcurrentHashMap<>();
         }
-        setup();
     }
 
 
@@ -95,7 +101,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return this.serviceContext.keyIndexService().lookup(source,key);
     }
 
-    protected void setup(){}
+
     protected void replicate(ClusterProvider.Node target){
 
     }
@@ -107,7 +113,8 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-
+        pendingEvents.forEach((k,v)->v.drop());
+        pendingEvents.clear();
     }
 
     @Override

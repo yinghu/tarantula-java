@@ -1,7 +1,7 @@
 {
   "integration" :{
      "asyncDistributing": true,
-     "maxPendingSize": 5,
+     "maxPendingSize": 10,
      "syncIntervalSeconds": 5
   },
   "data": {
