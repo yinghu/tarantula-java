@@ -30,31 +30,29 @@ public class IntegrationReplicationEvent extends Data implements Event {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        System.out.println(">>"+destination+">>"+list.size());
-        if(done) return;
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
         out.writeInt("3",list.size());
-        for(int i=0;i<list.size();i++){
-            OnReplication data = list.get(i).read();
-            out.writeInt("p"+i,data.partition());
-            out.writeByteArray("k"+i,data.key());
-            out.writeByteArray("v"+i,data.value());
-        }
-        done = true;
+        //for(int i=0;i<list.size();i++){
+            //OnReplication data = list.get(i).read();
+            //out.writeInt("p"+i,data.partition());
+            //out.writeByteArray("k"+i,data.key());
+            //out.writeByteArray("v"+i,data.value());
+        //}
+        //done = true;
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.destination = in.readUTF("1");
         this.source = in.readUTF("2");
         int size = in.readInt("3");
-        System.out.println("OUT SZ->"+size);
-        mp = new ScopedOnReplication[size];
-        for(int i=0;i<size;i++){
+        //System.out.println("OUT SZ->"+size);
+        //mp = new ScopedOnReplication[size];
+        //for(int i=0;i<size;i++){
             //data[i]=new ReplicationData(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
-            mp[i]=new OffHeapIntegrationScopeReplication();
-            mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
-        }
+            //mp[i]=new OffHeapIntegrationScopeReplication();
+            //mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
+        //}
     }
     @Override
     public int getClassId() {

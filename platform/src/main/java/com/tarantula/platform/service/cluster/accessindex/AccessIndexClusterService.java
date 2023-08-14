@@ -149,13 +149,13 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
             if(event instanceof IntegrationReplicationEvent){
                 IntegrationReplicationEvent integrationReplicationEvent = (IntegrationReplicationEvent)event;
-                for(ScopedOnReplication m : integrationReplicationEvent.mp){
-                    OnReplication onReplication = m.read();
-                    log.warn("SOURCE->"+onReplication.nodeName());
-                    log.warn("PARTITION->"+onReplication.partition());
-                    log.warn(new String(onReplication.key()));
-                    log.warn(new String(onReplication.value()));
-                }
+                //for(ScopedOnReplication m : integrationReplicationEvent.mp){
+                    //OnReplication onReplication = m.read();
+                    log.warn("SOURCE->"+integrationReplicationEvent.source());
+                    //log.warn("PARTITION->"+onReplication.partition());
+                    //log.warn(new String(onReplication.key()));
+                    //log.warn(new String(onReplication.value()));
+                //}
             }
             return false;
         });
