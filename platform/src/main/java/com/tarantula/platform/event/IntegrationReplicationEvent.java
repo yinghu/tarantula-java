@@ -19,6 +19,7 @@ public class IntegrationReplicationEvent extends Data implements Event {
     public ArrayBlockingQueue<ScopedOnReplication> pendingQueue;
 
     public ArrayList<ScopedOnReplication> list = new ArrayList<>();
+    boolean done = false;
     public IntegrationReplicationEvent(){
 
     }
@@ -30,6 +31,7 @@ public class IntegrationReplicationEvent extends Data implements Event {
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         System.out.println(">>"+destination+">>"+list.size());
+        if(done) return;
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
         out.writeInt("3",list.size());
@@ -39,6 +41,7 @@ public class IntegrationReplicationEvent extends Data implements Event {
             out.writeByteArray("k"+i,data.key());
             out.writeByteArray("v"+i,data.value());
         }
+        done = true;
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
