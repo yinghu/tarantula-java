@@ -64,16 +64,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     private int updateThreshold;
     private int cacheUpdateThreshold;
 
-    //private int replicationBatchSize;
-    //private int backupBatchSize;
-    //private int maxTimerLoop;
-    //private int maxBytesPerBatch;
-    //private int timerCount;
-    //private long nextReplicationInterval;
-    //private long nextBackupInterval;
-
-    //private int maxReplicationNumber = 3;
-
     private MapStoreListener integrationScopeReplicationProxy;
     private MapStoreListener dataScopeReplicationProxy;
 
@@ -86,14 +76,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _backupPath = ((JsonElement)properties.get("backupPath")).getAsString();
-        //this.replicationBatchSize = ((JsonElement)properties.get("replicationBatchSize")).getAsInt();
-        //this.maxTimerLoop = ((JsonElement)properties.get("maxTimerLoop")).getAsInt();
-        //this.maxBytesPerBatch = ((JsonElement)properties.get("maxBytesPerBatch")).getAsInt();
-        //this.backupBatchSize = ((JsonElement)properties.get("backupBatchSize")).getAsInt();
-        //this.timerCount = ((JsonElement)properties.get("timerCount")).getAsInt();
         long nextSyncInterval = 1000*((JsonElement)properties.get("diskSyncIntervalSeconds")).getAsInt();
-        //this.nextReplicationInterval = 1000*((JsonElement)properties.get("replicationSyncIntervalSeconds")).getAsInt();
-        //this.nextBackupInterval = 1000*((JsonElement)properties.get("backupSyncIntervalSeconds")).getAsInt();
         long nextEvictInterval = 1000*60*((JsonElement)properties.get("cacheSyncIntervalMinutes")).getAsInt();
         this.updateThreshold =  ((JsonElement)properties.get("syncUpdateThreshold")).getAsInt();
         this.cacheUpdateThreshold =  ((JsonElement)properties.get("cacheUpdateThreshold")).getAsInt();
@@ -105,7 +88,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         this.indexBackupPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_backupPath+FileSystems.getDefault().getSeparator()+_indexPath;
         this.dailyBackup = (Boolean)properties.get("dailyBackup");
         this.partitionNumber = (Integer)properties.get("partitionNumber");
-        //this.maxReplicationNumber = (Integer)properties.get("maxReplicationNumber");
         this.node = (ClusterNode) properties.get("node");
         ServiceContext serviceContext = (ServiceContext) properties.get("serviceContext");
         this.iBackupProvider = new BackupRouter("integration",Distributable.INTEGRATION_SCOPE);
@@ -210,15 +192,8 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        //this.integrationCluster = serviceContext.clusterProvider();
         this.serviceContext.schedule(this.diskSynchronizer);
         this.serviceContext.schedule(this.cacheSynchronizer);
-        //for(int i=0;i<timerCount;i++){
-            //this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval,Distributable.DATA_SCOPE));
-            //this.serviceContext.schedule(new ReplicationSynchronizer(this,nextReplicationInterval+10,Distributable.INTEGRATION_SCOPE));
-            //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval,Distributable.DATA_SCOPE));
-            //this.serviceContext.schedule(new BackupSynchronizer(this,nextBackupInterval+10,Distributable.INTEGRATION_SCOPE));
-        //}
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
         this.integrationScopeReplicationProxy.setup(serviceContext);
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
@@ -337,116 +312,6 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
         this.serviceContext.schedule(this.cacheSynchronizer);
     }
-    /**
-    public void _replicateOnIntegrationScope(ReplicationSynchronizer caller){
-        try{
-            int integrationSize = 0;
-            long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
-            long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
-            long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-            int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
-            operationSummary.lastIntegrationBatchSize.set(bsize);
-            OnReplication[] integration = new OnReplication[bsize];
-            for(int loop =0;loop<maxTimerLoop;loop++) {
-                for (int i = 0; i < bsize; i++) {
-                    String integrationId = pendingReplicationIntegrationQueue.poll();
-                    if (integrationId == null) break;
-                    OnReplication onReplication = pendingReplicationIndex.remove(integrationId);
-                    integration[i] = onReplication;
-                    integrationSize++;
-                }
-                if (integrationSize > 0) {
-                    this.serviceContext.clusterProvider().accessIndexService().onReplicate(integration, integrationSize,maxReplicationNumber);
-                    operationSummary.pendingUpdates.addAndGet((-1)*integrationSize);
-                }
-                integrationSize = 0;
-            }
-        } catch (Exception ex){
-            log.error("_replicationOnIntegrationScope",ex);
-        }
-        this.serviceContext.schedule(caller);
-    }
-    public void _replicateOnDataScope(ReplicationSynchronizer caller){
-        try{
-            int dataSize = 0;
-            long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
-            long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
-            long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-            int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):replicationBatchSize;
-            operationSummary.lastDataBatchSize.set(bsize);
-            OnReplication[] data = new OnReplication[bsize];
-            for(int loop =0;loop<maxTimerLoop;loop++) {
-                for (int i = 0; i < bsize; i++) {
-                    String dataId = pendingReplicationDataQueue.poll();
-                    if(dataId==null) break;
-                    OnReplication onReplication = pendingReplicationIndex.remove(dataId);
-                    data[i] = onReplication;
-                    dataSize++;
-                }
-                if (dataSize > 0) {
-                    this.serviceContext.clusterProvider().recoverService().onReplicate(data, dataSize,maxReplicationNumber);
-                    operationSummary.pendingUpdates.addAndGet((-1)*dataSize);
-                }
-                dataSize = 0;
-            }
-        }catch (Exception ex){
-            log.error("_replicationOnDataScope",ex);
-        }
-        this.serviceContext.schedule(caller);
-    }
-    public void _backupOnDataScope(BackupSynchronizer caller){
-        try{
-            long totalBytes = operationSummary.dailyTotalDataBytesUpdated.get();
-            long totalUpdates = operationSummary.dailyTotalDataUpdates.get();
-            long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-            int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):backupBatchSize;
-            int dataSize = 0;
-            OnReplication[] data = new OnReplication[bsize];
-            for(int loop =0;loop<maxTimerLoop;loop++) {
-                for (int i = 0; i < bsize; i++) {
-                    String dataId = pendingBackupDataQueue.poll();
-                    if(dataId==null) break;
-                    OnReplication onReplication = pendingBackupIndex.remove(dataId);
-                    data[i] = onReplication;
-                    dataSize++;
-                }
-                if (dataSize > 0) {
-                    this.dBackupProvider.batch(data,dataSize);
-                    operationSummary.pendingBackups.addAndGet((-1)*dataSize);
-                }
-                dataSize = 0;
-            }
-        }catch (Exception ex){
-            log.error("_backupOnDataScope",ex);
-        }
-        this.serviceContext.schedule(caller);
-    }
-
-    public void _backupOnIntegrationScope(BackupSynchronizer caller){
-        long totalBytes = operationSummary.dailyTotalIntegrationBytesUpdated.get();
-        long totalUpdates = operationSummary.dailyTotalIntegrationUpdates.get();
-        long averageBytes = totalBytes>0?(totalBytes/totalUpdates):0;
-        int bsize = averageBytes>0?(int)(maxBytesPerBatch/averageBytes):backupBatchSize;
-        //log.warn("Backup sync 2->"+bsize);
-        OnReplication[] integration = new OnReplication[bsize];
-        int integrationSize = 0;
-        for(int loop =0;loop<maxTimerLoop;loop++) {
-            for (int i = 0; i < bsize; i++) {
-                String integrationId = pendingBackupIntegrationQueue.poll();
-                if (integrationId == null) break;
-                OnReplication onReplication = pendingBackupIndex.remove(integrationId);
-                integration[i] = onReplication;
-                integrationSize++;
-            }
-            if (integrationSize > 0) {
-                this.iBackupProvider.batch(integration,integrationSize);
-                operationSummary.pendingBackups.addAndGet((-1)*integrationSize);
-            }
-            integrationSize = 0;
-        }
-        this.serviceContext.schedule(caller);
-    }
-    **/
     @Override
     public void shutdown() throws Exception {
         //running = false;
@@ -475,28 +340,12 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
 
     public <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t){
         if(metadata.scope()==Distributable.DATA_SCOPE){
-            /**
-            String pendingId = metadata.source()+"#"+key;
-            pendingBackupIndex.compute(pendingId,(k,v)->{
-                if(v==null){
-                    pendingBackupDataQueue.offer(pendingId);
-                    operationSummary.pendingBackups.incrementAndGet();
-                }
-                return new ReplicationData(metadata.source(),key,t);
-            });**/
+
             dataScopeReplicationProxy.onBackingUp(metadata,key,t);
             return;
         }
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
-            /**
-            String pendingId = metadata.source()+"#"+key;
-            pendingBackupIndex.compute(pendingId,(k,v)->{
-                if(v==null){
-                    pendingBackupIntegrationQueue.offer(pendingId);
-                    operationSummary.pendingBackups.incrementAndGet();
-                }
-                return new ReplicationData(metadata.source(),key,t);
-            });**/
+
             integrationScopeReplicationProxy.onBackingUp(metadata,key,t);
         }
     }
@@ -510,28 +359,14 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             operationSummary.dailyTotalDataUpdates.incrementAndGet();
             operationSummary.dailyTotalDataBytesUpdated.addAndGet(keySize+valueSize);
             dataScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
-            /**
-            pendingReplicationIndex.compute(pendingId,(k,v)->{
-                if(v==null){
-                    pendingReplicationDataQueue.offer(pendingId);
-                    operationSummary.pendingUpdates.incrementAndGet();
-                }
-                return new ReplicationData(metadata.source(),key,value);
-            });**/
+
         }
         else if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
             //String pendingId = metadata.source()+"#"+stringKey;
             operationSummary.dailyTotalIntegrationUpdates.incrementAndGet();
             operationSummary.dailyTotalIntegrationBytesUpdated.addAndGet(keySize+valueSize);
             integrationScopeReplicationProxy.onDistributing(metadata,stringKey,key,value);
-            /**
-            pendingReplicationIndex.compute(pendingId,(k,v)->{
-                if(v==null){
-                    pendingReplicationIntegrationQueue.offer(pendingId);
-                    operationSummary.pendingUpdates.incrementAndGet();
-                }
-                return new ReplicationData(metadata.partition(),key,value);
-            });**/
+
         }
         onMetrics();
     }

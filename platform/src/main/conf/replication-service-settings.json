@@ -1,14 +1,12 @@
 {
   "integration" :{
-     "asyncDistributing": false,
-     "maxPendingSize": 100,
-     "syncIntervalSeconds": 5,
-     "maxBatchSize": 50
+     "asyncDistributing": true,
+     "maxPendingSize": 5,
+     "syncIntervalSeconds": 5
   },
   "data": {
      "asyncDistributing": false,
-     "maxPendingSize": 100,
-     "syncIntervalSeconds": 5,
-     "maxBatchSize": 10
+     "maxPendingSize": 10,
+     "syncIntervalSeconds": 5
   }
 }

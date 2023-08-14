@@ -184,12 +184,14 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     @Override
     public int hashCode(){
-        return this.memberId.hashCode();
+        if(memberId!=null) return memberId.hashCode();
+        return this.nodeName.hashCode();
     }
     @Override
     public boolean equals(Object obj){
         ClusterNode r = (ClusterNode)obj;
-        return this.memberId.equals(r.memberId());
+        if(memberId!=null) return memberId.equals(r.memberId);
+        return this.nodeName.equals(r.nodeName());
     }
 
 }

@@ -8,11 +8,12 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
+    private ConcurrentHashMap<ClusterProvider.Node,IntegrationReplicationEvent> pendingEvents;
 
     public IntegrationScopeReplicationProxy(){
         super(Distributable.INTEGRATION_SCOPE);
@@ -25,14 +26,30 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+            if(nodes.length==0){
+                logger.warn("Replication number [" + 0 + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+                KeyIndex keyIndex = new KeyIndexTrack();
+                keyIndex.owner(metadata.source());
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(localNode.nodeName());
+                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
+                return;
+            }
             for(ClusterProvider.Node node : nodes){
-                IntegrationReplicationEvent integrationReplicationEvent = new IntegrationReplicationEvent(localNode,new OnReplication[0],node);
-                OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
-                offHeapOnReplication.write(node.nodeName(),metadata.partition(),key,value);
-                if(!pendingReplication.offer(offHeapOnReplication)){
-                    offHeapOnReplication.drop();
-                    replicate();
-                }
+                pendingEvents.compute(node,(n,e)->{
+                    if(e==null) {
+                        e = new IntegrationReplicationEvent(maxPendingSize, localNode.nodeName(), node.nodeName());
+                        serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
+                    }
+                    OffHeapIntegrationScopeReplication offHeapOnReplication = new OffHeapIntegrationScopeReplication();
+                    offHeapOnReplication.write(node.nodeName(),metadata.partition(),key,value);
+                    if(e.pendingQueue.offer(offHeapOnReplication)) return e;
+                    serviceContext.schedule(new ReplicationSynchronizerOverflow(serviceContext,100,e));
+                    IntegrationReplicationEvent ex = new IntegrationReplicationEvent(maxPendingSize,localNode.nodeName(),node.nodeName());
+                    ex.pendingQueue.offer(offHeapOnReplication);
+                    serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
+                    return ex;
+                });
             }
             return;
         }
@@ -61,14 +78,18 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-    protected void replicate(){
-        ArrayList<ScopedOnReplication> drop = new ArrayList<>();
-        pendingReplication.drainTo(drop,maxBatchSize);
-        drop.forEach(d->{
-            OnReplication onReplication = d.read();
-            reusingReplication.offer(d);
-            //serviceContext.clusterProvider().accessIndexService().onReplicate(onReplication.nodeName(),onReplication.partition(),onReplication.key(),onReplication.value())
-        });
+    protected void setup(){
+        if(asyncDistributing) {
+            logger.warn("Integration replication proxy running asynchronously");
+            this.pendingEvents = new ConcurrentHashMap<>();
+        }
     }
+
+    protected void replicate(ClusterProvider.Node target){
+        IntegrationReplicationEvent event = pendingEvents.remove(target);
+        if(event==null) return;
+        serviceContext.clusterProvider().publisher().publish(event);
+    }
+
 
 }

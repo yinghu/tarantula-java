@@ -4,35 +4,40 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
 import com.tarantula.platform.service.persistence.OffHeapIntegrationScopeReplication;
-import com.tarantula.platform.service.persistence.ReplicationData;
 import com.tarantula.platform.service.persistence.ScopedOnReplication;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class IntegrationReplicationEvent extends Data implements Event {
 
-    public OnReplication[] data;
-    //public ScopedOnReplication[] mp;
+
+    public ScopedOnReplication[] mp;
+    public ArrayBlockingQueue<ScopedOnReplication> pendingQueue;
     public IntegrationReplicationEvent(){
 
     }
-    public IntegrationReplicationEvent(ClusterProvider.Node sourceNode,OnReplication[] onReplication,ClusterProvider.Node targetNode){
-        this.source = sourceNode.nodeName();
-        this.data = onReplication;
-        this.destination = targetNode.nodeName()+"."+ AccessIndexService.NAME;
+    public IntegrationReplicationEvent(int pendingSize,String sourceNode,String targetNode){
+        this.source = sourceNode;
+        this.destination = targetNode+"."+ AccessIndexService.NAME;
+        this.pendingQueue = new ArrayBlockingQueue<>(pendingSize);
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
-        out.writeInt("3",data.length);
-        for(int i=0;i<data.length;i++){
-            out.writeInt("p"+i,data[i].partition());
-            out.writeByteArray("k"+i,data[i].key());
-            out.writeByteArray("v"+i,data[i].value());
+        ArrayList<ScopedOnReplication> list = new ArrayList<>();
+        pendingQueue.drainTo(list);
+        int sz = list.size();
+        out.writeInt("3",sz);
+        for(int i=0;i<sz;i++){
+            OnReplication data = list.get(i).read();
+            out.writeInt("p"+i,data.partition());
+            out.writeByteArray("k"+i,data.key());
+            out.writeByteArray("v"+i,data.value());
         }
     }
     @Override
@@ -40,12 +45,11 @@ public class IntegrationReplicationEvent extends Data implements Event {
         this.destination = in.readUTF("1");
         this.source = in.readUTF("2");
         int size = in.readInt("3");
-        data = new OnReplication[size];
-        //mp = new ScopedOnReplication[size];
-        for(int i=0;i<data.length;i++){
-            data[i]=new ReplicationData(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
-            //mp[i]=new OffHeapIntegrationScopeReplication();
-            //mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
+        mp = new ScopedOnReplication[size];
+        for(int i=0;i<size;i++){
+            //data[i]=new ReplicationData(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
+            mp[i]=new OffHeapIntegrationScopeReplication();
+            mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
         }
     }
     @Override

@@ -4,11 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Event;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
-
-import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
+import com.tarantula.platform.event.IntegrationReplicationEvent;
 
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
@@ -18,13 +17,11 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected ClusterProvider.Node localNode;
 
-    protected ArrayBlockingQueue<ScopedOnReplication> pendingReplication;
-    protected ArrayBlockingQueue<ScopedOnReplication> reusingReplication;
-
     private final int scope;
     protected boolean asyncDistributing;
     protected long syncInterval;
 
+    protected int maxPendingSize;
     protected int maxBatchSize;
     public ScopedReplicationProxy(int scope){
         this.scope = scope;
@@ -70,11 +67,11 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         if(conf==null) return;
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
         if(asyncDistributing){
-            pendingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
-            reusingReplication = new ArrayBlockingQueue<>(conf.get("maxPendingSize").getAsInt());
+            maxPendingSize = conf.get("maxPendingSize").getAsInt();
             syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
             maxBatchSize = conf.get("maxBatchSize").getAsInt();
         }
+        setup();
     }
 
 
@@ -101,12 +98,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return this.serviceContext.keyIndexService().lookup(source,key);
     }
 
-    protected void replicate(){
+    protected void setup(){}
+    protected void replicate(ClusterProvider.Node target){
 
-    }
-
-    public void sync(){
-        replicate();
     }
 
     @Override
@@ -116,10 +110,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        if(pendingReplication==null) return;
-        ArrayList<ScopedOnReplication> dropList = new ArrayList<>();
-        this.pendingReplication.drainTo(dropList);
-        dropList.forEach(offHeapOnReplication -> offHeapOnReplication.drop());
+
     }
 
     @Override
