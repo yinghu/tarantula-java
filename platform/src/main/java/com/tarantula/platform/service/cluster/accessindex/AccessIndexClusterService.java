@@ -15,6 +15,7 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
+import com.tarantula.platform.event.EventOnReplication;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.event.OnReplicationEvent;
@@ -148,7 +149,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }
 
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
-            if(event instanceof IntegrationReplicationEvent){
+            if(event instanceof EventOnReplication){
                 OnReplicationEvent integrationReplicationEvent = (OnReplicationEvent)event;
                 for(OnReplication r : integrationReplicationEvent.data()){
                     DataStoreOnPartition dso = this.onPartition(r.partition());

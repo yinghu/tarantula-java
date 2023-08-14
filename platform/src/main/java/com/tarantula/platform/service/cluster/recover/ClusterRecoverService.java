@@ -5,12 +5,18 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.event.EventOnReplication;
+import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
+import com.tarantula.platform.event.OnReplicationEvent;
 import com.tarantula.platform.service.cluster.accessindex.AccessIndexServiceBootstrap;
+import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -68,6 +74,18 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
 
     public void setup() throws Exception{
+        this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+ AccessIndexService.NAME, event -> {
+            if(event instanceof EventOnReplication){
+                OnReplicationEvent dataReplicationEvent = (OnReplicationEvent)event;
+                for(OnReplication r : dataReplicationEvent.data()){
+                    DataStore dataStore = tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber());
+                    dataStore.backup().set(r.key(),r.value());
+                    KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dataStore.name(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
+                    tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
+                }
+            }
+            return false;
+        });
         TarantulaContext._cluster_service_ready.countDown();
     }
     @Override

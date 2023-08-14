@@ -7,6 +7,8 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
+import com.tarantula.platform.event.DataReplicationEvent;
+import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
 
@@ -23,7 +25,40 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        logger.warn(metadata.source()+"#"+stringKey);
+        if(asyncDistributing){
+            ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
+            int replicated = 0;
+            for(ClusterProvider.Node node : nodes){
+                if(node==null){
+                    continue;
+                }
+                replicated++;
+                pendingEvents.compute(node,(n,e)->{
+                    if(e==null) {
+                        e = new DataReplicationEvent(maxPendingSize, localNode.nodeName(), node.nodeName());
+                        serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
+                    }
+                    OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication();
+                    offHeapOnReplication.write(node.nodeName(),metadata.source(),key,value);
+                    if(e.offer(offHeapOnReplication)) return e;
+                    serviceContext.schedule(new ReplicationSynchronizerOverflow(serviceContext,OVERFLOW_TIMER,e));
+                    DataReplicationEvent ex = new DataReplicationEvent(maxPendingSize,localNode.nodeName(),node.nodeName());
+                    ex.offer(offHeapOnReplication);
+                    serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
+                    return ex;
+                });
+            }
+            if(replicated==0){
+                logger.warn("Replication number [" + 0 + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+                KeyIndex keyIndex = new KeyIndexTrack();
+                keyIndex.owner(metadata.source());
+                keyIndex.index(stringKey);
+                keyIndex.placeMasterNode(localNode.nodeName());
+                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
+                return;
+            }
+            return;
+        }
         KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(this.maxReplicationNumber());
