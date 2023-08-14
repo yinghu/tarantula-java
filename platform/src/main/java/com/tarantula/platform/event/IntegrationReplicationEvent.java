@@ -17,6 +17,8 @@ public class IntegrationReplicationEvent extends Data implements Event {
 
     public ScopedOnReplication[] mp;
     public ArrayBlockingQueue<ScopedOnReplication> pendingQueue;
+
+    public ArrayList<ScopedOnReplication> list = new ArrayList<>();
     public IntegrationReplicationEvent(){
 
     }
@@ -27,14 +29,11 @@ public class IntegrationReplicationEvent extends Data implements Event {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        System.out.println(">>"+destination+"");
+        System.out.println(">>"+destination+">>"+list.size());
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
-        ArrayList<ScopedOnReplication> list = new ArrayList<>();
-        int sz = pendingQueue.drainTo(list);
-        System.out.println("SIZE->"+sz);
-        out.writeInt("3",sz);
-        for(int i=0;i<sz;i++){
+        out.writeInt("3",list.size());
+        for(int i=0;i<list.size();i++){
             OnReplication data = list.get(i).read();
             out.writeInt("p"+i,data.partition());
             out.writeByteArray("k"+i,data.key());

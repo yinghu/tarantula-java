@@ -34,7 +34,6 @@ public class ReplicationSynchronizerOverflow implements SchedulingTask {
 
     @Override
     public void run() {
-        System.out.println("OVERFLOW PUSH");
         proxy.clusterProvider().publisher().publish(event);
     }
 }
