@@ -27,35 +27,31 @@ public class IntegrationReplicationEvent extends Data implements Event {
     }
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        try{
         out.writeUTF("1",this.destination);
         out.writeUTF("2",source);
         ArrayList<ScopedOnReplication> list = new ArrayList<>();
         pendingQueue.drainTo(list);
         int sz = list.size();
+        System.out.println("SIZE->"+sz);
         out.writeInt("3",sz);
         for(int i=0;i<sz;i++){
             OnReplication data = list.get(i).read();
             out.writeInt("p"+i,data.partition());
             out.writeByteArray("k"+i,data.key());
             out.writeByteArray("v"+i,data.value());
-        }}catch (Exception ex){
-            ex.printStackTrace();
         }
     }
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        try{
         this.destination = in.readUTF("1");
         this.source = in.readUTF("2");
         int size = in.readInt("3");
+        System.out.println("OUT SZ->"+size);
         mp = new ScopedOnReplication[size];
         for(int i=0;i<size;i++){
             //data[i]=new ReplicationData(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
             mp[i]=new OffHeapIntegrationScopeReplication();
             mp[i].write(source,in.readInt("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
-        }}catch (Exception ex){
-            ex.printStackTrace();
         }
     }
     @Override
