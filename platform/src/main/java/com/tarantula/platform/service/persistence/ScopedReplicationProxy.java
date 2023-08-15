@@ -116,6 +116,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
+        if(pendingEvents==null) return;
         pendingEvents.forEach((k,v)->v.drop());
         pendingEvents.clear();
     }
