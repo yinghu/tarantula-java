@@ -5,7 +5,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
-import com.tarantula.platform.event.EventOnReplication;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
@@ -81,13 +80,5 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
-
-    protected void replicate(ClusterProvider.Node target){
-        EventOnReplication event = pendingEvents.remove(target);
-        if(event==null) return;
-        event.drain();
-        serviceContext.clusterProvider().publisher().publish(event);
-    }
-
 
 }

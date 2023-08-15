@@ -103,7 +103,10 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
 
     protected void replicate(ClusterProvider.Node target){
-
+        EventOnReplication event = pendingEvents.remove(target);
+        if(event==null) return;
+        event.drain();
+        serviceContext.clusterProvider().publisher().publish(event);
     }
 
     @Override
