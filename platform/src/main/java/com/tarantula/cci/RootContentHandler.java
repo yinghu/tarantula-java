@@ -10,6 +10,10 @@ public class RootContentHandler extends AbstractRequestHandler {
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
 
     private DeploymentServiceProvider deploymentServiceProvider;
+
+    public RootContentHandler(){
+        super(false);
+    }
     public String name(){
         return ROOT_PATH;
     }

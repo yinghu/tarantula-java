@@ -127,6 +127,5 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
-        logger.warn("Distribution Key index service proxy started");
     }
 }

@@ -27,6 +27,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int SERVICE_ACTION_EVENT_CID = 9;
 
+    public static final int PERMISSION_CHECK_EVENT_CID = 10;
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
     public static final int MODULE_RESET_EVENT_CID = 15;
@@ -96,6 +97,10 @@ public class PortableEventRegistry implements PortableFactory {
 
             case SERVICE_ACTION_EVENT_CID:
                 _ins = new ServiceActionEvent();
+                break;
+
+            case PERMISSION_CHECK_EVENT_CID:
+                _ins = new PermissionCheckEvent();
                 break;
 
             case MAP_STORE_SYNC_EVENT_CID:

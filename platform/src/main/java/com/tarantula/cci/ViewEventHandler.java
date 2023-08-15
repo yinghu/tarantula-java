@@ -22,6 +22,7 @@ public class ViewEventHandler extends AbstractRequestHandler {
 
     private GsonBuilder builder;
     public ViewEventHandler(){
+        super(false);
     }
     public String name(){
         return VIEW_PATH;

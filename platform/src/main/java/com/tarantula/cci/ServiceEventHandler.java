@@ -21,7 +21,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
     private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
 
     public ServiceEventHandler(){
-
+        super(true);
 	}
     public String name(){
         return SERVICE_PATH;
@@ -68,7 +68,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
     public void start() throws Exception {
         this.serverTopic = UUID.randomUUID().toString();
         this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Application handler started");
+        log.info("Service event handler started");
     }
 
     @Override

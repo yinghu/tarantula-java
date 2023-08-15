@@ -29,7 +29,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
     private AtomicBoolean onIndex;
 
     public UserEventHandler(){
-
+        super(true);
     }
     public String name(){
         return USER_PATH;

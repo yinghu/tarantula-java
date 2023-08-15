@@ -22,7 +22,7 @@ public class PresenceEventHandler extends AbstractRequestHandler {
     private GsonBuilder builder;
     private OnView invalidView;
     public PresenceEventHandler(){
-
+        super(false);
     }
     public String name(){
         return PRESENCE_PATH;

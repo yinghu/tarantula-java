@@ -9,6 +9,7 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -32,8 +33,13 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     private ConcurrentHashMap<String,SubscriptionItem> _items = new ConcurrentHashMap<>();
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        //this.context.log(session.action()+"=>"+new String(payload),OnLog.INFO);
-        if(session.action().equals("onUserList")){
+        if(session.action().equals("onCheckPermission")){
+            Access user = this.userService.loadUser(session.systemId());
+            Account acc = this.userService.loadAccount(user);
+            boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
+            session.write(new PermissionContext(0,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onUserList")){
             Access access = userService.loadUser(session.systemId());
             AccessContext atc = new AccessContext();
             atc.userList = userService.loadUsers(access);

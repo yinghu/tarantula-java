@@ -28,6 +28,9 @@ public class GameServerEventHandler extends AbstractRequestHandler {
 
     private GsonBuilder builder;
 
+    public GameServerEventHandler(){
+        super(false);
+    }
     public String name(){
         return GAME_SERVER_PATH;
     }

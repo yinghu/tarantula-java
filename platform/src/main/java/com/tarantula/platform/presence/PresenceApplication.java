@@ -127,9 +127,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 session.write(JsonUtil.toSimpleResponse(false,"wrong validation code").getBytes());
             }
         }
+
         else if(session.action().equals("onCheckRole")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
-            String role = (String)onAccess.property("role");
+            String role = session.name();
             Access u = this.user(session.systemId());
             if(tokenValidatorProvider.checkRole(u,role)){
                 PresenceContext pc = new PresenceContext(session.action());

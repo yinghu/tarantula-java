@@ -33,7 +33,7 @@
     </div>
 </div>
 <script>
-    TARA_API.onService(true,{serviceTag:'presence/lobby',command:'onCheckRole',role:'account'},(resp)=>{      
+    TARA_API.onGet('presence/lobby','onCheckRole','account',(resp)=>{      
             if(resp.successful){
                 if(resp.access.activated == true){
                     document.querySelector('#tx-upgrade-account-form').style.display='block'; 

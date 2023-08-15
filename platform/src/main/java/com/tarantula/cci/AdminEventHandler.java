@@ -21,7 +21,7 @@ public class AdminEventHandler extends AbstractRequestHandler{
     private OnView invalidView;
 
     public AdminEventHandler(){
-
+        super(false);
     }
 
     public String name(){

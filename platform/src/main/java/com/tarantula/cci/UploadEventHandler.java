@@ -24,6 +24,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
     private GsonBuilder builder;
 
     public UploadEventHandler(){
+        super(false);
     }
     public String name(){
         return UPLOAD_PATH;

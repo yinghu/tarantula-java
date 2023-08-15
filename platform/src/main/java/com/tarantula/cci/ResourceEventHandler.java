@@ -15,6 +15,7 @@ public class ResourceEventHandler extends AbstractRequestHandler{
     private DeploymentServiceProvider deploymentServiceProvider;
 
     public ResourceEventHandler(){
+        super(false);
     }
     public String name(){
         return RESOURCE_PATH;

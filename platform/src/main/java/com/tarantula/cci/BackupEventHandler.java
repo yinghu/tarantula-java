@@ -20,6 +20,9 @@ public class BackupEventHandler extends AbstractRequestHandler {
     private BackupProvider backupProvider;
     private ServiceContext serviceContext;
 
+    public BackupEventHandler(){
+        super(false);
+    }
 
     public String name(){
         return BACKUP_PATH;

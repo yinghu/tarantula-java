@@ -21,7 +21,7 @@ public class AccountEventHandler extends AbstractRequestHandler {
     private OnView invalidView;
 
     public AccountEventHandler(){
-        super();
+        super(false);
     }
 
     public String name(){
