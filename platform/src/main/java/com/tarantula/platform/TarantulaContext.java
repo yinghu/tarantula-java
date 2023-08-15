@@ -575,18 +575,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _syncNodeData() throws Exception{
  	    this.accessIndexService().onDisable();
- 	    //_cluster_service_ready.await();
- 	    /**
-         for(int i=0;i<accessIndexRoutingNumber;i++){
- 	        CountDownLatch countDownLatch = new CountDownLatch(1);
- 	        String _pk = "p"+i;
- 	        _syncLatch.put(_pk,countDownLatch);
- 	        if(this.accessIndexService().onStartSync(i,_pk)==-1){
- 	            countDownLatch.countDown();
-            }
- 	        countDownLatch.await();
- 	        _syncLatch.remove(_pk);
-        }**/
         DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
         CountDownLatch countDownLatch = new CountDownLatch(1);
         distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
@@ -594,19 +582,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         countDownLatch.await();
         _syncLatch.remove(DistributionKeyIndexService.NAME);
  	    log.warn("Key index data sync has finished");
-
-        //sync data store
-        /**
-        List<String> dataStoreList = this.deploymentDataStoreProvider.list();
-        for (String ds : dataStoreList){
-            CountDownLatch countDownLatch = new CountDownLatch(1);
-            String syncKey = "sync_"+ds;
-            _syncLatch.put(syncKey,countDownLatch);
-            this.integrationCluster.recoverService().onStartSync(ds,syncKey);
-            countDownLatch.await();
-            log.warn("Data store sync ended->"+syncKey);
-            _syncLatch.remove(syncKey);
-        }**/
         for(String s : this.integrationCluster.recoverService().onListModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().onLoadModuleJarFile(s);

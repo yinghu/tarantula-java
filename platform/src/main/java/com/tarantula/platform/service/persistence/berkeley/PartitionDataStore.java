@@ -26,7 +26,6 @@ public class PartitionDataStore implements ReplicatedDataStore{
     private final String bucket;
     private final String node;
 
-    //private final byte[] _node;
     private final String prefix;
 
     private final MapStoreListener mapStoreListener;
@@ -37,7 +36,6 @@ public class PartitionDataStore implements ReplicatedDataStore{
         this.partition = partition;
         this.bucket = bucket;
         this.node = node;
-        //this._node = node.getBytes();
         this.prefix = prefix;
         this.mapStoreListener = mapStoreListener;
         this.partitions = new DataBaseOnPartition[this.partition];
