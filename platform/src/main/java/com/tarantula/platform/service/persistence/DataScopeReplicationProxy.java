@@ -55,7 +55,6 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
                 keyIndex.index(stringKey);
                 keyIndex.placeMasterNode(localNode.nodeName());
                 this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
-                return;
             }
             return;
         }
