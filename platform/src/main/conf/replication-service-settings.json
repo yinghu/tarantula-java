@@ -5,7 +5,7 @@
      "syncIntervalSeconds": 5
   },
   "data": {
-     "asyncDistributing": false,
+     "asyncDistributing": true,
      "maxPendingSize": 10,
      "syncIntervalSeconds": 5
   }

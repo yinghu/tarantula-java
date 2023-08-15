@@ -8,7 +8,6 @@ import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.event.DataReplicationEvent;
-import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
 
