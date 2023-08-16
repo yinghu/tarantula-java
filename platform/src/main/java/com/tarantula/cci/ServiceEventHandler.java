@@ -6,19 +6,14 @@ import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.event.ServiceActionEvent;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ServiceEventHandler extends AbstractRequestHandler {
 
 	private static final JDKLogger log = JDKLogger.getLogger(ServiceEventHandler.class);
 
-    private EventService eventService;
     private TokenValidator auth;
-    private String serverTopic;
     private String bucket;
-    private final ConcurrentHashMap<String,OnExchange> _hex = new ConcurrentHashMap<>();
 
     public ServiceEventHandler(){
         super(true);
@@ -27,6 +22,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         return SERVICE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
+        super.onRequest(exchange);
         String path = exchange.path();
         String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
         String action = exchange.header(Session.TARANTULA_ACTION);
@@ -36,16 +32,14 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
         byte[]  _payload = exchange.payload();
-        String sid = exchange.id();
-        this._hex.put(sid,exchange);
         if(path.startsWith("/service/action")){
             OnSession id = new OnSessionTrack();//place holder for public access applications
-            RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+sid,tag);
+            RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+exchange.id(),tag);
             if((token!=null)&&(!token.equals("undefined"))){
                 id = auth.validateToken(token);//first entry point check
                 routingKey = eventService.routingKey(id.systemId(),tag);
             }
-            ServiceActionEvent actionEvent = new ServiceActionEvent(this.serverTopic,sid,_payload);
+            ServiceActionEvent actionEvent = new ServiceActionEvent(this.serviceTopic,exchange.id(),_payload);
             actionEvent.systemId(id.systemId());
             actionEvent.stub(id.stub());
             actionEvent.ticket(id.ticket());
@@ -66,32 +60,15 @@ public class ServiceEventHandler extends AbstractRequestHandler {
 
     @Override
     public void start() throws Exception {
-        this.serverTopic = UUID.randomUUID().toString();
-        this.eventService.registerEventListener(this.serverTopic,this);
-        log.info("Service event handler started");
+        super.start();
+        log.info("Application Service Event Handler Started");
     }
 
     @Override
-    public void shutdown() throws Exception {
 
-    }
-    @Override
-    public boolean onEvent(Event event) {
-        OnExchange hx = this._hex.get(event.sessionId());
-        if(hx!=null){
-            if(hx.onEvent(event)){
-                _hex.remove(event.sessionId());
-            }
-        }
-        return true;
-    }
     public void setup(ServiceContext tcx){
-        this.eventService = tcx.eventService();
-        TokenValidatorProvider tp = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.auth = tp.tokenValidator();
+        super.setup(tcx);
+        this.auth = tokenValidator.tokenValidator();
         this.bucket = tcx.node().bucketName();
-    }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
     }
 }

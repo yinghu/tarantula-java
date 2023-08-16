@@ -1,7 +1,6 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
-import com.icodesoftware.Event;
 import com.icodesoftware.OnView;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
@@ -38,23 +37,16 @@ public class ViewEventHandler extends AbstractRequestHandler {
     }
     @Override
     public void start() throws Exception {
+        super.start();
         log.info("View content handler started");
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnView.class,new OnViewSerializer());
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
 
     public void setup(ServiceContext tcx){
+        super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
-    public boolean onEvent(Event event){
-       return true;
-    }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
+
 }

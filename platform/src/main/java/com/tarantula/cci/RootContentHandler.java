@@ -1,6 +1,5 @@
 package com.tarantula.cci;
 
-import com.icodesoftware.Event;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -28,22 +27,14 @@ public class RootContentHandler extends AbstractRequestHandler {
     }
 
     public void setup(ServiceContext tcx){
+        super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
 
     @Override
-    public boolean onEvent(Event event) {
-        return false;
-    }
-
-    @Override
     public void start() throws Exception {
+        super.start();
         log.info("Root content event handler started");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-    public boolean deployable(){return true;}
 }

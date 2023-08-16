@@ -1,62 +1,86 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UploadEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
 
     private DeploymentServiceProvider deploymentServiceProvider;
+
+    private ConcurrentHashMap<String,UploadContent> uMap = new ConcurrentHashMap<>();
     private DeployService deployService;
-    private TokenValidatorProvider tokenValidator;
     private GsonBuilder builder;
 
     public UploadEventHandler(){
-        super(false);
+        super(true);
     }
     public String name(){
         return UPLOAD_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
+        super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         String typeId = exchange.header(Session.TARANTULA_TYPE_ID);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
+        UploadContent uploadContent = new UploadContent(exchange.id(),typeId,exchange.onStream().readAllBytes());
+        uMap.put(uploadContent.sessionId,uploadContent);
         if(typeId==null || typeId.equals("root")) {
-            if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.root.accessControl()) {
-                throw new RuntimeException("no access permission");
-            }
-            InputStream in = exchange.onStream();
-            String path = exchange.path();
-            //log.warn(onSession.systemId() + " is uploading module [" + path + "]");
-            boolean suc = deployService.onUpload(path.substring(path.lastIndexOf("/") + 1), in.readAllBytes());
-            ResponseHeader resp = new ResponseHeader("upload", suc ? "uploaded" : "failed", suc);
-            exchange.onEvent(new ResponsiveEvent("", "", this.builder.create().toJson(resp).getBytes(), 0, "text/html", true));
+            checkPermission(onSession,token,exchange.id(),"role/sudo");
         }
         else if(typeId.equals("createGameCluster")){
-            if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.admin.accessControl()) {
-                throw new RuntimeException("no access permission");
-            }
-            InputStream in = exchange.onStream();
-            byte[] data = in.readAllBytes();
-            String fn = SystemUtil.oid()+".png";
-            boolean suc = deployService.onUpload("web/"+fn,data);
-            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
+            checkPermission(onSession,token,exchange.id(),"role/admin");
         }
         else{
-            if (tokenValidator.role(onSession.systemId()).accessControl() < AccessControl.admin.accessControl()) {
-                throw new RuntimeException("no access permission");
+            checkPermission(onSession,token,exchange.id(),"role/admin");
+        }
+    }
+    @Override
+    public void start() throws Exception {
+        super.start();
+        this.builder = new GsonBuilder();
+        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        log.info("Upload handler started");
+    }
+
+
+    public void setup(ServiceContext tcx){
+        super.setup(tcx);
+        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
+        this.deployService = tcx.clusterProvider().deployService();
+    }
+    public boolean onEvent(Event event){
+        JsonObject resp = JsonUtil.parse(event.payload());
+        if(!resp.get("successful").getAsBoolean()){
+            uMap.remove(event.sessionId());
+            return super.onEvent(event);
+        }
+        OnExchange exchange = eMap.get(event.sessionId());
+        UploadContent uploadContent = uMap.get(event.sessionId());
+        String typeId = uploadContent.typeId;
+        try {
+            if (typeId == null || typeId.equals("root")) {
+                String path = exchange.path();
+                boolean suc = deployService.onUpload(path.substring(path.lastIndexOf("/") + 1), uploadContent.content);
+                ResponseHeader response = new ResponseHeader("upload", suc ? "uploaded" : "failed", suc);
+                return super.onEvent(new ResponsiveEvent("", event.sessionId(), this.builder.create().toJson(response).getBytes(), 0, "text/html", true));
+            }
+            if (typeId.equals("createGameCluster")) {
+                String fn = SystemUtil.oid()+".png";
+                boolean suc = deployService.onUpload("web/"+fn,uploadContent.content);
+                return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
             }
             String[] query = typeId.split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
@@ -65,40 +89,20 @@ public class UploadEventHandler extends AbstractRequestHandler {
             }
             String gameClusterName = (String) gameCluster.property(GameCluster.NAME);
             String path = exchange.path();
-            InputStream in = exchange.onStream();
-            byte[] data = in.readAllBytes();
             String fn = gameClusterName + path.substring(path.lastIndexOf("/"));
             TokenValidatorProvider.AuthVendor authVendor = tokenValidator.authVendor(query[1]);
             if(authVendor != null){
-                authVendor.upload(gameClusterName.toLowerCase()+"#"+fn,data);
+                authVendor.upload(gameClusterName.toLowerCase()+"#"+fn, uploadContent.content);
             }
             fn = gameClusterName +"/"+SystemUtil.oid()+path.substring(path.lastIndexOf(".")-1);
-            //log.warn(onSession.systemId() + " is uploading file [" + fn + "] to ["+gameClusterName+"] from ["+path+"]["+query[1]+"]");
-            boolean suc = deployService.onUpload("web/"+fn,data);
-            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
+            boolean suc = deployService.onUpload("web/"+fn,uploadContent.content);
+            return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
+
+        }catch (Exception ex){
+            log.error("failed to upload context ["+typeId+"]",ex);
+            return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(false,ex.getMessage()).getBytes(),0,"text/html",true));
         }
     }
-    @Override
-    public void start() throws Exception {
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        log.info("Upload handler started");
-    }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-    public void setup(ServiceContext tcx){
-        this.deploymentServiceProvider = tcx.deploymentServiceProvider();
-        this.tokenValidator = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
-        this.deployService = tcx.clusterProvider().deployService();
-    }
-    public boolean onEvent(Event event){
-       return true;
-    }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
 
 }

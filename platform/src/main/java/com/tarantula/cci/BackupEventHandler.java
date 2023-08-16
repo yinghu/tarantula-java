@@ -1,7 +1,6 @@
 package com.tarantula.cci;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Event;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -16,7 +15,6 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(BackupEventHandler.class);
 
-    private TokenValidatorProvider tokenValidatorProvider;
     private BackupProvider backupProvider;
     private ServiceContext serviceContext;
 
@@ -34,17 +32,17 @@ public class BackupEventHandler extends AbstractRequestHandler {
         String accessKey = exchange.header(Session.TARANTULA_ACCESS_KEY);
         byte[] _payload = exchange.payload();
         if(path.equals("/backup/deployment")){
-            String typeId = this.tokenValidatorProvider.validateAccessKey(accessKey);
+            String typeId = this.tokenValidator.validateAccessKey(accessKey);
             if(typeId==null) throw new IllegalAccessException("Invalid key");
             exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(true,serviceContext.node().deploymentId()).getBytes(),true));
             return;
         }
         if(path.equals("/backup/system")){
-            String access = this.tokenValidatorProvider.validateAccessKey(accessKey);
+            String access = this.tokenValidator.validateAccessKey(accessKey);
             if(access==null) throw new IllegalAccessException("Invalid key");
         }
         else if(path.equals("/backup/game")){
-            GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+            GameCluster gameCluster = this.tokenValidator.validateGameClusterAccessKey(accessKey);
             if(gameCluster==null) throw new IllegalAccessException("Invalid key");
         }
         else{
@@ -69,25 +67,14 @@ public class BackupEventHandler extends AbstractRequestHandler {
 
     @Override
     public void start() throws Exception {
+        super.start();
         log.info("Backup event handler started");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-
     public void setup(ServiceContext tcx){
-        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        super.setup(tcx);
         this.backupProvider = tcx.backupProvider();
         this.serviceContext = tcx;
     }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
 
-    @Override
-    public boolean onEvent(Event event) {
-        return false;
-    }
 }

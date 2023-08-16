@@ -1,6 +1,5 @@
 package com.tarantula.cci;
 
-import com.icodesoftware.Event;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -10,7 +9,6 @@ import com.tarantula.platform.event.ResponsiveEvent;
 public class ResourceEventHandler extends AbstractRequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(ResourceEventHandler.class);
-
 
     private DeploymentServiceProvider deploymentServiceProvider;
 
@@ -28,22 +26,13 @@ public class ResourceEventHandler extends AbstractRequestHandler{
      }
     @Override
     public void start() throws Exception {
+        super.start();
         log.info("Resource content handler started");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
 
     public void setup(ServiceContext tcx){
+        super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
-    public boolean onEvent(Event event){
-       return true;
-    }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-    public boolean deployable(){return true;}
 }

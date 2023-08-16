@@ -6,14 +6,15 @@ import com.icodesoftware.service.OnExchange;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 
 public class HttpUploadSession implements OnExchange {
 
 	private final HttpExchange hex;
-
+    private final String id;
 	public HttpUploadSession(HttpExchange hex){
-
+        this.id = UUID.randomUUID().toString();
 	    this.hex = hex;
     }
     public boolean onEvent(Event event) {
@@ -22,6 +23,7 @@ public class HttpUploadSession implements OnExchange {
             hex.sendResponseHeaders(200,event.payload().length);
             hex.getResponseBody().write(event.payload());
         }catch(Exception ex){
+            ex.printStackTrace();
             //skip client disconnect
         }
         finally{
@@ -30,7 +32,7 @@ public class HttpUploadSession implements OnExchange {
         return true;
     }
     public String id(){
-	    return null;
+	    return id;
     }
 
     public String path() {

@@ -1,10 +1,11 @@
 package com.tarantula.cci;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.AccessControl;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -15,13 +16,12 @@ public class AccountEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(AccountEventHandler.class);
 
-    private TokenValidatorProvider tokenValidator;
     private DeploymentServiceProvider deploymentServiceProvider;
     private GsonBuilder builder;
     private OnView invalidView;
 
     public AccountEventHandler(){
-        super(false);
+        super(true);
     }
 
     public String name(){
@@ -29,20 +29,15 @@ public class AccountEventHandler extends AbstractRequestHandler {
     }
 
     public void onRequest(OnExchange exchange) throws Exception{
+        super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        if(tokenValidator.role(onSession.systemId()).accessControl()<AccessControl.account.accessControl()){
-            throw new RuntimeException("no access permission");
-        }
-        Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
-        if(!ret.existed()){
-            ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
-        }
-        exchange.onEvent(new ResponsiveEvent("","",ret.data(),0,ret.type(),true));
+        checkPermission(onSession,token,exchange.id(),"role/account");
     }
 
     @Override
     public void start() throws Exception {
+        super.start();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
@@ -50,20 +45,20 @@ public class AccountEventHandler extends AbstractRequestHandler {
         log.info("Account event handler started");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
     public void setup(ServiceContext tcx){
-        this.tokenValidator  = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){
-        return true;
+        JsonObject resp = JsonUtil.parse(event.payload());
+        if(!resp.get("successful").getAsBoolean()){
+            return super.onEvent(event);
+        }
+        OnExchange exchange = eMap.get(event.sessionId());
+        Content ret = this.deploymentServiceProvider.resource(exchange.path().substring(1));
+        if(!ret.existed()){
+            ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
+        }
+        return super.onEvent(new ResponsiveEvent("",event.sessionId(),ret.data(),0,ret.type(),true));
     }
-
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-    public boolean deployable(){return true;}
 }

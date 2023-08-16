@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -15,7 +14,6 @@ import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 
-import javax.crypto.Cipher;
 import java.util.Base64;
 
 
@@ -23,7 +21,6 @@ public class GameServerEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(GameServerEventHandler.class);
 
-    private TokenValidatorProvider tokenValidatorProvider;
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private GsonBuilder builder;
@@ -42,7 +39,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         String serverId = exchange.header(Session.TARANTULA_SERVER_ID);
         String name = exchange.header(Session.TARANTULA_NAME);
         byte[] _payload = exchange.payload();
-        GameCluster gameCluster = tokenValidatorProvider.validateGameClusterAccessKey(accessKey);
+        GameCluster gameCluster = tokenValidator.validateGameClusterAccessKey(accessKey);
         if(gameCluster==null) throw new RuntimeException("Illegal access");
         String typeId = (String)gameCluster.property(GameCluster.GAME_LOBBY);
         if(action.equals("onConnect")){//start game server
@@ -110,6 +107,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
 
     @Override
     public void start() throws Exception {
+        super.start();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(ConnectionStub.class,new ConnectionDeserializer());
@@ -117,21 +115,9 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         log.info("Game server event handler started");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
 
     public void setup(ServiceContext tcx){
-        this.tokenValidatorProvider = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
+        super.setup(tcx);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
-    }
-    public void onCheck(){
-        //log.warn("Total active session ["+_hex.size()+"] on ["+name()+"]");
-    }
-
-    @Override
-    public boolean onEvent(Event event) {
-        return false;
     }
 }
