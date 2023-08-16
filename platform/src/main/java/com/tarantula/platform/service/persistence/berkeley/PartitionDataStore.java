@@ -4,6 +4,7 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.MapStoreListener;
 import com.sleepycat.je.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.IndexSet;

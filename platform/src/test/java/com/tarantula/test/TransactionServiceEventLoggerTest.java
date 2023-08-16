@@ -2,21 +2,13 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.room.GameEntry;
-import com.tarantula.platform.room.GameEntryQuery;
-import com.tarantula.platform.room.PVEGameRoom;
-import com.tarantula.platform.room.PVPGameRoom;
-import com.tarantula.platform.service.DataStoreProvider;
+import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.service.cluster.ClusterFailureEvent;
 import com.tarantula.platform.store.Transaction;
 import com.tarantula.platform.store.TransactionEventLogger;
-import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class TransactionServiceEventLoggerTest {
 

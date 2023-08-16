@@ -1,10 +1,7 @@
-package com.tarantula.platform.service;
+package com.icodesoftware.service;
 
 
 import com.icodesoftware.DataStore;
-
-import com.icodesoftware.service.ServiceProvider;
-import com.tarantula.platform.service.persistence.MapStoreListener;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;

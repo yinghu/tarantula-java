@@ -3,7 +3,7 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.room.*;
-import com.tarantula.platform.service.DataStoreProvider;
+import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

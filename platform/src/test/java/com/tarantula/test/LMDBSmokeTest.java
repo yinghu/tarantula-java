@@ -70,7 +70,7 @@ public class LMDBSmokeTest {
             try (Txn<ByteBuffer> txn = env.txnRead()) {
                 final ByteBuffer found = db.get(txn, key);
                 //found.flip();
-                System.out.println(">>>>>>>>>>>>"+UTF_8.decode(found));
+                //System.out.println(">>>>>>>>>>>>"+UTF_8.decode(found));
                 Assert.assertNotNull(found);
 
                 // The fetchedVal is read-only and points to LMDB memory

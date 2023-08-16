@@ -9,7 +9,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.service.DataStoreProvider;
+import com.icodesoftware.service.DataStoreProvider;
 
 import java.io.File;
 import java.io.FileInputStream;

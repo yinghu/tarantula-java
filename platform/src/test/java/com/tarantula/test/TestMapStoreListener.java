@@ -2,8 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
-import com.tarantula.platform.service.persistence.MapStoreListener;
-import com.tarantula.platform.service.persistence.RevisionObject;
+import com.icodesoftware.service.MapStoreListener;
 
 public class TestMapStoreListener implements MapStoreListener {
     @Override

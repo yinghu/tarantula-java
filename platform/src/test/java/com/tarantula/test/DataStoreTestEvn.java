@@ -2,9 +2,9 @@ package com.tarantula.test;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.service.DataStoreProvider;
+import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
-import com.tarantula.platform.service.persistence.MapStoreListener;
+import com.icodesoftware.service.MapStoreListener;
 
 public class DataStoreTestEvn {
 

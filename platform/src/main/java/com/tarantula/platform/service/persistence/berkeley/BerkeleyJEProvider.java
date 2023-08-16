@@ -8,7 +8,7 @@ import com.sleepycat.je.*;
 import com.sleepycat.je.util.DbBackup;
 import com.sleepycat.je.util.LogVerificationReadableByteChannel;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.service.DataStoreProvider;
+import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
 

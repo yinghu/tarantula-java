@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.persistence;
+package com.icodesoftware.service;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
