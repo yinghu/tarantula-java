@@ -15,6 +15,7 @@
     </properties>
     <modules>
         <module>modules/protocol</module>
+        <module>modules/lmdb</module>
         <module>modules/games</module>
         <module>platform</module>
         <module>modules/agent</module>

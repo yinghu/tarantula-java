@@ -1,4 +1,4 @@
-package com.tarantula.test;
+package com.icodesoftware.lmdb.test;
 
 import org.junit.rules.TemporaryFolder;
 import org.lmdbjava.Dbi;
