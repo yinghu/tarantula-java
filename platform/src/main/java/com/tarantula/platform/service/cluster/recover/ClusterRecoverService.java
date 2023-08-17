@@ -77,12 +77,19 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+ RecoverService.NAME, event -> {
             if(event instanceof EventOnReplication){
                 OnReplicationEvent dataReplicationEvent = (OnReplicationEvent)event;
-                for(OnReplication r : dataReplicationEvent.data()){
+                KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dataReplicationEvent.source(),this.tarantulaContext.node().nodeName());
+                String[] sources = new String[dataReplicationEvent.data().length];
+                String[] keys = new String[dataReplicationEvent.data().length];
+                for(int i=0;i<dataReplicationEvent.data().length;i++){
+                    OnReplication r = dataReplicationEvent.data()[i];
                     DataStore dataStore = tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber());
                     dataStore.backup().set(r.key(),r.value());
-                    KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dataStore.name(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
-                    tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
+                    sources[i]=r.source();
+                    keys[i]=new String(r.key());
                 }
+                keyIndexEvent.owners = sources;
+                keyIndexEvent.keys = keys;
+                tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
             }
             return false;
         });

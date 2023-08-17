@@ -13,6 +13,7 @@ import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.KeyIndexService;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.persistence.DataStoreOnPartition;
 
@@ -71,23 +72,27 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             dso.dataStore = this.tarantulaContext.dataStoreProvider().createKeyIndexDataStore(dso.name);
         }
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
-            KeyIndex keyIndex = new KeyIndexTrack();
-            keyIndex.owner(event.owner());
-            keyIndex.index(event.index());
-            String ckey = keyIndex.key().asString();
-            DataStoreOnPartition dso = onPartition(ckey);
-            byte[] key = ckey.getBytes();
-            return dso.lock(key,()->{
-                if(dso.dataStore.load(keyIndex)){
-                    if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
-                        dso.dataStore.update(keyIndex);
+            KeyIndexEvent keyIndexEvent = (KeyIndexEvent)event;
+            for(int i=0;i<keyIndexEvent.owners.length;i++){
+                KeyIndex keyIndex = new KeyIndexTrack();
+                keyIndex.owner(keyIndexEvent.owners[i]);
+                keyIndex.index(keyIndexEvent.keys[i]);
+                String ckey = keyIndex.key().asString();
+                DataStoreOnPartition dso = onPartition(ckey);
+                byte[] key = ckey.getBytes();
+                dso.lock(key,()->{
+                    if(dso.dataStore.load(keyIndex)){
+                        if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
+                            dso.dataStore.update(keyIndex);
+                        }
+                        return true;
                     }
-                    return true;
-                }
-                keyIndex.placeMasterNode(event.source());
-                keyIndex.placeSlaveNode(event.label());
-                return dso.dataStore.createIfAbsent(keyIndex,false);
-            });
+                    keyIndex.placeMasterNode(event.source());
+                    keyIndex.placeSlaveNode(event.label());
+                    return dso.dataStore.createIfAbsent(keyIndex,false);
+                });
+            }
+            return true;
         });
         tarantulaContext.keyIndexService = this;
         TarantulaContext._cluster_service_ready.countDown();
