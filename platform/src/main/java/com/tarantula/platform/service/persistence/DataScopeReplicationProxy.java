@@ -84,7 +84,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     @Override
     public void onDeleting(Metadata metadata, byte[] key) {
-        //KeyIndex keyIndex = this.lookup(metadata.source(),)
+        this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
     }
 
 
