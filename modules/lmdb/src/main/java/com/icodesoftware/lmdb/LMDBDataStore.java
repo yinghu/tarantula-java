@@ -4,6 +4,7 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.util.BufferUtil;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
@@ -65,7 +66,21 @@ public class LMDBDataStore implements DataStore, Closable {
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
-        return false;
+        String akey = t.key().asString();
+        if(akey==null) return false;
+        ByteBuffer key = ByteBuffer.allocateDirect(100);
+        key.put(akey.getBytes(UTF_8)).flip();
+        Txn<ByteBuffer> txn = env.txnWrite(); //can read also
+        try{
+            if (dbi.get(txn, key) == null) return false;
+            ByteBuffer value = ByteBuffer.allocateDirect(700);
+            value.put(t.toBinary()).flip();
+            if(!dbi.put(txn,key,value)) return false;
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+        }
     }
 
     @Override
@@ -78,22 +93,34 @@ public class LMDBDataStore implements DataStore, Closable {
         try{
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
-                t.fromBinary(txn.val().array());
+                t.fromBinary(BufferUtil.toArray(txn.val()));
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(700);
             value.put(t.toBinary()).flip();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
-        }finally {
+            return true;
+        }
+        finally {
             txn.close();//rollback if exception
         }
-        return true;
     }
 
     @Override
     public <T extends Recoverable> boolean load(T t) {
-        return false;
+        String akey = t.key().asString();
+        if(akey==null) return false;
+        ByteBuffer key = ByteBuffer.allocateDirect(100);
+        key.put(akey.getBytes(UTF_8)).flip();
+        Txn<ByteBuffer> txn = env.txnRead(); //read only
+        try{
+            if (dbi.get(txn, key) == null) return false;
+            t.fromBinary(BufferUtil.toArray(txn.val()));
+            return true;
+        }finally {
+            txn.close();
+        }
     }
 
     @Override
