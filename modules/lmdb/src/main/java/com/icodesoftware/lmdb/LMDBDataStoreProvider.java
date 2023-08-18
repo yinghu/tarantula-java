@@ -45,7 +45,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider {
     public DataStore createAccessIndexDataStore(String name) {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(name,dbi,data);
+            Dbi<ByteBuffer> dbx = data.openDbi("ix_"+name, DbiFlags.MDB_DUPSORT);
+            return new LMDBDataStore(name,dbi,dbx,data);
         });
     }
 
