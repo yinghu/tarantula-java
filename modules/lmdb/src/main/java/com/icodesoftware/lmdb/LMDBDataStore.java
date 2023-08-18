@@ -200,10 +200,27 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         txn.close();
     }
 
-    private <T extends Recoverable> void onEdge(T t,ByteBuffer key,Txn<ByteBuffer> tnx){
+    private <T extends Recoverable> void onEdge(T t,ByteBuffer edge,Txn<ByteBuffer> txn){
         if(!t.onEdge() || t.owner()==null || t.label()==null) return;
-
-        //index.put()
-
+        String akey = t.owner()+Recoverable.PATH_SEPARATOR+t.label();
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.put(akey.getBytes()).flip();
+        edge.rewind();
+        Cursor<ByteBuffer> cursor = index.openCursor(txn);
+        if(cursor.count()==0){
+            cursor.put(key,edge);
+            cursor.close();
+            return;
+        }
+        boolean existing = false;
+        while (cursor.next()){
+            if(BufferUtil.equals(cursor.val(),edge)){
+                existing = true;
+                break;
+            }
+            edge.rewind();
+        }
+        if(existing) return;
+        cursor.put(key,edge);
     }
 }
