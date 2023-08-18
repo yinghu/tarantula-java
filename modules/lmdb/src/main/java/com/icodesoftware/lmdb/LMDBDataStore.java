@@ -5,6 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.BufferUtil;
+import org.lmdbjava.Cursor;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
@@ -14,7 +15,7 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class LMDBDataStore implements DataStore, Closable {
+public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
@@ -145,11 +146,37 @@ public class LMDBDataStore implements DataStore, Closable {
 
     @Override
     public Backup backup() {
-        return null;
+        return this;
     }
 
     @Override
     public void close() {
         dbi.close();
+    }
+
+    @Override
+    public boolean set(byte[] key, byte[] value) {
+        return false;
+    }
+
+    @Override
+    public byte[] get(byte[] key) {
+        return new byte[0];
+    }
+
+    @Override
+    public void unset(byte[] key) {
+
+    }
+
+    @Override
+    public void list(Binary binary) {
+        final Txn<ByteBuffer> txn = env.txnRead();
+        final Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
+        while (cursor.next()){
+            if(!binary.on(BufferUtil.toArray(cursor.key()),BufferUtil.toArray(cursor.val()))) break;
+        }
+        cursor.close();
+        txn.close();
     }
 }

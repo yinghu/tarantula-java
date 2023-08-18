@@ -21,7 +21,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider {
     private Env<ByteBuffer> data;
 
     private String dir = "/var/tarantula/tds/lmdb";
-    private long storeSize = 100_485_760;//10M
+    private long storeSize = 10_485_760;//10M
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 

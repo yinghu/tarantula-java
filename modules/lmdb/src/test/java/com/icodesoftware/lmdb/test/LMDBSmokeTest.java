@@ -43,7 +43,7 @@ public class LMDBSmokeTest {
     }
     @Test(groups = { "LMDB" })
     public void batchTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"2");
         int batch =0;
         for(int i=0;i<100;i++) {
             String key = "px"+i;
@@ -51,10 +51,11 @@ public class LMDBSmokeTest {
             if(ds.createIfAbsent(testAccessIndex, false)) batch++;
         }
         Assert.assertEquals(batch,100);
-        
-        //TestAccessIndex load = new TestAccessIndex(key);
-        //Assert.assertTrue(ds.load(load));
-        //load.bucket("XDD");
-        //Assert.assertTrue(ds.update(load));
+        int[] keys ={0};
+        ds.backup().list((k,v)->{
+            keys[0]++;
+            return true;
+        });
+        Assert.assertEquals(keys[0],100);
     }
 }
