@@ -151,7 +151,16 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public boolean delete(byte[] key) {
-        return false;
+        Txn<ByteBuffer> txn = env.txnWrite(); //write/read txn
+        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        akey.put(key).flip();
+        try{
+            if(!dbi.delete(txn, akey)) return false;
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+        }
     }
 
     @Override
@@ -166,21 +175,21 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes()).flip();
-        Txn<ByteBuffer> read = env.txnRead();
-        CursorIterable<ByteBuffer> cursor = index.iterate(read, KeyRange.closed(key, key));
+        Txn<ByteBuffer> txn = env.txnRead();
+        CursorIterable<ByteBuffer> cursor = index.iterate(txn, KeyRange.closed(key, key));
         try{
             for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
                 T t = query.create();
-                if(dbi.get(read,kv.val())!=null){
-                    t.fromBinary(BufferUtil.toArray(read.val()));
+                if(dbi.get(txn,kv.val())!=null){
+                    t.fromBinary(BufferUtil.toArray(txn.val()));
                     t.distributionKey(UTF_8.decode(kv.val()).toString());
                     if(!stream.on(t)) break;
                 }
             }
         }finally {
             cursor.close();
-            read.close();
+            txn.close();
         }
     }
     @Override
@@ -191,6 +200,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public void close() {
         dbi.close();
+        index.close();
     }
 
     @Override
@@ -227,4 +237,5 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         edge.rewind();
         index.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
     }
+
 }

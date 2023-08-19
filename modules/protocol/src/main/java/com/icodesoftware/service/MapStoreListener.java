@@ -1,8 +1,6 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.service.Metadata;
-import com.icodesoftware.service.ServiceProvider;
 
 
 public interface MapStoreListener extends ServiceProvider {
@@ -17,6 +15,7 @@ public interface MapStoreListener extends ServiceProvider {
     byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 
     void onDeleting(Metadata metadata,byte[] key);
+
 
 
 }

@@ -63,7 +63,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(c[0],10);
         List<TestUser> ulist = ds.list(new TestUserQuery("owner2"));
         Assert.assertEquals(ulist.size(),100);
-
+        ulist.forEach(u-> Assert.assertTrue(ds.load(u)));
     }
 
 }
