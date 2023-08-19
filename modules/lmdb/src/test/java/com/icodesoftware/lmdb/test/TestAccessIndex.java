@@ -8,23 +8,21 @@ import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     private int referenceId;
     public TestAccessIndex(){
+        this.bucket = "DBS";
+        this.oid = UUID.randomUUID().toString();
+        this.referenceId = 1;
     }
-    public TestAccessIndex(String owner, String bucket, String oid, int referenceId){
-        this.owner = owner;
-        this.bucket = bucket;
-        this.oid = oid;
-        this.referenceId = referenceId;
-    }
-
     public TestAccessIndex(String owner){
         this();
         this.owner = owner;
     }
+
     public int referenceId(){
         return referenceId;
     }

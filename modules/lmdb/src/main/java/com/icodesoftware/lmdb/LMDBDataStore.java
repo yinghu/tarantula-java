@@ -8,6 +8,8 @@ import com.icodesoftware.util.BufferUtil;
 import org.lmdbjava.*;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -154,7 +156,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
-        return null;
+        ArrayList<T> list = new ArrayList<>();
+        list(query,(t)-> list.add(t));
+        return list;
     }
 
     @Override
@@ -163,14 +167,21 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes()).flip();
         Txn<ByteBuffer> read = env.txnRead();
-        CursorIterable<ByteBuffer> cursor = dbi.iterate(read, KeyRange.closed(key, key));
-        cursor.iterator().forEachRemaining((kv->{
-            T t = query.create();
-            t.fromBinary(BufferUtil.toArray(kv.val()));
-            t.distributionKey(UTF_8.decode(kv.val()).toString());
-            stream.on(t);
-        }));
-        cursor.close();
+        CursorIterable<ByteBuffer> cursor = index.iterate(read, KeyRange.closed(key, key));
+        try{
+            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
+                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                T t = query.create();
+                if(dbi.get(read,kv.val())!=null){
+                    t.fromBinary(BufferUtil.toArray(read.val()));
+                    t.distributionKey(UTF_8.decode(kv.val()).toString());
+                    if(!stream.on(t)) break;
+                }
+            }
+        }finally {
+            cursor.close();
+            read.close();
+        }
     }
     @Override
     public Backup backup() {

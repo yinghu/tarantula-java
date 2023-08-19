@@ -9,7 +9,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
-import java.util.UUID;
+import java.util.List;
 
 
 public class LMDBDataStoreTest {
@@ -29,31 +29,41 @@ public class LMDBDataStoreTest {
     }
 
     @Test(groups = { "LMDB" })
-    public void smokeTest() {
+    public void createIfAbsentTest() {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
         String key = "a100";
-        TestAccessIndex testAccessIndex = new TestAccessIndex(key,"DBS", UUID.randomUUID().toString(),1);
-        ds.createIfAbsent(testAccessIndex,false);
-        TestAccessIndex load = new TestAccessIndex(key);
-        Assert.assertTrue(ds.load(load));
-        load.bucket("XDD");
-        Assert.assertTrue(ds.update(load));
+        TestAccessIndex created = new TestAccessIndex(key);
+        Assert.assertTrue(ds.createIfAbsent(created,false));
+        TestAccessIndex not_created = new TestAccessIndex(key);
+        Assert.assertFalse(ds.createIfAbsent(not_created,false));
+        Assert.assertTrue(ds.load(not_created));
     }
     @Test(groups = { "LMDB" })
-    public void batchTest() {
+    public void createWithEdgeTest() {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"2");
-        int batch =0;
-        for(int i=0;i<100;i++) {
-            String key = "px"+i;
-            TestAccessIndex testAccessIndex = new TestAccessIndex(key, "DBS", UUID.randomUUID().toString(), 1);
-            if(ds.createIfAbsent(testAccessIndex, false)) batch++;
+        for(int i=0;i<10;i++) {
+            TestUser testUser = new TestUser("user"+i,"owner1");
+            Assert.assertTrue(ds.create(testUser));
         }
-        Assert.assertEquals(batch,100);
-        int[] keys ={0};
+        for(int i=0;i<100;i++) {
+            TestUser testUser = new TestUser("user"+i,"owner2");
+            Assert.assertTrue(ds.create(testUser));
+        }
+        int[] c={0};
         ds.backup().list((k,v)->{
-            keys[0]++;
+            c[0]++;
             return true;
         });
-        Assert.assertEquals(keys[0],100);
+        Assert.assertEquals(c[0],110);
+        c[0]=0;
+        ds.list(new TestUserQuery("owner1"),(t)->{
+            c[0]++;
+            return true;
+        });
+        Assert.assertEquals(c[0],10);
+        List<TestUser> ulist = ds.list(new TestUserQuery("owner2"));
+        Assert.assertEquals(ulist.size(),100);
+
     }
+
 }
