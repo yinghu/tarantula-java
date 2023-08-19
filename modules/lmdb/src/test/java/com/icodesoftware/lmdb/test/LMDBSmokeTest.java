@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb.test;
 
 
 import org.lmdbjava.*;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -10,10 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 
 public class LMDBSmokeTest {
 
@@ -39,28 +36,28 @@ public class LMDBSmokeTest {
     public void smokeTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         Txn<ByteBuffer> txn = env.txnWrite();
-        Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
+        //Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
 
         ByteBuffer edge = ByteBuffer.allocateDirect(env.getMaxKeySize());
         for(int i=0;i<10;i++){
             key.put("key".getBytes()).flip();
             edge.put(("1edge"+i).getBytes()).flip();
-            cursor.put(key,edge,PutFlags.MDB_NODUPDATA);
+            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
             edge.clear();
             key.clear();
         }
         for(int i=0;i<10;i++){
             key.put("key2".getBytes()).flip();
             edge.put(("2edge"+i).getBytes()).flip();
-            cursor.put(key,edge,PutFlags.MDB_NODUPDATA);
+            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
             edge.clear();
             key.clear();
         }
         for(int i=0;i<10;i++){
             key.put("key2".getBytes()).flip();
             edge.put(("2edge"+i).getBytes()).flip();
-            cursor.put(key,edge,PutFlags.MDB_NODUPDATA);
+            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
             edge.clear();
             key.clear();
         }
@@ -70,11 +67,14 @@ public class LMDBSmokeTest {
         key.clear();
         key.put("key2".getBytes()).flip();
         CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key));
+        int[] ct ={0};
         c.iterator().forEachRemaining((kv->{
-            System.out.println(UTF_8.decode(kv.key()));
-            System.out.println(UTF_8.decode(kv.val()));
+            ct[0]++;
+            //System.out.println(UTF_8.decode(kv.key()));
+            //System.out.println(UTF_8.decode(kv.val()));
         }));
         c.close();
+        Assert.assertEquals(ct[0],10);
     }
     @Test(groups = { "LMDB" })
     public void batchTest() {

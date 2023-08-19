@@ -5,10 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.BufferUtil;
-import org.lmdbjava.Cursor;
-import org.lmdbjava.Dbi;
-import org.lmdbjava.Env;
-import org.lmdbjava.Txn;
+import org.lmdbjava.*;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -120,6 +117,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             ByteBuffer value = ByteBuffer.allocateDirect(700);
             value.put(t.toBinary()).flip();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
+            onEdge(t,key,txn);
             txn.commit();
             return true;
         }
@@ -160,10 +158,20 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     @Override
-    public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
-
+    public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream){
+        String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.put(akey.getBytes()).flip();
+        Txn<ByteBuffer> read = env.txnRead();
+        CursorIterable<ByteBuffer> cursor = dbi.iterate(read, KeyRange.closed(key, key));
+        cursor.iterator().forEachRemaining((kv->{
+            T t = query.create();
+            t.fromBinary(BufferUtil.toArray(kv.val()));
+            t.distributionKey(UTF_8.decode(kv.val()).toString());
+            stream.on(t);
+        }));
+        cursor.close();
     }
-
     @Override
     public Backup backup() {
         return this;
@@ -206,21 +214,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes()).flip();
         edge.rewind();
-        Cursor<ByteBuffer> cursor = index.openCursor(txn);
-        if(cursor.count()==0){
-            cursor.put(key,edge);
-            cursor.close();
-            return;
-        }
-        boolean existing = false;
-        while (cursor.next()){
-            if(BufferUtil.equals(cursor.val(),edge)){
-                existing = true;
-                break;
-            }
-            edge.rewind();
-        }
-        if(existing) return;
-        cursor.put(key,edge);
+        index.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
     }
 }
