@@ -105,4 +105,29 @@ public class TestUser extends RecoverableObject implements Access {
         this.owner = (String)properties.get("9");
         this.primary = (boolean)properties.get("10");
     }
+
+    public void write(DataBuffer buffer){
+        buffer.writeUTF8(login);
+        buffer.writeUTF8(password);
+        buffer.writeUTF8(role);
+        buffer.writeBoolean(activated);
+        buffer.writeInt(routingNumber);
+        buffer.writeBoolean(validated);
+        buffer.writeUTF8(emailAddress);
+        buffer.writeUTF8(validator);
+        buffer.writeUTF8(this.owner);
+        buffer.writeBoolean(this.primary);
+    }
+    public void read(DataBuffer buffer) {
+        this.login = buffer.readUTF8();
+        this.password = buffer.readUTF8();
+        this.role = buffer.readUTF8();
+        this.activated = buffer.readBoolean();
+        this.routingNumber = buffer.readInt();
+        this.validated = buffer.readBoolean();
+        this.emailAddress = buffer.readUTF8();
+        this.validator = buffer.readUTF8();
+        this.owner = buffer.readUTF8();
+        this.primary = buffer.readBoolean();
+    }
 }

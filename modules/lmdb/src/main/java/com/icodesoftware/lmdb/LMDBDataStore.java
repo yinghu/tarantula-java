@@ -74,7 +74,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes(UTF_8)).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
-        value.put(t.toBinary()).flip();
+        t.write(new BufferProxy(value));
+        value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if(!dbi.put(txn,key,value)) return false;
@@ -96,7 +97,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn, key) == null) return false;
             ByteBuffer value = ByteBuffer.allocateDirect(700);
-            value.put(t.toBinary()).flip();
+            t.write(new BufferProxy(value));
+            value.flip();
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
             return true;
@@ -115,12 +117,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
-                t.fromBinary(BufferUtil.toArray(txn.val()));
-
+                t.read(new BufferProxy(txn.val()));
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(700);
-            value.put(t.toBinary()).flip();
+            t.write(new BufferProxy(value));
+            value.flip();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
             onEdge(t,key,txn);
             txn.commit();
@@ -140,7 +142,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
             if (dbi.get(txn, key) == null) return false;
-            t.fromBinary(BufferUtil.toArray(txn.val()));
+            t.read(new BufferProxy(txn.val()));
             return true;
         }finally {
             txn.close();
@@ -185,7 +187,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
                 T t = query.create();
                 if(dbi.get(txn,kv.val())!=null){
-                    t.fromBinary(BufferUtil.toArray(txn.val()));
+                    t.read(new BufferProxy(txn.val()));
                     t.distributionKey(UTF_8.decode(kv.val()).toString());
                     if(!stream.on(t)) break;
                 }

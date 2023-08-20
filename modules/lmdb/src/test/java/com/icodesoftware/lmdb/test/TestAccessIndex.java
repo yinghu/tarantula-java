@@ -59,6 +59,17 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
         this.referenceId = ((Number)properties.get("3")).intValue();
     }
 
+    public void read(DataBuffer buffer){
+        this.bucket = buffer.readUTF8();
+        this.oid = buffer.readUTF8();
+        this.referenceId = buffer.readInt();
+    }
+    public void write(DataBuffer buffer) {
+        buffer.writeUTF8(bucket);
+        buffer.writeUTF8(oid);
+        buffer.writeInt(referenceId);
+    }
+
     @Override
     public String toString(){
         return "Access Index ["+owner+"]->"+bucket+"/"+oid+"] referenceID =>"+referenceId+"]";

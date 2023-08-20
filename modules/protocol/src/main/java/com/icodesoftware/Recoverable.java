@@ -1,6 +1,5 @@
 package com.icodesoftware;
 
-
 import java.util.Map;
 
 public interface Recoverable extends Distributable,JsonSerializable {
@@ -23,6 +22,10 @@ public interface Recoverable extends Distributable,JsonSerializable {
 
     byte[] toBinary();
     void fromBinary(byte[] payload);
+
+    default void read(DataBuffer buffer){}
+    default void write(DataBuffer buffer){}
+
 
     boolean disabled();
     void disabled(boolean disabled);
@@ -48,5 +51,37 @@ public interface Recoverable extends Distributable,JsonSerializable {
 
     interface Key{
         String asString();
+    }
+
+    interface DataBuffer{
+
+        void writeInt(int i);
+        void writeLong(long l);
+
+        void writeFloat(float f);
+
+        void writeDouble(double d);
+
+        void writeShort(short s);
+
+        void writeBoolean(boolean b);
+
+        void writeByte();
+
+        void writeUTF8(String utf);
+        int readInt();
+
+        boolean readBoolean();
+
+        long readLong();
+
+        float readFloat();
+
+        double readDouble();
+
+        short readShort();
+
+        byte readByte();
+        String readUTF8();
     }
 }
