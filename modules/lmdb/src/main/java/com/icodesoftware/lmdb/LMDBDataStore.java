@@ -93,12 +93,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         if(akey==null) return false;
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes(UTF_8)).flip();
+        ByteBuffer value = ByteBuffer.allocateDirect(700);
+        t.write(new BufferProxy(value));
+        value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if (dbi.get(txn, key) == null) return false;
-            ByteBuffer value = ByteBuffer.allocateDirect(700);
-            t.write(new BufferProxy(value));
-            value.flip();
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
             return true;
