@@ -4,6 +4,7 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.util.BufferUtil;
 import org.lmdbjava.*;
 
@@ -11,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -25,11 +25,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     private final String bucket ="DBS";
     //NOTES : key+value < 2040 bytes ( 511 bytes for key ; value <= 1521 bytes (2040 - 511 - 8)
 
-    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi, Dbi<ByteBuffer> index,Env<ByteBuffer> env){
+    private final MapStoreListener mapStoreListener;
+    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi, Dbi<ByteBuffer> index,Env<ByteBuffer> env,MapStoreListener mapStoreListener){
         this.name = name;
         this.dbi = dbi;
         this.index = index;
         this.env = env;
+        this.mapStoreListener = mapStoreListener;
     }
 
     @Override
@@ -67,7 +69,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         String akey = t.key().asString();
         if (akey != null) return false;
         t.bucket(this.bucket);
-        t.oid(UUID.randomUUID().toString().replace("-",""));
+        t.oid(mapStoreListener.oid());
         akey = t.key().asString();
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes(UTF_8)).flip();
@@ -114,6 +116,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
                 t.fromBinary(BufferUtil.toArray(txn.val()));
+
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(700);

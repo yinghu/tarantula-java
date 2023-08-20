@@ -72,9 +72,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
         Member lm = nodeEngine.getLocalMember();
         //log.warn(">>>>>>>>>>>>>>>>>>>>>"+nodeEngine.getClusterService().getMember(lm.getUuid()).getUuid());
-        if(!lm.getUuid().equals(membershipServiceEvent.getMember().getUuid())){
-            this.tarantulaContext.integrationCluster().onNodeAdded(membershipServiceEvent.getMember().getUuid());
-        }
+        //if(!lm.getUuid().equals(membershipServiceEvent.getMember().getUuid())){
+            //this.tarantulaContext.integrationCluster().onNodeAdded(membershipServiceEvent.getMember().getUuid());
+        //}
         int sz = nodeEngine.getClusterService().getSize();
         int pt = 0;
         for(Member m : nodeEngine.getClusterService().getMembers()){

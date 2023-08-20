@@ -40,7 +40,6 @@ public interface ClusterProvider extends ServiceProvider {
     void unregisterReloadListener(String registerKey);
 
     void registerNodeListener(NodeListener nodeListener);
-    Node roundRobinMember();
 
     int partition(byte[] key);
 

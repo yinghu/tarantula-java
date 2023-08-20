@@ -134,10 +134,6 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
 
     }
     public void registerNodeListener(NodeListener nodeListener){}
-    @Override
-    public Node roundRobinMember() {
-        return null;
-    }
 
     @Override
     public Summary summary() {

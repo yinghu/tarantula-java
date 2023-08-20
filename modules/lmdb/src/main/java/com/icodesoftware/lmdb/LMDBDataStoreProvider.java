@@ -1,8 +1,10 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.service.Metadata;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
@@ -13,9 +15,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LMDBDataStoreProvider implements DataStoreProvider {
+public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
 
 
     private Env<ByteBuffer> data;
@@ -46,7 +49,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
             Dbi<ByteBuffer> dbx = data.openDbi("ix_"+name, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LMDBDataStore(name,dbi,dbx,data);
+            return new LMDBDataStore(name,dbi,dbx,data,this);
         });
     }
 
@@ -102,5 +105,30 @@ public class LMDBDataStoreProvider implements DataStoreProvider {
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
         data.close();
+    }
+
+    @Override
+    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
+
+    }
+
+    @Override
+    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
+
+    }
+
+    @Override
+    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
+        return new byte[0];
+    }
+
+    @Override
+    public void onDeleting(Metadata metadata, byte[] key) {
+
+    }
+
+    @Override
+    public String oid() {
+        return UUID.randomUUID().toString().replace("-","");
     }
 }

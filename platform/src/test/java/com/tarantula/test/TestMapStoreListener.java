@@ -3,6 +3,7 @@ package com.tarantula.test;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.MapStoreListener;
+import com.tarantula.platform.util.SystemUtil;
 
 public class TestMapStoreListener implements MapStoreListener {
     @Override
@@ -39,5 +40,8 @@ public class TestMapStoreListener implements MapStoreListener {
     @Override
     public void onDeleting(Metadata metadata, byte[] key) {
 
+    }
+    public String oid(){
+        return SystemUtil.oid();
     }
 }

@@ -11,6 +11,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.*;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -399,7 +400,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             indexScopeReplicationProxy.onDeleting(metadata,key);
         }
     }
-
+    public String oid(){
+        return SystemUtil.oid();
+    }
     //end of map store listener
 
     public void backup(int scope){

@@ -8,6 +8,7 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.EventOnReplication;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -124,5 +125,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     @Override
     public void waitForData() {
         this.localNode = serviceContext.node();
+    }
+
+    public String oid(){
+        return SystemUtil.oid();
     }
 }

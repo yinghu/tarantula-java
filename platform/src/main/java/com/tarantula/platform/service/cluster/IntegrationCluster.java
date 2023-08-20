@@ -66,7 +66,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<NodeListener> nList = new CopyOnWriteArrayList<>();
-    private final ArrayBlockingQueue<Node> roundRobinQueue;
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -79,7 +78,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
         _integrationInstanceStarted = new CountDownLatch(1);
         _serviceReady = new CountDownLatch(1);
-        roundRobinQueue = new ArrayBlockingQueue<>(tcx.clusterMaxSize);
     }
     public String name(){
         return "IntegrationCluster";
@@ -377,7 +375,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void onNodeRemoved(MembershipServiceEvent mEvent){
         String memberId = mEvent.getMember().getUuid();
-        roundRobinQueue.remove(new ClusterNode(memberId));
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
         ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
@@ -386,14 +383,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.vMap.remove(node[1].getBytes());//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
-    public void onNodeAdded(String memberId){
-        roundRobinQueue.offer(new ClusterNode(memberId));
-    }
-    public Node roundRobinMember(){
-        Node node = roundRobinQueue.poll();
-        if(node!=null) roundRobinQueue.offer(node);
-        return node;
-    }
+    //public void onNodeAdded(String memberId){
+
+    //}
+
     private Node fromCluster(String nodeId){
         Node n = new ClusterNode();
         byte[] ret = this.vMap.get(nodeId.getBytes());
