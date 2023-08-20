@@ -6,7 +6,10 @@ import java.nio.ByteBuffer;
 
 public class BufferProxy implements Recoverable.DataBuffer {
 
-    public ByteBuffer buffer;
+    private ByteBuffer buffer;
+
+    public boolean local;
+    public long revision;
 
     public BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;

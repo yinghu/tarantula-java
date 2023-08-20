@@ -28,6 +28,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
+
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     @Override
     public void configure(Map<String, Object> properties) {
@@ -116,10 +117,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
 
     }
-
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){}
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return new byte[0];
+        return null;
     }
 
     @Override

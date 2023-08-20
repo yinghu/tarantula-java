@@ -10,6 +10,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.event.EventOnReplication;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -52,7 +53,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
-
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){}
     @Override
     public String name() {
         return null;

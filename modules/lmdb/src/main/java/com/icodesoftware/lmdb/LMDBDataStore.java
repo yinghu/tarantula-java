@@ -5,6 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BufferUtil;
 import org.lmdbjava.*;
 
@@ -23,6 +24,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     private final String name;
 
     private final String bucket ="DBS";
+
+    private Metadata metadata;
+
     //NOTES : key+value < 2040 bytes ( 511 bytes for key ; value <= 1521 bytes (2040 - 511 - 8)
 
     private final MapStoreListener mapStoreListener;
@@ -74,7 +78,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes(UTF_8)).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
-        t.write(new BufferProxy(value));
+        BufferProxy proxy = new BufferProxy(value);
+        //proxy.writeBoolean(true);
+        //proxy.writeLong(Long.MIN_VALUE);
+        t.write(proxy);
         value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{

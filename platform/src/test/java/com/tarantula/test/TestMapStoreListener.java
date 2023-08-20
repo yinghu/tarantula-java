@@ -5,6 +5,8 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.MapStoreListener;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.nio.ByteBuffer;
+
 public class TestMapStoreListener implements MapStoreListener {
     @Override
     public String name() {
@@ -31,7 +33,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
 
-
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){}
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return null;
