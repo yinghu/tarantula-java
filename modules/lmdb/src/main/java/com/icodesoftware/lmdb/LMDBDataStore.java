@@ -79,8 +79,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         key.put(akey.getBytes(UTF_8)).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         BufferProxy proxy = new BufferProxy(value);
-        //proxy.writeBoolean(true);
-        //proxy.writeLong(Long.MIN_VALUE);
+        proxy.writeBoolean(true);
+        proxy.writeLong(Long.MIN_VALUE);
+        proxy.writeInt(t.getFactoryId());
+        proxy.writeInt(t.getClassId());
         t.write(proxy);
         value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
@@ -101,11 +103,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.put(akey.getBytes(UTF_8)).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
-        t.write(new BufferProxy(value));
-        value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if (dbi.get(txn, key) == null) return false;
+            BufferProxy proxy = new BufferProxy(txn.val());
+            boolean local = proxy.readBoolean();
+            long rev = proxy.readLong();
+            int facId = proxy.readInt();
+            int clsId = proxy.readInt();
+            BufferProxy update = new BufferProxy(value);
+            update.writeBoolean(local).writeLong(rev+1).writeInt(facId).writeInt(clsId);
+            t.write(update);
+            value.flip();
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
             return true;
@@ -124,11 +133,21 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
-                t.read(new BufferProxy(txn.val()));
+                BufferProxy proxy = new BufferProxy(txn.val());
+                proxy.readBoolean();
+                proxy.readLong();
+                proxy.readInt();
+                proxy.readInt();
+                t.read(proxy);
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(700);
-            t.write(new BufferProxy(value));
+            BufferProxy proxy = new BufferProxy(value);
+            proxy.writeBoolean(true);
+            proxy.writeLong(Long.MIN_VALUE);
+            proxy.writeInt(t.getFactoryId());
+            proxy.writeInt(t.getClassId());
+            t.write(proxy);
             value.flip();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
             onEdge(t,key,txn);
@@ -149,7 +168,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
             if (dbi.get(txn, key) == null) return false;
-            t.read(new BufferProxy(txn.val()));
+            BufferProxy proxy = new BufferProxy(txn.val());
+            proxy.readBoolean();
+            long rev = proxy.readLong();
+            proxy.readInt();
+            proxy.readInt();
+            t.read(proxy);
+            t.revision(rev);
             return true;
         }finally {
             txn.close();
@@ -194,7 +219,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
                 T t = query.create();
                 if(dbi.get(txn,kv.val())!=null){
-                    t.read(new BufferProxy(txn.val()));
+                    BufferProxy proxy = new BufferProxy(txn.val());
+                    boolean local = proxy.readBoolean();
+                    long rev = proxy.readLong();
+                    proxy.readInt();
+                    proxy.readInt();
+                    t.read(proxy);
+                    t.revision(rev);
                     t.distributionKey(UTF_8.decode(kv.val()).toString());
                     if(!stream.on(t)) break;
                 }

@@ -15,38 +15,48 @@ public class BufferProxy implements Recoverable.DataBuffer {
         this.buffer = buffer;
     }
     @Override
-    public void writeInt(int d) {
+    public Recoverable.DataBuffer writeInt(int d) {
         buffer.putInt(d);
+        return this;
     }
 
     @Override
-    public void writeLong(long l) {
+    public Recoverable.DataBuffer writeLong(long l) {
         buffer.putLong(l);
+        return this;
     }
 
     @Override
-    public void writeBoolean(boolean b){
+    public Recoverable.DataBuffer writeBoolean(boolean b){
         buffer.put(b?(byte) 1:0);
+        return this;
     }
 
-    public void writeFloat(float f){
+    public Recoverable.DataBuffer writeFloat(float f){
         buffer.putFloat(f);
+        return this;
     }
 
-    public void writeDouble(double d){
+    public Recoverable.DataBuffer writeDouble(double d){
         buffer.putDouble(d);
+        return this;
     }
 
-    public void writeShort(short s){
+    public Recoverable.DataBuffer writeShort(short s){
         buffer.putShort(s);
+        return this;
     }
 
 
-    public void writeByte(){}
+    public Recoverable.DataBuffer writeByte(byte b){
+        buffer.put(b);
+        return this;
+    }
     @Override
-    public void writeUTF8(String utf) {
+    public Recoverable.DataBuffer writeUTF8(String utf) {
         buffer.putInt(utf.length());
         buffer.put(utf.getBytes());
+        return this;
     }
 
     @Override

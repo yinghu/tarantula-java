@@ -37,6 +37,11 @@ public class LMDBDataStoreTest {
         TestAccessIndex not_created = new TestAccessIndex(key);
         Assert.assertFalse(ds.createIfAbsent(not_created,false));
         Assert.assertTrue(ds.load(not_created));
+        Assert.assertTrue(ds.update(not_created));
+        Assert.assertTrue(ds.update(not_created));
+        Assert.assertTrue(ds.update(not_created));
+        Assert.assertTrue(ds.load(not_created));
+        Assert.assertEquals(not_created.revision(),Long.MIN_VALUE+3);
     }
     @Test(groups = { "LMDB" })
     public void createWithEdgeTest() {

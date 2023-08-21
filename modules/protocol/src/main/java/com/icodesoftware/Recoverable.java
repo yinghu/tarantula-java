@@ -55,20 +55,20 @@ public interface Recoverable extends Distributable,JsonSerializable {
 
     interface DataBuffer{
 
-        void writeInt(int i);
-        void writeLong(long l);
+        DataBuffer writeInt(int i);
+        DataBuffer writeLong(long l);
 
-        void writeFloat(float f);
+        DataBuffer writeFloat(float f);
 
-        void writeDouble(double d);
+        DataBuffer writeDouble(double d);
 
-        void writeShort(short s);
+        DataBuffer writeShort(short s);
 
-        void writeBoolean(boolean b);
+        DataBuffer writeBoolean(boolean b);
 
-        void writeByte();
+        DataBuffer writeByte(byte b);
 
-        void writeUTF8(String utf);
+        DataBuffer writeUTF8(String utf);
         int readInt();
 
         boolean readBoolean();

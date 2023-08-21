@@ -70,14 +70,30 @@ public class LMDBSmokeTest {
         int[] ct ={0};
         c.iterator().forEachRemaining((kv->{
             ct[0]++;
-            //System.out.println(UTF_8.decode(kv.key()));
-            //System.out.println(UTF_8.decode(kv.val()));
         }));
         c.close();
         Assert.assertEquals(ct[0],10);
     }
     @Test(groups = { "LMDB" })
-    public void batchTest() {
-
+    public void keyTest() {
+        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_int_key", DbiFlags.MDB_CREATE);
+        Txn<ByteBuffer> txn = env.txnWrite();
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        for(long k=1 ; k<10;k++){
+            key.putLong(k).flip();
+            value.putLong(k).flip();
+            dbi.put(txn,key,value);
+            key.clear();
+            value.clear();
+        }
+        CursorIterable<ByteBuffer> c = dbi.iterate(txn, KeyRange.all());
+        long[] k = {1};
+        c.iterator().forEachRemaining((kv->{
+            Assert.assertEquals(kv.key().getLong(),k[0]++);
+        }));
+       txn.commit();
+       txn.close();
+       dbi.close();
     }
 }

@@ -37,12 +37,12 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
     public boolean distributable(){return true;}
     @Override
     public int getFactoryId() {
-        return 1;
+        return 10;
     }
 
     @Override
     public int getClassId() {
-        return 10;
+        return 100;
     }
 
     @Override
