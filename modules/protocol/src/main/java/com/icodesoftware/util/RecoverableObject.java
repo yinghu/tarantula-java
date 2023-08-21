@@ -12,6 +12,7 @@ public class RecoverableObject implements Recoverable {
 
     protected String bucket;
 
+    protected long id;
     protected String oid;
     protected String owner;
     protected  String label;
@@ -60,6 +61,12 @@ public class RecoverableObject implements Recoverable {
         this.oid = oid;
     }
 
+    public long id(){
+        return id;
+    }
+    public void id(long id){
+        this.id = id;
+    }
     public String owner(){
         return this.owner;
     }

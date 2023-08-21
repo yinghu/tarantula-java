@@ -12,6 +12,9 @@ public interface Recoverable extends Distributable,JsonSerializable {
     String oid();
     void oid(String oid);
 
+    long id();
+    void id(long id);
+
     String owner();
     void owner(String owner);
 
