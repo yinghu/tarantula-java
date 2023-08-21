@@ -80,7 +80,14 @@ public class LMDBSmokeTest {
         Txn<ByteBuffer> txn = env.txnWrite();
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        for(long k=1 ; k<10;k++){
+        for(long k=11 ; k<20;k++){
+            key.putLong(k).flip();
+            value.putLong(k).flip();
+            dbi.put(txn,key,value);
+            key.clear();
+            value.clear();
+        }
+        for(long k=1 ; k<11;k++){
             key.putLong(k).flip();
             value.putLong(k).flip();
             dbi.put(txn,key,value);
