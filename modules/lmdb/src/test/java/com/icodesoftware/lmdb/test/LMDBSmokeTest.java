@@ -11,6 +11,10 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class LMDBSmokeTest {
 
@@ -19,7 +23,7 @@ public class LMDBSmokeTest {
     private long mapSize = 100_100_100;
 
     private int maxStores = 100;
-    private int maxReader = 10;
+    private int maxReader = 100;
     private Env<ByteBuffer> env;
     @BeforeClass
     public void setUp() throws Exception{
@@ -103,4 +107,6 @@ public class LMDBSmokeTest {
        txn.close();
        dbi.close();
     }
+
+
 }
