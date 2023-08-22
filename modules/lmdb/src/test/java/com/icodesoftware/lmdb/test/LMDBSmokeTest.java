@@ -112,7 +112,7 @@ public class LMDBSmokeTest {
        for(int i=1;i<20;i++){
            long[] r = range(i);
            Assert.assertEquals(r[1]-r[0],offset-1);
-           System.out.println("Range ["+i+"]"+r[0]+"-"+r[1]);
+           //System.out.println("Range ["+i+"]"+r[0]+"-"+r[1]);
        }
     }
 
