@@ -8,11 +8,15 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private ByteBuffer buffer;
 
-    public boolean local;
-    public long revision;
 
     public BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
+    }
+
+    public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
+        buffer.put(dataHeader.local()?(byte) 1:0).putLong(dataHeader.revision());
+        buffer.putInt(dataHeader.factoryId()).putInt(dataHeader.classId());
+        return this;
     }
     @Override
     public Recoverable.DataBuffer writeInt(int d) {
@@ -59,6 +63,9 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return this;
     }
 
+    public Recoverable.DataHeader readHeader(){
+        return new LocalHeader(buffer.get()==1,buffer.getLong(),buffer.getInt(),buffer.getInt());
+    }
     @Override
     public int readInt() {
         return buffer.getInt();

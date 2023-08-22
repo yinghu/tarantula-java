@@ -79,10 +79,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         key.put(akey.getBytes(UTF_8)).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         BufferProxy proxy = new BufferProxy(value);
-        proxy.writeBoolean(true);
-        proxy.writeLong(Long.MIN_VALUE);
-        proxy.writeInt(t.getFactoryId());
-        proxy.writeInt(t.getClassId());
+        proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
         t.write(proxy);
         value.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
@@ -107,16 +104,15 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn, key) == null) return false;
             BufferProxy proxy = new BufferProxy(txn.val());
-            boolean local = proxy.readBoolean();
-            long rev = proxy.readLong();
-            int facId = proxy.readInt();
-            int clsId = proxy.readInt();
+            Recoverable.DataHeader header = proxy.readHeader();
             BufferProxy update = new BufferProxy(value);
-            update.writeBoolean(local).writeLong(rev+1).writeInt(facId).writeInt(clsId);
+            header.update(header.local(),1);
+            update.writeHeader(header);
             t.write(update);
             value.flip();
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
+            t.revision(header.revision());
             return true;
         }finally {
             txn.close();
@@ -134,19 +130,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
                 BufferProxy proxy = new BufferProxy(txn.val());
-                proxy.readBoolean();
-                proxy.readLong();
-                proxy.readInt();
-                proxy.readInt();
+                proxy.readHeader();
                 t.read(proxy);
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(700);
             BufferProxy proxy = new BufferProxy(value);
-            proxy.writeBoolean(true);
-            proxy.writeLong(Long.MIN_VALUE);
-            proxy.writeInt(t.getFactoryId());
-            proxy.writeInt(t.getClassId());
+            proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
             t.write(proxy);
             value.flip();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
@@ -169,12 +159,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn, key) == null) return false;
             BufferProxy proxy = new BufferProxy(txn.val());
-            proxy.readBoolean();
-            long rev = proxy.readLong();
-            proxy.readInt();
-            proxy.readInt();
+            Recoverable.DataHeader header = proxy.readHeader();
             t.read(proxy);
-            t.revision(rev);
+            t.revision(header.revision());
             return true;
         }finally {
             txn.close();
@@ -183,7 +170,33 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public byte[] load(byte[] key) {
-        return new byte[0];
+        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        akey.put(key).flip();
+        Txn<ByteBuffer> txn = env.txnRead(); //read only
+        try{
+            if (dbi.get(txn, akey) == null) return null;
+            BufferProxy proxy = new BufferProxy(txn.val());
+            proxy.readBoolean();
+            proxy.readLong();
+            proxy.readInt();
+            proxy.readInt();
+            return null;
+        }finally {
+            txn.close();
+        }
+    }
+
+
+    public Recoverable.DataBuffer find(byte[] key) {
+        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        akey.put(key).flip();
+        Txn<ByteBuffer> txn = env.txnRead(); //read only
+        try{
+            if (dbi.get(txn, akey) == null) return null;
+            return new BufferProxy(txn.val());
+        }finally {
+            txn.close();
+        }
     }
 
     @Override
@@ -220,12 +233,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 T t = query.create();
                 if(dbi.get(txn,kv.val())!=null){
                     BufferProxy proxy = new BufferProxy(txn.val());
-                    boolean local = proxy.readBoolean();
-                    long rev = proxy.readLong();
-                    proxy.readInt();
-                    proxy.readInt();
+                    Recoverable.DataHeader local = proxy.readHeader();
                     t.read(proxy);
-                    t.revision(rev);
+                    t.revision(local.revision());
                     t.distributionKey(UTF_8.decode(kv.val()).toString());
                     if(!stream.on(t)) break;
                 }

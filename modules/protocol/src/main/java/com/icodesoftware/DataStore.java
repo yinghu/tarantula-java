@@ -1,8 +1,6 @@
 package com.icodesoftware;
 
 
-import com.icodesoftware.service.ClusterProvider;
-
 import java.util.List;
 
 public interface DataStore {

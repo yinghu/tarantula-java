@@ -56,8 +56,21 @@ public interface Recoverable extends Distributable,JsonSerializable {
         String asString();
     }
 
+
+    interface DataHeader{
+        boolean local();
+        long revision();
+
+        int factoryId();
+
+        int classId();
+
+        void update(boolean local,long revisionDelta);
+    }
+
     interface DataBuffer{
 
+        DataBuffer writeHeader(DataHeader header);
         DataBuffer writeInt(int i);
         DataBuffer writeLong(long l);
 
@@ -72,6 +85,9 @@ public interface Recoverable extends Distributable,JsonSerializable {
         DataBuffer writeByte(byte b);
 
         DataBuffer writeUTF8(String utf);
+
+        DataHeader readHeader();
+
         int readInt();
 
         boolean readBoolean();
