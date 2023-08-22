@@ -22,6 +22,9 @@ public class LMDBSmokeTest {
     private String dir = "target/smoke";
     private long mapSize = 100_100_100;
 
+    long offset = 1_000_000_000_000l;
+
+
     private int maxStores = 100;
     private int maxReader = 100;
     private Env<ByteBuffer> env;
@@ -106,6 +109,17 @@ public class LMDBSmokeTest {
        txn.commit();
        txn.close();
        dbi.close();
+       for(int i=1;i<20;i++){
+           long[] r = range(i);
+           Assert.assertEquals(r[1]-r[0],offset-1);
+           System.out.println("Range ["+i+"]"+r[0]+"-"+r[1]);
+       }
+    }
+
+    private long[] range(int section){
+        long end = offset*section;
+        long start = end-offset;
+        return new long[]{start,end-1};
     }
 
 
