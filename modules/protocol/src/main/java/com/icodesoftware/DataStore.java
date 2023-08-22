@@ -26,7 +26,7 @@ public interface DataStore {
 
     <T extends Recoverable> boolean load(T t);
 
-    byte[] load(byte[] key);
+    default byte[] load(byte[] key){return null;}
     default boolean load(byte[] key, Buffer buffer){return false;}
 
     boolean delete(byte[] key);
@@ -43,7 +43,8 @@ public interface DataStore {
 
         void unset(byte[] key);
 
-        void list(Binary binary);
+        default void list(Binary binary){}
+        default void list(Buffer buffer){}
     }
 
 

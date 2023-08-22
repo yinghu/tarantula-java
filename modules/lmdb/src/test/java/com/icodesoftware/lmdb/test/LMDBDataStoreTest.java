@@ -65,7 +65,7 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(ds.create(testUser));
         }
         int[] c={0};
-        ds.backup().list((k,v)->{
+        ds.backup().list((v)->{
             c[0]++;
             return true;
         });

@@ -168,23 +168,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
 
-    @Override
-    public byte[] load(byte[] key) {
-        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        akey.put(key).flip();
-        Txn<ByteBuffer> txn = env.txnRead(); //read only
-        try{
-            if (dbi.get(txn, akey) == null) return null;
-            BufferProxy proxy = new BufferProxy(txn.val());
-            proxy.readBoolean();
-            proxy.readLong();
-            proxy.readInt();
-            proxy.readInt();
-            return null;
-        }finally {
-            txn.close();
-        }
-    }
+
 
 
     public boolean load(byte[] key,Buffer buffer) {
@@ -273,11 +257,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     @Override
-    public void list(Binary binary) {
+    public void list(Buffer binary) {
         final Txn<ByteBuffer> txn = env.txnRead();
         final Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
         while (cursor.next()){
-            if(!binary.on(BufferUtil.toArray(cursor.key()),BufferUtil.toArray(cursor.val()))) break;
+            if(!binary.on(new BufferProxy(cursor.val()))) break;
         }
         cursor.close();
         txn.close();
