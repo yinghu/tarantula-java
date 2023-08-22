@@ -1,6 +1,8 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.Session;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
 import org.testng.Assert;
@@ -42,6 +44,14 @@ public class LMDBDataStoreTest {
         Assert.assertTrue(ds.update(not_created));
         Assert.assertTrue(ds.load(not_created));
         Assert.assertEquals(not_created.revision(),Long.MIN_VALUE+3);
+
+        Assert.assertTrue(ds.load(key.getBytes(),dataBuffer -> {
+            TestAccessIndex testAccessIndex = new TestAccessIndex();
+            Recoverable.DataHeader header = dataBuffer.readHeader();
+            testAccessIndex.read(dataBuffer);
+            Assert.assertEquals(header.factoryId(),testAccessIndex.getFactoryId());
+            return true;
+        }));
     }
     @Test(groups = { "LMDB" })
     public void createWithEdgeTest() {

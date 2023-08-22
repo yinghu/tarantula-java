@@ -27,6 +27,7 @@ public interface DataStore {
     <T extends Recoverable> boolean load(T t);
 
     byte[] load(byte[] key);
+    default boolean load(byte[] key, Buffer buffer){return false;}
 
     boolean delete(byte[] key);
 
@@ -48,11 +49,14 @@ public interface DataStore {
 
     interface Stream<T extends Recoverable>{
         boolean on(T t);
+
     }
     interface Binary{
         boolean on(byte[] key,byte[] value);
     }
-
+    interface Buffer{
+       boolean on(Recoverable.DataBuffer dataBuffer);
+    }
 
     interface Updatable{
         void dataStore(DataStore dataStore);

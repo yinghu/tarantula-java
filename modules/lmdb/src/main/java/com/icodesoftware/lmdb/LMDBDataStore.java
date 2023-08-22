@@ -187,13 +187,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
 
-    public Recoverable.DataBuffer find(byte[] key) {
+    public boolean load(byte[] key,Buffer buffer) {
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
         akey.put(key).flip();
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
-            if (dbi.get(txn, akey) == null) return null;
-            return new BufferProxy(txn.val());
+            if (dbi.get(txn, akey) == null) return false;
+            return buffer.on(new BufferProxy(txn.val()));
         }finally {
             txn.close();
         }
@@ -201,9 +201,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public boolean delete(byte[] key) {
-        Txn<ByteBuffer> txn = env.txnWrite(); //write/read txn
+        //write/read txn
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
         akey.put(key).flip();
+        Txn<ByteBuffer> txn = env.txnWrite();
         try{
             if(!dbi.delete(txn, akey)) return false;
             txn.commit();
