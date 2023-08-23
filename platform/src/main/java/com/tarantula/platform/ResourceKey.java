@@ -1,10 +1,12 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
-public class ResourceKey extends RecoverableObject implements Recoverable.Key {
 
+public class ResourceKey  implements Recoverable.Key {
+
+    private String bucket;
+    private String oid;
     public String[] key;
 
     public ResourceKey(String bucket,String oid, String[] key){

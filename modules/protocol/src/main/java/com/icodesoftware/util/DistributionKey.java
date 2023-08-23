@@ -3,7 +3,7 @@ package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 
-public class DistributionKey extends RecoverableObject implements Recoverable.Key{
+public class DistributionKey implements Recoverable.Key{
 
     private String bucket;
     private String oid;
@@ -12,7 +12,9 @@ public class DistributionKey extends RecoverableObject implements Recoverable.Ke
         this.bucket = bucket;
         this.oid = oid;
     }
-
+    public byte[] asBinary(){
+        return null;
+    }
     public String asString(){
         if(bucket==null||oid==null){
             return null;

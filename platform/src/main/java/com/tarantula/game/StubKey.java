@@ -1,27 +1,32 @@
 package com.tarantula.game;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
-public class StubKey extends RecoverableObject implements Recoverable.Key {
 
+public class StubKey implements Recoverable.Key {
+    private String bucket;
+    private String oid;
+
+    private String label;
+
+    private int stub;
     public StubKey(String systemId,String label,int  stub){
         String[] query = systemId.split("/");
         this.bucket = query[0];
         this.oid = query[1];
         this.label = label;
-        this.routingNumber = stub;
+        this.stub = stub;
     }
     public StubKey(String bucket, String oid,String label,int  stub){
         this.bucket = bucket;
         this.oid = oid;
         this.label = label;
-        this.routingNumber = stub;
+        this.stub = stub;
     }
 
     @Override
     public String asString() {
-        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).append(Recoverable.PATH_SEPARATOR).append(routingNumber).toString();
+        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).append(Recoverable.PATH_SEPARATOR).append(stub).toString();
     }
     @Override
     public int hashCode(){

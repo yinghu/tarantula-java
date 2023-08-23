@@ -1,11 +1,10 @@
 package com.tarantula.platform;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
-public class CompositeKey extends RecoverableObject implements Recoverable.Key {
+public class CompositeKey  implements Recoverable.Key {
 
     public String key;
-
+    private String owner;
     public CompositeKey(String owner, String key){
         this.owner = owner;
         this.key = key;

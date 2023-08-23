@@ -1,7 +1,7 @@
 package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
-public class NaturalKey extends RecoverableObject implements Recoverable.Key {
+public class NaturalKey implements Recoverable.Key {
 
     public String key;
 
@@ -13,6 +13,9 @@ public class NaturalKey extends RecoverableObject implements Recoverable.Key {
         return this.key;
     }
 
+    public byte[] asBinary(){
+        return asString().getBytes();
+    }
     @Override
     public String toString(){
         return "Owner access key ["+key+"]";

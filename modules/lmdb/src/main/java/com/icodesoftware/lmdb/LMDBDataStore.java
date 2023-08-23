@@ -6,7 +6,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.BufferUtil;
 import org.lmdbjava.*;
 
 import java.nio.ByteBuffer;

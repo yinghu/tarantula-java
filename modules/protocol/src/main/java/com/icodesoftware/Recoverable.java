@@ -15,6 +15,9 @@ public interface Recoverable extends Distributable,JsonSerializable {
     long id();
     void id(long id);
 
+    Key ownerKey();
+    void ownerKey(Key ownerKey);
+
     String owner();
     void owner(String owner);
 
@@ -54,6 +57,7 @@ public interface Recoverable extends Distributable,JsonSerializable {
 
     interface Key{
         String asString();
+        default byte[] asBinary(){ return null;}
     }
 
 

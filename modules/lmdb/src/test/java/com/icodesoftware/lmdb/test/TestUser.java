@@ -120,6 +120,7 @@ public class TestUser extends RecoverableObject implements Access {
     }
     public void read(DataBuffer buffer) {
         this.login = buffer.readUTF8();
+
         this.password = buffer.readUTF8();
         this.role = buffer.readUTF8();
         this.activated = buffer.readBoolean();

@@ -1,10 +1,10 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
-public class IndexKey extends RecoverableObject implements Recoverable.Key {
-
+public class IndexKey implements Recoverable.Key {
+    private String bucket;
+    private String oid;
     private int index;
 
     public IndexKey(String bucket, String oid, int  index){

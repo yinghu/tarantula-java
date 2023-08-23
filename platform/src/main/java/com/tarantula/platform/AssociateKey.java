@@ -1,9 +1,12 @@
 package com.tarantula.platform;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
-public class AssociateKey extends RecoverableObject implements Recoverable.Key {
+public class AssociateKey implements Recoverable.Key {
 
+    private String bucket;
+    private String oid;
+
+    private String label;
     public AssociateKey(String bucket, String oid, String suffix){
         this.bucket = bucket;
         this.oid = oid;
