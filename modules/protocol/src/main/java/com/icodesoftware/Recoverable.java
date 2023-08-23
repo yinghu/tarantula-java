@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 import java.util.Map;
 
-public interface Recoverable extends Distributable,JsonSerializable {
+public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
 
     String PATH_SEPARATOR = "/";
 
@@ -29,10 +29,6 @@ public interface Recoverable extends Distributable,JsonSerializable {
     byte[] toBinary();
     void fromBinary(byte[] payload);
 
-    default void read(DataBuffer buffer){}
-    default void write(DataBuffer buffer){}
-
-
     boolean disabled();
     void disabled(boolean disabled);
 
@@ -55,9 +51,8 @@ public interface Recoverable extends Distributable,JsonSerializable {
 
     Key key();
 
-    interface Key{
-        String asString();
-        default byte[] asBinary(){ return null;}
+    interface Key extends Bufferable{
+        default String asString(){ return null;}
     }
 
 

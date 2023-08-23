@@ -106,7 +106,7 @@ public class TestUser extends RecoverableObject implements Access {
         this.primary = (boolean)properties.get("10");
     }
 
-    public void write(DataBuffer buffer){
+    public boolean write(DataBuffer buffer){
         buffer.writeUTF8(login);
         buffer.writeUTF8(password);
         buffer.writeUTF8(role);
@@ -117,6 +117,7 @@ public class TestUser extends RecoverableObject implements Access {
         buffer.writeUTF8(validator);
         buffer.writeUTF8(this.owner);
         buffer.writeBoolean(this.primary);
+        return true;
     }
     public void read(DataBuffer buffer) {
         this.login = buffer.readUTF8();

@@ -10,12 +10,16 @@ public class LongTypeKey implements Recoverable.Key{
     public LongTypeKey(long longId){
         this.longId = longId;
     }
-    public byte[] asBinary(){
-        return null;
+
+    public void read(Recoverable.DataBuffer buffer){
+        longId = buffer.readLong();
     }
-    public String asString(){
-        return Long.toString(longId);
+    public boolean write(Recoverable.DataBuffer buffer){
+        if(longId==0) return false;
+        buffer.writeLong(longId);
+        return true;
     }
+
     @Override
     public String toString(){
         return asString();
