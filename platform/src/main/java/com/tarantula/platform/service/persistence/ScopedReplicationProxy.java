@@ -128,7 +128,4 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         this.localNode = serviceContext.node();
     }
 
-    public String oid(){
-        return SystemUtil.oid();
-    }
 }

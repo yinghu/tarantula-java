@@ -2,6 +2,8 @@ package com.icodesoftware.lmdb.test;
 
 
 import com.icodesoftware.Access;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
@@ -25,10 +27,10 @@ public class TestUser extends RecoverableObject implements Access {
         this.emailAddress = "teser@mail.com";
         this.validator = "validator";
     }
-    public TestUser(String login,String owner){
+    public TestUser(String login,long owner){
         this();
         this.login = login;
-        this.owner = TestUserQuery.OWNER_KEY_PREFIX+owner;
+        this.ownerKey = new LongTypeKey(owner);
     }
     public String login(){
         return this.login;
@@ -115,13 +117,12 @@ public class TestUser extends RecoverableObject implements Access {
         buffer.writeBoolean(validated);
         buffer.writeUTF8(emailAddress);
         buffer.writeUTF8(validator);
-        buffer.writeUTF8(this.owner);
+        //buffer.writeUTF8(this.owner);
         buffer.writeBoolean(this.primary);
         return true;
     }
-    public void read(DataBuffer buffer) {
+    public boolean read(DataBuffer buffer) {
         this.login = buffer.readUTF8();
-
         this.password = buffer.readUTF8();
         this.role = buffer.readUTF8();
         this.activated = buffer.readBoolean();
@@ -129,7 +130,22 @@ public class TestUser extends RecoverableObject implements Access {
         this.validated = buffer.readBoolean();
         this.emailAddress = buffer.readUTF8();
         this.validator = buffer.readUTF8();
-        this.owner = buffer.readUTF8();
+        //this.owner = buffer.readUTF8();
         this.primary = buffer.readBoolean();
+        return true;
+    }
+
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        id = buffer.readLong();
+        return true;
+    }
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(id==0) return false;
+        buffer.writeLong(id);
+        return true;
+    }
+    @Override
+    public Key key() {
+        return new LongTypeKey(this.id);
     }
 }

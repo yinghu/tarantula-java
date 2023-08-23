@@ -4,7 +4,6 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.*;
 
@@ -19,7 +18,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
-    private final Dbi<ByteBuffer> index;
+    private final Dbi<ByteBuffer> key;
     private final String name;
 
     private final String bucket ="DBS";
@@ -28,13 +27,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     //NOTES : key+value < 2040 bytes ( 511 bytes for key ; value <= 1521 bytes (2040 - 511 - 8)
 
-    private final MapStoreListener mapStoreListener;
-    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi, Dbi<ByteBuffer> index,Env<ByteBuffer> env,MapStoreListener mapStoreListener){
+    private final LMDBDataStoreProvider lmdbDataStoreProvider;
+    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi, Dbi<ByteBuffer> key,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
         this.name = name;
         this.dbi = dbi;
-        this.index = index;
+        this.key = key;
         this.env = env;
-        this.mapStoreListener = mapStoreListener;
+        this.lmdbDataStoreProvider = lmdbDataStoreProvider;
     }
 
     @Override
@@ -69,19 +68,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> boolean create(T t) {
-        String akey = t.key().asString();
-        if (akey != null) return false;
-        t.bucket(this.bucket);
-        t.oid(mapStoreListener.oid());
-        akey = t.key().asString();
+        //create edge db before txn creation
+        lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes(UTF_8)).flip();
+        Txn<ByteBuffer> txn = env.txnWrite(); //can read also
+        t.id(nextId(txn));
+        if(!t.writeKey(new BufferProxy(key))) return false;
+        key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         BufferProxy proxy = new BufferProxy(value);
         proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
         t.write(proxy);
         value.flip();
-        Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if(!dbi.put(txn,key,value)) return false;
             onEdge(t,key,txn);
@@ -94,10 +92,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
-        String akey = t.key().asString();
-        if(akey==null) return false;
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes(UTF_8)).flip();
+        if(!t.key().write(new BufferProxy(key))) return false;
+        key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
@@ -109,6 +106,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             update.writeHeader(header);
             t.write(update);
             value.flip();
+            key.rewind();
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
             t.revision(header.revision());
@@ -120,10 +118,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
-        String akey = t.key().asString();
-        if(akey==null) throw new IllegalArgumentException("Key must be assigned first");
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes(UTF_8)).flip();
+        if(!t.key().write(new BufferProxy(key))) throw new IllegalArgumentException("Key must be assigned first");
+        key.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can be reading also
         try{
             if (dbi.get(txn, key) != null) {
@@ -138,6 +135,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
             t.write(proxy);
             value.flip();
+            key.rewind();
             if (!dbi.put(txn, key, value)) throw new RuntimeException("lmdb failure to insert key/value");
             onEdge(t,key,txn);
             txn.commit();
@@ -150,10 +148,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> boolean load(T t) {
-        String akey = t.key().asString();
-        if(akey==null) return false;
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes(UTF_8)).flip();
+        if(!t.key().write(new BufferProxy(key))) return false;
+        key.flip();
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
             if (dbi.get(txn, key) == null) return false;
@@ -170,9 +167,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
 
 
-    public boolean load(byte[] key,Buffer buffer) {
+    public boolean load(Recoverable.Key key, Buffer buffer) {
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        akey.put(key).flip();
+        key.write(new BufferProxy(akey));
+        akey.flip();
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
             if (dbi.get(txn, akey) == null) return false;
@@ -206,11 +204,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream){
-        String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes()).flip();
+        if(!query.key().write(new BufferProxy(key))) return;
+        key.flip();
         Txn<ByteBuffer> txn = env.txnRead();
-        CursorIterable<ByteBuffer> cursor = index.iterate(txn, KeyRange.closed(key, key));
+        Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(name+"_"+query.label());
+        CursorIterable<ByteBuffer> cursor = edgeDbi.iterate(txn, KeyRange.closed(key, key));
         try{
             for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
@@ -220,7 +219,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     Recoverable.DataHeader local = proxy.readHeader();
                     t.read(proxy);
                     t.revision(local.revision());
-                    t.distributionKey(UTF_8.decode(kv.val()).toString());
+                    t.readKey(new BufferProxy(kv.val()));
                     if(!stream.on(t)) break;
                 }
             }
@@ -237,7 +236,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public void close() {
         dbi.close();
-        index.close();
+        //index.close();
     }
 
     @Override
@@ -267,12 +266,28 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     private <T extends Recoverable> void onEdge(T t,ByteBuffer edge,Txn<ByteBuffer> txn){
-        if(!t.onEdge() || t.owner()==null || t.label()==null) return;
-        String akey = t.owner()+Recoverable.PATH_SEPARATOR+t.label();
+        if(!t.onEdge() || t.ownerKey()==null || t.label()==null) return;
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.put(akey.getBytes()).flip();
+        if(!t.ownerKey().write(new BufferProxy(key))) return;
+        key.flip();
         edge.rewind();
-        index.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
+        Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
+        edgeDbi.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
+    }
+
+    private long nextId(Txn<ByteBuffer> txn){
+        ByteBuffer idKey = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        idKey.put(name.getBytes());
+        idKey.flip();
+        ByteBuffer id = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        long pendingId = 0;
+        if(key.get(txn,idKey)!=null){
+            pendingId = txn.val().getLong();
+        }
+        idKey.rewind();
+        id.putLong(pendingId+1).flip();
+        key.put(txn,idKey,id);
+        return pendingId+1;
     }
 
 }

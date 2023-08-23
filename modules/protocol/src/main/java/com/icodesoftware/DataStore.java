@@ -27,7 +27,7 @@ public interface DataStore {
     <T extends Recoverable> boolean load(T t);
 
     default byte[] load(byte[] key){return null;}
-    default boolean load(byte[] key, Buffer buffer){return false;}
+    default boolean load(Recoverable.Key key, Buffer buffer){return false;}
 
     boolean delete(byte[] key);
 

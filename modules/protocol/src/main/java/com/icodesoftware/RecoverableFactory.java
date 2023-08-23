@@ -20,4 +20,6 @@ public interface RecoverableFactory<T extends Recoverable>{
 
     String distributionKey();
 
+    default Recoverable.Key key(){return null;}
+
 }

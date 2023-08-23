@@ -13,8 +13,14 @@ public class NaturalKey implements Recoverable.Key {
         return this.key;
     }
 
-    public byte[] asBinary(){
-        return asString().getBytes();
+    public boolean read(Recoverable.DataBuffer buffer){
+        key = buffer.readUTF8();
+        return true;
+    }
+    public boolean write(Recoverable.DataBuffer buffer){
+        if(key==null) return false;
+        buffer.writeUTF8(key);
+        return true;
     }
     @Override
     public String toString(){

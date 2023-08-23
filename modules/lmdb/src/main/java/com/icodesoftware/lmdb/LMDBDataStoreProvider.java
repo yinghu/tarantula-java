@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.LongTypeKey;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
@@ -15,21 +16,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
 
 
     private Env<ByteBuffer> data;
-
+    private Env<ByteBuffer> key;
+    private Dbi<ByteBuffer> keyDbi;
     private String dir = "/var/tarantula/tds/lmdb";
     private long storeSize = 10_485_760;//10M
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-
+    private long startId = 1_000_000;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override
     public void configure(Map<String, Object> properties) {
         dir = (String) properties.get("dir");
@@ -49,9 +51,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public DataStore createAccessIndexDataStore(String name) {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            Dbi<ByteBuffer> dbx = data.openDbi("ix_"+name, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbx = data.openDbi("key_"+name, DbiFlags.MDB_CREATE);
             return new LMDBDataStore(name,dbi,dbx,data,this);
         });
+    }
+
+    public Dbi<ByteBuffer> createEdgeDB(String edgeName){
+        return edgMap.computeIfAbsent(edgeName,k->data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
     }
 
     @Override
@@ -96,16 +102,23 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public void start() throws Exception {
-        Path path = Paths.get(dir);
-        if(!Files.exists(path)) Files.createDirectories(path);
-        data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path.toFile());
+        Path dataPath = Paths.get(dir+"/data");
+        if(!Files.exists(dataPath)) Files.createDirectories(dataPath);
+        data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(dataPath.toFile());
+        Path keyPath = Paths.get(dir+"/key");
+        if(!Files.exists(keyPath)) Files.createDirectories(keyPath);
+        key = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(keyPath.toFile());
+        keyDbi = key.openDbi("keys",DbiFlags.MDB_CREATE);
     }
 
     @Override
     public void shutdown() throws Exception {
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
+        edgMap.forEach((k,v)->v.close());
+        edgMap.clear();
         data.close();
+        key.close();
     }
 
     @Override
@@ -128,8 +141,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-    @Override
-    public String oid() {
-        return UUID.randomUUID().toString().replace("-","");
+   @Override
+    public long id() {
+
+        return 100;
     }
 }

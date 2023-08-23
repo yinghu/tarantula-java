@@ -43,7 +43,4 @@ public class TestMapStoreListener implements MapStoreListener {
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
-    public String oid(){
-        return SystemUtil.oid();
-    }
 }

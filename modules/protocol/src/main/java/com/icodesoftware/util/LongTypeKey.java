@@ -11,8 +11,9 @@ public class LongTypeKey implements Recoverable.Key{
         this.longId = longId;
     }
 
-    public void read(Recoverable.DataBuffer buffer){
+    public boolean read(Recoverable.DataBuffer buffer){
         longId = buffer.readLong();
+        return true;
     }
     public boolean write(Recoverable.DataBuffer buffer){
         if(longId==0) return false;
@@ -22,14 +23,18 @@ public class LongTypeKey implements Recoverable.Key{
 
     @Override
     public String toString(){
-        return asString();
+        return Long.toString(longId);
+    }
+
+    public long id(){
+        return longId;
     }
     @Override
     public boolean equals(Object obj){
-        return this.asString().equals(((LongTypeKey)obj).asString());
+        return this.longId==(((LongTypeKey)obj).id());
     }
     @Override
     public int hashCode(){
-        return this.asString().hashCode();
+        return Long.hashCode(this.longId);
     }
 }
