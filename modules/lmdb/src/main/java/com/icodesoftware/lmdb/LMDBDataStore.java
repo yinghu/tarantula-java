@@ -66,7 +66,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public <T extends Recoverable> boolean create(T t) {
         //create edge db before txn creation
-        lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
+        if(t.onEdge() && t.label()!=null) lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         t.id(lmdbDataStoreProvider.nextId(name));
@@ -115,6 +115,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
+        if(t.onEdge() && t.label()!=null) lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         if(!t.writeKey(new BufferProxy(key))) throw new IllegalArgumentException("Key must be assigned first");
         key.flip();
@@ -176,7 +177,19 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.close();
         }
     }
-
+    public boolean delete(Recoverable.Key key){
+        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.write(new BufferProxy(akey));
+        akey.flip();
+        Txn<ByteBuffer> txn = env.txnWrite();
+        try{
+            if(!dbi.delete(txn, akey)) return false;
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+        }
+    }
     @Override
     public boolean delete(byte[] key) {
         //write/read txn

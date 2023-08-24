@@ -75,14 +75,16 @@ public class LMDBDataStoreTest {
         c[0]=0;
         ds.list(new TestUserQuery(ownerId1),(t)->{
             c[0]++;
-            //System.out.println(t.login);
-            //System.out.println("IDd-"+t.id());
             return true;
         });
         Assert.assertEquals(c[0],10);
         List<TestUser> ulist = ds.list(new TestUserQuery(ownerId2));
         Assert.assertEquals(ulist.size(),100);
         ulist.forEach(u-> Assert.assertTrue(ds.load(u)));
+
+        List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
+        Assert.assertEquals(zerolist.size(),0);
     }
+
 
 }

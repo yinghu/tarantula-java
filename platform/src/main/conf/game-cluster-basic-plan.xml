@@ -26,7 +26,6 @@
                 <tag>game/lobby1</tag>
                 <module-name>com.tarantula.game.module.GameLobbyModule</module-name>
                 <access-rank>1</access-rank>
-                <timer-on-module>1000</timer-on-module>
             </application>
         </application-list>
     </lobby-context>

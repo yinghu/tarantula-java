@@ -30,7 +30,7 @@ public interface DataStore {
     default boolean load(Recoverable.Key key, Buffer buffer){return false;}
 
     boolean delete(byte[] key);
-
+    default boolean delete(Recoverable.Key key){return false;}
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);

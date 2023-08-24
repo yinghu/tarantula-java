@@ -97,9 +97,7 @@ public class XMLParser extends DefaultHandler{
             else if (tblock.equals("application-list")&&qname.equals("tournament-enabled")){
                 this.applicationDescriptor.tournamentEnabled(Boolean.parseBoolean(value));
             }
-            else if(tblock.equals("application-list")&&qname.equals("entry-cost")){
-                this.applicationDescriptor.entryCost(Long.parseLong(value));
-            }
+
             else if(tblock.equals("application-list")&&qname.equals("tag")){
                 this.applicationDescriptor.tag(value);
             }

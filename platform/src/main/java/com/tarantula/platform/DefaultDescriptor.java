@@ -2,12 +2,16 @@ package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Access;
+import com.icodesoftware.Bufferable;
 import com.icodesoftware.Descriptor;
+
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
+
 import java.util.Map;
 
-public class DefaultDescriptor extends DeploymentObject implements Descriptor {
+public class DefaultDescriptor extends RecoverableObject implements Descriptor {
 
 	protected String typeId;
     protected String type;
@@ -17,7 +21,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected int accessMode;
     protected int accessRank;
     protected String tag;
-    protected double entryCost;
 
     protected String moduleId;
     protected String moduleArtifact;
@@ -35,27 +38,29 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
     protected boolean resetEnabled;
     protected boolean tournamentEnabled;
 
-    public DefaultDescriptor(){}
+    public DefaultDescriptor(){
+        this.onEdge = true;
+    }
     public String moduleId(){
-        return this.moduleId!=null?moduleId:typeId;
+        return this.moduleId.equals(Bufferable.UTF_NULL)?typeId:moduleId;
     }
     public void moduleId(String moduleId){
         this.moduleId = moduleId;
     }
     public String moduleArtifact(){
-        return this.moduleArtifact;
+        return this.moduleArtifact.equals(Bufferable.UTF_NULL)?null:moduleArtifact;
     }
     public void moduleArtifact(String moduleArtifact){
         this.moduleArtifact = moduleArtifact;
     }
     public String moduleVersion(){
-        return this.moduleVersion;
+        return this.moduleVersion.equals(Bufferable.UTF_NULL)?null:this.moduleVersion;
     }
     public void moduleVersion(String moduleVersion){
         this.moduleVersion = moduleVersion;
     }
     public String codebase(){
-        return this.codebase;
+        return this.codebase.equals(Bufferable.UTF_NULL)?null:this.codebase;
     }
     public void codebase(String codebase){
         this.codebase = codebase;
@@ -145,12 +150,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.tag = tag;
     }
 
-    public double entryCost(){
-        return this.entryCost;
-    }
-    public void entryCost(double entryCost){
-        this.entryCost = entryCost;
-    }
 
 
     @Override
@@ -160,7 +159,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         _props.put("type",this.type);
         _props.put("name",this.name);
         _props.put("tag",this.tag);
-        _props.put("entryCost",this.entryCost);
         _props.put("category",this.category);
         _props.put("disabled",this.disabled);
         _props.put("accessControl",this.accessControl);
@@ -187,7 +185,6 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         this.type=(String)properties.get("type");
         this.name=(String)properties.get("name");
         this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
-        this.entryCost=properties.get("entryCost")!=null?((Number)properties.get("entryCost")).doubleValue():0;
         this.category=properties.get("category")!=null?(String)properties.get("category"):null;
         this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
         this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
@@ -233,4 +230,37 @@ public class DefaultDescriptor extends DeploymentObject implements Descriptor {
         jsonObject.addProperty("privateAccess",accessMode== Access.PRIVATE_ACCESS_MODE);
         return jsonObject;
     }
+
+    //Bufferable methods
+    @Override
+    public boolean read(DataBuffer buffer){
+        this.typeId = buffer.readUTF8();
+        this.type = buffer.readUTF8();
+        this.name = buffer.readUTF8();
+        this.category = buffer.readUTF8();
+        this.disabled = buffer.readBoolean();
+        this.logEnabled = buffer.readBoolean();
+        this.resetEnabled = buffer.readBoolean();
+        this.deployCode = buffer.readInt();
+        this.deployPriority = buffer.readInt();
+        this.accessControl = buffer.readInt();
+        this.accessMode = buffer.readInt();
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(this.typeId);
+        buffer.writeUTF8(this.type);
+        buffer.writeUTF8(this.name);
+        buffer.writeUTF8(this.category);
+        buffer.writeBoolean(this.disabled);
+        buffer.writeBoolean(this.logEnabled);
+        buffer.writeBoolean(this.resetEnabled);
+        buffer.writeInt(this.deployCode);
+        buffer.writeInt(this.deployPriority);
+        buffer.writeInt(this.accessControl);
+        buffer.writeInt(this.accessMode);
+        return true;
+    }
+
 }

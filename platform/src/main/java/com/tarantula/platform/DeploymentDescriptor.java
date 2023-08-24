@@ -6,14 +6,17 @@ import java.util.Map;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Bufferable;
 import com.icodesoftware.Descriptor;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.service.ApplicationProvider;
 
 public class DeploymentDescriptor extends DefaultDescriptor implements Portable {
 
 
     public DeploymentDescriptor(){
-        this.onEdge = true;
+        super();
+        this.label = ApplicationProvider.LABEL;
     }
 
     @Override
@@ -63,5 +66,33 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         _copy.resetEnabled(this.resetEnabled);
         _copy.accessMode(this.accessMode);
         return _copy;
+    } @Override
+    public boolean read(DataBuffer buffer){
+        super.read(buffer);
+        this.tag = buffer.readUTF8();
+        this.moduleName = buffer.readUTF8();
+        this.applicationClassName = buffer.readUTF8();
+        this.tournamentEnabled = buffer.readBoolean();
+        this.accessRank = buffer.readInt();
+        this.moduleId = buffer.readUTF8();
+        this.moduleArtifact  = buffer.readUTF8();
+        this.moduleVersion = buffer.readUTF8();
+        return true;
     }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        super.write(buffer);
+        buffer.writeUTF8(this.tag);
+        buffer.writeUTF8(this.moduleName!=null?this.moduleName:Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.applicationClassName);
+        buffer.writeBoolean(this.tournamentEnabled);
+        buffer.writeInt(this.accessRank);
+        buffer.writeUTF8(this.moduleId!=null?this.moduleId: Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.codebase!=null?this.codebase:Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.moduleArtifact!=null?this.moduleArtifact:Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.moduleVersion!=null?this.moduleVersion:Bufferable.UTF_NULL);
+        return true;
+    }
+
+
 }

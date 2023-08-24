@@ -5,7 +5,12 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
 
+import com.icodesoftware.util.LongTypeKey;
 import com.tarantula.platform.AccessIndexTrack;
+import com.tarantula.platform.LobbyDescriptor;
+import com.tarantula.platform.service.deployment.ApplicationQuery;
+import com.tarantula.platform.service.deployment.LobbyQuery;
+import com.tarantula.platform.service.deployment.XMLParser;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -13,7 +18,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
-
+import java.util.List;
 
 
 public class LMDBDataStoreMigrationTest {
@@ -37,6 +42,7 @@ public class LMDBDataStoreMigrationTest {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
         AccessIndex accessIndex = new AccessIndexTrack("test","BDS", SystemUtil.oid(),1);
         accessIndex.id(lmdbDataStoreProvider.nextId(ds.name()));
+
         Assert.assertTrue(ds.createIfAbsent(accessIndex,false));
 
         AccessIndex not_created = new AccessIndexTrack("test");
@@ -56,7 +62,45 @@ public class LMDBDataStoreMigrationTest {
         Assert.assertEquals(load.bucket(),accessIndex.bucket());
         Assert.assertEquals(load.oid(),accessIndex.oid());
 
+        Assert.assertTrue(ds.delete(accessIndex.key()));
+        Assert.assertFalse(ds.load(accessIndex));
 
+    }
+    @Test(groups = { "LMDBMigration" })
+    public void descriptorHook(){
+        Exception exception = null;
+        try {
+            DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
+            XMLParser xmlParser = new XMLParser();
+            xmlParser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-presence.xml"));
+            long ownerId = 100;
+            xmlParser.configurations.forEach(lb->{
+                LobbyDescriptor lobby = lb.descriptor;
+                lobby.ownerKey(new LongTypeKey(ownerId));
+                Assert.assertTrue(ds.create(lobby));
+                LobbyDescriptor load = new LobbyDescriptor();
+                load.id(lobby.id());
+                Assert.assertTrue(ds.load(load));
+                Assert.assertEquals(load.typeId(),lobby.typeId());
+                Assert.assertEquals(load.type(),lobby.type());
+                Assert.assertEquals(load.name(),lobby.name());
+                Assert.assertEquals(load.category(),lobby.category());
+                List<LobbyDescriptor> lbs = ds.list(new LobbyQuery(ownerId));
+                LobbyDescriptor lbx = lbs.get(0);
+                Assert.assertEquals(lbx.id(),lobby.id());
+                lb.applications.forEach(a->{
+                    a.ownerKey(new LongTypeKey(lobby.id()));
+                    Assert.assertTrue(ds.create(a));
+                });
+                ds.list(new ApplicationQuery(lobby.id())).forEach(a->{
+                    Assert.assertTrue(a.id()>0);
+                });
+            });
+        }catch (Exception ex){
+            ex.printStackTrace();
+            exception = ex;
+        }
+        Assert.assertNull(exception);
     }
 
 

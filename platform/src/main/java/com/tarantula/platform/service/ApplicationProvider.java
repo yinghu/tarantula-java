@@ -7,9 +7,9 @@ import com.icodesoftware.service.Serviceable;
 
 public interface ApplicationProvider extends Serviceable {
 
-    long DELTA = 60000;
+    //long DELTA = 60000;
 
-    String LABEL = "LDA";
+    String LABEL = "applications";
 
     Descriptor descriptor();
 

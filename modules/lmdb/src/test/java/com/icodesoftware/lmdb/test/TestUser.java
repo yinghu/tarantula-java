@@ -135,15 +135,6 @@ public class TestUser extends RecoverableObject implements Access {
         return true;
     }
 
-    public boolean readKey(Recoverable.DataBuffer buffer){
-        id = buffer.readLong();
-        return true;
-    }
-    public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(id==0) return false;
-        buffer.writeLong(id);
-        return true;
-    }
     @Override
     public Key key() {
         return new LongTypeKey(this.id);

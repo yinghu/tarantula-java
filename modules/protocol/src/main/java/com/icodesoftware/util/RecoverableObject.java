@@ -186,14 +186,28 @@ public class RecoverableObject implements Recoverable {
         return new DistributionKey(this.bucket,this.oid);
     }
 
+    //@Override
+    //public Key key() {
+        //return new LongTypeKey(this.id);
+    //}
+
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        id = buffer.readLong();
+        return true;
+    }
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(id==0) return false;
+        buffer.writeLong(id);
+        return true;
+    }
     @Override
     public boolean equals(Object obj){
         Recoverable tc =(Recoverable) obj;
-        return this.distributionKey().equals(tc.distributionKey());
+        return this.id==(tc.id());
     }
     @Override
     public int hashCode(){
-        return this.distributionKey().hashCode();
+        return Long.hashCode(id);
     }
     @Override
     public String toString(){

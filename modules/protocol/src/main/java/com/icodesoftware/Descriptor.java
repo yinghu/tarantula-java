@@ -47,7 +47,6 @@ public interface Descriptor extends Recoverable {
     int accessControl(); // 0 - 10
     int accessRank();
     String tag(); //service deploy tag
-    double entryCost();
 
 	void typeId(String id);//the system lobby unique ID
 
@@ -61,7 +60,6 @@ public interface Descriptor extends Recoverable {
     void accessMode(int accessMode);
     void accessRank(int accessRank);
     void tag(String tag);
-    void entryCost(double entryCost);
 
 
     String applicationClassName();
