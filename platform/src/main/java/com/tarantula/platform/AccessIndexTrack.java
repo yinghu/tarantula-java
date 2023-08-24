@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -97,5 +98,34 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         jsonObject.addProperty("distributionKey",distributionKey());
         jsonObject.addProperty("referenceId",referenceId);
         return jsonObject;
+    }
+
+    //Bufferable methods
+    @Override
+    public boolean read(DataBuffer buffer){
+        this.bucket = buffer.readUTF8();
+        this.oid = buffer.readUTF8();
+        this.referenceId = buffer.readInt();
+        this.id = buffer.readLong();
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(bucket);
+        buffer.writeUTF8(oid);
+        buffer.writeInt(referenceId);
+        buffer.writeLong(id);
+        return true;
+    }
+    @Override
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        owner = buffer.readUTF8();
+        return true;
+    }
+    @Override
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(owner==null) return false;
+        buffer.writeUTF8(owner);
+        return true;
     }
 }

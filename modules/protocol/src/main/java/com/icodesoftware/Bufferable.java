@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+//copy-free key-value store operations
 public interface Bufferable {
 
     default boolean read(Recoverable.DataBuffer buffer){ return false;}
