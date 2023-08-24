@@ -16,6 +16,17 @@
                 <category>presence</category>
                 <class-name>com.tarantula.platform.presence.PresenceApplication</class-name>
             </application>
+            <application>
+                <type-id>admin-role</type-id>
+                <name>Admin Role</name>
+                <type>application</type>
+                <category>admin</category>
+                <tag>role/admin</tag>
+                <module-name>com.tarantula.admin.AdminRoleModule</module-name>
+                <deploy-priority>10</deploy-priority>
+                <deploy-version>1</deploy-version>
+                <access-control>30</access-control>
+            </application>
         </application-list>
     </lobby-context>
 </tarantula>

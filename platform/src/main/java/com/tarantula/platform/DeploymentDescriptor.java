@@ -84,7 +84,7 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
         super.write(buffer);
         buffer.writeUTF8(this.tag);
         buffer.writeUTF8(this.moduleName!=null?this.moduleName:Bufferable.UTF_NULL);
-        buffer.writeUTF8(this.applicationClassName);
+        buffer.writeUTF8(this.applicationClassName!=null?this.applicationClassName:Bufferable.UTF_NULL);
         buffer.writeBoolean(this.tournamentEnabled);
         buffer.writeInt(this.accessRank);
         buffer.writeUTF8(this.moduleId!=null?this.moduleId: Bufferable.UTF_NULL);
