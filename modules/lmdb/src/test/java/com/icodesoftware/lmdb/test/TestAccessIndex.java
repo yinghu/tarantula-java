@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -69,6 +70,16 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
         buffer.writeUTF8(bucket);
         buffer.writeUTF8(oid);
         buffer.writeInt(referenceId);
+        return true;
+    }
+
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        owner = buffer.readUTF8();
+        return true;
+    }
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(owner==null) return false;
+        buffer.writeUTF8(owner);
         return true;
     }
 

@@ -5,10 +5,10 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.LongTypeKey;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
+import org.lmdbjava.Txn;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -29,7 +29,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-    private long startId = 1_000_000;
+    private long startId = 1_000_000;//
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override
@@ -51,8 +51,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public DataStore createAccessIndexDataStore(String name) {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            Dbi<ByteBuffer> dbx = data.openDbi("key_"+name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(name,dbi,dbx,data,this);
+            return new LMDBDataStore(name,dbi,data,this);
         });
     }
 
@@ -141,9 +140,26 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-   @Override
-    public long id() {
+    public long nextId(String name) {
 
-        return 100;
+        ByteBuffer idKey = ByteBuffer.allocateDirect(key.getMaxKeySize());
+        idKey.put(name.getBytes());
+        idKey.flip();
+        ByteBuffer id = ByteBuffer.allocateDirect(key.getMaxKeySize());
+        long pendingId = startId;
+        Txn<ByteBuffer> txn = key.txnWrite();
+        try {
+            if(keyDbi.get(txn,idKey)!=null) {
+                pendingId = txn.val().getLong();
+            }
+            idKey.rewind();
+            id.putLong(pendingId+1).flip();
+            keyDbi.put(txn,idKey,id);
+            txn.commit();
+            return pendingId+1;
+        }finally {
+            txn.close();
+        }
     }
+
 }

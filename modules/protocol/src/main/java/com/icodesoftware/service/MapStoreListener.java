@@ -20,6 +20,5 @@ public interface MapStoreListener extends ServiceProvider {
 
     void onDeleting(Metadata metadata,byte[] key);
 
-    default long id(){ return 0;}
 
 }

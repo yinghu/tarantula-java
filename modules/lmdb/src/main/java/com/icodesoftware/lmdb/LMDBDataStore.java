@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
-    private final Dbi<ByteBuffer> key;
     private final String name;
 
     private final String bucket ="DBS";
@@ -28,10 +26,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     //NOTES : key+value < 2040 bytes ( 511 bytes for key ; value <= 1521 bytes (2040 - 511 - 8)
 
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
-    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi, Dbi<ByteBuffer> key,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
+    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
         this.name = name;
         this.dbi = dbi;
-        this.key = key;
         this.env = env;
         this.lmdbDataStoreProvider = lmdbDataStoreProvider;
     }
@@ -72,7 +69,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         lmdbDataStoreProvider.createEdgeDB(name+"_"+t.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
-        t.id(nextId(txn));
+        t.id(lmdbDataStoreProvider.nextId(name));
         if(!t.writeKey(new BufferProxy(key))) return false;
         key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
@@ -93,7 +90,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public <T extends Recoverable> boolean update(T t) {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        if(!t.key().write(new BufferProxy(key))) return false;
+        if(!t.writeKey(new BufferProxy(key))) return false;
         key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
@@ -119,7 +116,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        if(!t.key().write(new BufferProxy(key))) throw new IllegalArgumentException("Key must be assigned first");
+        if(!t.writeKey(new BufferProxy(key))) throw new IllegalArgumentException("Key must be assigned first");
         key.flip();
         Txn<ByteBuffer> txn = env.txnWrite(); //can be reading also
         try{
@@ -149,7 +146,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public <T extends Recoverable> boolean load(T t) {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        if(!t.key().write(new BufferProxy(key))) return false;
+        if(!t.writeKey(new BufferProxy(key))) return false;
         key.flip();
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
@@ -275,19 +272,5 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         edgeDbi.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
     }
 
-    private long nextId(Txn<ByteBuffer> txn){
-        ByteBuffer idKey = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        idKey.put(name.getBytes());
-        idKey.flip();
-        ByteBuffer id = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        long pendingId = 0;
-        if(key.get(txn,idKey)!=null){
-            pendingId = txn.val().getLong();
-        }
-        idKey.rewind();
-        id.putLong(pendingId+1).flip();
-        key.put(txn,idKey,id);
-        return pendingId+1;
-    }
 
 }
