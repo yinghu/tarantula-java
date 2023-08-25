@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
+    public static final String LABEL = "stats";
     //private String name;
     private double total=0;
     private double hourly = 0;
@@ -25,7 +26,8 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     private boolean loaded;
     private Statistics.Listener listener;
     public StatisticsEntry(){
-        this.label = "Stats";
+        this.onEdge = true;
+        this.label = LABEL;
     }
     public StatisticsEntry(String bucket,String oid,String name){
         this();
@@ -136,17 +138,17 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.yearly = ((Number)properties.get("yearly")).doubleValue();
         this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
-    public void distributionKey(String distributionKey){
+    //public void distributionKey(String distributionKey){
         //parse key
-        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        bucket = k[0];
-        oid = k[1];
-        name = k[3];
-    }
-    @Override
-    public Key key(){
-        return new ResourceKey(this.bucket,this.oid,new String[]{label,name});
-    }
+        //String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
+        //bucket = k[0];
+        //oid = k[1];
+        //name = k[3];
+    //}
+    //@Override
+    //public Key key(){
+        //return new ResourceKey(this.bucket,this.oid,new String[]{label,name});
+    //}
     Statistics.Entry duplicate(){
         return new StatisticsEntry(this);
     }
@@ -167,5 +169,24 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         jsonObject.addProperty("Yearly",yearly);
         jsonObject.addProperty("Total",total);
         return jsonObject;
+    }
+
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.daily = buffer.readDouble();
+        this.weekly = buffer.readDouble();
+        this.monthly = buffer.readDouble();
+        this.yearly = buffer.readDouble();
+        this.total = buffer.readDouble();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeDouble(daily);
+        buffer.writeDouble(weekly);
+        buffer.writeDouble(monthly);
+        buffer.writeDouble(yearly);
+        buffer.writeDouble(total);
+        return true;
     }
 }

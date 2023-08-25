@@ -6,11 +6,15 @@ import com.icodesoftware.util.LongTypeKey;
 
 public class TestUserQuery implements RecoverableFactory<TestUser> {
 
-    public static final String OWNER_KEY_PREFIX = "testowner_";
 
     private long  ownerId;
+    private String label;
     public TestUserQuery(long ownerId){
         this.ownerId = ownerId;
+    }
+    public TestUserQuery(long ownerId,String label){
+        this.ownerId = ownerId;
+        this.label = label;
     }
     @Override
     public TestUser create() {
@@ -24,12 +28,12 @@ public class TestUserQuery implements RecoverableFactory<TestUser> {
 
     @Override
     public String label() {
-        return TestUser.LABEL;
+        return label==null?TestUser.LABEL:label;
     }
 
     @Override
     public String distributionKey() {
-        return OWNER_KEY_PREFIX;
+        return null;
     }
 
     @Override

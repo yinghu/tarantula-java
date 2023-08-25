@@ -11,6 +11,8 @@ import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
 import com.tarantula.platform.service.deployment.LobbyQuery;
 import com.tarantula.platform.service.deployment.XMLParser;
+import com.tarantula.platform.statistics.StatisticsEntry;
+import com.tarantula.platform.statistics.StatisticsEntryQuery;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -102,6 +104,24 @@ public class LMDBDataStoreMigrationTest {
         }
         Assert.assertNull(exception);
     }
-
+    @Test(groups = { "LMDBMigration" })
+    public void statisticsHook(){
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"4");
+        LongTypeKey owner = new LongTypeKey(1000);
+        StatisticsEntry kills = new StatisticsEntry();
+        kills.ownerKey(owner);
+        kills.name("kills");
+        Assert.assertTrue(ds.create(kills));
+        StatisticsEntry wins = new StatisticsEntry();
+        wins.ownerKey(owner);
+        wins.name("kills");
+        Assert.assertTrue(ds.create(wins));
+        int[] ct ={0};
+        ds.list(new StatisticsEntryQuery(owner.id())).forEach(e->{
+            Assert.assertTrue(ds.load(e));
+            ct[0]++;
+        });
+        Assert.assertEquals(ct[0],2);
+    }
 
 }

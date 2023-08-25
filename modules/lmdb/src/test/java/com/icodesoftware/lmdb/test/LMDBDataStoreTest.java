@@ -85,6 +85,14 @@ public class LMDBDataStoreTest {
         List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
         Assert.assertEquals(zerolist.size(),0);
     }
-
+    @Test(groups = { "LMDB" })
+    public void createEdgeTest() {
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
+        long ownerId1 = 10000;
+        TestUser testUser = new TestUser("user",ownerId1);
+        Assert.assertTrue(ds.create(testUser));
+        Assert.assertTrue(ds.createEdge(testUser,"friends"));
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+    }
 
 }

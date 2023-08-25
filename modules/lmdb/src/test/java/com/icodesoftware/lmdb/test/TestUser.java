@@ -2,7 +2,6 @@ package com.icodesoftware.lmdb.test;
 
 
 import com.icodesoftware.Access;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.RecoverableObject;
 
