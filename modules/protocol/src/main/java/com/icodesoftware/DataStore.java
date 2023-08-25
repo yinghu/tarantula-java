@@ -1,6 +1,7 @@
 package com.icodesoftware;
 
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public interface DataStore {
@@ -40,6 +41,8 @@ public interface DataStore {
 
     interface Backup{
         boolean set(byte[] key,byte[] value);
+
+        default boolean set(ByteBuffer key, ByteBuffer value){return false;}
         byte[] get(byte[] key);
 
         void unset(byte[] key);

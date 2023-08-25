@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
@@ -24,6 +25,7 @@ public class LMDBDataStoreTest {
             put("dir","target/lmdb");
         }});
         lmdbDataStoreProvider.start();
+        lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,new TestMapStoreListener(lmdbDataStoreProvider));
     }
     @AfterTest
     public void tearDown() throws Exception{
@@ -84,6 +86,22 @@ public class LMDBDataStoreTest {
 
         List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
         Assert.assertEquals(zerolist.size(),0);
+
+        DataStore dsx = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+"backup");
+        int[] ct = {0};
+
+
+        dsx.backup().list((buffer)->{
+            ct[0]++;
+            Recoverable.DataHeader h = buffer.readHeader();
+            if(h.classId()==10){
+                TestUser testUser = new TestUser();
+                testUser.read(buffer);
+                System.out.println(testUser.login());
+            }
+            return true;
+        });
+        Assert.assertEquals(ct[0],110);
     }
     @Test(groups = { "LMDB" })
     public void createEdgeTest() {

@@ -37,9 +37,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         dir = (String) properties.get("dir");
     }
 
+    private MapStoreListener mapStoreListener;
     @Override
     public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener) {
-
+        this.mapStoreListener = mapStoreListener;
     }
 
     @Override
@@ -129,7 +130,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
 
     }
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){}
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
+        if(mapStoreListener==null) return;
+        mapStoreListener.onDistributing(metadata,key,value);
+    }
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return null;

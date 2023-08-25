@@ -82,6 +82,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             onEdge(t,t.label(),key,txn);
             txn.commit();
+            key.rewind();
+            value.rewind();
+            lmdbDataStoreProvider.onDistributing(metadata,key,value);
             return true;
         }finally {
             txn.close();
@@ -264,7 +267,16 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     public void unset(byte[] key) {
 
     }
-
+    public boolean set(ByteBuffer key, ByteBuffer value){
+        Txn<ByteBuffer> txn = env.txnWrite();
+        try{
+            if(!dbi.put(txn,key,value)) return false;
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+        }
+    }
     @Override
     public void list(Buffer binary) {
         final Txn<ByteBuffer> txn = env.txnRead();
