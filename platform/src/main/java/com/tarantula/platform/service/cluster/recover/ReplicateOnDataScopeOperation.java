@@ -61,8 +61,7 @@ public class ReplicateOnDataScopeOperation extends Operation {
         source = in.readUTF();
         //key = in.readByteArray();
         //value = in.readByteArray();
-        bkey.put(in.readByteArray());
-        vkey.put(in.readByteArray());
-        in.readInt();
+        bkey.put(in.readByteArray()).flip();
+        vkey.put(in.readByteArray()).flip();
     }
 }
