@@ -1,13 +1,14 @@
 package com.icodesoftware.service;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Event;
+import com.icodesoftware.Recoverable;
 
 public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
 
     KeyIndex lookup(String source,String key);
+    KeyIndex lookup(String source, Recoverable.Key key);
 
     void onReplicated(Event event);
     boolean createIfAbsent(KeyIndex keyIndex);

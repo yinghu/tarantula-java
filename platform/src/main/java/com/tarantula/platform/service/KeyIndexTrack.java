@@ -4,9 +4,9 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.CompositeKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -21,6 +21,15 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     }
     public String[] slaveNodes(){
         return slaveNodes;
+    }
+
+
+    public KeyIndexTrack(){
+
+    }
+    public KeyIndexTrack(String source,Key key){
+        this.owner = source;
+        this.ownerKey = key;
     }
 
     @Override
@@ -74,10 +83,38 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
             slaveNodes[i] = (String)properties.get("s"+i);
         }
     }
-
-    public Key key(){
-        return new CompositeKey(this.owner,this.index);
+    @Override
+    public boolean read(DataBuffer buffer){
+        this.masterNode = buffer.readUTF8();
+        //this.team = buffer.readInt();
+        //this.occupied = buffer.readBoolean();
+        //this.totalJoined = buffer.readInt();
+        //this.totalLeft = buffer.readInt();
+        return true;
     }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(masterNode);
+        //buffer.writeInt(team);
+        //buffer.writeBoolean(occupied);
+        //buffer.writeInt(totalLeft);
+        return true;
+    }
+
+    @Override
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        owner = buffer.readUTF8();
+        ownerKey.readKey(buffer);
+        return true;
+    }
+    @Override
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(owner==null && ownerKey ==null) return false;
+        buffer.writeUTF8(owner);
+        ownerKey.writeKey(buffer);
+        return true;
+    }
+
 
     public boolean placeMasterNode(String node){
         if(masterNode==null){

@@ -4,6 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.util.LongTypeKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +29,7 @@ public class KeyIndexTest {
         String masterNode = "n01";
         String slaveNode1 = "n02";
         String slaveNode2 = "n03";
-        KeyIndexTrack index = new KeyIndexTrack();
+        KeyIndexTrack index = new KeyIndexTrack("users",new LongTypeKey(100));
         index.owner("px1");
         index.index("testkey");
         Assert.assertTrue(index.placeMasterNode(masterNode));

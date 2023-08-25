@@ -4,8 +4,8 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Event;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
@@ -107,6 +107,11 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         byte[] _key = keyIndexTrack.key().asString().getBytes();
         DataStoreOnPartition dso = onPartition(keyIndexTrack.key().asString());
         if(dso.lock(_key,()-> dso.dataStore.load(keyIndexTrack))) return keyIndexTrack;
+        return null;
+    }
+
+    public KeyIndex lookup(String source, Recoverable.Key key){
+        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(source,key);
         return null;
     }
 
