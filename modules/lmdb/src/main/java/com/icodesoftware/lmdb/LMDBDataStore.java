@@ -297,5 +297,4 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         return edgeDbi.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
     }
 
-
 }
