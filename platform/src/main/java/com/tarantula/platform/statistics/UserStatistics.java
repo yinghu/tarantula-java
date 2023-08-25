@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserStatistics extends RecoverableObject implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
+
     private Listener listener;
     public UserStatistics(){
         this.label = "Stats";
