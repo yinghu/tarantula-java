@@ -73,6 +73,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         }
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
             KeyIndexEvent keyIndexEvent = (KeyIndexEvent)event;
+            /**
             for(int i=0;i<keyIndexEvent.owners.length;i++){
                 KeyIndex keyIndex = new KeyIndexTrack();
                 keyIndex.owner(keyIndexEvent.owners[i]);
@@ -91,7 +92,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
                     keyIndex.placeSlaveNode(event.label());
                     return dso.dataStore.createIfAbsent(keyIndex,false);
                 });
-            }
+            }**/
             return true;
         });
         tarantulaContext.keyIndexService = this;
