@@ -1,11 +1,11 @@
 {
   "integration" :{
-     "asyncDistributing": true,
+     "asyncDistributing": false,
      "maxPendingSize": 10,
      "syncIntervalSeconds": 5
   },
   "data": {
-     "asyncDistributing": true,
+     "asyncDistributing": false,
      "maxPendingSize": 10,
      "syncIntervalSeconds": 5
   }
