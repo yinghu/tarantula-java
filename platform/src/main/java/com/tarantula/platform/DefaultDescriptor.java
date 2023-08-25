@@ -42,24 +42,28 @@ public class DefaultDescriptor extends RecoverableObject implements Descriptor {
         this.onEdge = true;
     }
     public String moduleId(){
+        if(moduleId==null) return null;
         return this.moduleId.equals(Bufferable.UTF_NULL)?typeId:moduleId;
     }
     public void moduleId(String moduleId){
         this.moduleId = moduleId;
     }
     public String moduleArtifact(){
+        if(moduleArtifact==null) return null;
         return this.moduleArtifact.equals(Bufferable.UTF_NULL)?null:moduleArtifact;
     }
     public void moduleArtifact(String moduleArtifact){
         this.moduleArtifact = moduleArtifact;
     }
     public String moduleVersion(){
+        if(this.moduleVersion==null) return null;
         return this.moduleVersion.equals(Bufferable.UTF_NULL)?null:this.moduleVersion;
     }
     public void moduleVersion(String moduleVersion){
         this.moduleVersion = moduleVersion;
     }
     public String codebase(){
+        if(this.codebase==null) return null;
         return this.codebase.equals(Bufferable.UTF_NULL)?null:this.codebase;
     }
     public void codebase(String codebase){
