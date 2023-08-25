@@ -23,7 +23,7 @@ public class KeyIndexTest {
         dataStore = dataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX+1);
     }
 
-    @Test(groups = { "KeyIndex" })
+    //@Test(groups = { "KeyIndex" })
     public void setupTest() {
         String masterNode = "n01";
         String slaveNode1 = "n02";

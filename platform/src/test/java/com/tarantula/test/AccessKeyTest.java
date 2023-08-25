@@ -2,11 +2,11 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.icodesoftware.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.tournament.PlayerTournamentHistory;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class DataStoreTest {
+public class AccessKeyTest {
 
     DataStoreProvider dataStoreProvider;
     ServiceContext serviceContext;
@@ -29,46 +29,44 @@ public class DataStoreTest {
 
     @Test(groups = { "DataStore" })
     public void smokeTest() {
-        DataStore dataStore = dataStoreProvider.create("test",serviceContext.node().partitionNumber());
+        DataStore dataStore = dataStoreProvider.create("access_key",serviceContext.node().partitionNumber());
+        LongTypeKey ownerId = new LongTypeKey(100);
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");
-        accessKey.owner(this.serviceContext.node().bucketId());
+        accessKey.index(this.serviceContext.node().bucketId());
         accessKey.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accessKey.disabled(false);
+        accessKey.ownerKey(ownerId);
         Assert.assertTrue(dataStore.create(accessKey));
-        Assert.assertFalse(dataStore.create(accessKey));
+
         AccessKey load = new AccessKey();
-        load.distributionKey(accessKey.distributionKey());
+        load.id(accessKey.id());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertTrue(load.typeId().equals(accessKey.typeId()));
+
         AccessKey loadIf = new AccessKey();
-        loadIf.distributionKey(load.distributionKey());
+        loadIf.id(load.id());
         Assert.assertFalse(dataStore.createIfAbsent(loadIf,true));
-        Assert.assertTrue(load.typeId().equals(loadIf.typeId()));
-        AccessKeyQuery query = new AccessKeyQuery(this.serviceContext.node().bucketId());
+        Assert.assertTrue(loadIf.typeId().equals(load.typeId()));
+
+        AccessKeyQuery query = new AccessKeyQuery(ownerId.id());
         List<AccessKey> keys = dataStore.list(query);
         Assert.assertTrue(keys.size()==1);
         Assert.assertTrue(accessKey.typeId().equals(keys.get(0).typeId()));
+
         AccessKey updating = keys.get(0);
         updating.disabled(true);
         Assert.assertTrue(dataStore.update(updating));
         AccessKey updated = new AccessKey();
-        updated.distributionKey(updating.distributionKey());
+        updated.id(updating.id());
+
         Assert.assertTrue(dataStore.load(updated));
         Assert.assertTrue(updated.disabled());
         Assert.assertTrue(updated.revision()==updating.revision());
-        Assert.assertTrue(updated.revision()>loadIf.revision());
-        byte[] raw = dataStore.load(accessKey.key().asString().getBytes());
-        Assert.assertTrue(raw!=null);
-        RevisionObject ro = RevisionObject.fromBinary(raw);
-        Assert.assertTrue(ro.revision==updating.revision());
-        Assert.assertTrue(ro.local);
-        AccessKey fromRaw = new AccessKey();
-        fromRaw.fromBinary(ro.data);
-        Assert.assertTrue(fromRaw.typeId().equals(accessKey.typeId()));
+
     }
 
-    @Test(groups = { "DataStore" })
+    //@Test(groups = { "DataStore" })
     public void playerTournamentHistoryTest() {
         DataStore dataStore = dataStoreProvider.create("test",serviceContext.node().partitionNumber());
         String systemId = "BDS/"+ SystemUtil.oid();

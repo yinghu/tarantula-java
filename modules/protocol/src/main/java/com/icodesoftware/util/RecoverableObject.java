@@ -186,11 +186,6 @@ public class RecoverableObject implements Recoverable {
         return new DistributionKey(this.bucket,this.oid);
     }
 
-    //@Override
-    //public Key key() {
-        //return new LongTypeKey(this.id);
-    //}
-
     public boolean readKey(Recoverable.DataBuffer buffer){
         id = buffer.readLong();
         return true;

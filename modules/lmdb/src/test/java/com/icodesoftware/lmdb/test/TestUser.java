@@ -134,8 +134,8 @@ public class TestUser extends RecoverableObject implements Access {
         return true;
     }
 
-    @Override
-    public Key key() {
-        return new LongTypeKey(this.id);
-    }
+    //@Override
+    //public Key key() {
+        //return new LongTypeKey(this.id);
+    //}
 }

@@ -64,6 +64,24 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
     }
 
     @Override
+    public boolean read(DataBuffer buffer){
+        this.seat = buffer.readInt();
+        this.team = buffer.readInt();
+        this.occupied = buffer.readBoolean();
+        //this.totalJoined = buffer.readInt();
+        //this.totalLeft = buffer.readInt();
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(seat);
+        buffer.writeInt(team);
+        buffer.writeBoolean(occupied);
+        //buffer.writeInt(totalLeft);
+        return true;
+    }
+
+    @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
     }

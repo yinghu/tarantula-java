@@ -26,13 +26,15 @@ public class AccessIndexTest {
     @Test(groups = { "AccessIndex" })
     public void accessIndexTest() {
         DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+1);
-        AccessIndexTrack accessIndexTrack = new AccessIndexTrack("access100","BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
-        Assert.assertTrue(accessIndexTrack.key().asString().equals("access100"));
+        String access = "access100";
+        AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access,"BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
+        accessIndexTrack.id(dataStoreProvider.nextId(dataStore.name()));
+        Assert.assertTrue(accessIndexTrack.id()>0);
         Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
-
-        //RevisionObject revisionObject = RevisionObject.fromBinary(dataStore.backup().get(accessIndexTrack.key().asString().getBytes()));
-        //Assert.assertEquals(revisionObject.node,serviceContext.node().nodeName().getBytes());
-        Assert.assertTrue(dataStore.delete(accessIndexTrack.key().asString().getBytes()));
+        AccessIndex load = new AccessIndexTrack(access);
+        Assert.assertTrue(dataStore.load(load));
+        Assert.assertEquals(accessIndexTrack.id(),load.id());
+        Assert.assertTrue(dataStore.delete(accessIndexTrack));
         Assert.assertFalse(dataStore.load(accessIndexTrack));
     }
 

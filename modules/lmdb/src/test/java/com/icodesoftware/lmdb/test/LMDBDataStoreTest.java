@@ -16,7 +16,9 @@ import java.util.List;
 
 
 public class LMDBDataStoreTest {
-
+    static {
+        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
+    }
     LMDBDataStoreProvider lmdbDataStoreProvider;
     @BeforeClass
     public void setUp() throws Exception{
@@ -97,7 +99,7 @@ public class LMDBDataStoreTest {
             if(h.classId()==10){
                 TestUser testUser = new TestUser();
                 testUser.read(buffer);
-                System.out.println(testUser.login());
+                //System.out.println(testUser.login());
             }
             return true;
         });

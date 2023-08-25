@@ -1,7 +1,7 @@
 {
     "data-source": {
         "name" : "tarantula",
-        "provider" : "com.tarantula.platform.service.persistence.berkeley.BerkeleyJEProvider",
+        "provider" : "com.icodesoftware.lmdb.LMDBDataStoreProvider",
         "properties": [
             {"truncated": false},
             {"dataPath":"tarantula/data"},

@@ -174,8 +174,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         key.flip();
         Txn<ByteBuffer> txn = env.txnWrite();
         try{
-            if(!onEdge(t,label,key,txn)) return false;
+
+            ByteBuffer okey = onEdge(t,label,key,txn);
+            if(okey==null) return false;
             txn.commit();
+            //lmdbDataStoreProvider.onDistributing(metadata,okey,key);
             return true;
         }finally {
             txn.close();
@@ -195,9 +198,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.close();
         }
     }
-    public boolean delete(Recoverable.Key key){
+
+    public <T extends Recoverable> boolean delete(T t){
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.write(new BufferProxy(akey));
+        t.writeKey(new BufferProxy(akey));
         akey.flip();
         Txn<ByteBuffer> txn = env.txnWrite();
         try{
@@ -288,13 +292,16 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         txn.close();
     }
 
-    private <T extends Recoverable> boolean onEdge(T t,String label,ByteBuffer edge,Txn<ByteBuffer> txn){
-        if(!t.onEdge() || t.ownerKey()==null || label==null) return false;
+    private <T extends Recoverable> ByteBuffer onEdge(T t,String label,ByteBuffer edge,Txn<ByteBuffer> txn){
+        if(!t.onEdge() || t.ownerKey()==null || label==null) return null;
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        if(!t.ownerKey().write(new BufferProxy(key))) return false;
+        if(!t.ownerKey().write(new BufferProxy(key))) return null;
         key.flip();
         Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(name+"_"+label);
-        return edgeDbi.put(txn,key,edge, PutFlags.MDB_NODUPDATA);
+        if(!edgeDbi.put(txn,key,edge, PutFlags.MDB_NODUPDATA)) return null;
+        key.rewind();
+        edge.rewind();
+        return key;
     }
 
 }

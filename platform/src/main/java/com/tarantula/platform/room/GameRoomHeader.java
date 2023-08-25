@@ -9,6 +9,7 @@ import com.icodesoftware.Arena;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
+import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
@@ -116,7 +117,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void load(){
         int[] created ={0};
-        dataStore.list(new GameEntryQuery(this.distributionKey()),(ge)->{
+        dataStore.list(new GameEntryQuery(this.id()),(ge)->{
             entries[ge.seat()]=ge;
             if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
             created[0]++;
@@ -128,6 +129,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             entry.seat(i);
             entry.occupied(false);
             entry.owner(this.distributionKey());
+            entry.ownerKey(new LongTypeKey(this.id));
             if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
             entries[i]=entry;
         }
@@ -159,6 +161,23 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
         this.totalLeft = ((Number)properties.getOrDefault("4",0)).intValue();
 
+    }
+
+    @Override
+    public boolean read(DataBuffer buffer){
+        this.capacity = buffer.readInt();
+        this.round = buffer.readInt();
+        this.totalJoined = buffer.readInt();
+        this.totalLeft = buffer.readInt();
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(capacity);
+        buffer.writeInt(round);
+        buffer.writeInt(totalJoined);
+        buffer.writeInt(totalLeft);
+        return true;
     }
     @Override
     public JsonObject toJson(){

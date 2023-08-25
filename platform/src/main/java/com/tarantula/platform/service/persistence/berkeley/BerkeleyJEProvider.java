@@ -401,6 +401,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         }
     }
 
+    public long nextId(String name) {
+        return 0;
+    }
     //end of map store listener
 
     public void backup(int scope){

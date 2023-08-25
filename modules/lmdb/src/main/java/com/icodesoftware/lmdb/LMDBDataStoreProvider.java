@@ -2,6 +2,8 @@ package com.icodesoftware.lmdb;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
@@ -20,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
 
-
+    //private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
     private Env<ByteBuffer> data;
     private Env<ByteBuffer> key;
     private Dbi<ByteBuffer> keyDbi;
@@ -62,12 +64,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public DataStore createKeyIndexDataStore(String name) {
-        return null;
+        return createAccessIndexDataStore(name);
     }
 
     @Override
     public DataStore create(String name, int partition) {
-        return null;
+        return createAccessIndexDataStore(name);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public DataStore lookup(String name) {
-        return null;
+        return storeMap.get(name);
     }
 
     @Override
@@ -109,6 +111,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(!Files.exists(keyPath)) Files.createDirectories(keyPath);
         key = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(keyPath.toFile());
         keyDbi = key.openDbi("keys",DbiFlags.MDB_CREATE);
+        //logger.warn("LMDB started");
     }
 
     @Override

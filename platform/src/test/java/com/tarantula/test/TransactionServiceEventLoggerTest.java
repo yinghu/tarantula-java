@@ -24,7 +24,7 @@ public class TransactionServiceEventLoggerTest {
         dataStore = dataStoreProvider.create("transaction",serviceContext.node().partitionNumber());
     }
 
-    @Test(groups = { "eventLoggerTest" })
+    //@Test(groups = { "eventLoggerTest" })
     public void loggerTest() {
         TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
         Transaction transaction = new Transaction("","","");

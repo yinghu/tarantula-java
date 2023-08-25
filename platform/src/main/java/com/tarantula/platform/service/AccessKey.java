@@ -17,7 +17,7 @@ public class AccessKey extends OnApplicationHeader implements OnAccess {
     public Map<String,Object> toMap(){
         this.properties.put("typeId",typeId);
         this.properties.put("timestamp",timestamp);
-        this.properties.put("index",owner);
+        this.properties.put("index",index);
         this.properties.put("disabled",disabled);
         return properties;
     }
@@ -36,5 +36,22 @@ public class AccessKey extends OnApplicationHeader implements OnAccess {
 
     public int getClassId() {
         return PortableRegistry.ACCESS_KEY;
+    }
+
+    @Override
+    public boolean read(DataBuffer buffer){
+        this.typeId = buffer.readUTF8();
+        this.timestamp = buffer.readLong();
+        this.index = buffer.readUTF8();
+        this.disabled = buffer.readBoolean();
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(typeId);
+        buffer.writeLong(timestamp);
+        buffer.writeUTF8(index);
+        buffer.writeBoolean(disabled);
+        return true;
     }
 }

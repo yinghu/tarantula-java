@@ -64,7 +64,7 @@ public class LMDBDataStoreMigrationTest {
         Assert.assertEquals(load.bucket(),accessIndex.bucket());
         Assert.assertEquals(load.oid(),accessIndex.oid());
 
-        Assert.assertTrue(ds.delete(accessIndex.key()));
+        Assert.assertTrue(ds.delete(accessIndex));
         Assert.assertFalse(ds.load(accessIndex));
 
     }

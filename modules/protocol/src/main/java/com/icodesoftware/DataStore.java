@@ -26,13 +26,12 @@ public interface DataStore {
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
 
     <T extends Recoverable> boolean load(T t);
-
+    default <T extends Recoverable> boolean delete(T t){ return false;}
     default byte[] load(byte[] key){return null;}
     default boolean load(Recoverable.Key key, Buffer buffer){return false;}
 
     default <T extends Recoverable> boolean createEdge(T t,String label){return false;}
     default boolean delete(byte[] key){return false;}
-    default boolean delete(Recoverable.Key key){return false;}
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);

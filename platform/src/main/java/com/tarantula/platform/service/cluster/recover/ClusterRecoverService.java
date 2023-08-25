@@ -130,7 +130,6 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         }
     }
     public void replicate(String nodeName,String source,byte[] key,byte[] value){
-        log.warn("replicating ->"+source);
         synchronized (pendingUpdates){
             pendingUpdates.add(new ReplicationData(nodeName,source,key,value));
         }
