@@ -66,25 +66,5 @@ public class AccessKeyTest {
 
     }
 
-    //@Test(groups = { "DataStore" })
-    public void playerTournamentHistoryTest() {
-        DataStore dataStore = dataStoreProvider.create("test",serviceContext.node().partitionNumber());
-        String systemId = "BDS/"+ SystemUtil.oid();
-        PlayerTournamentHistory history = new PlayerTournamentHistory(10);
-        history.distributionKey(systemId);
-        dataStore.createIfAbsent(history,true);
-        for(int i=0;i<12;i++){
-            history.addKey("tx-"+i);
-        }
-        List<String> input = history.keySet();
-        dataStore.update(history);
-        PlayerTournamentHistory fromDataStore = new PlayerTournamentHistory(10);
-        fromDataStore.distributionKey(systemId);
-        dataStore.createIfAbsent(fromDataStore,true);
-        List<String> output = fromDataStore.keySet();
-        for(int i=0;i<10;i++){
-            Assert.assertEquals(output.get(i),input.get(i));
-        }
-    }
 
 }

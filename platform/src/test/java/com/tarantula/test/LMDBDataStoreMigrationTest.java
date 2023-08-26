@@ -5,6 +5,8 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
 
+import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.LongTypeKey;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.LobbyDescriptor;
@@ -25,25 +27,27 @@ import java.util.List;
 
 public class LMDBDataStoreMigrationTest {
 
-    LMDBDataStoreProvider lmdbDataStoreProvider;
+
+    DataStoreProvider dataStoreProvider;
+    ServiceContext serviceContext;
     @BeforeClass
-    public void setUp() throws Exception{
-        lmdbDataStoreProvider = new LMDBDataStoreProvider();
-        lmdbDataStoreProvider.configure(new HashMap<>(){{
-            put("dir","target/lmdb");
-        }});
-        lmdbDataStoreProvider.start();
+    public void setUp() {
+        DataStoreTestEvn.setUp();
+        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
+        serviceContext = DataStoreTestEvn.serviceContext;
     }
+
+
     @AfterTest
     public void tearDown() throws Exception{
-       lmdbDataStoreProvider.shutdown();
+       dataStoreProvider.shutdown();
     }
 
     @Test(groups = { "LMDBMigration" })
     public void accessIndexHook() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
+        DataStore ds = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
         AccessIndex accessIndex = new AccessIndexTrack("test","BDS", SystemUtil.oid(),1);
-        accessIndex.id(lmdbDataStoreProvider.nextId(ds.name()));
+        accessIndex.id(dataStoreProvider.nextId(ds.name()));
 
         Assert.assertTrue(ds.createIfAbsent(accessIndex,false));
 
@@ -72,7 +76,7 @@ public class LMDBDataStoreMigrationTest {
     public void descriptorHook(){
         Exception exception = null;
         try {
-            DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
+            DataStore ds = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
             XMLParser xmlParser = new XMLParser();
             xmlParser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-presence.xml"));
             long ownerId = 100;
@@ -106,7 +110,7 @@ public class LMDBDataStoreMigrationTest {
     }
     @Test(groups = { "LMDBMigration" })
     public void statisticsHook(){
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"4");
+        DataStore ds = dataStoreProvider.create("statistics",1);
         LongTypeKey owner = new LongTypeKey(1000);
         StatisticsEntry kills = new StatisticsEntry();
         kills.ownerKey(owner);

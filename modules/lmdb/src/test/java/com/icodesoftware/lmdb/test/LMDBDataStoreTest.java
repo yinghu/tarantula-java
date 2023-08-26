@@ -23,9 +23,9 @@ public class LMDBDataStoreTest {
     @BeforeClass
     public void setUp() throws Exception{
         lmdbDataStoreProvider = new LMDBDataStoreProvider();
-        lmdbDataStoreProvider.configure(new HashMap<>(){{
-            put("dir","target/lmdb");
-        }});
+        //lmdbDataStoreProvider.configure(new HashMap<>(){{
+            //put("dir","target/lmdb");
+        //}});
         lmdbDataStoreProvider.start();
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,new TestMapStoreListener(lmdbDataStoreProvider));
     }
@@ -59,7 +59,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void createWithEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"2");
+        DataStore ds = lmdbDataStoreProvider.create("user",1);
         long ownerId1 = 10000;
         long ownerId2 = 20000;
         for(int i=0;i<10;i++) {
@@ -89,7 +89,7 @@ public class LMDBDataStoreTest {
         List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
         Assert.assertEquals(zerolist.size(),0);
 
-        DataStore dsx = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+"backup");
+        DataStore dsx = lmdbDataStoreProvider.create("user_backup",1);
         int[] ct = {0};
 
 
@@ -107,7 +107,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void createEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
+        DataStore ds = lmdbDataStoreProvider.create("users",1);
         long ownerId1 = 10000;
         TestUser testUser = new TestUser("user",ownerId1);
         Assert.assertTrue(ds.create(testUser));
