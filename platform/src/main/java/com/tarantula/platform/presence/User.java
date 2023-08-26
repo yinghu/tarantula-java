@@ -16,7 +16,7 @@ public class User extends RecoverableObject implements Access {
     protected String validator;
     protected String role;
     public User(){
-        this.label = "VA";
+        this.label = "users";
     }
     public User(String login,boolean validated,String validator){
         this();
@@ -98,5 +98,30 @@ public class User extends RecoverableObject implements Access {
         this.validator = (String)properties.get("8");
         this.owner = (String)properties.get("9");
         this.primary = (boolean)properties.get("10");
+    }
+
+    public boolean write(DataBuffer buffer){
+        buffer.writeUTF8(login);
+        buffer.writeUTF8(password);
+        buffer.writeUTF8(role);
+        buffer.writeBoolean(activated);
+        buffer.writeInt(routingNumber);
+        buffer.writeBoolean(validated);
+        buffer.writeUTF8(emailAddress);
+        buffer.writeUTF8(validator);
+        buffer.writeBoolean(this.primary);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.login = buffer.readUTF8();
+        this.password = buffer.readUTF8();
+        this.role = buffer.readUTF8();
+        this.activated = buffer.readBoolean();
+        this.routingNumber = buffer.readInt();
+        this.validated = buffer.readBoolean();
+        this.emailAddress = buffer.readUTF8();
+        this.validator = buffer.readUTF8();
+        this.primary = buffer.readBoolean();
+        return true;
     }
 }

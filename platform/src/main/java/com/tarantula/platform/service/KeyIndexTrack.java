@@ -86,18 +86,19 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     @Override
     public boolean read(DataBuffer buffer){
         this.masterNode = buffer.readUTF8();
-        //this.team = buffer.readInt();
-        //this.occupied = buffer.readBoolean();
-        //this.totalJoined = buffer.readInt();
-        //this.totalLeft = buffer.readInt();
+        this.slaveNodes = new String[buffer.readInt()];
+        for(int i=0;i<slaveNodes.length;i++){
+            slaveNodes[i]=buffer.readUTF8();
+        }
         return true;
     }
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeUTF8(masterNode);
-        //buffer.writeInt(team);
-        //buffer.writeBoolean(occupied);
-        //buffer.writeInt(totalLeft);
+        buffer.writeInt(slaveNodes.length);
+        for(int i=0;i<slaveNodes.length;i++){
+            buffer.writeUTF8(slaveNodes[i]);
+        }
         return true;
     }
 

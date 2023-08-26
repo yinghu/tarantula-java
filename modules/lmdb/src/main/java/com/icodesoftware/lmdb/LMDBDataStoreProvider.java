@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
 
-    //private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
     private Env<ByteBuffer> data;
     private Env<ByteBuffer> key;
     private Dbi<ByteBuffer> keyDbi;
@@ -111,7 +111,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(!Files.exists(keyPath)) Files.createDirectories(keyPath);
         key = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(keyPath.toFile());
         keyDbi = key.openDbi("keys",DbiFlags.MDB_CREATE);
-        //logger.warn("LMDB started");
+        logger.warn("LMDB started");
     }
 
     @Override
