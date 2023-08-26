@@ -70,12 +70,12 @@ public class GameLobbyAdminRoleModule implements Module {
         }
         else if(session.action().equals("onDisableLobby")){
             String[] query = session.name().split("#");
-            boolean suc = this.deploymentServiceProvider.disableApplication(query[1]);
+            boolean suc = this.deploymentServiceProvider.disableApplication(Long.parseLong(query[1]));
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else if(session.action().equals("onEnableLobby")){
             String[] query = session.name().split("#");
-            boolean suc = this.deploymentServiceProvider.enableApplication(query[1]);
+            boolean suc = this.deploymentServiceProvider.enableApplication(Long.parseLong(query[1]));
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else{

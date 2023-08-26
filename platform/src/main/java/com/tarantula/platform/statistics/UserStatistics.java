@@ -3,7 +3,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,24 +15,26 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     private Listener listener;
+
+    private int count;
     public UserStatistics(){
-        this.label = "Stats";
+
     }
 
     public void registerListener(Listener listener){
         this.listener = listener;
     }
 
-    public Entry entry(String key) {
-        StatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
+    public Entry entry(String ename) {
+        StatisticsEntry entry = this.mappings.computeIfAbsent(ename,(k)->{
             //new entry
-            StatisticsEntry se = new StatisticsEntry(this.bucket,this.oid,k);
+            StatisticsEntry se = new StatisticsEntry(this.key(),ename);
+            this.dataStore.create(se);
+            this.count++;
+            this.dataStore.update(this);
             se.dataStore(this.dataStore);
             return se;
         });
-        if(entry.load()){
-            this.dataStore.update(this);//update index
-        }//load as request
         entry.listener(this.listener);
         return entry;
     }
@@ -41,7 +42,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     public List<Entry> summary(){
         ArrayList<Entry> elist = new ArrayList<>();
         mappings.forEach((k,v)->{
-            v.load();
+            //v.load();
             elist.add(v.duplicate());
         });
         return elist;
@@ -49,7 +50,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     //original streaming
     public void summary(Stream query){
         mappings.forEach((k,v)->{
-            v.load();
+            //v.load();
             query.onEntry(v);
         });
     }
@@ -63,25 +64,6 @@ public class UserStatistics extends RecoverableObject implements Statistics {
         return StatisticsPortableRegistry.STATISTICS_CID;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.mappings.forEach((k,v)->{
-            this.properties.put(v.name(),"");//index stats name
-        });
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        properties.forEach((k,v)->{
-            StatisticsEntry entry = new StatisticsEntry(this.bucket,this.oid,k);
-            entry.dataStore(this.dataStore);
-            mappings.put(k,entry);
-        });
-    }
-    @Override
-    public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
-    }
 
     @Override
     public JsonObject toJson() {
@@ -93,5 +75,27 @@ public class UserStatistics extends RecoverableObject implements Statistics {
         jo.addProperty("Successful",true);
         jo.add("_categories",ja);
         return jo;
+    }
+
+    public int count(int delta){
+        //count += delta;
+        return count;
+    }
+
+    public boolean read(DataBuffer buffer){
+        this.count = buffer.readInt();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(count);
+        return true;
+    }
+
+    public void load(){
+        if(count==0) return;
+        dataStore.list(new StatisticsEntryQuery(this.id),e->{
+            mappings.put(e.name(),e);
+            return true;
+        });
     }
 }

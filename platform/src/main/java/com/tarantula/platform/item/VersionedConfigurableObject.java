@@ -28,7 +28,7 @@ public class VersionedConfigurableObject extends ConfigurableObject{
 
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.configurationVersion);
+        return new AssociateKey(this.id,this.configurationVersion);
     }
 
     @Override

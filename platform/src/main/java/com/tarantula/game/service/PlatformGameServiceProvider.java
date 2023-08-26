@@ -325,7 +325,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
     public ServiceEventLogger transactionEventLogger(String storeName){
-        DataStore dataStore = this.serviceContext.dataStore(gameCluster.typeId()+"_transaction_"+storeName,serviceContext.node().partitionNumber());
+        DataStore dataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,gameCluster.typeId()+"_transaction_"+storeName);
         TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
         return transactionEventLogger;
     }

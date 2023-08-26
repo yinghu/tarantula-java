@@ -3,12 +3,11 @@ package com.icodesoftware.service;
 import com.icodesoftware.*;
 
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 
 public interface ServiceContext extends Context{
 
     //create data scope partitioned data store
-    DataStore dataStore(String name, int partition);
+    DataStore dataStore(int scope,String name);
 
     EventService eventService();
     ClusterProvider clusterProvider();

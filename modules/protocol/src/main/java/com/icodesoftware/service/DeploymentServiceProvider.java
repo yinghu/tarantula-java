@@ -64,8 +64,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     boolean createApplication(Descriptor descriptor,String postSetup,String configName,boolean launching);
 
     boolean updateApplication(Descriptor descriptor,OnAccess properties);
-    boolean enableApplication(String applicationId);
-    boolean disableApplication(String applicationId);
+    boolean enableApplication(long applicationId);
+    boolean disableApplication(long applicationId);
 
     <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties);
     <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);
@@ -109,8 +109,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onModuleUpdated(Descriptor descriptor);
         void onModuleDeployed(String contentUrl,String resourceName);
 
-        void onApplicationLaunched(String typeId,String applicationId);
-        void onApplicationShutdown(String typeId,String applicationId);
+        void onApplicationLaunched(String typeId,long applicationId);
+        void onApplicationShutdown(String typeId,long applicationId);
 
         void onViewUpdated(OnView onView);
 

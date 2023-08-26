@@ -3,7 +3,7 @@ package com.icodesoftware;
 import java.util.List;
 
 
-public interface Statistics extends Recoverable{
+public interface Statistics extends Recoverable,Countable{
 
 
     Entry entry(String key);

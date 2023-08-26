@@ -6,6 +6,7 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.OnReplication;
@@ -54,7 +55,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
-                            this.tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber()).backup().set(r.key(),r.value());
+                            this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source()).backup().set(r.key(),r.value());
                             KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
                         });
@@ -82,7 +83,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 String[] keys = new String[dataReplicationEvent.data().length];
                 for(int i=0;i<dataReplicationEvent.data().length;i++){
                     OnReplication r = dataReplicationEvent.data()[i];
-                    DataStore dataStore = tarantulaContext.dataStore(r.source(),tarantulaContext.node().partitionNumber());
+                    DataStore dataStore = tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source());
                     dataStore.backup().set(r.key(),r.value());
                     sources[i]=r.source();
                     keys[i]=new String(r.key());
@@ -117,10 +118,10 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
 
     public void delete(String  source,byte[] key){
-        this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().unset(key);
+        this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().unset(key);
     }
     public byte[] load(String source,byte[] key){
-        return this.tarantulaContext.dataStore(source,tarantulaContext.node().partitionNumber()).backup().get(key);
+        return this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().get(key);
     }
     public void replicate(OnReplication[] onReplications){
         synchronized (pendingUpdates){
@@ -143,7 +144,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                this.tarantulaContext.dataStore(source,this.tarantulaContext.node().partitionNumber()).backup().list((k,v)->{
+                this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().list((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
                         recoverService.onSync(batch[0],keys,values,memberId,source);
                         batch[0] = 0;

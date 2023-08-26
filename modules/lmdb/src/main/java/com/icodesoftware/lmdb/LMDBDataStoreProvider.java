@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb;
 
 import com.google.gson.JsonElement;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
@@ -26,6 +27,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
+    private String name;
     private String dataPath ="target/lmdb/data";
     private String integrationPath="target/lmdb/integration";
     private String indexPath = "target/lmdb/index";
@@ -47,6 +49,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override
     public void configure(Map<String, Object> properties) {
+        this.name = (String)properties.get("name");
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
@@ -72,26 +75,35 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public DataStore createAccessIndexDataStore(String name) {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = integration.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(name,dbi,integration,this);
+            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,name,dbi,integration,this);
         });
     }
 
-    public Dbi<ByteBuffer> createEdgeDB(String edgeName){
-        return edgMap.computeIfAbsent(edgeName,k->data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+    public Dbi<ByteBuffer> createEdgeDB(int scope,String edgeName){
+        if(scope== Distributable.DATA_SCOPE){
+            return edgMap.computeIfAbsent(edgeName,k->data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return edgMap.computeIfAbsent(edgeName,k->integration.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            return edgMap.computeIfAbsent(edgeName,k->index.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+        }
+        throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
     @Override
     public DataStore createKeyIndexDataStore(String name) {
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = index.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(name,dbi,index,this);
+            return new LMDBDataStore(Distributable.INDEX_SCOPE,name,dbi,index,this);
         });
     }
 
     public DataStore createDataStore(String name){
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(name,dbi,data,this);
+            return new LMDBDataStore(Distributable.DATA_SCOPE,name,dbi,data,this);
         });
     }
 
@@ -122,7 +134,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public String name() {
-        return null;
+        return this.name;
     }
 
     @Override

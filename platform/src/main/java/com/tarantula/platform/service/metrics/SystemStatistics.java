@@ -17,7 +17,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
 
 
     private final static String LABEL = "statistics";
-
+    private int count;
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     public SystemStatistics(){
@@ -85,7 +85,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
+        return new AssociateKey(this.id,this.label);
     }
 
     @Override
@@ -98,5 +98,10 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         jo.addProperty("Successful",true);
         jo.add("_categories",ja);
         return jo;
+    }
+
+    public int count(int delta){
+        count += delta;
+        return count;
     }
 }

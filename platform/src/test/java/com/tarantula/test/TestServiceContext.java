@@ -25,12 +25,12 @@ public class TestServiceContext implements ServiceContext {
         this.node.backupEnabled = false;
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
-        node.bucketId = node.bucketName()+"/"+ SystemUtil.oid();
-        node.nodeId =node.bucketName()+"/"+ SystemUtil.oid();
+        node.bucketId = 1;//node.bucketName()+"/"+ SystemUtil.oid();
+        node.nodeId = 2;//node.bucketName()+"/"+ SystemUtil.oid();
 
     }
     @Override
-    public DataStore dataStore(String s, int i) {
+    public DataStore dataStore(int scope, String s) {
         return new EmptyDataStore();
     }
 

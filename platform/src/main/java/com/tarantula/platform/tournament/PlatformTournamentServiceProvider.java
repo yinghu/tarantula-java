@@ -154,9 +154,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
         this.pendingInstancePoolSizePerSchedule = ((Number)configuration.property("pendingInstancePoolSizePerSchedule")).intValue();
         this.lookupTournamentKey = new IndexSet(TOURNAMENT_LOOKUP_INDEX);
-        this.lookupTournamentKey.distributionKey(serviceContext.node().nodeId());
+        this.lookupTournamentKey.id(serviceContext.node().nodeId());
         this.lookupScheduleKey = new IndexSet(TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
-        this.lookupScheduleKey.distributionKey(serviceContext.node().nodeId());
+        this.lookupScheduleKey.id(serviceContext.node().nodeId());
         this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
         this.dataStore.createIfAbsent(this.lookupTournamentKey,true);
         this.dataStore.createIfAbsent(this.lookupScheduleKey,true);

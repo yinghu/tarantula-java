@@ -10,19 +10,19 @@ import com.icodesoftware.Lobby;
 public class DefaultLobby implements Lobby {
 
 	private Descriptor lobby;
-	private ConcurrentHashMap<String,Descriptor> applicationIndex = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long,Descriptor> applicationIndex = new ConcurrentHashMap<>();
 	private CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
     public DefaultLobby(Descriptor lobby){
         this.lobby = lobby;
     }
 
     public void addEntry(Descriptor descriptor){
-		this.applicationIndex.put(descriptor.distributionKey(),descriptor);
+		this.applicationIndex.put(descriptor.id(),descriptor);
 		listeners.forEach((l)->{
 			l.onLobby(descriptor);
 		});
 	}
-	public  void removeEntry(String applicationId){
+	public  void removeEntry(long applicationId){
 		Descriptor removed = this.applicationIndex.remove(applicationId);
 		removed.disabled(true);
 		listeners.forEach((l)->{
@@ -31,7 +31,7 @@ public class DefaultLobby implements Lobby {
     }
 	public List<Descriptor> entryList(){
 		ArrayList<Descriptor> dlist = new ArrayList<>();
-		this.applicationIndex.forEach((String k,Descriptor d)-> {
+		this.applicationIndex.forEach((k,d)-> {
 			dlist.add(d);
 		});
 		return dlist;

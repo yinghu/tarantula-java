@@ -15,16 +15,15 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String bucketName;
     public String nodeName;
 
-    public String bucketId;
-    public String nodeId;
+    public long bucketId;
+    public long nodeId;
     public String memberId;
     public String address;
     public long startTime;
 
-    public String deploymentId;
+    public long deploymentId;
     public String clusterNameSuffix;
     public int partitionNumber;
-    //public int clusterPartitionNumber;
 
     public String deployDirectory;
     public String servicePushAddress;
@@ -38,7 +37,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.bucketName = bucketName;
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
-        //this.clusterPartitionNumber = clusterPartitionNumber;
     }
     public ClusterNode(){
     }
@@ -62,12 +60,12 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     }
 
     @Override
-    public String bucketId() {
+    public long bucketId() {
         return bucketId;
     }
 
     @Override
-    public String nodeId() {
+    public long nodeId() {
         return nodeId;
     }
 
@@ -86,7 +84,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return startTime;
     }
 
-    public String deploymentId(){
+    public long deploymentId(){
         return this.deploymentId;
     }
 
@@ -134,34 +132,17 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucketName = (String) properties.get("bucketName");
-        this.bucketId = (String) properties.get("bucketId");
+        this.bucketId = ((Number)properties.getOrDefault("bucketId",0)).longValue();
         this.nodeName = (String) properties.get("nodeName");
-        this.nodeId = (String)properties.get("nodeId");
+        this.nodeId = ((Number)properties.getOrDefault("nodeId",0)).longValue();
         this.memberId = (String)properties.get("memberId");
         this.address = (String)properties.get("address");
         this.startTime = ((Number)properties.getOrDefault("startTime",0)).longValue();
         this.clusterNameSuffix = (String)properties.get("clusterNameSuffix");
         this.partitionNumber = ((Number)properties.getOrDefault("partitionNumber",0)).intValue();
-        this.deploymentId = (String)properties.get("deploymentId");
+        this.deploymentId = ((Number)properties.getOrDefault("deploymentId",0)).longValue();
     }
 
-    /**
-    public byte[] toBinary(){
-        return _toJson(false).toString().getBytes();
-    }
-    public void fromBinary(byte[] payload){
-        JsonObject jsonObject = JsonUtil.parse(payload);
-        this.bucketName = jsonObject.get("bucketName").getAsString();
-        this.bucketId = jsonObject.get("bucketId").getAsString();
-        this.nodeName = jsonObject.get("nodeName").getAsString();
-        this.nodeId = jsonObject.get("nodeId").getAsString();
-        this.memberId = jsonObject.get("memberId").getAsString();
-        this.address = jsonObject.get("address").getAsString();
-        this.startTime = jsonObject.get("startTime").getAsLong();
-        this.clusterNameSuffix = jsonObject.get("clusterNameSuffix").getAsString();
-        this.partitionNumber = jsonObject.get("partitionNumber").getAsInt();
-        this.deploymentId = jsonObject.get("deploymentId").getAsString();
-    }**/
     private JsonObject _toJson(boolean toWeb){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("bucketName",bucketName);

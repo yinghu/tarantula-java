@@ -199,7 +199,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         ck.timestamp(stmp);//property(AccessKey.TIMESTAMP,stmp);
         ck.typeId(label);//property(AccessKey.KEY_LABEL,label);
-        ck.owner(this.serviceContext.node().bucketId());
+        //???ck.owner(this.serviceContext.node().bucketId());
         if(deployDataStore.create(ck)){
             byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
             return SystemUtil.accessKey(messageDigest(),label,ck.distributionKey(),stmp,SystemUtil.toHexString(wmark));
@@ -366,12 +366,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
         this.deploymentServiceProvider = serviceContext.deploymentServiceProvider();
-        this.pdataStore =  this.serviceContext.dataStore(Presence.DataStore,this.serviceContext.node().partitionNumber());
-        this.udataStore =  this.serviceContext.dataStore(Access.DataStore,this.serviceContext.node().partitionNumber());
-        this.adataStore =  this.serviceContext.dataStore(Account.DataStore,this.serviceContext.node().partitionNumber());
-        this.idataStore = this.serviceContext.dataStore(Account.IndexDataStore,this.serviceContext.node().partitionNumber());
-        this.mdatastore =  this.serviceContext.dataStore(Subscription.DataStore,this.serviceContext.node().partitionNumber());
-        this.deployDataStore = this.serviceContext.dataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.serviceContext.node().partitionNumber());
+        this.pdataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Presence.DataStore);
+        this.udataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Access.DataStore);
+        this.adataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
+        this.idataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
+        this.mdatastore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
+        this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
         fMap = new ConcurrentHashMap<>();
         AuthVendorRegistry google = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.GOOGLE);
@@ -437,7 +437,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void waitForData() {
         try{
             PresenceKey pKey = new PresenceKey();
-            pKey.distributionKey(serviceContext.node().bucketId());
+            pKey.id(serviceContext.node().id());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
                 pKey.base64key(CipherUtil.toBase64Key(clusterKey));

@@ -3,22 +3,18 @@ import com.icodesoftware.Recoverable;
 
 public class AssociateKey implements Recoverable.Key {
 
-    private String bucket;
-    private String oid;
 
+    private long ownerId;
     private String label;
-    public AssociateKey(String bucket, String oid, String suffix){
-        this.bucket = bucket;
-        this.oid = oid;
+    public AssociateKey(long ownerId, String suffix){
+        this.ownerId = ownerId;
         this.label = suffix;
     }
 
     @Override
     public String asString() {
-        if(bucket==null||oid==null){
-            return null;
-        }
-        return new StringBuffer(bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+        if(ownerId==0 || label==null) return null;
+        return new StringBuffer().append(ownerId).append(Recoverable.PATH_SEPARATOR).append(label).toString();
     }
     @Override
     public int hashCode(){
@@ -28,5 +24,17 @@ public class AssociateKey implements Recoverable.Key {
     public boolean equals(Object obj){
         AssociateKey r = (AssociateKey)obj;
         return this.asString().equals(r.asString());
+    }
+
+    public boolean read(Recoverable.DataBuffer buffer){
+        ownerId = buffer.readLong();
+        label = buffer.readUTF8();
+        return true;
+    }
+    public boolean write(Recoverable.DataBuffer buffer){
+        if(ownerId==0||label==null) return false;
+        buffer.writeLong(ownerId);
+        buffer.writeUTF8(label);
+        return true;
     }
 }

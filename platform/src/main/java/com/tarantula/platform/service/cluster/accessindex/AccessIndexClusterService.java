@@ -53,7 +53,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         this.nodeEngine = nodeEngine;
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
-            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX +i);
+            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX +"x");
         }
         pendingUpdates = new ArrayList<>();
         updates = new ArrayList<>();
@@ -119,6 +119,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex setIfAbsent(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket,SystemUtil.oid(),referenceId);
+        accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
         byte[] key = accessKey.getBytes();
         dso.lock(key,()-> dso.dataStore.createIfAbsent(accessIndex,true));
         return accessIndex;

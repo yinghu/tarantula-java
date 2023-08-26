@@ -29,10 +29,9 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.onEdge = true;
         this.label = LABEL;
     }
-    public StatisticsEntry(String bucket,String oid,String name){
+    public StatisticsEntry(Key ownerKey,String name){
         this();
-        this.bucket = bucket;
-        this.oid = oid;
+        this.ownerKey = ownerKey;
         this.name = name;
     }
     public StatisticsEntry(Statistics.Entry entry){
@@ -138,27 +137,17 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.yearly = ((Number)properties.get("yearly")).doubleValue();
         this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
-    //public void distributionKey(String distributionKey){
-        //parse key
-        //String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        //bucket = k[0];
-        //oid = k[1];
-        //name = k[3];
-    //}
-    //@Override
-    //public Key key(){
-        //return new ResourceKey(this.bucket,this.oid,new String[]{label,name});
-    //}
+
     Statistics.Entry duplicate(){
         return new StatisticsEntry(this);
     }
-    public synchronized boolean load(){
-        if(loaded){
-            return false;
-        }
-        loaded = true;
-        return this.dataStore.createIfAbsent(this,true);
-    }
+    //public synchronized boolean load(){
+        //if(loaded){
+            //return false;
+        //}
+        //loaded = true;
+        //return this.dataStore.createIfAbsent(this,true);
+    //}
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

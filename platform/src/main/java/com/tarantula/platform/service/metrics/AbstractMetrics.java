@@ -146,10 +146,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             registerCategory(GAME_TIMEOUT_COUNT);
         }
         //this.serviceContext = serviceContext;
-        String nodeId = serviceContext.node().nodeId();
+        long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();
-        this.statistics.distributionKey(nodeId);
+        this.statistics.id(nodeId);
         this.statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
         this.bucket = this.statistics.bucket();

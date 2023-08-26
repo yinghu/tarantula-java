@@ -21,6 +21,7 @@ import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
@@ -335,7 +336,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
-        byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
+        byte[] ret = this.vMap.putIfAbsent(ByteBuffer.allocate(8).putLong(cnode.nodeId()).array(),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
@@ -347,13 +348,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
-        summary.register(fromCluster(nodeId));
+        summary.register(fromCluster(Long.parseLong(nodeId)));
         for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
                         String[] pnode = m.getStringAttribute("node").split("#");
-                        Node exstingNode = fromCluster(pnode[1]);
+                        Node exstingNode = fromCluster(Long.parseLong(pnode[1]));
                         if(exstingNode != null){
                             nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
                             this.summary.register(exstingNode);
@@ -387,9 +388,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     //}
 
-    private Node fromCluster(String nodeId){
+    private Node fromCluster(long nodeId){
         Node n = new ClusterNode();
-        byte[] ret = this.vMap.get(nodeId.getBytes());
+        byte[] ret = this.vMap.get(ByteBuffer.allocate(8).putLong(nodeId).array());
         if(ret==null) return null;
         n.fromBinary(ret);
         return n;

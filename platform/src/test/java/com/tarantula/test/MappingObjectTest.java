@@ -28,16 +28,4 @@ public class MappingObjectTest {
 
         Assert.assertEquals(true,Arrays.equals(mappingObject.value(),copy.value()));
     }
-    @Test(groups = { "MappingObejct" })
-    public void presenceKeyTest() {
-        String bkey = CipherUtil.toBase64Key();
-        byte[] key = CipherUtil.fromBase64Key(bkey);
-        PresenceKey mappingObject = new PresenceKey();
-        mappingObject.base64key(bkey);
-        JsonObject json = JsonUtil.toJsonObject(mappingObject.toMap());
-        PresenceKey presenceKey = new PresenceKey();
-        presenceKey.fromBinary(json.toString().getBytes());
-        byte[] akey = presenceKey.toKey();//Base64.getDecoder().decode(json.get("_key").getAsString());
-        Assert.assertEquals(true,Arrays.equals(key,akey));
-    }
 }

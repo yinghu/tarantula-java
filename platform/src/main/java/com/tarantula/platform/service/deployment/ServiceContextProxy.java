@@ -16,8 +16,8 @@ public class ServiceContextProxy implements ServiceContext {
     }
 
     @Override
-    public DataStore dataStore(String name, int partition) {
-        return this.tarantulaContext.dataStore(name,partition);
+    public DataStore dataStore(int scope,String name) {
+        return this.tarantulaContext.dataStore(scope,name);
     }
 
     @Override

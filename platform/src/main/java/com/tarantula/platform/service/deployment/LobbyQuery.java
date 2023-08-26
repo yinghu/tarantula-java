@@ -10,11 +10,8 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 
-    private   String bucketId;
+
     private long ownerId;
-    public LobbyQuery(String bucketId){
-        this.bucketId  = bucketId;
-    }
 
     public LobbyQuery(long ownerId){
         this.ownerId  = ownerId;
@@ -25,7 +22,7 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
     }
 
     public String distributionKey() {
-        return this.bucketId;
+        return null;
     }
 
     public  int registryId(){

@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
@@ -14,6 +15,6 @@ public class AccessMetrics extends AbstractMetrics{
         this.accessIncluded = true;
         this.accountIncluded = true;
         this.logger = JDKLogger.getLogger(AccessMetrics.class);
-        this.dataStore = serviceContext.dataStore("tarantula_access_metrics",serviceContext.node().partitionNumber());
+        this.dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"tarantula_access_metrics");
     }
 }

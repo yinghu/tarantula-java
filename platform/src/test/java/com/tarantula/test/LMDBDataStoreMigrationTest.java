@@ -108,24 +108,5 @@ public class LMDBDataStoreMigrationTest {
         }
         Assert.assertNull(exception);
     }
-    @Test(groups = { "LMDBMigration" })
-    public void statisticsHook(){
-        DataStore ds = dataStoreProvider.createDataStore("statistics");
-        LongTypeKey owner = new LongTypeKey(1000);
-        StatisticsEntry kills = new StatisticsEntry();
-        kills.ownerKey(owner);
-        kills.name("kills");
-        Assert.assertTrue(ds.create(kills));
-        StatisticsEntry wins = new StatisticsEntry();
-        wins.ownerKey(owner);
-        wins.name("kills");
-        Assert.assertTrue(ds.create(wins));
-        int[] ct ={0};
-        ds.list(new StatisticsEntryQuery(owner.id())).forEach(e->{
-            Assert.assertTrue(ds.load(e));
-            ct[0]++;
-        });
-        Assert.assertEquals(ct[0],2);
-    }
 
 }

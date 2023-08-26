@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class LobbyTypeIdIndex extends RecoverableObject {
 
+    private long ownerId;
     public int getFactoryId() {
         return PortableRegistry.OID;
     }
@@ -14,13 +15,13 @@ public class LobbyTypeIdIndex extends RecoverableObject {
 
     }
     //for query
-    public LobbyTypeIdIndex(String bucketId,String typeId){
-        this.bucket = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId){
+        ownerId = bucketId;
         this.label =  typeId;
     }
     //for create
-    public LobbyTypeIdIndex(String bucketId,String typeId,String index,String owner){
-        this.bucket = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId,String index,String owner){
+        this.ownerId = bucketId;
         this.label =  typeId;
         this.index = index;//lobby id
         this.owner = owner;//game cluster id

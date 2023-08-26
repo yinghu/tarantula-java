@@ -166,8 +166,8 @@ public class AdminRoleModule implements Module{
                 if(descriptor.tag().equals(query[1])){
                     suc[0]=this.deploymentServiceProvider.updateApplication(descriptor,onAccess);
                     if(suc[0]){
-                        this.deploymentServiceProvider.disableApplication(descriptor.distributionKey());
-                        this.deploymentServiceProvider.enableApplication(descriptor.distributionKey());
+                        this.deploymentServiceProvider.disableApplication(descriptor.id());
+                        this.deploymentServiceProvider.enableApplication(descriptor.id());
                     }
                 }
             });

@@ -200,6 +200,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             return suc[0];
         }
+        /***
         dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
             a.codebase(descriptor.codebase());
             a.moduleArtifact(descriptor.moduleArtifact());
@@ -207,7 +208,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             dataStore.update(a);
             suc[0]=true;
             return true;
-        });
+        });**/
         //return suc[0];
 
         //DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
@@ -352,7 +353,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
         }
-        this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionKey());
+        this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.id());
         return true;
     }
     public boolean updateApplication(Descriptor descriptor,OnAccess properties){
@@ -363,10 +364,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         descriptor.accessMode(privateAccess?Access.PRIVATE_ACCESS_MODE:0);
         return dataStore.update(descriptor);
     }
-    public boolean enableApplication(String applicationId){
+    public boolean enableApplication(long applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
-        app.distributionKey(applicationId);
+        app.id(applicationId);
         if(!ds.load(app)||!app.disabled()){
             return false;
         }
@@ -375,10 +376,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService  deployService = this.tarantulaContext.integrationCluster().deployService();
         return deployService.onLaunchApplication(app.typeId(),applicationId);
     }
-    public boolean disableApplication(String applicationId){
+    public boolean disableApplication(long applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
-        app.distributionKey(applicationId);
+        app.id(applicationId);
         if(!ds.load(app)||app.disabled()){
             return false;
         }
@@ -723,7 +724,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         lb.distributionKey(lobbyTypeIdIndex.index());
         if(!mds.load(lb)) return null;
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.distributionKey()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
+        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.id()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

@@ -5,6 +5,7 @@ public interface Distributable {
     int LOCAL_SCOPE = 0; //NO REPLICATION
 
     int DATA_SCOPE = 1; //USER DATA REPLICATION SCOPE
+
     int INTEGRATION_SCOPE = 2; //ACCESS REPLICATION SCOPE
     int INDEX_SCOPE = 3; //KEY INDEX REPLICATION SCOPE
 
@@ -16,6 +17,7 @@ public interface Distributable {
 
     int routingNumber();
     void routingNumber(int routingNumber);
+
 
     int scope();
 

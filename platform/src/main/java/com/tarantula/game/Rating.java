@@ -84,7 +84,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
 
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.bucket,this.oid,this.label);
+        return new AssociateKey(this.id,this.label);
     }
 
     public JsonObject toJson(){

@@ -93,13 +93,13 @@ public interface ClusterProvider extends ServiceProvider {
 
         String bucketName();
         String nodeName();
-        String bucketId();
-        String nodeId();
+        long bucketId();
+        long nodeId();
         String memberId();
         String address();
         long startTime();
 
-        String deploymentId();
+        long deploymentId();
 
         int partitionNumber();
 

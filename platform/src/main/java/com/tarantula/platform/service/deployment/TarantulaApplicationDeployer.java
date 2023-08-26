@@ -25,8 +25,8 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	public void start() throws Exception {
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
-		String bucketId = this.context.node().bucketId();
-		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
+		long bucketId = this.context.node().bucketId();
+		List<LobbyDescriptor> bList = new ArrayList<>();//datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
@@ -41,13 +41,13 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
-			c.applications = datastore.list(new ApplicationQuery(c.descriptor.distributionKey()));
+			c.applications = datastore.list(new ApplicationQuery(c.descriptor.id()));
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
-		String deploymentId = this.context.node().deploymentId();
+		long deploymentId = this.context.node().deploymentId();
 		IndexSet indexSet = new IndexSet();
-		indexSet.distributionKey(deploymentId);
+		indexSet.id(deploymentId);
 		indexSet.label(Account.GameClusterLabel);
 		if(datastore.load(indexSet)){
 			indexSet.keySet().forEach((gc)->{
@@ -55,15 +55,15 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			});
 		}
 		IndexSet moduleIndex = new IndexSet();
-		moduleIndex.distributionKey(deploymentId);
+		moduleIndex.id(deploymentId);
 		moduleIndex.label(Account.ModuleLabel);
 		if(datastore.load(moduleIndex)){
 			moduleIndex.keySet().forEach((pc)->{
-				deployModule(pc);
+				//deployModule(pc);
 			});
 		}
 	}
-	private void deployModule(String publishingId){
+	private void deployModule(long publishingId){
 		try {
 			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));
 			blist.forEach((lb)->{
@@ -88,20 +88,25 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
+	private List<LobbyDescriptor> deployFromLocal(long bucketId) throws Exception{
 		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		RecoverableFactory query = new LobbyQuery(bucketId);
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
 		XMLParser xp = new XMLParser();
 		dxml.forEach((xm)->{
-			try{xp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(xm));}catch (Exception ex){ex.printStackTrace();}
+			try{
+				xp.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(xm));
+			}catch (Exception ex){
+				logger.warn("XML parsing error",ex);
+				throw new RuntimeException(ex);//stop
+			}
 		});
 		ArrayList<LobbyDescriptor> blist = new ArrayList<>();
 		xp.configurations.forEach((c)->{
 			c.descriptor.label(query.label());
 			c.descriptor.onEdge(true);
-			c.descriptor.owner(query.distributionKey());
+			c.descriptor.ownerKey(query.key());
 			dataStore.create(c.descriptor);
 			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.distributionKey(),""),false);
 			blist.add(c.descriptor);

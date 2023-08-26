@@ -34,7 +34,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
         if(path.equals("/backup/deployment")){
             String typeId = this.tokenValidator.validateAccessKey(accessKey);
             if(typeId==null) throw new IllegalAccessException("Invalid key");
-            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(true,serviceContext.node().deploymentId()).getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(true,""+serviceContext.node().deploymentId()).getBytes(),true));
             return;
         }
         if(path.equals("/backup/system")){

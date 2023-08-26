@@ -9,7 +9,6 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
 
     private long ownerId;
 
-
     public StatisticsEntryQuery(long ownerId){
         this.ownerId = ownerId;
     }

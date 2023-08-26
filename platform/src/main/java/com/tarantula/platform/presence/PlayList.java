@@ -42,7 +42,7 @@ public class PlayList extends RecoverableObject {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.bucket,this.oid, PLAY_LIST_INDEX);
+        return new AssociateKey(this.id, PLAY_LIST_INDEX);
     }
 
 

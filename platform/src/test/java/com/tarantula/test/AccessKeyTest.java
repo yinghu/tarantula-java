@@ -33,7 +33,7 @@ public class AccessKeyTest {
         LongTypeKey ownerId = new LongTypeKey(100);
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");
-        accessKey.index(this.serviceContext.node().bucketId());
+        accessKey.index(""+this.serviceContext.node().bucketId());
         accessKey.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accessKey.disabled(false);
         accessKey.ownerKey(ownerId);

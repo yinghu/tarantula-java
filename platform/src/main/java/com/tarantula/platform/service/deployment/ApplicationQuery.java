@@ -9,13 +9,10 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor> {
 
-    private String lobbyId;
+    //private String lobbyId;
 
     private long ownerId;
 
-    public ApplicationQuery(String lobbyId){
-        this.lobbyId = lobbyId;
-    }
 
     public ApplicationQuery(long ownerId){
         this.ownerId = ownerId;
@@ -28,7 +25,7 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
 
 
     public String distributionKey() {
-        return lobbyId;
+        return null;
     }
 
     public  int registryId(){
