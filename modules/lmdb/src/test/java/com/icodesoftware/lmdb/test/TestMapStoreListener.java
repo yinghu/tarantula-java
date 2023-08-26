@@ -28,7 +28,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value) {
-        DataStore ds = provider.create("user_backup",1);
+        DataStore ds = provider.createDataStore("user_backup");
         ds.backup().set(key,value);
     }
 

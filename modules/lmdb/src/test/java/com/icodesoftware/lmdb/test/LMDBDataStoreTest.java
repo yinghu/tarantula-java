@@ -59,7 +59,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void createWithEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.create("user",1);
+        DataStore ds = lmdbDataStoreProvider.createDataStore("user");
         long ownerId1 = 10000;
         long ownerId2 = 20000;
         for(int i=0;i<10;i++) {
@@ -89,7 +89,7 @@ public class LMDBDataStoreTest {
         List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
         Assert.assertEquals(zerolist.size(),0);
 
-        DataStore dsx = lmdbDataStoreProvider.create("user_backup",1);
+        DataStore dsx = lmdbDataStoreProvider.createDataStore("user_backup");
         int[] ct = {0};
 
 
@@ -107,7 +107,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void createEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.create("users",1);
+        DataStore ds = lmdbDataStoreProvider.createDataStore("users");
         long ownerId1 = 10000;
         TestUser testUser = new TestUser("user",ownerId1);
         Assert.assertTrue(ds.create(testUser));

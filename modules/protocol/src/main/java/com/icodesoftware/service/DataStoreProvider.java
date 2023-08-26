@@ -24,8 +24,10 @@ public interface DataStoreProvider extends ServiceProvider {
 
     //create none-partitioned local scope data store
     DataStore createKeyIndexDataStore(String name);
+
+    DataStore createDataStore(String name);
     //create partitioned data scope data store
-    DataStore create(String name,int partition);
+    default DataStore create(String name,int partition){return  null;}
 
     List<String> list();
     DataStore lookup(String name);

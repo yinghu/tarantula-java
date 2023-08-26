@@ -144,6 +144,7 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
             return  new KeyIndexDataStore(this.node,db,this);
         });
     }
+    public DataStore createDataStore(String name){return null;}
     private Database createDatabase(String name,int scope){
         try{
             //log.warn("Create database ["+name+"] on scope ["+scope+"]");

@@ -88,8 +88,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         });
     }
 
-    @Override
-    public DataStore create(String name, int partition) {
+    public DataStore createDataStore(String name){
         return storeMap.computeIfAbsent(name,k->{
             Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
             return new LMDBDataStore(name,dbi,data,this);

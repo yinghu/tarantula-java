@@ -76,7 +76,7 @@ public class LMDBDataStoreMigrationTest {
     public void descriptorHook(){
         Exception exception = null;
         try {
-            DataStore ds = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"3");
+            DataStore ds = dataStoreProvider.createDataStore("tarantula");
             XMLParser xmlParser = new XMLParser();
             xmlParser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-presence.xml"));
             long ownerId = 100;
@@ -110,7 +110,7 @@ public class LMDBDataStoreMigrationTest {
     }
     @Test(groups = { "LMDBMigration" })
     public void statisticsHook(){
-        DataStore ds = dataStoreProvider.create("statistics",1);
+        DataStore ds = dataStoreProvider.createDataStore("statistics");
         LongTypeKey owner = new LongTypeKey(1000);
         StatisticsEntry kills = new StatisticsEntry();
         kills.ownerKey(owner);

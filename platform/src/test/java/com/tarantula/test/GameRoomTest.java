@@ -23,7 +23,7 @@ public class GameRoomTest {
         DataStoreTestEvn.setUp();
         dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
         serviceContext = DataStoreTestEvn.serviceContext;
-        dataStore = dataStoreProvider.create("room",serviceContext.node().partitionNumber());
+        dataStore = dataStoreProvider.createDataStore("room");
     }
 
     @Test(groups = { "GameRoom" })

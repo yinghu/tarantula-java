@@ -29,7 +29,7 @@ public class AccessKeyTest {
 
     @Test(groups = { "DataStore" })
     public void smokeTest() {
-        DataStore dataStore = dataStoreProvider.create("access_key",serviceContext.node().partitionNumber());
+        DataStore dataStore = dataStoreProvider.createDataStore("access_key");
         LongTypeKey ownerId = new LongTypeKey(100);
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");

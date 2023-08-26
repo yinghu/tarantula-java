@@ -2,6 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.AccessIndexTrack;
@@ -27,13 +28,13 @@ public class UserTest {
 
     //@Test(groups = { "DataStore" })
     public void userTest() {
-        DataStore accessStore = dataStoreProvider.createAccessIndexDataStore("test_access_index");
+        DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
         AccessIndex accessIndex = new AccessIndexTrack("test1","BDS", SystemUtil.oid(),1);
         accessIndex.id(dataStoreProvider.nextId(accessStore.name()));
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
-        DataStore dUser = dataStoreProvider.create("test_user",serviceContext.node().partitionNumber());
-        DataStore dPresence = dataStoreProvider.create("test_presence",serviceContext.node().partitionNumber());
-        DataStore dAccount = dataStoreProvider.create("test_account",serviceContext.node().partitionNumber());
+        DataStore dUser = dataStoreProvider.createDataStore("test_user");
+        DataStore dPresence = dataStoreProvider.createDataStore("test_presence");
+        DataStore dAccount = dataStoreProvider.createDataStore("test_account");
         User user = new User();
     }
 
