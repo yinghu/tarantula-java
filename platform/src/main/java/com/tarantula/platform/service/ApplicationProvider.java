@@ -9,7 +9,7 @@ public interface ApplicationProvider extends Serviceable {
 
     //long DELTA = 60000;
 
-    String LABEL = "applications";
+    String LABEL = "application";
 
     Descriptor descriptor();
 

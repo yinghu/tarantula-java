@@ -19,6 +19,7 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int PROPERTY_CID = 3;
 
+    public static final int BUCKET_INDEX_OID = 4;
     public static final int PARTITION_STATE_OID = 6;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
@@ -63,6 +64,9 @@ public class PortableRegistry extends AbstractRecoverableListener {
 		switch(cid){
             case PROPERTY_CID:
                 _ins = new DistributedProperty();
+                break;
+            case BUCKET_INDEX_OID:
+                _ins = new BucketIndex();
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();

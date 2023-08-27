@@ -1,30 +1,27 @@
 package com.tarantula.platform;
 
 import com.tarantula.platform.service.cluster.PortableRegistry;
-import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
 
-public class LobbyTypeIdIndex extends RecoverableObject {
+public class LobbyTypeIdIndex extends AssociateObject {
 
-    private long ownerId;
-    public int getFactoryId() {
-        return PortableRegistry.OID;
-    }
+    public long lobbyId;
+    public long gameClusterId;
 
     public LobbyTypeIdIndex(){
 
     }
     //for query
     public LobbyTypeIdIndex(long bucketId,String typeId){
-        ownerId = bucketId;
+        this.id = bucketId;
         this.label =  typeId;
     }
     //for create
-    public LobbyTypeIdIndex(long bucketId,String typeId,String index,String owner){
-        this.ownerId = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId,long lobbyId,long gameClusterId){
+        this.id = bucketId;
         this.label =  typeId;
-        this.index = index;//lobby id
-        this.owner = owner;//game cluster id
+        this.lobbyId = lobbyId;
+        this.gameClusterId = gameClusterId;//game cluster id
     }
     @Override
     public Map<String,Object> toMap(){
@@ -38,11 +35,22 @@ public class LobbyTypeIdIndex extends RecoverableObject {
         this.owner = (String)properties.get("owner");
     }
 
+    public boolean write(DataBuffer buffer){
+        buffer.writeLong(lobbyId);
+        buffer.writeLong(gameClusterId);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.lobbyId = buffer.readLong();
+        this.gameClusterId = buffer.readLong();
+        return true;
+    }
+    public int getFactoryId() {
+        return PortableRegistry.OID;
+    }
+
     public int getClassId() {
         return PortableRegistry.LOBBY_TYPE_ID_INDEX_CID;
     }
-    @Override
-    public Key key(){
-        return new CompositeKey(this.bucket,label);
-    }
+
 }

@@ -50,6 +50,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         onAccess.property("password",pwd);
         accessIndexService.set("serverPush",AccessIndex.SYSTEM_INDEX);
         AccessIndex accessIndex = accessIndexService.set(root,AccessIndex.USER_INDEX);
+
         if(accessIndex!=null){
             Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
             LocalDateTime loc = LocalDateTime.now();

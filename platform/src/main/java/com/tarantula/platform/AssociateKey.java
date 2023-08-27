@@ -3,7 +3,6 @@ import com.icodesoftware.Recoverable;
 
 public class AssociateKey implements Recoverable.Key {
 
-
     private long ownerId;
     private String label;
     public AssociateKey(long ownerId, String suffix){

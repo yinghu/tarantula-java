@@ -8,6 +8,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
+import com.icodesoftware.util.LongTypeKey;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationProvider;
 
@@ -26,9 +27,11 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
 		long bucketId = this.context.node().bucketId();
-		List<LobbyDescriptor> bList = new ArrayList<>();//datastore.list(new LobbyQuery(bucketId));
+		BucketIndex bucketIndex = new BucketIndex(bucketId);
+		datastore.createIfAbsent(bucketIndex,true);
+		List<LobbyDescriptor> bList = bucketIndex.lobbyCount>0?datastore.list(new LobbyQuery(bucketId)):new ArrayList<>();
 		if(bList.isEmpty()){
-			bList = deployFromLocal(bucketId);
+			bList = deployFromLocal(bucketIndex);
 		}
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
@@ -45,6 +48,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
+		/**
 		long deploymentId = this.context.node().deploymentId();
 		IndexSet indexSet = new IndexSet();
 		indexSet.id(deploymentId);
@@ -61,7 +65,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			moduleIndex.keySet().forEach((pc)->{
 				//deployModule(pc);
 			});
-		}
+		}**/
 	}
 	private void deployModule(long publishingId){
 		try {
@@ -88,9 +92,8 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(long bucketId) throws Exception{
-		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
-		RecoverableFactory query = new LobbyQuery(bucketId);
+	private List<LobbyDescriptor> deployFromLocal(BucketIndex bucketIndex) throws Exception{
+		logger.warn("Deploying application from local settings with bucketId ["+bucketIndex.id()+"]");
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
 		XMLParser xp = new XMLParser();
@@ -104,15 +107,13 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		});
 		ArrayList<LobbyDescriptor> blist = new ArrayList<>();
 		xp.configurations.forEach((c)->{
-			c.descriptor.label(query.label());
 			c.descriptor.onEdge(true);
-			c.descriptor.ownerKey(query.key());
+			c.descriptor.ownerKey(new LongTypeKey(bucketIndex.id()));
 			dataStore.create(c.descriptor);
-			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.distributionKey(),""),false);
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketIndex.id(),c.descriptor.typeId(),c.descriptor.id(),0),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
-				a.owner(c.descriptor.distributionKey());
-				a.label(ApplicationProvider.LABEL);
+				a.ownerKey(c.descriptor.key());
 				a.onEdge(true);
 				if(c.descriptor.deployCode()== DeployCode.SYSTEM_MODULE||c.descriptor.deployCode()== DeployCode.APPLICATION_MODULE||c.descriptor.deployCode()== DeployCode.USER_MODULE){
 					a.applicationClassName(this.context.singleModuleApplication);
@@ -122,7 +123,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		});
 		return blist;
 	}
-	private List<String> loadFromLocal() throws Exception{
+	private List<String> loadFromLocal(){
 		List<String> dlist = new ArrayList<>();
 		File f = new File("../deploy");
 		if(f.exists()){
