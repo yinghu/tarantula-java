@@ -8,7 +8,7 @@ public interface UserService extends ServiceProvider,MetricsListener{
 
     String NAME = "UserService";
 
-    Access loadUser(String systemId);
+    Access loadUser(long systemId);
 
     Account loadAccount(Access access);
     List<Access> loadUsers(Account account);

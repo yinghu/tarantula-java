@@ -42,14 +42,14 @@ public class AdminRoleModule implements Module{
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access user = _user(session.systemId());
+            Access user = _user(session.id());
             Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Access user = _user(session.systemId());
+            Access user = _user(session.id());
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = new ArrayList<>();
@@ -111,7 +111,7 @@ public class AdminRoleModule implements Module{
                 session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 4 chars at least").getBytes());
             }
             else{
-                Access ua = _user(session.systemId());
+                Access ua = _user(session.id());
                 Account acc = userService.loadAccount(ua);
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
                     onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
@@ -175,7 +175,7 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onLaunchGameCluster")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Access _u = _user(session.systemId());
+            Access _u = _user(session.id());
             Account acc = userService.loadAccount(_u);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
@@ -212,7 +212,7 @@ public class AdminRoleModule implements Module{
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 
-    private Access _user(String systemId){
+    private Access _user(long systemId){
         return this.userService.loadUser(systemId);
     }
     private byte[] toJson(Map<String,Descriptor> existed,List<Descriptor> exposedGameServices){

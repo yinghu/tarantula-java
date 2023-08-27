@@ -52,7 +52,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         AccessIndex accessIndex = accessIndexService.set(root,AccessIndex.USER_INDEX);
 
         if(accessIndex!=null){
-            Access user = createLogin(onAccess,accessIndex.distributionKey(),AccessControl.root.name(),false,"password",true);
+            Access user = createLogin(onAccess,accessIndex.id(),AccessControl.root.name(),false,"password",true);
             LocalDateTime loc = LocalDateTime.now();
             Membership membership = new Membership();
             membership.startTimestamp(TimeUtil.toUTCMilliseconds(loc));
@@ -90,7 +90,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
         }
         else if(session.action().equals("onLogin")){
-            OnSession access = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
+            this.context.log("USER ID->"+session.id(),OnLog.WARN);
+            OnSession access = this.login(session.id(),(String) acc.property(OnAccess.PASSWORD),session);
             userService.onUpdated(AccessMetrics.ACCESS_WEB_LOGIN_COUNT,1);
             onSession(access,session);
         }
@@ -100,7 +101,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.systemId());
             if(suc && _ox!=null ){
-                OnSession onSession = this.login(session.systemId(),_ox.password(),session);
+                OnSession onSession = this.login(session.id(),_ox.password(),session);
                 onSession(onSession,session);
             }else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
@@ -129,7 +130,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     userService.createLoginProvider(thirdPartyLogin);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
                     createLogin(acc,session.systemId(),AccessControl.player.name(),true,acc.name(),true);
-                    OnSession onSession = login(session.systemId(),thirdPartyLogin.password(),session);
+                    OnSession onSession = login(session.id(),thirdPartyLogin.password(),session);
                     onSession(onSession,session);
                 }
                 else{
@@ -153,7 +154,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 membership.endTimestamp(TimeUtil.toUTCMilliseconds(loc.plusDays(trialDays)));
                 this.userService.createAccount(access,membership);
                 session.systemId(access.distributionKey());
-                OnSession _onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
+                OnSession _onSession = this.login(session.id(),(String) acc.property(OnAccess.PASSWORD),session);
                 this.onSession(_onSession,session);
             }
         }
@@ -161,7 +162,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             LoginProvider _ox = userService.loginProvider(session.systemId());
             if(_ox!=null && _ox.clientId().equals(deviceId)){
-                OnSession access = this.login(session.systemId(),_ox.password(),session);
+                OnSession access = this.login(session.id(),_ox.password(),session);
                 onSession(access,session);
             }
             else{
@@ -178,7 +179,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.property("login",deviceId);
                 acc.property("password",thirdPartyLogin.password());
                 this.createLogin(acc,session.systemId(),AccessControl.player.name(),true,"device",true);
-                OnSession access = this.login(session.systemId(),thirdPartyLogin.password(),session);
+                OnSession access = this.login(session.id(),thirdPartyLogin.password(),session);
                 onSession(access,session);
             }
             else{
@@ -196,7 +197,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         else if(session.action().equals("onResetPassword")){
             String code = (String)acc.property(OnAccess.ACCESS_KEY);
-            Access user = this.userService.loadUser(session.systemId());
+            Access user = this.userService.loadUser(session.id());
             if(user==null){
                 session.write(JsonUtil.toSimpleResponse(false,"wrong user name").getBytes());
             }
@@ -204,7 +205,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
                     user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
                     user.update();
-                    OnSession onSession = this.login(session.systemId(),(String) acc.property(OnAccess.PASSWORD),session);
+                    OnSession onSession = this.login(session.id(),(String) acc.property(OnAccess.PASSWORD),session);
                     onSession(onSession,session);
                 }
                 else{
@@ -216,7 +217,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             LoginProvider _ox = userService.loginProvider(session.systemId());
             if(_ox!=null && _ox.clientId().equals(deviceId)){
-                OnSession access = this.login(session.systemId(),_ox.password(),session);
+                OnSession access = this.login(session.id(),_ox.password(),session);
                 onSession(access,session);
             }
             else{
@@ -237,7 +238,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.property("password",developerLogin.password());
                 this.createLogin(owner,acc,session.systemId(),AccessControl.admin.name(),true,"key",false);
                 userService.createLoginProvider(developerLogin);
-                OnSession access = this.login(session.systemId(),developerLogin.password(),session);
+                OnSession access = this.login(session.id(),developerLogin.password(),session);
                 onSession(access,session);
             }
             else{
@@ -261,16 +262,17 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         return access.successful();
     }
-    private OnSession login(String systemId, String password, Session session){
+    private OnSession login(long systemId, String password, Session session){
         Access access = this.userService.loadUser(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;
         if(access!=null){
             access.routingNumber(session.routingNumber());
             _onSession = this.context.validator().validatePassword(access,password);
-            _onSession.systemId(systemId);
+            _onSession.id(systemId);
         }
         return _onSession;
     }
+
     private Access createLogin(String accountId,OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);
         payload.property(OnAccess.ACCESS_CONTROL,roleName);
@@ -281,6 +283,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         return userService.createUser(accountId,payload);
     }
     private Access createLogin(OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
+        payload.property(OnAccess.SYSTEM_ID,systemId);
+        payload.property(OnAccess.ACCESS_CONTROL,roleName);
+        payload.property(OnAccess.VALIDATOR,validator);
+        payload.property(OnAccess.VALIDATED,validated);
+        payload.property(OnAccess.PRIMARY_USER,primary);
+        payload.property(OnAccess.ACTIVATED,activated);
+        return userService.createUser(payload);
+    }
+
+    private Access createLogin(OnAccess payload,long systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);
         payload.property(OnAccess.ACCESS_CONTROL,roleName);
         payload.property(OnAccess.VALIDATOR,validator);

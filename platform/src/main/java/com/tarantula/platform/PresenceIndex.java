@@ -87,7 +87,20 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.local = (Boolean)properties.getOrDefault("5",true);
         this.index = (String)properties.get("6");
     }
-
+    public boolean write(DataBuffer buffer){
+        buffer.writeInt(counter);
+        buffer.writeBoolean(local);
+        buffer.writeLong(timestamp);
+        buffer.writeBoolean(disabled);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.counter = buffer.readInt();
+        this.local = buffer.readBoolean();
+        this.timestamp = buffer.readLong();
+        this.disabled = buffer.readBoolean();
+        return true;
+    }
     public int count(int delta){
         if(delta<=0){
             return this.counter;

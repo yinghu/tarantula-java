@@ -36,22 +36,22 @@ public class PlatformUserService implements UserService {
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
         acc.emailAddress((String)onAccess.property(OnAccess.EMAIL_ADDRESS));
-        acc.distributionKey((String)onAccess.property(OnAccess.SYSTEM_ID));
+        acc.id((Long)onAccess.property(OnAccess.SYSTEM_ID));
         String pwd = (String)onAccess.property(OnAccess.PASSWORD);
         String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
         acc.password(hash);
         acc.activated((Boolean)onAccess.property(OnAccess.ACTIVATED));
         acc.primary((Boolean)onAccess.property(OnAccess.PRIMARY_USER));
         if(!acc.primary()){
-            if(onAccess.owner()==null) throw new IllegalArgumentException("No owner for sub user");
-            acc.owner(onAccess.owner());
+            if(onAccess.ownerKey()==null) throw new IllegalArgumentException("No owner for sub user");
+            acc.ownerKey(onAccess.ownerKey());
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
         PresenceIndex px = new PresenceIndex();
-        px.distributionKey(acc.distributionKey());
+        px.id(acc.id());
         presenceDataStore.createIfAbsent(px,false);
-        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return acc;
     }
     public Access createUser(String accountId,OnAccess access){
@@ -100,20 +100,20 @@ public class PlatformUserService implements UserService {
     public Account createAccount(Access access,Subscription subscription){
         if(!userDataStore.load(access)) throw new RuntimeException("No such user existed");
         if(!access.primary()) throw new RuntimeException("Only primary user can have an account");
-        subscription.distributionKey(access.distributionKey());
+        subscription.id(access.id());
         subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         subscription.count(1);
         if(!membershipDataStore.createIfAbsent(subscription,false)){
             throw new RuntimeException("Subscription already existed");
         }
         UserAccount account = new UserAccount();
-        account.distributionKey(access.distributionKey());
+        account.id(access.id());
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         if(!accountDataStore.createIfAbsent(account,false)){
             throw new RuntimeException("Account already existed");
         }
-        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
+        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
         return account;
     }
 
@@ -144,9 +144,9 @@ public class PlatformUserService implements UserService {
         return membership;
     }
 
-    public Access loadUser(String systemId){
+    public Access loadUser(long systemId){
         User u = new User();
-        u.distributionKey(systemId);
+        u.id(systemId);
         u.dataStore(userDataStore);
         if(userDataStore.load(u)) return u;
         return null;
@@ -167,10 +167,10 @@ public class PlatformUserService implements UserService {
         indexSet.label(Account.UserLabel);
         if(!accountIndexDataStore.load(indexSet)) return alist;
         indexSet.keySet().forEach((k)->{
-            Access u = loadUser(k);
-            if(u!=null){
-                alist.add(u);
-            }
+            //Access u = loadUser(k);
+            //if(u!=null){
+                //alist.add(u);
+            //}
         });
         return alist;
     }
@@ -181,10 +181,10 @@ public class PlatformUserService implements UserService {
         indexSet.label(Account.UserLabel);
         if(!accountIndexDataStore.load(indexSet)) return alist;
         indexSet.keySet().forEach((k)->{
-          Access u = loadUser(k);
-            if(u!=null){
-              alist.add(u);
-            }
+          //Access u = loadUser(k);
+            //if(u!=null){
+              //alist.add(u);
+            //}
         });
         return alist;
     }

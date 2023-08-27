@@ -52,12 +52,12 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
             }
 
             @Override
-            public RoutingKey routingKey(String magicKey, String tag) {
+            public RoutingKey routingKey(Object magicKey, String tag) {
                 return null;
             }
 
             @Override
-            public RoutingKey routingKey(String magicKey, String tag, int routingNumber) {
+            public RoutingKey routingKey(Object magicKey, String tag, int routingNumber) {
                 return null;
             }
 

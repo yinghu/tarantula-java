@@ -245,15 +245,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         });
     }
 
-    public RoutingKey routingKey(String magicKey,String tag){
+    public RoutingKey routingKey(Object magicKey,String tag){
         return this.routingKey(magicKey,tag,routingNumber(magicKey));
     }
-    public RoutingKey routingKey(String magicKey,String tag,int routingNumber){
-        int _ix = magicKey.indexOf(Recoverable.PATH_SEPARATOR);
-        return new ServiceRoutingKey(_ix!=-1?magicKey.substring(0,magicKey.indexOf("/")):magicKey,tag,routingNumber);
+    public RoutingKey routingKey(Object magicKey,String tag,int routingNumber){
+        //int _ix = magicKey.indexOf(Recoverable.PATH_SEPARATOR);
+        return new ServiceRoutingKey(this.bucket,tag,routingNumber);
     }
 
-    private int routingNumber(String magicKey){
+    private int routingNumber(Object magicKey){
+        //return -_cluster.getPartitionService().getPartition(magicKey).getPartitionId();
         return SystemUtil.partition(magicKey,this.tarantulaContext.platformRoutingNumber);
     }
     public void registerMetricsListener(MetricsListener metricsListener){

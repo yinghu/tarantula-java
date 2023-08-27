@@ -33,6 +33,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		out.writeUTF("13",this.destination);
 		out.writeUTF("15",this.tournamentId);
 		out.writeUTF("16",this.name);
+		out.writeLong("17",this.id);
 	}
 	@Override
 	public void readPortable(PortableReader in) throws IOException {
@@ -50,6 +51,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		this.destination = in.readUTF("13");
 		this.tournamentId = in.readUTF("15");
 		this.name = in.readUTF("16");
+		this.id = in.readLong("17");
 	}
 	@Override
 	public int getClassId() {

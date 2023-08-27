@@ -42,6 +42,24 @@ public class UserAccount extends User implements Account {
         this.subscribed = (Boolean) properties.get("6");
         this.owner = (String)properties.get("7");
     }
+
+    public boolean write(DataBuffer buffer){
+        buffer.writeInt(userCount);
+        buffer.writeInt(gameClusterCount);
+        buffer.writeBoolean(trial);
+        buffer.writeBoolean(subscribed);
+        buffer.writeLong(timestamp);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.userCount = buffer.readInt();
+        this.gameClusterCount = buffer.readInt();
+        this.trial = buffer.readBoolean();
+        this.subscribed = buffer.readBoolean();
+        this.timestamp = buffer.readLong();
+        return true;
+    }
+
     public int userCount(int delta){
         this.userCount = this.userCount+delta;
         return this.userCount;
@@ -63,5 +81,6 @@ public class UserAccount extends User implements Account {
     public void subscribed(boolean subscribed){
         this.subscribed = subscribed;
     }
+
 
 }

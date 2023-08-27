@@ -34,13 +34,13 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access user = this.userService.loadUser(session.systemId());
+            Access user = this.userService.loadUser(session.id());
             Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(0,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onUserList")){
-            Access access = userService.loadUser(session.systemId());
+            Access access = userService.loadUser(session.id());
             AccessContext atc = new AccessContext();
             atc.userList = userService.loadUsers(access);
             session.write(atc.toJson().toString().getBytes());
@@ -48,9 +48,9 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         else if(session.action().equals("onUpgradeUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String uid = (String)onAccess.property(OnAccess.ACCESS_ID);
-            Access owner = userService.loadUser(session.systemId());
+            Access owner = userService.loadUser(session.id());
             if(owner.primary()){//only primary
-                Access u = userService.loadUser(uid);
+                Access u = userService.loadUser(session.id());
                 if(u!=null){
                     if(!u.role().equals(owner.role())){
                         session.write(toMessage("upgraded",this.tokenValidatorProvider.grantAccess(u,owner)).getBytes());
@@ -67,7 +67,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         else if(session.action().equals("onAddUser")){
             if(accessIndexEnabled.get()){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-                Access ua =  userService.loadUser(session.systemId());
+                Access ua =  userService.loadUser(session.id());
                 AccessIndex query = accessIndexService.set((String)onAccess.property("login"),AccessIndex.USER_INDEX);
                 if(query!=null){
                     onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner

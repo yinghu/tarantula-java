@@ -38,6 +38,23 @@ public class Membership extends RecoverableObject implements Subscription {
         this.count = ((Number) properties.getOrDefault("4",0)).intValue();
         this.trial = (boolean) properties.getOrDefault("5",false);
     }
+
+    public boolean write(DataBuffer buffer){
+        buffer.writeInt(count);
+        buffer.writeLong(startTimestamp);
+        buffer.writeLong(endTimestamp);
+        buffer.writeLong(timestamp);
+        buffer.writeBoolean(true);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.count = buffer.readInt();
+        this.startTimestamp = buffer.readLong();
+        this.endTimestamp = buffer.readLong();
+        this.timestamp = buffer.readLong();
+        this.trial = buffer.readBoolean();
+        return true;
+    }
     public boolean trial(){
         return trial;
     }

@@ -9,6 +9,8 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.time.*;
 import java.util.Arrays;
@@ -96,8 +98,12 @@ public class SystemUtil {
     public static int partition(byte[] key,int partitionNumber){
         return Math.abs(Arrays.hashCode(key))%partitionNumber;
     }
-    public static int partition(String key,int partitionNumber){
-        return Math.abs(Arrays.hashCode(key.getBytes()))%partitionNumber;
+    public static int partition(Object key,int partitionNumber){
+        if(key instanceof Long){
+            ByteBuffer byteBuffer = ByteBuffer.allocate(8).putLong((Long)key);
+            return Math.abs(Arrays.hashCode(byteBuffer.array()))%partitionNumber;
+        }
+        return Math.abs(Arrays.hashCode(key.toString().getBytes()))%partitionNumber;
     }
 
 

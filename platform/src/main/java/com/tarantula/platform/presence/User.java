@@ -2,6 +2,7 @@ package com.tarantula.platform.presence;
 
 
 import com.icodesoftware.Access;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.util.RecoverableObject;
 import java.util.Map;
 
@@ -107,7 +108,7 @@ public class User extends RecoverableObject implements Access {
         buffer.writeBoolean(activated);
         buffer.writeInt(routingNumber);
         buffer.writeBoolean(validated);
-        buffer.writeUTF8(emailAddress);
+        buffer.writeUTF8(emailAddress!=null?emailAddress: OnAccess.UTF_NULL);
         buffer.writeUTF8(validator);
         buffer.writeBoolean(this.primary);
         return true;
