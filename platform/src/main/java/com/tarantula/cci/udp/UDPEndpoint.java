@@ -230,7 +230,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             String token = messageBuffer.readUTF8();
             String ticket = messageBuffer.readUTF8();
             OnSession session = tokenValidator.tokenValidator().validateToken(token);
-            boolean suc = tokenValidator.validateTicket(session.systemId(),session.stub(),ticket);
+            boolean suc = tokenValidator.validateTicket(session.id(),session.stub(),ticket);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
             boolean joined = sessionId == messageHeader.sessionId && suc && pendingJoins.remove(sessionId)!=null;
             if(joined) channels.get(sessionId).validated();

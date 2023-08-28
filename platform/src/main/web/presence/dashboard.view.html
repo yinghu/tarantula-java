@@ -430,7 +430,7 @@
         for(let i = 0; i<mChartSize;i++){
             metricsSelected.charts[i].destroy();
         }
-        if(TARA_API.query().systemId){
+        if(TARA_API.query().login){
             TARA_API.onLogout((resp)=>{
                 document.querySelector("#tx-dash-board").style.display="none";
                 document.querySelector("#tx-dash-board").innerHTML="";

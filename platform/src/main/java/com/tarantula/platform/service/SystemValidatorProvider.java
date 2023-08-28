@@ -185,7 +185,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             throw new RuntimeException(ex);
         }
     }
-    public void offSession(String systemId){
+    public void offSession(long systemId){
         Presence presence = pMap.remove(systemId);
         if(presence!=null){
             presence.disabled(true);
@@ -269,15 +269,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return keys;
     }
 
-    public String ticket(String key,int stub,int duration){
-        byte[] mark = encrypt(ByteBuffer.allocate(4).putInt(stub).array());
-        return SystemUtil.ticket(messageDigest(),key,stub,duration,SystemUtil.toHexString(mark));
+    public String ticket(long key,int stub,int duration){
+        byte[] mark = encrypt(ByteBuffer.allocate(16).putLong(key).putInt(stub).putInt(duration).array());
+        return SystemUtil.toBase64String(mark);
+        //return SystemUtil.ticket(messageDigest(),key,stub,duration,SystemUtil.toHexString(mark));
     }
-    public boolean validateTicket(String key,int stub,String ticket){
-        String waterMark = SystemUtil.validTicket(messageDigest(),key,stub,ticket);
-        byte[] data = ByteBuffer.allocate(4).putInt(stub).array();
-        byte[] mark = encrypt(data);
-        return SystemUtil.toHexString(mark).equals(waterMark);
+    public boolean validateTicket(long key,int stub,String ticket){
+        //String waterMark = SystemUtil.validTicket(messageDigest(),key,stub,ticket);
+        byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
+        ByteBuffer buffer = ByteBuffer.allocate(16).put(mark).flip();
+        log.info(ticket);
+        return buffer.getLong()==key && buffer.getInt() == stub;
     }
     public List<Access.Role> list(){
         return roleList;
@@ -573,9 +575,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public OnSession jwtToken(String token){
-        log.warn("TOKEN : "+token);
         OnSession onSession = new OnSessionTrack();
-        if(jwt.verify(token,(h,p)->{
+        if(!jwt.verify(token,(h,p)->{
             if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))) return false;
             Access.Role r = rMap.get(p.get("aud").getAsString());
             if(r==null) return false;
@@ -586,8 +587,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             onSession.id(id);
             onSession.stub(stub);
             return true;
-        })) return onSession;
-        return OnSessionTrack.INVALID_TOKEN;
+        })) return OnSessionTrack.INVALID_TOKEN;
+        onSession.ticket(ticket(onSession.id(),onSession.stub(),timeoutInSeconds));
+        return onSession;
     }
 
 }

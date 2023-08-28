@@ -154,7 +154,7 @@ public class PlatformUserService implements UserService {
 
     public Account loadAccount(Access access){
         Account account = new UserAccount();
-        account.distributionKey(access.primary()?access.distributionKey():access.owner());
+        account.id(access.primary()?access.id():access.id());
         account.dataStore(accountDataStore);
         if(accountDataStore.load(account)) return account;
         return null;
@@ -191,13 +191,13 @@ public class PlatformUserService implements UserService {
 
     public Subscription loadSubscription(Account account){
         Membership acc = new Membership();
-        acc.distributionKey(account.distributionKey());
+        acc.id(account.id());
         if(membershipDataStore.load(acc)) return acc;
         return null;
     }
     public Subscription loadSubscription(Access access){
         Membership acc = new Membership();
-        acc.distributionKey(access.primary()?access.distributionKey():access.owner());
+        acc.id(access.primary()?access.id():access.id());
         if(membershipDataStore.load(acc)) return acc;
         return null;
     }

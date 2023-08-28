@@ -14,12 +14,12 @@ public interface TokenValidator {
     OnSession validatePassword(Access hash, String password);
 
     //generate the ticket with limited life circle
-    String ticket(String systemId,int stub);
+    String ticket(long id,int stub);
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
 
 
-    void offSession(String systemId,int stub);
+    void offSession(long id,int stub);
 
 
     boolean validateToken(Map<String,Object> params);

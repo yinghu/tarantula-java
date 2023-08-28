@@ -158,12 +158,12 @@ var TARA_API = (function(){
         if(aj.status === 200 && aj.readyState === 4){
             let jsn = JSON.parse(aj.responseText);
             if(jsn.Successful){
-                presence.systemId = jsn.SystemId;
+                //presence.systemId = jsn.SystemId;
                 presence.token = jsn.Token;
                 presence.stub = jsn.Stub;
                 presence.login = jsn.Login;
 
-                qdata.systemId = presence.systemId;
+                //qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
@@ -192,12 +192,12 @@ var TARA_API = (function(){
           if(aj.status === 200 && aj.readyState === 4){
               let jsn = JSON.parse(aj.responseText);
               if(jsn.Successful){
-                presence.systemId = jsn.SystemId;
+                //presence.systemId = jsn.SystemId;
                 presence.token = jsn.Token;
                 presence.stub = jsn.Stub;
                 presence.login = jsn.Login;
 
-                qdata.systemId = presence.systemId;
+                //qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
@@ -230,14 +230,14 @@ var TARA_API = (function(){
     aj.onreadystatechange = function(){
         if(aj.status === 200 && aj.readyState === 4){
             let p = JSON.parse(aj.responseText);
-            //console.log(p);
+            console.log(p);
             if(p.Successful){
-                presence.systemId = p.SystemId;
+                //presence.systemId = p.SystemId;
                 presence.token = p.Token;
                 presence.stub = p.Stub;
                 presence.login = p.Login;
 
-                qdata.systemId = presence.systemId;
+                //qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;
@@ -300,7 +300,7 @@ var TARA_API = (function(){
             let p = JSON.parse(aj.responseText);
             if(p.successful){
                 presence = p.presence;
-                qdata.systemId = presence.systemId;
+                //qdata.systemId = presence.systemId;
                 qdata.token = presence.token;
                 qdata.stub = presence.stub;
                 qdata.login = presence.login;

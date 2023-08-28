@@ -33,7 +33,6 @@ public class SystemValidator{
         @Override
         public OnSession validateToken(String token) {
             return systemValidatorProvider.jwtToken(token);
-            //return SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
         }
         @Override
         public String hashPassword(String password) {
@@ -61,20 +60,22 @@ public class SystemValidator{
             }
         }
         @Override
-        public String ticket(String input, int stub) {//short live ticket
+        public String ticket(long input, int stub) {//short live ticket
             return systemValidatorProvider.ticket(input,stub,timeoutSeconds);
         }
         @Override
         public boolean validateTicket(Session session) {
-            Presence ptx = systemValidatorProvider.presence(session);
-            String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
-            byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
-            byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encrypt(ptx,data);
-            return SystemUtil.toHexString(mark).equals(waterMark);
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> VALID TICKET ["+session.ticket()+"]");
+            return systemValidatorProvider.validateTicket(session.id(),session.stub(),session.ticket());
+            //Presence ptx = systemValidatorProvider.presence(session);
+            //String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
+            //byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
+            //byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encrypt(ptx,data);
+            //return SystemUtil.toHexString(mark).equals(waterMark);
         }
 
         @Override
-        public void offSession(String systemId, int stub) {
+        public void offSession(long systemId, int stub) {
             systemValidatorProvider.offSession(systemId);
         }
         @Override
