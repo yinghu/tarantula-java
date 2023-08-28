@@ -90,7 +90,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
         }
         else if(session.action().equals("onLogin")){
-            this.context.log("USER ID->"+session.id(),OnLog.WARN);
+            //this.context.log("USER ID->"+session.id(),OnLog.WARN);
             OnSession access = this.login(session.id(),(String) acc.property(OnAccess.PASSWORD),session);
             userService.onUpdated(AccessMetrics.ACCESS_WEB_LOGIN_COUNT,1);
             onSession(access,session);

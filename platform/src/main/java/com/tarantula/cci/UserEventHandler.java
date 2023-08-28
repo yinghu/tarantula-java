@@ -49,13 +49,11 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
             if(action.equals("onLogin")){
                 AccessIndex acc = accessIndexService.get(magicKey);
                 if(acc!=null){
-                    log.warn("USER ID->"+acc.id());
                     event.id(acc.id());
                     event.systemId(acc.distributionKey());
                     RoutingKey _routingKey = eventService.routingKey(acc.id(),tag);
                     event.destination(_routingKey.route());
                     event.routingNumber(_routingKey.routingNumber());
-                    log.warn("USER ID->"+acc.id()+">>>"+_routingKey.route()+">>>"+_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }else{
                     //send login failed back

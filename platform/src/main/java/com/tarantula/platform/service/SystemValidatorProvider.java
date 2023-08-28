@@ -573,6 +573,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public OnSession jwtToken(String token){
+        log.warn("TOKEN : "+token);
         OnSession onSession = new OnSessionTrack();
         if(jwt.verify(token,(h,p)->{
             if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))) return false;
