@@ -278,18 +278,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         //String waterMark = SystemUtil.validTicket(messageDigest(),key,stub,ticket);
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
         ByteBuffer buffer = ByteBuffer.allocate(16).put(mark).flip();
-        log.info(ticket);
         return buffer.getLong()==key && buffer.getInt() == stub;
     }
     public List<Access.Role> list(){
         return roleList;
     }
-    public Access.Role role(String systemId){
-        if(systemId==null){
+    public Access.Role role(long systemId){
+        if(systemId==0){
             return rMap.get("player");
         }
         Access acc = new User();
-        acc.distributionKey(systemId);
+        acc.id(systemId);
         if(udataStore.load(acc)){
             return rMap.get(acc.role());
         }

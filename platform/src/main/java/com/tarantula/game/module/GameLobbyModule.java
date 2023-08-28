@@ -39,7 +39,7 @@ public class GameLobbyModule extends ModuleHeader{
             this.gameLobby.validate(session);
         }
         else if(session.action().equals("onTest")){
-            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+            if(this.context.validator().role(session.id()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
             Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
@@ -49,7 +49,7 @@ public class GameLobbyModule extends ModuleHeader{
             this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
         }
         else if(session.action().equals("onTestScore")){
-            if(this.context.validator().role(session.systemId()).accessControl()< AccessControl.admin.accessControl()){
+            if(this.context.validator().role(session.id()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
         }

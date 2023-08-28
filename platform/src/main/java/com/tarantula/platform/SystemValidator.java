@@ -65,7 +65,6 @@ public class SystemValidator{
         }
         @Override
         public boolean validateTicket(Session session) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> VALID TICKET ["+session.ticket()+"]");
             return systemValidatorProvider.validateTicket(session.id(),session.stub(),session.ticket());
             //Presence ptx = systemValidatorProvider.presence(session);
             //String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
@@ -95,7 +94,7 @@ public class SystemValidator{
         public boolean upgradeRole(Access access,String role){
             return systemValidatorProvider.upgradeRole(access,role);
         }
-        public Access.Role role(String systemId){
+        public Access.Role role(long systemId){
             return systemValidatorProvider.role(systemId);
         }
     }
