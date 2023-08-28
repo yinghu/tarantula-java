@@ -32,7 +32,8 @@ public class SystemValidator{
 
         @Override
         public OnSession validateToken(String token) {
-            return SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
+            return systemValidatorProvider.jwtToken(token);
+            //return SystemUtil.validToken(systemValidatorProvider.messageDigest(),token);
         }
         @Override
         public String hashPassword(String password) {
@@ -42,15 +43,15 @@ public class SystemValidator{
         @Override
         public OnSession validatePassword(Access access, String password) {
             if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
-                Presence presence = systemValidatorProvider.presence(access.distributionKey());
+                Presence presence = systemValidatorProvider.presence(access.id());
                 OnSession _ox = new OnSessionTrack();
-                _ox.systemId(access.distributionKey());
+                _ox.id(access.id());
                 _ox.stub(presence.count(1));
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
-                byte[] mark = systemValidatorProvider.encrypt(ByteBuffer.allocate(4).putInt(_ox.stub()).array());
-                _ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark),systemValidatorProvider.clusterNameSuffix()));
-                _ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
+                _ox.token(systemValidatorProvider.jwtToken(access,_ox));
+                //_ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark),systemValidatorProvider.clusterNameSuffix()));
+                //_ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
                 _ox.successful(true);
                 return _ox;
             }

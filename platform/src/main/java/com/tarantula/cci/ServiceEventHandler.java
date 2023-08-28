@@ -37,10 +37,10 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+exchange.id(),tag);
             if((token!=null)&&(!token.equals("undefined"))){
                 id = auth.validateToken(token);//first entry point check
-                routingKey = eventService.routingKey(id.systemId(),tag);
+                routingKey = eventService.routingKey(id.id(),tag);
             }
             ServiceActionEvent actionEvent = new ServiceActionEvent(this.serviceTopic,exchange.id(),_payload);
-            actionEvent.systemId(id.systemId());
+            actionEvent.id(id.id());
             actionEvent.stub(id.stub());
             actionEvent.ticket(id.ticket());
             actionEvent.token(token);

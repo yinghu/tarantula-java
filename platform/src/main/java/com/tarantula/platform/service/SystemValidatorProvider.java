@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.CipherUtil;
+import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
@@ -32,7 +33,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private int timeoutInSeconds;
 
     private ServiceContext serviceContext;
-    private ConcurrentHashMap<String,PresenceIndex> pMap;
+    private ConcurrentHashMap<Long,PresenceIndex> pMap;
     private HashMap<String,Access.Role> rMap;
     private HashMap<String,AuthVendorRegistry> aMap;
     private DataStore pdataStore;//presence
@@ -54,9 +55,10 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
+    private Cipher decrypt;
     private ClusterProvider.ClusterStore clusterStore;
 
-
+    private JWTUtil.JWT jwt;
     public MessageDigest messageDigest(){
         try{
             return (MessageDigest)this._messageDigest.clone();
@@ -69,9 +71,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return systemValidator.tokenValidator();
     }
     public Presence presence(Session session){
-        Presence presence = pMap.computeIfAbsent(session.systemId(),(k)->{
+        Presence presence = pMap.computeIfAbsent(session.id(),(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.distributionKey(session.systemId());
+            px.id(session.id());
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -86,15 +88,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pdataStore.update(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
-            pMap.put(session.systemId(),px);
+            pMap.put(session.id(),px);
             return px;
         }
         return presence;
     }
-    public Presence presence(String systemId){
-        return pMap.computeIfAbsent(systemId,(k)->{
+    public Presence presence(long id){
+        return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.distributionKey(systemId);
+            px.id(id);
             pdataStore.load(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -169,6 +171,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 return cipher.doFinal(data);
             }
             //return fMap.get(presence.index()).encrypt.doFinal(data);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public byte[] decrypt(byte[] data){
+        try{
+            synchronized (decrypt){
+                return decrypt.doFinal(data);
+            }
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -447,7 +459,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 deployDataStore.createIfAbsent(pKey,true);
             }
             encrypt = CipherUtil.encrypt(pKey.toKey());
+            decrypt = CipherUtil.decrypt(pKey.toKey());
             this.presenceKey = pKey;
+            jwt = JWTUtil.init();
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -546,6 +560,33 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public void releaseAuthVendor(String provider,AuthVendor authVendor){
         aMap.get(provider).registerAuthVendor(authVendor);
+    }
+
+    public String jwtToken(Access access,OnSession session){
+        return jwt.token((h,p)->{
+            byte[] mark = encrypt(ByteBuffer.allocate(12).putLong(access.id()).putInt(session.stub()).array());
+            h.addProperty("kid",CipherUtil.toBase64Key(mark));
+            p.addProperty("aud", access.role());
+            long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
+            p.addProperty("exp",expiry);
+            return true;
+        });
+    }
+    public OnSession jwtToken(String token){
+        OnSession onSession = new OnSessionTrack();
+        if(jwt.verify(token,(h,p)->{
+            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))) return false;
+            Access.Role r = rMap.get(p.get("aud").getAsString());
+            if(r==null) return false;
+            byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
+            ByteBuffer buffer = ByteBuffer.allocate(12).put(data).flip();
+            long id = buffer.getLong();
+            int stub = buffer.getInt();
+            onSession.id(id);
+            onSession.stub(stub);
+            return true;
+        })) return onSession;
+        return OnSessionTrack.INVALID_TOKEN;
     }
 
 }

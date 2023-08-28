@@ -14,6 +14,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     private String login;
 
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED",false);
+    public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN",false);
 
     public OnSessionTrack(){
 

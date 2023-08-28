@@ -32,6 +32,12 @@ public class CipherUtil {
         secureRandom.nextBytes(_key);
         return _key;
     }
+    public static byte[] key(int size){
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] _key = new byte[size];
+        secureRandom.nextBytes(_key);
+        return _key;
+    }
 
     public static String toBase64Key(){
         return Base64.getEncoder().encodeToString(key());

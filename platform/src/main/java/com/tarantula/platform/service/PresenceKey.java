@@ -8,6 +8,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 public class PresenceKey extends AssociateObject {
 
     private String base64Key;
+
     public PresenceKey(){
         this.label = "presenceKey";
     }
@@ -33,6 +34,7 @@ public class PresenceKey extends AssociateObject {
     public byte[] toKey(){
         return CipherUtil.fromBase64Key(base64Key);
     }
+
 
     public boolean write(DataBuffer buffer){
         buffer.writeUTF8(base64Key);
