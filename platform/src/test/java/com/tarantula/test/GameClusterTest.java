@@ -59,7 +59,7 @@ public class GameClusterTest {
         gameCluster.ownerKey(new LongTypeKey(1000));
         gameCluster.onEdge(true);
         Assert.assertTrue(ds.createEdge(gameCluster,"gameCluster"));
-        
+
     }
 
 }

@@ -29,8 +29,4 @@ public class LobbyItemObjectQuery implements RecoverableFactory<LobbyItem> {
         return label;
     }
 
-    @Override
-    public String distributionKey() {
-        return null;
-    }
 }

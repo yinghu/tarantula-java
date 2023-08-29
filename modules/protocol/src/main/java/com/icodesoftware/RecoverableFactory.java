@@ -18,7 +18,7 @@ public interface RecoverableFactory<T extends Recoverable>{
      * The owner key of the edge mapping or the vertext filter string
      * */
 
-    String distributionKey();
+    //String distributionKey();
 
     default Recoverable.Key key(){return null;}
 

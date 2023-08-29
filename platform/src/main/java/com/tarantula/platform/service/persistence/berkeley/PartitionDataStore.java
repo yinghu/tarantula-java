@@ -318,7 +318,7 @@ public class PartitionDataStore implements ReplicatedDataStore{
 
     public  <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> binary){
         try {
-            String akey = (query.distributionKey() + Recoverable.PATH_SEPARATOR + query.label());
+            String akey = (query.key().asString() + Recoverable.PATH_SEPARATOR + query.label());
             byte[] owner = akey.getBytes();
             DataBaseOnPartition dso = partitions[SystemUtil.partition(owner,partition)];
             RevisionObject pendingData = _getRevisionObject(dso,owner);

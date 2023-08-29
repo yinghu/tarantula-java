@@ -31,7 +31,7 @@ public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
         return AccessKey.LABEL;
     }
 
-    @Override
+
     public String distributionKey() {
         return owner;
     }

@@ -27,7 +27,7 @@ public class DailygGiveawayObjectQuery implements RecoverableFactory<DailyGiveaw
         return label;
     }
 
-    @Override
+
     public String distributionKey() {
         return null;
     }

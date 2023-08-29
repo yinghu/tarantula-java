@@ -28,8 +28,4 @@ public class AchievementObjectQuery implements RecoverableFactory<Achievement> {
         return label;
     }
 
-    @Override
-    public String distributionKey() {
-        return null;
-    }
 }

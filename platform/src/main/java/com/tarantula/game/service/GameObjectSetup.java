@@ -142,7 +142,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     protected <T extends Configurable> List<T> list(DataStore dataStore, Descriptor application, RecoverableFactory<T> recoverableFactory){
         IndexSet indexSet = new IndexSet(recoverableFactory.label());
-        indexSet.distributionKey(recoverableFactory.distributionKey()==null?application.distributionKey():recoverableFactory.distributionKey());
+        //indexSet.distributionKey(recoverableFactory.distributionKey()==null?application.distributionKey():recoverableFactory.distributionKey());
         ArrayList<T> arrayList = new ArrayList<>();
         if(!dataStore.load(indexSet)){
             return arrayList;

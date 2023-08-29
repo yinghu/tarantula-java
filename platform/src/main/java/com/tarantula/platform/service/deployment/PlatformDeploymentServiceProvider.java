@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -602,7 +603,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         mds.update(gameCluster);
         return (T)gameCluster;
     }
-
+    public <T extends OnAccess> List<T> gameClusterList(Account account){
+        return new ArrayList<>();
+    }
     public  <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().set(name,AccessIndex.SYSTEM_INDEX);//name+"-"+mode
         if(accessIndex==null){

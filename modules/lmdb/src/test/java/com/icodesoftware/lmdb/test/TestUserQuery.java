@@ -30,12 +30,7 @@ public class TestUserQuery implements RecoverableFactory<TestUser> {
     public String label() {
         return label==null?TestUser.LABEL:label;
     }
-
-    @Override
-    public String distributionKey() {
-        return null;
-    }
-
+    
     @Override
     public Recoverable.Key key() {
         return new LongTypeKey(ownerId);

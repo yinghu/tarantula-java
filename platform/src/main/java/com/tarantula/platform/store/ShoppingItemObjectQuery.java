@@ -27,8 +27,5 @@ public class ShoppingItemObjectQuery implements RecoverableFactory<Shop> {
         return label;
     }
 
-    @Override
-    public String distributionKey() {
-        return null;
-    }
+
 }

@@ -32,7 +32,7 @@ public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableO
         return label;
     }
 
-    @Override
+
     public String distributionKey() {
         return itemId;
     }

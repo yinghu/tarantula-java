@@ -27,8 +27,4 @@ public class GameResourceQuery implements RecoverableFactory<GameResource> {
         return label;
     }
 
-    @Override
-    public String distributionKey() {
-        return null;
-    }
 }
