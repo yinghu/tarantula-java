@@ -3,6 +3,7 @@ package com.tarantula.platform.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.icodesoftware.Bufferable;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
@@ -66,7 +67,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.listener = configurableObject.listener;
         this._reference = configurableObject._reference;
         this._configurableSetting = configurableObject._configurableSetting;
-        this.distributionKey(configurableObject.distributionKey());
+        this.id(configurableObject.id());
     }
 
     public <T extends Configurable> void registerListener(Listener<T> listener){
@@ -153,6 +154,34 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
         this._configurableSetting = JsonUtil.parse((String) properties.getOrDefault(SETTINGS_KEY, "{}"));
         this.configurationScope = (String) properties.get(SCOPE_KEY);
+    }
+
+    public boolean read(DataBuffer buffer){
+        this.configurationType = buffer.readUTF8();
+        this.configurationTypeId = buffer.readUTF8();
+        this.configurationName = buffer.readUTF8();
+        this.configurationCategory = buffer.readUTF8();
+        this.configurationVersion = buffer.readUTF8();
+        this.configurationScope = buffer.readUTF8();
+        this.disabled = buffer.readBoolean();
+        this.header = JsonUtil.parse(buffer.readUTF8());
+        this.application = JsonUtil.parse(buffer.readUTF8());
+        this.reference = JsonUtil.parseAsJsonArray(buffer.readUTF8());
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(this.configurationType);
+        buffer.writeUTF8(this.configurationTypeId);
+        buffer.writeUTF8(this.configurationName);
+        buffer.writeUTF8(this.configurationCategory);
+        buffer.writeUTF8(this.configurationVersion);
+        buffer.writeUTF8(this.configurationScope);
+        buffer.writeBoolean(disabled);
+        buffer.writeUTF8(header.toString());
+        buffer.writeUTF8(application.toString());
+        buffer.writeUTF8(reference.toString());
+        return true;
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
