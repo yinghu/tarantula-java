@@ -1,0 +1,11 @@
+{
+  "type": "asset",
+  "category": "type",
+  "version": "1.0",
+  "description": "types of asset category",
+  "itemList":
+  [
+    {"type": "category","name": "DisplayCard"},
+    {"type": "category","name": "GameView"}
+  ]
+}

@@ -62,7 +62,7 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         removeItem(type);
     }
     public Key key(){
-        return new NaturalKey("category/types/"+name);
+        return new NaturalKey("category/types/"+name);//name => one of asset, component, item, application
     }
 
     private JsonArray removeItem(JsonObject type){

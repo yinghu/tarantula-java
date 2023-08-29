@@ -32,7 +32,17 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         this.name = (String) properties.get("name");
         this.application = JsonUtil.parse((String)properties.getOrDefault("application","{}"));
     }
-
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.application = JsonUtil.parse(buffer.readUTF8());
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeUTF8(application.toString());
+        return true;
+    }
     @Override
     public int getClassId() {
         return ItemPortableRegistry.CONFIGURABLE_CATEGORIES_CID;
@@ -130,7 +140,7 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
 
     }
     public Key key(){
-        return new NaturalKey("category/classes/"+name);
+        return new NaturalKey("category/classes/"+name);//name => one of asset, component, item, application
     }
 
 }

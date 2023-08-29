@@ -1,0 +1,71 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category asset template list",
+  "name": "asset-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "asset",
+        "type": "DisplayCard",
+        "description": "general icon view",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SmallIconURL",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          },
+          {
+            "name": "MediumIconURL",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          },
+          {
+            "name": "LargeIconURL",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "asset",
+        "type": "GameView",
+        "description": "general game view",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

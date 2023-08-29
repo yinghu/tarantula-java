@@ -1,0 +1,26 @@
+{
+  "type": "common",
+  "category": "type",
+  "version": "1.0",
+  "description": "basic common types of category",
+  "itemList":
+  [
+    {"type": "string","name": "String","value": "text","reference": "String"},
+    {"type": "number","name": "Short","value": "number","reference": "short"},
+    {"type": "number","name": "Integer","value": "number","reference": "integer"},
+    {"type": "number","name": "Long","value": "number","reference": "long"},
+    {"type": "number","name": "Double","value": "number","reference": "double"},
+    {"type": "number","name": "Float","value": "number","reference": "float"},
+    {"type": "boolean","name": "Boolean","value": "boolean","reference": "boolean"},
+    {"type": "dateTime","name": "DateTime","value": "dateTime-local","reference": "DateTime"},
+    {"type": "list","name": "List"},
+    {"type": "set","name": "Set"},
+    {"type": "enum","name": "Environment","value": [{"name":"Development","value":0},{"name":"Production","value":1},{"name":"Disabled","value":2}]},
+    {"type": "enum","name": "PlayMode","value": [{"name":"pve","value":0},{"name":"pvp","value":1},{"name":"tve","value":2},{"name":"tvt","value":3}]},
+    {"type": "enum","name": "Schedule","value": [{"name":"Daily","value":0},{"name":"Weekly","value":1},{"name":"Monthly","value":2},{"name":"OnDemand","value":3}]},
+    {"type": "enum","name": "ItemType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"Bundle","value":2}]},
+    {"type": "enum","name": "PurchaseType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"IAP","value":2}]},
+    {"type": "enum","name": "VirtualCurrency","value": [{"name":"Gold","value":0},{"name":"Gem","value":1},{"name":"Coin","value":2},{"name":"Chip","value":3},{"name":"None","value":4}]},
+    {"type": "enum","name": "EquipmentType","value": [{"name":"TargetingSystem","value":0},{"name":"Motherboard","value":1},{"name":"Drone","value":2}]}
+  ]
+}
