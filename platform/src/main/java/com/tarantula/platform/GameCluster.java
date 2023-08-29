@@ -80,6 +80,32 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
+    public String mode;
+    public String applicationSetup;
+
+    public String gameLobbyName;
+
+    public String gameServiceName;
+
+    public String gameDataName;
+
+    public String developer;
+
+    public String gameIcon;
+
+    public String developerIcon;
+
+    public boolean dedicated;
+
+    public boolean tournamentEnabled;
+
+    public int maxLobbyCount;
+
+    public int maxZoneCount;
+
+    public int maxArenaCount;
+
+
     public GameCluster(){}
 
     @Override
@@ -110,23 +136,60 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
         jo.addProperty("message",message);
-        jo.addProperty("gameClusterId",distributionKey());
-        jo.addProperty("name",(String)property(GameCluster.NAME));
-        jo.addProperty("mode",(String)property(GameCluster.MODE));
-        jo.addProperty("setup",(String)property(GameCluster.LOBBY_PRE_SETUP_NAME));
-        jo.addProperty("gameLobby",(String)property(GameCluster.GAME_LOBBY));
-        jo.addProperty("gameService",(String)property(GameCluster.GAME_SERVICE));
-        jo.addProperty("gameData",(String)property(GameCluster.GAME_DATA));
-        jo.addProperty("developer",(String)property(GameCluster.DEVELOPER));
-        jo.addProperty("gameIcon",(String)property(GameCluster.GAME_ICON));
-        jo.addProperty("developerIcon",(String)property(GameCluster.DEVELOPER_ICON));
-        jo.addProperty("tournamentEnabled",(Boolean)property(GameCluster.TOURNAMENT_ENABLED));
-        jo.addProperty("dedicated",(Boolean)property(GameCluster.DEDICATED));
-        jo.addProperty("disabled",(Boolean)property(GameCluster.DISABLED));
-        jo.addProperty("maxLobbyCount",maxLobbyCount());
-        jo.addProperty("maxZoneCount",maxZoneCount());
-        jo.addProperty("maxArenaCount",maxArenaCount());
+        jo.addProperty("gameClusterId",id);
+        jo.addProperty("name",name);
+        jo.addProperty("mode",mode);
+        jo.addProperty("setup",applicationSetup);
+        jo.addProperty("gameLobby",gameLobbyName);
+        jo.addProperty("gameService",gameServiceName);
+        jo.addProperty("gameData",gameDataName);
+        jo.addProperty("developer",developer);
+        jo.addProperty("gameIcon",gameIcon);
+        jo.addProperty("developerIcon",developerIcon);
+        jo.addProperty("tournamentEnabled",tournamentEnabled);
+        jo.addProperty("dedicated",dedicated);
+        jo.addProperty("disabled",disabled);
+        jo.addProperty("maxLobbyCount",maxLobbyCount);
+        jo.addProperty("maxZoneCount",maxZoneCount);
+        jo.addProperty("maxArenaCount",maxArenaCount);
         return jo;
+    }
+
+    public boolean write(DataBuffer buffer){
+        buffer.writeUTF8(name);
+        buffer.writeUTF8(mode);
+        buffer.writeUTF8(applicationSetup);
+        buffer.writeUTF8(gameLobbyName);
+        buffer.writeUTF8(gameServiceName);
+        buffer.writeUTF8(gameDataName);
+        buffer.writeUTF8(developer);
+        buffer.writeUTF8(developerIcon);
+        buffer.writeUTF8(gameIcon);
+        buffer.writeBoolean(tournamentEnabled);
+        buffer.writeBoolean(dedicated);
+        buffer.writeBoolean(disabled);
+        buffer.writeInt(maxLobbyCount);
+        buffer.writeInt(maxZoneCount);
+        buffer.writeInt(maxArenaCount);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        name = buffer.readUTF8();
+        mode = buffer.readUTF8();
+        applicationSetup = buffer.readUTF8();
+        gameLobbyName = buffer.readUTF8();
+        gameServiceName = buffer.readUTF8();
+        gameDataName = buffer.readUTF8();
+        developer = buffer.readUTF8();
+        developerIcon = buffer.readUTF8();
+        gameIcon = buffer.readUTF8();
+        tournamentEnabled = buffer.readBoolean();
+        dedicated = buffer.readBoolean();
+        disabled = buffer.readBoolean();
+        maxLobbyCount = buffer.readInt();
+        maxZoneCount = buffer.readInt();
+        maxArenaCount = buffer.readInt();
+        return true;
     }
     @Override
     public int getFactoryId() {

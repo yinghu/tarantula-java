@@ -225,8 +225,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         if(!query.key().write(new BufferProxy(key))) return;
         key.flip();
-        Txn<ByteBuffer> txn = env.txnRead();
         Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(scope,name+"_"+query.label());
+        Txn<ByteBuffer> txn = env.txnRead();
         CursorIterable<ByteBuffer> cursor = edgeDbi.iterate(txn, KeyRange.closed(key, key));
         try{
             for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){

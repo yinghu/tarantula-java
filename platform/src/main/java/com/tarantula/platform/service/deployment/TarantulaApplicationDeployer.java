@@ -27,11 +27,10 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
 		long bucketId = this.context.node().bucketId();
-		BucketIndex bucketIndex = new BucketIndex(bucketId);
-		datastore.createIfAbsent(bucketIndex,true);
-		List<LobbyDescriptor> bList = bucketIndex.lobbyCount>0?datastore.list(new LobbyQuery(bucketId)):new ArrayList<>();
+
+		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
-			bList = deployFromLocal(bucketIndex);
+			bList = deployFromLocal(bucketId);
 		}
 		ArrayList<LobbyConfiguration> configurations = new ArrayList();
 		bList.forEach((d)->{
@@ -92,8 +91,8 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(BucketIndex bucketIndex) throws Exception{
-		logger.warn("Deploying application from local settings with bucketId ["+bucketIndex.id()+"]");
+	private List<LobbyDescriptor> deployFromLocal(long bucketId) throws Exception{
+		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
 		XMLParser xp = new XMLParser();
@@ -108,9 +107,9 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		ArrayList<LobbyDescriptor> blist = new ArrayList<>();
 		xp.configurations.forEach((c)->{
 			c.descriptor.onEdge(true);
-			c.descriptor.ownerKey(new LongTypeKey(bucketIndex.id()));
+			c.descriptor.ownerKey(new LongTypeKey(bucketId));
 			dataStore.create(c.descriptor);
-			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketIndex.id(),c.descriptor.typeId(),c.descriptor.id(),0),false);
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.id(),0),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.ownerKey(c.descriptor.key());

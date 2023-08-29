@@ -9,7 +9,6 @@ import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.PresenceKey;
 
-import com.tarantula.platform.service.deployment.BucketIndex;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -49,28 +48,6 @@ public class DeployTestSet {
         load.id(id);
         Assert.assertFalse(dataStore.createIfAbsent(load,true));
         Assert.assertEquals(true, Arrays.equals(key,load.toKey()));
-    }
-
-    @Test(groups = { "bucketIndex" })
-    public void bucketIndexTest() {
-        DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
-        long id = dataStoreProvider.nextId(dataStore.name());
-        BucketIndex created = new BucketIndex();
-        created.id(id);
-        Assert.assertTrue(dataStore.createIfAbsent(created,false));
-        Assert.assertEquals(created.lobbyCount,0);
-        BucketIndex load = new BucketIndex();
-        load.id(id);
-        Assert.assertFalse(dataStore.createIfAbsent(load,true));
-        Assert.assertEquals(load.lobbyCount, 0);
-        //update
-        load.lobbyCount++;
-        Assert.assertTrue(dataStore.update(load));
-
-        BucketIndex updated = new BucketIndex();
-        updated.id(id);
-        Assert.assertTrue(dataStore.load(updated));
-        Assert.assertEquals(updated.lobbyCount, 1);
     }
 
     @Test(groups = { "lobbyTypeIdIndex" })

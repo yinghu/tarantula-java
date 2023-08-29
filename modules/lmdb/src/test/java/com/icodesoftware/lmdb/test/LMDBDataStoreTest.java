@@ -62,6 +62,8 @@ public class LMDBDataStoreTest {
         DataStore ds = lmdbDataStoreProvider.createDataStore("user");
         long ownerId1 = 10000;
         long ownerId2 = 20000;
+        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
+        Assert.assertTrue(empty.size()==0);
         for(int i=0;i<10;i++) {
             TestUser testUser = new TestUser("user"+i,ownerId1);
             Assert.assertTrue(ds.create(testUser));
