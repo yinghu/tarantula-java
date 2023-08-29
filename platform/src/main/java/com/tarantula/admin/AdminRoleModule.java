@@ -52,8 +52,9 @@ public class AdminRoleModule implements Module{
             Access user = _user(session.id());
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
-            adminContext.gameClusterList = new ArrayList<>();
+            adminContext.gameClusterList = this.deploymentServiceProvider.gameClusterList(user);
             adminContext.index = index;
+            /**
             IndexSet idx = this.userService.loadGameClusterIndex(user);
             if(idx!=null){
                 idx.keySet().forEach((k)->{
@@ -62,7 +63,7 @@ public class AdminRoleModule implements Module{
                         adminContext.gameClusterList.add(g);
                     }
                 });
-            }
+            }**/
             session.write(adminContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoadGameCluster")){

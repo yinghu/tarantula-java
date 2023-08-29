@@ -117,14 +117,14 @@ public class PlatformUserService implements UserService {
         return account;
     }
 
-    public Subscription subscribe(String accountId,int durationMonth){
+    public Subscription subscribe(long accountId,int durationMonth){
         Access access = new User();
-        access.distributionKey(accountId);
+        access.id(accountId);
         if(!userDataStore.load(access)){
             throw new RuntimeException("no such user");
         }
         Account account = new UserAccount();
-        account.distributionKey(access.primary()?access.distributionKey(): access.owner());
+        account.id(access.primary()?access.id(): access.primaryId());
         if(!accountDataStore.load(account)){
             throw new RuntimeException("no such account");
         }
@@ -154,7 +154,7 @@ public class PlatformUserService implements UserService {
 
     public Account loadAccount(Access access){
         Account account = new UserAccount();
-        account.id(access.primary()?access.id():access.id());
+        account.id(access.primary()?access.id():access.primaryId());
         account.dataStore(accountDataStore);
         if(accountDataStore.load(account)) return account;
         return null;

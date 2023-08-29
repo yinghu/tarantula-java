@@ -449,8 +449,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void waitForData() {
         try{
-            PresenceKey pKey = new PresenceKey();
-            pKey.id(serviceContext.node().id());
+            PresenceKey pKey = new PresenceKey(serviceContext.node().id());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
                 pKey.base64key(CipherUtil.toBase64Key(clusterKey));

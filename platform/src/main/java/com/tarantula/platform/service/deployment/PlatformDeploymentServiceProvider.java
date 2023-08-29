@@ -603,7 +603,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         mds.update(gameCluster);
         return (T)gameCluster;
     }
-    public <T extends OnAccess> List<T> gameClusterList(Account account){
+    public <T extends OnAccess> List<T> gameClusterList(Access access){
         return new ArrayList<>();
     }
     public  <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties){

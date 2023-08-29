@@ -69,7 +69,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties);
 
-    <T extends OnAccess> List<T> gameClusterList(Account account);
+    <T extends OnAccess> List<T> gameClusterList(Access access);
     <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);
 
 

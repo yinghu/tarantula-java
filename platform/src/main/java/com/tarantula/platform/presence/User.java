@@ -14,6 +14,7 @@ public class User extends RecoverableObject implements Access {
     protected boolean activated;
     protected boolean validated;
     protected boolean primary;
+    protected long primaryId;
     protected String validator;
     protected String role;
     public User(){
@@ -67,6 +68,13 @@ public class User extends RecoverableObject implements Access {
     public void primary(boolean primary){
         this.primary = primary;
     }
+
+    public long primaryId(){
+        return this.primaryId;
+    }
+    public void primaryId(long primaryId){
+        this.primaryId = primaryId;
+    }
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }
@@ -111,6 +119,7 @@ public class User extends RecoverableObject implements Access {
         buffer.writeUTF8(emailAddress!=null?emailAddress: OnAccess.UTF_NULL);
         buffer.writeUTF8(validator);
         buffer.writeBoolean(this.primary);
+        buffer.writeLong(primaryId);
         return true;
     }
     public boolean read(DataBuffer buffer) {
@@ -123,6 +132,7 @@ public class User extends RecoverableObject implements Access {
         this.emailAddress = buffer.readUTF8();
         this.validator = buffer.readUTF8();
         this.primary = buffer.readBoolean();
+        this.primaryId = buffer.readLong();
         return true;
     }
 }

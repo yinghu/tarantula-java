@@ -32,6 +32,9 @@ public interface Access extends Recoverable,DataStore.Updatable {
     boolean validated();//validated to skip check password if user login from third party login token
     boolean primary();
     void primary(boolean primary);
+
+    long primaryId();
+    void primaryId(long primaryId);
     String validator();
 
     String role();
