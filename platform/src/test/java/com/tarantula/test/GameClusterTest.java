@@ -52,6 +52,8 @@ public class GameClusterTest {
         gameCluster.maxArenaCount = 10;
         gameCluster.maxZoneCount = 10;
         gameCluster.maxLobbyCount = 10;
+        gameCluster.maxDataSize = 4000;
+        gameCluster.upgradeVersion = 1;
         Assert.assertTrue(ds.create(gameCluster));
 
         GameCluster load = new GameCluster();

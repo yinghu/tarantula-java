@@ -116,7 +116,7 @@ public class AdminRoleModule implements Module{
                 Account acc = userService.loadAccount(ua);
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
                     onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
-                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.distributionKey(),pendingName,onAccess);
+                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.id(),pendingName,onAccess);
                     if(gc.successful()){
                         IndexSet idx = this.userService.loadGameClusterIndex(ua);
                         idx.addKey(gc.distributionKey());

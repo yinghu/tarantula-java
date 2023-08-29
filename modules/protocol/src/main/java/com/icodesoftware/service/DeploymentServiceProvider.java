@@ -67,7 +67,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     boolean enableApplication(long applicationId);
     boolean disableApplication(long applicationId);
 
-    <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties);
+    <T extends OnAccess> T createGameCluster(long accountId,String name,OnAccess properties);
 
     <T extends OnAccess> List<T> gameClusterList(Access access);
     <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);

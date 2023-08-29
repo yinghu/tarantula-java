@@ -9,6 +9,7 @@ import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.LongTypeKey;
+import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationProvider;
 
@@ -47,24 +48,22 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
-		/**
+
 		long deploymentId = this.context.node().deploymentId();
-		IndexSet indexSet = new IndexSet();
-		indexSet.id(deploymentId);
-		indexSet.label(Account.GameClusterLabel);
-		if(datastore.load(indexSet)){
-			indexSet.keySet().forEach((gc)->{
-				deployGameCluster(gc);
-			});
-		}
-		IndexSet moduleIndex = new IndexSet();
-		moduleIndex.id(deploymentId);
-		moduleIndex.label(Account.ModuleLabel);
-		if(datastore.load(moduleIndex)){
-			moduleIndex.keySet().forEach((pc)->{
+		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
+		//IndexSet indexSet = new IndexSet();
+		//indexSet.id(deploymentId);
+		//indexSet.label(Account.GameClusterLabel);
+		//if(datastore.load(indexSet)){
+		glist.forEach((gc)-> deployGameCluster(gc));
+		//IndexSet moduleIndex = new IndexSet();
+		//moduleIndex.id(deploymentId);
+		//moduleIndex.label(Account.ModuleLabel);
+		//if(datastore.load(moduleIndex)){
+			//moduleIndex.keySet().forEach((pc)->{
 				//deployModule(pc);
-			});
-		}**/
+			//});
+		//}
 	}
 	private void deployModule(long publishingId){
 		try {
@@ -76,9 +75,9 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			ex.printStackTrace();
 		}
 	}
-	private void deployGameCluster(String gameClusterId){
+	private void deployGameCluster(GameCluster gameCluster){
 		try {
-			GameCluster gameCluster = this.context.loadGameCluster(gameClusterId);//new GameCluster();
+			//GameCluster gameCluster = this.context.loadGameCluster(gameClusterId);//new GameCluster();
 			//gameCluster.distributionKey(gameClusterId);
 			//if(!this.context.masterDataStore().load(gameCluster)) return;
 			if(gameCluster==null || gameCluster.disabled()){

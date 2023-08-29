@@ -105,7 +105,11 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public int maxArenaCount;
 
+    public int maxDataSize;
 
+    public int upgradeVersion;
+    public long publishingId;
+    public long accountId;
     public GameCluster(){}
 
     @Override
@@ -171,6 +175,10 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         buffer.writeInt(maxLobbyCount);
         buffer.writeInt(maxZoneCount);
         buffer.writeInt(maxArenaCount);
+        buffer.writeLong(publishingId);
+        buffer.writeLong(accountId);
+        buffer.writeInt(maxDataSize);
+        buffer.writeInt(upgradeVersion);
         return true;
     }
     public boolean read(DataBuffer buffer) {
@@ -189,6 +197,10 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         maxLobbyCount = buffer.readInt();
         maxZoneCount = buffer.readInt();
         maxArenaCount = buffer.readInt();
+        publishingId = buffer.readLong();
+        accountId = buffer.readLong();
+        maxDataSize = buffer.readInt();
+        upgradeVersion = buffer.readInt();
         return true;
     }
     @Override
@@ -287,70 +299,58 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return serviceType().replace("-service","");
     }
 
-    @Override
-    public String name(){
-        return (String)this.properties.get(NAME);
-    }
 
     public String playMode(){
-        return (String)this.properties.get(MODE);
+        return this.mode;
     }
 
     public String lobbyType(){
-        return (String)this.properties.get(GAME_LOBBY);
+        return gameLobbyName;
     }
 
     public String serviceType(){
-        return (String)this.properties.get(GAME_SERVICE);
+        return gameServiceName;
     }
 
     public String dataType(){
-        return (String)this.properties.get(GAME_DATA);
+        return gameDataName;
     }
 
     public boolean tournamentEnabled(){
-        return (boolean)this.properties.get(TOURNAMENT_ENABLED);
+        return tournamentEnabled;
     }
 
     public boolean dedicated(){
-        return (boolean)this.properties.get(DEDICATED);
+        return dedicated;
     }
 
-    @Override
-    public boolean disabled(){
-        return (Boolean)property(GameCluster.DISABLED);
-    }
 
     public int maxLobbyCount(){
-        Number number = (Number) properties.get(MAX_LOBBY_COUNT);
-        return number!=null? number.intValue():10;
+       return maxLobbyCount;
     }
 
     public int maxZoneCount(){
-        Number number = (Number) properties.get(MAX_ZONE_COUNT);
-        return number!=null? number.intValue():10;
+        return maxZoneCount;
     }
 
     public int maxArenaCount(){
-        Number number = (Number) properties.get(MAX_ARENA_COUNT);
-        return number!=null? number.intValue():10;
+        return maxArenaCount;
     }
 
     public int maxDataSizeCount(){
-        Number number = (Number) properties.get(MAX_DATA_SIZE_ON_SET);
-        return number!=null? number.intValue():4000;
+        return maxDataSize;
     }
 
     public int upgradeVersion(){
-        Number number = (Number) properties.get(UPGRADE_VERSION);
-        return number!=null? number.intValue():0;
+        return upgradeVersion;
     }
 
-    @Override
-    public String owner(){
-        return (String)this.properties.get(OWNER);
+    public long publishingId(){
+        return publishingId;
     }
-
+    public long accountId(){
+        return accountId;
+    }
     @Override
     public <T extends Configurable> void onUpdated(Descriptor application,T t) {
         listeners.forEach(l->l.onUpdated(application,t));

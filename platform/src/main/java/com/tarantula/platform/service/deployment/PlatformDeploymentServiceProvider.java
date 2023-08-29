@@ -9,6 +9,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.icodesoftware.util.LongTypeKey;
 import com.tarantula.platform.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
@@ -606,7 +607,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> List<T> gameClusterList(Access access){
         return new ArrayList<>();
     }
-    public  <T extends OnAccess> T createGameCluster(String owner,String name,OnAccess properties){
+    public  <T extends OnAccess> T createGameCluster(long accountId,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().set(name,AccessIndex.SYSTEM_INDEX);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
@@ -614,7 +615,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        String publishingId = accessIndex.distributionKey();
+        long publishingId = accessIndex.id();
         String playMode = (String) properties.property("playMode");
         boolean tournamentEnabled = (boolean)properties.property("tournamentEnabled");
         boolean dedicated = (boolean)properties.property("dedicated");
@@ -630,21 +631,21 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         GameCluster gameCluster = new GameCluster();
         try {
             DataStore mds = this.tarantulaContext.masterDataStore();
-            gameCluster.property(GameCluster.NAME,name);
-            gameCluster.property(GameCluster.MODE,playMode);
-            gameCluster.property(GameCluster.OWNER,owner);
-            gameCluster.property(GameCluster.PUBLISHING_ID,publishingId);
-            gameCluster.property(GameCluster.DEVELOPER,developer);
-            gameCluster.property(GameCluster.TOURNAMENT_ENABLED,tournamentEnabled);
-            gameCluster.property(GameCluster.DISABLED,true);
-            gameCluster.property(GameCluster.DEDICATED,dedicated);
-            gameCluster.property(GameCluster.GAME_ICON,gameIcon);
-            gameCluster.property(GameCluster.DEVELOPER_ICON,developerIcon);
-            gameCluster.property(GameCluster.MAX_LOBBY_COUNT,maxLobbyCount);
-            gameCluster.property(GameCluster.MAX_ZONE_COUNT,maxZoneCount);
-            gameCluster.property(GameCluster.MAX_ARENA_COUNT,maxArenaCount);
-            gameCluster.property(GameCluster.MAX_DATA_SIZE_ON_SET,maxDataSize);
-            gameCluster.property(GameCluster.UPGRADE_VERSION,1);
+            gameCluster.name(name);
+            gameCluster.mode = playMode;
+            gameCluster.accountId = accountId;
+            gameCluster.publishingId = publishingId;
+            gameCluster.developer = developer;
+            gameCluster.tournamentEnabled = tournamentEnabled;
+            gameCluster.disabled(true);
+            gameCluster.dedicated = dedicated;
+            gameCluster.gameIcon = gameIcon;
+            gameCluster.developerIcon = developerIcon;
+            gameCluster.maxLobbyCount = maxLobbyCount;
+            gameCluster.maxZoneCount = maxZoneCount;
+            gameCluster.maxArenaCount = maxArenaCount;
+            gameCluster.maxDataSize = maxDataSize;
+            gameCluster.upgradeVersion = 1;
             mds.create(gameCluster);//create first and discharge if any errors on loop
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
@@ -673,7 +674,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
                 gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
                 Descriptor descriptor = configuration.descriptor;
-                descriptor.owner(publishingId);
+                descriptor.ownerKey(new LongTypeKey(publishingId));
                 descriptor.label(LobbyDescriptor.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
