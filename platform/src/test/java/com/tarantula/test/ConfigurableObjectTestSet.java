@@ -47,15 +47,15 @@ public class ConfigurableObjectTestSet {
         items.forEach(item->{
             JsonObject jo = item.getAsJsonObject();
             ConfigurableCategory category = new ConfigurableCategory(jo);
-            category.ownerKey(new NaturalKey("class/asset"));
+            category.ownerKey(ConfigurableCategoryQuery.AssetKey);
             Assert.assertTrue(dataStore.create(category));
             Assert.assertTrue(dataStore.createEdge(category,"category"));
             Assert.assertTrue(dataStore.createEdge(category,"link"));
             Assert.assertTrue(dataStore.createEdge(category,"data"));
         });
-        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("category")).size(),2);
-        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("link")).size(),2);
-        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("data")).size(),2);
+        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
+        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"link")).size(),2);
+        Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"data")).size(),2);
     }
 
     @Test(groups = { "configurableTemplate" })
