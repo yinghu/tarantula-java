@@ -3,7 +3,6 @@ package com.tarantula.platform.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.icodesoftware.Bufferable;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
@@ -12,7 +11,6 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {

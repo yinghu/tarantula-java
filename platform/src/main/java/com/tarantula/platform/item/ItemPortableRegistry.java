@@ -50,6 +50,8 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int CONFIGURABLE_CATEGORY_CID = 21;
 
+    public static final int CONFIGURABLE_TYPE_CID = 22;
+
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
@@ -112,6 +114,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case CONFIGURABLE_CATEGORY_CID:
                 pt = new ConfigurableCategory();
+                break;
+            case CONFIGURABLE_TYPE_CID:
+                pt = new ConfigurableType();
                 break;
             default:
         }

@@ -58,4 +58,29 @@ public class ConfigurableObjectTestSet {
         Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("data")).size(),2);
     }
 
+    @Test(groups = { "configurableTemplate" })
+    public void configurableTypeTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
+        //ApplicationPreSetup applicationPreSetup = new GameObjectSetup();
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name("asset");
+        ConfigurableTemplate template = JsonConfigurableTemplateParser.itemSet(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-common-type-settings.json"));
+        JsonArray items = (JsonArray) template.property("itemList");
+        Assert.assertNotNull(items);
+        items.forEach(item->{
+            JsonObject jo = item.getAsJsonObject();
+            ConfigurableType type = new ConfigurableType(jo);
+            Assert.assertTrue(dataStore.create(type));
+            //ConfigurableCategory category = new ConfigurableCategory(jo);
+            //category.ownerKey(new NaturalKey("class/asset"));
+            //Assert.assertTrue(dataStore.create(category));
+            //Assert.assertTrue(dataStore.createEdge(category,"category"));
+            //Assert.assertTrue(dataStore.createEdge(category,"link"));
+            //Assert.assertTrue(dataStore.createEdge(category,"data"));
+        });
+        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("category")).size(),2);
+        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("link")).size(),2);
+        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("data")).size(),2);
+    }
+
 }
