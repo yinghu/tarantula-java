@@ -655,16 +655,16 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 configuration.descriptor.typeId(configuration.descriptor.typeId().replace("game",typePrefix));//lower case only typeId
                 Lobby _lobby = new DefaultLobby(configuration.descriptor);
                 if(configuration.descriptor.typeId().endsWith("-lobby")){
-                    gameCluster.property(GameCluster.GAME_LOBBY,configuration.descriptor.typeId());
+                    gameCluster.gameLobbyName = (configuration.descriptor.typeId());
                     gameCluster.gameLobby = _lobby;
                 }
                 else if(configuration.descriptor.typeId().endsWith("-service")){
-                    gameCluster.property(GameCluster.GAME_SERVICE,configuration.descriptor.typeId());
+                    gameCluster.gameServiceName=(configuration.descriptor.typeId());
                     this.tarantulaContext.availableServices().forEach((s)-> configuration.applications.add((DeploymentDescriptor)s));
                     gameCluster.serviceLobby = _lobby;
                 }
                 else if(configuration.descriptor.typeId().endsWith("-data")){
-                    gameCluster.property(GameCluster.GAME_DATA,configuration.descriptor.typeId());
+                    gameCluster.gameDataName =(configuration.descriptor.typeId());
                     gameCluster.dataLobby  = _lobby;
                 }
                 LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),configuration.descriptor.typeId());
@@ -672,7 +672,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     throw new RuntimeException("["+name+"] duplicated");
                 }
                 String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
-                gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME,cname);
+                gameCluster.applicationSetup = (cname);
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.ownerKey(new LongTypeKey(publishingId));
                 descriptor.label(LobbyDescriptor.LABEL);
