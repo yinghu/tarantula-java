@@ -4,25 +4,25 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.NaturalKey;
 
-public class ConfigurableCategoryQuery implements RecoverableFactory<ConfigurableCategory> {
+public class ConfigurableTypeQuery implements RecoverableFactory<ConfigurableType> {
 
-    public static final Recoverable.Key AssetKey = new NaturalKey("category/asset");
-    public static final Recoverable.Key ComponentKey = new NaturalKey("category/component");
+    public static final Recoverable.Key AssetKey = new NaturalKey("type/asset");
+    public static final Recoverable.Key ComponentKey = new NaturalKey("type/component");
 
-    public static final Recoverable.Key CommodityKey = new NaturalKey("category/commodity");
-    public static final Recoverable.Key ItemKey = new NaturalKey("category/item");
+    public static final Recoverable.Key CommodityKey = new NaturalKey("type/commodity");
+    public static final Recoverable.Key ItemKey = new NaturalKey("type/item");
     public static final Recoverable.Key ApplicationKey = new NaturalKey("category/application");
 
 
     private Recoverable.Key key;
     private String label;
-    public ConfigurableCategoryQuery(Recoverable.Key key,String label) {
+    public ConfigurableTypeQuery(Recoverable.Key key, String label) {
         this.key = key;
         this.label = label;
     }
     @Override
-    public ConfigurableCategory create() {
-        return new ConfigurableCategory();
+    public ConfigurableType create() {
+        return new ConfigurableType();
     }
 
     @Override

@@ -9,9 +9,10 @@ public class ConfigurableType extends RecoverableObject {
     private String application;
 
     public ConfigurableType(){
-
+        this.onEdge = true;
     }
     public ConfigurableType(JsonObject jsonObject){
+        this();
         name = jsonObject.get("name").getAsString();
         application = jsonObject.toString();
     }

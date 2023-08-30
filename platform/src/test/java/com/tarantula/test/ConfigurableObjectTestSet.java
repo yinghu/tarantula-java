@@ -6,11 +6,8 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
-
-import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.item.*;
 
-import com.tarantula.platform.service.ApplicationPreSetup;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -38,7 +35,6 @@ public class ConfigurableObjectTestSet {
     @Test(groups = { "configurableTemplate" })
     public void configurableTemplateTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
-        //ApplicationPreSetup applicationPreSetup = new GameObjectSetup();
         ConfigurableCategories categories = new ConfigurableCategories();
         categories.name("asset");
         ConfigurableTemplate template = JsonConfigurableTemplateParser.itemSet(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-game-asset-category-settings.json"));
@@ -48,10 +44,16 @@ public class ConfigurableObjectTestSet {
             JsonObject jo = item.getAsJsonObject();
             ConfigurableCategory category = new ConfigurableCategory(jo);
             category.ownerKey(ConfigurableCategoryQuery.AssetKey);
+            Assert.assertNotNull(category.name());
             Assert.assertTrue(dataStore.create(category));
             Assert.assertTrue(dataStore.createEdge(category,"category"));
             Assert.assertTrue(dataStore.createEdge(category,"link"));
             Assert.assertTrue(dataStore.createEdge(category,"data"));
+            ConfigurableCategory load = new ConfigurableCategory();
+            load.id(category.id());
+            Assert.assertTrue(dataStore.load(load));
+            Assert.assertEquals(load.name(),category.name());
+            System.out.println(load.configurableType().toJson().toString());
         });
         Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
         Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"link")).size(),2);
@@ -61,7 +63,6 @@ public class ConfigurableObjectTestSet {
     @Test(groups = { "configurableTemplate" })
     public void configurableTypeTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
-        //ApplicationPreSetup applicationPreSetup = new GameObjectSetup();
         ConfigurableCategories categories = new ConfigurableCategories();
         categories.name("asset");
         ConfigurableTemplate template = JsonConfigurableTemplateParser.itemSet(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-common-type-settings.json"));
@@ -70,17 +71,15 @@ public class ConfigurableObjectTestSet {
         items.forEach(item->{
             JsonObject jo = item.getAsJsonObject();
             ConfigurableType type = new ConfigurableType(jo);
+            type.ownerKey(ConfigurableTypeQuery.AssetKey);
             Assert.assertTrue(dataStore.create(type));
-            //ConfigurableCategory category = new ConfigurableCategory(jo);
-            //category.ownerKey(new NaturalKey("class/asset"));
-            //Assert.assertTrue(dataStore.create(category));
-            //Assert.assertTrue(dataStore.createEdge(category,"category"));
-            //Assert.assertTrue(dataStore.createEdge(category,"link"));
-            //Assert.assertTrue(dataStore.createEdge(category,"data"));
+            Assert.assertTrue(dataStore.createEdge(type,"type"));
+            Assert.assertTrue(dataStore.createEdge(type,"link"));
+            Assert.assertTrue(dataStore.createEdge(type,"data"));
         });
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("category")).size(),2);
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("link")).size(),2);
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery("data")).size(),2);
+        Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"type")).size(),17);
+        Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"link")).size(),17);
+        Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"data")).size(),17);
     }
 
 }
