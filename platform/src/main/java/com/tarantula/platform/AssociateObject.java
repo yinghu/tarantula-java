@@ -5,9 +5,6 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class AssociateObject extends RecoverableObject {
 
-
-
-
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
         label = buffer.readUTF8();
