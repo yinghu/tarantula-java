@@ -25,8 +25,8 @@ public class TestServiceContext implements ServiceContext {
         this.node.backupEnabled = false;
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
-        node.bucketId = 1;//node.bucketName()+"/"+ SystemUtil.oid();
-        node.nodeId = 2;//node.bucketName()+"/"+ SystemUtil.oid();
+        node.bucketId =  SystemUtil.oid();
+        node.nodeId =  SystemUtil.oid();
 
     }
     @Override

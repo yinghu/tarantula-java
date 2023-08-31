@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
@@ -203,6 +204,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }finally {
             txn.close();
         }
+    }
+
+    public void assignKey(Recoverable.DataBuffer dataBuffer){
+        dataBuffer.writeUTF8(UUID.randomUUID().toString());
     }
 
     private Path path(String path) throws Exception{

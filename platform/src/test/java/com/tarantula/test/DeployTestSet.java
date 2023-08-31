@@ -53,7 +53,7 @@ public class DeployTestSet {
     @Test(groups = { "lobbyTypeIdIndex" })
     public void lobbyTypeIdIndexTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
-        long id = dataStoreProvider.nextId(dataStore.name());
+        String id = "testId";//dataStoreProvider.nextId(dataStore.name());
         LobbyTypeIdIndex created = new LobbyTypeIdIndex(id,"game",100,0);
 
         Assert.assertTrue(dataStore.createIfAbsent(created,false));

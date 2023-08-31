@@ -3,18 +3,19 @@ package com.tarantula.platform.service;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
 
     public String owner;
-    private long ownerId;
+    private Recoverable.Key key;
     public AccessKeyQuery(String owner){
         this.owner = owner;
     }
 
-    public AccessKeyQuery(long ownerId){
-        this.ownerId = ownerId;
+    public AccessKeyQuery(Recoverable.Key key){
+        this.key = key;
     }
     @Override
     public AccessKey create() {
@@ -38,6 +39,6 @@ public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
 
     @Override
     public Recoverable.Key key() {
-        return new LongTypeKey(ownerId);
+        return key;
     }
 }

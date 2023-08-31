@@ -406,7 +406,9 @@ public class BerkeleyJEProvider implements DataStoreProvider,MapStoreListener{
         return 0;
     }
     //end of map store listener
+    public void assignKey(Recoverable.DataBuffer dataBuffer){
 
+    }
     public void backup(int scope){
         if(scope==Distributable.DATA_SCOPE){
             this.environment.sync();

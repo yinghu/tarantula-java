@@ -15,4 +15,5 @@ public interface AccessIndex extends Recoverable {
     int DEVICE_INDEX = 5;
 
     int referenceId();
+
 }

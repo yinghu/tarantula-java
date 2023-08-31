@@ -9,6 +9,7 @@ import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class TestMapStoreListener implements MapStoreListener {
 
@@ -41,7 +42,9 @@ public class TestMapStoreListener implements MapStoreListener {
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
-
+    public void assignKey(Recoverable.DataBuffer dataBuffer){
+        dataBuffer.writeUTF8(UUID.randomUUID().toString());
+    }
     @Override
     public String name() {
         return null;

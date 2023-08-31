@@ -43,4 +43,7 @@ public class TestMapStoreListener implements MapStoreListener {
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
+    public void assignKey(Recoverable.DataBuffer dataBuffer){
+
+    }
 }

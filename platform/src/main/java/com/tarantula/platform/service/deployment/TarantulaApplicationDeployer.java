@@ -9,6 +9,7 @@ import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationProvider;
@@ -27,7 +28,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	public void start() throws Exception {
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
-		long bucketId = this.context.node().bucketId();
+		String bucketId = this.context.node().bucketId();
 
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
@@ -49,7 +50,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			this.context.deploymentService().register(_ob);
 		}
 
-		long deploymentId = this.context.node().deploymentId();
+		String deploymentId = this.context.node().deploymentId();
 		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
 		//IndexSet indexSet = new IndexSet();
 		//indexSet.id(deploymentId);
@@ -65,7 +66,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			//});
 		//}
 	}
-	private void deployModule(long publishingId){
+	private void deployModule(String publishingId){
 		try {
 			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));
 			blist.forEach((lb)->{
@@ -90,7 +91,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(long bucketId) throws Exception{
+	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
 		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
@@ -106,7 +107,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		ArrayList<LobbyDescriptor> blist = new ArrayList<>();
 		xp.configurations.forEach((c)->{
 			c.descriptor.onEdge(true);
-			c.descriptor.ownerKey(new LongTypeKey(bucketId));
+			c.descriptor.ownerKey(new OidKey(bucketId));
 			dataStore.create(c.descriptor);
 			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.id(),0),false);
 			blist.add(c.descriptor);

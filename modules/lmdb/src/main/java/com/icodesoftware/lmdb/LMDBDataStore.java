@@ -68,10 +68,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         //create edge db before txn creation
         if(t.onEdge() && t.label()!=null) lmdbDataStoreProvider.createEdgeDB(scope,name+"_"+t.label());
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        Txn<ByteBuffer> txn = env.txnWrite(); //can read also
-        t.id(lmdbDataStoreProvider.nextId(name));
-        if(!t.writeKey(new BufferProxy(key))) return false;
+        Recoverable.DataBuffer keyBuffer = new BufferProxy(key);
+        lmdbDataStoreProvider.assignKey(keyBuffer);
         key.flip();
+        if(!t.readKey(keyBuffer)) return false;
+        key.rewind();
+        Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         BufferProxy proxy = new BufferProxy(value);
         proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));

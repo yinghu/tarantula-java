@@ -226,7 +226,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
             index.runningRooms = new LinkedBlockingDeque<>(maxRoomPoolSizePerZone);
             index.roomIndex = new IndexSet(gameZone.configurationTypeId());
-            index.roomIndex.id(serviceContext.node().nodeId());
+            index.roomIndex.oid(serviceContext.node().nodeId());
             this.dataStore.createIfAbsent(index.roomIndex,true);
             int[] rooms = {0};
             index.roomIndex.keySet().forEach(k->{

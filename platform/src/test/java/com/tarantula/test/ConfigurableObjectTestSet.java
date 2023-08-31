@@ -50,7 +50,7 @@ public class ConfigurableObjectTestSet {
             Assert.assertTrue(dataStore.createEdge(category,"link"));
             Assert.assertTrue(dataStore.createEdge(category,"data"));
             ConfigurableCategory load = new ConfigurableCategory();
-            load.id(category.id());
+            load.oid(category.oid());
             Assert.assertTrue(dataStore.load(load));
             Assert.assertEquals(load.name(),category.name());
             System.out.println(load.configurableType().toJson().toString());

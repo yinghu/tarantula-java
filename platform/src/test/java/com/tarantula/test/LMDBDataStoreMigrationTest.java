@@ -8,6 +8,7 @@ import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.deployment.ApplicationQuery;
@@ -79,13 +80,13 @@ public class LMDBDataStoreMigrationTest {
             DataStore ds = dataStoreProvider.createDataStore("tarantula");
             XMLParser xmlParser = new XMLParser();
             xmlParser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-presence.xml"));
-            long ownerId = 100;
+            String ownerId = "T100";
             xmlParser.configurations.forEach(lb->{
                 LobbyDescriptor lobby = lb.descriptor;
-                lobby.ownerKey(new LongTypeKey(ownerId));
+                lobby.ownerKey(new OidKey(ownerId));
                 Assert.assertTrue(ds.create(lobby));
                 LobbyDescriptor load = new LobbyDescriptor();
-                load.id(lobby.id());
+                load.oid(lobby.oid());
                 Assert.assertTrue(ds.load(load));
                 Assert.assertEquals(load.typeId(),lobby.typeId());
                 Assert.assertEquals(load.type(),lobby.type());
@@ -93,7 +94,7 @@ public class LMDBDataStoreMigrationTest {
                 Assert.assertEquals(load.category(),lobby.category());
                 List<LobbyDescriptor> lbs = ds.list(new LobbyQuery(ownerId));
                 LobbyDescriptor lbx = lbs.get(0);
-                Assert.assertEquals(lbx.id(),lobby.id());
+                Assert.assertEquals(lbx.oid(),lobby.oid());
                 lb.applications.forEach(a->{
                     a.ownerKey(new LongTypeKey(lobby.id()));
                     Assert.assertTrue(ds.create(a));

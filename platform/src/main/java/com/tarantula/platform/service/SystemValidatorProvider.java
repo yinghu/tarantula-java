@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;
+import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
@@ -219,7 +220,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return null;
     }
     public List<OnAccess> accessKeyList(){
-        AccessKeyQuery query = new AccessKeyQuery(this.serviceContext.node().bucketId());
+        AccessKeyQuery query = new AccessKeyQuery(new OidKey(this.serviceContext.node().oid()));
         ArrayList<OnAccess> keys = new ArrayList<>();
         deployDataStore.list(query,accessKey -> {
             if(!accessKey.disabled()) keys.add(accessKey);

@@ -127,5 +127,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public void waitForData() {
         this.localNode = serviceContext.node();
     }
+    public void assignKey(Recoverable.DataBuffer dataBuffer){
 
+    }
 }

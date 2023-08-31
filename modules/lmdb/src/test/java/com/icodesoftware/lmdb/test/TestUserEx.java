@@ -9,7 +9,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
 
-public class TestUser extends RecoverableObject implements Access {
+public class TestUserEx extends RecoverableObject implements Access {
 
     public static final String LABEL = "users";
     protected String login;
@@ -21,7 +21,7 @@ public class TestUser extends RecoverableObject implements Access {
     protected long primaryId;
     protected String validator;
     protected String role;
-    public TestUser(){
+    public TestUserEx(){
         this.label = LABEL;
         this.onEdge = true;
         this.password = "password";
@@ -29,7 +29,7 @@ public class TestUser extends RecoverableObject implements Access {
         this.emailAddress = "teser@mail.com";
         this.validator = "validator";
     }
-    public TestUser(String login,long owner){
+    public TestUserEx(String login, long owner){
         this();
         this.login = login;
         this.ownerKey = new LongTypeKey(owner);
@@ -145,6 +145,7 @@ public class TestUser extends RecoverableObject implements Access {
         this.primaryId = buffer.readLong();
         return true;
     }
+
     public boolean readKey(Recoverable.DataBuffer buffer){
         oid = buffer.readUTF8();
         return true;
@@ -158,9 +159,4 @@ public class TestUser extends RecoverableObject implements Access {
     public Key key() {
         return new NaturalKey(this.oid);
     }
-
-    //@Override
-    //public Key key() {
-        //return new LongTypeKey(this.id);
-    //}
 }

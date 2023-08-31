@@ -337,7 +337,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
-        byte[] ret = this.vMap.putIfAbsent(ByteBuffer.allocate(8).putLong(cnode.nodeId()).array(),cnode.toBinary());
+        byte[] ret = this.vMap.putIfAbsent(cnode.nodeId().getBytes(),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }

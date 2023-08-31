@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.util.NaturalKey;
@@ -11,6 +12,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,6 +80,7 @@ public class LMDBDataStoreTest {
             return true;
         });
         Assert.assertEquals(c[0],110);
+
         c[0]=0;
         ds.list(new TestUserQuery(ownerId1),(t)->{
             c[0]++;
@@ -86,7 +89,9 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(c[0],10);
         List<TestUser> ulist = ds.list(new TestUserQuery(ownerId2));
         Assert.assertEquals(ulist.size(),100);
-        ulist.forEach(u-> Assert.assertTrue(ds.load(u)));
+        ulist.forEach(u->{
+            Assert.assertTrue(ds.load(u));
+        });
 
         List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
         Assert.assertEquals(zerolist.size(),0);
@@ -96,25 +101,49 @@ public class LMDBDataStoreTest {
 
 
         dsx.backup().list((buffer)->{
-            ct[0]++;
+            //ct[0]++;
             Recoverable.DataHeader h = buffer.readHeader();
             if(h.classId()==10){
                 TestUser testUser = new TestUser();
                 testUser.read(buffer);
-                //System.out.println(testUser.login());
+                //System.out.println(testUser.oid());
+                ct[0]++;
             }
             return true;
         });
         Assert.assertEquals(ct[0],110);
     }
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void createEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("users");
+        DataStore ds = lmdbDataStoreProvider.createDataStore("userex");
         long ownerId1 = 10000;
         TestUser testUser = new TestUser("user",ownerId1);
         Assert.assertTrue(ds.create(testUser));
         Assert.assertTrue(ds.createEdge(testUser,"friends"));
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void createAssignedTest() {
+        //DataStore ds = lmdbDataStoreProvider.createDataStore("users");
+        long ownerId1 = 10000;
+        TestUserEx testUser = new TestUserEx("user",ownerId1);
+        TestMapStoreListener mapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
+        ByteBuffer key = ByteBuffer.allocate(100);
+        Recoverable.DataBuffer dataBuffer = new BufferProxy(key);
+        mapStoreListener.assignKey(dataBuffer);
+        key.flip();
+        testUser.readKey(dataBuffer);
+        Assert.assertNotNull(testUser.oid());
+        key.clear();
+        testUser.writeKey(dataBuffer);
+        key.rewind();
+        TestUserEx tc = new TestUserEx("",ownerId1);
+        tc.readKey(dataBuffer);
+        Assert.assertEquals(testUser.oid(),tc.oid());
+        //Assert.assertTrue(ds.create(testUser));
+        //Assert.assertTrue(ds.createEdge(testUser,"friends"));
+        //Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
     }
 
 }

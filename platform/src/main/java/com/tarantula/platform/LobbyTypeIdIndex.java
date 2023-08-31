@@ -12,13 +12,13 @@ public class LobbyTypeIdIndex extends AssociateObject {
 
     }
     //for query
-    public LobbyTypeIdIndex(long bucketId,String typeId){
-        this.id = bucketId;
+    public LobbyTypeIdIndex(String bucketId,String typeId){
+        this.oid = bucketId;
         this.label =  typeId;
     }
     //for create
-    public LobbyTypeIdIndex(long bucketId,String typeId,long lobbyId,long gameClusterId){
-        this.id = bucketId;
+    public LobbyTypeIdIndex(String bucketId,String typeId,long lobbyId,long gameClusterId){
+        this.oid = bucketId;
         this.label =  typeId;
         this.lobbyId = lobbyId;
         this.gameClusterId = gameClusterId;//game cluster id

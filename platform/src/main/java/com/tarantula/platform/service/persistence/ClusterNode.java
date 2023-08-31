@@ -15,13 +15,13 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String bucketName;
     public String nodeName;
 
-    public long bucketId;
-    public long nodeId;
+    public String bucketId;
+    public String nodeId;
     public String memberId;
     public String address;
     public long startTime;
 
-    public long deploymentId;
+    public String deploymentId;
     public String clusterNameSuffix;
     public int partitionNumber;
 
@@ -60,12 +60,12 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     }
 
     @Override
-    public long bucketId() {
+    public String bucketId() {
         return bucketId;
     }
 
     @Override
-    public long nodeId() {
+    public String nodeId() {
         return nodeId;
     }
 
@@ -84,7 +84,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return startTime;
     }
 
-    public long deploymentId(){
+    public String deploymentId(){
         return this.deploymentId;
     }
 
@@ -132,15 +132,15 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucketName = (String) properties.get("bucketName");
-        this.bucketId = ((Number)properties.getOrDefault("bucketId",0)).longValue();
+        this.bucketId = (String)properties.getOrDefault("bucketId",0);
         this.nodeName = (String) properties.get("nodeName");
-        this.nodeId = ((Number)properties.getOrDefault("nodeId",0)).longValue();
+        this.nodeId = (String)properties.getOrDefault("nodeId",0);
         this.memberId = (String)properties.get("memberId");
         this.address = (String)properties.get("address");
         this.startTime = ((Number)properties.getOrDefault("startTime",0)).longValue();
         this.clusterNameSuffix = (String)properties.get("clusterNameSuffix");
         this.partitionNumber = ((Number)properties.getOrDefault("partitionNumber",0)).intValue();
-        this.deploymentId = ((Number)properties.getOrDefault("deploymentId",0)).longValue();
+        this.deploymentId = (String)properties.getOrDefault("deploymentId",0);
     }
 
     private JsonObject _toJson(boolean toWeb){

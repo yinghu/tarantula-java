@@ -183,26 +183,26 @@ public class RecoverableObject implements Recoverable {
     }
     @Override
     public Key key(){
-        return new LongTypeKey(this.id);
+        return new OidKey(this.oid);
     }
 
     public boolean readKey(Recoverable.DataBuffer buffer){
-        id = buffer.readLong();
+        oid = buffer.readUTF8();
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(id==0) return false;
-        buffer.writeLong(id);
+        if(oid==null) return false;
+        buffer.writeUTF8(oid);
         return true;
     }
     @Override
     public boolean equals(Object obj){
         Recoverable tc =(Recoverable) obj;
-        return this.id==(tc.id());
+        return this.oid==(tc.oid());
     }
     @Override
     public int hashCode(){
-        return Long.hashCode(id);
+        return oid.hashCode();
     }
     @Override
     public String toString(){

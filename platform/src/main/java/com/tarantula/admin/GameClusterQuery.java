@@ -3,13 +3,14 @@ package com.tarantula.admin;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.GameCluster;
 
 public class GameClusterQuery implements RecoverableFactory<GameCluster> {
 
-    private long accountId;
+    private String accountId;
 
-    public GameClusterQuery(long accountId){
+    public GameClusterQuery(String accountId){
         this.accountId = accountId;
     }
     @Override
@@ -29,6 +30,6 @@ public class GameClusterQuery implements RecoverableFactory<GameCluster> {
 
     @Override
     public Recoverable.Key key() {
-        return new LongTypeKey(accountId);
+        return new OidKey(accountId);
     }
 }

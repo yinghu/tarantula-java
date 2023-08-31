@@ -185,7 +185,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
             JsonObject json = JsonUtil.parse(resp);
             if(!json.get("successful").getAsBoolean()) throw new RuntimeException("failed to fetch remote deployment id");
-            node.deploymentId = json.get("message").getAsLong();
+            node.deploymentId = json.get("message").getAsString();
             log.warn("Using backup deployment id ["+node.deploymentId+"]");
         }
         node_started = new AtomicBoolean(false);
@@ -333,13 +333,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
  	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
- 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(10));
+ 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->_setOnLobby(c,listener));
         IndexSet indexSet = new IndexSet();
-        indexSet.id(this.node.deploymentId());
+        indexSet.oid(this.node.deploymentId());
         indexSet.label(Account.GameClusterLabel);
         indexSet.keySet.add(gameCluster.distributionKey());
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
@@ -379,7 +379,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
-        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(12));
+        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         bList.forEach((d)->{
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
@@ -391,8 +391,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }catch (Exception ex){ex.printStackTrace();}
         });
         IndexSet indexSet = new IndexSet();
-        indexSet.id(this.node.deploymentId
-                ());
+        indexSet.oid(this.node.deploymentId());
         indexSet.label(Account.ModuleLabel);
         indexSet.keySet.add(publishingId);
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
@@ -535,12 +534,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _setup() throws Exception{
         //Waiting for all distribution service ready
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
-        node.bucketId = bid.id();
+        node.bucketId = bid.oid();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
-        node.nodeId = nid.id();
+        node.nodeId = nid.oid();
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
         if(!backupEnabled){//using local deployment id
-            node.deploymentId = did.id();
+            node.deploymentId = did.oid();
             log.warn("Using local deployment id ["+node.deploymentId+"]");
         }
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
