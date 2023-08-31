@@ -58,6 +58,11 @@ public class BufferProxy implements Recoverable.DataBuffer {
     }
     @Override
     public Recoverable.DataBuffer writeUTF8(String utf) {
+        if(utf==null||utf.length()==0){
+            buffer.putInt(3);
+            buffer.put(Recoverable.UTF_NULL.getBytes());
+            return this;
+        }
         buffer.putInt(utf.length());
         buffer.put(utf.getBytes());
         return this;
@@ -107,6 +112,18 @@ public class BufferProxy implements Recoverable.DataBuffer {
         for(int i=0;i<len;i++){
             sb.append((char)buffer.get());
         }
-        return sb.toString();
+        String ret = sb.toString();
+        return ret.equals(Recoverable.UTF_NULL)?null:ret;
+    }
+
+    public static Recoverable.DataBuffer buffer(int size){
+        return new BufferProxy(ByteBuffer.allocate(size));
+    }
+    public static Recoverable.DataBuffer wrap(byte[] data){
+        return new BufferProxy(ByteBuffer.wrap(data));
+    }
+    public byte[] array(){
+        if(buffer.isDirect()) throw new RuntimeException("Do not use it for none heap buffer");
+        return buffer.array();
     }
 }

@@ -14,18 +14,18 @@ public interface TokenValidator {
     OnSession validatePassword(Access hash, String password);
 
     //generate the ticket with limited life circle
-    String ticket(long id,int stub);
+    String ticket(String id,int stub);
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
 
 
-    void offSession(long id,int stub);
+    void offSession(String id,int stub);
 
 
     boolean validateToken(Map<String,Object> params);
 
     boolean upgradeRole(Access access,String role);
 
-    Access.Role role(long systemId);
+    Access.Role role(String systemId);
 
 }

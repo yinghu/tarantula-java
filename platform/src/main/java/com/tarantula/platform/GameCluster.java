@@ -108,8 +108,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public int maxDataSize;
 
     public int upgradeVersion;
-    public long publishingId;
-    public long accountId;
+    public String publishingId;
+    public String accountId;
     public GameCluster(){}
 
     @Override
@@ -140,7 +140,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
         jo.addProperty("message",message);
-        jo.addProperty("gameClusterId",id);
+        jo.addProperty("gameClusterId",oid);
         jo.addProperty("name",name);
         jo.addProperty("mode",mode);
         jo.addProperty("setup",applicationSetup);
@@ -175,8 +175,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         buffer.writeInt(maxLobbyCount);
         buffer.writeInt(maxZoneCount);
         buffer.writeInt(maxArenaCount);
-        buffer.writeLong(publishingId);
-        buffer.writeLong(accountId);
+        buffer.writeUTF8(publishingId);
+        buffer.writeUTF8(accountId);
         buffer.writeInt(maxDataSize);
         buffer.writeInt(upgradeVersion);
         return true;
@@ -197,8 +197,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         maxLobbyCount = buffer.readInt();
         maxZoneCount = buffer.readInt();
         maxArenaCount = buffer.readInt();
-        publishingId = buffer.readLong();
-        accountId = buffer.readLong();
+        publishingId = buffer.readUTF8();
+        accountId = buffer.readUTF8();
         maxDataSize = buffer.readInt();
         upgradeVersion = buffer.readInt();
         return true;
@@ -345,10 +345,10 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return upgradeVersion;
     }
 
-    public long publishingId(){
+    public String publishingId(){
         return publishingId;
     }
-    public long accountId(){
+    public String accountId(){
         return accountId;
     }
     @Override

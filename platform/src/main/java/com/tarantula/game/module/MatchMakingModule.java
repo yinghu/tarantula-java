@@ -52,7 +52,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             module.onRequest(session,payload);
         }
         else if(session.action().equals("onTestTournament")){
-            if(this.context.validator().role(session.id()).accessControl()< AccessControl.admin.accessControl()){
+            if(this.context.validator().role(session.oid()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
             session.tournamentId(session.name());

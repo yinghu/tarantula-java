@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.UnsafeUtil;
 import org.testng.Assert;
@@ -44,7 +45,28 @@ public class BufferProxyTest {
         Assert.assertEquals(proxy.readFloat(),99f);
         Assert.assertEquals(proxy.readLong(),800l);
         Assert.assertEquals(proxy.readUTF8(),"hello");
+    }
+    @Test(groups = { "bufferProxy" })
+    public void bufferToArrayTest() {
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+        dataBuffer.writeUTF8("test").writeInt(100).writeUTF8("loop");
+        byte[] data = dataBuffer.array();
+        Recoverable.DataBuffer dataWrap = BufferProxy.wrap(data);
+        Assert.assertEquals(dataWrap.readUTF8(),"test");
+        Assert.assertEquals(dataWrap.readInt(),100);
+        Assert.assertEquals(dataWrap.readUTF8(),"loop");
+    }
 
+    @Test(groups = { "bufferProxy" })
+    public void bufferUTFNullTest() {
+        String n = null;
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+        dataBuffer.writeUTF8(n).writeInt(100).writeUTF8("loop");
+        byte[] data = dataBuffer.array();
+        Recoverable.DataBuffer dataWrap = BufferProxy.wrap(data);
+        Assert.assertEquals(dataWrap.readUTF8(),null);
+        Assert.assertEquals(dataWrap.readInt(),100);
+        Assert.assertEquals(dataWrap.readUTF8(),"loop");
     }
 
 

@@ -2,8 +2,6 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.LongTypeKey;
-import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class AccessKeyQuery implements RecoverableFactory<AccessKey> {

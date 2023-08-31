@@ -13,9 +13,9 @@ public class PresenceKey extends AssociateObject {
         this.label = "presenceKey";
     }
 
-    public PresenceKey(long associateId){
+    public PresenceKey(String associateId){
         this();
-        this.id = associateId;
+        this.oid = associateId;
     }
     @Override
     public int getFactoryId() {

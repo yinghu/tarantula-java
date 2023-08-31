@@ -2,14 +2,14 @@ package com.tarantula.platform.statistics;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 
 public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry> {
 
 
-    private long ownerId;
+    private String ownerId;
 
-    public StatisticsEntryQuery(long ownerId){
+    public StatisticsEntryQuery(String ownerId){
         this.ownerId = ownerId;
     }
 
@@ -33,6 +33,6 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
 
     @Override
     public Recoverable.Key key(){
-        return new LongTypeKey(ownerId);
+        return new OidKey(ownerId);
     }
 }

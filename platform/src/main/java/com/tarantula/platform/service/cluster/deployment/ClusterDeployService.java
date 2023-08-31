@@ -124,10 +124,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onShutdownGameCluster(String gameClusterKey){
         this.deploymentServiceProvider.distributionCallback().onGameClusterShutdown(gameClusterKey);
     }
-    public void onLaunchApplication(String typeId,long applicationId){
+    public void onLaunchApplication(String typeId,String applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationLaunched(typeId,applicationId);
     }
-    public void onShutdownApplication(String typeId,long applicationId){
+    public void onShutdownApplication(String typeId,String applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationShutdown(typeId,applicationId);
     }
     public void onLaunchModule(String typeId){

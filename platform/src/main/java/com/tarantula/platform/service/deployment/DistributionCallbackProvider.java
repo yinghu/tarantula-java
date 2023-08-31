@@ -99,12 +99,12 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onApplicationLaunched(String typeId ,long applicationId) {
+    public void onApplicationLaunched(String typeId ,String applicationId) {
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
     @Override
-    public void onApplicationShutdown(String typeId, long applicationId) {
+    public void onApplicationShutdown(String typeId, String applicationId) {
 
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.type().equals(Descriptor.TYPE_LOBBY)){

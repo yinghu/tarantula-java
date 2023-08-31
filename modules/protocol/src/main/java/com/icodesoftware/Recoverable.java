@@ -12,8 +12,8 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
     String oid();
     void oid(String oid);
 
-    long id();
-    void id(long id);
+    //long id();
+    //void id(long id);
 
     Key ownerKey();
     void ownerKey(Key ownerKey);
@@ -101,5 +101,8 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
 
         byte readByte();
         String readUTF8();
+
+        byte[] array();
+
     }
 }

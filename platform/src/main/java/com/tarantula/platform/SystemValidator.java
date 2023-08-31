@@ -42,9 +42,9 @@ public class SystemValidator{
         @Override
         public OnSession validatePassword(Access access, String password) {
             if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
-                Presence presence = systemValidatorProvider.presence(access.id());
+                Presence presence = systemValidatorProvider.presence(access.oid());
                 OnSession _ox = new OnSessionTrack();
-                _ox.id(access.id());
+                _ox.oid(access.oid());
                 _ox.stub(presence.count(1));
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
@@ -60,12 +60,12 @@ public class SystemValidator{
             }
         }
         @Override
-        public String ticket(long input, int stub) {//short live ticket
+        public String ticket(String input, int stub) {//short live ticket
             return systemValidatorProvider.ticket(input,stub,timeoutSeconds);
         }
         @Override
         public boolean validateTicket(Session session) {
-            return systemValidatorProvider.validateTicket(session.id(),session.stub(),session.ticket());
+            return systemValidatorProvider.validateTicket(session.oid(),session.stub(),session.ticket());
             //Presence ptx = systemValidatorProvider.presence(session);
             //String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
             //byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
@@ -74,7 +74,7 @@ public class SystemValidator{
         }
 
         @Override
-        public void offSession(long systemId, int stub) {
+        public void offSession(String systemId, int stub) {
             systemValidatorProvider.offSession(systemId);
         }
         @Override
@@ -94,7 +94,7 @@ public class SystemValidator{
         public boolean upgradeRole(Access access,String role){
             return systemValidatorProvider.upgradeRole(access,role);
         }
-        public Access.Role role(long systemId){
+        public Access.Role role(String systemId){
             return systemValidatorProvider.role(systemId);
         }
     }

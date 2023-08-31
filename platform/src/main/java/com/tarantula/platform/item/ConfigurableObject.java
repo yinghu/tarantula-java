@@ -65,7 +65,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.listener = configurableObject.listener;
         this._reference = configurableObject._reference;
         this._configurableSetting = configurableObject._configurableSetting;
-        this.id(configurableObject.id());
+        this.oid(configurableObject.oid());
     }
 
     public <T extends Configurable> void registerListener(Listener<T> listener){

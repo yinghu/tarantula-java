@@ -10,8 +10,8 @@ public interface DeployService extends ServiceProvider {
     boolean onUpdateResource(String contentUrl,String resourceName);
 
 
-    boolean onLaunchApplication(String typeId,long applicationId);
-    boolean onShutdownApplication(String typeId,long applicationId);
+    boolean onLaunchApplication(String typeId,String applicationId);
+    boolean onShutdownApplication(String typeId,String applicationId);
 
 
     void onCreateGameCluster(String gameClusterId);

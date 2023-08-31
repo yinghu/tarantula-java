@@ -2,7 +2,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.service.ApplicationProvider;
 import com.tarantula.platform.service.cluster.PortableRegistry;
@@ -11,10 +11,10 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
 
     //private String lobbyId;
 
-    private long ownerId;
+    private String ownerId;
 
 
-    public ApplicationQuery(long ownerId){
+    public ApplicationQuery(String ownerId){
         this.ownerId = ownerId;
     }
 
@@ -38,6 +38,6 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
 
     @Override
     public Recoverable.Key key(){
-        return new LongTypeKey(ownerId);
+        return new OidKey(ownerId);
     }
 }

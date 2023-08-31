@@ -3,8 +3,8 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Access;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.NaturalKey;
+import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ public class TestUser extends RecoverableObject implements Access {
     protected boolean activated;
     protected boolean validated;
     protected boolean primary;
-    protected long primaryId;
+    protected String primaryId;
     protected String validator;
     protected String role;
     public TestUser(){
@@ -29,10 +29,10 @@ public class TestUser extends RecoverableObject implements Access {
         this.emailAddress = "teser@mail.com";
         this.validator = "validator";
     }
-    public TestUser(String login,long owner){
+    public TestUser(String login,String owner){
         this();
         this.login = login;
-        this.ownerKey = new LongTypeKey(owner);
+        this.ownerKey = new OidKey(owner);
     }
     public String login(){
         return this.login;
@@ -77,10 +77,10 @@ public class TestUser extends RecoverableObject implements Access {
         this.primary = primary;
     }
 
-    public long primaryId(){
+    public String primaryId(){
         return this.primaryId;
     }
-    public void primaryId(long primaryId){
+    public void primaryId(String primaryId){
         this.primaryId = primaryId;
     }
     public int getFactoryId() {
@@ -128,7 +128,7 @@ public class TestUser extends RecoverableObject implements Access {
         buffer.writeUTF8(validator);
         //buffer.writeUTF8(this.owner);
         buffer.writeBoolean(this.primary);
-        buffer.writeLong(primaryId);
+        buffer.writeUTF8(primaryId);
         return true;
     }
     public boolean read(DataBuffer buffer) {
@@ -142,7 +142,7 @@ public class TestUser extends RecoverableObject implements Access {
         this.validator = buffer.readUTF8();
         //this.owner = buffer.readUTF8();
         this.primary = buffer.readBoolean();
-        this.primaryId = buffer.readLong();
+        this.primaryId = buffer.readUTF8();
         return true;
     }
     public boolean readKey(Recoverable.DataBuffer buffer){

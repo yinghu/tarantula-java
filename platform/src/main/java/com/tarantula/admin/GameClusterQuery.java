@@ -2,7 +2,6 @@ package com.tarantula.admin;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.GameCluster;
 

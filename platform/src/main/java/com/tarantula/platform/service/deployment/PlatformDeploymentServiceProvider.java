@@ -9,7 +9,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
-import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
@@ -355,7 +355,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
             //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
         }
-        this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.id());
+        this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.oid());
         return true;
     }
     public boolean updateApplication(Descriptor descriptor,OnAccess properties){
@@ -366,10 +366,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         descriptor.accessMode(privateAccess?Access.PRIVATE_ACCESS_MODE:0);
         return dataStore.update(descriptor);
     }
-    public boolean enableApplication(long applicationId){
+    public boolean enableApplication(String applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
-        app.id(applicationId);
+        app.oid(applicationId);
         if(!ds.load(app)||!app.disabled()){
             return false;
         }
@@ -378,10 +378,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DeployService  deployService = this.tarantulaContext.integrationCluster().deployService();
         return deployService.onLaunchApplication(app.typeId(),applicationId);
     }
-    public boolean disableApplication(long applicationId){
+    public boolean disableApplication(String applicationId){
         DataStore ds = this.tarantulaContext.masterDataStore();
         DeploymentDescriptor app = new DeploymentDescriptor();
-        app.id(applicationId);
+        app.oid(applicationId);
         if(!ds.load(app)||app.disabled()){
             return false;
         }
@@ -607,7 +607,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> List<T> gameClusterList(Access access){
         return new ArrayList<>();
     }
-    public  <T extends OnAccess> T createGameCluster(long accountId,String name,OnAccess properties){
+    public  <T extends OnAccess> T createGameCluster(String accountId,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().set(name,AccessIndex.SYSTEM_INDEX);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
@@ -615,7 +615,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gc.message("duplicated name ["+name+"]");
             return (T)gc;
         }
-        long publishingId = accessIndex.id();
+        String publishingId = accessIndex.oid();
         String playMode = (String) properties.property("playMode");
         boolean tournamentEnabled = (boolean)properties.property("tournamentEnabled");
         boolean dedicated = (boolean)properties.property("dedicated");
@@ -674,7 +674,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
                 gameCluster.applicationSetup = (cname);
                 Descriptor descriptor = configuration.descriptor;
-                descriptor.ownerKey(new LongTypeKey(publishingId));
+                descriptor.ownerKey(new OidKey(publishingId));
                 descriptor.label(LobbyDescriptor.LABEL);
                 descriptor.onEdge(true);
                 descriptor.resetEnabled(true);
@@ -728,7 +728,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         lb.distributionKey(lobbyTypeIdIndex.index());
         if(!mds.load(lb)) return null;
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.id()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
+        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.oid()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
         apps.forEach((a)->{
             lobby.addEntry(a);
         });

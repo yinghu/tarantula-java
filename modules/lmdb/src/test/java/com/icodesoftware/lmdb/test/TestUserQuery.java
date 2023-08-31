@@ -2,17 +2,17 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 
 public class TestUserQuery implements RecoverableFactory<TestUser> {
 
 
-    private long  ownerId;
+    private String  ownerId;
     private String label;
-    public TestUserQuery(long ownerId){
+    public TestUserQuery(String ownerId){
         this.ownerId = ownerId;
     }
-    public TestUserQuery(long ownerId,String label){
+    public TestUserQuery(String ownerId,String label){
         this.ownerId = ownerId;
         this.label = label;
     }
@@ -33,6 +33,6 @@ public class TestUserQuery implements RecoverableFactory<TestUser> {
     
     @Override
     public Recoverable.Key key() {
-        return new LongTypeKey(ownerId);
+        return new OidKey(ownerId);
     }
 }

@@ -9,12 +9,12 @@ import java.io.IOException;
 public class ShutdownApplicationOperation extends Operation {
 
     private String typeId;
-    private long applicationkey;
+    private String applicationkey;
     public ShutdownApplicationOperation() {
     }
 
 
-    public ShutdownApplicationOperation(String typeId, long applicationkey) {
+    public ShutdownApplicationOperation(String typeId, String applicationkey) {
         this.typeId = typeId;
         this.applicationkey = applicationkey;
     }
@@ -33,13 +33,13 @@ public class ShutdownApplicationOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(typeId);
-        out.writeLong(applicationkey);
+        out.writeUTF(applicationkey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.typeId = in.readUTF();
-        this.applicationkey = in.readLong();
+        this.applicationkey = in.readUTF();
     }
 }

@@ -83,14 +83,14 @@ public class DeploymentDescriptor extends DefaultDescriptor implements Portable 
     public boolean write(DataBuffer buffer) {
         super.write(buffer);
         buffer.writeUTF8(this.tag);
-        buffer.writeUTF8(this.moduleName!=null?this.moduleName:Bufferable.UTF_NULL);
-        buffer.writeUTF8(this.applicationClassName!=null?this.applicationClassName:Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.moduleName);
+        buffer.writeUTF8(this.applicationClassName);
         buffer.writeBoolean(this.tournamentEnabled);
         buffer.writeInt(this.accessRank);
-        buffer.writeUTF8(this.moduleId!=null?this.moduleId: Bufferable.UTF_NULL);
-        buffer.writeUTF8(this.codebase!=null?this.codebase:Bufferable.UTF_NULL);
-        buffer.writeUTF8(this.moduleArtifact!=null?this.moduleArtifact:Bufferable.UTF_NULL);
-        buffer.writeUTF8(this.moduleVersion!=null?this.moduleVersion:Bufferable.UTF_NULL);
+        buffer.writeUTF8(this.moduleId);
+        buffer.writeUTF8(this.codebase);
+        buffer.writeUTF8(this.moduleArtifact);
+        buffer.writeUTF8(this.moduleVersion);
         return true;
     }
 

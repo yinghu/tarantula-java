@@ -9,12 +9,11 @@ import com.icodesoftware.Arena;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
-import com.icodesoftware.util.LongTypeKey;
+import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
-import com.tarantula.game.Rating;
 
 import java.io.IOException;
 import java.util.*;
@@ -117,7 +116,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void load(){
         int[] created ={0};
-        dataStore.list(new GameEntryQuery(this.id()),(ge)->{
+        dataStore.list(new GameEntryQuery(this.oid()),(ge)->{
             entries[ge.seat()]=ge;
             if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
             created[0]++;
@@ -129,7 +128,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             entry.seat(i);
             entry.occupied(false);
             entry.owner(this.distributionKey());
-            entry.ownerKey(new LongTypeKey(this.id));
+            entry.ownerKey(new OidKey(this.oid));
             if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
             entries[i]=entry;
         }

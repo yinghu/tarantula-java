@@ -81,7 +81,7 @@ public class AchievementProgress extends RecoverableObject {
     }
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.id,this.label);
+        return new AssociateKey(this.oid,this.label);
     }
     public void reset(int tier,int target,double objective){
         this.tier = tier;

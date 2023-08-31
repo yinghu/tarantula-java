@@ -124,7 +124,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onLaunchApplication(String typeId,long applicationId){
+    public boolean onLaunchApplication(String typeId,String applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         LaunchApplicationOperation operation = new LaunchApplicationOperation(typeId,applicationId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -169,7 +169,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onShutdownApplication(String typeId,long applicationId){
+    public boolean onShutdownApplication(String typeId,String applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownApplicationOperation operation = new ShutdownApplicationOperation(typeId,applicationId);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

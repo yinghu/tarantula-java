@@ -8,7 +8,7 @@ public interface UserService extends ServiceProvider,MetricsListener{
 
     String NAME = "UserService";
 
-    Access loadUser(long systemId);
+    Access loadUser(String systemId);
 
     Account loadAccount(Access access);
     List<Access> loadUsers(Account account);
@@ -25,7 +25,7 @@ public interface UserService extends ServiceProvider,MetricsListener{
     boolean changePassword(OnAccess access);
     boolean updateEmail(OnAccess access);
     Account createAccount(Access access, Subscription subscription);
-    Subscription subscribe(long accountId,int durationMonth);
+    Subscription subscribe(String accountId,int durationMonth);
 
     LoginProvider loginProvider(String systemId);
     void createLoginProvider(LoginProvider loginProvider);

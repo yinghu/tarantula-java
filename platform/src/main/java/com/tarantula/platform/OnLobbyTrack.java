@@ -69,6 +69,6 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     }
     @Override
     public Key key() {
-        return new AssociateKey(this.id,this.label);
+        return new AssociateKey(this.oid,this.label);
     }
 }

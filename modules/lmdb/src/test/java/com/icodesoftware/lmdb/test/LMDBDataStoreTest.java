@@ -62,8 +62,8 @@ public class LMDBDataStoreTest {
     @Test(groups = { "LMDB" })
     public void createWithEdgeTest() {
         DataStore ds = lmdbDataStoreProvider.createDataStore("user");
-        long ownerId1 = 10000;
-        long ownerId2 = 20000;
+        String ownerId1 = "s10000";
+        String ownerId2 = "s20000";
         List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
         Assert.assertTrue(empty.size()==0);
         for(int i=0;i<10;i++) {
@@ -93,7 +93,7 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(ds.load(u));
         });
 
-        List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
+        List<TestUser> zerolist = ds.list(new TestUserQuery("s1200"));
         Assert.assertEquals(zerolist.size(),0);
 
         DataStore dsx = lmdbDataStoreProvider.createDataStore("user_backup");
@@ -116,7 +116,7 @@ public class LMDBDataStoreTest {
     //@Test(groups = { "LMDB" })
     public void createEdgeTest() {
         DataStore ds = lmdbDataStoreProvider.createDataStore("userex");
-        long ownerId1 = 10000;
+        String ownerId1 = "s10000";
         TestUser testUser = new TestUser("user",ownerId1);
         Assert.assertTrue(ds.create(testUser));
         Assert.assertTrue(ds.createEdge(testUser,"friends"));
@@ -126,7 +126,7 @@ public class LMDBDataStoreTest {
     @Test(groups = { "LMDB" })
     public void createAssignedTest() {
         //DataStore ds = lmdbDataStoreProvider.createDataStore("users");
-        long ownerId1 = 10000;
+        String ownerId1 = "s10000";
         TestUserEx testUser = new TestUserEx("user",ownerId1);
         TestMapStoreListener mapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         ByteBuffer key = ByteBuffer.allocate(100);

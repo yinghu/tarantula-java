@@ -69,7 +69,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private final List<DefaultLobby> mlobbyList = new LinkedList();
 
-    private final ConcurrentHashMap<Long, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>(); //id =>
+    private final ConcurrentHashMap<String, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>(); //id =>
 
     public static String releaseVersion;
     public String applicationSchedulingPoolSetting;
@@ -255,7 +255,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
         if(lb.descriptor().accessMode() > c.accessMode) c.accessMode(lb.descriptor().accessMode());
         SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
-        this.availableApplicationManagers.put(c.id(),singletonApplicationManager);
+        this.availableApplicationManagers.put(c.oid(),singletonApplicationManager);
         singletonApplicationManager.start();
         lb.addEntry(c);
     }
@@ -353,7 +353,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
-        lc.applications = masterDataStore().list(new ApplicationQuery(d.id()));
+        lc.applications = masterDataStore().list(new ApplicationQuery(d.oid()));
         lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));
         this.configureViews(lc);
         try{
@@ -368,7 +368,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.id()));
+        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.oid()));
         //this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
@@ -384,7 +384,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = masterDataStore().list(new ApplicationQuery(d.id()));
+            lc.applications = masterDataStore().list(new ApplicationQuery(d.oid()));
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onUpdated(ob);
@@ -408,20 +408,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String, Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                ApplicationProvider ap = this.availableApplicationManagers.get(d.id());
+                ApplicationProvider ap = this.availableApplicationManagers.get(d.oid());
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
                 if(d.type().equals(Descriptor.TYPE_APPLICATION)){ //shut down app
                     ap.shutdown();
-                    this.availableApplicationManagers.remove(d.id());
+                    this.availableApplicationManagers.remove(d.oid());
                 }
                 else{
                     lab = d;
                 }
             }
             if(lab!=null){
-                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.id());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.oid());
                 lbb.shutdown();
                 listener.onLobby(lab);
             }
@@ -430,14 +430,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             ex.printStackTrace();
         }
     }
-    public synchronized void setApplicationOnLobby(String typeId,long applicationId){
+    public synchronized void setApplicationOnLobby(String typeId,String applicationId){
  	    Lobby lb = this._lobbyMapping.get(typeId);
  	    if(lb==null||this.availableApplicationManagers.containsKey(applicationId)){
  	        return;
         }
         try{
             DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
-            deploymentDescriptor.id(applicationId);
+            deploymentDescriptor.oid(applicationId);
             if(!masterDataStore().load(deploymentDescriptor)) throw new RuntimeException("no application config data");
             try{setApplicationManager(deploymentDescriptor,lb);}catch (Exception exx){
                 throw new RuntimeException(exx);
@@ -446,7 +446,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             log.error("error on setApplicationOnLobby",ex);
         }
     }
-    public synchronized void unsetApplication(String typeId,long applicationId,Lobby.Listener listener){
+    public synchronized void unsetApplication(String typeId,String applicationId,Lobby.Listener listener){
  	    Lobby lb = this._lobbyMapping.get(typeId);
         if(lb==null){
             return;
@@ -455,7 +455,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String,Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.id()==(applicationId)){
+                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.oid().equals(applicationId)){
                     lb.removeEntry(applicationId);
                     ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
@@ -469,7 +469,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
             if(lb.entryList().size()==1&&(lab!=null)){//clean lobby and clean module class loaders
                 this._lobbyMapping.remove(typeId);
-                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.id());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.oid());
                 lbb.shutdown();
                 listener.onLobby(lab);
                 _codeBase.forEach((k,v)-> listener.onLobby(v));

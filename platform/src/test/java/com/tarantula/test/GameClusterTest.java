@@ -1,14 +1,10 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Statistics;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.LongTypeKey;
-import com.tarantula.admin.GameClusterQuery;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.resource.GameResourceQuery;
-import com.tarantula.platform.statistics.UserStatistics;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -60,10 +56,10 @@ public class GameClusterTest {
         load.oid(gameCluster.oid());
         Assert.assertTrue(ds.load(load));
         Assert.assertEquals(load.name(),gameCluster.name());
-        gameCluster.ownerKey(new LongTypeKey(1000));
+        gameCluster.ownerKey(new OidKey("a1000"));
         gameCluster.onEdge(true);
         Assert.assertTrue(ds.createEdge(gameCluster,"gameCluster"));
-        gameCluster.ownerKey(new LongTypeKey(2000));
+        gameCluster.ownerKey(new OidKey("a2000"));
         Assert.assertTrue(ds.createEdge(gameCluster,"gameCluster"));
         //Assert.assertEquals(ds.list(new GameClusterQuery(1000)).size(),1);
         //Assert.assertEquals(ds.list(new GameClusterQuery(2000)).size(),1);

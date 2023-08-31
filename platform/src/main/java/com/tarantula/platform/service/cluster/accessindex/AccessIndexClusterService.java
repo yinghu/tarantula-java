@@ -6,6 +6,7 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -110,7 +111,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex set(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket, SystemUtil.oid(),referenceId);
-        accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
+        //accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
         byte[] key = accessKey.getBytes();
         boolean suc = dso.lock(key,()->
             dso.dataStore.createIfAbsent(accessIndex,false)
@@ -120,7 +121,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex setIfAbsent(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket,SystemUtil.oid(),referenceId);
-        accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
+        //accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
         byte[] key = accessKey.getBytes();
         dso.lock(key,()-> dso.dataStore.createIfAbsent(accessIndex,true));
         return accessIndex;
@@ -238,4 +239,5 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public void syncEnd(String syncKey){
         tarantulaContext._syncLatch.get(syncKey).countDown();
     }
+
 }

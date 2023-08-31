@@ -29,7 +29,7 @@ public class MetricsViewSudoRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access acc = userService.loadUser(session.id());
+            Access acc = userService.loadUser(session.oid());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onMetricsList")){

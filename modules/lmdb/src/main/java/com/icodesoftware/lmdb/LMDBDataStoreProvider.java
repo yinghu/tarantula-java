@@ -69,7 +69,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public MapStoreListener mapStoreListener(int scope) {
-        return null;
+        return this;
     }
 
     @Override
@@ -184,6 +184,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
+    /**
     public long nextId(String name) {
 
         ByteBuffer idKey = ByteBuffer.allocateDirect(key.getMaxKeySize());
@@ -204,7 +205,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }finally {
             txn.close();
         }
-    }
+    }**/
 
     public void assignKey(Recoverable.DataBuffer dataBuffer){
         dataBuffer.writeUTF8(UUID.randomUUID().toString());

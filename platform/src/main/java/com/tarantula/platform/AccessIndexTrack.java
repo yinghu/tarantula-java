@@ -58,7 +58,6 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         out.writeUTF("2",this.bucket);
         out.writeUTF("3",this.oid);
         out.writeInt("4",this.referenceId);
-        out.writeLong("5",this.id);
     }
 
     @Override
@@ -67,7 +66,6 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         this.bucket = in.readUTF("2");
         this.oid = in.readUTF("3");
         this.referenceId = in.readInt("4");
-        this.id = in.readLong("5");
     }
     @Override
     public Map<String,Object> toMap(){
@@ -97,7 +95,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",owner);
-        jsonObject.addProperty("distributionKey",distributionKey());
+        jsonObject.addProperty("oid",oid());
         jsonObject.addProperty("referenceId",referenceId);
         return jsonObject;
     }
@@ -108,7 +106,6 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         this.bucket = buffer.readUTF8();
         this.oid = buffer.readUTF8();
         this.referenceId = buffer.readInt();
-        this.id = buffer.readLong();
         return true;
     }
     @Override
@@ -116,7 +113,6 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         buffer.writeUTF8(bucket);
         buffer.writeUTF8(oid);
         buffer.writeInt(referenceId);
-        buffer.writeLong(id);
         return true;
     }
     @Override

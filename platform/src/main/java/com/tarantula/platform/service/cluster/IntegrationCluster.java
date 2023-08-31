@@ -349,13 +349,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
         this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
-        summary.register(fromCluster(Long.parseLong(nodeId)));
+        summary.register(fromCluster(nodeId));
         for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
                         String[] pnode = m.getStringAttribute("node").split("#");
-                        Node exstingNode = fromCluster(Long.parseLong(pnode[1]));
+                        Node exstingNode = fromCluster((pnode[1]));
                         if(exstingNode != null){
                             nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
                             this.summary.register(exstingNode);
@@ -389,9 +389,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     //}
 
-    private Node fromCluster(long nodeId){
+    private Node fromCluster(String nodeId){
         Node n = new ClusterNode();
-        byte[] ret = this.vMap.get(ByteBuffer.allocate(8).putLong(nodeId).array());
+        byte[] ret = this.vMap.get(nodeId.getBytes());
         if(ret==null) return null;
         n.fromBinary(ret);
         return n;

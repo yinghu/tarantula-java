@@ -1,6 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.CipherUtil;
@@ -34,7 +35,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private int timeoutInSeconds;
 
     private ServiceContext serviceContext;
-    private ConcurrentHashMap<Long,PresenceIndex> pMap;
+    private ConcurrentHashMap<String,PresenceIndex> pMap;
     private HashMap<String,Access.Role> rMap;
     private HashMap<String,AuthVendorRegistry> aMap;
     private DataStore pdataStore;//presence
@@ -72,9 +73,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return systemValidator.tokenValidator();
     }
     public Presence presence(Session session){
-        Presence presence = pMap.computeIfAbsent(session.id(),(k)->{
+        Presence presence = pMap.computeIfAbsent(session.oid(),(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.id(session.id());
+            px.oid(session.oid());
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -89,15 +90,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pdataStore.update(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
-            pMap.put(session.id(),px);
+            pMap.put(session.oid(),px);
             return px;
         }
         return presence;
     }
-    public Presence presence(long id){
+    public Presence presence(String id){
         return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.id(id);
+            px.oid(id);
             pdataStore.load(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -186,7 +187,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             throw new RuntimeException(ex);
         }
     }
-    public void offSession(long systemId){
+    public void offSession(String systemId){
         Presence presence = pMap.remove(systemId);
         if(presence!=null){
             presence.disabled(true);
@@ -270,26 +271,25 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return keys;
     }
 
-    public String ticket(long key,int stub,int duration){
-        byte[] mark = encrypt(ByteBuffer.allocate(16).putLong(key).putInt(stub).putInt(duration).array());
+    public String ticket(String key,int stub,int duration){
+        byte[] data = BufferProxy.buffer(200).writeUTF8(key).writeInt(stub).writeInt(duration).array();
+        byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
-        //return SystemUtil.ticket(messageDigest(),key,stub,duration,SystemUtil.toHexString(mark));
     }
-    public boolean validateTicket(long key,int stub,String ticket){
-        //String waterMark = SystemUtil.validTicket(messageDigest(),key,stub,ticket);
+    public boolean validateTicket(String key,int stub,String ticket){
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
-        ByteBuffer buffer = ByteBuffer.allocate(16).put(mark).flip();
-        return buffer.getLong()==key && buffer.getInt() == stub;
+        Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
+        return buffer.readUTF8().equals(key) && buffer.readInt() == stub;
     }
     public List<Access.Role> list(){
         return roleList;
     }
-    public Access.Role role(long systemId){
-        if(systemId==0){
+    public Access.Role role(String systemId){
+        if(systemId==null){
             return rMap.get("player");
         }
         Access acc = new User();
-        acc.id(systemId);
+        acc.oid(systemId);
         if(udataStore.load(acc)){
             return rMap.get(acc.role());
         }
@@ -450,7 +450,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void waitForData() {
         try{
-            PresenceKey pKey = new PresenceKey(serviceContext.node().id());
+            PresenceKey pKey = new PresenceKey(serviceContext.node().nodeId());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
             if(clusterKey!=null){
                 pKey.base64key(CipherUtil.toBase64Key(clusterKey));
@@ -565,10 +565,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public String jwtToken(Access access,OnSession session){
         return jwt.token((h,p)->{
-            byte[] mark = encrypt(ByteBuffer.allocate(12).putLong(access.id()).putInt(session.stub()).array());
+            long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
+            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+            dataBuffer.writeUTF8(access.oid()).writeInt(session.stub());
+            byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
-            long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
             p.addProperty("exp",expiry);
             return true;
         });
@@ -576,18 +578,19 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public OnSession jwtToken(String token){
         OnSession onSession = new OnSessionTrack();
         if(!jwt.verify(token,(h,p)->{
-            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))) return false;
+            long expiry = p.get("exp").getAsLong();
+            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) return false;
             Access.Role r = rMap.get(p.get("aud").getAsString());
             if(r==null) return false;
             byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
-            ByteBuffer buffer = ByteBuffer.allocate(12).put(data).flip();
-            long id = buffer.getLong();
-            int stub = buffer.getInt();
-            onSession.id(id);
+            Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
+            String id = dataBuffer.readUTF8();
+            int stub = dataBuffer.readInt();
+            onSession.oid(id);
             onSession.stub(stub);
             return true;
         })) return OnSessionTrack.INVALID_TOKEN;
-        onSession.ticket(ticket(onSession.id(),onSession.stub(),timeoutInSeconds));
+        onSession.ticket(ticket(onSession.oid(),onSession.stub(),timeoutInSeconds));
         return onSession;
     }
 

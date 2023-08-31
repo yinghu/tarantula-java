@@ -41,7 +41,7 @@ public interface DataStoreProvider extends ServiceProvider {
     //recover from incremental back up
     void recover(int scope,OnBackup backup);
 
-    long nextId(String name);
+    //long nextId(String name);
     interface OnBackup{
         void on(String fName,int fSize,ReadableByteChannel in);
     }

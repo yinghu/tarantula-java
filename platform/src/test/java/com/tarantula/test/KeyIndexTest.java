@@ -4,8 +4,8 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.NaturalKey;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -30,7 +30,7 @@ public class KeyIndexTest {
         String masterNode = "n01";
         String slaveNode1 = "n02";
         String slaveNode2 = "n03";
-        KeyIndexTrack index = new KeyIndexTrack("users",new LongTypeKey(100));
+        KeyIndexTrack index = new KeyIndexTrack("users",new OidKey("a100"));
         Assert.assertTrue(index.placeMasterNode(masterNode));
         Assert.assertFalse(index.placeMasterNode(masterNode));
         Assert.assertTrue(index.placeSlaveNode(slaveNode1));
@@ -44,7 +44,7 @@ public class KeyIndexTest {
         Assert.assertTrue(dataStore.createIfAbsent(index1,false));
         Assert.assertFalse(dataStore.createIfAbsent(index1,true));
 
-        KeyIndexTrack load = new KeyIndexTrack("users",new LongTypeKey(100));
+        KeyIndexTrack load = new KeyIndexTrack("users",new OidKey("a100"));
         KeyIndexTrack load1 = new KeyIndexTrack("accesses",new NaturalKey("noop"));
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(index.masterNode(),load.masterNode());

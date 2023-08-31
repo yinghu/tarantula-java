@@ -8,19 +8,19 @@ public class AssociateObject extends RecoverableObject {
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
         label = buffer.readUTF8();
-        id = buffer.readLong();
+        oid = buffer.readUTF8();
         return true;
     }
     @Override
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(id==0 && label ==null) return false;
+        if(oid==null && label ==null) return false;
         buffer.writeUTF8(label);
-        buffer.writeLong(id);
+        buffer.writeUTF8(oid);
         return true;
     }
 
     @Override
     public Key key() {
-        return new AssociateKey(id,label);
+        return new AssociateKey(oid,label);
     }
 }

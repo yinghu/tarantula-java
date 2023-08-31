@@ -2,14 +2,11 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
 import com.icodesoftware.service.DataStoreProvider;
-import com.tarantula.platform.tournament.PlayerTournamentHistory;
-import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

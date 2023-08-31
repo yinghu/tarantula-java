@@ -31,7 +31,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
         Stub stub = stubIndex.get(stubKey.asString());
         if(stub !=null && stub.joined) {
-            stub.ticket(this.context.validator().ticket(session.id(),session.stub()));
+            stub.ticket(this.context.validator().ticket(session.oid(),session.stub()));
             return stub;
         }
         GameZone _zone = gameZone(rating);

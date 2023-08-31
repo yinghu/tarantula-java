@@ -8,11 +8,9 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.util.LongTypeKey;
 import com.icodesoftware.util.OidKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.ApplicationProvider;
 
 public class TarantulaApplicationDeployer implements Serviceable, Configurable.Listener<OnLobby> {
 
@@ -45,7 +43,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
-			c.applications = datastore.list(new ApplicationQuery(c.descriptor.id()));
+			c.applications = datastore.list(new ApplicationQuery(c.descriptor.oid()));
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
@@ -91,7 +89,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(String bucketId) throws Exception{
+	private List<LobbyDescriptor> deployFromLocal(String bucketId){
 		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
@@ -109,7 +107,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			c.descriptor.onEdge(true);
 			c.descriptor.ownerKey(new OidKey(bucketId));
 			dataStore.create(c.descriptor);
-			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.id(),0),false);
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.oid()),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.ownerKey(c.descriptor.key());

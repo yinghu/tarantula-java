@@ -42,14 +42,14 @@ public class AdminRoleModule implements Module{
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access user = _user(session.id());
+            Access user = _user(session.oid());
             Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(maxGameClusterCount,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onGameClusterList")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            Access user = _user(session.id());
+            Access user = _user(session.oid());
             int index = ((Number)onAccess.property("index")).intValue();
             GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = this.deploymentServiceProvider.gameClusterList(user);
@@ -112,11 +112,11 @@ public class AdminRoleModule implements Module{
                 session.write(JsonUtil.toSimpleResponse(false,"letter and number only with 4 chars at least").getBytes());
             }
             else{
-                Access ua = _user(session.id());
+                Access ua = _user(session.oid());
                 Account acc = userService.loadAccount(ua);
                 if(acc.gameClusterCount(0)<maxGameClusterCount){
                     onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
-                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.id(),pendingName,onAccess);
+                    GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.oid(),pendingName,onAccess);
                     if(gc.successful()){
                         IndexSet idx = this.userService.loadGameClusterIndex(ua);
                         idx.addKey(gc.distributionKey());
@@ -167,8 +167,8 @@ public class AdminRoleModule implements Module{
                 if(descriptor.tag().equals(query[1])){
                     suc[0]=this.deploymentServiceProvider.updateApplication(descriptor,onAccess);
                     if(suc[0]){
-                        this.deploymentServiceProvider.disableApplication(descriptor.id());
-                        this.deploymentServiceProvider.enableApplication(descriptor.id());
+                        this.deploymentServiceProvider.disableApplication(descriptor.oid());
+                        this.deploymentServiceProvider.enableApplication(descriptor.oid());
                     }
                 }
             });
@@ -176,7 +176,7 @@ public class AdminRoleModule implements Module{
         }
         else if(session.action().equals("onLaunchGameCluster")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            Access _u = _user(session.id());
+            Access _u = _user(session.oid());
             Account acc = userService.loadAccount(_u);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
@@ -213,7 +213,7 @@ public class AdminRoleModule implements Module{
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 
-    private Access _user(long systemId){
+    private Access _user(String systemId){
         return this.userService.loadUser(systemId);
     }
     private byte[] toJson(Map<String,Descriptor> existed,List<Descriptor> exposedGameServices){
