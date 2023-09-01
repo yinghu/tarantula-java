@@ -9,12 +9,14 @@ import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigurableTypes extends RecoverableObject implements Configuration {
 
     private static String ITEM_LIST = "itemList";
     private JsonObject application = new JsonObject();
 
+    private ConcurrentHashMap<String,ConfigurableType> types = new ConcurrentHashMap<>();
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -41,13 +43,20 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",name);
-        jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
+        JsonArray items = new JsonArray();
+        types.forEach((k,v)-> items.add(v.toJson()));
+        jsonObject.add(ITEM_LIST,items);
+        //jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
         return jsonObject;
     }
 
     public JsonArray toTypes(){
         if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
         return application.get(ITEM_LIST).getAsJsonArray();
+    }
+
+    public boolean addType(ConfigurableType type){
+        return types.putIfAbsent(type.name(),type)==null;
     }
     public void addType(JsonObject type){
         if(!application.has(ITEM_LIST)){

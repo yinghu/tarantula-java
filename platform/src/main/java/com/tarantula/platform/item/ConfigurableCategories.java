@@ -10,12 +10,14 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigurableCategories extends RecoverableObject implements Configuration {
 
     private static String ITEM_LIST = "itemList";
     private JsonObject application = new JsonObject();
     private ConfigurableTypes configurableTypes;
+    private ConcurrentHashMap<String,ConfigurableCategory> categories = new ConcurrentHashMap<>();
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -52,14 +54,19 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",name);
-        if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
-        jsonObject.add(ITEM_LIST,application.get(ITEM_LIST));
+        JsonArray items = new JsonArray();
+        categories.forEach((k,v)-> items.add(v.toJson()));
+        jsonObject.add(ITEM_LIST,items);
         if(configurableTypes!=null) jsonObject.add("types",configurableTypes.toJson());
         return jsonObject;
     }
     public JsonArray toCategories(){
         if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
         return application.get(ITEM_LIST).getAsJsonArray();
+    }
+
+    public boolean addCategory(ConfigurableCategory category){
+        return categories.putIfAbsent(category.name(),category)==null;
     }
     public boolean addCategory(JsonObject type){
         if(!application.has(ITEM_LIST)){

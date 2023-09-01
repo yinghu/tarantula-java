@@ -76,7 +76,7 @@ public class TestServiceContext implements ServiceContext {
 
     @Override
     public DeploymentServiceProvider deploymentServiceProvider() {
-        return null;
+        return new TestDeploymentProvider();
     }
 
 
