@@ -706,7 +706,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     }
                 }
             );
-            this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionKey());
+            this.integrationCluster.deployService().onCreateGameCluster(gameCluster.oid());
         }catch (Exception ex){
             log.error("error on create game cluster",ex);
             gameCluster.message(ex.getMessage());

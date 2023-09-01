@@ -288,7 +288,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public ApplicationPreSetup applicationPreSetup(){
         if(applicationPreSetup!=null) return applicationPreSetup;
-        applicationPreSetup = SystemUtil.applicationPreSetup((String) properties.get(GameCluster.LOBBY_PRE_SETUP_NAME));
+        applicationPreSetup = SystemUtil.applicationPreSetup(applicationSetup);
         applicationPreSetup.setup(serviceContext);
         applicationPreSetup.registerListener(this);
         return applicationPreSetup;
