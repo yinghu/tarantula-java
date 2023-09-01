@@ -4,34 +4,27 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.OidKey;
 
-public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
+public class VersionedConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
 
-    public String label;
     public String itemId;
-
-    public ConfigurableObjectQuery(String query){
-        this.label = query;
-    }
-
-    public ConfigurableObjectQuery(String itemId,String query){
+    public VersionedConfigurableObjectQuery(String itemId){
         this.itemId = itemId;
-        this.label = query;
-    }
 
+    }
 
     @Override
     public ConfigurableObject create() {
-        return new ConfigurableObject();
+        return new VersionedConfigurableObject();
     }
 
     @Override
     public int registryId() {
-        return ItemPortableRegistry.CONFIGURABLE_OBJECT_CID;
+        return ItemPortableRegistry.VERSIONED_CONFIGURABLE_OBJECT_CID;
     }
 
     @Override
     public String label() {
-        return label;
+        return VersionedConfigurableObject.LABEL;
     }
 
 

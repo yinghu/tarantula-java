@@ -89,7 +89,7 @@ public class TestUserEx extends RecoverableObject implements Access {
 
 
     public int getClassId() {
-        return 10;
+        return 12;
     }
     public Map<String,Object> toMap(){
         properties.put("1",login);

@@ -1,15 +1,21 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.AssociateKey;
 
 public class VersionedConfigurableObject extends ConfigurableObject{
 
-    public VersionedConfigurableObject(){
+    public static final String LABEL = "version";
 
+    public VersionedConfigurableObject(){
+        this.onEdge = true;
+        this.label = LABEL;
     }
 
     public VersionedConfigurableObject(ConfigurableObject configurableObject){
+        this();
+        this.ownerKey = configurableObject.key();
         this.configurationType = configurableObject.configurationType();
         this.configurationTypeId = configurableObject.configurationTypeId();
         this.configurationName = configurableObject.configurationName();
@@ -23,23 +29,30 @@ public class VersionedConfigurableObject extends ConfigurableObject{
         //this.listener = configurableObject.listener;
         //this._reference = configurableObject._reference;
         this._configurableSetting = configurableObject._configurableSetting;
-        this.distributionKey(configurableObject.distributionKey());
+        this.oid(configurableObject.oid());
+    }
+    public int getFactoryId() {
+        return ItemPortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return ItemPortableRegistry.VERSIONED_CONFIGURABLE_OBJECT_CID;
     }
 
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        oid = buffer.readUTF8();
+        configurationVersion = buffer.readUTF8();
+        return true;
+    }
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(oid==null) return false;
+        buffer.writeUTF8(oid);
+        buffer.writeUTF8(configurationVersion);
+        return true;
+    }
     @Override
     public Recoverable.Key key(){
         return new AssociateKey(this.oid,this.configurationVersion);
     }
 
-    @Override
-    public void distributionKey(String distributionKey){
-        try{
-            String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-            this.bucket = klist[0];
-            this.oid = klist[1];
-            this.configurationVersion = klist[2];
-        }catch (Exception ex){
-            //ignore wrong format key
-        }
-    }
 }

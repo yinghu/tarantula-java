@@ -7,6 +7,7 @@ import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.util.NaturalKey;
+import com.icodesoftware.util.OidKey;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -113,13 +114,34 @@ public class LMDBDataStoreTest {
         });
         Assert.assertEquals(ct[0],110);
     }
-    //@Test(groups = { "LMDB" })
+    @Test(groups = { "LMDB" })
     public void createEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("userex");
+        DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_c");
         String ownerId1 = "s10000";
-        TestUser testUser = new TestUser("user",ownerId1);
+        TestUserEx testUser = new TestUserEx("user",ownerId1);
         Assert.assertTrue(ds.create(testUser));
         Assert.assertTrue(ds.createEdge(testUser,"friends"));
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void deleteWithEdgeTest() {
+        DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_d");
+        String ownerId1 = "s10000";
+
+        TestUserEx testUser = new TestUserEx("user",ownerId1);
+        Assert.assertTrue(ds.create(testUser));
+        Assert.assertTrue(ds.createEdge(testUser,"friends"));
+        TestUserEx testUser1 = new TestUserEx("user1",ownerId1);
+        Assert.assertTrue(ds.create(testUser1));
+        Assert.assertTrue(ds.createEdge(testUser1,"friends"));
+
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,testUser.label())).size(),2);
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),2);
+        Assert.assertTrue(ds.deleteEdge(testUser.ownerKey(),testUser.key(),"friends"));
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+        Assert.assertTrue(ds.delete(testUser));
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,testUser.label())).size(),1);
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
     }
 

@@ -49,8 +49,8 @@ public class StatisticsTest {
         //Assert.assertTrue(wins.id()>0);
         UserStatistics load = new UserStatistics();
         load.oid(userStatistics.oid());
+        Assert.assertFalse(ds.createIfAbsent(load,true));
         load.dataStore(ds);
-        ds.createIfAbsent(load,true);
         load.load();
         Assert.assertEquals(load.count(0),2);
     }

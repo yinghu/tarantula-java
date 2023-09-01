@@ -52,6 +52,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
 
     public static final int CONFIGURABLE_TYPE_CID = 22;
 
+    public static final int VERSIONED_CONFIGURABLE_OBJECT_CID = 23;
+
+
     public Recoverable create(int i) {
         Recoverable pt = null;
         switch (i){
@@ -117,6 +120,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             case CONFIGURABLE_TYPE_CID:
                 pt = new ConfigurableType();
+                break;
+            case VERSIONED_CONFIGURABLE_OBJECT_CID:
+                pt = new VersionedConfigurableObject();
                 break;
             default:
         }

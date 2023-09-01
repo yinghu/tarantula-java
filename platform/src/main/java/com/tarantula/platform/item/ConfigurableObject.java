@@ -192,8 +192,8 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        if(distributionKey()==null) return jsonObject;
-        jsonObject.addProperty("ItemId", distributionKey());
+        if(oid()==null) return jsonObject;
+        jsonObject.addProperty("ItemId", oid());
         header.entrySet().forEach(e->{
             String k  = e.getKey();
             JsonPrimitive pv = e.getValue().getAsJsonPrimitive();
@@ -280,12 +280,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         category.dataStore(dataStore);
         return category;
     }
-    //public Index index(Descriptor app,String query){
-        //Index index = new Index(query);
-        //index.distributionKey(app.distributionKey());
-        //index.dataStore(dataStore);
-        //return index;
-    //}
 
     public void configurableSetting(ConfigurableSetting configurableSetting){
         configurationScope = configurableSetting.scope;

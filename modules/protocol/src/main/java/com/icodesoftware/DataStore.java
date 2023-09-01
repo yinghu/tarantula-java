@@ -31,6 +31,8 @@ public interface DataStore {
     default boolean load(Recoverable.Key key, Buffer buffer){return false;}
 
     default <T extends Recoverable> boolean createEdge(T t,String label){return false;}
+    default <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label){return false;}
+    default <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,String label){return false;}
     default boolean delete(byte[] key){return false;}
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);

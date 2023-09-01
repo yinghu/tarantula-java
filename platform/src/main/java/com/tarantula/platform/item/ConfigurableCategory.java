@@ -61,11 +61,13 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
     }
 
     public boolean readKey(Recoverable.DataBuffer buffer){
+        buffer.readUTF8();
         name = buffer.readUTF8();
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
         if(name==null) return false;
+        buffer.writeUTF8("category");
         buffer.writeUTF8(name);
         return true;
     }

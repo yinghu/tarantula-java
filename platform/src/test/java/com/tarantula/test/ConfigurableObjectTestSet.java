@@ -47,7 +47,7 @@ public class ConfigurableObjectTestSet {
             category.label("category");
             category.onEdge(true);
             Assert.assertNotNull(category.name());
-            Assert.assertTrue(dataStore.create(category));
+            Assert.assertTrue(dataStore.createIfAbsent(category,false));
             //Assert.assertTrue(dataStore.createEdge(category,"category"));
             //Assert.assertTrue(dataStore.createEdge(category,"link"));
             //Assert.assertTrue(dataStore.createEdge(category,"data"));
@@ -75,7 +75,7 @@ public class ConfigurableObjectTestSet {
             type.label("type");
             type.onEdge(true);
             type.ownerKey(ConfigurableTypeQuery.AssetKey);
-            Assert.assertTrue(dataStore.create(type));
+            Assert.assertTrue(dataStore.createIfAbsent(type,false));
             //Assert.assertTrue(dataStore.createEdge(type,"type"));
             //Assert.assertTrue(dataStore.createEdge(type,"link"));
             //Assert.assertTrue(dataStore.createEdge(type,"data"));

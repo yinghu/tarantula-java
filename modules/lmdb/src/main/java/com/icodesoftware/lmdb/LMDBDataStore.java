@@ -104,6 +104,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if (dbi.get(txn, key) == null) return false;
             BufferProxy proxy = new BufferProxy(txn.val());
             Recoverable.DataHeader header = proxy.readHeader();
+            if(header.revision()!=t.revision()) return false;
             BufferProxy update = new BufferProxy(value);
             header.update(header.local(),1);
             update.writeHeader(header);
@@ -187,6 +188,21 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
 
+    public  <T extends Recoverable> boolean deleteEdge(Recoverable.Key t,String label){
+        Txn<ByteBuffer> txn = env.txnWrite();
+        if(!offEdge(t,label,txn)) return false;
+        txn.commit();
+        return true;
+    }
+    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key t,Recoverable.Key edge,String label){
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        if(!edge.write(new BufferProxy(key))) return false;
+        key.flip();
+        Txn<ByteBuffer> txn = env.txnWrite();
+        if(!offEdge(t,label,key,txn)) return false;
+        txn.commit();
+        return true;
+    }
 
     public boolean load(Recoverable.Key key, Buffer buffer) {
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
@@ -202,12 +218,14 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     public <T extends Recoverable> boolean delete(T t){
-        ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        t.writeKey(new BufferProxy(akey));
-        akey.flip();
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        t.writeKey(new BufferProxy(key));
+        key.flip();
         Txn<ByteBuffer> txn = env.txnWrite();
         try{
-            if(!dbi.delete(txn, akey)) return false;
+            if(!dbi.delete(txn, key)) return false;
+            key.rewind();
+            offEdge(t.ownerKey(),t.label(),key,txn);
             txn.commit();
             return true;
         }finally {
@@ -304,5 +322,25 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         edge.rewind();
         return key;
     }
-
+    private <T extends Recoverable> boolean offEdge(Recoverable.Key t,String label,ByteBuffer edge,Txn<ByteBuffer> txn){
+        if(t==null || edge==null || label ==null) return false;
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        if(!t.write(new BufferProxy(key))) return false;
+        key.flip();
+        Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(scope,name+"_"+label);
+        if(!edgeDbi.delete(txn,key,edge)) return false;
+        key.rewind();
+        edge.rewind();
+        return true;
+    }
+    private <T extends Recoverable> boolean offEdge(Recoverable.Key t,String label,Txn<ByteBuffer> txn){
+        if(t==null || label ==null) return false;
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        if(!t.write(new BufferProxy(key))) return false;
+        key.flip();
+        Dbi<ByteBuffer> edgeDbi = lmdbDataStoreProvider.createEdgeDB(scope,name+"_"+label);
+        if(!edgeDbi.delete(txn,key)) return false;
+        key.rewind();
+        return true;
+    }
 }

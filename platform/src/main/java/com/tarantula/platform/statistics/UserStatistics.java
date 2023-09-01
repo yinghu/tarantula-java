@@ -79,7 +79,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
 
     public int count(int delta){
         //count += delta;
-        return count;
+        return mappings.size();
     }
 
     public boolean read(DataBuffer buffer){
@@ -92,7 +92,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     }
 
     public void load(){
-        if(count==0) return;
+        //if(count==0) return;
         dataStore.list(new StatisticsEntryQuery(this.oid),e->{
             mappings.put(e.name(),e);
             return true;

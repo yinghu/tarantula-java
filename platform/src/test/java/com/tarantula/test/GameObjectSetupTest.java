@@ -1,8 +1,10 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DataStoreProvider;
@@ -11,10 +13,7 @@ import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.ConfigurableCategory;
-import com.tarantula.platform.item.ConfigurableCategoryQuery;
-import com.tarantula.platform.item.ConfigurableTemplate;
-import com.tarantula.platform.item.JsonConfigurableTemplateParser;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -71,7 +70,7 @@ public class GameObjectSetupTest {
 
     }
     @Test(groups = { "GameObjectSetup" })
-    public void configObjectTest() {
+    public void configSettingTest() {
         GameObjectSetup gameObjectSetup = new GameObjectSetup();
         gameObjectSetup.setup(serviceContext);
         GameCluster app = new GameCluster();
@@ -91,18 +90,69 @@ public class GameObjectSetupTest {
             Assert.assertTrue(gameObjectSetup.save(app,category));
             category.ownerKey(ConfigurableCategoryQuery.ComponentKey);
             Assert.assertTrue(gameObjectSetup.edge(app,category,"category"));
+            ConfigurableType type = category.configurableType();
+            type.ownerKey(ConfigurableTypeQuery.AssetKey);
+            type.onEdge(true);
+            type.label("type");
+            gameObjectSetup.save(app,type);
+            type.ownerKey(ConfigurableTypeQuery.CommodityKey);
+            Assert.assertTrue(gameObjectSetup.edge(app,type,"type"));
             //ConfigurableCategory load = new ConfigurableCategory();
             //load.oid(category.oid());
             //Assert.assertTrue(gameObjectSetup.load(app,category));
             //System.out.println(load.configurableType().toJson().toString());
         });
-        gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).forEach(c->{
-            System.out.println(c.name());
-        });
-        gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.ComponentKey,"category")).forEach(c->{
-            System.out.println(c.name());
-        });
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.ComponentKey,"category")).size(),2);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"type")).size(),2);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableTypeQuery(ConfigurableTypeQuery.CommodityKey,"type")).size(),2);
     }
 
+    @Test(groups = { "GameObjectSetup" })
+    public void configCreateObjectTest() {
+        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        gameObjectSetup.setup(serviceContext);
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.typeId("holee-game-data");
+        app.oid("gameApp");
+        Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
+        Assert.assertNotNull(configuration);
+        JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
+        list.forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            ConfigurableObject co = new ConfigurableObject();
+            Assert.assertTrue(co.configureAndValidate(jo));
+            Assert.assertTrue(gameObjectSetup.save(app,co));
+            Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.oid())).size(),1);
+        });
+        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"commodity")).forEach(c->{
+            c.setup();
+            Assert.assertNotEquals(c.toJson().toString(),"{}");
+        });
+        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"Gem")).forEach(c->{
+            c.setup();
+            Assert.assertNotEquals(c.toJson().toString(),"{}");
+        });
+    }
+    @Test(groups = { "GameObjectSetup" })
+    public void configDeleteObjectTest() {
+        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        gameObjectSetup.setup(serviceContext);
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.typeId("sample-game-data");
+        app.oid("gameApp");
+        Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
+        Assert.assertNotNull(configuration);
+        JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
+        list.forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            ConfigurableObject co = new ConfigurableObject();
+            Assert.assertTrue(co.configureAndValidate(jo));
+            Assert.assertTrue(gameObjectSetup.save(app,co));
+            Assert.assertTrue(gameObjectSetup.delete(app,co));
+        });
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"commodity")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"Gem")).size(),0);
+    }
 
 }
