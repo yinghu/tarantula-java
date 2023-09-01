@@ -27,6 +27,7 @@ public class DataStoreTestEvn {
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.waitForData();
+                ((TestServiceContext)serviceContext).dataStoreProvider = dataStoreProvider;
 
             }catch (Exception exx){
                 exx.printStackTrace();

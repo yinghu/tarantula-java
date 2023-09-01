@@ -72,7 +72,12 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return true;
     }
 
-    public <T extends Configurable> boolean load(Descriptor application,T t){
+    @Override
+    public <T extends Configurable> boolean edge(Descriptor application, T t, String label) {
+        return false;
+    }
+
+    public <T extends Configurable> boolean load(Descriptor application, T t){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
         t.dataStore(dataStore);
         return dataStore.load(t);
@@ -128,13 +133,13 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     protected String serviceDataStore(Descriptor application){
         if(application.typeId().endsWith("-data")){
-            return application.typeId().replaceAll("-data","_service");
+            return application.typeId().replaceAll("-","_").replace("data","service");
         }
         if(application.typeId().endsWith("-lobby")){
-            return application.typeId().replaceAll("-lobby","_service");
+            return application.typeId().replaceAll("-","_").replace("lobby","service");
         }
         if(application.typeId().endsWith("-service")){
-            return application.typeId().replaceAll("-service","_service");
+            return application.typeId().replaceAll("-","_");
         }
         return null;
     }
@@ -172,6 +177,12 @@ public class GameObjectSetup implements ApplicationPreSetup {
         boolean created = dataStore.createIfAbsent(t,false);
         if(created && this.listener!=null) listener.onCreated(gameCluster,t);
         return created;
+    }
+
+    @Override
+    public <T extends Configurable> boolean edge(GameCluster gameCluster, T t, String label) {
+        DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        return dataStore.createEdge(t,label);
     }
 
     public <T extends Configurable> boolean load(GameCluster gameCluster, T t){

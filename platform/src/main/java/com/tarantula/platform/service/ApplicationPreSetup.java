@@ -11,6 +11,8 @@ public interface ApplicationPreSetup {
     String SET_UP_NAME = "applicationPreSetup";
 
     <T extends Configurable> boolean save(Descriptor application,T t);
+
+    <T extends Configurable> boolean edge(Descriptor application, T t,String label);
     <T extends Configurable> boolean load(Descriptor application,T t);
     <T extends Configurable> boolean delete(Descriptor application,T t);
     <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory);
@@ -18,6 +20,8 @@ public interface ApplicationPreSetup {
 
     //[game]_service_configuration data store
     <T extends Configurable> boolean save(GameCluster gameCluster, T t);
+
+    <T extends Configurable> boolean edge(GameCluster gameCluster, T t,String label);
 
     <T extends Configurable> boolean load(GameCluster gameCluster, T t);
     <T extends Configurable> boolean delete(GameCluster gameCluster, T t);

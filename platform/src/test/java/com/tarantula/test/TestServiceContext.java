@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledFuture;
 public class TestServiceContext implements ServiceContext {
 
     ClusterNode node;
-
+    DataStoreProvider dataStoreProvider;
 
     public TestServiceContext(){
         this.node = new ClusterNode("BSD","T01",31);
@@ -31,6 +31,16 @@ public class TestServiceContext implements ServiceContext {
     }
     @Override
     public DataStore dataStore(int scope, String s) {
+        if(dataStoreProvider==null) return new EmptyDataStore();
+        if(scope == Distributable.DATA_SCOPE){
+            return dataStoreProvider.createDataStore(s);
+        }
+        if(scope == Distributable.INTEGRATION_SCOPE){
+            return dataStoreProvider.createAccessIndexDataStore(s);
+        }
+        if(scope== Distributable.INDEX_SCOPE){
+            return dataStoreProvider.createKeyIndexDataStore(s);
+        }
         return new EmptyDataStore();
     }
 

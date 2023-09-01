@@ -1,10 +1,13 @@
 package com.tarantula.platform.item;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
-public class ConfigurableCategory extends RecoverableObject {
+public class ConfigurableCategory extends RecoverableObject implements Configuration {
 
     public String header;
     public String application;
@@ -57,5 +60,18 @@ public class ConfigurableCategory extends RecoverableObject {
         return ItemPortableRegistry.CONFIGURABLE_CATEGORY_CID;
     }
 
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        name = buffer.readUTF8();
+        return true;
+    }
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(name==null) return false;
+        buffer.writeUTF8(name);
+        return true;
+    }
+    @Override
+    public Key key() {
+        return new NaturalKey(this.name);
+    }
 
 }
