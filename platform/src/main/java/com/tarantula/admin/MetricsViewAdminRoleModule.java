@@ -36,7 +36,7 @@ public class MetricsViewAdminRoleModule implements Module {
         }
         else if(session.action().equals("onMetricsList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
-            String serviceName = (String) gameCluster.property(GameCluster.GAME_SERVICE);
+            String serviceName = gameCluster.gameServiceName;//(String) gameCluster.property(GameCluster.GAME_SERVICE);
             Metrics m = this.context.metrics(serviceName);
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("successful",true);

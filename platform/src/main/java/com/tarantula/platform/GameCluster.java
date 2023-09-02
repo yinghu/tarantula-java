@@ -29,30 +29,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
+
+    public final static String LABEL = "gameCluster";
+
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
-    public final static String NAME="1";
-    public final static String MODE="2";//pve | pvp |tvp|tvt
-    public final static String GAME_LOBBY = "3";
-    public final static String GAME_SERVICE = "4";
-    public final static String GAME_DATA = "5";
-    public final static String OWNER = "6";
+    //public final static String NAME="1";
+    //public final static String MODE="2";//pve | pvp |tvp|tvt
+    //public final static String GAME_LOBBY = "3";
+    //public final static String GAME_SERVICE = "4";
+    //public final static String GAME_DATA = "5";
+    //public final static String OWNER = "6";
 
-    public final static String DISABLED = "9";
-    public final static String PUBLISHING_ID = "10";
-    public final static String TOURNAMENT_ENABLED = "11";
-    public final static String LOBBY_PRE_SETUP_NAME ="12";
-    public final static String DEDICATED ="13";
-    public final static String GAME_ICON = "14";
-    public final static String DEVELOPER_ICON = "15";
-    public final static String DEVELOPER = "16";
+    //public final static String DISABLED = "9";
+    //public final static String PUBLISHING_ID = "10";
+    //public final static String TOURNAMENT_ENABLED = "11";
+    //public final static String LOBBY_PRE_SETUP_NAME ="12";
+    //public final static String DEDICATED ="13";
+    //public final static String GAME_ICON = "14";
+    //public final static String DEVELOPER_ICON = "15";
+    //public final static String DEVELOPER = "16";
 
-    public final static String MAX_LOBBY_COUNT = "17";
-    public final static String MAX_ZONE_COUNT = "18";
-    public final static String MAX_ARENA_COUNT = "19";
-    public final static String MAX_DATA_SIZE_ON_SET = "20";
+    //public final static String MAX_LOBBY_COUNT = "17";
+    //public final static String MAX_ZONE_COUNT = "18";
+    //public final static String MAX_ARENA_COUNT = "19";
+    //public final static String MAX_DATA_SIZE_ON_SET = "20";
 
-    public final static String UPGRADE_VERSION = "21";
+    //public final static String UPGRADE_VERSION = "21";
 
 
     public Lobby gameLobby;
@@ -107,7 +110,9 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public int upgradeVersion;
     public String publishingId;
     public String accountId;
-    public GameCluster(){}
+    public GameCluster(){
+        this.onEdge = true;
+    }
 
     @Override
     public int getClassId() {
@@ -230,7 +235,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         try{
             this.serviceContext = serviceContext;
             String deployDir = serviceContext.node().deployDirectory();
-            Path _config_game = Paths.get(deployDir+"/conf/"+this.property(GameCluster.NAME));
+            Path _config_game = Paths.get(deployDir+"/conf/"+this.name);
             if(!Files.exists(_config_game)){
                 Path _config_assets = Paths.get(_config_game.toString(),"assets");
                 Path _config_components = Paths.get(_config_game.toString(),"components");

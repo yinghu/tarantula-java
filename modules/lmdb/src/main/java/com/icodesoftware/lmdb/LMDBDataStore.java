@@ -86,6 +86,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
+            t.revision(Long.MIN_VALUE);
             lmdbDataStoreProvider.onDistributing(metadata,key,value);
             return true;
         }finally {
@@ -131,8 +132,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if (dbi.get(txn, key) != null) {
                 if (!loading) return false;
                 BufferProxy proxy = new BufferProxy(txn.val());
-                proxy.readHeader();
+                Recoverable.DataHeader h = proxy.readHeader();
                 t.read(proxy);
+                t.revision(h.revision());
                 return false;
             }
             ByteBuffer value = ByteBuffer.allocateDirect(2700);
@@ -145,6 +147,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             onEdge(t,t.label(),key,txn);
             txn.commit();
+            t.revision(Long.MIN_VALUE);
             return true;
         }
         finally {

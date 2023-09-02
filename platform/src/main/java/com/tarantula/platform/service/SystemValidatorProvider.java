@@ -244,7 +244,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(!this.deployDataStore.load(akey) || akey.disabled()) return null;
         GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
         if(gameCluster==null) return null;
-        String validLobby = (String)gameCluster.property(GameCluster.GAME_LOBBY);
+        String validLobby = gameCluster.gameLobbyName;
         String wmark = SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp());
         String wm = SystemUtil.toHexString(encrypt(ByteBuffer.allocate(8).putLong(akey.timestamp()).array()));
         if(wm.equals(wmark)) return (T)gameCluster;
@@ -254,7 +254,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
         long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         AccessKey accessKey = new AccessKey();
-        accessKey.typeId((String)gc.property(GameCluster.GAME_LOBBY));
+        accessKey.typeId(gc.gameLobbyName);
         accessKey.timestamp(stmp);
         accessKey.owner(gameClusterId);
         if(!this.deployDataStore.create(accessKey)) return null;
@@ -362,13 +362,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         rlist.forEach((k)->{
             OnLobby o = oMap.remove(k);
             GameCluster g = this.deploymentServiceProvider.gameCluster(k);//new GameCluster();
-            //g.distributionKey(o.gameClusterId());
+            g.oid(o.gameClusterId());
             if(g!=null){
-                g.property(GameCluster.DISABLED,true);
+                g.disabled(true);
                 deployDataStore.update(g);
             }
             Account acc = new UserAccount();
-            acc.distributionKey(o.subscriptionId());
+            acc.oid(o.subscriptionId());
             if(adataStore.load(acc)){
                 acc.trial(false);
                 acc.subscribed(false);

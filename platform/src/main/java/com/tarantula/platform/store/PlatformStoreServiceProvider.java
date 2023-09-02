@@ -32,7 +32,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+        this.gameServiceName = gameCluster.gameServiceName;//(String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override

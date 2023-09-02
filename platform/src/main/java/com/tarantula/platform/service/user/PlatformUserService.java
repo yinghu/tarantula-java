@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
@@ -202,14 +203,15 @@ public class PlatformUserService implements UserService {
         return null;
     }
 
-    public <T extends Recoverable> T loadGameClusterIndex(Access access){
-        IndexSet idx = new IndexSet();
-        idx.distributionKey(access.primary()?access.distributionKey():access.owner());
-        idx.label(Account.GameClusterLabel);
-        idx.dataStore(accountIndexDataStore);
-        accountIndexDataStore.createIfAbsent(idx,true);
-        return (T)idx;
-    }
+    //public <T extends OnAccess> T gameClusterList(Access access){
+        //GameClusterQuery query = new GameClusterQuery(access.primaryId()?access.oid():access.primaryId());
+        //IndexSet idx = new IndexSet();
+        //idx.distributionKey(access.primary()?access.distributionKey():access.owner());
+        //idx.label(Account.GameClusterLabel);
+        //idx.dataStore(accountIndexDataStore);
+        //accountIndexDataStore.createIfAbsent(idx,true);
+        //return
+    //}
 
     public LoginProvider loginProvider(String systemId){
         ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();

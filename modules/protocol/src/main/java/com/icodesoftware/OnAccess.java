@@ -42,6 +42,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String MODULE_NAME = "moduleName";
     String MODULE_INDEX = "moduleIndex";
     String DESCRIPTION = "description";
+
     String NAME = "name";
     String ACCESS_CONTROL = "accessControl";
     String DEPLOY_PRIORITY = "deployPriority";

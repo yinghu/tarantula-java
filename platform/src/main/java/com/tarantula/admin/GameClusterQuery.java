@@ -7,6 +7,7 @@ import com.tarantula.platform.GameCluster;
 
 public class GameClusterQuery implements RecoverableFactory<GameCluster> {
 
+
     private String accountId;
 
     public GameClusterQuery(String accountId){

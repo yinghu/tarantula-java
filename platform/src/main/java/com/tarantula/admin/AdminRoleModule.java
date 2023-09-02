@@ -19,7 +19,6 @@ import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +53,6 @@ public class AdminRoleModule implements Module{
             GameClusterContext adminContext = new GameClusterContext();
             adminContext.gameClusterList = this.deploymentServiceProvider.gameClusterList(user);
             adminContext.index = index;
-            /**
-            IndexSet idx = this.userService.loadGameClusterIndex(user);
-            if(idx!=null){
-                idx.keySet().forEach((k)->{
-                    GameCluster g = this.deploymentServiceProvider.gameCluster(k);
-                    if(g!=null){
-                        adminContext.gameClusterList.add(g);
-                    }
-                });
-            }**/
             session.write(adminContext.toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoadGameCluster")){
@@ -118,9 +107,9 @@ public class AdminRoleModule implements Module{
                     onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc.oid(),pendingName,onAccess);
                     if(gc.successful()){
-                        IndexSet idx = this.userService.loadGameClusterIndex(ua);
-                        idx.addKey(gc.distributionKey());
-                        idx.update();
+                        //IndexSet idx = this.deploymentServiceProvider.loadGameClusterIndex(ua);
+                        //idx.addKey(gc.distributionKey());
+                        //idx.update();
                         acc.gameClusterCount(1);
                         acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                         acc.update();
@@ -145,8 +134,8 @@ public class AdminRoleModule implements Module{
             String[] query = session.name().split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
             Descriptor pendingService = pendingGameServices.get(query[1]);
-            String name = (String)gameCluster.property(GameCluster.NAME);
-            String typeId = (String)gameCluster.property(GameCluster.GAME_SERVICE);
+            String name = gameCluster.name();//.property(GameCluster.NAME);
+            String typeId = gameCluster.typeId();//(GameCluster.GAME_SERVICE);
             if(pendingService!=null){
                 Descriptor desc = pendingService.copy();
                 desc.typeId(typeId);//replaced with named type id

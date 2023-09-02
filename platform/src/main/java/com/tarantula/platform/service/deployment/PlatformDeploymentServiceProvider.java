@@ -10,6 +10,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
 import com.icodesoftware.util.OidKey;
+import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
@@ -569,8 +570,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(this.enableGameCluster(gameCluster.distributionKey())&&deployService.onStartGameService(gameCluster.distributionKey())){
-            return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionKey());
+        if(this.enableGameCluster(gameCluster.oid())&&deployService.onStartGameService(gameCluster.oid())){
+            return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.oid());
         }
         else{
             return false;
@@ -578,8 +579,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(this.disableGameCluster(gameCluster.distributionKey())){
-            return deployService.onShutdownGameCluster(gameCluster.distributionKey());
+        if(this.disableGameCluster(gameCluster.oid())){
+            return deployService.onShutdownGameCluster(gameCluster.oid());
         }
         else{
             return false;
@@ -595,17 +596,18 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String gameIcon = (String) properties.property("gameIcon");
         String developerIcon = (String) properties.property("developerIcon");
         String developer = (String) properties.property("developer");
-        gameCluster.property(GameCluster.MODE,playMode);
-        gameCluster.property(GameCluster.DEVELOPER,developer);
-        gameCluster.property(GameCluster.DEDICATED,dedicated);
-        gameCluster.property(GameCluster.GAME_ICON,gameIcon);
-        gameCluster.property(GameCluster.DEVELOPER_ICON,developerIcon);
-        gameCluster.property(GameCluster.UPGRADE_VERSION,gameCluster.upgradeVersion()+1);
+        gameCluster.mode = playMode;
+        gameCluster.developer = developer;
+        gameCluster.dedicated =dedicated;
+        gameCluster.gameIcon = gameIcon;
+        gameCluster.developerIcon = developerIcon;
+        gameCluster.upgradeVersion++;
         mds.update(gameCluster);
         return (T)gameCluster;
     }
     public <T extends OnAccess> List<T> gameClusterList(Access access){
-        return new ArrayList<>();
+        GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.oid():access.primaryId());
+        return (List<T>)this.tarantulaContext.masterDataStore().list(gameClusterQuery);
     }
     public  <T extends OnAccess> T createGameCluster(String accountId,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().set(name,AccessIndex.SYSTEM_INDEX);//name+"-"+mode
@@ -646,7 +648,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gameCluster.maxArenaCount = maxArenaCount;
             gameCluster.maxDataSize = maxDataSize;
             gameCluster.upgradeVersion = 1;
-            mds.create(gameCluster);//create first and discharge if any errors on loop
+            if(!mds.create(gameCluster)) throw new RuntimeException("faled to create game cluster");//create first and discharge if any errors on loop
+            gameCluster.ownerKey(new OidKey(accountId));
+            mds.createEdge(gameCluster,GameCluster.LABEL);
+            gameCluster.ownerKey(new OidKey(publishingId));
+            mds.createEdge(gameCluster,GameCluster.LABEL);
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
@@ -906,13 +912,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(gameCluster==null){
             return false;
         }
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        String data = gameCluster.gameDataName;//1
+        String lobby = gameCluster.gameLobbyName;//2
+        String service = gameCluster.gameServiceName;//3
         boolean suc1 = enableLobby(data);
         boolean suc2 = enableLobby(lobby);
         boolean suc3 = enableLobby(service);
-        gameCluster.property(GameCluster.DISABLED,false);
+        gameCluster.disabled(false);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;//make sure all enabled
     }
@@ -923,13 +929,13 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(gameCluster==null){
             return false;
         }
-        String data = (String) gameCluster.property(GameCluster.GAME_DATA);//1
-        String lobby = (String) gameCluster.property(GameCluster.GAME_LOBBY); //2
-        String service = (String) gameCluster.property(GameCluster.GAME_SERVICE);;//3
+        String data = gameCluster.gameDataName;//1
+        String lobby = gameCluster.gameLobbyName;//2
+        String service = gameCluster.gameServiceName;//3
         boolean suc1 = disableLobby(data);
         boolean suc2 = disableLobby(lobby);
         boolean suc3 = disableLobby(service);
-        gameCluster.property(GameCluster.DISABLED,true);
+        gameCluster.disabled(true);
         mds.update(gameCluster);
         return suc1&&suc2&&suc3;
     }

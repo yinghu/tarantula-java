@@ -20,8 +20,8 @@ public class GameLobbyAdminRoleModule implements Module {
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
             GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
-            if(gc!=null && !((boolean)gc.property(GameCluster.DISABLED))){
-                Lobby lobby = this.deploymentServiceProvider.lobby((String) gc.property(GameCluster.GAME_LOBBY));
+            if(gc!=null && !(gc.disabled())){
+                Lobby lobby = this.deploymentServiceProvider.lobby(gc.gameLobbyName);
                 session.write(toJson(lobby).toString().getBytes());
             }
             else{
@@ -53,8 +53,8 @@ public class GameLobbyAdminRoleModule implements Module {
                     desc.name("Game Lobby " + lobbyIndex);
                     desc.tag(((String) gameCluster.property(GameCluster.NAME)).toLowerCase() + "/lobby" + lobbyIndex);
                     desc.accessRank(lobbyIndex);
-                    String configName = (String) gameCluster.property(GameCluster.MODE);
-                    if(this.deploymentServiceProvider.createApplication(desc,(String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME),configName,true)){
+                    String configName = gameCluster.playMode();
+                    if(this.deploymentServiceProvider.createApplication(desc,gameCluster.applicationSetup,configName,true)){
                         session.write(JsonUtil.toSimpleResponse(true,"lobby added->"+lobbyIndex).getBytes());
                     }
                     else{

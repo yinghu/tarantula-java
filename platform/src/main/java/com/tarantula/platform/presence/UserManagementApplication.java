@@ -231,7 +231,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             if(accessIndex!=null){
                 //create association with the master account
                 GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(session.trackId());
-                String owner = (String)gameCluster.property(GameCluster.OWNER);
+                String owner = gameCluster.accountId;//(String)gameCluster.property(GameCluster.OWNER);
                 ThirdPartyLogin developerLogin = new ThirdPartyLogin("developer",SystemUtil.oid(),deviceId);
                 developerLogin.distributionKey(session.systemId());
                 acc.property("login",deviceId);

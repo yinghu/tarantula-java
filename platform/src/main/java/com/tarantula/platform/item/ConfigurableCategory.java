@@ -13,11 +13,9 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
     public String application;
 
     public String scope;
-    public String type;
-    public String category;
     public String version;
     public String description;
-    //public String name;
+
     public boolean rechargeable;
 
     public ConfigurableCategory(){
@@ -49,6 +47,14 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         resp.add("header", JsonUtil.parse(header));
         resp.add("application", JsonUtil.parse(application));
         return resp;
+    }
+
+    public void parse(){
+        JsonObject h = JsonUtil.parse(header);
+        scope = h.get("scope").getAsString();
+        version = h.get("version").getAsString();
+        description = h.get("description").getAsString();
+        rechargeable = h.get("rechargeable").getAsBoolean();
     }
 
     public ConfigurableType configurableType(){

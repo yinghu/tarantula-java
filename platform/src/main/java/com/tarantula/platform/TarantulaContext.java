@@ -332,7 +332,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
- 	    String publishingId = (String) gameCluster.property(GameCluster.PUBLISHING_ID);
+ 	    String publishingId = gameCluster.publishingId;//(String) gameCluster.property(GameCluster.PUBLISHING_ID);
  	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
@@ -845,7 +845,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                         || config.equals(GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE)
                         || config.equals(GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE)
                         || config.equals(GameCluster.GAME_ASSET_CATEGORY_TEMPLATE)){
-                    File f = new File(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config);
+                    File f = new File(this.deployDir+"/conf/"+gameCluster.name()+"/"+config);
                     return fromDir(f);
                 }
                 if(config.equals(GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE)){
@@ -853,7 +853,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                     File fd = new File(src.getFile());
                     return fromDir(fd);
                 }
-                FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.property(GameCluster.NAME)+"/"+config+".json");
+                FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.name()+"/"+config+".json");
                 ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
                 fileInputStream.close();
                 return item;
@@ -998,7 +998,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public GameCluster loadGameCluster(String key){
          GameCluster gameCluster = gMap.computeIfAbsent(key,k->{
              GameCluster gc = new GameCluster();
-             gc.distributionKey(key);
+             gc.oid(key);
              gc.dataStore(this.masterDataStore());
              if(!this.masterDataStore().load(gc)) return null;
              gc.gameLobby = this.lobby(gc.lobbyType());

@@ -281,13 +281,14 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         return category;
     }
 
-    public void configurableSetting(ConfigurableSetting configurableSetting){
+    public void configurableSetting(ConfigurableCategory configurableSetting){
+        configurableSetting.parse();
         configurationScope = configurableSetting.scope;
-        configurableSetting.properties.forEach(e->{
-            String fn = e.getAsJsonObject().get("name").getAsString();
-            if(_configurableSetting.has(fn)) _configurableSetting.remove(fn);
-            _configurableSetting.add(fn,e);
-        });
+        //configurableSetting.properties.forEach(e->{
+            //String fn = e.getAsJsonObject().get("name").getAsString();
+            //if(_configurableSetting.has(fn)) _configurableSetting.remove(fn);
+            //_configurableSetting.add(fn,e);
+        //});
     }
 
     public JsonObject header(){

@@ -111,10 +111,10 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className);
             serviceExported.put(serviceId,serviceProxy);
         }));
-        this.metrics = new GameClusterMetrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.metrics = new GameClusterMetrics(gameCluster.gameServiceName);
         this.metrics.setup(serviceContext);
         serviceContext.registerMetrics(metrics);
-        this.metrics = serviceContext.metrics((String)gameCluster.property(GameCluster.GAME_SERVICE));
+        this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
         this.serviceContext = serviceContext;
         this.serviceContext.deploymentServiceProvider().register(gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{

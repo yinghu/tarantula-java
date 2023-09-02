@@ -15,7 +15,7 @@ public interface UserService extends ServiceProvider,MetricsListener{
 
     List<Access> loadUsers(Access access);
 
-    <T extends Recoverable> T loadGameClusterIndex(Access access);
+    //<T extends OnAccess> List<T> gameClusterList(Access access);
 
     Subscription loadSubscription(Account account);
     Subscription loadSubscription(Access access);
