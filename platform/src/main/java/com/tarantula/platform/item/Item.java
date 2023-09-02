@@ -46,7 +46,7 @@ public class Item extends ConfigurableObject{
         int passed = 0;//have to have at least one reference
         for(JsonElement je : this.reference){
             ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
+            cob.oid(je.getAsString());
             if(dataStore.load(cob)){
                 passed++;
             }

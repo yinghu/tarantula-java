@@ -157,7 +157,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             logger.warn("Categories missed from ["+ scope+"]");
             return;
         }
-        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
+        ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
         logger.warn(configurableSetting.toString());
         logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
     }

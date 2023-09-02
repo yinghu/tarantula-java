@@ -12,10 +12,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.PortableEventRegistry;
-import com.tarantula.platform.item.ConfigurableCategories;
-import com.tarantula.platform.item.ConfigurableSetting;
-import com.tarantula.platform.item.ReferenceIndex;
-import com.tarantula.platform.item.TypeIndex;
+import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -440,19 +437,19 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
             logger.warn("Categories not existed ["+scope+"]");
             return;
         }
-        ConfigurableSetting configurableSetting = categories.configurableSetting(t.configurationCategory());
+        ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
         if(configurableSetting==null){
             logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
             return;
         }
         resetReferenceIndex(t.configurationCategory(),t.key().asString(),!updated);
-        configurableSetting.properties.forEach(prop->{
-            JsonObject ctype = prop.getAsJsonObject();
-            String type = ctype.get("type").getAsString();
-            if(type.equals("enum")){
-                resetReferenceIndex(ctype.get("reference").getAsString(),t.key().asString(),!updated);
-            }
-        });
+        //configurableSetting.properties.forEach(prop->{
+          //  JsonObject ctype = prop.getAsJsonObject();
+           // String type = ctype.get("type").getAsString();
+            //if(type.equals("enum")){
+              //  resetReferenceIndex(ctype.get("reference").getAsString(),t.key().asString(),!updated);
+            //}
+        //});
     }
 
     private void reset(TypeIndex typeIndex,HashMap<String,JsonObject> previous){

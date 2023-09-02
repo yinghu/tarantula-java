@@ -8,7 +8,9 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,14 +62,18 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         if(configurableTypes!=null) jsonObject.add("types",configurableTypes.toJson());
         return jsonObject;
     }
-    public JsonArray toCategories(){
-        if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
-        return application.get(ITEM_LIST).getAsJsonArray();
+    public List<ConfigurableCategory> toCategories(){
+        //if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
+        //return application.get(ITEM_LIST).getAsJsonArray();
+        ArrayList<ConfigurableCategory> list = new ArrayList<>();
+        categories.forEach((k,v)->list.add(v));
+        return list;
     }
 
     public boolean addCategory(ConfigurableCategory category){
         return categories.putIfAbsent(category.name(),category)==null;
     }
+    /**
     public boolean addCategory(JsonObject type){
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());
@@ -85,7 +91,7 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
         if(exiting) return false;
         items.add(type);
         return true;
-    }
+    }**/
     public boolean updateCategory(JsonObject type){
         if(!application.has(ITEM_LIST)){
             application.add(ITEM_LIST,new JsonArray());
@@ -125,25 +131,23 @@ public class ConfigurableCategories extends RecoverableObject implements Configu
     public void configurableTypes(ConfigurableTypes configurableTypes){
         this.configurableTypes = configurableTypes;
     }
-    public ConfigurableSetting configurableSetting(String category){
-        if(!application.has(ITEM_LIST)) return null;
-        JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
-        ConfigurableSetting configurableSetting = null;
-        for(JsonElement je : items) {
-            JsonObject item = je.getAsJsonObject();
-            JsonObject header = item.getAsJsonObject().get("header").getAsJsonObject();
-            if(header.get("type").getAsString().equals(category)){
-                configurableSetting = new ConfigurableSetting();
-                configurableSetting.type = category;
-                configurableSetting.scope = header.get("scope").getAsString();
-                configurableSetting.version = header.get("version").getAsString();
-                configurableSetting.description = header.get("description").getAsString();
-                configurableSetting.rechargeable = header.get("rechargeable").getAsBoolean();
-                configurableSetting.properties = item.get("application").getAsJsonObject().get("properties").getAsJsonArray();
-                break;
-            }
-        }
-        return configurableSetting;
+    public ConfigurableCategory configurableSetting(String category){
+        //ConfigurableCategory config = categories.get(category);
+        //if(config==null) return null;
+        //JsonArray items = application.get(ITEM_LIST).getAsJsonArray();
+        //ConfigurableSetting configurableSetting = new ConfigurableSetting();
+        //for(JsonElement je : items) {
+            //JsonObject item = je.getAsJsonObject();
+            //JsonObject header = item.getAsJsonObject().get("header").getAsJsonObject();
+            //if(header.get("type").getAsString().equals(category)){
+        //configurableSetting.type = category;
+          //      configurableSetting.scope = config.header.get("scope").getAsString();
+            //    configurableSetting.version = header.get("version").getAsString();
+              //  configurableSetting.description = header.get("description").getAsString();
+               // configurableSetting.rechargeable = header.get("rechargeable").getAsBoolean();
+               // configurableSetting.properties = item.get("application").getAsJsonObject().get("properties").getAsJsonArray();
+
+        return categories.get(category);
 
     }
     public Key key(){

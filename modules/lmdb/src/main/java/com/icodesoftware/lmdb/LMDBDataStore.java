@@ -74,7 +74,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         if(!t.readKey(keyBuffer)) return false;
         key.rewind();
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
-        ByteBuffer value = ByteBuffer.allocateDirect(700);
+        ByteBuffer value = ByteBuffer.allocateDirect(2700);
         BufferProxy proxy = new BufferProxy(value);
         proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
         t.write(proxy);
@@ -98,7 +98,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         if(!t.writeKey(new BufferProxy(key))) return false;
         key.flip();
-        ByteBuffer value = ByteBuffer.allocateDirect(700);
+        ByteBuffer value = ByteBuffer.allocateDirect(2700);
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if (dbi.get(txn, key) == null) return false;
@@ -135,7 +135,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 t.read(proxy);
                 return false;
             }
-            ByteBuffer value = ByteBuffer.allocateDirect(700);
+            ByteBuffer value = ByteBuffer.allocateDirect(2700);
             BufferProxy proxy = new BufferProxy(value);
             proxy.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
             t.write(proxy);

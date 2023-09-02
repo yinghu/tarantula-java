@@ -275,7 +275,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     public Category category(Descriptor app){
         Category category = new Category();
-        category.distributionKey(app.distributionKey());
+        category.oid(app.oid());
         this.dataStore.createIfAbsent(category,true);
         category.dataStore(dataStore);
         return category;

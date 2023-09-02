@@ -7,9 +7,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.Achievement;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
@@ -128,7 +126,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
     public Inventory newInventory(String category,String typeId){
         ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
-        ConfigurableSetting conf = categories.configurableSetting(category);
+        ConfigurableCategory conf = categories.configurableSetting(category);
         return new Inventory(conf.type,typeId,conf.rechargeable);
     }
 
@@ -161,7 +159,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
             ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
             JsonArray cclasses = (JsonArray)configuration.property("itemList");
             cclasses.forEach((c)->{
-                categories.addCategory(c.getAsJsonObject());
+                categories.addCategory(new ConfigurableCategory(c.getAsJsonObject()));
             });
             applicationPreSetup.save(gameCluster,categories);
         }

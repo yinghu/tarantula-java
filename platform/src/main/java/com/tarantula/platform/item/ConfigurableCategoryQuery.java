@@ -1,5 +1,6 @@
 package com.tarantula.platform.item;
 
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.NaturalKey;
@@ -38,5 +39,14 @@ public class ConfigurableCategoryQuery implements RecoverableFactory<Configurabl
     @Override
     public Recoverable.Key key() {
         return key;
+    }
+
+    public static ConfigurableCategoryQuery query(String type,String label){
+        if(type.equals(Configurable.ASSET_CONFIG_TYPE)) return new ConfigurableCategoryQuery(AssetKey,label);
+        if(type.equals(Configurable.COMPONENT_CONFIG_TYPE)) return new ConfigurableCategoryQuery(ComponentKey,label);
+        if(type.equals(Configurable.COMMODITY_CONFIG_TYPE)) return new ConfigurableCategoryQuery(CommodityKey,label);
+        if(type.equals(Configurable.ITEM_CONFIG_TYPE)) return new ConfigurableCategoryQuery(ItemKey,label);
+        if(type.equals(Configurable.APPLICATION_CONFIG_TYPE)) return new ConfigurableCategoryQuery(ApplicationKey,label);
+        return null;
     }
 }

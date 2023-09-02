@@ -8,6 +8,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,9 +52,12 @@ public class ConfigurableTypes extends RecoverableObject implements Configuratio
         return jsonObject;
     }
 
-    public JsonArray toTypes(){
-        if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
-        return application.get(ITEM_LIST).getAsJsonArray();
+    public List<ConfigurableType> toTypes(){
+        //if(!application.has(ITEM_LIST)) application.add(ITEM_LIST,new JsonArray());
+        //return application.get(ITEM_LIST).getAsJsonArray();
+        ArrayList<ConfigurableType> list = new ArrayList<>();
+        types.forEach((c,t)->list.add(t));
+        return list;
     }
 
     public boolean addType(ConfigurableType type){

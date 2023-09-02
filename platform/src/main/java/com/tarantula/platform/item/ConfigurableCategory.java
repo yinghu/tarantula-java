@@ -12,6 +12,13 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
     public String header;
     public String application;
 
+    public String scope;
+    public String type;
+    public String category;
+    public String version;
+    public String description;
+    //public String name;
+    public boolean rechargeable;
 
     public ConfigurableCategory(){
         this.onEdge = true;
@@ -75,5 +82,6 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
     public Key key() {
         return new NaturalKey(this.name);
     }
+
 
 }
