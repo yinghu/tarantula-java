@@ -232,7 +232,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
         if(config.has("itemId")){
-            this.distributionKey(config.get("itemId").getAsString());
+            this.oid(config.get("itemId").getAsString());
             this.revision = Long.parseLong(config.get("revision").getAsString());
         }
         return true;

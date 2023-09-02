@@ -62,7 +62,7 @@ public class Item extends ConfigurableObject{
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
+            cob.oid(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
                 cob.registerListener(this.listener);

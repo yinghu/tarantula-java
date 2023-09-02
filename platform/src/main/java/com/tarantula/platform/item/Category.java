@@ -43,7 +43,7 @@ public class Category extends IndexSet implements Configurable {
     public void list(Filter filter){
         keySet.forEach((k)->{
             CategoryItem categoryItem = new CategoryItem();
-            categoryItem.distributionKey(k);
+            categoryItem.oid(k);
             if(dataStore.load(categoryItem)){
                 if(filter.onFilter(categoryItem)) itemList.add(categoryItem);
             }
@@ -52,7 +52,7 @@ public class Category extends IndexSet implements Configurable {
     public void addItem(CategoryItem item){
         if(itemList.add(item)){
             dataStore.create(item);
-            keySet.add(item.distributionKey());
+            keySet.add(item.oid());
             dataStore.update(this);
         }
     }

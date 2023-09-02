@@ -593,22 +593,22 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         Component room = new Component();
         createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
 
-        zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.distributionKey());
+        zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.oid());
         JsonArray refs = zonePayload.get("reference").getAsJsonArray();
-        refs.add(room.distributionKey());
+        refs.add(room.oid());
         JsonArray arenas = ((JsonElement)lobbyConfiguration.property("arenas")).getAsJsonArray();
         JsonArray aset = zonePayload.get("application").getAsJsonObject().get("ArenaSet").getAsJsonArray();
         arenas.forEach(arenaPayload -> {
             Commodity arena = new Commodity();
             createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
-            aset.add(arena.distributionKey());
-            refs.add(arena.distributionKey());
+            aset.add(arena.oid());
+            refs.add(arena.oid());
         });
         Item zone = new Item();
         createItem(zone,zonePayload,gameCluster,applicationPreSetup);
         JsonObject lobbyPayload = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-        lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionKey());
-        lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionKey());
+        lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.oid());
+        lobbyPayload.get("reference").getAsJsonArray().add(zone.oid());
         Application lobby = new Application();
         createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
         //pre-defined third party validators

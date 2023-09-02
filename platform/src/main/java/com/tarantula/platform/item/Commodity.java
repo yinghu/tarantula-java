@@ -39,7 +39,7 @@ public class Commodity extends ConfigurableObject{
         boolean passed = true;
         for(JsonElement je : this.reference){
             ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
+            cob.oid(je.getAsString());
             if(!dataStore.load(cob)){
                 passed = false;
                 break;
@@ -59,7 +59,7 @@ public class Commodity extends ConfigurableObject{
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
-            cob.distributionKey(je.getAsString());
+            cob.oid(je.getAsString());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
                 cob.registerListener(this.listener);
