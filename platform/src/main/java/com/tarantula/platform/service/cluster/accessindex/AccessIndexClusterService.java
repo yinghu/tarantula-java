@@ -54,7 +54,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         this.nodeEngine = nodeEngine;
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
-            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX +"x");
+            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX +"single");
         }
         pendingUpdates = new ArrayList<>();
         updates = new ArrayList<>();

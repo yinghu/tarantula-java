@@ -28,7 +28,7 @@ public interface DataStore {
     <T extends Recoverable> boolean load(T t);
     default <T extends Recoverable> boolean delete(T t){ return false;}
     default byte[] load(byte[] key){return null;}
-    default boolean load(Recoverable.Key key, Buffer buffer){return false;}
+    default boolean load(Recoverable.Key key, BufferStream buffer){return false;}
 
     default <T extends Recoverable> boolean createEdge(T t,String label){return false;}
     default <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label){return false;}
@@ -49,7 +49,7 @@ public interface DataStore {
         void unset(byte[] key);
 
         default void list(Binary binary){}
-        default void list(Buffer buffer){}
+        default void list(BufferStream buffer){}
     }
 
 
@@ -60,8 +60,8 @@ public interface DataStore {
     interface Binary{
         boolean on(byte[] key,byte[] value);
     }
-    interface Buffer{
-       boolean on(Recoverable.DataBuffer dataBuffer);
+    interface BufferStream{
+       boolean on(Recoverable.DataBuffer keyBuffer, Recoverable.DataHeader dataHeader,Recoverable.DataBuffer dataBuffer);
     }
 
     interface Updatable{

@@ -166,7 +166,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public byte[] onClusterKey() {
         return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.node().clusterNameSuffix());
     }
-
+    public byte[] onTokenKey() {
+        return this.tarantulaContext.tokenValidatorProvider().tokenKey(this.tarantulaContext.node().clusterNameSuffix());
+    }
     public void onResetClusterKey() {
         this.tarantulaContext.tokenValidatorProvider().reset();
     }

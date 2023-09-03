@@ -21,6 +21,9 @@ public class TestUserEx extends RecoverableObject implements Access {
     protected String primaryId;
     protected String validator;
     protected String role;
+    public TestUserEx(boolean ex){
+
+    }
     public TestUserEx(){
         this.label = LABEL;
         this.onEdge = true;

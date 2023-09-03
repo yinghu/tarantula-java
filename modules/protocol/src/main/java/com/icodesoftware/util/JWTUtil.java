@@ -21,12 +21,16 @@ public class JWTUtil {
         secureRandom = new SecureRandom();
     }
 
+    public static byte[] key(){
+        byte[] key = new byte[KEY_SIZE];
+        secureRandom.nextBytes(key);
+        return key;
+    }
+
     public static JWT init() {
         try {
-            byte[] key = new byte[KEY_SIZE];
-            secureRandom.nextBytes(key);
             Mac mac = Mac.getInstance(ALG_HMAC);
-            SecretKeySpec secretKey = new SecretKeySpec(key, ALG_HMAC);
+            SecretKeySpec secretKey = new SecretKeySpec(key(), ALG_HMAC);
             mac.init(secretKey);
             return new JWT(mac);
         } catch (Exception ex) {

@@ -39,6 +39,11 @@ public interface DeployService extends ServiceProvider {
     byte[] onClusterKey();
 
     void onResetClusterKey();
+
+    byte[] onTokenKey();
+
+    void onResetTokenKey();
+
     void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
     void onDisablePresenceService(String classNameSuffix);
 

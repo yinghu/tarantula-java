@@ -50,7 +50,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public long count() {
-        return 0;
+        Txn<ByteBuffer> txn = env.txnRead();
+        Stat st = dbi.stat(txn);
+        long count = st.entries;
+        txn.close();
+        return count;
     }
 
     @Override
@@ -207,14 +211,15 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         return true;
     }
 
-    public boolean load(Recoverable.Key key, Buffer buffer) {
+    public boolean load(Recoverable.Key key, BufferStream buffer) {
         ByteBuffer akey = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.write(new BufferProxy(akey));
         akey.flip();
         Txn<ByteBuffer> txn = env.txnRead(); //read only
         try{
             if (dbi.get(txn, akey) == null) return false;
-            return buffer.on(new BufferProxy(txn.val()));
+            BufferProxy data = new BufferProxy(txn.val());
+            return buffer.on(new BufferProxy(txn.key()),data.readHeader(),data);
         }finally {
             txn.close();
         }
@@ -304,11 +309,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
     @Override
-    public void list(Buffer binary) {
+    public void list(BufferStream binary) {
         final Txn<ByteBuffer> txn = env.txnRead();
         final Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
         while (cursor.next()){
-            if(!binary.on(new BufferProxy(cursor.val()))) break;
+            BufferProxy dataBuffer = new BufferProxy(cursor.val());
+            if(!binary.on(new BufferProxy(cursor.key()),dataBuffer.readHeader(),dataBuffer)) break;
         }
         cursor.close();
         txn.close();

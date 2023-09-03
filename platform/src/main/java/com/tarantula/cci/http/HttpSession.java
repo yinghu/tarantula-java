@@ -67,6 +67,7 @@ public class HttpSession extends RequestParser implements OnExchange {
     }
     public void onError(Exception error,String message){
         try{
+            error.printStackTrace();
             hex.sendResponseHeaders(500,message.length());
             hex.getResponseBody().write(message.getBytes());
         }catch (Exception ex){

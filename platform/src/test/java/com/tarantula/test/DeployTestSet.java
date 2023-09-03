@@ -6,6 +6,7 @@ import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.CipherUtil;
 
+import com.icodesoftware.util.JWTUtil;
 import com.tarantula.platform.LobbyTypeIdIndex;
 import com.tarantula.platform.service.PresenceKey;
 
@@ -38,15 +39,18 @@ public class DeployTestSet {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
         String bkey = CipherUtil.toBase64Key();
         byte[] key = CipherUtil.fromBase64Key(bkey);
+        byte[] tkey = JWTUtil.key();
         PresenceKey presenceKey = new PresenceKey();
-        presenceKey.base64key(bkey);
+        presenceKey.clusterKey(bkey);
+        presenceKey.tokenKey(CipherUtil.toBase64Key(tkey));
         presenceKey.oid(serviceContext.node().nodeId());
         Assert.assertTrue(dataStore.createIfAbsent(presenceKey,false));
-        Assert.assertEquals(true, Arrays.equals(key,presenceKey.toKey()));
+        Assert.assertEquals(true, Arrays.equals(key,presenceKey.clusterKey()));
         PresenceKey load = new PresenceKey();
         load.oid(serviceContext.node().nodeId());
         Assert.assertFalse(dataStore.createIfAbsent(load,true));
-        Assert.assertEquals(true, Arrays.equals(key,load.toKey()));
+        Assert.assertEquals(Arrays.equals(key,load.clusterKey()),true);
+        Assert.assertEquals(Arrays.equals(tkey,load.tokenKey()),true);
     }
 
     @Test(groups = { "lobbyTypeIdIndex" })

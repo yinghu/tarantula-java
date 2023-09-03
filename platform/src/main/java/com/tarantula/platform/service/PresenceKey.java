@@ -7,7 +7,8 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class PresenceKey extends AssociateObject {
 
-    private String base64Key;
+    private String clusterKey;
+    private String tokenKey;
 
     public PresenceKey(){
         this.label = "presenceKey";
@@ -28,20 +29,29 @@ public class PresenceKey extends AssociateObject {
     }
 
 
-    public void base64key(String base64Key){
-        this.base64Key = base64Key;
-    }
-    public byte[] toKey(){
-        return CipherUtil.fromBase64Key(base64Key);
+    public void clusterKey(String base64Key){
+        this.clusterKey = base64Key;
     }
 
+    public void tokenKey(String base64Key){
+        this.tokenKey = base64Key;
+    }
+    public byte[] clusterKey(){
+        return CipherUtil.fromBase64Key(clusterKey);
+    }
+
+    public byte[] tokenKey(){
+        return CipherUtil.fromBase64Key(tokenKey);
+    }
 
     public boolean write(DataBuffer buffer){
-        buffer.writeUTF8(base64Key);
+        buffer.writeUTF8(clusterKey);
+        buffer.writeUTF8(tokenKey);
         return true;
     }
     public boolean read(DataBuffer buffer) {
-        this.base64Key = buffer.readUTF8();
+        this.clusterKey = buffer.readUTF8();
+        this.tokenKey = buffer.readUTF8();
         return true;
     }
 

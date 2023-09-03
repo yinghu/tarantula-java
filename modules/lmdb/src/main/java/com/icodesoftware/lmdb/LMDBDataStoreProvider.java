@@ -12,7 +12,6 @@ import com.icodesoftware.service.Metadata;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
-import org.lmdbjava.Txn;
 
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
@@ -42,11 +41,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private Env<ByteBuffer> key;
     private Dbi<ByteBuffer> keyDbi;
 
-    private long storeSize = 10_485_760;//10M
+    private long storeSize = 1_048_576_0000L; // 1MB = 1,048,576 (1024*1024)
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-    private long startId = 1_000_000;//
+    //private long startId = 1_000_000;//
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override

@@ -108,7 +108,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public byte[] clusterKey(String clusterNameSuffix){
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.toKey();
+        return presenceKey.clusterKey();
+    }
+    public byte[] tokenKey(String clusterNameSuffix){
+        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
+        return presenceKey.tokenKey();
     }
     public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
         try {
@@ -132,9 +136,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public boolean resetClusterKey(){
         try{
-            presenceKey.base64key(CipherUtil.toBase64Key());
+            presenceKey.clusterKey(CipherUtil.toBase64Key());
             this.deployDataStore.update(presenceKey);
-            this.clusterStore.mapSet(presenceKey.distributionKey().getBytes(),presenceKey.toKey());
+            this.clusterStore.mapSet(presenceKey.distributionKey().getBytes(),presenceKey.clusterKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -146,8 +150,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             byte[] key = this.clusterStore.mapGet(presenceKey.distributionKey().getBytes());
             if(key==null) return;
-            presenceKey.base64key(CipherUtil.toBase64Key(key));
-            encrypt = CipherUtil.encrypt(presenceKey.toKey());
+            presenceKey.clusterKey(CipherUtil.toBase64Key(key));
+            encrypt = CipherUtil.encrypt(presenceKey.clusterKey());
             log.warn("Cluster key has set!");
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -452,17 +456,20 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             PresenceKey pKey = new PresenceKey(serviceContext.node().nodeId());
             byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
-            if(clusterKey!=null){
-                pKey.base64key(CipherUtil.toBase64Key(clusterKey));
+            byte[] tokenKey = this.serviceContext.clusterProvider().deployService().onTokenKey();
+            if(clusterKey!=null&&tokenKey!=null){
+                pKey.clusterKey(CipherUtil.toBase64Key(clusterKey));
+                pKey.tokenKey(CipherUtil.toBase64Key(tokenKey));
             }
             else{
-                pKey.base64key(CipherUtil.toBase64Key());
+                pKey.clusterKey(CipherUtil.toBase64Key());
+                pKey.tokenKey(CipherUtil.toBase64Key(JWTUtil.key()));
                 deployDataStore.createIfAbsent(pKey,true);
             }
-            encrypt = CipherUtil.encrypt(pKey.toKey());
-            decrypt = CipherUtil.decrypt(pKey.toKey());
+            encrypt = CipherUtil.encrypt(pKey.clusterKey());
+            decrypt = CipherUtil.decrypt(pKey.clusterKey());
             this.presenceKey = pKey;
-            jwt = JWTUtil.init();
+            jwt = JWTUtil.init(this.presenceKey.tokenKey());
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
