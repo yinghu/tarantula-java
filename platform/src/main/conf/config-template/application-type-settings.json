@@ -9,15 +9,12 @@
     {"type": "category","name": "Achievement"},
     {"type": "category","name": "DailyGiveaway"},
     {"type": "category","name": "Map"},
-    {"type": "category","name": "DailyRewardItem"},
     {"type": "category","name": "ShoppingItem"},
-    {"type": "category","name": "AchievementAwardItem"},
     {"type": "category","name": "TournamentSchedule"},
     {"type": "category","name": "TournamentPrize"},
-    {"type": "category","name": "AwsS3Configuration"},
-    {"type": "category","name": "AppleStoreConfiguration"},
-    {"type": "category","name": "FacebookConfiguration"},
-    {"type": "category","name": "GooglePlayConfiguration"},
-    {"type": "category","name": "GoogleStoreConfiguration"}
+    {"type": "category","name": "AmazonCredentialConfiguration"},
+    {"type": "category","name": "AppleCredentialConfiguration"},
+    {"type": "category","name": "FacebookCredentialConfiguration"},
+    {"type": "category","name": "GoogleCredentialConfiguration"}
   ]
 }

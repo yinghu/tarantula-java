@@ -22,7 +22,7 @@ public class GameApplicationAdminRoleModule implements Module {
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
-            List<ConfigurableObject> items = preSetup.list(app,new VersionedConfigurableObjectQuery(query[2]));
+            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),query[2].split("/")[1]));
             session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){

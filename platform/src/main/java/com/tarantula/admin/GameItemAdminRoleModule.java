@@ -230,13 +230,14 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             this.context.log(gameCluster.lobbyType(),OnLog.WARN);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
-            ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
-            ConfigurableCategory configurableSetting = categories.configurableSetting(query[1].split("/")[1]);
-            if(configurableSetting != null && configurableSetting.scope.startsWith("application.")){
-                String serviceCategory = configurableSetting.scope.substring(12);
-                app = gameCluster.serviceWithCategory(serviceCategory);
-            }
-            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),query[1].split("/")[1]));
+            //ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
+            String category = query[1].split("/")[1];
+            //ConfigurableCategory configurableSetting = categories.configurableSetting(category);
+            //if(configurableSetting != null && configurableSetting.scope.startsWith("application.")){
+                //String serviceCategory = configurableSetting.scope.substring(12);
+                //app = gameCluster.serviceWithCategory(serviceCategory);
+            //}
+            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),category));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onVersionedStock")){
@@ -275,106 +276,12 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         this.deploymentServiceProvider.registerConfigurableListener(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE,this);
         this.context.log("Game item admin module started", OnLog.WARN);
     }
-    private String createCategory(JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        JsonObject header = payload.get("header").getAsJsonObject();
-        String scope = header.get("scope").getAsString();
-        TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),TypeIndex.Typed.Category,scope,payload);
-        if(applicationPreSetup.load(gameCluster,typeIndex)) return JsonUtil.toSimpleResponse(false,"Category already existed");
-        applicationPreSetup.save(gameCluster,typeIndex);
-        String ctype = typeIndex.index();
-        int aix = ctype.indexOf('.');
-        if(aix>0){
-            ctype = ctype.substring(0,aix);
-        }
-        List<String> updates = this.availableUpdates(ctype);
-        updates.forEach(update->{
-            ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-            if(categories.addCategory(new ConfigurableCategory(payload))){
-                applicationPreSetup.save(gameCluster,categories);
-                ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
-                JsonObject type = new JsonObject();
-                type.addProperty("type","category");
-                type.addProperty("name",typeIndex.name());
-                configurableTypes.addType(type);
-                applicationPreSetup.save(gameCluster,configurableTypes);
-            }
-        });
-        return JsonUtil.toSimpleResponse(true,"Category added");
-    }
-    private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
-        if(name.equals(Configurable.ASSET_CONFIG_TYPE))
-            return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.COMPONENT_CONFIG_TYPE))
-            return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.COMMODITY_CONFIG_TYPE))
-            return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.ITEM_CONFIG_TYPE))
-            return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.APPLICATION_CONFIG_TYPE))
-            return this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
-        return null;
-    }
+
     private ConfigurableCategories configurableCategories(String type,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        ConfigurableCategories categories = new ConfigurableCategories();
-        categories.name(type);
-        ConfigurableCategoryQuery query = ConfigurableCategoryQuery.query(type,"category");
-        ConfigurableTypeQuery typeQuery = ConfigurableTypeQuery.query(type,"type");
-        applicationPreSetup.list(gameCluster, query).forEach(c->{
-            categories.addCategory(c);
-        });
-        ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
-        JsonArray cdata = (JsonArray)configuration.property("itemList");
-        cdata.forEach((c)->{
-            ConfigurableCategory category = new ConfigurableCategory(c.getAsJsonObject());
-            if(categories.addCategory(category)){
-                category.onEdge(true);
-                category.label("category");
-                category.ownerKey(query.key());
-                applicationPreSetup.save(gameCluster,category);
-                ConfigurableType ty = category.configurableType();
-                ty.onEdge(true);
-                ty.label("type");
-                ty.ownerKey(typeQuery.key());
-                applicationPreSetup.save(gameCluster,ty);
-            }
-        });
-        return categories;
+        return gameCluster.configurableCategories(type);
     }
     private ConfigurableTypes configurableTypes(String name,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        ConfigurableTypes configurableTypes = new ConfigurableTypes();
-        configurableTypes.name(name);
-        ConfigurableTypeQuery query = ConfigurableTypeQuery.query(name,"type");
-        applicationPreSetup.list(gameCluster,query).forEach(t->{
-            configurableTypes.addType(t);
-        });
-        Configuration commonTypes = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_COMMON_TYPE_TEMPLATE);
-        JsonArray ctypes = (JsonArray)commonTypes.property("itemList");
-        ctypes.forEach((c)-> {
-            ConfigurableType t  = new ConfigurableType(c.getAsJsonObject());
-            if(configurableTypes.addType(t)){
-                t.onEdge(true);
-                t.label("type");
-                t.ownerKey(query.key());
-                applicationPreSetup.save(gameCluster,t);
-            }
-        });
-        ConfigurableTemplate template = this.categoryTemplateSetting(gameCluster,name);
-        //JsonArray cct = (JsonArray)template.property("itemList");
-        //cct.forEach((t)->{
-            //String type = t.getAsJsonObject().get("header").getAsJsonObject().get("type").getAsString();
-            //JsonObject jsonObject = new JsonObject();
-            //jsonObject.addProperty("type","category");
-            //jsonObject.addProperty("name",type);
-            //configurableTypes.addType(jsonObject);
-        //});
-        Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,template.name);
-        JsonArray items = (JsonArray) configuration.property("itemList");
-        items.forEach((f)-> {
-            if(configurableTypes.addType(new ConfigurableType(f.getAsJsonObject()))){
-                this.context.log(">>"+f,OnLog.WARN);
-            }
-        });
-        return configurableTypes;
+        return gameCluster.configurableTypes(name);
     }
     private List<String> availableUpdates(String type){
         ArrayList<String> updates = new ArrayList<>();
@@ -495,7 +402,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableCategories items = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE, gameCluster, applicationPreSetup);
-        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        //ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
         assets.toCategories().forEach((c -> {
             c.ownerKey(ConfigurableCategoryQuery.ComponentKey);
             applicationPreSetup.edge(gameCluster,c,"category");
@@ -524,6 +431,10 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             c.ownerKey(ConfigurableCategoryQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,c,"category");
         }));
+        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        applications.toCategories().forEach(c->{
+            this.context.log("APP->"+c.configurableType().toJson(),OnLog.WARN);
+        });
         //applications.toCategories().forEach((c -> {
             //JsonObject jo = c.getAsJsonObject();
             //JsonObject ho = jo.get("header").getAsJsonObject();
@@ -588,7 +499,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         //applicationPreSetup.save(gameCluster, itemTypes);
         //applicationPreSetup.save(gameCluster, applicationTypes);
 
-        this.onLoaded(gameCluster);
+        //this.onLoaded(gameCluster);
         //pre-defined lobby configurations
         //log lobby apps
         Configuration lobbyConfiguration = this.context.configuration("lobby");
@@ -672,13 +583,15 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
 
     @Override
     public void onLoaded(GameCluster gameCluster){
-        //ConfigurableCategories categories = this.configurableCategories()
-        ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-        Configuration configuration = this.deploymentServiceProvider.configuration(gameCluster,GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE);
-        JsonArray cclasses = (JsonArray)configuration.property("itemList");
-        cclasses.forEach((c)->{
-            this.context.log(c.toString(),OnLog.WARN);
-            //createCategory(c.getAsJsonObject(),gameCluster,applicationPreSetup);
-        });
+        gameCluster.configurableCategories(Configurable.ASSET_CONFIG_TYPE);
+        gameCluster.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE);
+        gameCluster.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
+        gameCluster.configurableCategories(Configurable.ITEM_CONFIG_TYPE);
+        gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE);
+        gameCluster.configurableTypes(Configurable.ASSET_CONFIG_TYPE);
+        gameCluster.configurableTypes(Configurable.COMPONENT_CONFIG_TYPE);
+        gameCluster.configurableTypes(Configurable.COMMODITY_CONFIG_TYPE);
+        gameCluster.configurableTypes(Configurable.ITEM_CONFIG_TYPE);
+        gameCluster.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE);
     }
 }

@@ -850,11 +850,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                     File f = new File(this.deployDir+"/conf/"+gameCluster.name()+"/"+config);
                     return fromDir(f);
                 }
-                if(config.equals(GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE)){
-                    URL src = Thread.currentThread().getContextClassLoader().getResource("config-template/"+GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE);
-                    File fd = new File(src.getFile());
-                    return fromDir(fd);
-                }
+                //if(config.equals(GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE)){
+                    //URL src = Thread.currentThread().getContextClassLoader().getResource("config-template/"+GameCluster.GAME_UPGRADE_CATEGORY_TEMPLATE);
+                    //File fd = new File(src.getFile());
+                    //return fromDir(fd);
+                //}
                 FileInputStream fileInputStream = new FileInputStream(this.deployDir+"/conf/"+gameCluster.name()+"/"+config+".json");
                 ConfigurableTemplate item = JsonConfigurableTemplateParser.itemSet(fileInputStream);
                 fileInputStream.close();

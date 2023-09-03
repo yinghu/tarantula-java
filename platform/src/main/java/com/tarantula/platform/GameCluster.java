@@ -1,13 +1,11 @@
 package com.tarantula.platform;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.Lobby;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
@@ -71,7 +69,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 
-    public final static String GAME_UPGRADE_CATEGORY_TEMPLATE = "upgrade";
+    //public final static String GAME_UPGRADE_CATEGORY_TEMPLATE = "upgrade";
 
 
     protected ServiceContext serviceContext;
@@ -436,18 +434,13 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     private <T extends Configurable> void reset(T t,boolean updated){
         int index = t.configurationType().indexOf(".");
         String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
-        ConfigurableCategories categories = new ConfigurableCategories();
-        categories.name(scope);
-        if(!applicationPreSetup.load(this,categories)){
-            logger.warn("Categories not existed ["+scope+"]");
-            return;
-        }
+        ConfigurableCategories categories = this.configurableCategories(scope);
         ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
         if(configurableSetting==null){
             logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
             return;
         }
-        resetReferenceIndex(t.configurationCategory(),t.key().asString(),!updated);
+        //resetReferenceIndex(t.configurationCategory(),t.key().asString(),!updated);
         //configurableSetting.properties.forEach(prop->{
           //  JsonObject ctype = prop.getAsJsonObject();
            // String type = ctype.get("type").getAsString();
@@ -541,6 +534,69 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         boolean suc = deleted? referenceIndex.removeKey(key):referenceIndex.addKey(key);
         if(!suc) return;
         applicationPreSetup.save(this,referenceIndex);
+    }
+
+    public ConfigurableCategories configurableCategories(String type){
+        ApplicationPreSetup preSetup = applicationPreSetup();
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name(type);
+        ConfigurableCategoryQuery query = ConfigurableCategoryQuery.query(type,"category");
+        ConfigurableTypeQuery typeQuery = ConfigurableTypeQuery.query(type,"type");
+        preSetup.list(this, query).forEach(c->{
+            categories.addCategory(c);
+        });
+        ConfigurableTemplate configuration = this.categoryTemplateSetting(type);
+        JsonArray cdata = (JsonArray)configuration.property("itemList");
+        cdata.forEach((c)->{
+            ConfigurableCategory category = new ConfigurableCategory(c.getAsJsonObject());
+            if(categories.addCategory(category)){
+                category.onEdge(true);
+                category.label("category");
+                category.ownerKey(query.key());
+                preSetup.save(this,category);
+                ConfigurableType ty = category.configurableType();
+                ty.onEdge(true);
+                ty.label("type");
+                ty.ownerKey(typeQuery.key());
+                preSetup.save(this,ty);
+                logger.warn("category added->"+ty.toJson());
+            }
+        });
+        return categories;
+    }
+    public ConfigurableTypes configurableTypes(String name){
+        ConfigurableTypes configurableTypes = new ConfigurableTypes();
+        configurableTypes.name(name);
+        ConfigurableTypeQuery query = ConfigurableTypeQuery.query(name,"type");
+        applicationPreSetup().list(this,query).forEach(t->{
+            configurableTypes.addType(t);
+        });
+        Configuration commonTypes = this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_COMMON_TYPE_TEMPLATE);
+        JsonArray ctypes = (JsonArray)commonTypes.property("itemList");
+        ctypes.forEach((c)-> {
+            ConfigurableType t  = new ConfigurableType(c.getAsJsonObject());
+            if(configurableTypes.addType(t)){
+                t.onEdge(true);
+                t.label("type");
+                t.ownerKey(query.key());
+                applicationPreSetup().save(this,t);
+            }
+        });
+        return configurableTypes;
+    }
+
+    private ConfigurableTemplate categoryTemplateSetting(String name){
+        if(name.equals(Configurable.ASSET_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.COMPONENT_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.COMMODITY_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.ITEM_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
+        if(name.equals(Configurable.APPLICATION_CONFIG_TYPE))
+            return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
+        return null;
     }
 
 }
