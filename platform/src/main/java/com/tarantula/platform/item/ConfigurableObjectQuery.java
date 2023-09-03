@@ -2,19 +2,15 @@ package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.OidKey;
+
 
 public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
 
     public String label;
-    public String itemId;
+    public Recoverable.Key key;
 
-    public ConfigurableObjectQuery(String query){
-        this.label = query;
-    }
-
-    public ConfigurableObjectQuery(String itemId,String query){
-        this.itemId = itemId;
+    public ConfigurableObjectQuery(Recoverable.Key key, String query){
+        this.key = key;
         this.label = query;
     }
 
@@ -35,12 +31,8 @@ public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableO
     }
 
 
-    public String distributionKey() {
-        return itemId;
-    }
-
     @Override
     public Recoverable.Key key() {
-        return new OidKey(itemId);
+        return key;
     }
 }

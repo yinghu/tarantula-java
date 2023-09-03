@@ -736,7 +736,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),typeId);
         if(!mds.load(lobbyTypeIdIndex)) return null;
         LobbyDescriptor lb = new LobbyDescriptor();
-        lb.distributionKey(lobbyTypeIdIndex.index());
+        lb.oid(lobbyTypeIdIndex.owner());
         if(!mds.load(lb)) return null;
         Lobby lobby = new DefaultLobby(lb);
         List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.oid()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);

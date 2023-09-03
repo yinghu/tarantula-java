@@ -17,12 +17,12 @@ public class GameApplicationAdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onStock")){
-            //this.context.log(session.name(),OnLog.WARN);
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
-            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(query[2]));
+            List<ConfigurableObject> items = preSetup.list(app,new VersionedConfigurableObjectQuery(query[2]));
             session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){

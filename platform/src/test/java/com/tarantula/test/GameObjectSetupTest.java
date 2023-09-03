@@ -125,11 +125,11 @@ public class GameObjectSetupTest {
             Assert.assertTrue(gameObjectSetup.save(app,co));
             Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.oid())).size(),1);
         });
-        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"commodity")).forEach(c->{
+        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).forEach(c->{
             c.setup();
             Assert.assertNotEquals(c.toJson().toString(),"{}");
         });
-        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"Gem")).forEach(c->{
+        gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).forEach(c->{
             c.setup();
             Assert.assertNotEquals(c.toJson().toString(),"{}");
         });
@@ -151,8 +151,8 @@ public class GameObjectSetupTest {
             Assert.assertTrue(gameObjectSetup.save(app,co));
             Assert.assertTrue(gameObjectSetup.delete(app,co));
         });
-        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"commodity")).size(),0);
-        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.oid(),"Gem")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),0);
     }
 
 }

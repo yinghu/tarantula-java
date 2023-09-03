@@ -417,7 +417,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public void onUpdated(OnLobby onLobby) {
-        if(!onLobby.gameClusterId().equals(this.distributionKey())) return;
+        if(!onLobby.gameClusterId().equals(this.oid())) return;
         if(onLobby.typeId().equals(lobbyType())){
             this.gameLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
         }

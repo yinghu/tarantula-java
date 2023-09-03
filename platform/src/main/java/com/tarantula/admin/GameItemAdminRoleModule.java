@@ -7,6 +7,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.OidKey;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -221,9 +222,12 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
-            //this.context.log(session.name(),OnLog.WARN);
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            this.context.log(gameCluster.serviceType(),OnLog.WARN);
+            this.context.log(gameCluster.dataType(),OnLog.WARN);
+            this.context.log(gameCluster.lobbyType(),OnLog.WARN);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
             ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
@@ -232,15 +236,16 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 String serviceCategory = configurableSetting.scope.substring(12);
                 app = gameCluster.serviceWithCategory(serviceCategory);
             }
-            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(query[1]));
+            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),query[1].split("/")[1]));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onVersionedStock")){
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
-            List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(query[1],"version"));
+            List<ConfigurableObject> items = preSetup.list(app,new VersionedConfigurableObjectQuery(query[1]));//,"version"));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onDelete")){
@@ -366,7 +371,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         JsonArray items = (JsonArray) configuration.property("itemList");
         items.forEach((f)-> {
             if(configurableTypes.addType(new ConfigurableType(f.getAsJsonObject()))){
-                this.context.log(f.toString(),OnLog.WARN);
+                this.context.log(">>"+f,OnLog.WARN);
             }
         });
         return configurableTypes;

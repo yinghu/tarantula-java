@@ -49,7 +49,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<ConfigurableObject> items = applicationPreSetup.list(descriptor,new ConfigurableObjectQuery("typeId/"+descriptor.category()));
+        List<ConfigurableObject> items = applicationPreSetup.list(descriptor,new ConfigurableObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()){
