@@ -105,7 +105,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             });
-            if(result.successful) expected--;
+            if(result.successful){
+                expected--;
+            }
+            else{
+                logger.error("error on on start game service",result.exception);
+            }
         }
         return expected==0;
     }

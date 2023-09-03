@@ -569,6 +569,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
+        log.warn("Launching game cluster->"+gameCluster.oid());
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.enableGameCluster(gameCluster.oid())&&deployService.onStartGameService(gameCluster.oid())){
             return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.oid());
@@ -580,6 +581,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.disableGameCluster(gameCluster.oid())){
+            log.warn("close game cluster->"+gameCluster.oid());
             return deployService.onShutdownGameCluster(gameCluster.oid());
         }
         else{
@@ -884,7 +886,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
+        lobbyDescriptor.oid(query.owner());
         if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
             return false;
         }
@@ -900,7 +902,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        lobbyDescriptor.distributionKey(query.index());
+        lobbyDescriptor.oid(query.owner());
         if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
             return false;
         }
