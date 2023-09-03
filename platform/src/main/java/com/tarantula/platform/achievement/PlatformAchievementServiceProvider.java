@@ -89,7 +89,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Achievement> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery("category/Achievement"));
+        List<Achievement> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery(descriptor.key(),"Achievement"));
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()) achievements.put(a.name(),a);

@@ -108,7 +108,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery("category/Shop"));
+        List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
                 registerShop(a);
@@ -120,10 +120,10 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private void registerShop(Shop shop){
         Shop s = shop.setup();
         shopIndex.put(shop.configurationName(),s);
-        shopIndex.put(shop.distributionKey(),s);
+        shopIndex.put(shop.oid(),s);
         shop.list().forEach(item->{
             //item.setup();
-            shoppingItems.put(item.distributionKey(),new ShoppingItem(item));
+            shoppingItems.put(item.oid(),new ShoppingItem(item));
         });
     }
 

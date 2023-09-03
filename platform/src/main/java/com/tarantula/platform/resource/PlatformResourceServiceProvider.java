@@ -88,7 +88,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<GameResource> items = applicationPreSetup.list(descriptor,new GameResourceQuery("typeId/"+descriptor.category()));
+        List<GameResource> items = applicationPreSetup.list(descriptor,new GameResourceQuery(descriptor.key(), descriptor.category()));
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()) {

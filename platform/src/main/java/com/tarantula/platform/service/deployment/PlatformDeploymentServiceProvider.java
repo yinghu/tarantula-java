@@ -653,6 +653,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             mds.createEdge(gameCluster,GameCluster.LABEL);
             gameCluster.ownerKey(new OidKey(publishingId));
             mds.createEdge(gameCluster,GameCluster.LABEL);
+            gameCluster.ownerKey(new OidKey(this.tarantulaContext.node().deploymentId()));
+            mds.createEdge(gameCluster,GameCluster.LABEL);
+
             gameCluster.successful(true);
             XMLParser parser = new XMLParser();
             String typePrefix = name.toLowerCase();
@@ -687,11 +690,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 descriptor.disabled(true);//pending launch
                 descriptor.deployCode(DeployCode.USER_GAME_CLUSTER);
                 mds.create(descriptor);
-                lobbyTypeIdIndex.index(descriptor.distributionKey());
-                lobbyTypeIdIndex.owner(gameCluster.distributionKey());
+                lobbyTypeIdIndex.owner(descriptor.oid());
+                lobbyTypeIdIndex.index(gameCluster.oid());
                 mds.createIfAbsent(lobbyTypeIdIndex,false);
                 configuration.applications.forEach((a)->{
-                    a.owner(descriptor.distributionKey());
+                    a.ownerKey(descriptor.key());
                     a.label(ApplicationProvider.LABEL);
                     a.onEdge(true);
                     a.tournamentEnabled(tournamentEnabled);

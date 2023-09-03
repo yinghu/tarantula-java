@@ -1,14 +1,16 @@
 package com.tarantula.platform.resource;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class GameResourceQuery implements RecoverableFactory<GameResource> {
 
     public String label;
+    private Recoverable.Key key;
 
-
-    public GameResourceQuery(String query){
+    public GameResourceQuery(Recoverable.Key key,String query){
+        this.key = key;
         this.label = query;
     }
 
@@ -27,4 +29,8 @@ public class GameResourceQuery implements RecoverableFactory<GameResource> {
         return label;
     }
 
+    @Override
+    public Recoverable.Key key() {
+        return key;
+    }
 }

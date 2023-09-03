@@ -274,10 +274,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled && conf.descriptor.deployCode == DeployCode.USER_GAME_CLUSTER){
-            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.owner());
+            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.index());
             if(gameCluster==null) throw new RuntimeException("no game cluster config data");
         }
-        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.owner(),gameCluster.owner());
+        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.index(),gameCluster.publishingId());
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             if(c.disabled()) {
@@ -354,12 +354,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
         lc.applications = masterDataStore().list(new ApplicationQuery(d.oid()));
-        lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));
-        this.configureViews(lc);
+        //lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));
+        //this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
             listener.onUpdated(ob);
-        }catch (Exception ex){ex.printStackTrace();}
+        } catch (Exception ex){
+            log.error("error on _setOnLobby",ex);
+        }
     }
     public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
  	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){

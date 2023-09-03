@@ -1,16 +1,16 @@
 package com.tarantula.platform.lobby;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.store.Shop;
 
 public class LobbyItemObjectQuery implements RecoverableFactory<LobbyItem> {
 
     public String label;
+    private Recoverable.Key key;
 
-
-    public LobbyItemObjectQuery(String query){
+    public LobbyItemObjectQuery(Recoverable.Key key,String query){
+        this.key = key;
         this.label = query;
     }
 
@@ -29,4 +29,8 @@ public class LobbyItemObjectQuery implements RecoverableFactory<LobbyItem> {
         return label;
     }
 
+    @Override
+    public Recoverable.Key key() {
+        return key;
+    }
 }

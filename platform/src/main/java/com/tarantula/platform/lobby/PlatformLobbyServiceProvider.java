@@ -103,9 +103,9 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
-        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery("typeId/"+descriptor.category()));
+        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.distributionKey());
+            logger.warn(a.configurationCategory()+""+a.oid());
             if(!a.disabled()){
                 a.setup();
                 lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
