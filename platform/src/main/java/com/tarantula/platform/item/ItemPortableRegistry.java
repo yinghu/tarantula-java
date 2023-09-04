@@ -82,9 +82,9 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
             case INVENTORY_ITEM_CID:
                 pt = new InventoryItem();
                 break;
-            case CATEGORY_CID:
-                pt = new Category();
-                break;
+            //case CATEGORY_CID:
+                //pt = new Category();
+                //break;
             case CATEGORY_ITEM_CID:
                 pt = new CategoryItem();
                 break;

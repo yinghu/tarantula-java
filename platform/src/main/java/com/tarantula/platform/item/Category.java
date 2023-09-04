@@ -3,18 +3,20 @@ package com.tarantula.platform.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.Descriptor;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Category extends IndexSet implements Configurable {
+public class Category extends RecoverableObject implements Configurable {
 
     private Set<CategoryItem> itemList = new HashSet<>();
-
-    public Category(){
+    private Descriptor app;
+    public Category(Descriptor app){
         this.label = "category";
+        this.app = app;
     }
 
     @Override
@@ -41,19 +43,19 @@ public class Category extends IndexSet implements Configurable {
         list(ci->true);
     }
     public void list(Filter filter){
-        keySet.forEach((k)->{
-            CategoryItem categoryItem = new CategoryItem();
-            categoryItem.oid(k);
-            if(dataStore.load(categoryItem)){
-                if(filter.onFilter(categoryItem)) itemList.add(categoryItem);
-            }
+        CategoryItemQuery query = new CategoryItemQuery(app.key(),label);
+        dataStore.list(query).forEach(c->{
+            if(filter.onFilter(c)) itemList.add(c);
         });
     }
     public void addItem(CategoryItem item){
         if(itemList.add(item)){
-            dataStore.create(item);
-            keySet.add(item.oid());
-            dataStore.update(this);
+            if(dataStore.create(item)){
+                item.ownerKey(app.key());
+                item.onEdge(true);
+                item.label(label);
+                dataStore.createEdge(item,label);
+            }
         }
     }
     @Override

@@ -131,11 +131,11 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     }
 
     private Category category(Category.Filter filter){
-        Descriptor app = gameCluster.serviceWithCategory("item");
-        ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
-        Category category = new Category();
-        category.distributionKey(app.distributionKey());
-        preSetup.load(app,category);
+        GameCluster g = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.oid());
+        Descriptor app = g.serviceWithCategory("inventory");
+        ApplicationPreSetup preSetup = g.applicationPreSetup();
+        Category category = new Category(app);
+        category.dataStore(preSetup.dataStore(app));
         category.list((ci)-> filter.onFilter(ci));
         return category;
     }

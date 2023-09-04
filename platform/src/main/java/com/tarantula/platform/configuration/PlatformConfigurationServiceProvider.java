@@ -149,17 +149,13 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
 
     public <T extends Configurable> void onCreated(Descriptor application,T t){
+        logger.warn("Created->"+t.configurationType());
         int index = t.configurationType().indexOf(".");
         String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
-        ConfigurableCategories categories = new ConfigurableCategories();
-        categories.name(scope);
-        if(!applicationPreSetup.load(gameCluster,categories)){
-            logger.warn("Categories missed from ["+ scope+"]");
-            return;
-        }
+        ConfigurableCategories categories = gameCluster.configurableCategories(scope);
         ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
         logger.warn(configurableSetting.toString());
-        logger.warn(application.distributionKey()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
+        logger.warn(application.oid()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());

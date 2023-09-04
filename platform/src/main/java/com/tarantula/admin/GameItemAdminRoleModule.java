@@ -222,12 +222,8 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
-            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
-            this.context.log(gameCluster.serviceType(),OnLog.WARN);
-            this.context.log(gameCluster.dataType(),OnLog.WARN);
-            this.context.log(gameCluster.lobbyType(),OnLog.WARN);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
             //ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
@@ -356,9 +352,9 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
-        //Category category = app.category(desc);
-        //category.list();
-        //category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.type,app.configurationTypeId()));
+        Category category = app.category(gameCluster.serviceWithCategory("inventory"));
+        category.list();
+        category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.name(),app.configurationTypeId()));
         return new CommoditySerializer().serialize(app,Application.class,null).toString();
     }
     private String createItem(Item app,JsonObject payload,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
@@ -402,7 +398,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         ConfigurableCategories components = this.configurableCategories(Configurable.COMPONENT_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableCategories commodities = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableCategories items = this.configurableCategories(Configurable.ITEM_CONFIG_TYPE, gameCluster, applicationPreSetup);
-        //ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
         assets.toCategories().forEach((c -> {
             c.ownerKey(ConfigurableCategoryQuery.ComponentKey);
             applicationPreSetup.edge(gameCluster,c,"category");
@@ -431,28 +427,13 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             c.ownerKey(ConfigurableCategoryQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,c,"category");
         }));
-        ConfigurableCategories applications = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
-        applications.toCategories().forEach(c->{
-            this.context.log("APP->"+c.configurableType().toJson(),OnLog.WARN);
-        });
-        //applications.toCategories().forEach((c -> {
-            //JsonObject jo = c.getAsJsonObject();
-            //JsonObject ho = jo.get("header").getAsJsonObject();
-            //TypeIndex typeIndex = new TypeIndex(ho.get("type").getAsString(),TypeIndex.Typed.Category, ho.get("scope").getAsString(), jo);
-            //applicationPreSetup.save(gameCluster, typeIndex);
-            //applications.addCategory(jo);
-        //}));
-        //applicationPreSetup.save(gameCluster, assets);
-        //applicationPreSetup.save(gameCluster, components);
-        //applicationPreSetup.save(gameCluster, commodities);
-        //applicationPreSetup.save(gameCluster, items);
-        //applicationPreSetup.save(gameCluster, applications);
+        //this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
 
         ConfigurableTypes assetTypes = this.configurableTypes(Configurable.ASSET_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableTypes componentTypes = this.configurableTypes(Configurable.COMPONENT_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableTypes commodityTypes = this.configurableTypes(Configurable.COMMODITY_CONFIG_TYPE, gameCluster, applicationPreSetup);
         ConfigurableTypes itemTypes = this.configurableTypes(Configurable.ITEM_CONFIG_TYPE, gameCluster, applicationPreSetup);
-        ConfigurableTypes applicationTypes = this.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
+        this.configurableTypes(Configurable.APPLICATION_CONFIG_TYPE, gameCluster, applicationPreSetup);
         assetTypes.toTypes().forEach((t) -> {
             t.ownerKey(ConfigurableTypeQuery.ComponentKey);
             applicationPreSetup.edge(gameCluster,t,"type");
@@ -462,10 +443,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             applicationPreSetup.edge(gameCluster,t,"type");
             t.ownerKey(ConfigurableTypeQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,t,"type");
-            //componentTypes.addType(t.getAsJsonObject());
-            //commodityTypes.addType(t.getAsJsonObject());
-            //itemTypes.addType(t.getAsJsonObject());
-            //applicationTypes.addType(t.getAsJsonObject());
         });
         componentTypes.toTypes().forEach((t) -> {
             t.ownerKey(ConfigurableTypeQuery.CommodityKey);
@@ -474,30 +451,17 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             applicationPreSetup.edge(gameCluster,t,"type");
             t.ownerKey(ConfigurableTypeQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,t,"type");
-
-            //commodityTypes.addType(t.getAsJsonObject());
-            //itemTypes.addType(t.getAsJsonObject());
-            //applicationTypes.addType(t.getAsJsonObject());
         });
         commodityTypes.toTypes().forEach((t) -> {
             t.ownerKey(ConfigurableTypeQuery.ItemKey);
             applicationPreSetup.edge(gameCluster,t,"type");
             t.ownerKey(ConfigurableTypeQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,t,"type");
-            //itemTypes.addType(t.getAsJsonObject());
-            //applicationTypes.addType(t.getAsJsonObject());
         });
         itemTypes.toTypes().forEach((t) -> {
             t.ownerKey(ConfigurableTypeQuery.ApplicationKey);
             applicationPreSetup.edge(gameCluster,t,"type");
-            //applicationTypes.addType(t.getAsJsonObject());
         });
-
-        //applicationPreSetup.save(gameCluster, assetTypes);
-        //applicationPreSetup.save(gameCluster, componentTypes);
-        //applicationPreSetup.save(gameCluster, commodityTypes);
-        //applicationPreSetup.save(gameCluster, itemTypes);
-        //applicationPreSetup.save(gameCluster, applicationTypes);
 
         //this.onLoaded(gameCluster);
         //pre-defined lobby configurations
@@ -526,7 +490,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.oid());
         lobbyPayload.get("reference").getAsJsonArray().add(zone.oid());
         Application lobby = new Application();
-        createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
+        this.context.log(createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup),OnLog.WARN);
         //pre-defined third party validators
         Configuration configuration = this.context.configuration((gameCluster.name()).toLowerCase());
         if(configuration!=null) {
@@ -534,7 +498,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 JsonArray validators = ((JsonElement)configuration.property("validators")).getAsJsonArray();
                 validators.forEach(validator->{
                     Application app = new Application();
-                    createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
+                    this.context.log(createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup),OnLog.WARN);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);

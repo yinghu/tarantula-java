@@ -36,9 +36,14 @@ public class GameObjectSetup implements ApplicationPreSetup {
         t.onEdge(true);
         dataStore.createEdge(t,t.configurationCategory());
         dataStore.createEdge(t,t.configurationTypeId());
-        dataStore.createEdge(t,t.configurationType());
         dataStore.createEdge(t,t.configurationName());
         int superIndex;
+        if((superIndex = t.configurationType().indexOf(".")) > 0){
+            dataStore.createEdge(t,t.configurationType().substring(0,superIndex));
+        }
+        else{
+            dataStore.createEdge(t,t.configurationType());
+        }
         if((superIndex = t.configurationCategory().indexOf(".")) > 0){
             dataStore.createEdge(t,t.configurationCategory().substring(0,superIndex));
         }
@@ -62,11 +67,16 @@ public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
         if(!dataStore.delete(t)) return false;
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationName());
-        dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType());
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationTypeId());
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationCategory());
-        int superIndex = t.configurationCategory().indexOf(".");
-        if(superIndex > 0){
+        int superIndex;
+        if((superIndex = t.configurationType().indexOf(".")) > 0){
+            dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType().substring(0,superIndex));
+        }
+        else{
+            dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType());
+        }
+        if((superIndex = t.configurationCategory().indexOf("."))> 0){
             dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationCategory().substring(0,superIndex));
         }
         deleteVersion(dataStore,(ConfigurableObject)t);

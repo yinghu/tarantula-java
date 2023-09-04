@@ -33,6 +33,24 @@ public class CategoryItem extends ConfigurableObject{
         this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
     }
 
+    public boolean read(DataBuffer buffer){
+        this.configurationType = buffer.readUTF8();
+        this.configurationTypeId = buffer.readUTF8();
+        this.configurationCategory = buffer.readUTF8();
+        this.header = JsonUtil.parse(buffer.readUTF8());
+        this.application = JsonUtil.parse(buffer.readUTF8());
+        return true;
+    }
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(this.configurationType);
+        buffer.writeUTF8(this.configurationTypeId);
+        buffer.writeUTF8(this.configurationCategory);
+        buffer.writeUTF8(header.toString());
+        buffer.writeUTF8(application.toString());
+        return true;
+    }
+
     @Override
     public int getClassId() {
         return ItemPortableRegistry.CATEGORY_ITEM_CID;
