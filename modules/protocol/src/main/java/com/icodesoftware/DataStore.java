@@ -26,14 +26,13 @@ public interface DataStore {
     <T extends Recoverable> boolean createIfAbsent(T t, boolean loading);
 
     <T extends Recoverable> boolean load(T t);
-    default <T extends Recoverable> boolean delete(T t){ return false;}
-    default byte[] load(byte[] key){return null;}
-    default boolean load(Recoverable.Key key, BufferStream buffer){return false;}
+    <T extends Recoverable> boolean delete(T t);
 
-    default <T extends Recoverable> boolean createEdge(T t,String label){return false;}
-    default <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label){return false;}
-    default <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,String label){return false;}
-    default boolean delete(byte[] key){return false;}
+    boolean load(Recoverable.Key key, BufferStream buffer);
+
+    <T extends Recoverable> boolean createEdge(T t,String label);
+    <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label);
+    <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,String label);
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
@@ -43,13 +42,12 @@ public interface DataStore {
     interface Backup{
         boolean set(byte[] key,byte[] value);
 
-        default boolean set(ByteBuffer key, ByteBuffer value){return false;}
+        boolean set(ByteBuffer key, ByteBuffer value);
         byte[] get(byte[] key);
 
         void unset(byte[] key);
 
-        default void list(Binary binary){}
-        default void list(BufferStream buffer){}
+        void list(BufferStream buffer);
     }
 
 
@@ -57,9 +55,7 @@ public interface DataStore {
         boolean on(T t);
 
     }
-    interface Binary{
-        boolean on(byte[] key,byte[] value);
-    }
+
     interface BufferStream{
        boolean on(Recoverable.DataBuffer keyBuffer, Recoverable.DataHeader dataHeader,Recoverable.DataBuffer dataBuffer);
     }

@@ -32,7 +32,7 @@ public class DataStoreViewer implements DataStoreSummary {
 
 
     public void list(DataStoreSummary.View view){
-        dataStore.backup().list((k,v)->view.on(tarantulaContext.node(),k,v));
+        //dataStore.backup().list((k,h,v)->view.on(tarantulaContext.node(),k,v));
     }
 
     public void load(byte[] key, DataStoreSummary.View view){

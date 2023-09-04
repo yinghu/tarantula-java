@@ -10,7 +10,6 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.service.DataStoreProvider;
-import com.tarantula.platform.service.persistence.berkeley.DataStoreOperationSummary;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

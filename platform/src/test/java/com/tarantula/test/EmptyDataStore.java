@@ -3,8 +3,6 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.service.persistence.DataBaseOnPartition;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 
@@ -54,6 +52,31 @@ public class EmptyDataStore implements DataStore {
 
     @Override
     public <T extends Recoverable> boolean load(T t) {
+        return false;
+    }
+
+    @Override
+    public <T extends Recoverable> boolean delete(T t) {
+        return false;
+    }
+
+    @Override
+    public boolean load(Recoverable.Key key, BufferStream buffer) {
+        return false;
+    }
+
+    @Override
+    public <T extends Recoverable> boolean createEdge(T t, String label) {
+        return false;
+    }
+
+    @Override
+    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key key, Recoverable.Key edge, String label) {
+        return false;
+    }
+
+    @Override
+    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key key, String label) {
         return false;
     }
 

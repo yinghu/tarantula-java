@@ -190,13 +190,13 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
                 int[] batch={0,i};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                dso.dataStore.backup().list((k,v)->{
+                dso.dataStore.backup().list((k,h,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
-                        distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
+                        //distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
                         batch[0] = 0;
                     }
-                    keys[batch[0]]=k;
-                    values[batch[0]]=v;
+                    //keys[batch[0]]=k;
+                    //values[batch[0]]=v;
                     batch[0]++;
                     //total[0]++;
                     return true;

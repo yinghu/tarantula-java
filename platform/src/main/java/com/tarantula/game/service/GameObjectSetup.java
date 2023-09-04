@@ -138,7 +138,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
     }
     public <T extends Configurable> boolean delete(GameCluster gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
-        boolean suc = dataStore.delete(t.key().asString().getBytes());
+        boolean suc = dataStore.delete(t);
         if(suc && this.listener!=null) listener.onDeleted(gameCluster,t);
         return suc;
     }

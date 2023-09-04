@@ -45,8 +45,8 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
         boolean[] done = {false};
         for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
             DataStore ds = dataStore(i);
-            ds.backup().list((k,v)->{
-                if(view.on(tarantulaContext.node(),k,v)) return true;
+            ds.backup().list((k,h,v)->{
+                //if(view.on(tarantulaContext.node(),k,v)) return true;
                 done[0] = true;
                 return false;
             });

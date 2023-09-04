@@ -62,9 +62,9 @@ public class PersonalDataStoreModule extends ModuleHeader implements Configurabl
                 session.write(JsonUtil.toSimpleResponse(false,session.name()+ " not existed").getBytes());
             }
             else{
-                if(dataStore.delete(key.split("#")[1].getBytes()) && savedIndex.removeKey(key)){
-                    savedIndex.update();
-                }
+                //if(dataStore.delete(key.split("#")[1].getBytes()) && savedIndex.removeKey(key)){
+                    //savedIndex.update();
+                //}
                 session.write(JsonUtil.toSimpleResponse(true,key+" deleted").getBytes());
             }
         }

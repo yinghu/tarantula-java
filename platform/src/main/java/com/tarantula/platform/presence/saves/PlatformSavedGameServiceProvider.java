@@ -89,7 +89,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         //reset or delete saved data associated with the save
         PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
         saveIndex.keySet().forEach(k->{
-            this.dataStore.delete(k.getBytes());
+            //this.dataStore.delete(k);
         });
         saveIndex.clear();
         return currentSaveIndex;

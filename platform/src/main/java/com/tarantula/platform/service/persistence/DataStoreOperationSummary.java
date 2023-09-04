@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.persistence.berkeley;
+package com.tarantula.platform.service.persistence;
 
 
 import java.util.concurrent.atomic.AtomicInteger;

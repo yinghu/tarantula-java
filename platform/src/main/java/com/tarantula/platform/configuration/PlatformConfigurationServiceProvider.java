@@ -166,9 +166,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         indexSet.distributionKey(t.distributionKey());
         if(!dataStore.load(indexSet)) return;
         indexSet.keySet().forEach((k->{
-            this.dataStore.delete(k.getBytes());
+            //this.dataStore.delete(t);
         }));
-        this.dataStore.delete(indexSet.key().asString().getBytes());
+        this.dataStore.delete(t);
     }
     public <T extends Configurable> void onCreated(GameCluster application,T t){
         //logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
@@ -182,9 +182,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         indexSet.distributionKey(t.distributionKey());
         if(!dataStore.load(indexSet)) return;
         indexSet.keySet().forEach((k->{
-            this.dataStore.delete(k.getBytes());
+            //this.dataStore.delete(k.getBytes());
         }));
-        this.dataStore.delete(indexSet.key().asString().getBytes());
+        //this.dataStore.delete(indexSet.key().asString().getBytes());
     }
 
     public <T extends CredentialConfiguration> T credentialConfiguration(String vendor){
