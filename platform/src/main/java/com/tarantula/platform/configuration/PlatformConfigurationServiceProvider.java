@@ -154,7 +154,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
         ConfigurableCategories categories = gameCluster.configurableCategories(scope);
         ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
-        logger.warn(configurableSetting.toString());
+        logger.warn(configurableSetting.toJson().toString());
         logger.warn(application.oid()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){

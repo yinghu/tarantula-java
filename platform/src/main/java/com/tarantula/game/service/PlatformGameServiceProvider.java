@@ -16,7 +16,6 @@ import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
-import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
@@ -116,7 +115,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         serviceContext.registerMetrics(metrics);
         this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
         this.serviceContext = serviceContext;
-        this.serviceContext.deploymentServiceProvider().register(gameCluster);
+        this.serviceContext.deploymentServiceProvider().registerConfigurableListener(OnLobby.TYPE,gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{
             EventListener listener = eventListeners.get(e.trackId());
             if(listener==null) return false;
@@ -329,4 +328,5 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
         return transactionEventLogger;
     }
+
 }

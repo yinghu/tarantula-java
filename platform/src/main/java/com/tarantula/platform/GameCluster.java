@@ -416,14 +416,16 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     @Override
     public void onUpdated(OnLobby onLobby) {
         if(!onLobby.gameClusterId().equals(this.oid())) return;
-        if(onLobby.typeId().equals(lobbyType())){
-            this.gameLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        if(onLobby.typeId().equals(gameLobbyName)){
+            this.gameLobby = this.serviceContext.deploymentServiceProvider().lobby(gameLobbyName);
+            return;
         }
-        else if(onLobby.typeId().equals(dataType())){
-            this.dataLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        if(onLobby.typeId().equals(gameDataName)){
+            this.dataLobby = this.serviceContext.deploymentServiceProvider().lobby(gameDataName);
+            return;
         }
-        else if(onLobby.typeId().equals(serviceType())){
-            this.serviceLobby = this.serviceContext.deploymentServiceProvider().lobby(onLobby.typeId());
+        if(onLobby.typeId().equals(gameServiceName)){
+            this.serviceLobby = this.serviceContext.deploymentServiceProvider().lobby(gameServiceName);
         }
     }
 

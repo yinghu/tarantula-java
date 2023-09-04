@@ -326,6 +326,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.registerMetricsListener(metrics(Metrics.SYSTEM));
             gameServiceProvider.start();
+            gMap.put(gameCluster.oid(),gameCluster);
         }catch (Exception ex){
             log.error("error on set game service provider",ex);
             throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
