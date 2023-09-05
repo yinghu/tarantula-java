@@ -12,7 +12,6 @@ public class RecoverableObject implements Recoverable {
 
     protected String bucket;
 
-    //protected long id;
     protected Key ownerKey;
     protected String oid;
     protected String owner;
@@ -149,23 +148,10 @@ public class RecoverableObject implements Recoverable {
 
     public String distributionKey() {
         return oid;
-        //if(this.bucket!=null&&this.oid!=null){
-            //return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).toString();
-        //}
-        //else{
-            //return null;
-        //}
     }
     @Override
     public void distributionKey(String distributionKey){
         this.oid = distributionKey;
-        //try{
-            //String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-            //this.bucket = klist[0];
-            //this.oid = klist[1];
-        //}catch (Exception ex){
-            //ignore wrong format key
-        //}
     }
     public int scope(){
         return Distributable.DATA_SCOPE;

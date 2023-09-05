@@ -89,5 +89,9 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         return new NaturalKey(this.name);
     }
 
+    public void reset(JsonObject update){
+        header = update.get("header").toString();
+        application = update.get("application").toString();
+    }
 
 }

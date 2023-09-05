@@ -174,7 +174,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         //logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
-        //logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
+        logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
     }
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
         logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());

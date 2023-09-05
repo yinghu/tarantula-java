@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 import java.util.Map;
 
-public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
+public interface Recoverable extends Distributable,JsonSerializable,Bufferable,Validatable {
 
     String PATH_SEPARATOR = "/";
 
@@ -11,9 +11,6 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
 
     String oid();
     void oid(String oid);
-
-    //long id();
-    //void id(long id);
 
     Key ownerKey();
     void ownerKey(Key ownerKey);
@@ -51,7 +48,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable {
 
     Key key();
 
-    interface Key extends Bufferable{
+    interface Key extends Bufferable,Validatable{
         default String asString(){ return null;}
     }
 

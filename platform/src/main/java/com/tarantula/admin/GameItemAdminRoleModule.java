@@ -106,32 +106,38 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
-            String scope = header.get("scope").getAsString();
-            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString(),TypeIndex.Typed.Category,scope,jo);
-            if(!applicationPreSetup.load(gameCluster,typeIndex)){
-                applicationPreSetup.save(gameCluster,typeIndex);
-                String ctype = typeIndex.index();
-                int aix = ctype.indexOf('.');
-                if(aix>0){
-                    ctype = ctype.substring(0,aix);
+            String ctype = header.get("scope").getAsString();
+            int aix = ctype.indexOf('.');
+            if(aix>0){
+                ctype = ctype.substring(0,aix);
+            }
+            ConfigurableCategory category = new ConfigurableCategory(jo);
+            if(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE).addCategory(category)){
+                category.ownerKey(ConfigurableCategoryQuery.query(ctype,"category").key());
+                category.onEdge(true);
+                if(applicationPreSetup.save(gameCluster,category)){
+                    ConfigurableType type = category.configurableType();
+                    type.ownerKey(ConfigurableTypeQuery.query(ctype,"type").key());
+                    type.onEdge(true);
+                    applicationPreSetup.save(gameCluster,type);
+                    this.availableUpdates(ctype).forEach(c->{
+                        gameCluster.configurableCategories(c).addCategory(category);
+                        category.ownerKey(ConfigurableCategoryQuery.query(c,"category").key());
+                        applicationPreSetup.edge(gameCluster,category,"category");
+                        gameCluster.configurableTypes(c).addType(type);
+                        type.ownerKey(ConfigurableTypeQuery.query(c,"type").key());
+                        applicationPreSetup.edge(gameCluster,type,"type");
+                    });
+                    ConfigurableCategories categories = this.configurableCategories(ctype,gameCluster,applicationPreSetup);
+                    categories.configurableTypes(this.configurableTypes(ctype,gameCluster,applicationPreSetup));
+                    session.write(categories.toJson().toString().getBytes());
                 }
-                List<String> updates = this.availableUpdates(ctype);
-                updates.forEach(update->{
-                    ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-                    if(categories.addCategory(new ConfigurableCategory(jo))){
-                        applicationPreSetup.save(gameCluster,categories);
-                        ConfigurableTypes configurableTypes = this.configurableTypes(update,gameCluster,applicationPreSetup);
-                        JsonObject type = new JsonObject();
-                        type.addProperty("type","category");
-                        type.addProperty("name",typeIndex.name());
-                        configurableTypes.addType(type);
-                        applicationPreSetup.save(gameCluster,configurableTypes);
-                    }
-                    if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
-                });
+                else{
+                    session.write(JsonUtil.toSimpleResponse(false,category.name()+" failed to save").getBytes());
+                }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" already existed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,category.name()+" already existed").getBytes());
             }
         }
         else if(session.action().equals("onUpdateCategorySettings")){
@@ -140,61 +146,34 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
-            String scope = header.get("scope").getAsString();
+            String ctype = header.get("scope").getAsString();
+            int aix = ctype.indexOf('.');
+            if(aix>0){
+                ctype = ctype.substring(0,aix);
+            }
             boolean updated = query[2].equals("save");
-            TypeIndex typeIndex = new TypeIndex(header.get("type").getAsString());
-            if(applicationPreSetup.load(gameCluster,typeIndex)){
-                if(typeIndex.index().equals(scope)){
-                    if(updated){
-                        typeIndex.upgrade(jo);
-                        applicationPreSetup.save(gameCluster,typeIndex);
-                        String ctype = typeIndex.index();
-                        int aix = ctype.indexOf('.');
-                        if(aix>0){
-                            ctype = ctype.substring(0,aix);
-                        }
-                        List<String> updates = this.availableUpdates(ctype);
-                        updates.forEach(update->{
-                            ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-                            if(categories.updateCategory(jo)){
-                                applicationPreSetup.save(gameCluster,categories);
-                            }
-                            if(update.equals(query[1])) session.write(categories.toJson().toString().getBytes());
-                        });
+            ConfigurableCategories _categories = gameCluster.configurableCategories(ctype);
+            ConfigurableCategory category = new ConfigurableCategory(jo);
+            if((category = _categories.configurableSetting(category.name()))!=null){
+                category.parse();
+                if(category.scope.equals(ctype)){
+                    if(updated){//do update
+                        category.reset(jo);
+                        applicationPreSetup.save(gameCluster,category);
+                        session.write(JsonUtil.toSimpleResponse(false,"["+ category.name()+"] updated in scope["+ctype+"]").getBytes());
                     }
-                    else{
-                        ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
-                        applicationPreSetup.load(gameCluster,instanceIndex);
-                        boolean deleted = query[2].equals("delete") && instanceIndex.keySet().isEmpty();
-                        if(deleted){
-                            applicationPreSetup.delete(gameCluster,typeIndex);
-                            applicationPreSetup.delete(gameCluster,instanceIndex);
-                            String ctype = typeIndex.index();
-                            int aix = ctype.indexOf('.');
-                            if(aix>0){
-                                ctype = ctype.substring(0,aix);
-                            }
-                            List<String> updates = this.availableUpdates(ctype);
-                            updates.forEach(update->{
-                                ConfigurableCategories categories = this.configurableCategories(update,gameCluster,applicationPreSetup);
-                                if(categories.removeCategory(jo)){
-                                    applicationPreSetup.save(gameCluster,categories);
-                                }
-                            });
-                            session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" deleted").getBytes());
-                        }
-                        else{
-                            session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not allowed to delete").getBytes());
-                        }
+                    else{//do delete
+                        session.write(JsonUtil.toSimpleResponse(false,"["+ category.name()+"] deleted in scope["+ctype+"]").getBytes());
                     }
                 }
                 else{
-                    session.write(JsonUtil.toSimpleResponse(false,"scope not matched ["+ header.get("scope").getAsString()+"<>"+typeIndex.index()+"]").getBytes());
+                    session.write(JsonUtil.toSimpleResponse(false,"["+category.scope+"] not matched in ["+ctype+"]").getBytes());
                 }
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,typeIndex.name()+" not existed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false,"["+ category.name()+"] not existed in scope["+ctype+"]").getBytes());
             }
+
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
@@ -498,7 +477,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 JsonArray validators = ((JsonElement)configuration.property("validators")).getAsJsonArray();
                 validators.forEach(validator->{
                     Application app = new Application();
-                    this.context.log(createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup),OnLog.WARN);
+                    createApplication(app,validator.getAsJsonObject(),gameCluster,applicationPreSetup);
                 });
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);

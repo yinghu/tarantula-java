@@ -79,7 +79,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     public boolean onItemRegistered(String category,String itemId){
         LobbyItem lobbyItem = new LobbyItem();
         lobbyItem.distributionKey(itemId);
-        //GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
         Descriptor app = gameCluster.serviceWithCategory(category);
         if(!applicationPreSetup.load(app,lobbyItem)){
             return false;

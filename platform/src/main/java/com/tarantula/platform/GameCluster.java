@@ -32,30 +32,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public final static String GAME_CLUSTER_CONFIGURATION_TYPE = "GameCluster";
 
-    //public final static String NAME="1";
-    //public final static String MODE="2";//pve | pvp |tvp|tvt
-    //public final static String GAME_LOBBY = "3";
-    //public final static String GAME_SERVICE = "4";
-    //public final static String GAME_DATA = "5";
-    //public final static String OWNER = "6";
-
-    //public final static String DISABLED = "9";
-    //public final static String PUBLISHING_ID = "10";
-    //public final static String TOURNAMENT_ENABLED = "11";
-    //public final static String LOBBY_PRE_SETUP_NAME ="12";
-    //public final static String DEDICATED ="13";
-    //public final static String GAME_ICON = "14";
-    //public final static String DEVELOPER_ICON = "15";
-    //public final static String DEVELOPER = "16";
-
-    //public final static String MAX_LOBBY_COUNT = "17";
-    //public final static String MAX_ZONE_COUNT = "18";
-    //public final static String MAX_ARENA_COUNT = "19";
-    //public final static String MAX_DATA_SIZE_ON_SET = "20";
-
-    //public final static String UPGRADE_VERSION = "21";
-
-
     public Lobby gameLobby;
     public Lobby serviceLobby;
     public Lobby dataLobby;
@@ -69,7 +45,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 
-    //public final static String GAME_UPGRADE_CATEGORY_TEMPLATE = "upgrade";
 
 
     protected ServiceContext serviceContext;
