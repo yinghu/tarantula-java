@@ -371,12 +371,12 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
-        if(t instanceof TypeIndex){
-            TypeIndex typeIndex = (TypeIndex)t;
-            if(typeIndex.typed == TypeIndex.Typed.Category){
-                reset(typeIndex,new HashMap<>());
-            }
-        }
+        //if(t instanceof TypeIndex){
+            //TypeIndex typeIndex = (TypeIndex)t;
+            //if(typeIndex.typed == TypeIndex.Typed.Category){
+                //reset(typeIndex,new HashMap<>());
+            //}
+        //}
         listeners.forEach(l->l.onCreated(application,t));
     }
 

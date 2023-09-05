@@ -22,18 +22,15 @@ public class CurrentSaveIndex extends RecoverableObject {
     }
 
     public CurrentSaveIndex(Session session){
-        String[] query = session.systemId().split(Recoverable.PATH_SEPARATOR);
-        this.bucket = query[0];
-        this.oid = query[1];
+        this.oid = session.systemId();
         this.routingNumber = session.stub();
     }
 
 
     public CurrentSaveIndex(String key){
         String[] query = key.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = query[0];
-        this.oid = query[1];
-        this.routingNumber = Integer.parseInt(query[2]);
+        this.oid = query[0];
+        this.routingNumber = Integer.parseInt(query[1]);
     }
 
     @Override
@@ -51,7 +48,20 @@ public class CurrentSaveIndex extends RecoverableObject {
         this.version =  ((Number)properties.getOrDefault("3",0)).intValue();
         this.timestamp =  ((Number)properties.getOrDefault("4",0)).longValue();
     }
-
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.index = buffer.readUTF8();
+        this.version = buffer.readInt();
+        this.timestamp = buffer.readLong();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeUTF8(index);
+        buffer.writeInt(version);
+        buffer.writeLong(timestamp);
+        return true;
+    }
     @Override
     public int getClassId() {
         return PresencePortableRegistry.CURRENT_SAVE_INDEX_CID;
@@ -63,7 +73,21 @@ public class CurrentSaveIndex extends RecoverableObject {
     }
     @Override
     public Recoverable.Key key(){
-        return new SaveKey(this.bucket,this.oid,routingNumber);
+        return new SaveKey(this.oid,routingNumber);
+    }
+
+    @Override
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        oid = buffer.readUTF8();
+        routingNumber = buffer.readInt();
+        return true;
+    }
+    @Override
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(oid==null) return false;
+        buffer.writeUTF8(oid);
+        buffer.writeInt(routingNumber);
+        return true;
     }
 
     @Override
