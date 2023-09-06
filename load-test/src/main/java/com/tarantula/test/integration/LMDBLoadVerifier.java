@@ -43,10 +43,16 @@ public class LMDBLoadVerifier {
         }
     }
     public static void main(String[] args) throws Exception{
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("load.properties"));
-        int batch = Integer.parseInt(properties.getProperty("batch"));
-        int nodeNumber = Integer.parseInt(properties.getProperty("pool.size"));
+        int batch = 100;
+        int nodeNumber = 12;
+        try{
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("load.properties"));
+            batch = Integer.parseInt(properties.getProperty("batch"));
+            nodeNumber = Integer.parseInt(properties.getProperty("pool.size"));
+        }catch (Exception ex){
+            System.out.println("Using local setting");
+        }
         executorService = Executors.newFixedThreadPool(nodeNumber);
         long st = System.currentTimeMillis();
         CountDownLatch countDownLatch = new CountDownLatch(nodeNumber);
