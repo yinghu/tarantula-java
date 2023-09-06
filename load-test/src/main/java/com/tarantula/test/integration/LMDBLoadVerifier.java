@@ -43,7 +43,7 @@ public class LMDBLoadVerifier {
     public static void main(String[] args) throws Exception{
         long st = System.currentTimeMillis();
         CountDownLatch countDownLatch = new CountDownLatch(nodeNumber);
-        int batch = 10_000;
+        int batch = 1_000;
         String[] prefixSet = new String[nodeNumber];
         for(int i=0;i<nodeNumber;i++){
             prefixSet[i]="user_"+i+"_";
