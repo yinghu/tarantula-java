@@ -6,6 +6,7 @@ import com.icodesoftware.service.MapStoreListener;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class TestMapStoreListener implements MapStoreListener {
     @Override
@@ -44,6 +45,6 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
     public void assignKey(Recoverable.DataBuffer dataBuffer){
-
+        dataBuffer.writeUTF8(UUID.randomUUID().toString());
     }
 }

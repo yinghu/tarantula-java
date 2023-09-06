@@ -191,31 +191,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-    /**
-    public long nextId(String name) {
-
-        ByteBuffer idKey = ByteBuffer.allocateDirect(key.getMaxKeySize());
-        idKey.put(name.getBytes());
-        idKey.flip();
-        ByteBuffer id = ByteBuffer.allocateDirect(key.getMaxKeySize());
-        long pendingId = startId;
-        Txn<ByteBuffer> txn = key.txnWrite();
-        try {
-            if(keyDbi.get(txn,idKey)!=null) {
-                pendingId = txn.val().getLong();
-            }
-            idKey.rewind();
-            id.putLong(pendingId+1).flip();
-            keyDbi.put(txn,idKey,id);
-            txn.commit();
-            return pendingId+1;
-        }finally {
-            txn.close();
-        }
-    }**/
-
     public void assignKey(Recoverable.DataBuffer dataBuffer){
-        dataBuffer.writeUTF8(UUID.randomUUID().toString());
+        mapStoreListener.assignKey(dataBuffer);
     }
 
     private Path path(String path) throws Exception{

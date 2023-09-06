@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.Recoverable;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class BufferProxy implements Recoverable.DataBuffer {
 
@@ -11,6 +12,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     public BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
+        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){

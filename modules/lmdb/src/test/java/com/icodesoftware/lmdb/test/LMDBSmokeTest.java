@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
 import org.lmdbjava.*;
@@ -134,11 +135,15 @@ public class LMDBSmokeTest {
         long v =  snowflakeIdGenerator.snowflakeId();
         //System.out.println(snowflakeIdGenerator.fromSnowflakeId(v)[2]);
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        key.order(ByteOrder.LITTLE_ENDIAN);
-        key.putLong(k).flip();
+        BufferProxy kp = new BufferProxy(key);
+        //key.order(ByteOrder.LITTLE_ENDIAN);
+        kp.writeLong(k);
+        key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        value.order(ByteOrder.LITTLE_ENDIAN);
-        value.putLong(v).flip();
+        BufferProxy vp = new BufferProxy(value);
+        //value.order(ByteOrder.LITTLE_ENDIAN);
+        vp.writeLong(v);
+        value.flip();
         dbi.put(txn,key,value);
         //txn.commit();
         //txn.close();
@@ -147,13 +152,14 @@ public class LMDBSmokeTest {
         //Txn<ByteBuffer> read = env.txnRead();
         if(dbi.get(txn,key)!=null){
             txn.val().order(ByteOrder.LITTLE_ENDIAN);
-            long vx = txn.val().getLong();
-            long[] vp = snowflakeIdGenerator.fromSnowflakeId(v);
-            long[] vq = snowflakeIdGenerator.fromSnowflakeId(vx);
-            Assert.assertEquals(vp[0],vq[0]);
-            Assert.assertEquals(vp[1],vq[1]);
-            Assert.assertEquals(vp[2],vq[2]);
-            System.out.println(snowflakeIdGenerator.fromSnowflakeId(vx)[1]);
+            BufferProxy p = new BufferProxy(txn.val());
+            long vx = p.readLong();
+            long[] v1 = snowflakeIdGenerator.fromSnowflakeId(v);
+            long[] v2 = snowflakeIdGenerator.fromSnowflakeId(vx);
+            Assert.assertEquals(v1[0],v2[0]);
+            Assert.assertEquals(v1[1],v2[1]);
+            Assert.assertEquals(v1[2],v2[2]);
+            //System.out.println(snowflakeIdGenerator.fromSnowflakeId(vx)[1]);
         }
     }
 

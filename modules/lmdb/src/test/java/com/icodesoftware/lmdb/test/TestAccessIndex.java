@@ -64,12 +64,14 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
         this.bucket = buffer.readUTF8();
         this.oid = buffer.readUTF8();
         this.referenceId = buffer.readInt();
+        this.distributionId = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
         buffer.writeUTF8(bucket);
         buffer.writeUTF8(oid);
         buffer.writeInt(referenceId);
+        buffer.writeLong(distributionId);
         return true;
     }
 
