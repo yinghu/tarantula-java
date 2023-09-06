@@ -6,8 +6,7 @@ import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
 
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +33,7 @@ public class LMDBLoadVerifier {
                 //put("dir","target/lmdb");
             //}});
             lmdbDataStoreProvider.start();
+
             testMapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
             lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,testMapStoreListener);
         }catch (Exception ex){
@@ -43,7 +43,7 @@ public class LMDBLoadVerifier {
     public static void main(String[] args) throws Exception{
         long st = System.currentTimeMillis();
         CountDownLatch countDownLatch = new CountDownLatch(nodeNumber);
-        int batch = 1_000;
+        int batch = 100_000;
         String[] prefixSet = new String[nodeNumber];
         for(int i=0;i<nodeNumber;i++){
             prefixSet[i]="user_"+i+"_";
