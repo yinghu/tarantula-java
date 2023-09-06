@@ -6,6 +6,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.SnowflakeKey;
 
 import java.util.Map;
 
@@ -29,10 +30,10 @@ public class TestUser extends RecoverableObject implements Access {
         this.emailAddress = "teser@mail.com";
         this.validator = "validator";
     }
-    public TestUser(String login,String owner){
+    public TestUser(String login,long owner){
         this();
         this.login = login;
-        this.ownerKey = new OidKey(owner);
+        this.ownerKey = new SnowflakeKey(owner);
     }
     public String login(){
         return this.login;
@@ -146,17 +147,17 @@ public class TestUser extends RecoverableObject implements Access {
         return true;
     }
     public boolean readKey(Recoverable.DataBuffer buffer){
-        oid = buffer.readUTF8();
+        distributionId = buffer.readLong();
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(oid==null) return false;
-        buffer.writeUTF8(oid);
+        if(distributionId==0) return false;
+        buffer.writeLong(distributionId);
         return true;
     }
     @Override
     public Key key() {
-        return new NaturalKey(this.oid);
+        return new SnowflakeKey(this.distributionId);
     }
 
     //@Override

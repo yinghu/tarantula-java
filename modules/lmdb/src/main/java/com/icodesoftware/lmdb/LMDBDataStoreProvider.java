@@ -9,6 +9,8 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.SnowflakeIdGenerator;
+import com.icodesoftware.util.TimeUtil;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
@@ -45,12 +47,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-    //private long startId = 1_000_000;//
+    private SnowflakeIdGenerator snowflakeIdGenerator;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
+        this.snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(20202,1,1));
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();

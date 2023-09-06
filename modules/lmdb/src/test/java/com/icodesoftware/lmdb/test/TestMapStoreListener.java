@@ -2,20 +2,21 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
-import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.SnowflakeIdGenerator;
+import com.icodesoftware.util.TimeUtil;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 public class TestMapStoreListener implements MapStoreListener {
 
     LMDBDataStoreProvider provider;
+    public SnowflakeIdGenerator snowflakeIdGenerator;
     public TestMapStoreListener(LMDBDataStoreProvider provider){
         this.provider = provider;
+        snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
     }
     @Override
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
@@ -43,7 +44,8 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
     public void assignKey(Recoverable.DataBuffer dataBuffer){
-        dataBuffer.writeUTF8(UUID.randomUUID().toString());
+        dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());
+        //dataBuffer.writeUTF8(UUID.randomUUID().toString());
     }
     @Override
     public String name() {

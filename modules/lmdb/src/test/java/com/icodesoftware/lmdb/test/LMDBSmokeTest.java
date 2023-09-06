@@ -1,6 +1,8 @@
 package com.icodesoftware.lmdb.test;
 
 
+import com.icodesoftware.util.SnowflakeIdGenerator;
+import com.icodesoftware.util.TimeUtil;
 import org.lmdbjava.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -8,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -120,6 +123,38 @@ public class LMDBSmokeTest {
         long end = offset*section;
         long start = end-offset;
         return new long[]{start,end-1};
+    }
+
+    @Test(groups = { "LMDB" })
+    public void snowflakeTest() {
+        SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(99, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
+        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_snow_flake", DbiFlags.MDB_CREATE);
+        Txn<ByteBuffer> txn = env.txnWrite();
+        long k =  snowflakeIdGenerator.snowflakeId();
+        long v =  snowflakeIdGenerator.snowflakeId();
+        //System.out.println(snowflakeIdGenerator.fromSnowflakeId(v)[2]);
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.order(ByteOrder.LITTLE_ENDIAN);
+        key.putLong(k).flip();
+        ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        value.order(ByteOrder.LITTLE_ENDIAN);
+        value.putLong(v).flip();
+        dbi.put(txn,key,value);
+        //txn.commit();
+        //txn.close();
+        key.rewind();
+        value.clear();
+        //Txn<ByteBuffer> read = env.txnRead();
+        if(dbi.get(txn,key)!=null){
+            txn.val().order(ByteOrder.LITTLE_ENDIAN);
+            long vx = txn.val().getLong();
+            long[] vp = snowflakeIdGenerator.fromSnowflakeId(v);
+            long[] vq = snowflakeIdGenerator.fromSnowflakeId(vx);
+            Assert.assertEquals(vp[0],vq[0]);
+            Assert.assertEquals(vp[1],vq[1]);
+            Assert.assertEquals(vp[2],vq[2]);
+            System.out.println(snowflakeIdGenerator.fromSnowflakeId(vx)[1]);
+        }
     }
 
 

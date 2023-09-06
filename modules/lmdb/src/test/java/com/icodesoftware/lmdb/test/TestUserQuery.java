@@ -2,17 +2,17 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 
 public class TestUserQuery implements RecoverableFactory<TestUser> {
 
 
-    private String  ownerId;
+    private long  ownerId;
     private String label;
-    public TestUserQuery(String ownerId){
+    public TestUserQuery(long ownerId){
         this.ownerId = ownerId;
     }
-    public TestUserQuery(String ownerId,String label){
+    public TestUserQuery(long ownerId,String label){
         this.ownerId = ownerId;
         this.label = label;
     }
@@ -33,6 +33,6 @@ public class TestUserQuery implements RecoverableFactory<TestUser> {
     
     @Override
     public Recoverable.Key key() {
-        return new OidKey(ownerId);
+        return new SnowflakeKey(ownerId);
     }
 }
