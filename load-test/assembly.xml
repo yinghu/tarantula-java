@@ -16,6 +16,7 @@
       	<outputDirectory>bin</outputDirectory>
       	<includes>
             <include>load.sh</include>
+			<include>lmdb_load.sh</include>
 			<include>load.properties</include>
       	</includes>
       	<fileMode>0777</fileMode>
