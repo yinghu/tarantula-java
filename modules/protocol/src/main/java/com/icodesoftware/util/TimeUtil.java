@@ -64,4 +64,10 @@ public class TimeUtil {
     public static LocalDateTime toFirstDayOfLastYear(LocalDateTime end){
         return end.minusYears(1).withDayOfYear(1);
     }
+
+    public static long epochMillisecondsFromMidnight(int year,int month,int day){
+        LocalDateTime localDateTime = LocalDateTime.of(year,month,day,day,0,0,0);
+        Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        return instant.toEpochMilli();
+    }
 }
