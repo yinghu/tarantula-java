@@ -12,6 +12,10 @@ public interface Distributable {
     String bucket();
     void bucket(String bucket);
 
+    long distributionId();
+    void distributionId(long distributionId);
+
+
     String distributionKey();
     void distributionKey(String distributionKey);
 

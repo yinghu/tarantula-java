@@ -3,16 +3,10 @@
         "name" : "tarantula",
         "provider" : "com.icodesoftware.lmdb.LMDBDataStoreProvider",
         "properties": [
-            {"truncated": false},
             {"dataPath":"tarantula/data"},
             {"integrationPath":"tarantula/integration"},
             {"indexPath":"tarantula/index"},
-            {"keyPath":"tarantula/key"},
-            {"backupPath":"backup"},
-            {"cacheSyncIntervalMinutes": 60},
-            {"cacheUpdateThreshold": 10000},
-            {"diskSyncIntervalSeconds": 60},
-            {"syncUpdateThreshold": 10000}
+            {"keyPath":"tarantula/key"}
         ]
     },
     "integration-backup-router": {

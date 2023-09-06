@@ -25,7 +25,7 @@ public class RecoverableObject implements Recoverable {
 
     protected long timestamp;
     protected long revision;
-
+    protected long distributionId;
     protected int routingNumber;
 
     protected String index;
@@ -144,6 +144,14 @@ public class RecoverableObject implements Recoverable {
     }
     public int getClassId(){
         return -1;
+    }
+
+    public long distributionId() {
+        return distributionId;
+    }
+    @Override
+    public void distributionId(long distributionId){
+        this.distributionId = distributionId;
     }
 
     public String distributionKey() {
