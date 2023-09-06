@@ -7,6 +7,8 @@ import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
 
 
+import java.io.FileInputStream;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,11 +20,11 @@ public class LMDBLoadVerifier {
     }
     static ExecutorService executorService;
 
-    static final int nodeNumber = 12;
+    //static final int nodeNumber = 12;
 
-    static {
-        executorService = Executors.newFixedThreadPool(nodeNumber);
-    }
+    //static {
+        //executorService = Executors.newFixedThreadPool(nodeNumber);
+    //}
 
     static LMDBDataStoreProvider lmdbDataStoreProvider;
     static TestMapStoreListener testMapStoreListener;
@@ -41,9 +43,14 @@ public class LMDBLoadVerifier {
         }
     }
     public static void main(String[] args) throws Exception{
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("load.properties"));
+        int batch = Integer.parseInt(properties.getProperty("batch"));
+        int nodeNumber = Integer.parseInt(properties.getProperty("pool.size"));
+        executorService = Executors.newFixedThreadPool(nodeNumber);
         long st = System.currentTimeMillis();
         CountDownLatch countDownLatch = new CountDownLatch(nodeNumber);
-        int batch = 1_000;
+        //int batch = 1_000;
         String[] prefixSet = new String[nodeNumber];
         for(int i=0;i<nodeNumber;i++){
             prefixSet[i]="user_"+i+"_";
