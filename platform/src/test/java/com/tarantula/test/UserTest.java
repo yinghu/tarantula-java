@@ -33,7 +33,7 @@ public class UserTest {
     @Test(groups = { "User" })
     public void userTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
-        AccessIndex accessIndex = new AccessIndexTrack("test1","BDS", SystemUtil.oid(),1);
+        AccessIndex accessIndex = new AccessIndexTrack("test1",1,0);
         //accessIndex.id(dataStoreProvider.nextId(accessStore.name()));
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
         DataStore dUser = dataStoreProvider.createDataStore("test_user");
@@ -55,7 +55,7 @@ public class UserTest {
     @Test(groups = { "Account" })
     public void accountTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
-        AccessIndex accessIndex = new AccessIndexTrack("test11","BDS", SystemUtil.oid(),1);
+        AccessIndex accessIndex = new AccessIndexTrack("test11",1,0);
         //accessIndex.id(dataStoreProvider.nextId(accessStore.name()));
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
         //DataStore dUser = dataStoreProvider.createDataStore("test_user");
@@ -76,7 +76,7 @@ public class UserTest {
     @Test(groups = { "Account" })
     public void presenceTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
-        AccessIndex accessIndex = new AccessIndexTrack("test111","BDS", SystemUtil.oid(),1);
+        AccessIndex accessIndex = new AccessIndexTrack("test111",1,0);
         //accessIndex.id(dataStoreProvider.nextId(accessStore.name()));
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
         //DataStore dUser = dataStoreProvider.createDataStore("test_user");
@@ -96,7 +96,7 @@ public class UserTest {
     @Test(groups = { "Membership" })
     public void membershipTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
-        AccessIndex accessIndex = new AccessIndexTrack("test9111","BDS", SystemUtil.oid(),1);
+        AccessIndex accessIndex = new AccessIndexTrack("test9111",1,0);
         //accessIndex.id(dataStoreProvider.nextId(accessStore.name()));
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
         //DataStore dUser = dataStoreProvider.createDataStore("test_user");

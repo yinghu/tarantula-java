@@ -11,7 +11,6 @@ import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
 
 public class AccessIndexTrack extends RecoverableObject implements AccessIndex, Portable {
@@ -19,11 +18,10 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     private int referenceId;
     public AccessIndexTrack(){
     }
-    public AccessIndexTrack(String owner,String bucket,String oid,int referenceId){
+    public AccessIndexTrack(String owner,int referenceId,long distributionId){
         this.owner = owner;
-        this.bucket = bucket;
-        //this.oid = oid;
         this.referenceId = referenceId;
+        this.distributionId = distributionId;
     }
 
     public AccessIndexTrack(String owner){
@@ -55,37 +53,20 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.owner);
-        out.writeUTF("2",this.bucket);
-        //out.writeUTF("3",this.oid);
-        out.writeInt("4",this.referenceId);
-        out.writeLong("5",distributionId);
+        out.writeInt("2",this.referenceId);
+        out.writeLong("3",distributionId);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.owner = in.readUTF("1");
-        this.bucket = in.readUTF("2");
-        //this.oid = in.readUTF("3");
-        this.referenceId = in.readInt("4");
-        this.distributionId = in.readLong("5");
-    }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",bucket);
-        //this.properties.put("2",oid);
-        this.properties.put("3",referenceId);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.bucket = (String)properties.get("1");
-        //this.oid = (String)properties.get("2");
-        this.referenceId = ((Number)properties.get("3")).intValue();
+        this.referenceId = in.readInt("2");
+        this.distributionId = in.readLong("3");
     }
 
     @Override
     public String toString(){
-        return "Access Index ["+owner+"]->"+bucket+"/"+distributionId+"] referenceID =>"+referenceId+"]";
+        return "Access ["+owner+"] Distribution ID ["+distributionId+"] ReferenceID ["+referenceId+"]";
     }
 
     public Key key(){
@@ -95,7 +76,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",owner);
-        //jsonObject.addProperty("oid",oid());
+        jsonObject.addProperty("distributionId",distributionId);
         jsonObject.addProperty("referenceId",referenceId);
         return jsonObject;
     }
@@ -103,16 +84,12 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     //Bufferable methods
     @Override
     public boolean read(DataBuffer buffer){
-        this.bucket = buffer.readUTF8();
-        //this.oid = buffer.readUTF8();
         this.referenceId = buffer.readInt();
         this.distributionId = buffer.readLong();
         return true;
     }
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(bucket);
-        //buffer.writeUTF8(oid);
         buffer.writeInt(referenceId);
         buffer.writeLong(distributionId);
         return true;
@@ -127,5 +104,10 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
         if(owner==null) return false;
         buffer.writeUTF8(owner);
         return true;
+    }
+
+    @Override
+    public boolean validate() {
+        return owner!=null && owner.length()>4;
     }
 }

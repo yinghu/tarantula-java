@@ -6,7 +6,6 @@ import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.AccessIndexTrack;
 import com.icodesoftware.service.DataStoreProvider;
-import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,16 +24,17 @@ public class AccessIndexTest {
 
     @Test(groups = { "AccessIndex" })
     public void accessIndexTest() {
-        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+1);
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        Assert.assertEquals(dataStore.name(),AccessIndexService.AccessIndexStore.STORE_NAME);
         String access = "access100";
-        AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access,"BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
-        accessIndexTrack.distributionId(serviceContext.deploymentServiceProvider().distributionId());
-        //Assert.assertNotNull(accessIndexTrack.oid());
+        AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access, AccessIndex.USER_INDEX,serviceContext.deploymentServiceProvider().distributionId());
+        Assert.assertTrue(accessIndexTrack.validate());
+        Assert.assertNotNull(accessIndexTrack.owner());
         Assert.assertTrue(accessIndexTrack.distributionId()>0);
         Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
         AccessIndex load = new AccessIndexTrack(access);
         Assert.assertTrue(dataStore.load(load));
-        //Assert.assertEquals(accessIndexTrack.oid(),load.oid());
+        Assert.assertEquals(accessIndexTrack.referenceId(),load.referenceId());
         Assert.assertEquals(accessIndexTrack.distributionId(),load.distributionId());
         Assert.assertTrue(dataStore.delete(accessIndexTrack));
         Assert.assertFalse(dataStore.load(accessIndexTrack));
