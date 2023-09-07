@@ -13,7 +13,7 @@ public class RecoverableObject implements Recoverable {
     protected String bucket;
 
     protected Key ownerKey;
-    protected String oid;
+
     protected String owner;
     protected  String label;
 
@@ -52,13 +52,6 @@ public class RecoverableObject implements Recoverable {
 
     public void bucket(String bucket) {
         this.bucket = bucket;
-    }
-
-    public String oid(){
-        return this.oid;
-    }
-    public void oid(String oid){
-        this.oid = oid;
     }
 
     public Key ownerKey(){
@@ -155,11 +148,11 @@ public class RecoverableObject implements Recoverable {
     }
 
     public String distributionKey() {
-        return oid;
+        return null;
     }
     @Override
     public void distributionKey(String distributionKey){
-        this.oid = distributionKey;
+
     }
     public int scope(){
         return Distributable.DATA_SCOPE;
@@ -172,26 +165,26 @@ public class RecoverableObject implements Recoverable {
     }
     @Override
     public Key key(){
-        return new OidKey(this.oid);
+        return new SnowflakeKey(this.distributionId);
     }
 
     public boolean readKey(Recoverable.DataBuffer buffer){
-        oid = buffer.readUTF8();
+        this.distributionId = buffer.readLong();
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(oid==null) return false;
-        buffer.writeUTF8(oid);
+        if(distributionId==0) return false;
+        buffer.writeLong(distributionId);
         return true;
     }
     @Override
     public boolean equals(Object obj){
         Recoverable tc =(Recoverable) obj;
-        return this.oid==(tc.oid());
+        return this.distributionId==(tc.distributionId());
     }
     @Override
     public int hashCode(){
-        return oid.hashCode();
+        return Long.hashCode(distributionId);
     }
     @Override
     public String toString(){

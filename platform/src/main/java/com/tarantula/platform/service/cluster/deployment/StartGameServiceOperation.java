@@ -9,12 +9,12 @@ import java.io.IOException;
 public class StartGameServiceOperation extends Operation {
 
 
-    private String gameClusterKey;
+    private long gameClusterKey;
     public StartGameServiceOperation() {
     }
 
 
-    public StartGameServiceOperation(String gameClusterKey) {
+    public StartGameServiceOperation(long gameClusterKey) {
         this.gameClusterKey = gameClusterKey;
     }
     @Override
@@ -31,12 +31,12 @@ public class StartGameServiceOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(gameClusterKey);
+        out.writeLong(gameClusterKey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.gameClusterKey = in.readUTF();
+        this.gameClusterKey = in.readLong();
     }
 }

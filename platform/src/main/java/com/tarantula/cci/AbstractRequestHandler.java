@@ -67,8 +67,8 @@ abstract public class AbstractRequestHandler implements RequestHandler {
 
     protected void checkPermission(OnSession id,String token,String sessionId,String tag){
         PermissionCheckEvent actionEvent = new PermissionCheckEvent(this.serviceTopic,sessionId);
-        RoutingKey routingKey = eventService.routingKey(id.oid(),tag);
-        actionEvent.oid(id.oid());
+        RoutingKey routingKey = eventService.routingKey(id.distributionId(),tag);
+        actionEvent.distributionId(id.distributionId());
         actionEvent.stub(id.stub());
         actionEvent.ticket(id.ticket());
         actionEvent.token(token);

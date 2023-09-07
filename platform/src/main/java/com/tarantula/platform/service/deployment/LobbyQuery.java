@@ -3,6 +3,7 @@ package com.tarantula.platform.service.deployment;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.LobbyDescriptor;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
@@ -11,9 +12,9 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
 
 
-    private String ownerId;
+    private long ownerId;
 
-    public LobbyQuery(String ownerId){
+    public LobbyQuery(long ownerId){
         this.ownerId  = ownerId;
     }
 
@@ -36,7 +37,7 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
 
     @Override
     public Recoverable.Key key() {
-        return new OidKey(ownerId);
+        return new SnowflakeKey(ownerId);
     }
 
 }

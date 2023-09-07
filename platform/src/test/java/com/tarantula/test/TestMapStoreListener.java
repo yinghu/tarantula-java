@@ -3,12 +3,16 @@ package com.tarantula.test;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.util.SnowflakeIdGenerator;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class TestMapStoreListener implements MapStoreListener {
+
+    SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
     @Override
     public String name() {
         return null;
@@ -45,6 +49,10 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
     public void assignKey(Recoverable.DataBuffer dataBuffer){
-        dataBuffer.writeUTF8(UUID.randomUUID().toString());
+        dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());
+        //dataBuffer.writeUTF8(UUID.randomUUID().toString());
+    }
+    public long distributionId(){
+        return snowflakeIdGenerator.snowflakeId();
     }
 }

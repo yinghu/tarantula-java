@@ -23,6 +23,6 @@ public class PlayerGameObject extends Data implements Event {
 
     @Override
     public String systemId(){
-        return this.bucket+ Recoverable.PATH_SEPARATOR+oid;
+        return this.bucket+ Recoverable.PATH_SEPARATOR+owner;
     }
 }

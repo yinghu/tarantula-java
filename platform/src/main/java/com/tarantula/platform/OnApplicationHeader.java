@@ -19,12 +19,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
 
     public String systemId() {
-        return this.oid;
+        return this.owner;
     }
 
 
     public void systemId(String systemId) {
-        this.oid = systemId;
+        this.owner = systemId;
     }
 
 

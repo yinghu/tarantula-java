@@ -76,7 +76,7 @@ public class MetricsProperty extends RecoverableObject implements Property {
 
 
     public Key key(){
-        return new IndexKey(this.bucket,oid,routingNumber);
+        return new IndexKey(this.bucket,owner,routingNumber);
     }
 
     public static String historyPropertyLabel(LocalDateTime current){

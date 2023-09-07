@@ -85,7 +85,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     public void distributionKey(String rkey){
         String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
         bucket = idx[0];
-        oid = idx[1];
+        //oid = idx[1];
         label = idx[2];
     }
     @Override
@@ -99,7 +99,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     }
     //key label format history_[category]_[year]_[dayofyear]  history_httpRequestCount_2022_145
     public Key key(){
-        return new AssociateKey(this.oid,label);
+        return new AssociateKey(this.distributionId,label);
     }
 
     public void archiveHourly(Property property){

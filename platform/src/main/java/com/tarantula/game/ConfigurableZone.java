@@ -160,7 +160,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return this.zoneItem.distributionKey();
     }
     public String oid(){
-        return this.zoneItem.oid();
+        return this.zoneItem.distributionKey();
     }
     public String bucket(){
         return this.zoneItem.bucket();

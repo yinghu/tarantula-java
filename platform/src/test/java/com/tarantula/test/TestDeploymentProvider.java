@@ -11,6 +11,11 @@ import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import java.util.List;
 
 public class TestDeploymentProvider implements DeploymentServiceProvider {
+
+    private DataStoreProvider dataStoreProvider;
+    public TestDeploymentProvider(DataStoreProvider dataStoreProvider){
+        this.dataStoreProvider = dataStoreProvider;
+    }
     @Override
     public OnAccess registerConnection(Connection connection) {
         return null;
@@ -157,17 +162,17 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public boolean enableApplication(String applicationId) {
+    public boolean enableApplication(long applicationId) {
         return false;
     }
 
     @Override
-    public boolean disableApplication(String applicationId) {
+    public boolean disableApplication(long applicationId) {
         return false;
     }
 
     @Override
-    public <T extends OnAccess> T createGameCluster(String accountId, String name, OnAccess properties) {
+    public <T extends OnAccess> T createGameCluster(Account accountId, String name, OnAccess properties) {
         return null;
     }
 
@@ -177,7 +182,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public <T extends OnAccess> T updateGameCluster(String gameClusterId, OnAccess properties) {
+    public <T extends OnAccess> T updateGameCluster(long gameClusterId, OnAccess properties) {
         return null;
     }
 
@@ -192,7 +197,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public <T extends OnAccess> T gameCluster(String key) {
+    public <T extends OnAccess> T gameCluster(long key) {
         return null;
     }
 
@@ -216,7 +221,9 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public void registerAccessIndexListener(AccessIndexService.Listener listener) {
 
     }
-
+    public long distributionId(){
+        return dataStoreProvider.mapStoreListener(Distributable.DATA_SCOPE).distributionId();
+    }
     @Override
     public AccessIndexService.AccessIndexStore accessIndexStore() {
         return null;

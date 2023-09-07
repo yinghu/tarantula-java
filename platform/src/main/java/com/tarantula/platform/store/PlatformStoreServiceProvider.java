@@ -93,7 +93,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public boolean onItemRegistered(String category,String itemId){
         Shop configurableObject = new Shop();
         configurableObject.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionId());
         Descriptor app = _gc.serviceWithCategory(category);
         if(!applicationPreSetup.load(app,configurableObject)) return false;
         registerShop(configurableObject);
@@ -120,10 +120,10 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     private void registerShop(Shop shop){
         Shop s = shop.setup();
         shopIndex.put(shop.configurationName(),s);
-        shopIndex.put(shop.oid(),s);
+        //shopIndex.put(shop.distributionId(),s);
         shop.list().forEach(item->{
             //item.setup();
-            shoppingItems.put(item.oid(),new ShoppingItem(item));
+            //shoppingItems.put(item.distributionId(),new ShoppingItem(item));
         });
     }
 

@@ -69,7 +69,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private final List<DefaultLobby> mlobbyList = new LinkedList();
 
-    private final ConcurrentHashMap<String, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>(); //id =>
+    private final ConcurrentHashMap<Long, ApplicationProvider> availableApplicationManagers = new ConcurrentHashMap<>(); //id =>
 
     public static String releaseVersion;
     public String applicationSchedulingPoolSetting;
@@ -105,7 +105,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String,GameCluster> gMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long,GameCluster> gMap = new ConcurrentHashMap<>();
 
     private final MetricsManager metricsManager;
 
@@ -185,7 +185,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
             JsonObject json = JsonUtil.parse(resp);
             if(!json.get("successful").getAsBoolean()) throw new RuntimeException("failed to fetch remote deployment id");
-            node.deploymentId = json.get("message").getAsString();
+            node.deploymentId = json.get("message").getAsLong();
             log.warn("Using backup deployment id ["+node.deploymentId+"]");
         }
         node_started = new AtomicBoolean(false);
@@ -255,7 +255,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
         if(lb.descriptor().accessMode() > c.accessMode) c.accessMode(lb.descriptor().accessMode());
         SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
-        this.availableApplicationManagers.put(c.oid(),singletonApplicationManager);
+        this.availableApplicationManagers.put(c.distributionId(),singletonApplicationManager);
         singletonApplicationManager.start();
         lb.addEntry(c);
     }
@@ -274,10 +274,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled && conf.descriptor.deployCode == DeployCode.USER_GAME_CLUSTER){
-            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.index());
+            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.distributionId());
             if(gameCluster==null) throw new RuntimeException("no game cluster config data");
         }
-        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.index(),gameCluster.publishingId());
+        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.distributionId(),gameCluster.publishingId());
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             if(c.disabled()) {
@@ -326,21 +326,21 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             this.deployServiceProvider(gameServiceProvider);
             gameServiceProvider.registerMetricsListener(metrics(Metrics.SYSTEM));
             gameServiceProvider.start();
-            gMap.put(gameCluster.oid(),gameCluster);
+            gMap.put(gameCluster.distributionId(),gameCluster);
         }catch (Exception ex){
             log.error("error on set game service provider",ex);
             throw new RuntimeException("failed to start game service provider->"+gameCluster.property(GameCluster.NAME));
         }
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
- 	    String publishingId = gameCluster.publishingId;//(String) gameCluster.property(GameCluster.PUBLISHING_ID);
+ 	    long publishingId = gameCluster.publishingId;//(String) gameCluster.property(GameCluster.PUBLISHING_ID);
  	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->_setOnLobby(c,listener));
         IndexSet indexSet = new IndexSet();
-        indexSet.oid(this.node.deploymentId());
+        indexSet.distributionId(this.node.deploymentId());
         indexSet.label(Account.GameClusterLabel);
         indexSet.keySet.add(gameCluster.distributionKey());
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
@@ -354,7 +354,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         LobbyDescriptor d = lc.descriptor;
         this.setLobby(d);//
-        lc.applications = masterDataStore().list(new ApplicationQuery(d.oid()));
+        lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionId()));
         //lc.views = masterDataStore().list(new OnViewQuery(d.distributionKey()));
         //this.configureViews(lc);
         try{
@@ -371,14 +371,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.setLobby(lobbyDescriptor);
         LobbyConfiguration lc = new LobbyConfiguration();
         lc.descriptor = lobbyDescriptor;
-        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.oid()));
+        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionId()));
         //this.configureViews(lc);
         try{
             OnLobby ob = this.configure(lc);
             listener.onUpdated(ob);
         }catch (Exception ex){ex.printStackTrace();}
     }
-    public synchronized void setOnLobby(String typeId,String publishingId,Configurable.Listener listener){
+    public synchronized void setOnLobby(String typeId,long publishingId,Configurable.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
             return;
         }
@@ -387,18 +387,18 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             this.setLobby(d);//
             LobbyConfiguration lc = new LobbyConfiguration();
             lc.descriptor = d;
-            lc.applications = masterDataStore().list(new ApplicationQuery(d.oid()));
+            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionId()));
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onUpdated(ob);
             }catch (Exception ex){ex.printStackTrace();}
         });
         IndexSet indexSet = new IndexSet();
-        indexSet.oid(this.node.deploymentId());
+        indexSet.distributionId(this.node.deploymentId());
         indexSet.label(Account.ModuleLabel);
-        indexSet.keySet.add(publishingId);
+        //indexSet.keySet.add(publishingId);
         if(!this.masterDataStore().createIfAbsent(indexSet,true)){
-            indexSet.keySet.add(publishingId);
+            //indexSet.keySet.add(publishingId);
             this.masterDataStore().update(indexSet);
         }
     }
@@ -411,20 +411,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String, Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                ApplicationProvider ap = this.availableApplicationManagers.get(d.oid());
+                ApplicationProvider ap = this.availableApplicationManagers.get(d.distributionId());
                 if(d.codebase()!=null&&d.moduleName()!=null){
                     _codeBase.putIfAbsent(d.codebase(),d);
                 }
                 if(d.type().equals(Descriptor.TYPE_APPLICATION)){ //shut down app
                     ap.shutdown();
-                    this.availableApplicationManagers.remove(d.oid());
+                    this.availableApplicationManagers.remove(d.distributionId());
                 }
                 else{
                     lab = d;
                 }
             }
             if(lab!=null){
-                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.oid());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionId());
                 lbb.shutdown();
                 listener.onLobby(lab);
             }
@@ -433,14 +433,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             ex.printStackTrace();
         }
     }
-    public synchronized void setApplicationOnLobby(String typeId,String applicationId){
+    public synchronized void setApplicationOnLobby(String typeId,long applicationId){
  	    Lobby lb = this._lobbyMapping.get(typeId);
  	    if(lb==null||this.availableApplicationManagers.containsKey(applicationId)){
  	        return;
         }
         try{
             DeploymentDescriptor deploymentDescriptor = new DeploymentDescriptor();
-            deploymentDescriptor.oid(applicationId);
+            deploymentDescriptor.distributionId(applicationId);
             if(!masterDataStore().load(deploymentDescriptor)) throw new RuntimeException("no application config data");
             try{setApplicationManager(deploymentDescriptor,lb);}catch (Exception exx){
                 throw new RuntimeException(exx);
@@ -449,7 +449,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             log.error("error on setApplicationOnLobby",ex);
         }
     }
-    public synchronized void unsetApplication(String typeId,String applicationId,Lobby.Listener listener){
+    public synchronized void unsetApplication(String typeId,long applicationId,Lobby.Listener listener){
  	    Lobby lb = this._lobbyMapping.get(typeId);
         if(lb==null){
             return;
@@ -458,7 +458,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String,Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.oid().equals(applicationId)){
+                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
                     lb.removeEntry(applicationId);
                     ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
@@ -472,7 +472,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
             if(lb.entryList().size()==1&&(lab!=null)){//clean lobby and clean module class loaders
                 this._lobbyMapping.remove(typeId);
-                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.oid());
+                ApplicationProvider lbb = this.availableApplicationManagers.remove(lab.distributionId());
                 lbb.shutdown();
                 listener.onLobby(lab);
                 _codeBase.forEach((k,v)-> listener.onLobby(v));
@@ -537,12 +537,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _setup() throws Exception{
         //Waiting for all distribution service ready
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
-        node.bucketId = bid.oid();
+        node.bucketId = bid.distributionId();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
-        node.nodeId = nid.oid();
+        node.nodeId = nid.distributionId();
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
         if(!backupEnabled){//using local deployment id
-            node.deploymentId = did.oid();
+            node.deploymentId = did.distributionId();
             log.warn("Using local deployment id ["+node.deploymentId+"]");
         }
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
@@ -998,10 +998,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
 
-    public GameCluster loadGameCluster(String key){
+    public GameCluster loadGameCluster(long key){
          GameCluster gameCluster = gMap.computeIfAbsent(key,k->{
              GameCluster gc = new GameCluster();
-             gc.oid(key);
+             gc.distributionId(key);
              gc.dataStore(this.masterDataStore());
              if(!this.masterDataStore().load(gc)) return null;
              gc.gameLobby = this.lobby(gc.lobbyType());
@@ -1014,7 +1014,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          if(gameCluster.disabled()) unloadGameCluster(key);
          return gameCluster;
     }
-    public void unloadGameCluster(String key){
+    public void unloadGameCluster(long key){
          gMap.remove(key);
     }
 

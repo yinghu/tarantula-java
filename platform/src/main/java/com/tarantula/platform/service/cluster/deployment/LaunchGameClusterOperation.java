@@ -9,18 +9,18 @@ import java.io.IOException;
 public class LaunchGameClusterOperation extends Operation {
 
 
-    private String gameClusterkey;
+    private long gameClusterId;
     public LaunchGameClusterOperation() {
     }
 
 
-    public LaunchGameClusterOperation(String gameClusterkey) {
-        this.gameClusterkey = gameClusterkey;
+    public LaunchGameClusterOperation(long gameClusterId) {
+        this.gameClusterId = gameClusterId;
     }
     @Override
     public void run() throws Exception {
         ClusterDeployService cds = this.getService();
-        cds.onLaunchGameCluster(gameClusterkey);
+        cds.onLaunchGameCluster(gameClusterId);
     }
 
     @Override
@@ -31,12 +31,12 @@ public class LaunchGameClusterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(gameClusterkey);
+        out.writeLong(gameClusterId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.gameClusterkey = in.readUTF();
+        this.gameClusterId = in.readLong();
     }
 }

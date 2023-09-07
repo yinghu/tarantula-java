@@ -10,7 +10,7 @@ public interface Lobby {
 	List<Descriptor> entryList();
 
 	void addEntry(Descriptor descriptor);
-	void removeEntry(String applicationId);
+	void removeEntry(long applicationId);
 
 	void addListener(Listener listener);
 

@@ -43,7 +43,7 @@ public class Component extends ConfigurableObject{
         _reference = new ArrayList<>();
         for(JsonElement je : reference){
             ConfigurableObject cob = new ConfigurableObject();
-            cob.oid(je.getAsString());
+            cob.distributionId(je.getAsLong());
             cob.dataStore(dataStore);
             if(this.dataStore.load(cob)){
                 cob.registerListener(this.listener);

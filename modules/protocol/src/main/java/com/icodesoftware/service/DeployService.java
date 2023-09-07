@@ -10,15 +10,15 @@ public interface DeployService extends ServiceProvider {
     boolean onUpdateResource(String contentUrl,String resourceName);
 
 
-    boolean onLaunchApplication(String typeId,String applicationId);
-    boolean onShutdownApplication(String typeId,String applicationId);
+    boolean onLaunchApplication(String typeId,long applicationId);
+    boolean onShutdownApplication(String typeId,long applicationId);
 
 
-    void onCreateGameCluster(String gameClusterId);
+    void onCreateGameCluster(long gameClusterId);
 
-    boolean onStartGameService(String gameClusterKey);
-    boolean onLaunchGameCluster(String gameClusterKey);
-    boolean onShutdownGameCluster(String gameClusterKey);
+    boolean onStartGameService(long gameClusterKey);
+    boolean onLaunchGameCluster(long gameClusterKey);
+    boolean onShutdownGameCluster(long gameClusterKey);
 
     //distribute the module or view content in cluster
     boolean onUpload(String fileName,byte[] content);

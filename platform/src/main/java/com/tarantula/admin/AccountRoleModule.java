@@ -34,13 +34,13 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access user = this.userService.loadUser(session.oid());
+            Access user = this.userService.loadUser(session.distributionId());
             Account acc = this.userService.loadAccount(user);
             boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
             session.write(new PermissionContext(0,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onUserList")){
-            Access access = userService.loadUser(session.oid());
+            Access access = userService.loadUser(session.distributionId());
             AccessContext atc = new AccessContext();
             atc.userList = userService.loadUsers(access);
             session.write(atc.toJson().toString().getBytes());
@@ -48,9 +48,9 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         else if(session.action().equals("onUpgradeUser")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String uid = (String)onAccess.property(OnAccess.ACCESS_ID);
-            Access owner = userService.loadUser(session.oid());
+            Access owner = userService.loadUser(session.distributionId());
             if(owner.primary()){//only primary
-                Access u = userService.loadUser(session.oid());
+                Access u = userService.loadUser(session.distributionId());
                 if(u!=null){
                     if(!u.role().equals(owner.role())){
                         session.write(toMessage("upgraded",this.tokenValidatorProvider.grantAccess(u,owner)).getBytes());
@@ -67,7 +67,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         else if(session.action().equals("onAddUser")){
             if(accessIndexEnabled.get()){
                 OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-                Access ua =  userService.loadUser(session.oid());
+                Access ua =  userService.loadUser(session.distributionId());
                 AccessIndex query = accessIndexService.set((String)onAccess.property("login"),AccessIndex.USER_INDEX);
                 if(query!=null){
                     onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner
@@ -97,7 +97,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
             chargeParams.put("currency", "usd");
             chargeParams.put("description",item.description);
             if(this.context.validator().validateToken(chargeParams)){
-                Subscription subscription = userService.subscribe(session.oid(),12);
+                Subscription subscription = userService.subscribe(null,12);
                 session.write(toMessage( "on commit",true).getBytes());
             }
             else {
@@ -127,10 +127,10 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         SubscriptionItem item2 = new SubscriptionItem(SystemUtil.oid(),"Yearly","one year subscription",19.99,true);
         SubscriptionItem item3 = new SubscriptionItem(SystemUtil.oid(),"2-Month","two month subscription",2.99,true);
         SubscriptionItem item4 = new SubscriptionItem(SystemUtil.oid(),"2-Year","two year subscription",29.99,true);
-        _items.put(item1.oid(),item1);
-        _items.put(item2.oid(),item2);
-        _items.put(item3.oid(),item3);
-        _items.put(item4.oid(),item4);
+        //_items.put(item1.oid(),item1);
+        //_items.put(item2.oid(),item2);
+        //_items.put(item3.oid(),item3);
+        //_items.put(item4.oid(),item4);
         this.context.log("Account role module started with max user count ["+trialMaxUserCount+","+subscribedMaxUserCount+"]", OnLog.INFO);
     }
 

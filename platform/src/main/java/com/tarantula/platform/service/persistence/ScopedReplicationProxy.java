@@ -130,4 +130,8 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public void assignKey(Recoverable.DataBuffer dataBuffer){
 
     }
+
+    public long distributionId(){
+        return 1;//snowflakeIdGenerator.snowflakeId();
+    }
 }

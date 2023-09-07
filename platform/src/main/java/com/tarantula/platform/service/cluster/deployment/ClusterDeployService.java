@@ -60,7 +60,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void destroyDistributedObject(String s) {
     }
 
-    public void onCreateGameCluster(String gameClusterId){
+    public void onCreateGameCluster(long gameClusterId){
         this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameClusterId);
     }
 
@@ -115,19 +115,19 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onUpload(String fileName,byte[] content){
         this.tarantulaContext._writeContent(fileName,content);
     }
-    public void onStartGameService(String gameClusterKey){
+    public void onStartGameService(long gameClusterKey){
         this.deploymentServiceProvider.distributionCallback().onGameServiceStarted(gameClusterKey);
     }
-    public void onLaunchGameCluster(String gameClusterKey){
+    public void onLaunchGameCluster(long gameClusterKey){
         this.deploymentServiceProvider.distributionCallback().onGameClusterLaunched(gameClusterKey);
     }
-    public void onShutdownGameCluster(String gameClusterKey){
+    public void onShutdownGameCluster(long gameClusterKey){
         this.deploymentServiceProvider.distributionCallback().onGameClusterShutdown(gameClusterKey);
     }
-    public void onLaunchApplication(String typeId,String applicationId){
+    public void onLaunchApplication(String typeId,long applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationLaunched(typeId,applicationId);
     }
-    public void onShutdownApplication(String typeId,String applicationId){
+    public void onShutdownApplication(String typeId,long applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationShutdown(typeId,applicationId);
     }
     public void onLaunchModule(String typeId){

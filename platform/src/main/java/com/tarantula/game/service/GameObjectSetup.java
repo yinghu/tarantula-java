@@ -178,7 +178,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         dataStore.update(versionedConfigurableObject);
     }
     private void deleteVersion(DataStore dataStore,ConfigurableObject configurableObject){
-        dataStore.list(new VersionedConfigurableObjectQuery(configurableObject.oid()),v->{
+        dataStore.list(new VersionedConfigurableObjectQuery(configurableObject.distributionId()),v->{
             dataStore.delete(v);
             return true;
         });

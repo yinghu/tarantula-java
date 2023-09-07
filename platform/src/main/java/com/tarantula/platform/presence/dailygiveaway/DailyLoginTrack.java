@@ -48,7 +48,7 @@ public class DailyLoginTrack extends RecoverableObject {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.oid,this.label);
+        return new AssociateKey(this.distributionId,this.label);
     }
 
     public boolean checkDailyLogin(int pendingHours,int maxDays,int maxTier){

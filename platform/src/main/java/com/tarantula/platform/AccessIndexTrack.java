@@ -22,7 +22,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public AccessIndexTrack(String owner,String bucket,String oid,int referenceId){
         this.owner = owner;
         this.bucket = bucket;
-        this.oid = oid;
+        //this.oid = oid;
         this.referenceId = referenceId;
     }
 
@@ -56,38 +56,38 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.owner);
         out.writeUTF("2",this.bucket);
-        out.writeUTF("3",this.oid);
+        //out.writeUTF("3",this.oid);
         out.writeInt("4",this.referenceId);
+        out.writeLong("5",distributionId);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.owner = in.readUTF("1");
         this.bucket = in.readUTF("2");
-        this.oid = in.readUTF("3");
+        //this.oid = in.readUTF("3");
         this.referenceId = in.readInt("4");
+        this.distributionId = in.readLong("5");
     }
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",bucket);
-        this.properties.put("2",oid);
+        //this.properties.put("2",oid);
         this.properties.put("3",referenceId);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.bucket = (String)properties.get("1");
-        this.oid = (String)properties.get("2");
+        //this.oid = (String)properties.get("2");
         this.referenceId = ((Number)properties.get("3")).intValue();
     }
 
     @Override
     public String toString(){
-        return "Access Index ["+owner+"]->"+bucket+"/"+oid+"] referenceID =>"+referenceId+"]";
+        return "Access Index ["+owner+"]->"+bucket+"/"+distributionId+"] referenceID =>"+referenceId+"]";
     }
-    public void distributionKey(String distributionKey){
-       //skip the natural key
-    }
+
     public Key key(){
         return new NaturalKey(this.owner);
     }
@@ -95,7 +95,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",owner);
-        jsonObject.addProperty("oid",oid());
+        //jsonObject.addProperty("oid",oid());
         jsonObject.addProperty("referenceId",referenceId);
         return jsonObject;
     }
@@ -104,15 +104,17 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     @Override
     public boolean read(DataBuffer buffer){
         this.bucket = buffer.readUTF8();
-        this.oid = buffer.readUTF8();
+        //this.oid = buffer.readUTF8();
         this.referenceId = buffer.readInt();
+        this.distributionId = buffer.readLong();
         return true;
     }
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeUTF8(bucket);
-        buffer.writeUTF8(oid);
+        //buffer.writeUTF8(oid);
         buffer.writeInt(referenceId);
+        buffer.writeLong(distributionId);
         return true;
     }
     @Override

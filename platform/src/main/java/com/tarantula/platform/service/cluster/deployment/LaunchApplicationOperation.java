@@ -10,12 +10,12 @@ import java.io.IOException;
 public class LaunchApplicationOperation extends Operation {
 
     private String typeId;
-    private String applicationKey;
+    private long applicationKey;
     public LaunchApplicationOperation() {
     }
 
 
-    public LaunchApplicationOperation(String typeId,String applicationKey) {
+    public LaunchApplicationOperation(String typeId,long applicationKey) {
         this.typeId = typeId;
         this.applicationKey = applicationKey;
     }
@@ -34,13 +34,13 @@ public class LaunchApplicationOperation extends Operation {
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(typeId);
-        out.writeUTF(applicationKey);
+        out.writeLong(applicationKey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         this.typeId = in.readUTF();
-        this.applicationKey = in.readUTF();
+        this.applicationKey = in.readLong();
     }
 }

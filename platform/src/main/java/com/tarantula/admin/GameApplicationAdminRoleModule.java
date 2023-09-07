@@ -18,7 +18,7 @@ public class GameApplicationAdminRoleModule implements Module {
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             Descriptor app = gameCluster.serviceWithCategory(query[1]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),query[2].split("/")[1]));
@@ -26,7 +26,7 @@ public class GameApplicationAdminRoleModule implements Module {
         }
         else if(session.action().equals("onLoad")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
@@ -42,7 +42,7 @@ public class GameApplicationAdminRoleModule implements Module {
         else if (session.action().equals("onRegister")){
 
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
@@ -59,7 +59,7 @@ public class GameApplicationAdminRoleModule implements Module {
         }
         else if (session.action().equals("onRelease")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             Application app = new Application();
             app.distributionKey(query[1]);

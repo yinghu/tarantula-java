@@ -104,7 +104,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.oid());
+            logger.warn(a.configurationCategory()+""+a.distributionId());
             if(!a.disabled()){
                 a.setup();
                 lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);

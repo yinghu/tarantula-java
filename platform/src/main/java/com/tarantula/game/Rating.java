@@ -67,7 +67,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeUTF("1",bucket);
-        portableWriter.writeUTF("2",oid);
+        portableWriter.writeLong("2",distributionId);
         portableWriter.writeInt("3",rank);
         portableWriter.writeInt("4",level);
         portableWriter.writeDouble("5",levelUpXp);
@@ -76,7 +76,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         bucket = portableReader.readUTF("1");
-        oid = portableReader.readUTF("2");
+        distributionId = portableReader.readLong("2");
         rank = portableReader.readInt("3");
         level = portableReader.readInt("4");
         levelUpXp = portableReader.readDouble("5");
@@ -84,7 +84,7 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
 
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.oid,this.label);
+        return new AssociateKey(this.distributionId,this.label);
     }
 
     public JsonObject toJson(){

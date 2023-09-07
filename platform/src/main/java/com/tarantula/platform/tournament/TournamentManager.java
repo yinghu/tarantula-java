@@ -197,7 +197,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         portableWriter.writeLong("6",TimeUtil.toUTCMilliseconds(endTime));
         portableWriter.writeInt("7",durationMinutes);
         portableWriter.writeUTF("8",bucket);
-        portableWriter.writeUTF("9",oid);
+        portableWriter.writeLong("9",distributionId);
     }
 
     @Override
@@ -209,7 +209,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.endTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("6"));
         this.durationMinutes = portableReader.readInt("7");
         this.bucket = portableReader.readUTF("8");
-        this.oid = portableReader.readUTF("9");
+        this.distributionId = portableReader.readLong("9");
     }
 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
@@ -244,11 +244,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 pendingQueue.offer(createInstance());
             }
         }
-        this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.oid(),true,false,false);
+        this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.distributionKey(),true,false,false);
         this.instanceStores = new ClusterProvider.ClusterStore[this.tournamentServiceProvider.concurrentInstanceSize];
         String storeSize = storeSize(this.maxEntriesPerInstance);
         for(int i=0;i<this.tournamentServiceProvider.concurrentInstanceSize;i++){
-            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(storeSize,this.oid()+"."+i,false,false,true);
+            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(storeSize,this.distributionKey()+"."+i,false,false,true);
             tryStartingInstance(i);
         }
         status = Status.STARTED;

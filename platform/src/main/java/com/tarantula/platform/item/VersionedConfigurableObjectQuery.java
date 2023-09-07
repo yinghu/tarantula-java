@@ -3,11 +3,12 @@ package com.tarantula.platform.item;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 
 public class VersionedConfigurableObjectQuery implements RecoverableFactory<ConfigurableObject> {
 
-    public String itemId;
-    public VersionedConfigurableObjectQuery(String itemId){
+    public long itemId;
+    public VersionedConfigurableObjectQuery(long itemId){
         this.itemId = itemId;
 
     }
@@ -28,12 +29,9 @@ public class VersionedConfigurableObjectQuery implements RecoverableFactory<Conf
     }
 
 
-    public String distributionKey() {
-        return itemId;
-    }
 
     @Override
     public Recoverable.Key key() {
-        return new OidKey(itemId);
+        return new SnowflakeKey(itemId);
     }
 }

@@ -63,7 +63,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.tokenValidatorProvider().presence(session);
     }
     public void absence(Session session){
-        this.validator.offSession(session.oid(),session.stub());
+        this.validator.offSession(session.distributionKey(),session.stub());
     }
 
     public Lobby lobby(String typeId){

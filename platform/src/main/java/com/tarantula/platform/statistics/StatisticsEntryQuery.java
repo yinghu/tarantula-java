@@ -2,14 +2,14 @@ package com.tarantula.platform.statistics;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 
 public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry> {
 
 
-    private String ownerId;
+    private long ownerId;
 
-    public StatisticsEntryQuery(String ownerId){
+    public StatisticsEntryQuery(long ownerId){
         this.ownerId = ownerId;
     }
 
@@ -33,6 +33,6 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
 
     @Override
     public Recoverable.Key key(){
-        return new OidKey(ownerId);
+        return new SnowflakeKey(ownerId);
     }
 }

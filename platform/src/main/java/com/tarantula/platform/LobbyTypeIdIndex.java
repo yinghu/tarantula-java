@@ -9,18 +9,18 @@ public class LobbyTypeIdIndex extends AssociateObject {
 
     }
     //for query
-    public LobbyTypeIdIndex(String bucketId,String typeId){
-        this.oid = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId){
+        this.distributionId = bucketId;
         this.label =  typeId;
     }
     //for create
-    public LobbyTypeIdIndex(String bucketId,String typeId,String lobbyId){
-        this.oid = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId,String lobbyId){
+        this.distributionId = bucketId;
         this.label =  typeId;
         this.owner = lobbyId;
     }
-    public LobbyTypeIdIndex(String bucketId,String typeId,String lobbyId,String gameClusterId){
-        this.oid = bucketId;
+    public LobbyTypeIdIndex(long bucketId,String typeId,String lobbyId,String gameClusterId){
+        this.distributionId = bucketId;
         this.label =  typeId;
         this.owner = lobbyId;
         this.index = gameClusterId;//game cluster id

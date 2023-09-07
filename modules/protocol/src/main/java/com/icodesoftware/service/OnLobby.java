@@ -8,8 +8,8 @@ public interface OnLobby extends Configurable {
     String TYPE = "OnLobby";
 
     String typeId(); //associated with lobby id
-    String gameClusterId(); //associated with game cluster
-    String subscriptionId(); //associated with membership
+    long gameClusterId(); //associated with game cluster
+    long subscriptionId(); //associated with membership
     int deployCode();
     boolean resetEnabled();
     boolean closed();

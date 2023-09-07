@@ -146,14 +146,14 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             registerCategory(GAME_TIMEOUT_COUNT);
         }
         //this.serviceContext = serviceContext;
-        String nodeId = serviceContext.node().nodeId();
+        long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();
-        this.statistics.oid(nodeId);
+        this.statistics.distributionId(nodeId);
         this.statistics.dataStore(this.dataStore);
         this.dataStore.createIfAbsent(statistics,true);
         this.bucket = this.statistics.bucket();
-        this.oid = this.statistics.oid();
+        //this = this.statistics.oid();
         logger.warn("Metrics statistics loaded->"+statistics.key().asString());
         //reset snapshots
         for(String category : categories){
@@ -464,7 +464,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         return snapshots.computeIfAbsent(ckey,k->{
             MetricsSnapshot pending = new MetricsSnapshot(metricsTrackingNumber,category,classifier);
             pending.bucket(bucket);
-            pending.oid(oid);
+            //pending.distributionId(dis);
             initialize(classifier,pending,LocalDateTime.now());
             pending.dataStore(this.dataStore);
             this.dataStore.createIfAbsent(pending,true);

@@ -3,14 +3,15 @@ package com.tarantula.admin;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.GameCluster;
 
 public class GameClusterQuery implements RecoverableFactory<GameCluster> {
 
 
-    private String accountId;
+    private long accountId;
 
-    public GameClusterQuery(String accountId){
+    public GameClusterQuery(long accountId){
         this.accountId = accountId;
     }
     @Override
@@ -30,6 +31,6 @@ public class GameClusterQuery implements RecoverableFactory<GameCluster> {
 
     @Override
     public Recoverable.Key key() {
-        return new OidKey(accountId);
+        return new SnowflakeKey(accountId);
     }
 }

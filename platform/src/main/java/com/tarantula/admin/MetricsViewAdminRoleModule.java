@@ -31,11 +31,11 @@ public class MetricsViewAdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
-            Access acc = userService.loadUser(session.oid());
+            Access acc = userService.loadUser(session.distributionId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if(session.action().equals("onMetricsList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             String serviceName = gameCluster.gameServiceName;//(String) gameCluster.property(GameCluster.GAME_SERVICE);
             Metrics m = this.context.metrics(serviceName);
             JsonObject jsonObject = new JsonObject();

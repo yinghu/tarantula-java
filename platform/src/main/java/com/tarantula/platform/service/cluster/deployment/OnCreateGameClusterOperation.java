@@ -9,14 +9,14 @@ import java.io.IOException;
 
 public class OnCreateGameClusterOperation extends Operation {
 
-    private String akey;
+    private long akey;
 
 
     public OnCreateGameClusterOperation() {
     }
 
 
-    public OnCreateGameClusterOperation(String akey) {
+    public OnCreateGameClusterOperation(long akey) {
         this.akey = akey;
     }
     @Override
@@ -33,12 +33,12 @@ public class OnCreateGameClusterOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(akey);
+        out.writeLong(akey);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.akey = in.readUTF();
+        this.akey = in.readLong();
     }
 }

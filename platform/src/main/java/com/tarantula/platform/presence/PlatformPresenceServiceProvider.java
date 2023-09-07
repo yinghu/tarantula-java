@@ -47,7 +47,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     @Override
     public void start() throws Exception {
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
-        this.recentlyPlayList.oid(this.gameCluster.oid());
+        this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
         this.recentlyPlayList.dataStore(this.dataStore);
         this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{

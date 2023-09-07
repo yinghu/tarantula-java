@@ -111,6 +111,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public AccessIndex set(String accessKey,int referenceId){
         DataStoreOnPartition dso = this.onPartition(accessKey);
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,bucket, SystemUtil.oid(),referenceId);
+        //accessIndex.distributionId();
         //accessIndex.id(tarantulaContext.deploymentDataStoreProvider.nextId(dso.name));
         byte[] key = accessKey.getBytes();
         boolean suc = dso.lock(key,()->

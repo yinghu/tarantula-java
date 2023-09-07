@@ -15,7 +15,7 @@ public class OnAccessSerializer implements JsonSerializer<OnAccess> {
         jo.addProperty("timestamp",access.timestamp());
         jo.addProperty("accessKey",(String) access.property(OnAccess.ACCESS_KEY));
         jo.addProperty("accessId",(String) access.property(OnAccess.ACCESS_ID));
-        jo.addProperty("oid",access.oid());
+        jo.addProperty("oid",access.distributionId());
         //jo.addProperty("accessMode",access.accessMode());
         return jo;
     }

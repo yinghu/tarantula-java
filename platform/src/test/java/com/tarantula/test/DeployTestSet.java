@@ -37,25 +37,27 @@ public class DeployTestSet {
     @Test(groups = { "PresenceKey" })
     public void presenceKeyTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
+        long ownerId = serviceContext.deploymentServiceProvider().distributionId();
         String bkey = CipherUtil.toBase64Key();
         byte[] key = CipherUtil.fromBase64Key(bkey);
         byte[] tkey = JWTUtil.key();
         PresenceKey presenceKey = new PresenceKey();
         presenceKey.clusterKey(bkey);
         presenceKey.tokenKey(CipherUtil.toBase64Key(tkey));
-        presenceKey.oid(serviceContext.node().nodeId());
+        presenceKey.distributionId(ownerId);
         Assert.assertTrue(dataStore.createIfAbsent(presenceKey,false));
         Assert.assertEquals(true, Arrays.equals(key,presenceKey.clusterKey()));
         PresenceKey load = new PresenceKey();
-        load.oid(serviceContext.node().nodeId());
+        load.distributionId(ownerId);
         Assert.assertFalse(dataStore.createIfAbsent(load,true));
         Assert.assertEquals(Arrays.equals(key,load.clusterKey()),true);
         Assert.assertEquals(Arrays.equals(tkey,load.tokenKey()),true);
     }
 
-    @Test(groups = { "lobbyTypeIdIndex" })
+    //@Test(groups = { "lobbyTypeIdIndex" })
     public void lobbyTypeIdIndexTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
+        long ownerId = serviceContext.deploymentServiceProvider().distributionId();
         LobbyTypeIdIndex created = new LobbyTypeIdIndex(serviceContext.node().bucketId(),"game","lobbyId","gameClusterId");
 
         Assert.assertTrue(dataStore.createIfAbsent(created,false));

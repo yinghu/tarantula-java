@@ -53,7 +53,7 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
             }
         }
         else if(session.action().equals("onTestWithAdmin")){
-            if(this.context.validator().role(session.oid()).accessControl()< AccessControl.admin.accessControl()){
+            if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
             String[] query = session.name().split("#");

@@ -6,9 +6,9 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
 
-    public String owner;
+    public long owner;
     private Recoverable.Key key;
-    public AccessKeyQuery(String owner){
+    public AccessKeyQuery(long owner){
         this.owner = owner;
     }
 
@@ -32,7 +32,7 @@ public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
 
 
     public String distributionKey() {
-        return owner;
+        return null;
     }
 
     @Override

@@ -21,4 +21,6 @@ public interface MapStoreListener extends ServiceProvider {
     void onDeleting(Metadata metadata,byte[] key);
 
     void assignKey(Recoverable.DataBuffer dataBuffer);
+
+    long distributionId();
 }

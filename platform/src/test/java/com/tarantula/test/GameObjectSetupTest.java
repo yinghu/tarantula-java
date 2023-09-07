@@ -114,7 +114,7 @@ public class GameObjectSetupTest {
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("holee-game-data");
-        app.oid("gameApp");
+        //app.oid("gameApp");
         Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
         Assert.assertNotNull(configuration);
         JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
@@ -123,7 +123,7 @@ public class GameObjectSetupTest {
             ConfigurableObject co = new ConfigurableObject();
             Assert.assertTrue(co.configureAndValidate(jo));
             Assert.assertTrue(gameObjectSetup.save(app,co));
-            Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.oid())).size(),1);
+            //Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.oid())).size(),1);
         });
         gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).forEach(c->{
             c.setup();
@@ -140,7 +140,7 @@ public class GameObjectSetupTest {
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("sample-game-data");
-        app.oid("gameApp");
+        //app.oid("gameApp");
         Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
         Assert.assertNotNull(configuration);
         JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();

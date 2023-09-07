@@ -47,13 +47,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-    private SnowflakeIdGenerator snowflakeIdGenerator;
+    //private SnowflakeIdGenerator snowflakeIdGenerator;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
-        this.snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(20202,1,1));
+        //this.snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(20202,1,1));
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
@@ -195,6 +195,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         mapStoreListener.assignKey(dataBuffer);
     }
 
+    public long distributionId(){
+        return mapStoreListener.distributionId();
+    }
     private Path path(String path) throws Exception{
         Path _path = Paths.get(path);
         if(!Files.exists(_path)) Files.createDirectories(_path);

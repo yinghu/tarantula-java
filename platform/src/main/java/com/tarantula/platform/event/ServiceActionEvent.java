@@ -33,7 +33,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		out.writeUTF("13",this.destination);
 		out.writeUTF("15",this.tournamentId);
 		out.writeUTF("16",this.name);
-		out.writeUTF("17",this.oid);
+		//out.writeUTF("17",this.oid);
 	}
 	@Override
 	public void readPortable(PortableReader in) throws IOException {
@@ -51,7 +51,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		this.destination = in.readUTF("13");
 		this.tournamentId = in.readUTF("15");
 		this.name = in.readUTF("16");
-		this.oid = in.readUTF("17");
+		//this.oid = in.readUTF("17");
 	}
 	@Override
 	public int getClassId() {
@@ -64,6 +64,6 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 
     @Override
 	public String toString(){
-		return "SERVICE ACTION EVENT ["+action+"]["+this.oid+"/"+this.stub+"]";
+		return "SERVICE ACTION EVENT ["+action+"]["+this.distributionId()+"/"+this.stub+"]";
 	}
 }

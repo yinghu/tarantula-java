@@ -28,11 +28,14 @@ public class AccessIndexTest {
         DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME_PREFIX+1);
         String access = "access100";
         AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access,"BDS",SystemUtil.oid(), AccessIndex.USER_INDEX);
-        Assert.assertNotNull(accessIndexTrack.oid());
+        accessIndexTrack.distributionId(serviceContext.deploymentServiceProvider().distributionId());
+        //Assert.assertNotNull(accessIndexTrack.oid());
+        Assert.assertTrue(accessIndexTrack.distributionId()>0);
         Assert.assertTrue(dataStore.createIfAbsent(accessIndexTrack,false));
         AccessIndex load = new AccessIndexTrack(access);
         Assert.assertTrue(dataStore.load(load));
-        Assert.assertEquals(accessIndexTrack.oid(),load.oid());
+        //Assert.assertEquals(accessIndexTrack.oid(),load.oid());
+        Assert.assertEquals(accessIndexTrack.distributionId(),load.distributionId());
         Assert.assertTrue(dataStore.delete(accessIndexTrack));
         Assert.assertFalse(dataStore.load(accessIndexTrack));
     }

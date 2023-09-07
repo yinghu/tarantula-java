@@ -71,22 +71,23 @@ public class Stub extends PlayerGameObject {
     }
     @Override
     public Recoverable.Key key(){
-        return new StubKey(this.bucket,this.oid,label,stub);
+        return new StubKey(this.bucket,this.owner,label,stub);
     }
     @Override
     public String distributionKey() {
-        if(this.bucket!=null&&this.oid!=null){
-            return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
-        }
-        else{
-            return null;
-        }
+        //if(this.bucket!=null&&this.oid!=null){
+            //return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+        //}
+        //else{
+           // return null;
+        //}
+        return null;
     }
     @Override
     public void distributionKey(String distributionKey) {
         String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
         this.bucket = klist[0];
-        this.oid = klist[1];
+        //this.oid = klist[1];
     }
     @Override
     public int getFactoryId() {

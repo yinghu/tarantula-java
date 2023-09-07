@@ -11,6 +11,7 @@ import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
@@ -116,7 +117,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void load(){
         int[] created ={0};
-        dataStore.list(new GameEntryQuery(this.oid()),(ge)->{
+        dataStore.list(new GameEntryQuery(this.distributionId()),(ge)->{
             entries[ge.seat()]=ge;
             if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
             created[0]++;
@@ -128,7 +129,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             entry.seat(i);
             entry.occupied(false);
             entry.owner(this.distributionKey());
-            entry.ownerKey(new OidKey(this.oid));
+            entry.ownerKey(new SnowflakeKey(this.distributionId));
             if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
             entries[i]=entry;
         }
@@ -207,7 +208,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",round);
         portableWriter.writeUTF("2",bucket);
-        portableWriter.writeUTF("3",oid);
+        portableWriter.writeLong("3",distributionId);
         portableWriter.writeInt("4",capacity);
         portableWriter.writePortableArray("5",entries);
     }
@@ -215,7 +216,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public void readPortable(PortableReader portableReader) throws IOException {
         this.round = portableReader.readInt("1");
         this.bucket = portableReader.readUTF("2");
-        this.oid = portableReader.readUTF("3");
+        this.distributionId = portableReader.readLong("3");
         this.entries = new Entry[portableReader.readInt("4")];
         for(Portable p : portableReader.readPortableArray("5")){
             Entry gameEntry = (Entry)p;
@@ -260,7 +261,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         GameRoom room = duplicate();
         if(room==null) return this;
         room.bucket(this.bucket);
-        room.oid(this.oid);
+        room.distributionId(this.distributionId);
         return room;
     }
 

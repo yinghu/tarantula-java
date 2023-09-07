@@ -30,8 +30,8 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
 
     //game server register key on game cluster lobby tyeId
     <T extends OnAccess> T validateGameClusterAccessKey(String gameClusterId);
-    String createGameClusterAccessKey(String gameClusterId);
-    List<String> gameClusterAccessKeyList(String gameClusterId);
+    String createGameClusterAccessKey(long gameClusterId);
+    List<String> gameClusterAccessKeyList(long gameClusterId);
 
 
     void timeout(int minutes,int seconds);
@@ -39,7 +39,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     Presence presence(Session session);
     //void updateVendorAccessToken(String systemId,String accessToken);
 
-    Access.Role role(String systemId);
+    Access.Role role(long systemId);
     boolean checkRole(Access access,String role);
     boolean upgradeRole(Access access,String role);
     boolean grantAccess(Access access,Access owner);

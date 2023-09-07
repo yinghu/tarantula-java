@@ -22,14 +22,14 @@ public class CurrentSaveIndex extends RecoverableObject {
     }
 
     public CurrentSaveIndex(Session session){
-        this.oid = session.systemId();
+        //this.oid = session.systemId();
         this.routingNumber = session.stub();
     }
 
 
     public CurrentSaveIndex(String key){
         String[] query = key.split(Recoverable.PATH_SEPARATOR);
-        this.oid = query[0];
+        //this.oid = query[0];
         this.routingNumber = Integer.parseInt(query[1]);
     }
 
@@ -73,19 +73,19 @@ public class CurrentSaveIndex extends RecoverableObject {
     }
     @Override
     public Recoverable.Key key(){
-        return new SaveKey(this.oid,routingNumber);
+        return new SaveKey(this.owner,routingNumber);
     }
 
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
-        oid = buffer.readUTF8();
+        //oid = buffer.readUTF8();
         routingNumber = buffer.readInt();
         return true;
     }
     @Override
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(oid==null) return false;
-        buffer.writeUTF8(oid);
+        //if(oid==null) return false;
+        //buffer.writeUTF8(oid);
         buffer.writeInt(routingNumber);
         return true;
     }

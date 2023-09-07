@@ -26,6 +26,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void verifyConnection(String typeId,String serverId);
     byte[] serverKey(String typeId);
 
+    long distributionId();
 
     String registerGameServerListener(GameServerListener gameServerListener);
     void unregisterGameServerListener(String registerKey);
@@ -64,18 +65,18 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     boolean createApplication(Descriptor descriptor,String postSetup,String configName,boolean launching);
 
     boolean updateApplication(Descriptor descriptor,OnAccess properties);
-    boolean enableApplication(String applicationId);
-    boolean disableApplication(String applicationId);
+    boolean enableApplication(long applicationId);
+    boolean disableApplication(long applicationId);
 
-    <T extends OnAccess> T createGameCluster(String accountId,String name,OnAccess properties);
+    <T extends OnAccess> T createGameCluster(Account account,String name,OnAccess properties);
 
     <T extends OnAccess> List<T> gameClusterList(Access access);
-    <T extends OnAccess> T updateGameCluster(String gameClusterId,OnAccess properties);
+    <T extends OnAccess> T updateGameCluster(long gameClusterId,OnAccess properties);
 
 
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
-    <T extends OnAccess> T gameCluster(String key);
+    <T extends OnAccess> T gameCluster(long key);
     List<Descriptor> gameServiceList();
     <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config);
     Lobby lobby(String typeId);
@@ -100,19 +101,19 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //local callbacks on distributed operations
     interface DistributionCallback{
 
-        void onGameServiceStarted(String gameClusterId);
+        void onGameServiceStarted(long gameClusterId);
 
-        void onGameClusterLaunched(String gameClusterId);
-        void onGameClusterShutdown(String gameClusterId);
-        void onGameClusterCreated(String gameClusterId);
+        void onGameClusterLaunched(long gameClusterId);
+        void onGameClusterShutdown(long gameClusterId);
+        void onGameClusterCreated(long gameClusterId);
 
         void onModuleLaunched(String typeId);
         void onModuleShutdown(String typeId);
         void onModuleUpdated(Descriptor descriptor);
         void onModuleDeployed(String contentUrl,String resourceName);
 
-        void onApplicationLaunched(String typeId,String applicationId);
-        void onApplicationShutdown(String typeId,String applicationId);
+        void onApplicationLaunched(String typeId,long applicationId);
+        void onApplicationShutdown(String typeId,long applicationId);
 
         void onViewUpdated(OnView onView);
 

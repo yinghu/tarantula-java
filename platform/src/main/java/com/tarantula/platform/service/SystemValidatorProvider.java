@@ -4,10 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.CipherUtil;
-import com.icodesoftware.util.JWTUtil;
-import com.icodesoftware.util.OidKey;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.util.*;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
@@ -35,7 +32,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private int timeoutInSeconds;
 
     private ServiceContext serviceContext;
-    private ConcurrentHashMap<String,PresenceIndex> pMap;
+    private ConcurrentHashMap<Long,PresenceIndex> pMap;
     private HashMap<String,Access.Role> rMap;
     private HashMap<String,AuthVendorRegistry> aMap;
     private DataStore pdataStore;//presence
@@ -73,9 +70,9 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return systemValidator.tokenValidator();
     }
     public Presence presence(Session session){
-        Presence presence = pMap.computeIfAbsent(session.oid(),(k)->{
+        Presence presence = pMap.computeIfAbsent(session.distributionId(),(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.oid(session.oid());
+            px.distributionId(session.distributionId());
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -90,15 +87,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             pdataStore.update(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
-            pMap.put(session.oid(),px);
+            pMap.put(session.distributionId(),px);
             return px;
         }
         return presence;
     }
-    public Presence presence(String id){
+    public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex();
-            px.oid(id);
+            px.distributionId(id);
             pdataStore.load(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
@@ -225,7 +222,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return null;
     }
     public List<OnAccess> accessKeyList(){
-        AccessKeyQuery query = new AccessKeyQuery(new OidKey(this.serviceContext.node().oid()));
+        AccessKeyQuery query = new AccessKeyQuery(new SnowflakeKey(this.serviceContext.node().nodeId()));
         ArrayList<OnAccess> keys = new ArrayList<>();
         deployDataStore.list(query,accessKey -> {
             if(!accessKey.disabled()) keys.add(accessKey);
@@ -246,7 +243,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         AccessKey akey = new AccessKey();
         akey.distributionKey(sp[0]);
         if(!this.deployDataStore.load(akey) || akey.disabled()) return null;
-        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.index());
+        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.distributionId());
         if(gameCluster==null) return null;
         String validLobby = gameCluster.gameLobbyName;
         String wmark = SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp());
@@ -254,18 +251,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(wm.equals(wmark)) return (T)gameCluster;
         return null;
     }
-    public String createGameClusterAccessKey(String gameClusterId){
+    public String createGameClusterAccessKey(long gameClusterId){
         GameCluster gc = this.deploymentServiceProvider.gameCluster(gameClusterId);
         long stmp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId(gc.gameLobbyName);
         accessKey.timestamp(stmp);
-        accessKey.owner(gameClusterId);
+        accessKey.distributionId(gameClusterId);
         if(!this.deployDataStore.create(accessKey)) return null;
         byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
         return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp,SystemUtil.toHexString(wmark));
     }
-    public List<String> gameClusterAccessKeyList(String gameClusterId){
+    public List<String> gameClusterAccessKeyList(long gameClusterId){
         AccessKeyQuery query = new AccessKeyQuery(gameClusterId);
         ArrayList<String> keys = new ArrayList<>();
         deployDataStore.list(query,accessKey -> {
@@ -288,12 +285,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public List<Access.Role> list(){
         return roleList;
     }
-    public Access.Role role(String systemId){
-        if(systemId==null){
+    public Access.Role role(long systemId){
+        if(systemId==0){
             return rMap.get("player");
         }
         Access acc = new User();
-        acc.oid(systemId);
+        acc.distributionId(systemId);
         if(udataStore.load(acc)){
             return rMap.get(acc.role());
         }
@@ -310,7 +307,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public void onCheck(OnLobby onLobby){
         Subscription subscription = new Membership();
-        subscription.distributionKey(onLobby.subscriptionId());
+        subscription.distributionId(onLobby.subscriptionId());
         if(mdatastore.load(subscription)) {
             oMap.put(onLobby.typeId(), onLobby);
             log.warn(onLobby+ " has been monitored at expiration time ->" + TimeUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -351,7 +348,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         LocalDateTime _curr = LocalDateTime.now();
         oMap.forEach((k,o)->{
             Subscription subscription = new Membership();
-            subscription.distributionKey(o.subscriptionId());
+            subscription.distributionId(o.subscriptionId());
             if(this.mdatastore.load(subscription)){
                 LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
                 if(end.isBefore(_curr)){
@@ -365,14 +362,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
         rlist.forEach((k)->{
             OnLobby o = oMap.remove(k);
-            GameCluster g = this.deploymentServiceProvider.gameCluster(k);//new GameCluster();
-            g.oid(o.gameClusterId());
+            GameCluster g = this.deploymentServiceProvider.gameCluster(o.gameClusterId());//new GameCluster();
+            g.distributionId(o.gameClusterId());
             if(g!=null){
                 g.disabled(true);
                 deployDataStore.update(g);
             }
             Account acc = new UserAccount();
-            acc.oid(o.subscriptionId());
+            acc.distributionId(o.subscriptionId());
             if(adataStore.load(acc)){
                 acc.trial(false);
                 acc.subscribed(false);
@@ -574,7 +571,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
             Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
-            dataBuffer.writeUTF8(access.oid()).writeInt(session.stub());
+            //dataBuffer.writeUTF8(access.oid()).writeInt(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
@@ -593,11 +590,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
             String id = dataBuffer.readUTF8();
             int stub = dataBuffer.readInt();
-            onSession.oid(id);
+            //onSession.oid(id);
             onSession.stub(stub);
             return true;
         })) return OnSessionTrack.INVALID_TOKEN;
-        onSession.ticket(ticket(onSession.oid(),onSession.stub(),timeoutInSeconds));
+        onSession.ticket(ticket(onSession.distributionKey(),onSession.stub(),timeoutInSeconds));
         return onSession;
     }
 

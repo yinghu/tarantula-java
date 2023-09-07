@@ -33,7 +33,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     public Entry entry(String key) {
         SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
             //new entry
-            SystemStatisticsEntry se = new SystemStatisticsEntry(this.bucket,this.oid,k);
+            SystemStatisticsEntry se = new SystemStatisticsEntry(this.bucket,this.owner,k);
             se.dataStore(this.dataStore);
             return se;
         });
@@ -77,7 +77,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     @Override
     public void fromMap(Map<String,Object> properties){
         properties.forEach((k,v)->{
-            SystemStatisticsEntry entry = new SystemStatisticsEntry(this.bucket,this.oid,k);
+            SystemStatisticsEntry entry = new SystemStatisticsEntry(this.bucket,this.distributionKey(),k);
             entry.dataStore(this.dataStore);
             //entry.load();
             mappings.put(k,entry);
@@ -85,7 +85,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     }
     @Override
     public Key key(){
-        return new AssociateKey(this.oid,this.label);
+        return new AssociateKey(this.distributionId,this.label);
     }
 
     @Override

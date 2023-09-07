@@ -83,7 +83,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
                 return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
             }
             String[] query = typeId.split("#");
-            GameCluster gameCluster = deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             if(gameCluster==null){
                 throw new RuntimeException("no game cluster setup");
             }

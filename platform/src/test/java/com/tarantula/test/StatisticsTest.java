@@ -39,7 +39,7 @@ public class StatisticsTest {
     public void statisticsHook(){
         DataStore ds = dataStoreProvider.createDataStore("statistics");
         UserStatistics userStatistics = new UserStatistics();
-        userStatistics.oid(UUID.randomUUID().toString());
+        //userStatistics.oid(UUID.randomUUID().toString());
         userStatistics.dataStore(ds);
         ds.createIfAbsent(userStatistics,true);
         userStatistics.load();
@@ -48,7 +48,7 @@ public class StatisticsTest {
         ///Assert.assertTrue(kills.id()>0);
         //Assert.assertTrue(wins.id()>0);
         UserStatistics load = new UserStatistics();
-        load.oid(userStatistics.oid());
+        //load.oid(userStatistics.oid());
         Assert.assertFalse(ds.createIfAbsent(load,true));
         load.dataStore(ds);
         load.load();

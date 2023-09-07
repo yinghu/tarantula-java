@@ -29,7 +29,7 @@ public class VersionedConfigurableObject extends ConfigurableObject{
         //this.listener = configurableObject.listener;
         //this._reference = configurableObject._reference;
         this._configurableSetting = configurableObject._configurableSetting;
-        this.oid(configurableObject.oid());
+        this.distributionId(configurableObject.distributionId());
     }
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -40,19 +40,19 @@ public class VersionedConfigurableObject extends ConfigurableObject{
     }
 
     public boolean readKey(Recoverable.DataBuffer buffer){
-        oid = buffer.readUTF8();
+        distributionId = buffer.readLong();
         configurationVersion = buffer.readUTF8();
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(oid==null) return false;
-        buffer.writeUTF8(oid);
+        if(distributionId==0) return false;
+        buffer.writeLong(distributionId);
         buffer.writeUTF8(configurationVersion);
         return true;
     }
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.oid,this.configurationVersion);
+        return new AssociateKey(this.distributionId,this.configurationVersion);
     }
 
 }

@@ -65,7 +65,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.listener = configurableObject.listener;
         this._reference = configurableObject._reference;
         this._configurableSetting = configurableObject._configurableSetting;
-        this.oid(configurableObject.oid());
+        this.distributionId(configurableObject.distributionId());
     }
 
     public <T extends Configurable> void registerListener(Listener<T> listener){
@@ -192,8 +192,8 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        if(oid()==null) return jsonObject;
-        jsonObject.addProperty("ItemId", oid());
+        if(distributionId()==0) return jsonObject;
+        jsonObject.addProperty("ItemId", distributionId());
         header.entrySet().forEach(e->{
             String k  = e.getKey();
             JsonPrimitive pv = e.getValue().getAsJsonPrimitive();
@@ -232,7 +232,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.application = config.getAsJsonObject("application");
         this.reference = config.getAsJsonArray("reference");
         if(config.has("itemId")){
-            this.oid(config.get("itemId").getAsString());
+            this.distributionId(config.get("itemId").getAsLong());
             this.revision = Long.parseLong(config.get("revision").getAsString());
         }
         return true;

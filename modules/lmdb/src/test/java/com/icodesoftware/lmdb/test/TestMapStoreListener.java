@@ -47,6 +47,10 @@ public class TestMapStoreListener implements MapStoreListener {
         dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());
         //dataBuffer.writeUTF8(UUID.randomUUID().toString());
     }
+
+    public long distributionId(){
+        return snowflakeIdGenerator.snowflakeId();
+    }
     @Override
     public String name() {
         return null;

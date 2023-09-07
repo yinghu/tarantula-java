@@ -81,8 +81,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public int maxDataSize;
 
     public int upgradeVersion;
-    public String publishingId;
-    public String accountId;
+    public long publishingId;
+    public long accountId;
     public GameCluster(){
         this.onEdge = true;
     }
@@ -98,7 +98,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         portableWriter.writeUTF("2",message);
         if(successful){
             portableWriter.writeUTF("3",this.bucket);
-            portableWriter.writeUTF("4",oid);
+            portableWriter.writeLong("4",distributionId);
         }
     }
 
@@ -108,14 +108,14 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         message = portableReader.readUTF("2");
         if(successful){
             bucket = portableReader.readUTF("3");
-            oid = portableReader.readUTF("4");
+            distributionId = portableReader.readLong("4");
         }
     }
     public JsonObject toJson(){
         JsonObject jo = new JsonObject();
         jo.addProperty("successful",successful);
         jo.addProperty("message",message);
-        jo.addProperty("gameClusterId",oid);
+        jo.addProperty("gameClusterId",distributionId);
         jo.addProperty("name",name);
         jo.addProperty("mode",mode);
         jo.addProperty("setup",applicationSetup);
@@ -150,8 +150,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         buffer.writeInt(maxLobbyCount);
         buffer.writeInt(maxZoneCount);
         buffer.writeInt(maxArenaCount);
-        buffer.writeUTF8(publishingId);
-        buffer.writeUTF8(accountId);
+        buffer.writeLong(publishingId);
+        buffer.writeLong(accountId);
         buffer.writeInt(maxDataSize);
         buffer.writeInt(upgradeVersion);
         return true;
@@ -172,8 +172,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         maxLobbyCount = buffer.readInt();
         maxZoneCount = buffer.readInt();
         maxArenaCount = buffer.readInt();
-        publishingId = buffer.readUTF8();
-        accountId = buffer.readUTF8();
+        publishingId = buffer.readLong();
+        accountId = buffer.readLong();
         maxDataSize = buffer.readInt();
         upgradeVersion = buffer.readInt();
         return true;
@@ -320,10 +320,10 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         return upgradeVersion;
     }
 
-    public String publishingId(){
+    public long publishingId(){
         return publishingId;
     }
-    public String accountId(){
+    public long accountId(){
         return accountId;
     }
     @Override
@@ -390,7 +390,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public void onUpdated(OnLobby onLobby) {
-        if(!onLobby.gameClusterId().equals(this.oid())) return;
+        if(onLobby.gameClusterId()!=(this.distributionId())) return;
         if(onLobby.typeId().equals(gameLobbyName)){
             this.gameLobby = this.serviceContext.deploymentServiceProvider().lobby(gameLobbyName);
             return;

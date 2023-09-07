@@ -2,7 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
@@ -28,7 +28,7 @@ public class AccessKeyTest {
     @Test(groups = { "DataStore" })
     public void smokeTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("access_key");
-        OidKey ownerId = new OidKey("TESTKEY");
+        SnowflakeKey ownerId = new SnowflakeKey(serviceContext.deploymentServiceProvider().distributionId());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");
         accessKey.index(""+this.serviceContext.node().bucketId());
@@ -38,12 +38,12 @@ public class AccessKeyTest {
         Assert.assertTrue(dataStore.create(accessKey));
 
         AccessKey load = new AccessKey();
-        load.oid(accessKey.oid());
+        load.distributionId(accessKey.distributionId());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertTrue(load.typeId().equals(accessKey.typeId()));
 
         AccessKey loadIf = new AccessKey();
-        loadIf.oid(load.oid());
+        loadIf.distributionId(load.distributionId());
         Assert.assertFalse(dataStore.createIfAbsent(loadIf,true));
         Assert.assertTrue(loadIf.typeId().equals(load.typeId()));
 
@@ -56,7 +56,7 @@ public class AccessKeyTest {
         updating.disabled(true);
         Assert.assertTrue(dataStore.update(updating));
         AccessKey updated = new AccessKey();
-        updated.oid(updating.oid());
+        updated.distributionId(updating.distributionId());
 
         Assert.assertTrue(dataStore.load(updated));
         Assert.assertTrue(updated.disabled());

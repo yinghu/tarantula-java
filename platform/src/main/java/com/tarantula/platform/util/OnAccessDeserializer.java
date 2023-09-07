@@ -82,9 +82,9 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         else if(k.equals("typeId")){
             access.typeId((String) v);
         }
-        else if(k.equals("oid")){
-            access.oid((String) v);
-        }
+        //else if(k.equals("oid")){
+            //access.oid((String) v);
+        //}
         else if(k.equals("timestamp")){
             access.timestamp(((Number)v).longValue());
         }

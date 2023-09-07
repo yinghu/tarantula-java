@@ -40,7 +40,7 @@ public class Profile extends RecoverableObject implements Configurable {
 
     @Override
     public Key key(){
-        return new AssociateKey(this.oid, "profile");
+        return new AssociateKey(this.distributionId, "profile");
     }
 
     @Override

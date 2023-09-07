@@ -37,7 +37,7 @@ public class PlatformUserService implements UserService {
     public Access createUser(OnAccess onAccess) {
         Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
         acc.emailAddress((String)onAccess.property(OnAccess.EMAIL_ADDRESS));
-        acc.oid((String) onAccess.property(OnAccess.SYSTEM_ID));
+        acc.distributionId((Long) onAccess.property(OnAccess.SYSTEM_ID));
         String pwd = (String)onAccess.property(OnAccess.PASSWORD);
         String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
         acc.password(hash);
@@ -50,14 +50,14 @@ public class PlatformUserService implements UserService {
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
         PresenceIndex px = new PresenceIndex();
-        px.oid(acc.oid());
+        px.distributionId(acc.distributionId());
         presenceDataStore.createIfAbsent(px,false);
         //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return acc;
     }
-    public Access createUser(String accountId,OnAccess access){
-        Account account = new UserAccount();
-        account.distributionKey(accountId);
+    public Access createUser(Account account,OnAccess access){
+        //Account account = new UserAccount();
+        //account.distributionKey(accountId);
         if(!accountDataStore.load(account)) throw new RuntimeException("Account not existed");
         if(!account.trial() && !account.subscribed()) throw new RuntimeException("Account expired");
         int maxUsersPerAccount = account.trial()?trialMaxUsersPerAccount:subscribedMaxUsersPerAccount;
@@ -65,7 +65,7 @@ public class PlatformUserService implements UserService {
         account.userCount(1);
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
-        access.owner(accountId);
+        //access.owner(account.distributionId());
         Access user = createUser(access);
         IndexSet idx = new IndexSet();
         idx.distributionKey(account.distributionKey());
@@ -101,14 +101,14 @@ public class PlatformUserService implements UserService {
     public Account createAccount(Access access,Subscription subscription){
         if(!userDataStore.load(access)) throw new RuntimeException("No such user existed");
         if(!access.primary()) throw new RuntimeException("Only primary user can have an account");
-        subscription.oid(access.oid());
+        subscription.distributionId(access.distributionId());
         subscription.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         subscription.count(1);
         if(!membershipDataStore.createIfAbsent(subscription,false)){
             throw new RuntimeException("Subscription already existed");
         }
         UserAccount account = new UserAccount();
-        account.oid(access.oid());
+        account.distributionId(access.distributionId());
         account.trial(subscription.trial());
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         if(!accountDataStore.createIfAbsent(account,false)){
@@ -118,14 +118,14 @@ public class PlatformUserService implements UserService {
         return account;
     }
 
-    public Subscription subscribe(String accountId,int durationMonth){
+    public Subscription subscribe(Account aaccount,int durationMonth){
         Access access = new User();
-        access.oid(accountId);
+        access.distributionId(aaccount.distributionId());
         if(!userDataStore.load(access)){
             throw new RuntimeException("no such user");
         }
         Account account = new UserAccount();
-        account.oid(access.primary()?access.oid(): access.primaryId());
+        account.distributionId(access.primary()?access.distributionId(): access.distributionId());
         if(!accountDataStore.load(account)){
             throw new RuntimeException("no such account");
         }
@@ -145,9 +145,9 @@ public class PlatformUserService implements UserService {
         return membership;
     }
 
-    public Access loadUser(String systemId){
+    public Access loadUser(long systemId){
         User u = new User();
-        u.oid(systemId);
+        u.distributionId(systemId);
         u.dataStore(userDataStore);
         if(userDataStore.load(u)) return u;
         return null;
@@ -155,7 +155,7 @@ public class PlatformUserService implements UserService {
 
     public Account loadAccount(Access access){
         Account account = new UserAccount();
-        account.oid(access.primary()?access.oid():access.primaryId());
+        account.distributionId(access.primary()?access.distributionId():access.distributionId());
         account.dataStore(accountDataStore);
         if(accountDataStore.load(account)) return account;
         return null;
@@ -192,13 +192,13 @@ public class PlatformUserService implements UserService {
 
     public Subscription loadSubscription(Account account){
         Membership acc = new Membership();
-        acc.oid(account.oid());
+        acc.distributionId(account.distributionId());
         if(membershipDataStore.load(acc)) return acc;
         return null;
     }
     public Subscription loadSubscription(Access access){
         Membership acc = new Membership();
-        acc.oid(access.primary()?access.oid():access.oid());
+        acc.distributionId(access.primary()?access.distributionId():access.distributionId());
         if(membershipDataStore.load(acc)) return acc;
         return null;
     }

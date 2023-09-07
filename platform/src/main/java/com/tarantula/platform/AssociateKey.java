@@ -3,16 +3,16 @@ import com.icodesoftware.Recoverable;
 
 public class AssociateKey implements Recoverable.Key {
 
-    private String ownerId;
+    private long ownerId;
     private String label;
-    public AssociateKey(String ownerId, String suffix){
+    public AssociateKey(long ownerId, String suffix){
         this.ownerId = ownerId;
         this.label = suffix;
     }
 
     @Override
     public String asString() {
-        if(ownerId==null || label==null) return null;
+        if(ownerId==0 || label==null) return null;
         return new StringBuffer().append(ownerId).append(Recoverable.PATH_SEPARATOR).append(label).toString();
     }
     @Override
@@ -26,13 +26,13 @@ public class AssociateKey implements Recoverable.Key {
     }
 
     public boolean read(Recoverable.DataBuffer buffer){
-        ownerId = buffer.readUTF8();
+        ownerId = buffer.readLong();
         label = buffer.readUTF8();
         return true;
     }
     public boolean write(Recoverable.DataBuffer buffer){
-        if(ownerId==null||label==null) return false;
-        buffer.writeUTF8(ownerId);
+        if(ownerId==0||label==null) return false;
+        buffer.writeLong(ownerId);
         buffer.writeUTF8(label);
         return true;
     }

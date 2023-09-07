@@ -4,6 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.GameCluster;
 import org.testng.Assert;
@@ -34,8 +35,8 @@ public class GameClusterTest {
     @Test(groups = { "GameCluster" })
     public void createGameCluster(){
         DataStore ds = dataStoreProvider.createDataStore("test_tarantula");
-        String accountId = "accoutId";
-        String publishingId = "publishingId";
+        long accountId = 1;//"accoutId";
+        long publishingId = 2;//"publishingId";
         GameCluster gameCluster = new GameCluster();
         gameCluster.name("beam");
         gameCluster.mode = "pve";
@@ -59,15 +60,15 @@ public class GameClusterTest {
         Assert.assertTrue(ds.update(gameCluster));
 
         GameCluster load = new GameCluster();
-        load.oid(gameCluster.oid());
+        //load.oid(gameCluster.oid());
         Assert.assertTrue(ds.load(load));
         Assert.assertEquals(load.name(),gameCluster.name());
         Assert.assertNotNull(load.gameLobbyName);
 
-        gameCluster.ownerKey(new OidKey(accountId));
+        gameCluster.ownerKey(new SnowflakeKey(accountId));
         gameCluster.onEdge(true);
         Assert.assertTrue(ds.createEdge(gameCluster,"gameCluster"));
-        gameCluster.ownerKey(new OidKey(publishingId));
+        gameCluster.ownerKey(new SnowflakeKey(publishingId));
         Assert.assertTrue(ds.createEdge(gameCluster,"gameCluster"));
         Assert.assertEquals(ds.list(new GameClusterQuery(accountId)).size(),1);
         Assert.assertEquals(ds.list(new GameClusterQuery(publishingId)).size(),1);

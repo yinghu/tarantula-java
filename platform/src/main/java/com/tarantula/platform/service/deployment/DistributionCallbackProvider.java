@@ -25,7 +25,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     }
     @Override
-    public void onGameServiceStarted(String gameClusterId) {
+    public void onGameServiceStarted(long gameClusterId) {
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         if(gameCluster==null){
             log.warn("No game cluster found ["+gameClusterId+"]");
@@ -35,7 +35,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onGameClusterLaunched(String gameClusterId) {
+    public void onGameClusterLaunched(long gameClusterId) {
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         if(gameCluster==null){
             log.warn("No game cluster found ["+gameClusterId+"]");
@@ -45,7 +45,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onGameClusterShutdown(String gameClusterId) {
+    public void onGameClusterShutdown(long gameClusterId) {
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         if(gameCluster==null){
             log.warn("No game cluster found ["+gameClusterId+"]");
@@ -59,7 +59,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onGameClusterCreated(String gameClusterId) {
+    public void onGameClusterCreated(long gameClusterId) {
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         if(gameCluster==null){
             log.warn("No game cluster found ["+gameClusterId+"]");
@@ -71,7 +71,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     @Override
     public void onModuleLaunched(String typeId) {
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().get(typeId);
-        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionKey(),new OnLobbyListener(platformDeploymentServiceProvider));
+        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionId(),new OnLobbyListener(platformDeploymentServiceProvider));
     }
 
     @Override
@@ -99,12 +99,12 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onApplicationLaunched(String typeId ,String applicationId) {
+    public void onApplicationLaunched(String typeId ,long applicationId) {
         this.tarantulaContext.setApplicationOnLobby(typeId,applicationId);
     }
 
     @Override
-    public void onApplicationShutdown(String typeId, String applicationId) {
+    public void onApplicationShutdown(String typeId, long applicationId) {
 
         this.tarantulaContext.unsetApplication(typeId,applicationId,(d)->{
             if(d.type().equals(Descriptor.TYPE_LOBBY)){

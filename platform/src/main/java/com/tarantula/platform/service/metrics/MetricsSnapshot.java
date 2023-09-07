@@ -61,11 +61,11 @@ public class MetricsSnapshot extends RecoverableObject  {
         return metrics;
     }
     public void distributionKey(String rkey){
-        String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
-        bucket = idx[0];
-        oid = idx[1];
-        index = idx[2];
-        name = idx[3];
+        //String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
+        //bucket = idx[0];
+        //d = idx[1];
+        //index = idx[2];
+        //name = idx[3];
     }
     @Override
     public int getFactoryId() {
@@ -78,7 +78,7 @@ public class MetricsSnapshot extends RecoverableObject  {
     }
 
     public Key key(){
-        return new ResourceKey(this.bucket,oid,new String[]{index,name});
+        return new ResourceKey(this.bucket,owner,new String[]{index,name});
     }
 
     public void initialize(Property property,LocalDateTime timeUpdated){

@@ -19,7 +19,7 @@ public class GameLobbyAdminRoleModule implements Module {
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if (session.action().equals("onGameLobbyList")){
-            GameCluster gc = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gc = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             if(gc!=null && !(gc.disabled())){
                 Lobby lobby = this.deploymentServiceProvider.lobby(gc.gameLobbyName);
                 session.write(toJson(lobby).toString().getBytes());
@@ -29,7 +29,7 @@ public class GameLobbyAdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onGameServiceList")){
-            GameCluster gameCluster = deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             if(gameCluster.serviceLobby!=null) {
                 session.write(toJson(gameCluster.serviceLobby.entryList()));
             }
@@ -39,7 +39,7 @@ public class GameLobbyAdminRoleModule implements Module {
         }
         else if (session.action().equals("onAddLobby")){
             String[] query = session.name().split("#");
-            String gameClusterId = query[0];
+            long gameClusterId = Long.parseLong(query[0]);
             int lobbyIndex = Integer.parseInt(query[1]);
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameClusterId);
             Lobby lobby = gameCluster.gameLobby;
@@ -70,12 +70,12 @@ public class GameLobbyAdminRoleModule implements Module {
         }
         else if(session.action().equals("onDisableLobby")){
             String[] query = session.name().split("#");
-            boolean suc = this.deploymentServiceProvider.disableApplication((query[1]));
+            boolean suc = this.deploymentServiceProvider.disableApplication(Long.parseLong(query[1]));
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else if(session.action().equals("onEnableLobby")){
             String[] query = session.name().split("#");
-            boolean suc = this.deploymentServiceProvider.enableApplication((query[1]));
+            boolean suc = this.deploymentServiceProvider.enableApplication(Long.parseLong(query[1]));
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
         else{

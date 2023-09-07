@@ -97,7 +97,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionId());
         Descriptor app = _gc.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
@@ -122,7 +122,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     public boolean onItemReleased(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();
         configurableObject.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionId());
         Descriptor app = _gc.serviceWithCategory("item");
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
@@ -155,7 +155,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         ConfigurableCategories categories = gameCluster.configurableCategories(scope);
         ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
         logger.warn(configurableSetting.toJson().toString());
-        logger.warn(application.oid()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
+        logger.warn(application.distributionId()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
         //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());

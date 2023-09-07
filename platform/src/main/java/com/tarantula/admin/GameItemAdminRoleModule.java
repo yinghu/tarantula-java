@@ -23,7 +23,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCategorySettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             ConfigurableCategories categories = this.configurableCategories(query[1],gameCluster,applicationPreSetup);
             categories.configurableTypes(this.configurableTypes(query[1],gameCluster,applicationPreSetup));
@@ -31,14 +31,14 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         else if(session.action().equals("onTypesSettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             ConfigurableTypes configurableTypes = this.configurableTypes(query[1],gameCluster,applicationPreSetup);
             session.write(configurableTypes.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdateEnumSettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Enum,query[1],jo);
@@ -74,7 +74,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         else if(session.action().equals("onUpdateTypesSettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonArray jtypes = JsonUtil.parse(payload).get("types").getAsJsonArray();
             int send = jtypes.size();
@@ -102,7 +102,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         else if(session.action().equals("onCreateCategorySettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
@@ -142,7 +142,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         else if(session.action().equals("onUpdateCategorySettings")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("category").getAsJsonObject();
             JsonObject header = jo.get("header").getAsJsonObject();
@@ -176,33 +176,33 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
 
         }
         else if (session.action().equals("onCreateAsset")||session.action().equals("onUpdateAsset")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             session.write(createAsset(new Asset(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateComponent") || session.action().equals("onUpdateComponent")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             session.write(createComponent(new Component(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateCommodity")||session.action().equals("onUpdateCommodity")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             session.write(createCommodity(new Commodity(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateItem")||session.action().equals("onUpdateItem")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             session.write(createItem(new Item(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if (session.action().equals("onCreateApplication")||session.action().equals("onUpdateApplication")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
             //ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
@@ -218,15 +218,15 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         else if(session.action().equals("onVersionedStock")){
             this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
-            List<ConfigurableObject> items = preSetup.list(app,new VersionedConfigurableObjectQuery(query[1]));//,"version"));
+            List<ConfigurableObject> items = preSetup.list(app,new VersionedConfigurableObjectQuery(Long.parseLong(query[1])));//,"version"));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onDelete")){
             String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(query[0]);
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
             ConfigurableObject configurableObject = new ConfigurableObject();
@@ -452,22 +452,22 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         Component room = new Component();
         createComponent(room, roomPayload.getAsJsonObject(), gameCluster, applicationPreSetup);
 
-        zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.oid());
+        zonePayload.get("application").getAsJsonObject().get("Room").getAsJsonArray().add(room.distributionId());
         JsonArray refs = zonePayload.get("reference").getAsJsonArray();
-        refs.add(room.oid());
+        refs.add(room.distributionId());
         JsonArray arenas = ((JsonElement)lobbyConfiguration.property("arenas")).getAsJsonArray();
         JsonArray aset = zonePayload.get("application").getAsJsonObject().get("ArenaSet").getAsJsonArray();
         arenas.forEach(arenaPayload -> {
             Commodity arena = new Commodity();
             createCommodity(arena,arenaPayload.getAsJsonObject(),gameCluster,applicationPreSetup);
-            aset.add(arena.oid());
-            refs.add(arena.oid());
+            aset.add(arena.distributionId());
+            refs.add(arena.distributionId());
         });
         Item zone = new Item();
         createItem(zone,zonePayload,gameCluster,applicationPreSetup);
         JsonObject lobbyPayload = ((JsonElement)lobbyConfiguration.property("lobby")).getAsJsonObject();
-        lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.oid());
-        lobbyPayload.get("reference").getAsJsonArray().add(zone.oid());
+        lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionId());
+        lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionId());
         Application lobby = new Application();
         this.context.log(createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup),OnLog.WARN);
         //pre-defined third party validators

@@ -43,11 +43,11 @@ public class UserTest {
         user.password("password");
         user.emailAddress("email");
         user.role("root");
-        user.oid(accessIndex.oid());
+        //user.oid(accessIndex.oid());
         Assert.assertTrue(dUser.createIfAbsent(user,false));
 
         User load = new User();
-        load.oid(user.oid());
+        //load.oid(user.oid());
         Assert.assertTrue(dUser.load(load));
         Assert.assertEquals(load.login(),user.login());
     }
@@ -62,13 +62,13 @@ public class UserTest {
         //DataStore dPresence = dataStoreProvider.createDataStore("test_presence");
         DataStore dAccount = dataStoreProvider.createDataStore("test_account");
         UserAccount user = new UserAccount();
-        user.oid(accessIndex.oid());
+        //user.oid(accessIndex.oid());
         user.userCount(1);
         user.gameClusterCount(1);
         Assert.assertTrue(dAccount.createIfAbsent(user,false));
 
         UserAccount load = new UserAccount();
-        load.oid(user.oid());
+        //load.oid(user.oid());
         Assert.assertTrue(dAccount.load(load));
         Assert.assertEquals(load.gameClusterCount(0),1);
         Assert.assertEquals(load.userCount(0),1);
@@ -83,12 +83,12 @@ public class UserTest {
         DataStore dPresence = dataStoreProvider.createDataStore("test_presence");
         //DataStore dAccount = dataStoreProvider.createDataStore("test_account");
         Presence user = new PresenceIndex();
-        user.oid(accessIndex.oid());
+        //user.oid(accessIndex.oid());
         user.dataStore(dPresence);
         Assert.assertTrue(dPresence.createIfAbsent(user,false));
         Assert.assertEquals(user.count(1),1);
         Presence load = new PresenceIndex();
-        load.oid(user.oid());
+        //load.oid(user.oid());
         Assert.assertFalse(dPresence.createIfAbsent(load,true));
         //Assert.assertEquals(load.count(0),1);
     }
@@ -103,14 +103,14 @@ public class UserTest {
         DataStore dSubscription = dataStoreProvider.createDataStore("test_subscription");
         //DataStore dAccount = dataStoreProvider.createDataStore("test_account");
         Subscription user = new Membership();
-        user.oid(accessIndex.oid());
+        //user.oid(accessIndex.oid());
         user.count(1);
         user.startTimestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         user.endTimestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMonths(1)));
         Assert.assertTrue(dSubscription.createIfAbsent(user,false));
         //Assert.assertEquals(user.count(1),1);
         Subscription load = new Membership();
-        load.oid(user.oid());
+        //load.oid(user.oid());
         Assert.assertFalse(dSubscription.createIfAbsent(load,true));
         Assert.assertEquals(load.count(0),1);
     }

@@ -8,7 +8,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeployCode;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.util.OidKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
 
@@ -26,7 +26,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 	public void start() throws Exception {
 		this.context._syncNodeData();
 		DataStore datastore = this.context.masterDataStore();
-		String bucketId = this.context.node().bucketId();
+		long bucketId = this.context.node().bucketId();
 
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
 		if(bList.isEmpty()){
@@ -43,24 +43,24 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		for(LobbyConfiguration c:configurations){//may load from cluster or data store or local files
 			c.views = this.context.loadViewList(c.descriptor.typeId());
 			this.context.configureViews(c);//deploy views
-			c.applications = datastore.list(new ApplicationQuery(c.descriptor.oid()));
+			c.applications = datastore.list(new ApplicationQuery(c.descriptor.distributionId()));
 			OnLobby _ob = this.context.configure(c);
 			this.context.deploymentService().register(_ob);
 		}
 
-		String deploymentId = this.context.node().deploymentId();
+		long deploymentId = this.context.node().deploymentId();
 		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
 		glist.forEach((gc)-> deployGameCluster(gc));
-		//IndexSet moduleIndex = new IndexSet();
-		//moduleIndex.id(deploymentId);
-		//moduleIndex.label(Account.ModuleLabel);
-		//if(datastore.load(moduleIndex)){
-			//moduleIndex.keySet().forEach((pc)->{
+		IndexSet moduleIndex = new IndexSet();
+		moduleIndex.distributionId(deploymentId);
+		moduleIndex.label(Account.ModuleLabel);
+		if(datastore.load(moduleIndex)){
+			moduleIndex.keySet().forEach((pc)->{
 				//deployModule(pc);
-			//});
-		//}
+			});
+		}
 	}
-	private void deployModule(String publishingId){
+	private void deployModule(long publishingId){
 		try {
 			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));
 			blist.forEach((lb)->{
@@ -82,7 +82,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		}
 	}
 
-	private List<LobbyDescriptor> deployFromLocal(String bucketId){
+	private List<LobbyDescriptor> deployFromLocal(long bucketId){
 		logger.warn("Deploying application from local settings with bucketId ["+bucketId+"]");
 		DataStore dataStore = this.context.masterDataStore();
 		List<String> dxml = loadFromLocal();
@@ -98,9 +98,9 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		ArrayList<LobbyDescriptor> blist = new ArrayList<>();
 		xp.configurations.forEach((c)->{
 			c.descriptor.onEdge(true);
-			c.descriptor.ownerKey(new OidKey(bucketId));
+			c.descriptor.ownerKey(new SnowflakeKey(bucketId));
 			dataStore.create(c.descriptor);
-			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.oid()),false);
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.owner()),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.ownerKey(c.descriptor.key());

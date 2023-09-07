@@ -25,9 +25,11 @@ public class SnowflakeIdTest {
         }
         unique.forEach((k,v)->{
             long[] bits = snowflakeIdGenerator.fromSnowflakeId(k);
-            System.out.println(TimeUtil.fromUTCMilliseconds(bits[0]));
+            //System.out.println(k);
+            //System.out.println(TimeUtil.fromUTCMilliseconds(bits[0]));
             for(int i=0;i<bits.length;i++){
-                System.out.println("B1=>"+bits[i]);
+                //System.out.println("B1=>"+bits[i]);
+                Assert.assertEquals(bits[1],100);
             }
         });
 

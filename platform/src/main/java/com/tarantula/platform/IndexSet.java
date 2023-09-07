@@ -44,7 +44,7 @@ public class IndexSet extends RecoverableObject {
 
     @Override
     public Recoverable.Key key(){
-        return new AssociateKey(this.oid,this.label);
+        return new AssociateKey(this.distributionId,this.label);
     }
 
     public boolean addKey(String key){

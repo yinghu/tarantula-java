@@ -14,9 +14,9 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
 
     private boolean resetEnabled;
 
-    private String gameClusterId;
+    private long gameClusterId;
 
-    private String subscriptionId;
+    private long subscriptionId;
 
     private int deployCode;
 
@@ -26,7 +26,7 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     public OnLobbyTrack(){
 
     }
-    public OnLobbyTrack(String typeId,int deployCode,boolean resetEnabled,boolean closed,String gameClusterId,String subscriptionId){
+    public OnLobbyTrack(String typeId,int deployCode,boolean resetEnabled,boolean closed,long gameClusterId,long subscriptionId){
         this.typeId = typeId;
         this.deployCode  = deployCode;
         this.resetEnabled = resetEnabled;
@@ -34,10 +34,10 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
         this.gameClusterId = gameClusterId;
         this.subscriptionId = subscriptionId;
     }
-    public String gameClusterId(){
+    public long gameClusterId(){
         return this.gameClusterId;
     }
-    public String subscriptionId(){ return this.subscriptionId;}
+    public long subscriptionId(){ return this.subscriptionId;}
     public String typeId() {
         return this.typeId;
     }
@@ -69,6 +69,6 @@ public class OnLobbyTrack extends RecoverableObject implements OnLobby {
     }
     @Override
     public Key key() {
-        return new AssociateKey(this.oid,this.label);
+        return new AssociateKey(this.distributionId,this.label);
     }
 }

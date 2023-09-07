@@ -32,7 +32,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     public SystemStatisticsEntry(String bucket, String oid, String name){
         this();
         this.bucket = bucket;
-        this.oid = oid;
+        //this.oid = oid;
         this.name = name;
     }
     public SystemStatisticsEntry(Statistics.Entry entry){
@@ -154,13 +154,13 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         //parse key
         String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
         bucket = k[0];
-        oid = k[1];
+        //oid = k[1];
         label = k[2];
         name = k[3];
     }
     @Override
     public Key key(){
-        return new ResourceKey(this.bucket,this.oid,new String[]{label,name});
+        return new ResourceKey(this.bucket,this.owner,new String[]{label,name});
     }
     Statistics.Entry duplicate(){
         return new SystemStatisticsEntry(this);

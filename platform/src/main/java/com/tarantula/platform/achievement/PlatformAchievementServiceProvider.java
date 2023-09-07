@@ -69,7 +69,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     public boolean onItemRegistered(String category,String itemId){
         Achievement configurableObject = new Achievement();
         configurableObject.distributionKey(itemId);
-        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionKey());
+        GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionId());
         Descriptor app = _gc.serviceWithCategory(category);
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
