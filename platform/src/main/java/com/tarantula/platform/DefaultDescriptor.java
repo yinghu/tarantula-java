@@ -114,11 +114,6 @@ public class DefaultDescriptor extends RecoverableObject implements Descriptor {
     public void resetEnabled(boolean resetEnabled){
         this.resetEnabled = resetEnabled;
     }
-	@Override
-	public String toString(){
-		return new String(JsonUtil.toJson(this.toMap()));
-	}
-
 
 
     public int accessControl(){
@@ -149,59 +144,6 @@ public class DefaultDescriptor extends RecoverableObject implements Descriptor {
         this.tag = tag;
     }
 
-
-
-    @Override
-    public Map<String, Object> toMap() {
-        Map<String,Object> _props = this.properties;
-        _props.put("typeId",this.typeId);
-        _props.put("type",this.type);
-        _props.put("name",this.name);
-        _props.put("tag",this.tag);
-        _props.put("category",this.category);
-        _props.put("disabled",this.disabled);
-        _props.put("accessControl",this.accessControl);
-        _props.put("accessMode",this.accessMode);
-        _props.put("accessRank",this.accessRank);
-        _props.put("deployCode",this.deployCode);
-        _props.put("deployPriority",this.deployPriority);
-        _props.put("moduleId",this.moduleId);
-        _props.put("codebase",this.codebase);
-        _props.put("moduleArtifact",this.moduleArtifact);
-        _props.put("moduleVersion",this.moduleVersion);
-        _props.put("moduleName",this.moduleName);
-        _props.put("logEnabled",this.logEnabled);
-        _props.put("applicationClassName",this.applicationClassName);
-        _props.put("resetEnabled",this.resetEnabled);
-        _props.put("tournamentEnabled",this.tournamentEnabled);
-        //_props.put("index",this.index);
-        return _props;
-    }
-
-    @Override
-    public void fromMap(Map<String, Object> properties) {
-        this.typeId=(String)properties.get("typeId");
-        this.type=(String)properties.get("type");
-        this.name=(String)properties.get("name");
-        this.tag=properties.get("tag")!=null?(String)properties.get("tag"):null;
-        this.category=properties.get("category")!=null?(String)properties.get("category"):null;
-        this.disabled = properties.get("disabled")!=null?(boolean)properties.get("disabled"):false;
-        this.accessControl  = properties.get("accessControl")!=null?((Number)properties.get("accessControl")).intValue():0;
-        this.accessMode  = properties.get("accessMode")!=null?((Number)properties.get("accessMode")).intValue():12;
-        this.accessRank = properties.get("accessRank")!=null?((Number)properties.get("accessRank")).intValue():0;
-        this.moduleArtifact  = properties.get("moduleArtifact")!=null?(String) properties.get("moduleArtifact"):null;
-        this.moduleVersion  = properties.get("moduleVersion")!=null?(String) properties.get("moduleVersion"):null;
-        this.deployCode = properties.get("deployCode")!=null?((Number)properties.get("deployCode")).intValue():0;
-        this.deployPriority = properties.get("deployPriority")!=null?((Number)properties.get("deployPriority")).intValue():0;
-        this.moduleId = properties.get("moduleId")!=null?(String)properties.get("moduleId"):typeId;//
-        this.codebase =properties.get("codebase")!=null?(String)properties.get("codebase"):null;
-        this.moduleName = properties.get("moduleName")!=null?(String)properties.get("moduleName"):null;
-        this.logEnabled = properties.get("logEnabled")!=null?(Boolean)properties.get("logEnabled"):true;
-        this.applicationClassName = properties.get("applicationClassName")!=null?(String)properties.get("applicationClassName"):null;
-        this.resetEnabled = properties.get("resetEnabled")!=null?(boolean)properties.get("resetEnabled"):false;
-        this.tournamentEnabled = (boolean)properties.getOrDefault("tournamentEnabled",false);
-        //this.index = properties.get("index")!=null?(String)properties.get("index"):null;
-    }
 
     public String applicationClassName() {
         return applicationClassName;

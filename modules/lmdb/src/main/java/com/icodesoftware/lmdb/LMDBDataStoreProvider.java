@@ -47,9 +47,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
-    //private SnowflakeIdGenerator snowflakeIdGenerator;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
+
+    //private MapStoreListener
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");

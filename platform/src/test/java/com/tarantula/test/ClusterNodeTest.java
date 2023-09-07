@@ -1,41 +1,34 @@
 package com.tarantula.test;
 
-import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.AccessIndex;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.AccessIndexService;
+import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class ClusterNodeTest {
-
-    @BeforeClass
-    public void setUp() {
-    }
+public class ClusterNodeTest extends DataStoreHook{
 
     @Test(groups = { "ClusterNode" })
-    public void localTest() {
-        LinkedList<ClusterNode> queue = new LinkedList<>();
-        for(int i=0;i<10;i++){
-            queue.offer(new ClusterNode("m"+i));
-        }
-        ClusterNode c = queue.poll();
-        Assert.assertEquals(true,c.memberId.equals("m0"));
-        queue.remove(new ClusterNode("m1"));
-        queue.offer(c);
-        queue.remove(c);
-        queue.poll();
-        queue.poll();
-        Assert.assertEquals(true,queue.size()==6);
-
-        ConcurrentHashMap<ClusterProvider.Node,String> mix = new ConcurrentHashMap<>();
-        ClusterProvider.Node mnode = new ClusterNode("mid");
-        ClusterProvider.Node nnode = new ClusterNode("","N05",5);
-        mix.put(mnode,"memid");
-        mix.put(nnode,"nnid");
-        Assert.assertEquals(mix.remove(mnode),"memid");
-        Assert.assertEquals(mix.remove(nnode),"nnid");
+    public void clusterNodeSetupTest() {
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        ClusterNode node = (ClusterNode)serviceContext.node();
+        long bucketId = serviceContext.deploymentServiceProvider().distributionId();
+        long nodeId = serviceContext.deploymentServiceProvider().distributionId();
+        long developmentId = serviceContext.deploymentServiceProvider().distributionId();
+        AccessIndexTrack abucket = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+node.bucketName(),AccessIndex.SYSTEM_INDEX,bucketId);
+        AccessIndexTrack anode = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+node.nodeName(),AccessIndex.SYSTEM_INDEX,nodeId);
+        AccessIndexTrack adevelop = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+"development",AccessIndex.SYSTEM_INDEX,developmentId);
+        Assert.assertTrue(dataStore.createIfAbsent(abucket,false));
+        Assert.assertTrue(dataStore.createIfAbsent(anode,false));
+        Assert.assertTrue(dataStore.createIfAbsent(adevelop,false));
+        node.bucketId = abucket.distributionId();
+        node.nodeId = anode.distributionId();
+        node.deploymentId = adevelop.distributionId();
+        Assert.assertEquals(node.bucketId(),bucketId);
+        Assert.assertEquals(node.nodeId(),nodeId);
+        Assert.assertEquals(node.deploymentId(),developmentId);
     }
 }

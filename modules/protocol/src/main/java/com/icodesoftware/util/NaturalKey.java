@@ -3,7 +3,7 @@ import com.icodesoftware.Recoverable;
 
 public class NaturalKey implements Recoverable.Key {
 
-    public String key;
+    private String key;
 
     public NaturalKey(String key){
         this.key = key;
@@ -24,7 +24,7 @@ public class NaturalKey implements Recoverable.Key {
     }
     @Override
     public String toString(){
-        return "Owner access key ["+key+"]";
+        return key;
     }
 
     @Override

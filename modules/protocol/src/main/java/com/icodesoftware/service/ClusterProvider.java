@@ -114,6 +114,8 @@ public interface ClusterProvider extends ServiceProvider {
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
 
+        int snowflakeNodeNumber();
+        long snowflakeEpochStart();
     }
 
     interface NodeListener{

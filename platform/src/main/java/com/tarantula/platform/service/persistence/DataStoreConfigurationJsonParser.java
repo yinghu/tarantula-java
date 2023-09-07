@@ -36,6 +36,9 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private DataStoreProvider.OnStart onStart;
     private ClusterProvider.Node node;
 
+    private int snowflakeNodeNumber;
+    private long snowflakeEpochStart;
+
     public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx,int maxReplicationNumber, DataStoreProvider.OnStart onStart){
         this.dataStoreProviderConfiguration = dconfig;
         this.node = tx.node();
@@ -46,7 +49,6 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.dataStoreDailyBackup = node.dailyBackupEnabled();//tx.dataStoreDailyBackup;
         this.serviceContext = tx;
         this.onStart = onStart;
-        this.maxReplicationNumber = maxReplicationNumber;
     }
     private void parse(InputStream json){
         HashMap<String,Object> properties = new HashMap();

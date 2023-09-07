@@ -4,6 +4,8 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class LobbyTypeIdIndex extends AssociateObject {
 
+    private long lobbyId;
+    private long gameClusterId;
 
     public LobbyTypeIdIndex(){
 
@@ -14,27 +16,33 @@ public class LobbyTypeIdIndex extends AssociateObject {
         this.label =  typeId;
     }
     //for create
-    public LobbyTypeIdIndex(long bucketId,String typeId,String lobbyId){
+    public LobbyTypeIdIndex(long bucketId,String typeId,long lobbyId){
         this.distributionId = bucketId;
         this.label =  typeId;
-        this.owner = lobbyId;
+        this.lobbyId = lobbyId;
     }
-    public LobbyTypeIdIndex(long bucketId,String typeId,String lobbyId,String gameClusterId){
+    public LobbyTypeIdIndex(long bucketId,String typeId,long lobbyId,long gameClusterId){
         this.distributionId = bucketId;
         this.label =  typeId;
-        this.owner = lobbyId;
-        this.index = gameClusterId;//game cluster id
+        this.lobbyId = lobbyId;
+        this.gameClusterId = gameClusterId;//game cluster id
     }
 
+    public long lobbyId(){
+        return lobbyId;
+    }
 
+    public long gameClusterId(){
+        return gameClusterId;
+    }
     public boolean write(DataBuffer buffer){
-        buffer.writeUTF8(owner);
-        buffer.writeUTF8(index);
+        buffer.writeLong(lobbyId);
+        buffer.writeLong(gameClusterId);
         return true;
     }
     public boolean read(DataBuffer buffer) {
-        this.owner = buffer.readUTF8();
-        this.index = buffer.readUTF8();
+        this.lobbyId = buffer.readLong();
+        this.gameClusterId = buffer.readLong();
         return true;
     }
     public int getFactoryId() {

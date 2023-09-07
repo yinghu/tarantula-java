@@ -18,6 +18,7 @@ import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableTemplate;
@@ -113,6 +114,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public String dataBucketNode;
     private ClusterNode node;
 
+    public int snowflakeNodeNumber = 1;
+    public int[] snowflakeEpochStart = {2020,1,1};// start from 2020 1,1
+
     public String dataStoreDir;
 
     public boolean dataStoreDailyBackup;
@@ -181,6 +185,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node.backupEnabled = this.backupEnabled;
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
+        this.node.snowflakeNodeNumber = snowflakeNodeNumber;
+        this.node
+                .snowflakeEpochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         if(backupEnabled){//using backup deployment id
             String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
             JsonObject json = JsonUtil.parse(resp);
@@ -274,10 +281,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
         GameCluster gameCluster = new GameCluster();
         if(conf.descriptor.resetEnabled && conf.descriptor.deployCode == DeployCode.USER_GAME_CLUSTER){
-            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.distributionId());
+            gameCluster = this.loadGameCluster(lobbyTypeIdIndex.gameClusterId());
             if(gameCluster==null) throw new RuntimeException("no game cluster config data");
         }
-        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.distributionId(),gameCluster.publishingId());
+        OnLobby _onLobby = new OnLobbyTrack(lb.descriptor().typeId(),lb.descriptor().deployCode(),lb.descriptor().resetEnabled(),false,lobbyTypeIdIndex.gameClusterId(),gameCluster.accountId());
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             if(c.disabled()) {

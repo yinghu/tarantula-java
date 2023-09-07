@@ -19,7 +19,7 @@ public class TestUser extends RecoverableObject implements Access {
     protected boolean activated;
     protected boolean validated;
     protected boolean primary;
-    protected String primaryId;
+    protected long primaryId;
     protected String validator;
     protected String role;
     public TestUser(){
@@ -78,10 +78,10 @@ public class TestUser extends RecoverableObject implements Access {
         this.primary = primary;
     }
 
-    public String primaryId(){
+    public long primaryId(){
         return this.primaryId;
     }
-    public void primaryId(String primaryId){
+    public void primaryId(long primaryId){
         this.primaryId = primaryId;
     }
     public int getFactoryId() {
@@ -129,7 +129,7 @@ public class TestUser extends RecoverableObject implements Access {
         buffer.writeUTF8(validator);
         //buffer.writeUTF8(this.owner);
         buffer.writeBoolean(this.primary);
-        buffer.writeUTF8(primaryId);
+        buffer.writeLong(primaryId);
         return true;
     }
     public boolean read(DataBuffer buffer) {
@@ -143,7 +143,7 @@ public class TestUser extends RecoverableObject implements Access {
         this.validator = buffer.readUTF8();
         //this.owner = buffer.readUTF8();
         this.primary = buffer.readBoolean();
-        this.primaryId = buffer.readUTF8();
+        this.primaryId = buffer.readLong();
         return true;
     }
     public boolean readKey(Recoverable.DataBuffer buffer){

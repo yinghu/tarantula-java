@@ -2,9 +2,7 @@ package com.tarantula.platform.presence;
 
 
 import com.icodesoftware.Access;
-import com.icodesoftware.OnAccess;
 import com.icodesoftware.util.RecoverableObject;
-import java.util.Map;
 
 public class User extends RecoverableObject implements Access {
 
@@ -14,11 +12,11 @@ public class User extends RecoverableObject implements Access {
     protected boolean activated;
     protected boolean validated;
     protected boolean primary;
-    protected String primaryId;
+    protected long primaryId;
     protected String validator;
     protected String role;
     public User(){
-        this.label = "users";
+        this.label = "user";
     }
     public User(String login,boolean validated,String validator){
         this();
@@ -69,44 +67,18 @@ public class User extends RecoverableObject implements Access {
         this.primary = primary;
     }
 
-    public String primaryId(){
+    public long primaryId(){
         return this.primaryId;
     }
-    public void primaryId(String primaryId){
+    public void primaryId(long primaryId){
         this.primaryId = primaryId;
     }
     public int getFactoryId() {
         return UserPortableRegistry.OID;
     }
 
-
     public int getClassId() {
         return UserPortableRegistry.USER_CID;
-    }
-    public Map<String,Object> toMap(){
-        properties.put("1",login);
-        properties.put("2",password);
-        properties.put("3",role);
-        properties.put("4",activated);
-        properties.put("5",routingNumber);
-        properties.put("6",validated);
-        properties.put("7",emailAddress);
-        properties.put("8",validator);
-        properties.put("9",this.owner);
-        properties.put("10",this.primary);
-        return properties;
-    }
-    public void fromMap(Map<String,Object> properties){
-        this.login = (String) properties.get("1");
-        this.password = (String) properties.get("2");
-        this.role = (String) properties.get("3");
-        this.activated = (boolean) properties.get("4");
-        this.routingNumber = ((Number) properties.get("5")).intValue();
-        this.validated = (boolean) properties.get("6");
-        this.emailAddress = (String)properties.get("7");
-        this.validator = (String)properties.get("8");
-        this.owner = (String)properties.get("9");
-        this.primary = (boolean)properties.get("10");
     }
 
     public boolean write(DataBuffer buffer){
@@ -116,10 +88,10 @@ public class User extends RecoverableObject implements Access {
         buffer.writeBoolean(activated);
         buffer.writeInt(routingNumber);
         buffer.writeBoolean(validated);
-        buffer.writeUTF8(emailAddress!=null?emailAddress: OnAccess.UTF_NULL);
+        buffer.writeUTF8(emailAddress);
         buffer.writeUTF8(validator);
         buffer.writeBoolean(this.primary);
-        buffer.writeUTF8(primaryId);
+        buffer.writeLong(primaryId);
         return true;
     }
     public boolean read(DataBuffer buffer) {
@@ -132,7 +104,12 @@ public class User extends RecoverableObject implements Access {
         this.emailAddress = buffer.readUTF8();
         this.validator = buffer.readUTF8();
         this.primary = buffer.readBoolean();
-        this.primaryId = buffer.readUTF8();
+        this.primaryId = buffer.readLong();
         return true;
+    }
+
+    @Override
+    public boolean validate() {
+        return primary? primaryId>0 : true;
     }
 }

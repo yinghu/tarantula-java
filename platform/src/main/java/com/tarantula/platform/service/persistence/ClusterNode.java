@@ -33,6 +33,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
 
+    public int snowflakeNodeNumber;
+    public long snowflakeEpochStart;
+
     public ClusterNode(String bucketName, String nodeName,int partitionNumber){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
@@ -109,6 +112,13 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
     public String dataStoreDirectory(){
         return this.dataStoreDirectory;
+    }
+
+    public int snowflakeNodeNumber(){
+        return snowflakeNodeNumber;
+    }
+    public long snowflakeEpochStart(){
+        return snowflakeEpochStart;
     }
     @Override
     public JsonObject toJson(){

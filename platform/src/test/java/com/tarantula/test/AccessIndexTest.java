@@ -3,23 +3,12 @@ package com.tarantula.test;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.NaturalKey;
 import com.tarantula.platform.AccessIndexTrack;
-import com.icodesoftware.service.DataStoreProvider;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class AccessIndexTest {
-
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-    }
+public class AccessIndexTest extends DataStoreHook{
 
 
     @Test(groups = { "AccessIndex" })
@@ -38,6 +27,7 @@ public class AccessIndexTest {
         Assert.assertEquals(accessIndexTrack.distributionId(),load.distributionId());
         Assert.assertTrue(dataStore.delete(accessIndexTrack));
         Assert.assertFalse(dataStore.load(accessIndexTrack));
+        Assert.assertTrue(accessIndexTrack.key().equals(new NaturalKey(access)));
     }
 
 }

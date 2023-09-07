@@ -3,7 +3,7 @@ import com.icodesoftware.Recoverable;
 
 public class SnowflakeKey implements Recoverable.Key {
 
-    public long snowflakeId;
+    private long snowflakeId;
 
     public SnowflakeKey(long snowflakeId){
         this.snowflakeId = snowflakeId;
@@ -21,10 +21,6 @@ public class SnowflakeKey implements Recoverable.Key {
         if(snowflakeId==0) return false;
         buffer.writeLong(snowflakeId);
         return true;
-    }
-    @Override
-    public String toString(){
-        return asString();
     }
 
     @Override

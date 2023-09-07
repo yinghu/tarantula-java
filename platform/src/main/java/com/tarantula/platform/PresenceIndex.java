@@ -10,10 +10,8 @@ import com.icodesoftware.util.RecoverableObject;
 public class PresenceIndex extends RecoverableObject implements Presence {
 
     private int counter;
-
     private boolean local = true;
     private EventService eventService;
-    //private String vendorToken;
 
     public PresenceIndex(int stub,String index){
         this();
@@ -23,7 +21,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public PresenceIndex(){
-        this.label = "Presence";
+
     }
     @Override
     public boolean distributable(){

@@ -4,10 +4,10 @@ import java.time.Instant;
 
 public class SnowflakeIdGenerator {
 
-    private static final int BITS_OF_NODE_ID = 10;
+    private static final int BITS_OF_NODE_NUMBER = 10;
     private static final int BITS_OF_SEQUENCE = 12;
 
-    private static final long MAX_NODE_ID = (1L << BITS_OF_NODE_ID) - 1; //1023
+    private static final long MAX_NODE_ID = (1L << BITS_OF_NODE_NUMBER) - 1; //1023
     private static final long MAX_SEQUENCE = (1L << BITS_OF_SEQUENCE) - 1; //4095
 
     private final long nodeId;
@@ -38,7 +38,7 @@ public class SnowflakeIdGenerator {
             sequence = 0;
         }
         lastTimestamp = currentTimestamp;
-        long id = currentTimestamp << (BITS_OF_NODE_ID + BITS_OF_SEQUENCE) | (nodeId << BITS_OF_SEQUENCE) | sequence;
+        long id = currentTimestamp << (BITS_OF_NODE_NUMBER + BITS_OF_SEQUENCE) | (nodeId << BITS_OF_SEQUENCE) | sequence;
         return id;
     }
     private long epochTimestamp() {
@@ -46,9 +46,9 @@ public class SnowflakeIdGenerator {
     }
 
     public long[] fromSnowflakeId(long snowflakeId) {
-        long nodeIdMask = ((1L << BITS_OF_NODE_ID) - 1) << BITS_OF_SEQUENCE;
+        long nodeIdMask = ((1L << BITS_OF_NODE_NUMBER) - 1) << BITS_OF_SEQUENCE;
         long sequenceMask = (1L << BITS_OF_SEQUENCE) - 1;
-        long timestamp = (snowflakeId >> (BITS_OF_NODE_ID + BITS_OF_SEQUENCE)) + epochStart;
+        long timestamp = (snowflakeId >> (BITS_OF_NODE_NUMBER + BITS_OF_SEQUENCE)) + epochStart;
         long nodeId = (snowflakeId & nodeIdMask) >> BITS_OF_SEQUENCE;
         long sequence = snowflakeId & sequenceMask;
         return new long[]{timestamp, nodeId, sequence};

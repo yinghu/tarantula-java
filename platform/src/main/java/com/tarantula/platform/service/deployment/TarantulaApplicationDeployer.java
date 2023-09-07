@@ -51,14 +51,14 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		long deploymentId = this.context.node().deploymentId();
 		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
 		glist.forEach((gc)-> deployGameCluster(gc));
-		IndexSet moduleIndex = new IndexSet();
-		moduleIndex.distributionId(deploymentId);
-		moduleIndex.label(Account.ModuleLabel);
-		if(datastore.load(moduleIndex)){
-			moduleIndex.keySet().forEach((pc)->{
+		//IndexSet moduleIndex = new IndexSet();
+		//moduleIndex.distributionId(deploymentId);
+		//moduleIndex.label(Account.ModuleLabel);
+		//if(datastore.load(moduleIndex)){
+			//moduleIndex.keySet().forEach((pc)->{
 				//deployModule(pc);
-			});
-		}
+			//});
+		//}
 	}
 	private void deployModule(long publishingId){
 		try {
@@ -100,7 +100,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			c.descriptor.onEdge(true);
 			c.descriptor.ownerKey(new SnowflakeKey(bucketId));
 			dataStore.create(c.descriptor);
-			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.owner()),false);
+			dataStore.createIfAbsent(new LobbyTypeIdIndex(bucketId,c.descriptor.typeId(),c.descriptor.distributionId()),false);
 			blist.add(c.descriptor);
 			c.applications.forEach((a)->{
 				a.ownerKey(c.descriptor.key());

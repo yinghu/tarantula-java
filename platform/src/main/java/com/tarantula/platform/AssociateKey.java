@@ -1,6 +1,8 @@
 package com.tarantula.platform;
 import com.icodesoftware.Recoverable;
 
+import java.util.Objects;
+
 public class AssociateKey implements Recoverable.Key {
 
     private long ownerId;
@@ -17,12 +19,12 @@ public class AssociateKey implements Recoverable.Key {
     }
     @Override
     public int hashCode(){
-        return this.asString().hashCode();
+        return Objects.hash(ownerId,label);
     }
     @Override
     public boolean equals(Object obj){
         AssociateKey r = (AssociateKey)obj;
-        return this.asString().equals(r.asString());
+        return this.ownerId == r.ownerId && label.equals(r.label);
     }
 
     public boolean read(Recoverable.DataBuffer buffer){

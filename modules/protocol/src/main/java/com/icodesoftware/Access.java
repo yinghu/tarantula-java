@@ -33,8 +33,8 @@ public interface Access extends Recoverable,DataStore.Updatable {
     boolean primary();
     void primary(boolean primary);
 
-    String primaryId();
-    void primaryId(String primaryId);
+    long primaryId();
+    void primaryId(long primaryId);
     String validator();
 
     String role();

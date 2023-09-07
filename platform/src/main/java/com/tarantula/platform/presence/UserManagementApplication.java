@@ -43,7 +43,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         userService = this.context.serviceProvider(UserService.NAME);
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.onLobbyIndex = new ConcurrentHashMap<>();
-        String root = this.context.node().clusterNameSuffix()+"/"+(String)configuration.property("root");
+        String root = this.context.node().clusterNameSuffix()+"/"+configuration.property("root");
         String pwd = (String) configuration.property("password");
         OnAccess onAccess = new OnAccessTrack();
         onAccess.property("login",root);

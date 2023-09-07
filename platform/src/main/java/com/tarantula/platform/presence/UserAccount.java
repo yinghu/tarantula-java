@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class UserAccount extends User implements Account {
 
-
     private int userCount;
     private int gameClusterCount;
     private boolean trial;

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 public class SystemValidatorProvider implements TokenValidatorProvider {
 
@@ -83,7 +82,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             PresenceFetcher httpCaller = fMap.get(session.trackId());
             OnSession onSession = httpCaller.presence(session.token());
             PresenceIndex px = new PresenceIndex(onSession.stub(),session.trackId());
-            px.distributionKey(onSession.systemId());
+            px.distributionId(onSession.distributionId());
             pdataStore.update(px);
             px.dataStore(pdataStore);
             px.registerEventService(this.serviceContext.eventService());
