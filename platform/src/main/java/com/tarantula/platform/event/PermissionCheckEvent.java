@@ -20,7 +20,7 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 	public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.source);
 		out.writeUTF("2",this.sessionId);
-        //out.writeUTF("3",this.oid);
+        out.writeLong("3",this.distributionId);
 		out.writeUTF("4",this.token);
         out.writeInt("5", this.stub);
 		out.writeUTF("6",this.action);
@@ -32,7 +32,7 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 	public void readPortable(PortableReader in) throws IOException {
 		this.source = in.readUTF("1");
 		this.sessionId = in.readUTF("2");
-        //this.oid = in.readUTF("3");
+        this.distributionId = in.readLong("3");
 		this.token = in.readUTF("4");
 		this.stub = in.readInt("5");
 		this.action = in.readUTF("6");
@@ -51,6 +51,6 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 
     @Override
 	public String toString(){
-		return "SERVICE ACTION EVENT ["+action+"]["+this.owner+"/"+this.stub+"]";
+		return "PERMISSION CHECK ACTION EVENT ["+action+"]["+this.distributionId+"/"+this.stub+"]";
 	}
 }

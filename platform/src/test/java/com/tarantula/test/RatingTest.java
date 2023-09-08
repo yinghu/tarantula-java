@@ -11,9 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 public class RatingTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = { "Rating" })
     public void levelUp1000Test() {

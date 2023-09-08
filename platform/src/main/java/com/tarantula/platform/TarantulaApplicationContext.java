@@ -63,7 +63,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.tokenValidatorProvider().presence(session);
     }
     public void absence(Session session){
-        this.validator.offSession(session.distributionKey(),session.stub());
+        this.validator.offSession(session.distributionId(),session.stub());
     }
 
     public Lobby lobby(String typeId){
@@ -74,7 +74,6 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     }
 
     public boolean onEvent(Event event) {
-        log.warn(event.toString());
         if(event instanceof MapStoreSyncEvent){
             MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
             RecoverableListener rc = this.rMap.get(msc.factoryId);

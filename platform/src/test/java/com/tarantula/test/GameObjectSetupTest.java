@@ -3,33 +3,21 @@ package com.tarantula.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.icodesoftware.AccessIndex;
+
 import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.service.ServiceContext;
+
 import com.tarantula.game.service.GameObjectSetup;
-import com.tarantula.platform.AccessIndexTrack;
+
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.util.SystemUtil;
+
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+
 import org.testng.annotations.Test;
 
-public class GameObjectSetupTest {
-
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-    }
-
+public class GameObjectSetupTest extends DataStoreHook{
 
     @Test(groups = { "GameObjectSetup" })
     public void serviceDataStoreTest() {

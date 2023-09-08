@@ -13,21 +13,25 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     private String login;
 
-    public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED",false);
-    public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN",false);
+    public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
+    public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
 
     public OnSessionTrack(){
 
     }
-
-    public OnSessionTrack(String systemId,boolean successful){
+    public OnSessionTrack(String message){
         this();
-        this.systemId = systemId;
+        this.message = message;
+        this.successful = false;
+    }
+    public OnSessionTrack(long systemId,boolean successful){
+        this();
+        this.distributionId = systemId;
         this.successful = successful;
     }
-    public OnSessionTrack(String systemId,int stub,String ticket,String index){
+    public OnSessionTrack(long systemId,int stub,String ticket,String index){
         this();
-        this.systemId = systemId;
+        this.distributionId = systemId;
         this.stub = stub;
         this.ticket = ticket;
         this.index = index;
@@ -75,7 +79,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public JsonObject toJson() {
         JsonObject jp = new JsonObject();
         jp.addProperty("Successful",true);
-        jp.addProperty("SystemId",systemId);
+        jp.addProperty("SystemId",distributionId);
         jp.addProperty("Stub",stub);
         jp.addProperty("Token",token);
         jp.addProperty("Ticket",ticket);

@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 public class UserTest extends DataStoreHook{
 
 
-
-
     @Test(groups = { "User" })
     public void userTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);

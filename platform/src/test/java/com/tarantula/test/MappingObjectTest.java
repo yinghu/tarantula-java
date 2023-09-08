@@ -1,21 +1,15 @@
 package com.tarantula.test;
 
-import com.google.gson.JsonObject;
-import com.icodesoftware.util.CipherUtil;
-import com.icodesoftware.util.JsonUtil;
+
 import com.tarantula.game.MappingObject;
-import com.tarantula.platform.service.PresenceKey;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
 public class MappingObjectTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
+
 
     @Test(groups = { "MappingObejct" })
     public void mappingObjectTest() {

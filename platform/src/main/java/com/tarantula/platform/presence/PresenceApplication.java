@@ -40,18 +40,18 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if (session.action().equals("onSession")) {
             Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence = new OnSessionTrack(session.systemId(),true);
+            pc.presence = new OnSessionTrack(session.distributionId(),true);
             pc.presence.stub(presence.count(0));
             session.write(this.builder.create().toJson(pc).getBytes());
         }
         else if (session.action().equals("onPresence")) {
             Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence= new OnSessionTrack(session.systemId(),true);
+            pc.presence= new OnSessionTrack(session.distributionId(),true);
             pc.presence.stub(presence.count(0));
             pc.access = user(session.distributionId());
             pc.account = account(pc.access);
-            pc.subscription = membership(pc.access.primary()?session.distributionId():pc.access.distributionId());
+            pc.subscription = membership(pc.access.primary()?session.distributionId():pc.access.primaryId());
             pc.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             session.write(this.builder.create().toJson(pc).getBytes());
         }

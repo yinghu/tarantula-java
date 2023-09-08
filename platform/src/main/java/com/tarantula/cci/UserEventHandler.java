@@ -107,8 +107,8 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                 if(onIndex.get()){ //register
                     AccessIndex _aindex = this.accessIndexService.set(magicKey,AccessIndex.USER_INDEX);
                     if(_aindex!=null){
-                        event.systemId(_aindex.distributionKey());
-                        RoutingKey _routingKey = eventService.routingKey(_aindex.distributionKey(),tag);
+                        event.distributionId(_aindex.distributionId());
+                        RoutingKey _routingKey = eventService.routingKey(_aindex.distributionId(),tag);
                         event.destination(_routingKey.route());
                         event.routingNumber(_routingKey.routingNumber());
                         this.eventService.publish(event);

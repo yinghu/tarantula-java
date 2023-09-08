@@ -187,7 +187,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             throw new RuntimeException(ex);
         }
     }
-    public void offSession(String systemId){
+    public void offSession(long systemId){
         Presence presence = pMap.remove(systemId);
         if(presence!=null){
             presence.disabled(true);
@@ -312,18 +312,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             log.warn(onLobby+ " has been monitored at expiration time ->" + TimeUtil.fromUTCMilliseconds(subscription.endTimestamp()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
-    public boolean checkSubscription(String systemId){
+    public boolean checkSubscription(long systemId){
         Subscription subscription = new Membership();
-        subscription.distributionKey(systemId);
+        subscription.distributionId(systemId);
         if(!this.mdatastore.load(subscription)){
             return false;
         }
         LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
         return end.isAfter(LocalDateTime.now());
     }
-    public int updateSubscription(String systemId,int months){
+    public int updateSubscription(long systemId,int months){
         Subscription subscription = new Membership();
-        subscription.distributionKey(systemId);
+        subscription.distributionId(systemId);
         if(!this.mdatastore.load(subscription)){
             return 0;
         }
@@ -334,7 +334,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.mdatastore.update(subscription);
         boolean suc = end.isAfter(LocalDateTime.now());
         Account acc = new UserAccount();
-        acc.distributionKey(systemId);
+        acc.distributionId(systemId);
         if(adataStore.load(acc)){
             acc.trial(false);
             acc.subscribed(suc);

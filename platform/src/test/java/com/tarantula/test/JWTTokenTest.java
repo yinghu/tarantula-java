@@ -20,9 +20,6 @@ import java.util.HashMap;
 
 public class JWTTokenTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = {"JWT"})
     public void jwtTokenTest(){

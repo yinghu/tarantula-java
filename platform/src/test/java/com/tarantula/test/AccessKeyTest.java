@@ -1,29 +1,19 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.ServiceContext;
+
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.AccessKeyQuery;
-import com.icodesoftware.service.DataStoreProvider;
+
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class AccessKeyTest {
-
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-    }
+public class AccessKeyTest extends DataStoreHook{
 
     @Test(groups = { "DataStore" })
     public void smokeTest() {

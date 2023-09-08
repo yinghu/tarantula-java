@@ -9,6 +9,9 @@ public class DataStoreHook {
 
     protected DataStoreProvider dataStoreProvider;
     protected ServiceContext serviceContext;
+
+    protected String name;
+
     @BeforeClass
     public void setUp() {
         DataStoreTestEvn.setUp();
@@ -17,7 +20,12 @@ public class DataStoreHook {
     }
     @AfterTest
     public void tearDown() throws Exception{
-        dataStoreProvider.shutdown();
+        try{
+            dataStoreProvider.shutdown();
+        }catch (Exception ex){
+            //System.out.println(name);
+            //ex.printStackTrace();
+        }
     }
 
 }

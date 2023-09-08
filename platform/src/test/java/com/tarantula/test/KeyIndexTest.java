@@ -11,22 +11,13 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class KeyIndexTest {
+public class KeyIndexTest extends DataStoreHook{
 
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
 
-    DataStore dataStore;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-        dataStore = dataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX+1);
-    }
 
     @Test(groups = { "KeyIndex" })
     public void setupTest() {
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX+"test");
         String masterNode = "n01";
         String slaveNode1 = "n02";
         String slaveNode2 = "n03";

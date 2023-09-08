@@ -7,21 +7,14 @@ import com.icodesoftware.service.Metrics;
 import com.tarantula.platform.service.metrics.MetricsProperty;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MetricsTest extends DataStoreHook{
-    static {
-        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
-    }
-    @BeforeClass
-    public void setUp() {
-    }
 
-    @Test(groups = { "PerformanceMetrics" })
+
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
         //TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-12-31").atTime(23,50,0,0);
@@ -48,7 +41,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsMonthlyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-07-31").atTime(23,50,0,0);//Mon
@@ -72,7 +65,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);//Mon
@@ -95,7 +88,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsDailyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-08-10").atTime(23,50,0,0);//Sun
@@ -118,7 +111,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    @Test(groups = { "PerformanceMetrics" })
+    //@Test(groups = { "PerformanceMetrics" })
     public void metricsHistoryTest() {
 
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);

@@ -36,7 +36,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         if(session.action().equals("onCheckPermission")){
             Access user = this.userService.loadUser(session.distributionId());
             Account acc = this.userService.loadAccount(user);
-            boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.systemId():user.owner());
+            boolean ex = this.tokenValidatorProvider.checkSubscription(user.primary()?session.distributionId():user.primaryId());
             session.write(new PermissionContext(0,acc.gameClusterCount(0),!ex).toJson().toString().getBytes());
         }
         else if(session.action().equals("onUserList")){

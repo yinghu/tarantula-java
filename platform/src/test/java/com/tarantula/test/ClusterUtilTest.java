@@ -8,9 +8,6 @@ import org.testng.annotations.Test;
 
 public class ClusterUtilTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = { "ClusterUtil" })
     public void callSuccessTest() {

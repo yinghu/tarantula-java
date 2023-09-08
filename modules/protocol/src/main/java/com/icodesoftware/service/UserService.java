@@ -27,6 +27,6 @@ public interface UserService extends ServiceProvider,MetricsListener{
     Account createAccount(Access access, Subscription subscription);
     Subscription subscribe(Account accountId,int durationMonth);
 
-    LoginProvider loginProvider(String systemId);
+    LoginProvider loginProvider(long systemId);
     void createLoginProvider(LoginProvider loginProvider);
 }

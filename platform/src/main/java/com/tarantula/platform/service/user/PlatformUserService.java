@@ -213,9 +213,9 @@ public class PlatformUserService implements UserService {
         //return
     //}
 
-    public LoginProvider loginProvider(String systemId){
+    public LoginProvider loginProvider(long systemId){
         ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();
-        thirdPartyLogin.distributionKey(systemId);
+        thirdPartyLogin.distributionId(systemId);
         return loginProviderDataStore.load(thirdPartyLogin)?thirdPartyLogin:null;
     }
     public void createLoginProvider(LoginProvider loginProvider){

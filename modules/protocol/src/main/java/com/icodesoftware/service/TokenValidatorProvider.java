@@ -49,8 +49,8 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     void registerAuthVendor(String provider,AuthVendor authVendor);
     void releaseAuthVendor(String provider,AuthVendor authVendor);
     void onCheck(OnLobby onLobby);
-    boolean checkSubscription(String systemId);
-    int updateSubscription(String systemId,int months);
+    boolean checkSubscription(long systemId);
+    int updateSubscription(long systemId,int months);
     interface AuthVendor{
         String name();
         String typeId();

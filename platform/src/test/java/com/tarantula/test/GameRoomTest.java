@@ -12,22 +12,13 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
-public class GameRoomTest {
+public class GameRoomTest extends DataStoreHook{
 
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
 
-    DataStore dataStore;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-        dataStore = dataStoreProvider.createDataStore("room");
-    }
 
     @Test(groups = { "GameRoom" })
     public void setupTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_room");
         PVPGameRoom room = new PVPGameRoom(10);
         Assert.assertTrue(dataStore.create(room));
         room.dataStore(dataStore);
@@ -45,6 +36,7 @@ public class GameRoomTest {
     }
     //@Test(groups = { "GameRoom" })
     public void joinTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_room");
         PVPGameRoom room = new PVPGameRoom(5);
         dataStore.create(room);
         room.dataStore(dataStore);

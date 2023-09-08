@@ -74,7 +74,7 @@ public class SystemValidator{
         }
 
         @Override
-        public void offSession(String systemId, int stub) {
+        public void offSession(long systemId, int stub) {
             systemValidatorProvider.offSession(systemId);
         }
         @Override

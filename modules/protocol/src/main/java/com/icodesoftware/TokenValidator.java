@@ -19,7 +19,7 @@ public interface TokenValidator {
     boolean validateTicket(Session session);
 
 
-    void offSession(String id,int stub);
+    void offSession(long id,int stub);
 
 
     boolean validateToken(Map<String,Object> params);

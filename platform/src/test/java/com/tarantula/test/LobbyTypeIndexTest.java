@@ -12,8 +12,6 @@ import org.testng.annotations.Test;
 public class LobbyTypeIndexTest extends DataStoreHook{
 
 
-
-
     @Test(groups = { "lobbyTypeIdIndex" })
     public void lobbyTypeIdIndexTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");

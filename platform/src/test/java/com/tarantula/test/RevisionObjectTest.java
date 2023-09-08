@@ -1,17 +1,13 @@
 package com.tarantula.test;
 
-import com.tarantula.platform.AccessIndexTrack;
+
 import com.tarantula.platform.service.persistence.RevisionObject;
-import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class RevisionObjectTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = { "RevisionObject" })
     public void localTest() {

@@ -4,34 +4,16 @@ package com.tarantula.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.service.ServiceContext;
+
 import com.tarantula.platform.item.*;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.List;
+
+public class ConfigurableObjectTestSet extends DataStoreHook{
 
 
-public class ConfigurableObjectTestSet {
-
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-    }
-
-
-    @AfterTest
-    public void tearDown() throws Exception{
-        dataStoreProvider.shutdown();
-    }
     @Test(groups = { "configurableTemplate" })
     public void configurableTemplateTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");

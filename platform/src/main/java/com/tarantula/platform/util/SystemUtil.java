@@ -87,7 +87,7 @@ public class SystemUtil {
         //System.out.println(token);
         ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
         if(!validated.valid) throw new RuntimeException("Wrong session token");
-        return new OnSessionTrack(validated.systemId,validated.stub,validated.ticket,validated.index);
+        return new OnSessionTrack(1,validated.stub,validated.ticket,validated.index);//need to update
     }
     public static String hashPassword(MessageDigest messageDigest,String password) {
         messageDigest.reset();

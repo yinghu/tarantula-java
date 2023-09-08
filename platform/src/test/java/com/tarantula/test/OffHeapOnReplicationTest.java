@@ -15,9 +15,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class OffHeapOnReplicationTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = { "OffHeapReplication" })
     public void dataScopeTest() {

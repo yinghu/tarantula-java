@@ -15,17 +15,14 @@ public class GameClusterTest extends DataStoreHook{
     @Test(groups = { "GameCluster" })
     public void createGameCluster(){
         DataStore ds = dataStoreProvider.createDataStore("test_tarantula");
-        long accountId = 1;//"accoutId";
-        long publishingId = 2;//"publishingId";
+        long accountId = serviceContext.distributionId();
+        long publishingId = serviceContext.distributionId();
         GameCluster gameCluster = new GameCluster();
         gameCluster.name("beam");
         gameCluster.mode = "pve";
         gameCluster.developerIcon = "dicon";
         gameCluster.gameIcon = "gaicon";
         gameCluster.developer = "gdds";
-        //gameCluster.gameLobbyName = "beam/lobby";
-        //gameCluster.gameServiceName = "beam/service";
-        //gameCluster.gameDataName = "beam/data";
         gameCluster.tournamentEnabled = true;
         gameCluster.dedicated = false;
         gameCluster.applicationSetup = "com.tarantula.Appsetup";
@@ -40,7 +37,7 @@ public class GameClusterTest extends DataStoreHook{
         Assert.assertTrue(ds.update(gameCluster));
 
         GameCluster load = new GameCluster();
-        //load.oid(gameCluster.oid());
+        load.distributionId(gameCluster.distributionId());
         Assert.assertTrue(ds.load(load));
         Assert.assertEquals(load.name(),gameCluster.name());
         Assert.assertNotNull(load.gameLobbyName);
