@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 
 import com.google.gson.JsonObject;
 
+import com.icodesoftware.DataStore;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
@@ -77,6 +78,28 @@ public class ConfigurableCategoriesSetupTest extends DataStoreHook{
         //Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableTypeQuery(ConfigurableTypeQuery.CommodityKey,"type")).size(),2);
     }
 
-
+    @Test(groups = { "ConfigurableCategories" })
+    public void configurableTypeTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
+        ConfigurableCategories categories = new ConfigurableCategories();
+        categories.name("asset");
+        ConfigurableTemplate template = JsonConfigurableTemplateParser.itemSet(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-common-type-settings.json"));
+        JsonArray items = (JsonArray) template.property("itemList");
+        Assert.assertNotNull(items);
+        items.forEach(item->{
+            JsonObject jo = item.getAsJsonObject();
+            ConfigurableType type = new ConfigurableType(jo);
+            type.label("type");
+            type.onEdge(true);
+            type.ownerKey(ConfigurableTypeQuery.AssetKey);
+            Assert.assertTrue(dataStore.createIfAbsent(type,false));
+            //Assert.assertTrue(dataStore.createEdge(type,"type"));
+            //Assert.assertTrue(dataStore.createEdge(type,"link"));
+            //Assert.assertTrue(dataStore.createEdge(type,"data"));
+        });
+        Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"type")).size(),17);
+        //Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"link")).size(),17);
+        //Assert.assertEquals(dataStore.list(new ConfigurableTypeQuery(ConfigurableTypeQuery.AssetKey,"data")).size(),17);
+    }
 
 }

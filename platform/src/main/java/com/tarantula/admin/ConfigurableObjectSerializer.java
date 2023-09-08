@@ -17,7 +17,7 @@ public class ConfigurableObjectSerializer implements JsonSerializer<Configurable
         jsonObject.addProperty("configurationName",configurableObject.configurationName());
         jsonObject.addProperty("configurationCategory",configurableObject.configurationCategory());
         jsonObject.addProperty("configurationVersion",configurableObject.configurationVersion());
-        jsonObject.addProperty("itemId", configurableObject.distributionKey());
+        jsonObject.addProperty("itemId", Long.toString(configurableObject.distributionId()));
         jsonObject.addProperty("disabled",configurableObject.disabled());
         jsonObject.addProperty("revision",Long.toString(configurableObject.revision()));
         jsonObject.add("header",configurableObject.header());

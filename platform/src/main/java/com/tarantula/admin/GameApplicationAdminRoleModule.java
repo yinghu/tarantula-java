@@ -25,12 +25,13 @@ public class GameApplicationAdminRoleModule implements Module {
             session.write(new ItemAdminContext(true,items.size()>0?"Configure store item":"no items configured",items).toJson().toString().getBytes());
         }
         else if(session.action().equals("onLoad")){
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             Descriptor desc = gameCluster.serviceWithCategory(query[2]);
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Application app = new Application();
-            app.distributionKey(query[1]);
+            app.distributionId(Long.parseLong(query[1]));
             if(preSetup.load(desc,app)){
                 app.setup();
                 session.write(new ApplicationSerializer().serialize(app,Application.class,null).toString().getBytes());

@@ -469,7 +469,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         lobbyPayload.get("application").getAsJsonObject().get("ZoneSet").getAsJsonArray().add(zone.distributionId());
         lobbyPayload.get("reference").getAsJsonArray().add(zone.distributionId());
         Application lobby = new Application();
-        this.context.log(createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup),OnLog.WARN);
+        createApplication(lobby,lobbyPayload,gameCluster,applicationPreSetup);
         //pre-defined third party validators
         Configuration configuration = this.context.configuration((gameCluster.name()).toLowerCase());
         if(configuration!=null) {
