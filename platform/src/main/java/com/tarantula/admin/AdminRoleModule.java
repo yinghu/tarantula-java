@@ -107,9 +107,7 @@ public class AdminRoleModule implements Module{
                     onAccess.property(OnAccess.GAME_CLUSTER_CONFIG,this.gameClusterConfiguration);
                     GameCluster gc = this.deploymentServiceProvider.createGameCluster(acc,pendingName,onAccess);
                     if(gc.successful()){
-                        //IndexSet idx = this.deploymentServiceProvider.loadGameClusterIndex(ua);
-                        //idx.addKey(gc.distributionKey());
-                        //idx.update();
+                        this.context.log(gc.distributionId()+"",OnLog.WARN);
                         acc.gameClusterCount(1);
                         acc.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
                         acc.update();

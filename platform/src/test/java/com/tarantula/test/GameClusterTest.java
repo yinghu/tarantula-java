@@ -18,6 +18,7 @@ public class GameClusterTest extends DataStoreHook{
         long accountId = serviceContext.distributionId();
         long publishingId = serviceContext.distributionId();
         GameCluster gameCluster = new GameCluster();
+        gameCluster.distributionId(publishingId);
         gameCluster.name("beam");
         gameCluster.mode = "pve";
         gameCluster.developerIcon = "dicon";
@@ -31,7 +32,7 @@ public class GameClusterTest extends DataStoreHook{
         gameCluster.maxLobbyCount = 10;
         gameCluster.maxDataSize = 4000;
         gameCluster.upgradeVersion = 1;
-        Assert.assertTrue(ds.create(gameCluster));
+        Assert.assertTrue(ds.createIfAbsent(gameCluster,false));
         Assert.assertNull(gameCluster.gameLobbyName);
         gameCluster.gameLobbyName = "beam/lobby";
         Assert.assertTrue(ds.update(gameCluster));

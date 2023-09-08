@@ -569,9 +569,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
-        log.warn("Launching game cluster->"+gameCluster.distributionId());
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        if(this.enableGameCluster(gameCluster.distributionId())&&deployService.onStartGameService(gameCluster.distributionId())){
+        if(this.enableGameCluster(gameCluster.distributionId()) && deployService.onStartGameService(gameCluster.distributionId())){
             return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionId());
         }
         else{
@@ -611,7 +610,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.distributionId():access.distributionId());
         return (List<T>)this.tarantulaContext.masterDataStore().list(gameClusterQuery);
     }
-    public  <T extends OnAccess> T createGameCluster(Account accountId,String name,OnAccess properties){
+    public  <T extends OnAccess> T createGameCluster(Account account,String name,OnAccess properties){
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().set(name,AccessIndex.SYSTEM_INDEX);//name+"-"+mode
         if(accessIndex==null){
             GameCluster gc = new GameCluster();
@@ -637,8 +636,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             DataStore mds = this.tarantulaContext.masterDataStore();
             gameCluster.name(name);
             gameCluster.mode = playMode;
-            gameCluster.accountId = accountId.distributionId();
-            gameCluster.publishingId = publishingId;
+            gameCluster.accountId = account.distributionId();
             gameCluster.developer = developer;
             gameCluster.tournamentEnabled = tournamentEnabled;
             gameCluster.disabled(true);
@@ -650,10 +648,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gameCluster.maxArenaCount = maxArenaCount;
             gameCluster.maxDataSize = maxDataSize;
             gameCluster.upgradeVersion = 1;
-            if(!mds.create(gameCluster)) throw new RuntimeException("faled to create game cluster");//create first and discharge if any errors on loop
-            gameCluster.ownerKey(new SnowflakeKey(accountId.distributionId()));
-            mds.createEdge(gameCluster,GameCluster.LABEL);
-            gameCluster.ownerKey(new SnowflakeKey(publishingId));
+            gameCluster.distributionId(publishingId);
+            if(!mds.createIfAbsent(gameCluster,false)) throw new RuntimeException("failed to create game cluster");//create first and discharge if any errors on loop
+            gameCluster.ownerKey(new SnowflakeKey(account.distributionId()));
             mds.createEdge(gameCluster,GameCluster.LABEL);
             gameCluster.ownerKey(new SnowflakeKey(this.tarantulaContext.node().deploymentId()));
             mds.createEdge(gameCluster,GameCluster.LABEL);
@@ -692,8 +689,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 descriptor.disabled(true);//pending launch
                 descriptor.deployCode(DeployCode.USER_GAME_CLUSTER);
                 mds.create(descriptor);
-                //lobbyTypeIdIndex.owner(descriptor.distributionId());
-                //lobbyTypeIdIndex.index(gameCluster.distributionId());
+                lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),configuration.descriptor.typeId(),descriptor.distributionId(),gameCluster.distributionId());
                 mds.createIfAbsent(lobbyTypeIdIndex,false);
                 configuration.applications.forEach((a)->{
                     a.ownerKey(descriptor.key());
@@ -736,10 +732,10 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),typeId);
         if(!mds.load(lobbyTypeIdIndex)) return null;
         LobbyDescriptor lb = new LobbyDescriptor();
-        //lb.oid(lobbyTypeIdIndex.owner());
+        lb.distributionId(lobbyTypeIdIndex.lobbyId());
         if(!mds.load(lb)) return null;
         Lobby lobby = new DefaultLobby(lb);
-        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.distributionId()));//this.tarantulaContext.queryFromDataMaster(PortableRegistry.OID,new ApplicationQuery(lb.distributionKey()),new String[]{lb.distributionKey()},true);
+        List<DeploymentDescriptor> apps = this.tarantulaContext.masterDataStore().list(new ApplicationQuery(lb.distributionId()));
         apps.forEach((a)->{
             lobby.addEntry(a);
         });
@@ -885,7 +881,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        //lobbyDescriptor.distributionId(query.owner());
+        lobbyDescriptor.distributionId(query.lobbyId());
         if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
             return false;
         }
@@ -901,7 +897,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             return false;
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
-        //lobbyDescriptor.oid(query.owner());
+        lobbyDescriptor.distributionId(query.lobbyId());
         if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
             return false;
         }

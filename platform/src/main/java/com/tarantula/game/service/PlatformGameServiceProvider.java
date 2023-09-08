@@ -111,9 +111,9 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             serviceExported.put(serviceId,serviceProxy);
         }));
         this.metrics = new GameClusterMetrics(gameCluster.gameServiceName);
-        this.metrics.setup(serviceContext);
-        serviceContext.registerMetrics(metrics);
-        this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
+        //this.metrics.setup(serviceContext);
+        //serviceContext.registerMetrics(metrics);
+        //this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
         this.serviceContext = serviceContext;
         this.serviceContext.deploymentServiceProvider().registerConfigurableListener(OnLobby.TYPE,gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{
@@ -122,7 +122,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             listener.onEvent(e);
             return true;
         });
-        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionKey()+"]");
+        logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
     @Override
     public void waitForData(){

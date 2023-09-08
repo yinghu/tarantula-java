@@ -342,20 +342,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
     public synchronized void setGameClusterOnLobby(GameCluster gameCluster,Configurable.Listener listener){
- 	    long publishingId = gameCluster.publishingId;//(String) gameCluster.property(GameCluster.PUBLISHING_ID);
- 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
+ 	    //long publishingId = gameCluster.publishingId;//(String) gameCluster.property(GameCluster.PUBLISHING_ID);
+ 	    List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(gameCluster.distributionId()));
         List<LobbyConfiguration> configurations = new ArrayList<>();
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->_setOnLobby(c,listener));
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionId(this.node.deploymentId());
-        indexSet.label(Account.GameClusterLabel);
-        indexSet.keySet.add(gameCluster.distributionKey());
-        if(!this.masterDataStore().createIfAbsent(indexSet,true)){
-            indexSet.keySet.add(gameCluster.distributionKey());
-            this.masterDataStore().update(indexSet);
-        }
+        //IndexSet indexSet = new IndexSet();
+        //indexSet.distributionId(this.node.deploymentId());
+        //indexSet.label(Account.GameClusterLabel);
+        //indexSet.keySet.add(gameCluster.distributionKey());
+        //if(!this.masterDataStore().createIfAbsent(indexSet,true)){
+            //indexSet.keySet.add(gameCluster.distributionKey());
+            //this.masterDataStore().update(indexSet);
+        //}
     }
     private void _setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){

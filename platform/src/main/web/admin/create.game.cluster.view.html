@@ -157,6 +157,7 @@
         cmd.developer = _developer;
         cmd.developerIcon = _dicon;
         TARA_API.onService(true,cmd,(resp)=>{
+            console.log(resp);
             if(resp.successful){
                 //goes to do lobby configurations
                 TARA_API.query().gameClusterId = resp.gameClusterId;
