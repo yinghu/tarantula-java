@@ -35,7 +35,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
             stub.tournament = instance;
         }
         stub.tag(application.tag());
-        stub.ticket(this.context.validator().ticket(session.owner(),session.stub()));
+        stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         this.dataStore.update(stub);
         return stub;
     }

@@ -60,12 +60,12 @@ public class SystemValidator{
             }
         }
         @Override
-        public String ticket(String input, int stub) {//short live ticket
+        public String ticket(long input, int stub) {//short live ticket
             return systemValidatorProvider.ticket(input,stub,timeoutSeconds);
         }
         @Override
         public boolean validateTicket(Session session) {
-            return systemValidatorProvider.validateTicket(session.distributionKey(),session.stub(),session.ticket());
+            return systemValidatorProvider.validateTicket(session.distributionId(),session.stub(),session.ticket());
             //Presence ptx = systemValidatorProvider.presence(session);
             //String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
             //byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();

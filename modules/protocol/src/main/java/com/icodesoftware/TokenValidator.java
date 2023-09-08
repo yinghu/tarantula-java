@@ -14,7 +14,7 @@ public interface TokenValidator {
     OnSession validatePassword(Access hash, String password);
 
     //generate the ticket with limited life circle
-    String ticket(String id,int stub);
+    String ticket(long id,int stub);
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
 

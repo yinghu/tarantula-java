@@ -271,15 +271,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return keys;
     }
 
-    public String ticket(String key,int stub,int duration){
-        byte[] data = BufferProxy.buffer(200).writeUTF8(key).writeInt(stub).writeInt(duration).array();
+    public String ticket(long key,int stub,int duration){
+        byte[] data = BufferProxy.buffer(200).writeLong(key).writeInt(stub).writeInt(duration).array();
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
-    public boolean validateTicket(String key,int stub,String ticket){
+    public boolean validateTicket(long key,int stub,String ticket){
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
         Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
-        return buffer.readUTF8().equals(key) && buffer.readInt() == stub;
+        return buffer.readLong()==(key) && buffer.readInt() == stub;
     }
     public List<Access.Role> list(){
         return roleList;
@@ -570,7 +570,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
             Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
-            //dataBuffer.writeUTF8(access.oid()).writeInt(session.stub());
+            dataBuffer.writeLong(access.distributionId()).writeInt(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
@@ -587,13 +587,13 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             if(r==null) return false;
             byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
-            String id = dataBuffer.readUTF8();
+            long id = dataBuffer.readLong();
             int stub = dataBuffer.readInt();
-            //onSession.oid(id);
+            onSession.distributionId(id);
             onSession.stub(stub);
             return true;
         })) return OnSessionTrack.INVALID_TOKEN;
-        onSession.ticket(ticket(onSession.distributionKey(),onSession.stub(),timeoutInSeconds));
+        onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
         return onSession;
     }
 

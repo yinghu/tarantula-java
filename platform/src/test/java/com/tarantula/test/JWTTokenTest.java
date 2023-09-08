@@ -29,7 +29,7 @@ public class JWTTokenTest {
         byte[] key = CipherUtil.key(16);
         JWTUtil.JWT jwt = JWTUtil.init(CipherUtil.key(32));
         Access access = new User();
-        //access.oid("test1");
+        access.distributionId(1000);
         access.role(AccessControl.root.name());
         OnSession session = new OnSessionTrack();
         session.stub(1);
@@ -37,7 +37,7 @@ public class JWTTokenTest {
         roles.put(AccessControl.root.name(),AccessControl.root);
         String jwtToken = jwt.token((h, p) -> {
             Access.Role r = roles.get(access.role());
-            byte[] mark = waterMark(key, BufferProxy.buffer(200).writeUTF8(access.owner()).writeInt(session.stub()).writeInt(r.accessControl()).array());
+            byte[] mark = waterMark(key, BufferProxy.buffer(200).writeLong(access.distributionId()).writeInt(session.stub()).writeInt(r.accessControl()).array());
             h.addProperty("kid", CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
@@ -50,11 +50,11 @@ public class JWTTokenTest {
             if(r==null) return false;
             byte[] data = reverse(key, CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer buffer = BufferProxy.wrap(data);
-            String id = buffer.readUTF8();
+            long id = buffer.readLong();
             int stub = buffer.readInt();
             int role = buffer.readInt();
             //System.out.println(id+"<><>"+stub);
-            return id.equals(access.owner()) && stub == session.stub() && role == r.accessControl();
+            return id==(access.distributionId()) && stub == session.stub() && role == r.accessControl();
         }));
     }
 
