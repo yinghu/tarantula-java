@@ -1,8 +1,10 @@
 package com.tarantula.test;
 
 import com.icodesoftware.Distributable;
+import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.icodesoftware.service.MapStoreListener;
 
@@ -15,12 +17,15 @@ public class DataStoreTestEvn {
     static DataStoreProvider dataStoreProvider;
     static ServiceContext serviceContext;
 
+    static DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     static MapStoreListener mapStoreListener = new TestMapStoreListener();
     public static void setUp() {
-        serviceContext = new TestServiceContext();
+        distributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
+        serviceContext = new TestServiceContext(distributionIdGenerator);
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, 3,dataStoreProvider->{
             try{
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
+                DataStoreTestEvn.dataStoreProvider.registerDistributionIdGenerator(distributionIdGenerator);
                 DataStoreTestEvn.dataStoreProvider.start();
                 DataStoreTestEvn.dataStoreProvider.setup(serviceContext);
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,mapStoreListener);

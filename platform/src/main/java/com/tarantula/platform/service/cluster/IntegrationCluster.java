@@ -10,6 +10,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.service.*;
 
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.TimeUtil;
@@ -337,7 +338,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
         cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
-        byte[] ret = this.vMap.putIfAbsent(cnode.nodeName.getBytes(),cnode.toBinary());
+        byte[] ret = this.vMap.putIfAbsent(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(cnode.nodeId)),cnode.toBinary());
         if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered");
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
@@ -345,17 +346,17 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _wait();
         String[] node = mEvent.getValue().toString().split("#");
         String nodeName = node[0];
-        String nodeId = node[1];
+        long nodeId = Long.parseLong(node[1]);
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
-        this.vMap.putIfAbsent(memberId.getBytes(),nodeId.getBytes()); //memberId => nodeId index
+        this.vMap.putIfAbsent(memberId.getBytes(),BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId))); //memberId => nodeId index
         summary.register(fromCluster(nodeId));
         for(int i=0;i<10;i++){
             try{
                 for(Member m : _cluster.getCluster().getMembers()){
                     if(!m.localMember()){
                         String[] pnode = m.getStringAttribute("node").split("#");
-                        Node exstingNode = fromCluster((pnode[1]));
+                        Node exstingNode = fromCluster(Long.parseLong(pnode[1]));
                         if(exstingNode != null){
                             nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
                             this.summary.register(exstingNode);
@@ -382,16 +383,16 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
         nList.forEach(nodeListener -> nodeListener.nodeRemoved(removed));
         this.summary.unregister(removed);
-        this.vMap.remove(node[1].getBytes());//remove nodeId = > node
+        this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1]))));//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
     //public void onNodeAdded(String memberId){
 
     //}
 
-    private Node fromCluster(String nodeId){
+    private Node fromCluster(long nodeId){
         Node n = new ClusterNode();
-        byte[] ret = this.vMap.get(nodeId.getBytes());
+        byte[] ret = this.vMap.get(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId)));
         if(ret==null) return null;
         n.fromBinary(ret);
         return n;

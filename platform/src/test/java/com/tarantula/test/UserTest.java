@@ -26,7 +26,7 @@ public class UserTest extends DataStoreHook{
     @Test(groups = { "User" })
     public void userTest() {
         DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
-        AccessIndex accessIndex = new AccessIndexTrack("test1",1,serviceContext.deploymentServiceProvider().distributionId());
+        AccessIndex accessIndex = new AccessIndexTrack("test1",1,serviceContext.distributionId());
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
         DataStore dUser = dataStoreProvider.createDataStore("test_user");
         DataStore pUser = dataStoreProvider.createDataStore("test_presence");

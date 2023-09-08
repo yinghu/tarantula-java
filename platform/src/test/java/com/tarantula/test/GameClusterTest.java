@@ -1,35 +1,15 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.OidKey;
+
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.GameCluster;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
-public class GameClusterTest {
-
-
-    DataStoreProvider dataStoreProvider;
-    ServiceContext serviceContext;
-    @BeforeClass
-    public void setUp() {
-        DataStoreTestEvn.setUp();
-        dataStoreProvider = DataStoreTestEvn.dataStoreProvider;
-        serviceContext = DataStoreTestEvn.serviceContext;
-    }
-
-
-    @AfterTest
-    public void tearDown() throws Exception{
-       dataStoreProvider.shutdown();
-    }
+public class GameClusterTest extends DataStoreHook{
 
 
     @Test(groups = { "GameCluster" })

@@ -26,7 +26,7 @@ public class DeploymentDescriptorTest extends DataStoreHook{
         Exception exception = null;
         try {
             DataStore ds = dataStoreProvider.createDataStore("test_tarantula");
-            long bucketId = serviceContext.deploymentServiceProvider().distributionId();
+            long bucketId = serviceContext.distributionId();
             List<LobbyDescriptor> lobbies = ds.list(new LobbyQuery(bucketId));
             Assert.assertEquals(lobbies.size(),0);
             XMLParser xmlParser = new XMLParser();

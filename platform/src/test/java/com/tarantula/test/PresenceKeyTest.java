@@ -19,7 +19,7 @@ public class PresenceKeyTest extends DataStoreHook{
     @Test(groups = { "PresenceKey" })
     public void presenceKeyTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
-        long nodeId = serviceContext.deploymentServiceProvider().distributionId();
+        long nodeId = serviceContext.distributionId();
         String bkey = CipherUtil.toBase64Key();
         byte[] key = CipherUtil.fromBase64Key(bkey);
         byte[] tkey = JWTUtil.key();

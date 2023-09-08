@@ -15,9 +15,9 @@ public class ClusterNodeTest extends DataStoreHook{
     public void clusterNodeSetupTest() {
         DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
         ClusterNode node = (ClusterNode)serviceContext.node();
-        long bucketId = serviceContext.deploymentServiceProvider().distributionId();
-        long nodeId = serviceContext.deploymentServiceProvider().distributionId();
-        long developmentId = serviceContext.deploymentServiceProvider().distributionId();
+        long bucketId = serviceContext.distributionId();
+        long nodeId = serviceContext.distributionId();
+        long developmentId = serviceContext.distributionId();
         AccessIndexTrack abucket = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+node.bucketName(),AccessIndex.SYSTEM_INDEX,bucketId);
         AccessIndexTrack anode = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+node.nodeName(),AccessIndex.SYSTEM_INDEX,nodeId);
         AccessIndexTrack adevelop = new AccessIndexTrack(node.clusterNameSuffix()+ Recoverable.PATH_SEPARATOR+"development",AccessIndex.SYSTEM_INDEX,developmentId);

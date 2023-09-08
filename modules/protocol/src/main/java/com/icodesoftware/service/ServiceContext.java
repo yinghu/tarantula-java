@@ -20,7 +20,7 @@ public interface ServiceContext extends Context{
     OnPartition[] partitions();
 
     ClusterProvider.Node node();
-
+    long distributionId();
     ServiceEventLogger serviceEventLogger();
     RecoverableRegistry recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);

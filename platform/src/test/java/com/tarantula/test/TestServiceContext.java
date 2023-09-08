@@ -16,7 +16,9 @@ public class TestServiceContext implements ServiceContext {
     ClusterNode node;
     DataStoreProvider dataStoreProvider;
 
-    public TestServiceContext(){
+    DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
+    public TestServiceContext(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){
+        this.distributionIdGenerator = distributionIdGenerator;
         this.node = new ClusterNode("BSD","T01",31);
         this.node.clusterNameSuffix = "test";
         this.node.deployDirectory = "deploy";
@@ -76,7 +78,10 @@ public class TestServiceContext implements ServiceContext {
         return new TestDeploymentProvider(dataStoreProvider);
     }
 
-
+    @Override
+    public long distributionId() {
+        return distributionIdGenerator.id();
+    }
 
     @Override
     public OnPartition[] partitions() {

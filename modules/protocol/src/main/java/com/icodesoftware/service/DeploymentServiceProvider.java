@@ -26,8 +26,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void verifyConnection(String typeId,String serverId);
     byte[] serverKey(String typeId);
 
-    long distributionId();
-
     String registerGameServerListener(GameServerListener gameServerListener);
     void unregisterGameServerListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs

@@ -48,11 +48,4 @@ public class TestMapStoreListener implements MapStoreListener {
     public void onDeleting(Metadata metadata, byte[] key) {
 
     }
-    public void assignKey(Recoverable.DataBuffer dataBuffer){
-        dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());
-        //dataBuffer.writeUTF8(UUID.randomUUID().toString());
-    }
-    public long distributionId(){
-        return snowflakeIdGenerator.snowflakeId();
-    }
 }

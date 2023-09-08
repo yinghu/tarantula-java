@@ -16,7 +16,7 @@ public class AccessIndexTest extends DataStoreHook{
         DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
         Assert.assertEquals(dataStore.name(),AccessIndexService.AccessIndexStore.STORE_NAME);
         String access = "access100";
-        AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access, AccessIndex.USER_INDEX,serviceContext.deploymentServiceProvider().distributionId());
+        AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access, AccessIndex.USER_INDEX,serviceContext.distributionId());
         Assert.assertTrue(accessIndexTrack.validate());
         Assert.assertNotNull(accessIndexTrack.owner());
         Assert.assertTrue(accessIndexTrack.distributionId()>0);

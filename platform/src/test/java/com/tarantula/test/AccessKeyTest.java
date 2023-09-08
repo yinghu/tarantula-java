@@ -28,7 +28,7 @@ public class AccessKeyTest {
     @Test(groups = { "DataStore" })
     public void smokeTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("access_key");
-        SnowflakeKey ownerId = new SnowflakeKey(serviceContext.deploymentServiceProvider().distributionId());
+        SnowflakeKey ownerId = new SnowflakeKey(serviceContext.distributionId());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");
         accessKey.index(""+this.serviceContext.node().bucketId());

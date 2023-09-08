@@ -9,8 +9,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.SnowflakeIdGenerator;
-import com.icodesoftware.util.TimeUtil;
+
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
@@ -23,7 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
@@ -50,11 +49,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
 
-    //private MapStoreListener
+    private MapStoreListener mapStoreListener;
+    private DistributionIdGenerator distributionIdGenerator;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
-        //this.snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(20202,1,1));
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
@@ -65,12 +65,14 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.keyPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_keyPath;
     }
 
-    private MapStoreListener mapStoreListener;
     @Override
     public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener) {
         this.mapStoreListener = mapStoreListener;
     }
-
+    @Override
+    public void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator){
+        if(distributionIdGenerator!=null) this.distributionIdGenerator = distributionIdGenerator;
+    }
     @Override
     public MapStoreListener mapStoreListener(int scope) {
         return this;
@@ -148,6 +150,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public void start() throws Exception {
+        if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
         data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
         integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
         index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
@@ -192,13 +195,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-    public void assignKey(Recoverable.DataBuffer dataBuffer){
-        mapStoreListener.assignKey(dataBuffer);
+    public void assign(Recoverable.DataBuffer dataBuffer){
+        this.distributionIdGenerator.assign(dataBuffer);
     }
 
-    public long distributionId(){
-        return mapStoreListener.distributionId();
-    }
     private Path path(String path) throws Exception{
         Path _path = Paths.get(path);
         if(!Files.exists(_path)) Files.createDirectories(_path);

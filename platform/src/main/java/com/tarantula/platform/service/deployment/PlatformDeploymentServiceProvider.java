@@ -761,9 +761,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] existing = clusterStore.mapSetIfAbsent(typeId.getBytes(),key);
         return existing!=null?existing:key;
     }
-    public long distributionId(){
-        return 0;
-    }
     public OnAccess registerConnection(Connection connection){
         GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
         if(gameServerListener==null) return null;

@@ -5,9 +5,11 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.util.NaturalKey;
 
+import com.icodesoftware.util.TimeUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -24,6 +26,8 @@ public class LMDBDataStoreTest {
     }
     LMDBDataStoreProvider lmdbDataStoreProvider;
     TestMapStoreListener testMapStoreListener;
+
+    LocalDistributionIdGenerator localDistributionIdGenerator;
     @BeforeClass
     public void setUp() throws Exception{
 
@@ -31,6 +35,8 @@ public class LMDBDataStoreTest {
         //lmdbDataStoreProvider.configure(new HashMap<>(){{
             //put("dir","target/lmdb");
         //}});
+        localDistributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
+        lmdbDataStoreProvider.registerDistributionIdGenerator(localDistributionIdGenerator);
         lmdbDataStoreProvider.start();
         testMapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,testMapStoreListener);
@@ -45,7 +51,7 @@ public class LMDBDataStoreTest {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
         String key = "a100";
         TestAccessIndex created = new TestAccessIndex(key);
-        created.distributionId(testMapStoreListener.snowflakeIdGenerator.snowflakeId());
+        created.distributionId(localDistributionIdGenerator.id());
         Assert.assertTrue(ds.createIfAbsent(created,false));
         TestAccessIndex not_created = new TestAccessIndex(key);
         Assert.assertFalse(ds.createIfAbsent(not_created,false));
@@ -167,7 +173,7 @@ public class LMDBDataStoreTest {
         TestMapStoreListener mapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         ByteBuffer key = ByteBuffer.allocate(100);
         Recoverable.DataBuffer dataBuffer = new BufferProxy(key);
-        mapStoreListener.assignKey(dataBuffer);
+        localDistributionIdGenerator.assign(dataBuffer);
         key.flip();
         testUser.readKey(dataBuffer);
         Assert.assertTrue(testUser.distributionId()>0);

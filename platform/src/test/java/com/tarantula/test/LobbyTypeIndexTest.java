@@ -17,9 +17,9 @@ public class LobbyTypeIndexTest extends DataStoreHook{
     @Test(groups = { "lobbyTypeIdIndex" })
     public void lobbyTypeIdIndexTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula");
-        long deploymentId = serviceContext.deploymentServiceProvider().distributionId();
-        long lobbyId = serviceContext.deploymentServiceProvider().distributionId();
-        long gameClusterId = serviceContext.deploymentServiceProvider().distributionId();
+        long deploymentId = serviceContext.distributionId();
+        long lobbyId = serviceContext.distributionId();
+        long gameClusterId = serviceContext.distributionId();
         LobbyTypeIdIndex created = new LobbyTypeIdIndex(deploymentId,"holee-lobby",lobbyId,gameClusterId);
         Assert.assertTrue(dataStore.createIfAbsent(created,false));
         Assert.assertEquals(created.lobbyId(),lobbyId);

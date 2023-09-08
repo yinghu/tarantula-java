@@ -221,9 +221,6 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public void registerAccessIndexListener(AccessIndexService.Listener listener) {
 
     }
-    public long distributionId(){
-        return dataStoreProvider.mapStoreListener(Distributable.DATA_SCOPE).distributionId();
-    }
     @Override
     public AccessIndexService.AccessIndexStore accessIndexStore() {
         return null;

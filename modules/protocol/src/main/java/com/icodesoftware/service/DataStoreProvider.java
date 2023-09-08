@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
 
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
@@ -15,6 +16,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     void configure(Map<String,Object> properties);
 
+    void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator);
     void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
     MapStoreListener mapStoreListener(int scope);
@@ -48,6 +50,11 @@ public interface DataStoreProvider extends ServiceProvider {
 
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);
+    }
+
+    interface DistributionIdGenerator{
+        long id();
+        void assign(Recoverable.DataBuffer dataBuffer);
     }
 
 }

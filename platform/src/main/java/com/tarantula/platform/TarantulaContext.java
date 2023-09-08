@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
+import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.HttpCaller;
@@ -163,6 +164,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public KeyIndexService keyIndexService;
 
+    private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
  	private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
@@ -185,9 +187,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node.backupEnabled = this.backupEnabled;
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
-        this.node.snowflakeNodeNumber = snowflakeNodeNumber;
-        this.node
-                .snowflakeEpochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
+        long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
+        this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
         if(backupEnabled){//using backup deployment id
             String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
             JsonObject json = JsonUtil.parse(resp);
@@ -203,6 +204,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.maxReplicationNumber,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
+                this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
                 this._initMirrorClusterBackup();
@@ -1029,4 +1031,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return serviceEventLogger;
     }
 
+    @Override
+    public long distributionId() {
+        return distributionIdGenerator.id();
+    }
 }

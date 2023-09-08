@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class MetricsTest {
+public class MetricsTest extends DataStoreHook{
     static {
         System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
     }
@@ -23,7 +23,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
-        TestServiceContext serviceContext = new TestServiceContext();
+        //TestServiceContext serviceContext = new TestServiceContext();
         LocalDateTime end = LocalDate.parse("2022-12-31").atTime(23,50,0,0);
         MockMetrics metrics = new MockMetrics(end);
         Assert.assertEquals(end.getHour()==23,true);
@@ -50,7 +50,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsMonthlyTest() {
-        TestServiceContext serviceContext = new TestServiceContext();
+
         LocalDateTime end = LocalDate.parse("2022-07-31").atTime(23,50,0,0);//Mon
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -74,7 +74,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
-        TestServiceContext serviceContext = new TestServiceContext();
+
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);//Mon
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -97,7 +97,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsDailyTest() {
-        TestServiceContext serviceContext = new TestServiceContext();
+
         LocalDateTime end = LocalDate.parse("2022-08-10").atTime(23,50,0,0);//Sun
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
@@ -120,7 +120,7 @@ public class MetricsTest {
 
     @Test(groups = { "PerformanceMetrics" })
     public void metricsHistoryTest() {
-        TestServiceContext serviceContext = new TestServiceContext();
+
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);
         MockMetrics metrics = new MockMetrics(end);
         metrics.setup(serviceContext);
