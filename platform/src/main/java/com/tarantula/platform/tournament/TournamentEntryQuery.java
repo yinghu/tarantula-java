@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.Tournament;
 
@@ -17,16 +18,14 @@ public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry>
         return ocx;
     }
 
-    public String distributionKey() {
-        return this.instanceId;
-    }
 
-
-    public  int registryId(){
-        return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
-    }
 
     public String label(){
         return Tournament.ENTRY_LABEL;
+    }
+
+    @Override
+    public Recoverable.Key key() {
+        return null;
     }
 }

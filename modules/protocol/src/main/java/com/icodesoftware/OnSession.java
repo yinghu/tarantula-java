@@ -2,7 +2,7 @@ package com.icodesoftware;
 
 public interface OnSession extends OnApplication, Response {
 
-    //String DataStore = "session";
+    String LABEL = "onSession";
 
     String token();
     void token(String token);

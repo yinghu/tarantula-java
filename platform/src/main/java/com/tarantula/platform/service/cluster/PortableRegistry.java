@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.cluster;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
+
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -10,7 +10,6 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
-import com.tarantula.platform.service.deployment.*;
 import com.tarantula.platform.service.persistence.*;
 
 public class PortableRegistry extends AbstractRecoverableListener {
@@ -58,7 +57,7 @@ public class PortableRegistry extends AbstractRecoverableListener {
     public static final int KEY_INDEX_CID = PortableEventRegistry.KEY_INDEX_CID;
 
 
-    public Recoverable create(int cid) {
+    public <T extends Recoverable> T create(int cid) {
         Recoverable _ins;
 		switch(cid){
             case PROPERTY_CID:
@@ -126,7 +125,7 @@ public class PortableRegistry extends AbstractRecoverableListener {
             default:
                 throw new IllegalArgumentException("Not supported event type");
 		}
-		return _ins;
+		return (T)_ins;
 	}
 
     @Override

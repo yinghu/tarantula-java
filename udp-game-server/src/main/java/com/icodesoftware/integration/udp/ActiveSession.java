@@ -6,9 +6,9 @@ import com.icodesoftware.util.RecoverableObject;
 public class ActiveSession extends RecoverableObject implements Session {
 
 
-    public ActiveSession(String systemId,int stub){
+    public ActiveSession(String systemId,long stub){
         this.owner = systemId;
-        this.routingNumber = stub;
+        //this.routingNumber = stub;
     }
     @Override
     public String systemId() {
@@ -21,12 +21,12 @@ public class ActiveSession extends RecoverableObject implements Session {
     }
 
     @Override
-    public int stub() {
+    public long stub() {
         return routingNumber;
     }
 
     @Override
-    public void stub(int stub) {
+    public void stub(long stub) {
 
     }
 

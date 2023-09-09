@@ -25,7 +25,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		out.writeUTF("4",this.token);
         out.writeByteArray("6",this.payload);
 		out.writeUTF("7", this.clientId);
-		out.writeInt("8", this.stub);
+		out.writeLong("8", this.stub);
 		out.writeUTF("9",this.action);
 		out.writeUTF("10",this.ticket);
 		out.writeUTF("11",this.trackId);
@@ -43,7 +43,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 		this.token = in.readUTF("4");
 		this.payload = in.readByteArray("6");
 		this.clientId = in.readUTF("7");
-		this.stub = in.readInt("8");
+		this.stub = in.readLong("8");
 		this.action = in.readUTF("9");
 		this.ticket = in.readUTF("10");
 		this.trackId = in.readUTF("11");

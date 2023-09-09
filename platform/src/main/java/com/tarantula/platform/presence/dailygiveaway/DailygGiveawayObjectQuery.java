@@ -21,19 +21,10 @@ public class DailygGiveawayObjectQuery implements RecoverableFactory<DailyGiveaw
     }
 
     @Override
-    public int registryId() {
-        return PresencePortableRegistry.DAILY_GIVEAWAY_CID;
-    }
-
-    @Override
     public String label() {
         return label;
     }
 
-
-    public String distributionKey() {
-        return null;
-    }
 
     @Override
     public Recoverable.Key key() {

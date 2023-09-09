@@ -23,7 +23,7 @@ public class CurrentSaveIndex extends RecoverableObject {
 
     public CurrentSaveIndex(Session session){
         //this.oid = session.systemId();
-        this.routingNumber = session.stub();
+        //this.routingNumber = session.stub();
     }
 
 

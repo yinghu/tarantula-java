@@ -27,11 +27,6 @@ public class ConfigurableCategoryQuery implements RecoverableFactory<Configurabl
     }
 
     @Override
-    public int registryId() {
-        return 0;
-    }
-
-    @Override
     public String label() {
         return label;
     }

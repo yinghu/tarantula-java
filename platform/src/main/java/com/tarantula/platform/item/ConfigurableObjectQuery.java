@@ -21,11 +21,6 @@ public class ConfigurableObjectQuery implements RecoverableFactory<ConfigurableO
     }
 
     @Override
-    public int registryId() {
-        return ItemPortableRegistry.CONFIGURABLE_OBJECT_CID;
-    }
-
-    @Override
     public String label() {
         return label;
     }

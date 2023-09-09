@@ -1,29 +1,31 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform;
 
+import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
+public class OnSessionQuery<T extends Recoverable> implements RecoverableFactory<T> {
 
-    public long owner;
+
     private Recoverable.Key key;
-    public AccessKeyQuery(long owner){
-        this.owner = owner;
-    }
 
-    public AccessKeyQuery(Recoverable.Key key){
+    public OnSessionQuery(Recoverable.Key key){
         this.key = key;
     }
+
     @Override
-    public AccessKey create() {
-        return new AccessKey();
+    public T create() {
+        return new PortableRegistry().create(PortableRegistry.ON_SESSION_CID);
     }
+
 
     @Override
     public String label() {
-        return AccessKey.LABEL;
+        return OnSession.LABEL;
     }
+
     @Override
     public Recoverable.Key key() {
         return key;

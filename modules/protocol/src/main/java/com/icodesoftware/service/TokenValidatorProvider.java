@@ -25,8 +25,8 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     List<OnAccess> accessKeyList();
     void revokeAccessKey(String accessKey);
 
-    String ticket(long key,int stub,int duration);
-    boolean validateTicket(long key,int stub,String ticket);
+    String ticket(long key,long stub,int duration);
+    boolean validateTicket(long key,long stub,String ticket);
 
     //game server register key on game cluster lobby tyeId
     <T extends OnAccess> T validateGameClusterAccessKey(String gameClusterId);

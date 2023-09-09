@@ -21,11 +21,6 @@ public class AchievementObjectQuery implements RecoverableFactory<Achievement> {
     }
 
     @Override
-    public int registryId() {
-        return PresencePortableRegistry.ACHIEVEMENT_CID;
-    }
-
-    @Override
     public String label() {
         return label;
     }

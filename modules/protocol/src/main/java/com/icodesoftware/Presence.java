@@ -12,5 +12,7 @@ public interface Presence extends Recoverable,DataStore.Updatable,Countable{
 
     boolean local();
 
-
+    //long stub();
+    OnSession stub();
+    boolean offSession(long stub);
 }

@@ -18,15 +18,6 @@ public class StatisticsEntryQuery implements RecoverableFactory<StatisticsEntry>
         return app;
     }
 
-
-    public String distributionKey() {
-        return null;
-    }
-
-    public  int registryId(){
-        return StatisticsPortableRegistry.STATISTICS_ENTRY_CID;
-    }
-
     public String label(){
         return StatisticsEntry.LABEL;
     }

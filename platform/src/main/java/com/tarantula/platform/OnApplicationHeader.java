@@ -11,7 +11,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String typeId;
 
-    protected int stub;
+    protected long stub;
 
     protected String ticket;
 
@@ -19,12 +19,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
 
     public String systemId() {
-        return this.owner;
+        return this.systemId;
     }
 
 
     public void systemId(String systemId) {
-        this.owner = systemId;
+        this.systemId = systemId;
     }
 
 
@@ -44,8 +44,8 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
         this.typeId = typeId;
     }
 
-    public int stub(){return this.stub;}
-    public void stub(int stub){ this.stub = stub;}
+    public long stub(){return this.stub;}
+    public void stub(long stub){ this.stub = stub;}
 
     public String ticket(){
         return this.ticket;

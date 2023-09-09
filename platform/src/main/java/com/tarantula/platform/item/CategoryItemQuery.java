@@ -19,11 +19,6 @@ public class CategoryItemQuery implements RecoverableFactory<CategoryItem> {
     }
 
     @Override
-    public int registryId() {
-        return 0;
-    }
-
-    @Override
     public String label() {
         return label;
     }

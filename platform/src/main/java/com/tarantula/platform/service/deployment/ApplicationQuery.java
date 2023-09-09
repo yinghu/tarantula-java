@@ -23,15 +23,6 @@ public class ApplicationQuery implements RecoverableFactory<DeploymentDescriptor
         return app;
     }
 
-
-    public String distributionKey() {
-        return null;
-    }
-
-    public  int registryId(){
-        return PortableRegistry.APPLICATION_DESCRIPTOR_CID;
-    }
-
     public String label(){
         return ApplicationProvider.LABEL;
     }

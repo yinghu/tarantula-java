@@ -20,11 +20,6 @@ public class GameClusterQuery implements RecoverableFactory<GameCluster> {
     }
 
     @Override
-    public int registryId() {
-        return 0;
-    }
-
-    @Override
     public String label() {
         return "gameCluster";
     }

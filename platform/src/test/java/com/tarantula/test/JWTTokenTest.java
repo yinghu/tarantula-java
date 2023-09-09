@@ -34,7 +34,7 @@ public class JWTTokenTest {
         roles.put(AccessControl.root.name(),AccessControl.root);
         String jwtToken = jwt.token((h, p) -> {
             Access.Role r = roles.get(access.role());
-            byte[] mark = waterMark(key, BufferProxy.buffer(200).writeLong(access.distributionId()).writeInt(session.stub()).writeInt(r.accessControl()).array());
+            byte[] mark = waterMark(key, BufferProxy.buffer(200).writeLong(access.distributionId()).writeLong(session.stub()).writeInt(r.accessControl()).array());
             h.addProperty("kid", CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
@@ -48,7 +48,7 @@ public class JWTTokenTest {
             byte[] data = reverse(key, CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer buffer = BufferProxy.wrap(data);
             long id = buffer.readLong();
-            int stub = buffer.readInt();
+            long stub = buffer.readLong();
             int role = buffer.readInt();
             //System.out.println(id+"<><>"+stub);
             return id==(access.distributionId()) && stub == session.stub() && role == r.accessControl();

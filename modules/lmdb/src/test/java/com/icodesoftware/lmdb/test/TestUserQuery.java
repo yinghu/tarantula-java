@@ -22,11 +22,6 @@ public class TestUserQuery implements RecoverableFactory<TestUser> {
     }
 
     @Override
-    public int registryId() {
-        return 10;
-    }
-
-    @Override
     public String label() {
         return label==null?TestUser.LABEL:label;
     }

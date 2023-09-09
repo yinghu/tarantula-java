@@ -19,10 +19,6 @@ public class GameResourceQuery implements RecoverableFactory<GameResource> {
         return new GameResource();
     }
 
-    @Override
-    public int registryId() {
-        return PresencePortableRegistry.GAME_RESOURCE_CID;
-    }
 
     @Override
     public String label() {

@@ -29,7 +29,7 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     }
     abstract public int registryId();
 
-    abstract public Recoverable create(int i);
+    abstract public <T extends Recoverable> T create(int i);
     public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
         return null;
     }

@@ -28,7 +28,7 @@ public class UDPChannel extends GameChannel {
     public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
         this.stub = session;
         this.owner = session.systemId();
-        this.routingNumber = session.stub();
+        //this.routingNumber = session.stub();
         this.channelListener = channelListener;
         this.requestListener = requestListener;
         this.actionListener = actionListener;

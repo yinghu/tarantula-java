@@ -27,11 +27,6 @@ public class ConfigurableTypeQuery implements RecoverableFactory<ConfigurableTyp
     }
 
     @Override
-    public int registryId() {
-        return 0;
-    }
-
-    @Override
     public String label() {
         return label;
     }

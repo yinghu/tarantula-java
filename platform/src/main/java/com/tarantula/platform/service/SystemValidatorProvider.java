@@ -69,14 +69,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return systemValidator.tokenValidator();
     }
     public Presence presence(Session session){
-        Presence presence = pMap.computeIfAbsent(session.distributionId(),(k)->{
+        Presence presence = presence(session.distributionId());
+        /**
+        pMap.computeIfAbsent(session.distributionId(),(k)->{
             PresenceIndex px = new PresenceIndex();
             px.distributionId(session.distributionId());
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
+            px.load(5);
             px.registerEventService(this.serviceContext.eventService());
             return px;
-        });
+        });**/
+        /**
         if(presence==null&&remotePresenceEnabled){
             log.warn("Fetching presence from presence service ...");
             PresenceFetcher httpCaller = fMap.get(session.trackId());
@@ -88,7 +92,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.registerEventService(this.serviceContext.eventService());
             pMap.put(session.distributionId(),px);
             return px;
-        }
+        }**/
         return presence;
     }
     public Presence presence(long id){
@@ -97,6 +101,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             px.distributionId(id);
             pdataStore.load(px);
             px.dataStore(pdataStore);
+            px.load(5);
             px.registerEventService(this.serviceContext.eventService());
             return px;
         });
@@ -187,12 +192,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             throw new RuntimeException(ex);
         }
     }
-    public void offSession(long systemId){
-        Presence presence = pMap.remove(systemId);
-        if(presence!=null){
-            presence.disabled(true);
-            presence.update();
-        }
+    public void offSession(long systemId,long stub){
+        Presence presence = pMap.get(systemId);
+        if(presence==null) return;
+        if(presence.offSession(stub)) return;
+        presence.disabled(true);
+        presence.update();
     }
     public void timeout(int minutes,int seconds){
         this.timeoutInMinutes = minutes;
@@ -271,15 +276,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return keys;
     }
 
-    public String ticket(long key,int stub,int duration){
-        byte[] data = BufferProxy.buffer(200).writeLong(key).writeInt(stub).writeInt(duration).array();
+    public String ticket(long key,long stub,int duration){
+        byte[] data = BufferProxy.buffer(200).writeLong(key).writeLong(stub).writeInt(duration).array();
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
-    public boolean validateTicket(long key,int stub,String ticket){
+    public boolean validateTicket(long key,long stub,String ticket){
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
         Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
-        return buffer.readLong()==(key) && buffer.readInt() == stub;
+        return buffer.readLong()==(key) && buffer.readLong() == stub;
     }
     public List<Access.Role> list(){
         return roleList;
@@ -570,7 +575,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
             Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
-            dataBuffer.writeLong(access.distributionId()).writeInt(session.stub());
+            dataBuffer.writeLong(access.distributionId()).writeLong(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
@@ -588,7 +593,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
             long id = dataBuffer.readLong();
-            int stub = dataBuffer.readInt();
+            long stub = dataBuffer.readLong();
             onSession.distributionId(id);
             onSession.stub(stub);
             return true;

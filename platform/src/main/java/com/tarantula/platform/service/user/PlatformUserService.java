@@ -6,6 +6,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.IndexSet;
+import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.ThirdPartyLogin;
@@ -31,6 +32,8 @@ public class PlatformUserService implements UserService {
     private int trialMaxUsersPerAccount = 10;
     private int subscribedMaxUsersPerAccount = 10;
 
+    private int maxOnSessionCount = 5;
+
     private MetricsListener metricsListener = (m,v)->{};
 
     @Override
@@ -52,6 +55,11 @@ public class PlatformUserService implements UserService {
         PresenceIndex px = new PresenceIndex();
         px.distributionId(acc.distributionId());
         presenceDataStore.createIfAbsent(px,false);
+        for(int i=0;i<maxOnSessionCount;i++){
+            OnSessionTrack onSessionTrack = new OnSessionTrack();
+            onSessionTrack.ownerKey(px.key());
+            presenceDataStore.create(onSessionTrack);
+        }
         //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return acc;
     }
@@ -240,7 +248,8 @@ public class PlatformUserService implements UserService {
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();
         subscribedMaxUsersPerAccount = ((Number)configuration.property("subscribedMaxUserCount")).intValue();
-        logger.warn("User service started with max users per account ["+trialMaxUsersPerAccount+","+subscribedMaxUsersPerAccount+"]");
+        maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
+        logger.warn("User service started with max users per account ["+trialMaxUsersPerAccount+","+subscribedMaxUsersPerAccount+"]["+maxOnSessionCount+"]");
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.EventService;
+import com.icodesoftware.util.FIFOBuffer;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import java.util.Map;
@@ -13,19 +14,9 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private boolean local = true;
     private EventService eventService;
 
-    public PresenceIndex(int stub,String index){
-        this();
-        this.counter = stub;
-        this.local = false;
-        this.index = index;
-    }
-
+    private FIFOBuffer<OnSessionTrack> sessions;
     public PresenceIndex(){
 
-    }
-    @Override
-    public boolean distributable(){
-        return true;
     }
 
     public void registerEventService(EventService eventService){
@@ -33,27 +24,21 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public Response onPlay(Session session,Descriptor desc){
-        Response resp = null;
-        //if(this.transact(desc.entryCost()*(-1))){
-            fastJoin(session,desc,session.payload());
-        //}
-        //else{
-            //resp = new ResponseHeader("onPlay",false,Response.INSUFFICIENT_BALANCE,"not enough balance","error");
-        //}
-        return resp;
+        fastJoin(session,desc,session.payload());
+        return null;
     }
     private void fastJoin(Session session,Descriptor desc,byte[] payload){
         SessionForward fd = new SessionForward(session.source(),session.sessionId());
         FastPlayEvent fe = new FastPlayEvent(fd);
         fe.tournamentId(session.tournamentId());
-        fe.systemId(session.systemId());
+        fe.distributionId(session.distributionId());
         fe.stub(session.stub());
         fe.routingNumber(session.routingNumber());
         fe.ticket(session.ticket());
         fe.name(session.name());
         fe.clientId(session.clientId());
         fe.payload(payload);
-        RoutingKey rk = this.eventService.routingKey(session.systemId(),desc.tag());//route to player node
+        RoutingKey rk = this.eventService.routingKey(session.distributionId(),desc.tag());//route to player node
         fe.destination(rk.route());//node/tag/partition
         this.eventService.onEvent(fe);
     }
@@ -118,8 +103,31 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         return local;
     }
 
+    public OnSession stub(){
+        return sessions.pop();
+    }
+
+    public boolean offSession(long stub){
+        OnSessionTrack onSessionTrack = new OnSessionTrack();
+        onSessionTrack.distributionId(stub);
+        if(this.dataStore.load(onSessionTrack)){
+            System.out.println(onSessionTrack.distributionId());
+            onSessionTrack.systemId(distributionKey());
+            sessions.push(onSessionTrack);
+        }
+        return true;
+    }
     @Override
     public String toString(){
-        return "On Presence ["+this.distributionKey()+"/"+timestamp+"/"+counter+"/"+disabled+"]";
+        return "On Presence ["+this.distributionId()+"/"+timestamp+"/"+counter+"/"+disabled+"]";
+    }
+
+    public void load(int max){
+        sessions = new FIFOBuffer<>(max,new OnSessionTrack[max]);
+        dataStore.list(new OnSessionQuery<OnSessionTrack>(key()),t->{
+            t.systemId(distributionKey());
+            sessions.push(t);
+            return true;
+        });
     }
 }

@@ -89,7 +89,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
     }
     public boolean onSession(Session session){
         if(stub==0){
-            stub = session.stub();
+            //stub = session.stub();
             timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
             this.update();
             return true;

@@ -20,11 +20,6 @@ public class ShoppingItemObjectQuery implements RecoverableFactory<Shop> {
     }
 
     @Override
-    public int registryId() {
-        return ItemPortableRegistry.SHOP_CID;
-    }
-
-    @Override
     public String label() {
         return label;
     }

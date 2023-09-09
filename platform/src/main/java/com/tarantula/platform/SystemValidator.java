@@ -43,9 +43,9 @@ public class SystemValidator{
         public OnSession validatePassword(Access access, String password) {
             if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
                 Presence presence = systemValidatorProvider.presence(access.distributionId());
-                OnSession _ox = new OnSessionTrack();
-                _ox.distributionId(access.distributionId());
-                _ox.stub(presence.count(1));
+                OnSession _ox = presence.stub();//new OnSessionTrack();
+                //_ox.distributionId(access.distributionId());
+                //_ox.stub(presence.stub());
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
                 _ox.token(systemValidatorProvider.jwtToken(access,_ox));
@@ -60,7 +60,7 @@ public class SystemValidator{
             }
         }
         @Override
-        public String ticket(long input, int stub) {//short live ticket
+        public String ticket(long input, long stub) {//short live ticket
             return systemValidatorProvider.ticket(input,stub,timeoutSeconds);
         }
         @Override
@@ -74,8 +74,8 @@ public class SystemValidator{
         }
 
         @Override
-        public void offSession(long systemId, int stub) {
-            systemValidatorProvider.offSession(systemId);
+        public void offSession(long systemId, long stub) {
+            systemValidatorProvider.offSession(systemId,stub);
         }
         @Override
         public boolean validateToken(Map<String,Object> params){

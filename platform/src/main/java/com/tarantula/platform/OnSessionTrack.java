@@ -17,7 +17,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
 
     public OnSessionTrack(){
-
+        this.onEdge = true;
+        this.label = LABEL;
     }
     public OnSessionTrack(String message){
         this();
@@ -37,6 +38,15 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.index = index;
     }
 
+    @Override
+    public long stub() {
+        return distributionId;
+    }
+
+    @Override
+    public void stub(long stub) {
+
+    }
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;
@@ -70,7 +80,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.login = login;
     }
 
-
     public String toString(){
         return "OnSession->["+token+"]";
     }
@@ -79,11 +88,22 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public JsonObject toJson() {
         JsonObject jp = new JsonObject();
         jp.addProperty("Successful",true);
-        jp.addProperty("SystemId",distributionId);
+        jp.addProperty("SystemId",systemId);
         jp.addProperty("Stub",stub);
         jp.addProperty("Token",token);
         jp.addProperty("Ticket",ticket);
         jp.addProperty("Login",login);
         return jp;
+    }
+
+    public boolean write(DataBuffer buffer){
+        buffer.writeLong(timestamp);
+        buffer.writeBoolean(disabled);
+        return true;
+    }
+    public boolean read(DataBuffer buffer) {
+        this.timestamp = buffer.readLong();
+        this.disabled = buffer.readBoolean();
+        return true;
     }
 }

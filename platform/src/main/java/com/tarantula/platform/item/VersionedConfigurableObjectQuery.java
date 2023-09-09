@@ -19,11 +19,6 @@ public class VersionedConfigurableObjectQuery implements RecoverableFactory<Conf
     }
 
     @Override
-    public int registryId() {
-        return ItemPortableRegistry.VERSIONED_CONFIGURABLE_OBJECT_CID;
-    }
-
-    @Override
     public String label() {
         return VersionedConfigurableObject.LABEL;
     }

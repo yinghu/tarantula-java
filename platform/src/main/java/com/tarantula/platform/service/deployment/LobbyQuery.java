@@ -19,10 +19,6 @@ public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {
         return  new LobbyDescriptor();
     }
 
-    public  int registryId(){
-        return PortableRegistry.LOBBY_CID;
-    }
-
     public String label(){
         return LobbyDescriptor.LABEL;
     }

@@ -6,12 +6,11 @@ public interface OnApplication extends Response {
     String systemId();
     void systemId(String systemId);
 
-    int stub();
-    void stub(int stub);
+    long stub();
+    void stub(long stub);
 
     String name();
     void name(String name);
-
 
     String tournamentId();
     void tournamentId(String tournamentId);

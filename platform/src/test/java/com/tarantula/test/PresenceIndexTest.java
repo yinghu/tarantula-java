@@ -1,0 +1,34 @@
+package com.tarantula.test;
+
+
+import com.icodesoftware.DataStore;
+
+import com.tarantula.platform.OnSessionQuery;
+import com.tarantula.platform.OnSessionTrack;
+import com.tarantula.platform.PresenceIndex;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import java.util.List;
+
+public class PresenceIndexTest extends DataStoreHook{
+
+
+    @Test(groups = { "PresenceIndex" })
+    public void presenceKeyTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_presence");
+        long presenceId = serviceContext.distributionId();
+        PresenceIndex presenceIndex = new PresenceIndex();
+        presenceIndex.distributionId(presenceId);
+        Assert.assertTrue(dataStore.createIfAbsent(presenceIndex,true));
+        OnSessionTrack t1 = new OnSessionTrack();
+        t1.ownerKey(presenceIndex.key());
+        Assert.assertTrue(dataStore.create(t1));
+        OnSessionTrack t2 = new OnSessionTrack();
+        t2.ownerKey(presenceIndex.key());
+        Assert.assertTrue(dataStore.create(t2));
+        List<OnSessionTrack> tlist = dataStore.list(new OnSessionQuery<>(presenceIndex.key()));
+        Assert.assertEquals(tlist.size(),2);
+    }
+
+}

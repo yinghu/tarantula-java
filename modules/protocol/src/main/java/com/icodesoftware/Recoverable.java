@@ -9,9 +9,6 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     //marked as backup operation on remote data storage
     boolean backup();
 
-    //String oid();
-    //void oid(String oid);
-
     Key ownerKey();
     void ownerKey(Key ownerKey);
 

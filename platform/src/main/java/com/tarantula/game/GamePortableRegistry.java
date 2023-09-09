@@ -9,8 +9,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
 
     public static final int OID = 10;
 
-
-
     public static final int STUB_CID = 3;
     public static final int MAPPING_OBJECT_CID = 4;
     public static final int GAME_UPDATE_OBJECT_CID = 5;
@@ -29,7 +27,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     }
 
     @Override
-    public Recoverable create(int i) {
+    public  <T extends Recoverable> T create(int i) {
         Recoverable pt = null;
         switch (i){
             case MAPPING_OBJECT_CID:
@@ -61,6 +59,6 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 }

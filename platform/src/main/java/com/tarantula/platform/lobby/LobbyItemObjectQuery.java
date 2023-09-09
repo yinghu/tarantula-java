@@ -20,11 +20,6 @@ public class LobbyItemObjectQuery implements RecoverableFactory<LobbyItem> {
     }
 
     @Override
-    public int registryId() {
-        return PresencePortableRegistry.LOBBY_ITEM_CID;
-    }
-
-    @Override
     public String label() {
         return label;
     }
