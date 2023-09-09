@@ -71,10 +71,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void memberAdded(MembershipServiceEvent membershipServiceEvent) {
         Member lm = nodeEngine.getLocalMember();
-        //log.warn(">>>>>>>>>>>>>>>>>>>>>"+nodeEngine.getClusterService().getMember(lm.getUuid()).getUuid());
-        //if(!lm.getUuid().equals(membershipServiceEvent.getMember().getUuid())){
-            //this.tarantulaContext.integrationCluster().onNodeAdded(membershipServiceEvent.getMember().getUuid());
-        //}
         int sz = nodeEngine.getClusterService().getSize();
         int pt = 0;
         for(Member m : nodeEngine.getClusterService().getMembers()){
@@ -83,7 +79,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             }
             pt++;
         }
-        log.warn("bucket receiver updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
+        log.warn("Bucket receiver updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
             this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
         }

@@ -148,14 +148,14 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     private JsonObject _toJson(boolean toWeb){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("bucketName",bucketName);
-        jsonObject.addProperty("bucketId",bucketId);
+        jsonObject.addProperty("bucketId","A_"+bucketId);
         jsonObject.addProperty("nodeName",nodeName);
-        jsonObject.addProperty("nodeId",nodeId);
+        jsonObject.addProperty("nodeId","A_"+nodeId);
         jsonObject.addProperty("memberId",memberId);
         jsonObject.addProperty("address",address);
         jsonObject.addProperty("clusterNameSuffix",clusterNameSuffix);
         jsonObject.addProperty("partitionNumber",partitionNumber);
-        jsonObject.addProperty("deploymentId",deploymentId);
+        jsonObject.addProperty("deploymentId","A_"+deploymentId);
         if(toWeb){
             jsonObject.addProperty("startTime",TimeUtil.fromUTCMilliseconds(startTime).format(DateTimeFormatter.ISO_DATE_TIME));
         }

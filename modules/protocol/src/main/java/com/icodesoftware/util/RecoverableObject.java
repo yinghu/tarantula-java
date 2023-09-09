@@ -148,11 +148,11 @@ public class RecoverableObject implements Recoverable {
     }
 
     public String distributionKey() {
-        return null;
+        return Long.toString(distributionId);
     }
     @Override
     public void distributionKey(String distributionKey){
-
+        distributionId = Long.parseLong(distributionKey);
     }
     public int scope(){
         return Distributable.DATA_SCOPE;

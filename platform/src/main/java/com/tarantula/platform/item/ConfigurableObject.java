@@ -193,7 +193,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         if(distributionId()==0) return jsonObject;
-        jsonObject.addProperty("ItemId", Long.toString(distributionId()));
+        jsonObject.addProperty("ItemId",distributionKey());
         header.entrySet().forEach(e->{
             String k  = e.getKey();
             JsonPrimitive pv = e.getValue().getAsJsonPrimitive();
