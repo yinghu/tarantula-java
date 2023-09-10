@@ -15,8 +15,14 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private EventService eventService;
 
     private FIFOBuffer<OnSessionTrack> sessions;
+
+    private DataStore sessionDataStore;
     public PresenceIndex(){
 
+    }
+
+    public PresenceIndex(DataStore sessionDataStore){
+        this.sessionDataStore = sessionDataStore;
     }
 
     public void registerEventService(EventService eventService){
@@ -84,17 +90,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         this.disabled = buffer.readBoolean();
         return true;
     }
-    public int count(int delta){
-        if(delta<=0){
-            return this.counter;
-        }
-        //new login session
-        this.disabled = false;
-        this.timestamp = System.currentTimeMillis();
-        counter +=delta;
-        this.dataStore.update(this);
-        return (counter);
-    }
+
     public boolean online(){
         this.timestamp = System.currentTimeMillis();
         return (!this.disabled);
@@ -104,15 +100,15 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public OnSession stub(){
-        return sessions.pop();
+        OnSessionTrack onSessionTrack = sessions.pop();
+        if(onSessionTrack==null) return OnSessionTrack.SESSION_NOT_AVAILABLE;
+        return new OnSessionTrack(distributionId,onSessionTrack.distributionId());
     }
 
     public boolean offSession(long stub){
         OnSessionTrack onSessionTrack = new OnSessionTrack();
         onSessionTrack.distributionId(stub);
-        if(this.dataStore.load(onSessionTrack)){
-            System.out.println(onSessionTrack.distributionId());
-            onSessionTrack.systemId(distributionKey());
+        if(this.sessionDataStore.load(onSessionTrack)){
             sessions.push(onSessionTrack);
         }
         return true;
@@ -124,8 +120,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
 
     public void load(int max){
         sessions = new FIFOBuffer<>(max,new OnSessionTrack[max]);
-        dataStore.list(new OnSessionQuery<OnSessionTrack>(key()),t->{
-            t.systemId(distributionKey());
+        sessionDataStore.list(new OnSessionQuery<OnSessionTrack>(key()),t->{
             sessions.push(t);
             return true;
         });

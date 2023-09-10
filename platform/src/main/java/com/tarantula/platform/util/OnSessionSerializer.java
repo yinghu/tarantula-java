@@ -13,7 +13,7 @@ public class  OnSessionSerializer implements JsonSerializer<OnSession>{
     public JsonElement serialize(OnSession presence, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject jp = new JsonObject();
         jp.addProperty("systemId",presence.distributionKey());
-        jp.addProperty("stub",presence.stub());
+        jp.addProperty("stub",Long.toString(presence.stub()));
         return jp;
     }
 }

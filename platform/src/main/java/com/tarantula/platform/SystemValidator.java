@@ -5,7 +5,6 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Map;
 
@@ -43,14 +42,11 @@ public class SystemValidator{
         public OnSession validatePassword(Access access, String password) {
             if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
                 Presence presence = systemValidatorProvider.presence(access.distributionId());
-                OnSession _ox = presence.stub();//new OnSessionTrack();
-                //_ox.distributionId(access.distributionId());
-                //_ox.stub(presence.stub());
+                OnSession _ox = presence.stub();
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
                 _ox.token(systemValidatorProvider.jwtToken(access,_ox));
-                //_ox.token(SystemUtil.token(systemValidatorProvider.messageDigest(),access.distributionKey(),_ox.stub(),timeoutMinutes,SystemUtil.toHexString(mark),systemValidatorProvider.clusterNameSuffix()));
-                //_ox.ticket(this.ticket(access.distributionKey(),_ox.stub()));
+                //_ox.ticket(systemValidatorProvider.ticket());
                 _ox.successful(true);
                 return _ox;
             }
@@ -66,11 +62,6 @@ public class SystemValidator{
         @Override
         public boolean validateTicket(Session session) {
             return systemValidatorProvider.validateTicket(session.distributionId(),session.stub(),session.ticket());
-            //Presence ptx = systemValidatorProvider.presence(session);
-            //String waterMark = SystemUtil.validTicket(systemValidatorProvider.messageDigest(),session.systemId(),session.stub(),session.ticket());
-            //byte[] data = ByteBuffer.allocate(4).putInt(session.stub()).array();
-            //byte[] mark = ptx.local()?systemValidatorProvider.encrypt(data) : systemValidatorProvider.encrypt(ptx,data);
-            //return SystemUtil.toHexString(mark).equals(waterMark);
         }
 
         @Override

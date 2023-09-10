@@ -30,6 +30,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private int timeoutInMinutes;
     private int timeoutInSeconds;
 
+    private int maxOnSessionCount;
     private ServiceContext serviceContext;
     private ConcurrentHashMap<Long,PresenceIndex> pMap;
     private HashMap<String,Access.Role> rMap;
@@ -39,6 +40,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore adataStore;//account
     private DataStore idataStore;//account index
     private DataStore mdatastore;//membership
+
+    private DataStore sdatastore;//onsession
 
     private DataStore deployDataStore;
 
@@ -97,11 +100,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
-            PresenceIndex px = new PresenceIndex();
+            PresenceIndex px = new PresenceIndex(sdatastore);
             px.distributionId(id);
-            pdataStore.load(px);
+            if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
-            px.load(5);
+            px.load(maxOnSessionCount);
             px.registerEventService(this.serviceContext.eventService());
             return px;
         });
@@ -196,6 +199,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         Presence presence = pMap.get(systemId);
         if(presence==null) return;
         if(presence.offSession(stub)) return;
+        pMap.remove(systemId);
         presence.disabled(true);
         presence.update();
     }
@@ -390,6 +394,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.adataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
         this.idataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
         this.mdatastore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
+        this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
         fMap = new ConcurrentHashMap<>();
@@ -447,6 +452,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             applicationStore.setup(serviceContext);
             aMap.put(OnAccess.APPLICATION_STORE,applicationStore);
         }
+        Configuration configuration = serviceContext.configuration("account-role-user-settings");
+        maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
         //map only store
         clusterStore = serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,TokenValidatorProvider.NAME,true,false,false);
     }

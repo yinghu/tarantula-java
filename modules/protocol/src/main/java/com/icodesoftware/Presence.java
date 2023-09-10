@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface Presence extends Recoverable,DataStore.Updatable,Countable{
+public interface Presence extends Recoverable,DataStore.Updatable{
 
     String DataStore = "tarantula_presence";
 

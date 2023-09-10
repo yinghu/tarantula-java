@@ -83,7 +83,7 @@ public class UserTest extends DataStoreHook{
         //user.oid(accessIndex.oid());
         user.dataStore(dPresence);
         Assert.assertTrue(dPresence.createIfAbsent(user,false));
-        Assert.assertEquals(user.count(1),1);
+        //Assert.assertEquals(user.count(1),1);
         Presence load = new PresenceIndex();
         //load.oid(user.oid());
         Assert.assertFalse(dPresence.createIfAbsent(load,true));

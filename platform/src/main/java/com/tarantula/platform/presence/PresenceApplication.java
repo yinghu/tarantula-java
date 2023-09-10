@@ -38,17 +38,15 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if (session.action().equals("onSession")) {
-            Presence presence = this.context.presence(session);
+            //Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence = new OnSessionTrack(session.distributionId(),true);
-            pc.presence.stub(presence.count(0));
+            pc.presence = new OnSessionTrack(session.distributionId(),session.stub());
             session.write(this.builder.create().toJson(pc).getBytes());
         }
         else if (session.action().equals("onPresence")) {
-            Presence presence = this.context.presence(session);
+            //Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence= new OnSessionTrack(session.distributionId(),true);
-            pc.presence.stub(presence.count(0));
+            pc.presence= new OnSessionTrack(session.distributionId(),session.stub());
             pc.access = user(session.distributionId());
             pc.account = account(pc.access);
             pc.subscription = membership(pc.access.primary()?session.distributionId():pc.access.primaryId());

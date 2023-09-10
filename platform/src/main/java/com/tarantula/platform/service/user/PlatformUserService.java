@@ -22,6 +22,8 @@ public class PlatformUserService implements UserService {
 
     private DataStore userDataStore;
     private DataStore presenceDataStore;
+
+    private DataStore sessionDataStore;
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
     private DataStore accountIndexDataStore;
@@ -49,19 +51,24 @@ public class PlatformUserService implements UserService {
         if(!acc.primary()){
             if(onAccess.ownerKey()==null) throw new IllegalArgumentException("No owner for sub user");
             acc.ownerKey(onAccess.ownerKey());
+            acc.onEdge(true);
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
+        createPresenceIndex(acc);
+        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        return acc;
+    }
+
+    private void createPresenceIndex(Access access){
         PresenceIndex px = new PresenceIndex();
-        px.distributionId(acc.distributionId());
+        px.distributionId(access.distributionId());
         presenceDataStore.createIfAbsent(px,false);
         for(int i=0;i<maxOnSessionCount;i++){
             OnSessionTrack onSessionTrack = new OnSessionTrack();
             onSessionTrack.ownerKey(px.key());
-            presenceDataStore.create(onSessionTrack);
+            sessionDataStore.create(onSessionTrack);
         }
-        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
-        return acc;
     }
     public Access createUser(Account account,OnAccess access){
         //Account account = new UserAccount();
@@ -73,17 +80,17 @@ public class PlatformUserService implements UserService {
         account.userCount(1);
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
-        //access.owner(account.distributionId());
+        access.ownerKey(account.key());
         Access user = createUser(access);
-        IndexSet idx = new IndexSet();
-        idx.distributionKey(account.distributionKey());
-        idx.label(Account.UserLabel);
-        idx.addKey(user.distributionKey());
-        if(!accountIndexDataStore.createIfAbsent(idx,true)){
-            idx.addKey(user.distributionKey());//update on existing
-            accountIndexDataStore.update(idx);
-        }
-        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        //IndexSet idx = new IndexSet();
+        //idx.distributionKey(account.distributionKey());
+        //idx.label(Account.UserLabel);
+        //idx.addKey(user.distributionKey());
+        //if(!accountIndexDataStore.createIfAbsent(idx,true)){
+            //idx.addKey(user.distributionKey());//update on existing
+            //accountIndexDataStore.update(idx);
+        //}
+        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return user;
     }
     public boolean updateEmail(OnAccess access){
@@ -244,6 +251,7 @@ public class PlatformUserService implements UserService {
         accountDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
         accountIndexDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
         membershipDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
+        sessionDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         loginProviderDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,LoginProvider.DataStore);
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();

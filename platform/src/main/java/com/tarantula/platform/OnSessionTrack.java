@@ -16,6 +16,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
 
+    public static final OnSession SESSION_NOT_AVAILABLE = new OnSessionTrack("SESSION NOT AVAILABLE");
+
     public OnSessionTrack(){
         this.onEdge = true;
         this.label = LABEL;
@@ -25,10 +27,11 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.message = message;
         this.successful = false;
     }
-    public OnSessionTrack(long systemId,boolean successful){
+    public OnSessionTrack(long systemId,long stub){
         this();
         this.distributionId = systemId;
-        this.successful = successful;
+        this.stub = stub;
+        this.successful = true;
     }
     public OnSessionTrack(long systemId,int stub,String ticket,String index){
         this();
@@ -38,15 +41,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.index = index;
     }
 
-    @Override
-    public long stub() {
-        return distributionId;
-    }
-
-    @Override
-    public void stub(long stub) {
-
-    }
     @Override
     public int getFactoryId() {
         return PortableRegistry.OID;
