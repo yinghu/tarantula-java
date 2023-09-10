@@ -32,7 +32,7 @@ public class SudoEventHandler extends AbstractRequestHandler{
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession id = tokenValidator.tokenValidator().validateToken(token);
-        checkPermission(id,token,exchange.id(),"role/sudo");
+        checkPermission(id,exchange.id(),"role/sudo");
     }
 
     @Override

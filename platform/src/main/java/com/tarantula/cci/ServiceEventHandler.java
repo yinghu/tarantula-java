@@ -43,7 +43,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             actionEvent.distributionId(id.distributionId());
             actionEvent.stub(id.stub());
             actionEvent.ticket(id.ticket());
-            actionEvent.token(token);
+            //actionEvent.token(token);
             actionEvent.trackId(trackId);
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());

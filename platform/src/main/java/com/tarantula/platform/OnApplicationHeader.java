@@ -19,7 +19,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
 
     public String systemId() {
-        return this.systemId;
+        return systemId==null?Long.toString(this.distributionId):systemId;
     }
 
 

@@ -32,7 +32,7 @@ public class AccountEventHandler extends AbstractRequestHandler {
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        checkPermission(onSession,token,exchange.id(),"role/account");
+        checkPermission(onSession,exchange.id(),"role/account");
     }
 
     @Override

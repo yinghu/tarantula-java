@@ -38,13 +38,13 @@ public class UploadEventHandler extends AbstractRequestHandler {
         UploadContent uploadContent = new UploadContent(exchange.id(),typeId,exchange.onStream().readAllBytes());
         uMap.put(uploadContent.sessionId,uploadContent);
         if(typeId==null || typeId.equals("root")) {
-            checkPermission(onSession,token,exchange.id(),"role/sudo");
+            checkPermission(onSession,exchange.id(),"role/sudo");
         }
         else if(typeId.equals("createGameCluster")){
-            checkPermission(onSession,token,exchange.id(),"role/admin");
+            checkPermission(onSession,exchange.id(),"role/admin");
         }
         else{
-            checkPermission(onSession,token,exchange.id(),"role/admin");
+            checkPermission(onSession,exchange.id(),"role/admin");
         }
     }
     @Override

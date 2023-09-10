@@ -30,7 +30,7 @@ public class PresenceEventHandler extends AbstractRequestHandler {
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        checkPermission(onSession,token,exchange.id(),Presence.LOBBY_TAG);
+        checkPermission(onSession,exchange.id(),Presence.LOBBY_TAG);
     }
 
     @Override
