@@ -17,7 +17,7 @@ public class OnSessionQuery<T extends Recoverable> implements RecoverableFactory
 
     @Override
     public T create() {
-        return new PortableRegistry().create(PortableRegistry.ON_SESSION_CID);
+        return new PortableRegistry<T>().create(PortableRegistry.ON_SESSION_CID);
     }
 
 

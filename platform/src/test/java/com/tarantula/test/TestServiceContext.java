@@ -4,6 +4,8 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.ApplicationConfiguration;
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -27,6 +29,7 @@ public class TestServiceContext implements ServiceContext {
         this.node.backupEnabled = false;
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
+        PresencePortableRegistry registry = new PresencePortableRegistry<>();
     }
     @Override
     public DataStore dataStore(int scope, String s) {
@@ -92,8 +95,8 @@ public class TestServiceContext implements ServiceContext {
 
 
     @Override
-    public RecoverableRegistry recoverableRegistry(int i) {
-        return null;
+    public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int i) {
+        return new PortableRegistry<T>();
     }
 
     @Override

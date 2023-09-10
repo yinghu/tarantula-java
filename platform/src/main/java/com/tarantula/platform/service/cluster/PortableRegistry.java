@@ -12,7 +12,7 @@ import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.service.persistence.*;
 
-public class PortableRegistry extends AbstractRecoverableListener {
+public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
 	public static final int OID = 1;
 
@@ -56,8 +56,12 @@ public class PortableRegistry extends AbstractRecoverableListener {
 
     public static final int KEY_INDEX_CID = PortableEventRegistry.KEY_INDEX_CID;
 
+    public static PortableRegistry INS;
+    public PortableRegistry(){
+        INS = this;
+    }
 
-    public <T extends Recoverable> T create(int cid) {
+    public T create(int cid) {
         Recoverable _ins;
 		switch(cid){
             case PROPERTY_CID:
@@ -133,23 +137,4 @@ public class PortableRegistry extends AbstractRecoverableListener {
         return OID;
     }
 
-    /**
-    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
-        RecoverableFactory _fac = null;
-        switch (registerId){
-            case LOBBY_CID:
-                _fac = new LobbyQuery(params[0]);
-                break;
-            case APPLICATION_CONFIGURATION_CID:
-                _fac = new ApplicationConfigurationQuery(params[0]);
-                break;
-            case ON_VIEW_OID:
-                _fac = new OnViewQuery(params[0]);
-                break;
-            case APPLICATION_DESCRIPTOR_CID:
-                _fac = new ApplicationQuery(params[0]);
-                break;
-        }
-        return _fac;
-    }**/
 }

@@ -1,14 +1,13 @@
 package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.RecoverableListener;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class AbstractRecoverableListener implements RecoverableListener {
+public abstract class AbstractRecoverableListener<T extends Recoverable> implements RecoverableListener {
 
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();
 
@@ -29,10 +28,10 @@ public abstract class AbstractRecoverableListener implements RecoverableListener
     }
     abstract public int registryId();
 
-    abstract public <T extends Recoverable> T create(int i);
-    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
-        return null;
-    }
+    abstract public  T create(int i);
+    //public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
+       // return null;
+    //}
     private static class OnFilter{
         List<Filter> list = new CopyOnWriteArrayList<>();
         public void onUpdated(Recoverable t){

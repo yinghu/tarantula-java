@@ -4,8 +4,6 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
@@ -23,7 +21,8 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
     private double levelUpXp =0;  //xp of arena level
 
     public Rating(){
-        this.label = "Rating";
+        this.onEdge = true;
+        this.label = "rating";
     }
 
     public Rating update(double xpDelta,double levelUpLimit){
@@ -55,6 +54,23 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         this.granted = ((boolean)properties.getOrDefault("5",false));
     }
 
+    public boolean read(DataBuffer buffer){
+        this.rank = buffer.readInt();
+        this.level = buffer.readInt();
+        this.levelUpXp = buffer.readDouble();
+        this.xp = buffer.readDouble();
+        this.granted = buffer.readBoolean();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(rank);
+        buffer.writeInt(level);
+        buffer.writeDouble(levelUpXp);
+        buffer.writeDouble(xp);
+        buffer.writeBoolean(granted);
+        return true;
+    }
+
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -82,10 +98,10 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         levelUpXp = portableReader.readDouble("5");
     }
 
-    @Override
-    public Recoverable.Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
+    //@Override
+    //public Recoverable.Key key(){
+        //return new AssociateKey(this.distributionId,this.label);
+    //}
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

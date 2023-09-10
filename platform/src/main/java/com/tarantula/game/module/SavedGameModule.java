@@ -29,7 +29,7 @@ public class SavedGameModule extends ModuleHeader {
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),this.presenceServiceProvider.listSaves(session.systemId(),session.name()));
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),this.presenceServiceProvider.listSaves(session,session.name()));
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else if(session.action().equals("onSelect")){

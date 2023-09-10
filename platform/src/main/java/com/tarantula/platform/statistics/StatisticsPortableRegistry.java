@@ -4,7 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.service.metrics.*;
 
-public class StatisticsPortableRegistry extends AbstractRecoverableListener {
+public class StatisticsPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 5;
 
@@ -20,7 +20,7 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
     public static final int METRICS_SNAPSHOT_CID = 12;
     public static final int METRICS_HISTORY_CID = 13;
 
-    public Recoverable create(int i) {
+    public T create(int i) {
         Recoverable pt = null;
         switch (i){
             case STATISTICS_CID:
@@ -49,7 +49,7 @@ public class StatisticsPortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {

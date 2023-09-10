@@ -4,7 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 
 
-public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
+public class LeaderBoardPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 6;
 
@@ -12,7 +12,7 @@ public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
 
 
 
-    public Recoverable create(int i) {
+    public T create(int i) {
         Recoverable pt = null;
         switch (i){
             case LEADER_BOARD_ENTRY_CID:
@@ -20,7 +20,7 @@ public class LeaderBoardPortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {

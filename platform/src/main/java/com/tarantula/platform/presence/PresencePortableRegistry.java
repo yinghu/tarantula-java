@@ -16,7 +16,7 @@ import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
 
-public class PresencePortableRegistry extends AbstractRecoverableListener {
+public class PresencePortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 3;
 
@@ -65,7 +65,13 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
-    public Recoverable create(int i) {
+    public static PresencePortableRegistry INS;
+
+    public PresencePortableRegistry(){
+        INS = this;
+    }
+
+    public  T create(int i) {
         Recoverable pt = null;
         switch (i){
             case PRESENCE_CID:
@@ -136,7 +142,7 @@ public class PresencePortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {

@@ -4,7 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.OnAccessTrack;
 
-public class UserPortableRegistry extends AbstractRecoverableListener {
+public class UserPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 2;
 
@@ -17,7 +17,7 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
     public static final int ON_ACCESS_CID = 5;
 
 
-    public Recoverable create(int i) {
+    public T create(int i) {
         Recoverable pt = null;
         switch (i){
             case USER_CID:
@@ -34,7 +34,7 @@ public class UserPortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {

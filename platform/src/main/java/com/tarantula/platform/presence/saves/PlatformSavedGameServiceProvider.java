@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
@@ -13,9 +12,11 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvider {
@@ -50,9 +51,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public int mappingObjectMaxSize(){
         return mappingObjectMaxSize;
     }
-    public int saveSize(){
-        return saveSize;
-    }
+
     public <T extends RecoverableObject> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
@@ -133,6 +132,23 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.dataStore.createIfAbsent(playerSessionIndex,true);
         playerSessionIndex.dataStore(dataStore);
         return playerSessionIndex;
+    }
+
+    public List<SavedGame> savedGameList(Session session){
+        //PresencePortableRegistry registry = PresencePortableRegistry.INS;
+        RecoverableQuery<SavedGame> query = new RecoverableQuery<>(session.key(),SavedGame.USER_SAVE,PresencePortableRegistry.SAVED_GAME_CID,PresencePortableRegistry.INS);
+        List<SavedGame> list = dataStore.list(query);//dataStore.list(new SavedGameQuery<>(session.key()));
+        if(list.size()==0){
+            for(int i=0;i<saveSize;i++){
+                SavedGame save = new SavedGame();
+                save.name("save"+i);
+                save.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                save.ownerKey(session.key());
+                dataStore.create(save);
+                list.add(save);
+            }
+        }
+        return list;
     }
 
 }

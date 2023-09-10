@@ -15,13 +15,17 @@ public class SavedGame extends RecoverableObject implements Configurable {
     //index -- device id
     //version -- game latest update mark
 
+
+    public final static String USER_SAVE = "user";
+
     public int version;
-    public int stub;
+    public long stub;
 
     private boolean loaded;
 
     public SavedGame(){
-
+        this.onEdge = true;
+        this.label = USER_SAVE;
     }
     public SavedGame(String owner,String saveName){
         this.owner = owner;
@@ -44,7 +48,20 @@ public class SavedGame extends RecoverableObject implements Configurable {
         this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
         this.stub = ((Number)properties.getOrDefault("5",0)).intValue();
     }
-
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.version = buffer.readInt();
+        this.timestamp = buffer.readLong();
+        this.stub = buffer.readLong();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeInt(version);
+        buffer.writeLong(timestamp);
+        buffer.writeLong(stub);
+        return true;
+    }
     @Override
     public int getClassId() {
         return PresencePortableRegistry.SAVED_GAME_CID;
@@ -60,21 +77,21 @@ public class SavedGame extends RecoverableObject implements Configurable {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("GameId",this.distributionKey());
         jsonObject.addProperty("SaveName",name);
-        jsonObject.addProperty("OwnerId",owner);
+        //jsonObject.addProperty("OwnerId",owner);
         jsonObject.addProperty("Version",version);
-        jsonObject.addProperty("Timestamp",timestamp);
-        jsonObject.addProperty("Stub",stub);
+        jsonObject.addProperty("Timestamp",Long.toString(timestamp));
+        jsonObject.addProperty("Stub",Long.toString(stub));
         return jsonObject;
     }
 
     @Override
     public boolean equals(Object obj){
         SavedGame savedGame =(SavedGame) obj;
-        return savedGame.distributionKey().equals(this.distributionKey());
+        return savedGame.distributionId()==(this.distributionId());
     }
     @Override
     public int hashCode(){
-        return (distributionKey()).hashCode();
+        return Long.hashCode(distributionId);
     }
 
     @Override

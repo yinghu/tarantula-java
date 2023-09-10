@@ -120,22 +120,28 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return deltaStatistics;
     }
 
-    public List<SavedGame> listSaves(String systemId,String deviceId){
-        platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId);
-        deviceIndex(systemId,deviceId);
-        SavedGameIndex savedGameIndex = savedGameIndex(systemId);
-        return savedGameIndex.list(platformGameServiceProvider.savedGameServiceProvider().saveSize());
+    public List<SavedGame> listSaves(Session session,String deviceId){
+        deviceIndex(session.systemId(),deviceId);
+        return platformGameServiceProvider.savedGameServiceProvider().savedGameList(session);
+        //platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId);
+
+        //SavedGameIndex savedGameIndex = savedGameIndex(systemId);
+        //return savedGameIndex.list(platformGameServiceProvider.savedGameServiceProvider().saveSize());
     }
 
     public CurrentSaveIndex selectSave(Session session, String saveId){
-        SavedGameIndex savedGameIndex = savedGameIndex(session.systemId());
-        SavedGame selected = savedGameIndex.select(saveId);
-        if(!selected.onSession(session)) return null;
-        return this.platformGameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
-            if(currentSaveIndex.index()==null) return;
-            SavedGame released = savedGame(currentSaveIndex.index());
-            released.offSession(session);
-        });
+        SavedGame savedGame = new SavedGame();
+        savedGame.distributionId(Long.parseLong(saveId));
+        platformGameServiceProvider.savedGameServiceProvider().load(session,savedGame);
+        //SavedGameIndex savedGameIndex = savedGameIndex(session.systemId());
+        //SavedGame selected = savedGameIndex.select(saveId);
+        //if(!selected.onSession(session)) return null;
+        //return this.platformGameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
+            //if(currentSaveIndex.index()==null) return;
+            //SavedGame released = savedGame(currentSaveIndex.index());
+            //released.offSession(session);
+        //});
+        return null;
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
         if(currentSaveIndex.index()==null) return null;
@@ -184,10 +190,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return savedGame;
     }
     private void deviceIndex(String systemId,String deviceId){
-        AccessIndex accessIndex = serviceContext.clusterProvider().accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
-        DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
-        this.dataStore.createIfAbsent(deviceSaveIndex,true);
-        if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);
+        //AccessIndex accessIndex = serviceContext.clusterProvider().accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
+        //DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
+        //this.dataStore.createIfAbsent(deviceSaveIndex,true);
+        //if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);
     }
 
     private void syncPlayList(){

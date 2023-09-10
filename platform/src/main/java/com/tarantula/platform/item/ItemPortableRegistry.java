@@ -11,7 +11,7 @@ import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.Transaction;
 
 
-public class ItemPortableRegistry extends AbstractRecoverableListener {
+public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 7;
 
@@ -55,7 +55,7 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
     public static final int VERSIONED_CONFIGURABLE_OBJECT_CID = 23;
 
 
-    public Recoverable create(int i) {
+    public T create(int i) {
         Recoverable pt = null;
         switch (i){
             case CONFIGURABLE_OBJECT_CID:
@@ -126,7 +126,7 @@ public class ItemPortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {

@@ -524,7 +524,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public DataStore masterDataStore(){
         return this.deploymentDataStoreProvider.createDataStore(DeploymentServiceProvider.DEPLOY_DATA_STORE);
     }
-    public RecoverableRegistry recoverableRegistry(int registryId){
+    public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId){
  	    return fMap.get(registryId);
     }
 

@@ -5,7 +5,7 @@ import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-public class TournamentPortableRegistry extends AbstractRecoverableListener {
+public class TournamentPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 4;
 
@@ -25,7 +25,7 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
     public static final int PLAYER_TOURNAMENT_HISTORY_CID = 18;
 
 
-    public Recoverable create(int i) {
+    public T create(int i) {
         Recoverable pt = null;
         switch (i){
             case TOURNAMENT_CID:
@@ -57,13 +57,13 @@ public class TournamentPortableRegistry extends AbstractRecoverableListener {
                 break;
             default:
         }
-        return pt;
+        return (T)pt;
     }
 
     public int registryId() {
         return OID;
     }
-    public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
+    public RecoverableFactory<T> query(int registerId, String[] params){
         RecoverableFactory _fac = null;
         switch (registerId){
             case TOURNAMENT_ENTRY_CID:

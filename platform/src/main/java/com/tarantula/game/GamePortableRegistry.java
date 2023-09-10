@@ -5,7 +5,7 @@ import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.room.*;
 
-public class GamePortableRegistry  extends AbstractRecoverableListener {
+public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecoverableListener {
 
     public static final int OID = 10;
 
@@ -27,7 +27,7 @@ public class GamePortableRegistry  extends AbstractRecoverableListener {
     }
 
     @Override
-    public  <T extends Recoverable> T create(int i) {
+    public   T create(int i) {
         Recoverable pt = null;
         switch (i){
             case MAPPING_OBJECT_CID:

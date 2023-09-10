@@ -22,7 +22,7 @@ public interface ServiceContext extends Context{
     ClusterProvider.Node node();
     long distributionId();
     ServiceEventLogger serviceEventLogger();
-    RecoverableRegistry recoverableRegistry(int registryId);
+    <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);
     List<Descriptor> availableServices();
