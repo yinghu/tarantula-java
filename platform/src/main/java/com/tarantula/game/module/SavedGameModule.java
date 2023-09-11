@@ -29,11 +29,11 @@ public class SavedGameModule extends ModuleHeader {
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")) {
-            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),this.presenceServiceProvider.listSaves(session,session.name()));
+            PlayerSavedGames playerSavedGames = new PlayerSavedGames(session.systemId(),this.savedGameServiceProvider.savedGameList(session));
             session.write(playerSavedGames.toJson().toString().getBytes());
         }
         else if(session.action().equals("onSelect")){
-            CurrentSaveIndex savedGame = this.presenceServiceProvider.selectSave(session,session.name());
+            CurrentSaveIndex savedGame = this.savedGameServiceProvider.selectSavedGame(session);
             session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
         else if(session.action().equals("onSet")){
@@ -42,16 +42,15 @@ public class SavedGameModule extends ModuleHeader {
             }else{
                 MappingObject mo = new MappingObject();
                 mo.label(session.name());
-                savedGameServiceProvider.load(session,mo);
                 mo.value(bytes);
-                this.savedGameServiceProvider.save(session,mo);
-                session.write(JsonUtil.toSimpleResponse(true,mo.key().asString()).getBytes());
+                boolean suc = this.presenceServiceProvider.save(session,mo);
+                session.write(JsonUtil.toSimpleResponse(suc,mo.key().asString()).getBytes());
             }
         }
         else if(session.action().equals("onGet")){
             MappingObject mo = new MappingObject();
             mo.label(session.name());
-            boolean suc = savedGameServiceProvider.load(session,mo);
+            boolean suc = presenceServiceProvider.load(session,mo);
             session.write(suc ? mo.value() : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
         }
         else if(session.action().equals("onReset")){

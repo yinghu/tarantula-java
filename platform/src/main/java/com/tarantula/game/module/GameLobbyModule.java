@@ -23,6 +23,7 @@ public class GameLobbyModule extends ModuleHeader{
             return;
         }
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+        this.context.log("RATING ["+rating.distributionId()+"]["+rating.rank+"]",OnLog.WARN);
         Stub stub = gameLobby.join(session,rating);
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
         session.write(stub.toJson().toString().getBytes());
@@ -44,9 +45,10 @@ public class GameLobbyModule extends ModuleHeader{
             }
             Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
             rating.level = this.context.descriptor().accessRank()*100-99;
+            this.context.log("RATING ["+rating.distributionId()+"]["+rating.rank+"]",OnLog.WARN);
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
-            this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
+            //this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
         }
         else if(session.action().equals("onTestScore")){
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){

@@ -24,6 +24,11 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
 
     public static final int PLAYER_TOURNAMENT_HISTORY_CID = 18;
 
+    public static TournamentPortableRegistry INS;
+
+    public TournamentPortableRegistry(){
+        INS = this;
+    }
 
     public T create(int i) {
         Recoverable pt = null;

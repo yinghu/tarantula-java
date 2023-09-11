@@ -20,6 +20,11 @@ public class StatisticsPortableRegistry<T extends Recoverable> extends AbstractR
     public static final int METRICS_SNAPSHOT_CID = 12;
     public static final int METRICS_HISTORY_CID = 13;
 
+    public StatisticsPortableRegistry INS;
+
+    public StatisticsPortableRegistry(){
+        INS = this;
+    }
     public T create(int i) {
         Recoverable pt = null;
         switch (i){

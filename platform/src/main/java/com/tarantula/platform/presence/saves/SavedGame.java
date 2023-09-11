@@ -8,15 +8,13 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 public class SavedGame extends RecoverableObject implements Configurable {
 
     //index -- device id
     //version -- game latest update mark
 
-
-    public final static String USER_SAVE = "user";
+    public final static String USER_SAVE = "save";
 
     public int version;
     public long stub;
@@ -31,23 +29,7 @@ public class SavedGame extends RecoverableObject implements Configurable {
         this.owner = owner;
         this.name = saveName;
     }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",name);
-        this.properties.put("2",owner);
-        this.properties.put("3",version);
-        this.properties.put("4",timestamp);
-        this.properties.put("5",stub);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.name = ((String) properties.get("1"));
-        this.owner = ((String) properties.get("2"));
-        this.version = ((Number)properties.getOrDefault("3",0)).intValue();
-        this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-        this.stub = ((Number)properties.getOrDefault("5",0)).intValue();
-    }
+
     public boolean read(DataBuffer buffer){
         this.name = buffer.readUTF8();
         this.version = buffer.readInt();
@@ -77,7 +59,6 @@ public class SavedGame extends RecoverableObject implements Configurable {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("GameId",this.distributionKey());
         jsonObject.addProperty("SaveName",name);
-        //jsonObject.addProperty("OwnerId",owner);
         jsonObject.addProperty("Version",version);
         jsonObject.addProperty("Timestamp",Long.toString(timestamp));
         jsonObject.addProperty("Stub",Long.toString(stub));

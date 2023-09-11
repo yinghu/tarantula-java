@@ -54,6 +54,10 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int VERSIONED_CONFIGURABLE_OBJECT_CID = 23;
 
+    public static ItemPortableRegistry INS;
+    public ItemPortableRegistry(){
+        INS = this;
+    }
 
     public T create(int i) {
         Recoverable pt = null;

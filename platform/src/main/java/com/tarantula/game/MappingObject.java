@@ -19,6 +19,10 @@ public class MappingObject extends RecoverableObject {
 
     @Override
     public void label(String label){
+        if(label.startsWith("mo_")){
+            this.label = label;
+            return;
+        }
         this.label = "mo_"+label;
     }
 
@@ -56,6 +60,11 @@ public class MappingObject extends RecoverableObject {
         for(byte b : value){
             buffer.writeByte(b);
         }
+        return true;
+    }
+
+    @Override
+    public boolean validate() {
         return true;
     }
 }

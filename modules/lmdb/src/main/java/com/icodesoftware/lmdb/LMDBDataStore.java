@@ -266,6 +266,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     t.read(proxy);
                     t.revision(local.revision());
                     t.readKey(new BufferProxy(kv.val()));
+                    t.label(query.label());
                     if(!stream.on(t)) break;
                 }
             }

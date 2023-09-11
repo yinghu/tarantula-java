@@ -4,6 +4,7 @@ package com.tarantula.platform.util;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.RecoverableRegistry;
+import com.icodesoftware.util.SnowflakeKey;
 
 
 public class RecoverableQuery<T extends Recoverable> implements RecoverableFactory<T> {
@@ -34,5 +35,9 @@ public class RecoverableQuery<T extends Recoverable> implements RecoverableFacto
     @Override
     public Recoverable.Key key() {
         return key;
+    }
+
+    public static RecoverableQuery query(long snowflakeId,Recoverable target, RecoverableRegistry registry){
+        return new RecoverableQuery(new SnowflakeKey(snowflakeId), target.label(), target.getClassId(),registry);
     }
 }

@@ -98,11 +98,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         levelUpXp = portableReader.readDouble("5");
     }
 
-    //@Override
-    //public Recoverable.Key key(){
-        //return new AssociateKey(this.distributionId,this.label);
-    //}
-
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Rank",rank);

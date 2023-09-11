@@ -16,6 +16,11 @@ public class UserPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int ON_ACCESS_CID = 5;
 
+    public UserPortableRegistry INS;
+
+    public UserPortableRegistry(){
+        INS = this;
+    }
 
     public T create(int i) {
         Recoverable pt = null;

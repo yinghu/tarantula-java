@@ -9,6 +9,8 @@ import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.GamePortableRegistry;
+import com.tarantula.game.MappingObject;
 import com.tarantula.game.Rating;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -18,6 +20,7 @@ import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.presence.saves.*;
 
 import com.tarantula.platform.statistics.UserStatistics;
+import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,6 +40,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     private AtomicInteger updates;
     private ScheduleRunner scheduleRunner;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
+
+    private DataStore mDataStore;
 
     public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -69,6 +74,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.friendListSize = plist.get("friendListSize").getAsInt();
         this.syncIntervalSeconds = plist.get("syncIntervalSeconds").getAsLong();
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
+        this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
@@ -103,12 +109,27 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return profile;
     }
     public Rating rating(Session session){
-        Rating rating = new Rating();
-        this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,rating);
-        if(rating.granted) return rating;
-        rating.granted = this.platformGameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
-        rating.update();
-        return rating;
+        Rating[] loaded  = {new Rating()};
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
+        RecoverableQuery<Rating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
+        mDataStore.list(query,(m)->{
+            if(m.label().equals(loaded[0].label())){
+                loaded[0]=m;
+                return false;
+            }
+            return true;
+        });
+        if(loaded[0].distributionId()==0){
+            loaded[0].ownerKey(query.key());
+            loaded[0].rank = 1;
+            loaded[0].xp = 100;
+            mDataStore.create(loaded[0]);
+        }
+        //this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,rating);
+        //if(rating.granted) return rating;
+        //rating.granted = this.platformGameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
+        //rating.update();
+        return loaded[0];
     }
     public Statistics statistics(Session session){
         UserStatistics deltaStatistics = new UserStatistics();
@@ -120,28 +141,39 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return deltaStatistics;
     }
 
-    public List<SavedGame> listSaves(Session session,String deviceId){
-        deviceIndex(session.systemId(),deviceId);
-        return platformGameServiceProvider.savedGameServiceProvider().savedGameList(session);
-        //platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(systemId);
-
-        //SavedGameIndex savedGameIndex = savedGameIndex(systemId);
-        //return savedGameIndex.list(platformGameServiceProvider.savedGameServiceProvider().saveSize());
+    public boolean save(Session session, MappingObject mappingObject){
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
+        RecoverableQuery<MappingObject> query = RecoverableQuery.query(currentSaveIndex.saveId,mappingObject, GamePortableRegistry.INS);
+        boolean[] updated ={false};
+        mDataStore.list(query,(m)->{
+           if(m.label().equals(mappingObject.label())){
+               m.value(mappingObject.value());
+               mDataStore.update(m);
+               updated[0]=true;
+               return false;
+           }
+           return true;
+        });
+        if(!updated[0]){
+            mappingObject.ownerKey(query.key());
+            mDataStore.create(mappingObject);
+        }
+        return true;
     }
 
-    public CurrentSaveIndex selectSave(Session session, String saveId){
-        SavedGame savedGame = new SavedGame();
-        savedGame.distributionId(Long.parseLong(saveId));
-        platformGameServiceProvider.savedGameServiceProvider().load(session,savedGame);
-        //SavedGameIndex savedGameIndex = savedGameIndex(session.systemId());
-        //SavedGame selected = savedGameIndex.select(saveId);
-        //if(!selected.onSession(session)) return null;
-        //return this.platformGameServiceProvider.savedGameServiceProvider().selectSavedGame(session,selected,currentSaveIndex -> {
-            //if(currentSaveIndex.index()==null) return;
-            //SavedGame released = savedGame(currentSaveIndex.index());
-            //released.offSession(session);
-        //});
-        return null;
+    public boolean load(Session session,MappingObject mappingObject){
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
+        RecoverableQuery<MappingObject> query = RecoverableQuery.query(currentSaveIndex.saveId,mappingObject, GamePortableRegistry.INS);
+        boolean[] loaded ={false};
+        mDataStore.list(query,(m)->{
+            if(m.label().equals(mappingObject.label())){
+                mappingObject.value(m.value());
+                loaded[0]=true;
+                return false;
+            }
+            return true;
+        });
+        return loaded[0];
     }
     public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
         if(currentSaveIndex.index()==null) return null;

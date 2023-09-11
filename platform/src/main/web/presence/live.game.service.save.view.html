@@ -107,7 +107,7 @@
                 saveList.innerHTML = '';
                 resp._savedGames.forEach(item => {
                     
-                    saveList.innerHTML += TARA_HTML.command(item.GameId,item.SaveName+'>'+item.GameId,item.Version,'save-select','Select');
+                    saveList.innerHTML += TARA_HTML.command(item.GameId,item.SaveName+' : '+item.GameId,item.Stub,'save-select','Select');
                         
                 });
                 document.querySelectorAll('.tx-live-save-select').forEach(a=>{
