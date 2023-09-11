@@ -44,7 +44,7 @@ public class PlayerSessionIndex extends PropertyIndexSet {
     public boolean load(CurrentSaveIndex pending){
         Object value = value(pending.key().asString());
         if(value==null) return false;
-        pending.parse((String) value);
+        //pending.parse((String) value);
         return true;
     }
     public void update(CurrentSaveIndex pending){
@@ -61,11 +61,11 @@ public class PlayerSessionIndex extends PropertyIndexSet {
     public void check(long timeout,SavedGameSelected deleted){
         ArrayList<CurrentSaveIndex> expired = new ArrayList<>();
         keySet().forEach(k->{
-            CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(k.name());
-            if(load(currentSaveIndex) && currentSaveIndex.expired(timeout)){
-                deleted.selected(currentSaveIndex);
-                expired.add(currentSaveIndex);
-            }
+            //CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(k.name());
+            //if(load(currentSaveIndex) && currentSaveIndex.expired(timeout)){
+                //deleted.selected(currentSaveIndex);
+                //expired.add(currentSaveIndex);
+            //}
         });
         expired.forEach(c->delete(c));
     }

@@ -3,6 +3,7 @@ package com.tarantula.test;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
@@ -30,6 +31,7 @@ public class TestServiceContext implements ServiceContext {
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
         PresencePortableRegistry registry = new PresencePortableRegistry<>();
+        GamePortableRegistry gamePortableRegistry = new GamePortableRegistry();
     }
     @Override
     public DataStore dataStore(int scope, String s) {

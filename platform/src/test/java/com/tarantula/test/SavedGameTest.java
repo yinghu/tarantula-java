@@ -7,6 +7,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.Rating;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
 import com.tarantula.platform.presence.saves.SavedGameQuery;
 import com.tarantula.platform.util.RecoverableQuery;
@@ -26,7 +27,14 @@ public class SavedGameTest extends DataStoreHook{
         DataStore dataStoreForRanking = dataStoreProvider.createDataStore("test_ranking");
         long playerId = serviceContext.distributionId();
         long stub = serviceContext.distributionId();
-        //SavedGame systemSave = new SavedGame();
+        SavedGame systemSave = new SavedGame();
+        systemSave.name("save");
+        systemSave.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        systemSave.distributionId(playerId);
+        Assert.assertTrue(dataStore.createIfAbsent(systemSave,false));
+        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex();
+        currentSaveIndex.distributionId(stub);
+        Assert.assertTrue(dataStore.createIfAbsent(currentSaveIndex,false));
         for(int i=0;i<3;i++){
             SavedGame savedGame = new SavedGame();
             savedGame.name("save"+i);
@@ -49,6 +57,6 @@ public class SavedGameTest extends DataStoreHook{
         Assert.assertTrue(dataStoreForRanking.create(rating));
         GamePortableRegistry registry = new GamePortableRegistry();
         List<Rating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(),GamePortableRegistry.RATING_CID,registry));
-        System.out.println(rlist.size());
+        Assert.assertEquals(rlist.size(),1);
     }
 }

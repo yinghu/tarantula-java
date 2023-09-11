@@ -1,14 +1,11 @@
 package com.tarantula.game;
 
-import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.AssociateKey;
 import com.icodesoftware.util.RecoverableObject;
 
 
 public class MappingObject extends RecoverableObject {
 
-    private final static String _KEY = "_key";
-
+    private byte[] value;
     @Override
     public int getFactoryId() {
         return GamePortableRegistry.OID;
@@ -18,22 +15,47 @@ public class MappingObject extends RecoverableObject {
         return GamePortableRegistry.MAPPING_OBJECT_CID;
     }
 
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
+
 
     @Override
     public void label(String label){
         this.label = "mo_"+label;
     }
 
+    public MappingObject(){
+        this.onEdge = true;
+    }
+
+
     public void value(byte[] json){
-        properties.put(_KEY, JsonUtil.parseAsJsonElement(json));
+        value = json;
     }
 
     public byte[] value(){
-        return properties.getOrDefault(_KEY,"{}").toString().getBytes();
+        return value;
     }
 
+    @Override
+    public boolean read(DataBuffer buffer) {
+        int size = buffer.readInt();
+        if(size==0) return true;
+        value = new byte[size];
+        for(int i=0;i<size;i++){
+            value[i]=buffer.readByte();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean write(DataBuffer buffer) {
+        if(value==null || value.length==0){
+            buffer.writeInt(0);
+            return true;
+        }
+        buffer.writeInt(value.length);
+        for(byte b : value){
+            buffer.writeByte(b);
+        }
+        return true;
+    }
 }

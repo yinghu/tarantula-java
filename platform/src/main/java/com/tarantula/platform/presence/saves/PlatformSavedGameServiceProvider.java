@@ -96,11 +96,16 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     private CurrentSaveIndex currentSaveIndex(Session session){
         CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex(session);
-        PlayerSessionIndex playerSessionIndex = playerSessionIndex(session.systemId());
-        if(playerSessionIndex.load(currentSaveIndex)) return currentSaveIndex;
-        currentSaveIndex.version = 1;
-        currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        playerSessionIndex.update(currentSaveIndex);
+        dataStore.createIfAbsent(currentSaveIndex,true);
+        if(currentSaveIndex.saveId == 0){
+            SavedGame savedGame = new SavedGame();
+            savedGame.distributionId(session.distributionId());
+            savedGame.stub = session.stub();
+            if(!dataStore.createIfAbsent(savedGame,true)){
+                savedGame.stub = session.stub();
+                dataStore.update(savedGame);
+            }
+        }
         return currentSaveIndex;
     }
 
@@ -110,7 +115,6 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         previousSelected.selected(currentSaveIndex);
         currentSaveIndex.index(selected.distributionKey());
         currentSaveIndex.name(selected.name());
-        currentSaveIndex.version = selected.version;
         currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         playerSessionIndex(session.systemId()).update(currentSaveIndex);
         return currentSaveIndex;

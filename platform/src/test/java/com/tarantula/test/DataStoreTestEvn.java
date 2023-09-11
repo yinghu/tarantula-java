@@ -19,7 +19,11 @@ public class DataStoreTestEvn {
 
     static DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     static MapStoreListener mapStoreListener = new TestMapStoreListener();
+
+    static boolean started = false;
     public static void setUp() {
+        if(started) return;
+        started = true;
         distributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         serviceContext = new TestServiceContext(distributionIdGenerator);
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, 3,dataStoreProvider->{

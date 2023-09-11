@@ -21,6 +21,11 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
 
     public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
 
+    public static GamePortableRegistry INS;
+
+    public GamePortableRegistry(){
+        INS = this;
+    }
     @Override
     public int registryId() {
         return OID;
