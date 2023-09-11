@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
@@ -13,6 +14,7 @@ import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.MappingObject;
 import com.tarantula.game.Rating;
 
+import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
@@ -131,6 +133,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         //rating.update();
         return loaded[0];
     }
+    public Stub stub(Session session,Descriptor lobby){
+        DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
+        logger.warn(ds.name());
+        return null;
+    }
     public Statistics statistics(Session session){
         UserStatistics deltaStatistics = new UserStatistics();
         this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,deltaStatistics);
@@ -235,6 +242,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     public void onLeave(Session session){
         platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.systemId());
+    }
+
+    public void onLobby(Descriptor onLobby){
+        applicationPreSetup.dataStore(gameCluster,NAME+"_"+onLobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
     }
 
 }

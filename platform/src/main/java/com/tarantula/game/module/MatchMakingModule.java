@@ -108,6 +108,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             for(int i = start;i<a.accessRank();i++){
                 mLobby.put(i,a);
             }
+            gameServiceProvider.presenceServiceProvider().onLobby(a);
             start++;
         }
         if(start>1&&start<maxRank){
