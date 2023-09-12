@@ -46,7 +46,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     Key key();
 
     interface Key extends Bufferable,Validatable{
-        default String asString(){ return null;}
+        String asString();
     }
 
 

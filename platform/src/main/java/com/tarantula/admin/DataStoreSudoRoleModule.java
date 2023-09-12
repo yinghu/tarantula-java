@@ -5,9 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
-import com.tarantula.platform.service.persistence.RevisionObject;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.util.List;

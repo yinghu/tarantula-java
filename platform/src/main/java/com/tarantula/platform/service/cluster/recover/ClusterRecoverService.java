@@ -8,20 +8,18 @@ import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.EventOnReplication;
-import com.tarantula.platform.event.IntegrationReplicationEvent;
+
 import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.event.OnReplicationEvent;
-import com.tarantula.platform.service.cluster.accessindex.AccessIndexServiceBootstrap;
-import com.tarantula.platform.service.persistence.DataStoreOnPartition;
+
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.persistence.RevisionObject;
+
 
 import java.util.ArrayList;
 import java.util.Properties;

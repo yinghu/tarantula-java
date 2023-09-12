@@ -93,9 +93,10 @@ public class MirrorClusterBackupProvider implements BackupProvider{
                         String source = data.get("source").getAsString();
                         long revision = data.get("revision").getAsLong();
                         JsonObject payload = data.get("payload").getAsJsonObject();
-                        if(scope == Distributable.DATA_SCOPE){
-                            DataStore ds = this.dataStoreProvider.create(source,serviceContext.node().partitionNumber());
-                            ds.backup().set(key.getBytes(),RevisionObject.toBinary(revision,payload.toString().getBytes(),true));                    }
+                        if(scope == Distributable.DATA_SCOPE) {
+                            DataStore ds = this.dataStoreProvider.create(source, serviceContext.node().partitionNumber());
+                            //ds.backup().set(key.getBytes(),RevisionObject.toBinary(revision,payload.toString().getBytes(),true));                    }
+                        }
                         else if(scope == Distributable.INTEGRATION_SCOPE){
                             DataStore ds = this.dataStoreProvider.createAccessIndexDataStore(source);
                             ds.backup().set(key.getBytes(),payload.toString().getBytes());
