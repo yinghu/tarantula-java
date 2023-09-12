@@ -4,14 +4,11 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.admin.GameClusterQuery;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.util.RecoverableQuery;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -81,8 +78,6 @@ public class PlatformUserService implements UserService {
         }
     }
     public Access createUser(Account account,Access access){
-        //Account account = new UserAccount();
-        //account.distributionKey(accountId);
         if(!accountDataStore.load(account)) throw new RuntimeException("Account not existed");
         if(!account.trial() && !account.subscribed()) throw new RuntimeException("Account expired");
         int maxUsersPerAccount = account.trial()?trialMaxUsersPerAccount:subscribedMaxUsersPerAccount;
@@ -93,14 +88,6 @@ public class PlatformUserService implements UserService {
         access.ownerKey(account.key());
         access.password(tokenValidatorProvider.tokenValidator().hashPassword(access.password()));
         Access user = createUser(access);
-        //IndexSet idx = new IndexSet();
-        //idx.distributionKey(account.distributionKey());
-        //idx.label(Account.UserLabel);
-        //idx.addKey(user.distributionKey());
-        //if(!accountIndexDataStore.createIfAbsent(idx,true)){
-            //idx.addKey(user.distributionKey());//update on existing
-            //accountIndexDataStore.update(idx);
-        //}
         //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
         return user;
     }
