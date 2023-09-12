@@ -50,6 +50,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int APPLICATION_DESCRIPTOR_CID = PortableEventRegistry.APPLICATION_DESCRIPTOR_CID; //DEPLOY OBJECT
 
+    public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
@@ -111,6 +112,12 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
                 break;
+            case LOBBY_CID:
+                _ins = new LobbyDescriptor();
+                break;
+            case GAME_CLUSTER_CID:
+                _ins = new GameCluster();
+                break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
                 break;
@@ -127,7 +134,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 _ins = new KeyIndexTrack();
                 break;
             default:
-                throw new IllegalArgumentException("Not supported event type");
+                throw new IllegalArgumentException("Not supported event type ["+cid+"]");
 		}
 		return (T)_ins;
 	}

@@ -1,6 +1,8 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
@@ -12,10 +14,10 @@ import com.tarantula.platform.service.cluster.accessindex.DistributionAccessInde
 public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexStore {
 
     private TarantulaContext tarantulaContext;
-
-    public AccessIndexStoreViewer(TarantulaContext tarantulaContext){
+    private DataStore dataStore;
+    public AccessIndexStoreViewer(TarantulaContext tarantulaContext,DataStore dataStore){
         this.tarantulaContext = tarantulaContext;
-
+        this.dataStore = dataStore;
     }
 
     @Override
@@ -28,32 +30,26 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return tarantulaContext.accessIndexRoutingNumber;
     }
 
-
+    @Override
     public long totalRecords() {
-        long rt = 0;
-        for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
-            DataStore ds = dataStore(i);
-            rt += ds.count();
-        }
-        return rt;
+        return dataStore.count();
     }
+
 
     public void list(DataStoreSummary.View view){
-        boolean[] done = {false};
-        for (int i=0;i< tarantulaContext.accessIndexRoutingNumber;i++){
-            DataStore ds = dataStore(i);
-            ds.backup().list((k,h,v)->{
-                //if(view.on(tarantulaContext.node(),k,v)) return true;
-                done[0] = true;
-                return false;
-            });
-            if(done[0]) break;
-        }
+        dataStore.backup().list((k,h,v)-> {
+            RecoverableRegistry registry = tarantulaContext.recoverableRegistry(h.factoryId());
+            Recoverable r = registry.create(h.classId());
+            r.readKey(k);
+            r.read(v);
+            return view.on(tarantulaContext.node(),h,r);
+        });
     }
+
 
     public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
-        view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
+        //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
         KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
         if(keyIndex==null) return;
         ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
@@ -61,7 +57,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue;
             byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
-            if(ret!=null) view.on(node,key,ret);
+            //if(ret!=null) view.on(node,t);
         }
     }
     private DataStore dataStore(int partition){

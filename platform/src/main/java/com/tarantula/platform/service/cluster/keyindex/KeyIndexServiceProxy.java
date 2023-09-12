@@ -105,7 +105,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
             });
             if(callResult.successful){
                 ClusterProvider.Node node = serviceContext.clusterProvider().summary().node(m.getUuid());
-                view.on(node,key,(byte[]) callResult.result);
+                //view.on(node,key,(byte[]) callResult.result);
             }
         }
     }

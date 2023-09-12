@@ -193,7 +193,9 @@ public class RecoverableObject implements Recoverable {
 
     @Override
     public JsonObject toJson(){
-        return JsonUtil.toJsonObject(this.properties);
+        JsonObject ret = new JsonObject();
+        ret.addProperty("warn","override toJson");
+        return ret;
     }
 
 }

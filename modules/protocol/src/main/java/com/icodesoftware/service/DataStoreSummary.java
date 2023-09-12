@@ -1,5 +1,7 @@
 package com.icodesoftware.service;
 
+import com.icodesoftware.Recoverable;
+
 public interface DataStoreSummary {
 
     String name();
@@ -13,6 +15,6 @@ public interface DataStoreSummary {
     void load(byte[] key, DataStoreSummary.View view);
 
     interface View{
-        boolean on(ClusterProvider.Node node,byte[] key, byte[] value);
+         boolean on(ClusterProvider.Node node,Recoverable.DataHeader h, Recoverable t);
     }
 }

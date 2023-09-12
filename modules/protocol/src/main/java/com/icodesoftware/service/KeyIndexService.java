@@ -26,7 +26,7 @@ public interface KeyIndexService extends ServiceProvider{
     ClusterProvider.Node[] recoveringNodeList(String source,String key);
 
     interface KeyIndexStore extends DataStoreSummary {
-        String STORE_NAME_PREFIX = "tarantula_key_index_";
+        String STORE_NAME = "tarantula_key_index";
         //String name();
         //int partitionNumber();
         //long count();

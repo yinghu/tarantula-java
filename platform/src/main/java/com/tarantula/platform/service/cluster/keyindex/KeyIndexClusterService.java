@@ -34,7 +34,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         this.nodeEngine = nodeEngine;
         this.dataStoreOnPartitions = new DataStoreOnPartition[this.nodeEngine.getPartitionService().getPartitionCount()];
         for(int i=0;i<this.dataStoreOnPartitions.length;i++){
-            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, KeyIndexService.KeyIndexStore.STORE_NAME_PREFIX +"single");
+            this.dataStoreOnPartitions[i]=new DataStoreOnPartition(i, KeyIndexService.KeyIndexStore.STORE_NAME);
         }
         clusterNodeManager = new ClusterNodeManager(tarantulaContext.node());
         tarantulaContext.clusterProvider().registerNodeListener(clusterNodeManager);

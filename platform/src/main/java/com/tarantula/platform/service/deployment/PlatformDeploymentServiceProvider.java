@@ -819,11 +819,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public AccessIndexService.AccessIndexStore accessIndexStore(){
-        return new AccessIndexStoreViewer(this.tarantulaContext);
+        return new AccessIndexStoreViewer(this.tarantulaContext,this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME));
     }
 
     public  KeyIndexService.KeyIndexStore keyIndexStore(){
-        return new KeyIndexStoreViewer(tarantulaContext);
+        return new KeyIndexStoreViewer(tarantulaContext,this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME));
     }
 
     public void issueDataStoreBackup(){

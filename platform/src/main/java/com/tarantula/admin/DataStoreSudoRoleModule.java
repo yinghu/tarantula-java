@@ -56,16 +56,16 @@ public class DataStoreSudoRoleModule implements Module {
             int[] batch = {Integer.parseInt(query[2])};
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
-            sum.list((n,k,v)->{
+            sum.list((n,h,t)->{
                 kn[0]--;
                 if(kn[0]<0) {
-                    RevisionObject revisionObject = RevisionObject.fromBinary(v);
                     JsonObject debug = new JsonObject();
-                    debug.addProperty("key",new String(k));
-                    debug.addProperty("local",revisionObject.local);
-                    debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    //debug.addProperty("node",new String(revisionObject.node));
-                    debug.add("content",JsonUtil.parse(revisionObject.data));
+                    debug.addProperty("name",t.getClass().getName());
+                    debug.addProperty("key",t.key().asString());
+                    debug.addProperty("local",h.local());
+                    debug.addProperty("revision",h.revision());
+                    debug.addProperty("node",n.nodeName());
+                    debug.add("content",t.toJson());
                     keys.add(debug);
                     batch[0]--;
                 }
@@ -80,14 +80,14 @@ public class DataStoreSudoRoleModule implements Module {
             JsonObject summary = new JsonObject();
             JsonArray data = new JsonArray();
             if(sum!=null){
-                sum.load(query[1].getBytes(),(n,k,v)->{
-                    RevisionObject revisionObject = RevisionObject.fromBinary(v);
+                sum.load(query[1].getBytes(),(n,h,t)->{
+                    //RevisionObject revisionObject = RevisionObject.fromBinary(v);
                     JsonObject debug = new JsonObject();
                     debug.addProperty("address",n.address());
-                    debug.addProperty("local",revisionObject.local);
-                    debug.addProperty("revision",Long.toString(revisionObject.revision));
+                    //debug.addProperty("local",revisionObject.local);
+                    //debug.addProperty("revision",Long.toString(revisionObject.revision));
                     //debug.addProperty("node",new String(revisionObject.node));
-                    debug.add("content",JsonUtil.parse(revisionObject.data));
+                    //debug.add("content",JsonUtil.parse(revisionObject.data));
                     data.add(debug);
                     return true;
                 });
@@ -107,16 +107,16 @@ public class DataStoreSudoRoleModule implements Module {
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
             JsonArray keys = new JsonArray();
-            accessIndexStore.list((n,k,v)->{
+            accessIndexStore.list((n,h,t)->{
                 kn[0]--;
                 if(kn[0]<0) {
                     JsonObject debug = new JsonObject();
-                    debug.addProperty("key",new String(k));
-                    RevisionObject ro = RevisionObject.fromBinary(v);
-                    debug.addProperty("local",ro.local);
-                    //debug.addProperty("node",new String(ro.node));
-                    debug.addProperty("revision",ro.revision);
-                    debug.add("content",JsonUtil.parse(ro.data));
+                    debug.addProperty("key",t.key().asString());
+                    //RevisionObject ro = RevisionObject.fromBinary(v);
+                    debug.addProperty("local",h.local());
+                    debug.addProperty("node",n.nodeName());
+                    debug.addProperty("revision",Long.toString(h.revision()));
+                    debug.add("content",t.toJson());
                     keys.add(debug);
                     batch[0]--;
                 }
@@ -128,14 +128,14 @@ public class DataStoreSudoRoleModule implements Module {
         else if(session.action().equals("onAccessIndexStoreValue")){
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
             JsonArray data = new JsonArray();
-            accessIndexStore.load(session.name().getBytes(),(n,k,v)->{
+            accessIndexStore.load(session.name().getBytes(),(n,h,t)->{
                 JsonObject debug = new JsonObject();
-                RevisionObject ro = RevisionObject.fromBinary(v);
+                //RevisionObject ro = RevisionObject.fromBinary(v);
                 debug.addProperty("address",n.address());
-                debug.addProperty("local",ro.local);
+                //debug.addProperty("local",ro.local);
                 //debug.addProperty("node",new String(ro.node));
-                debug.addProperty("revision",ro.revision);
-                debug.add("content",JsonUtil.parse(ro.data));
+                //debug.addProperty("revision",ro.revision);
+                //debug.add("content",JsonUtil.parse(ro.data));
                 data.add(debug);
                 return false;
             });
@@ -155,12 +155,12 @@ public class DataStoreSudoRoleModule implements Module {
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
             JsonArray keys = new JsonArray();
-            accessIndexStore.list((n,k,v)->{
+            accessIndexStore.list((n,h,t)->{
                 kn[0]--;
                 if(kn[0]<0) {
                     JsonObject debug = new JsonObject();
-                    debug.addProperty("key",new String(k));
-                    debug.add("content",JsonUtil.parse(v));
+                    //debug.addProperty("key",new String(k));
+                    //debug.add("content",JsonUtil.parse(v));
                     keys.add(debug);
                     batch[0]--;
                 }
@@ -172,10 +172,10 @@ public class DataStoreSudoRoleModule implements Module {
         else if(session.action().equals("onKeyIndexStoreValue")){
             KeyIndexService.KeyIndexStore keyIndexStore = this.deploymentServiceProvider.keyIndexStore();
             JsonArray data = new JsonArray();
-            keyIndexStore.load(session.name().getBytes(),(n,k,v)->{
+            keyIndexStore.load(session.name().getBytes(),(n,h,t)->{
                 JsonObject debug = new JsonObject();
                 debug.addProperty("address",n.address());
-                debug.add("content",JsonUtil.parse(v));
+                //debug.add("content",JsonUtil.parse(v));
                 data.add(debug);
                 return true;
             });
