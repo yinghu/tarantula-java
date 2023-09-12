@@ -14,11 +14,11 @@ public class PVERoomProxy extends RoomProxyHeader {
     }
     @Override
     public Stub join(Session session,Rating rating) {
-        Stub stub = new Stub();
-        stub.distributionKey(session.systemId());
-        stub.stub(session.stub());
-        stub.label(application.tag());
-        this.dataStore.createIfAbsent(stub,true);
+        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);//new Stub();
+        //stub.distributionKey(session.systemId());
+        //stub.stub(session.stub());
+        //stub.label(application.tag());
+        //this.dataStore.createIfAbsent(stub,true);
         GameRoom room = this.gameServiceProvider.roomServiceProvider().join(rating,gameZone);
         stub.joined = room!=null;
         if(!stub.joined) return stub;
@@ -38,12 +38,14 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.offline = true;
         stub.tag(application.tag());
         stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
-        this.dataStore.update(stub);
+        //this.dataStore.update(stub);
+        stub.update();
         return stub;
     }
     public boolean leave(Stub stub){
         stub.joined = false;
-        this.dataStore.update(stub);
+        stub.update();
+        //this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
             gameServiceProvider.tournamentServiceProvider().finish(stub.tournamentId(),stub.trackId(),stub.systemId());

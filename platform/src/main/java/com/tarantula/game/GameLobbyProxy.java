@@ -28,38 +28,39 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public Stub join(Session session, Rating rating) {
         if(!started) return new Stub("lobby not started");
-        gameServiceProvider.presenceServiceProvider().stub(session,application);
-        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.get(stubKey.asString());
-        if(stub !=null && stub.joined) {
-            stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
-            return stub;
-        }
+        //Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
+        //StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        //Stub stub = stubIndex.get(stubKey.asString());
+        //if(stub.joined) {
+            //stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
+            //return stub;
+        //}
         GameZone _zone = gameZone(rating);
-        stub = _zone.join(session,rating);
-        stubIndex.put(stub.key().asString(),stub);
+        return _zone.join(session,rating);
+        //stubIndex.put(stub.key().asString(),stub);
         //this.context.log("Room->"+stub.roomId,OnLog.WARN);
-        return stub;
+        //return stub;
     }
 
     @Override
     public boolean leave(Session session) {
         if(!started) return false;
-        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = stubIndex.remove(stubKey.asString());
-        if(stub!=null){
-            stub.zone.leave(stub);
-            stub.pushChannel.close();
-            return true;
-        }
-        //recover from disk
-        stub = new Stub();
-        stub.distributionKey(session.systemId());
-        stub.stub(session.stub());
-        stub.label(application.tag());
+        //StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
+        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);//stubIndex.remove(stubKey.asString());
+        if(!stub.joined) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
-        if(!gameZone.dataStore().load(stub) || !stub.joined) return false;
-        return gameZone.leave(stub);
+        gameZone.leave(stub);
+        //stub.pushChannel.close();
+        return true;
+
+        //recover from disk
+        //stub = new Stub();
+        //stub.distributionKey(session.systemId());
+        //stub.stub(session.stub());
+        //stub.label(application.tag());
+        //GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
+        //if(!gameZone.dataStore().load(stub) || !stub.joined) return false;
+        //return gameZone.leave(stub);
     }
 
     public void validate(Session session){

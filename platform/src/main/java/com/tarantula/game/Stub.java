@@ -12,6 +12,7 @@ import java.util.Map;
 //per stub/game by playerId + lobby tag
 public class Stub extends PlayerGameObject {
 
+    public final static String LABEL = "stub";
     public boolean joined;
     public boolean offline;
     public String zoneId;
@@ -25,6 +26,8 @@ public class Stub extends PlayerGameObject {
 
     public Stub(){
         timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+        this.onEdge = true;
+        this.label = LABEL;
     }
 
     public Stub(String error){
@@ -48,6 +51,7 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("TournamentEnabled",tournament!=null);
         jo.addProperty("PlayMode",zone.playMode());
         jo.addProperty("Ticket",ticket);
+        jo.addProperty("DistributionId",distributionId);
         return jo;
     }
     @Override
@@ -69,26 +73,28 @@ public class Stub extends PlayerGameObject {
         trackId = ((String)properties.getOrDefault("trackId",null));
         timestamp = ((Number)properties.getOrDefault("timestamp",0)).longValue();
     }
-    @Override
-    public Recoverable.Key key(){
-        return new StubKey(this.bucket,this.owner,label,stub);
+
+    public boolean read(DataBuffer buffer){
+        this.joined = buffer.readBoolean();
+        this.zoneId = buffer.readUTF8();
+        this.roomId = buffer.readUTF8();
+        this.tournamentId = buffer.readUTF8();
+        this.trackId = buffer.readUTF8();
+        this.timestamp = buffer.readLong();
+        this.stub = buffer.readLong();
+        return true;
     }
-    @Override
-    public String distributionKey() {
-        //if(this.bucket!=null&&this.oid!=null){
-            //return new StringBuffer(this.bucket).append(Recoverable.PATH_SEPARATOR).append(oid).append(Recoverable.PATH_SEPARATOR).append(label).toString();
-        //}
-        //else{
-           // return null;
-        //}
-        return null;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeBoolean(joined);
+        buffer.writeUTF8(zoneId);
+        buffer.writeUTF8(roomId);
+        buffer.writeUTF8(tournamentId);
+        buffer.writeUTF8(trackId);
+        buffer.writeLong(timestamp);
+        buffer.writeLong(stub);
+        return true;
     }
-    @Override
-    public void distributionKey(String distributionKey) {
-        String[] klist = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        this.bucket = klist[0];
-        //this.oid = klist[1];
-    }
+
     @Override
     public int getFactoryId() {
         return GamePortableRegistry.OID;

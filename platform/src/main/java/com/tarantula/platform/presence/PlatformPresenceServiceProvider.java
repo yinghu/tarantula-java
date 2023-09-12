@@ -135,8 +135,22 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
     public Stub stub(Session session,Descriptor lobby){
         DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
-        logger.warn(ds.name());
-        return null;
+        Stub[] stub = {new Stub()};
+        RecoverableQuery<Stub> query = RecoverableQuery.query(session.distributionId(),stub[0],GamePortableRegistry.INS);
+        ds.list(query,(t)->{
+            if(t.stub()==session.stub()){
+                stub[0] = t;
+                return false;
+            }
+            return true;
+        });
+        if(stub[0].stub()==0){
+            stub[0].stub(session.stub());
+            stub[0].ownerKey(session.key());
+            ds.create(stub[0]);
+        }
+        stub[0].dataStore(ds);
+        return stub[0];
     }
     public Statistics statistics(Session session){
         UserStatistics deltaStatistics = new UserStatistics();
