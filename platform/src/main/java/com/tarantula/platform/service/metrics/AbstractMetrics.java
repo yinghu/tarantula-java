@@ -149,12 +149,12 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();
-        this.statistics.distributionId(nodeId);
+        //this.statistics.distributionId(nodeId);
         this.statistics.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(statistics,true);
+        //this.dataStore.createIfAbsent(statistics,true);
         this.bucket = this.statistics.bucket();
         //this = this.statistics.oid();
-        logger.warn("Metrics statistics loaded->"+statistics.key().asString());
+        //logger.warn("Metrics statistics loaded->"+statistics.key().asString());
         //reset snapshots
         for(String category : categories){
             //reset statistics entry and archive history

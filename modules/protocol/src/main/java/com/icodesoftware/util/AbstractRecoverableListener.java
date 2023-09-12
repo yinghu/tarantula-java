@@ -12,13 +12,9 @@ public abstract class AbstractRecoverableListener<T extends Recoverable> impleme
     private ConcurrentHashMap<Integer,OnFilter> oMap = new ConcurrentHashMap<>();
 
     @Override
-    public void onUpdated(int classId,String owner,String key, byte[] value) {
-        OnFilter onFilter = oMap.get(classId);
+    public void onUpdated(Recoverable recoverable) {
+        OnFilter onFilter = oMap.get(recoverable.getClassId());
         if(onFilter!=null){
-            Recoverable recoverable = this.create(classId);
-            recoverable.fromBinary((value));
-            recoverable.owner(owner);
-            recoverable.distributionKey(key);
             onFilter.onUpdated(recoverable);
         }
     }
@@ -29,9 +25,7 @@ public abstract class AbstractRecoverableListener<T extends Recoverable> impleme
     abstract public int registryId();
 
     abstract public  T create(int i);
-    //public <T extends Recoverable> RecoverableFactory<T> query(int registerId, String[] params){
-       // return null;
-    //}
+
     private static class OnFilter{
         List<Filter> list = new CopyOnWriteArrayList<>();
         public void onUpdated(Recoverable t){

@@ -3,7 +3,7 @@ package com.icodesoftware;
 public interface Access extends Recoverable,DataStore.Updatable {
 
     //application access level control
-
+    String LABEL = "user";
     String DataStore = "tarantula_user";
 
     int PUBLIC_ACCESS_MODE = 10;

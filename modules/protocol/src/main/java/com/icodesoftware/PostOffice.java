@@ -26,7 +26,7 @@ public interface PostOffice {
 
     //app to app messaging
     interface OnTag{
-       void send(String distributionKey, Recoverable data);
+       <T extends Recoverable> void send(Object routingKey,T data);
     }
 
 }

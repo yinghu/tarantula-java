@@ -150,18 +150,8 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.yearly = ((Number)properties.get("yearly")).doubleValue();
         this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
-    public void distributionKey(String distributionKey){
-        //parse key
-        String[] k = distributionKey.split(Recoverable.PATH_SEPARATOR);
-        bucket = k[0];
-        //oid = k[1];
-        label = k[2];
-        name = k[3];
-    }
-    @Override
-    public Key key(){
-        return new ResourceKey(this.bucket,this.owner,new String[]{label,name});
-    }
+
+
     Statistics.Entry duplicate(){
         return new SystemStatisticsEntry(this);
     }

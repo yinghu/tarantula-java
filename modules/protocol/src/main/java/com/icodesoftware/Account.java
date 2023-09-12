@@ -5,9 +5,9 @@ public interface Account extends Access {
     String DataStore = "tarantula_account";
     String IndexDataStore = "tarantula_account_index";
 
-    String UserLabel = "users";
-    String GameClusterLabel = "games";
-    String ModuleLabel = "modules";
+    //String UserLabel = "users";
+    //String GameClusterLabel = "games";
+    //String ModuleLabel = "modules";
 
     int userCount(int delta);
     int gameClusterCount(int delta);

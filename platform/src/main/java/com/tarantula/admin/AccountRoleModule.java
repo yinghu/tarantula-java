@@ -9,9 +9,12 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.presence.PermissionContext;
+import com.tarantula.platform.presence.User;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
+import jnr.x86asm.SEGMENT;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -42,15 +45,14 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         else if(session.action().equals("onUserList")){
             Access access = userService.loadUser(session.distributionId());
             AccessContext atc = new AccessContext();
-            atc.userList = userService.loadUsers(access);
+            atc.userList = userService.loadUsers(userService.loadAccount(access));
             session.write(atc.toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpgradeUser")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String uid = (String)onAccess.property(OnAccess.ACCESS_ID);
+            String uid = session.name();
             Access owner = userService.loadUser(session.distributionId());
             if(owner.primary()){//only primary
-                Access u = userService.loadUser(session.distributionId());
+                Access u = userService.loadUser(Long.parseLong(uid));
                 if(u!=null){
                     if(!u.role().equals(owner.role())){
                         session.write(toMessage("upgraded",this.tokenValidatorProvider.grantAccess(u,owner)).getBytes());
@@ -70,9 +72,13 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 Access ua =  userService.loadUser(session.distributionId());
                 AccessIndex query = accessIndexService.set((String)onAccess.property("login"),AccessIndex.USER_INDEX);
                 if(query!=null){
-                    onAccess.owner(ua.primary()?session.systemId():ua.owner());//make sure acc id as the owner
-                    onAccess.distributionKey(query.distributionKey());
-                    this.context.postOffice().onTag("index/user").send(onAccess.distributionKey(),onAccess);
+                    User user =  new User((String) onAccess.property(OnAccess.LOGIN),true,"password");
+                    user.activated(true);
+                    user.distributionId(query.distributionId());
+                    user.primaryId(ua.primary()?ua.distributionId():ua.primaryId());
+                    user.password((String)onAccess.property(OnAccess.PASSWORD));
+                    user.role(AccessControl.player.name());
+                    this.context.postOffice().onTag("index/user").send(query.distributionId(),user);
                     session.write(this.toMessage("add user event send",true).getBytes());
                 }
                 else {

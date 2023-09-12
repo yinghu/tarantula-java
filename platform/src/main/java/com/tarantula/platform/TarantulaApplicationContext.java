@@ -3,6 +3,7 @@ package com.tarantula.platform;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
@@ -78,7 +79,10 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             MapStoreSyncEvent msc = (MapStoreSyncEvent)event;
             RecoverableListener rc = this.rMap.get(msc.factoryId);
             if(rc!=null){
-                rc.onUpdated(msc.classId,msc.systemId,msc.index(),msc.payload());
+                Recoverable r = rc.create(msc.classId);
+                r.readKey(new BufferProxy(msc.key));
+                r.read(new BufferProxy(msc.value));
+                rc.onUpdated(r);
             }
             else{
                 this.application.onEvent(event);

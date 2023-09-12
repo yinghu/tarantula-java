@@ -8,11 +8,10 @@ import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
-import com.tarantula.platform.presence.Membership;
-import com.tarantula.platform.presence.ThirdPartyLogin;
-import com.tarantula.platform.presence.User;
-import com.tarantula.platform.presence.UserAccount;
+import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.metrics.AccessMetrics;
+import com.tarantula.platform.util.RecoverableQuery;
+import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,6 +53,17 @@ public class PlatformUserService implements UserService {
             acc.onEdge(true);
         }
         acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
+        createUser(acc);
+        //if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
+        //createPresenceIndex(acc);
+        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        return acc;
+    }
+    private Access createUser(Access acc) {
+        if(!acc.primary()){
+            if(acc.ownerKey()==null) throw new IllegalArgumentException("No owner for sub user");
+            acc.onEdge(true);
+        }
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
         createPresenceIndex(acc);
         //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
@@ -70,7 +80,7 @@ public class PlatformUserService implements UserService {
             sessionDataStore.create(onSessionTrack);
         }
     }
-    public Access createUser(Account account,OnAccess access){
+    public Access createUser(Account account,Access access){
         //Account account = new UserAccount();
         //account.distributionKey(accountId);
         if(!accountDataStore.load(account)) throw new RuntimeException("Account not existed");
@@ -81,6 +91,7 @@ public class PlatformUserService implements UserService {
         account.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
         access.ownerKey(account.key());
+        access.password(tokenValidatorProvider.tokenValidator().hashPassword(access.password()));
         Access user = createUser(access);
         //IndexSet idx = new IndexSet();
         //idx.distributionKey(account.distributionKey());
@@ -170,39 +181,16 @@ public class PlatformUserService implements UserService {
 
     public Account loadAccount(Access access){
         Account account = new UserAccount();
-        account.distributionId(access.primary()?access.distributionId():access.distributionId());
+        account.distributionId(access.primary()?access.distributionId():access.primaryId());
         account.dataStore(accountDataStore);
         if(accountDataStore.load(account)) return account;
         return null;
     }
 
-    public List<Access> loadUsers(Access access){
-        ArrayList<Access> alist = new ArrayList<>();
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(access.primary()?access.distributionKey():access.owner());
-        indexSet.label(Account.UserLabel);
-        if(!accountIndexDataStore.load(indexSet)) return alist;
-        indexSet.keySet().forEach((k)->{
-            //Access u = loadUser(k);
-            //if(u!=null){
-                //alist.add(u);
-            //}
-        });
-        return alist;
-    }
     public List<Access> loadUsers(Account account){
-        ArrayList<Access> alist = new ArrayList<>();
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(account.distributionKey());
-        indexSet.label(Account.UserLabel);
-        if(!accountIndexDataStore.load(indexSet)) return alist;
-        indexSet.keySet().forEach((k)->{
-          //Access u = loadUser(k);
-            //if(u!=null){
-              //alist.add(u);
-            //}
-        });
-        return alist;
+        if(account==null) return new ArrayList<>();
+        RecoverableQuery query = RecoverableQuery.query(account.distributionId(),new User(), UserPortableRegistry.INS);
+        return userDataStore.list(query);
     }
 
     public Subscription loadSubscription(Account account){
@@ -218,15 +206,6 @@ public class PlatformUserService implements UserService {
         return null;
     }
 
-    //public <T extends OnAccess> T gameClusterList(Access access){
-        //GameClusterQuery query = new GameClusterQuery(access.primaryId()?access.oid():access.primaryId());
-        //IndexSet idx = new IndexSet();
-        //idx.distributionKey(access.primary()?access.distributionKey():access.owner());
-        //idx.label(Account.GameClusterLabel);
-        //idx.dataStore(accountIndexDataStore);
-        //accountIndexDataStore.createIfAbsent(idx,true);
-        //return
-    //}
 
     public LoginProvider loginProvider(long systemId){
         ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();

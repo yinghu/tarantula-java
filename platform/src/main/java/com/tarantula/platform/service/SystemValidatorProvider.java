@@ -9,7 +9,9 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
+import com.tarantula.platform.presence.UserPortableRegistry;
 import com.tarantula.platform.util.PresenceFetcher;
+import com.tarantula.platform.util.RecoverableQuery;
 import com.tarantula.platform.util.SystemUtil;
 
 import javax.crypto.Cipher;
@@ -549,19 +551,17 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public boolean grantAccess(Access access,Access owner){
         if(access.primary()||!owner.primary()) return false;
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionKey(owner.distributionKey());
-        indexSet.label(Account.UserLabel);
-        if(!idataStore.load(indexSet)) return false;
-        boolean updated= false;
-        for(String k : indexSet.keySet()){
-            if(k.equals(access.distributionKey())){
-                access.role(owner.role());
-                updated = udataStore.update(access);
-                break;
+        RecoverableQuery<User> query = RecoverableQuery.query(owner.distributionId(),new User(), UserPortableRegistry.INS);
+        boolean[] updated = {false};
+        udataStore.list(query,(u)->{
+            if(u.distributionId()==access.distributionId()){
+                u.role(owner.role());
+                updated[0] = udataStore.update(u);
+                return false;
             }
-        }
-        return updated;
+            return true;
+        });
+        return updated[0];
     }
     public boolean revokeAccess(Access access){
         if(access.primary()){

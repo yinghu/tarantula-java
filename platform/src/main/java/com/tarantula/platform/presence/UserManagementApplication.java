@@ -61,12 +61,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             membership.trial(true);
             this.userService.createAccount(user,membership);
         }
-        this.context.registerRecoverableListener(new UserPortableRegistry()).addRecoverableFilter(UserPortableRegistry.ON_ACCESS_CID,(a)->{
+        this.context.registerRecoverableListener(UserPortableRegistry.INS).addRecoverableFilter(UserPortableRegistry.USER_CID,(a)->{
             //add player user to the account
-            OnAccess uadded = (OnAccess)a;
-            if(uadded.property("command").equals("onAddUser")){
-                //createLogin(uadded.owner(),uadded,uadded.distributionKey(),AccessControl.player.name(),false,"password",false);
-            }
+            User uadded = (User) a;
+            Account account = new UserAccount();
+            account.distributionId(uadded.primaryId());
+            userService.createUser(account,uadded);
         });
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
@@ -282,7 +282,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.ACTIVATED,activated);
         Account account = new UserAccount();
         account.distributionId(accountId);
-        return userService.createUser(account,payload);
+        return userService.createUser(account,new User());
     }
     private Access createLogin(OnAccess payload,long systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);

@@ -402,14 +402,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 listener.onUpdated(ob);
             }catch (Exception ex){ex.printStackTrace();}
         });
-        IndexSet indexSet = new IndexSet();
-        indexSet.distributionId(this.node.deploymentId());
-        indexSet.label(Account.ModuleLabel);
+        //IndexSet indexSet = new IndexSet();
+        //indexSet.distributionId(this.node.deploymentId());
+        //indexSet.label(Account.ModuleLabel);
         //indexSet.keySet.add(publishingId);
-        if(!this.masterDataStore().createIfAbsent(indexSet,true)){
+        //if(!this.masterDataStore().createIfAbsent(indexSet,true)){
             //indexSet.keySet.add(publishingId);
-            this.masterDataStore().update(indexSet);
-        }
+            //this.masterDataStore().update(indexSet);
+        //}
     }
     public synchronized void unsetLobby(String typeId,Lobby.Listener listener){
         try{

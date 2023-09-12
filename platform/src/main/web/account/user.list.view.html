@@ -55,7 +55,8 @@
     _list_user();
 
     document.querySelector('#tx-list-user-enable-ok').onclick=()=>{
-        TARA_API.onService(true,{serviceTag:'role/account',command:'onUpgradeUser',accessId:targetUpdagraded},(resp)=>{
+        TARA_API.onGet('role/account','onUpgradeUser',targetUpdagraded,(resp)=>{
+            console.log(resp);
             document.querySelector('#tx-list-user-enable-access-message').innerHTML = resp.message+'/'+resp.successful;  
             document.querySelector('#tx-list-user-enable-access').style.display='none';    
             _list_user();
@@ -68,7 +69,7 @@
         tx_close_current_page();       
     };
     function _list_user(){
-        TARA_API.onService(true,{serviceTag:'role/account',command:'onUserList'},(resp)=>{
+        TARA_API.onGet('role/account','onUserList','c',(resp)=>{
             if(resp.successful){
                 //console.log(resp);  
                 let ubar = document.querySelector('#tx-user-access-list-bar');

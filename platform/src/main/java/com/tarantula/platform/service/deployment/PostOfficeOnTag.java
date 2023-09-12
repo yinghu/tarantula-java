@@ -15,11 +15,14 @@ public class PostOfficeOnTag implements PostOffice.OnTag {
         this.eventService = eventService;
     }
     @Override
-    public void send(String distributionKey, Recoverable data) {
-        String key = data.key().asString();
-        byte[] payload = data.toBinary();
+    public <T extends Recoverable> void send(Object distributionKey,T data) {
+        //String key = data.key().asString();
+        //byte[] payload = data.toBinary();
+        //data.writeKey()
         RoutingKey routingKey = eventService.routingKey(distributionKey,tag);
-        MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(routingKey.route(),data.owner(),data.getFactoryId(),data.getClassId(),key!=null?key:"",payload);
+        MapStoreSyncEvent mapStoreSyncEvent = new MapStoreSyncEvent(data);//new MapStoreSyncEvent(routingKey.route(),data.owner(),data.getFactoryId(),data.getClassId(),key!=null?key:"",payload);
+        mapStoreSyncEvent.destination(routingKey.route());
+        mapStoreSyncEvent.routingNumber(routingKey.routingNumber());
         eventService.publish(mapStoreSyncEvent);
     }
 
