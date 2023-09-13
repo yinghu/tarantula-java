@@ -42,19 +42,22 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private Env<ByteBuffer> key;
     private Dbi<ByteBuffer> keyDbi;
 
-    private long storeSize = 1_048_576_0000L; // 1MB = 1,048,576 (1024*1024)
+    private long storeSize = 1_048_576L; // 1MB = 1,048,576 (1024*1024)
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
 
-    private MapStoreListener mapStoreListener;
+    private MapStoreListener integrationMapStoreListener;
+    private MapStoreListener keyIndexMapStoreListener;
+    private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
 
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
+        this.storeSize = storeSize*(int)properties.get("storeSizeMb");
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
@@ -67,7 +70,19 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener) {
-        this.mapStoreListener = mapStoreListener;
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            integrationMapStoreListener = mapStoreListener;
+            return;
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            keyIndexMapStoreListener = mapStoreListener;
+            return;
+        }
+        if(scope==Distributable.DATA_SCOPE){
+            dataMapStoreListener = mapStoreListener;
+            return;
+        }
+        throw new RuntimeException("Scope ["+scope+"] not supported");
     }
     @Override
     public void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator){
@@ -75,7 +90,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
     @Override
     public MapStoreListener mapStoreListener(int scope) {
-        return this;
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return integrationMapStoreListener;
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            return keyIndexMapStoreListener;
+        }
+        if(scope==Distributable.DATA_SCOPE){
+            return dataMapStoreListener;
+        }
+        throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
     @Override
@@ -156,7 +180,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
         key = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(keyPath).toFile());
         keyDbi = key.openDbi("keys",DbiFlags.MDB_CREATE);
-        logger.warn("LMDB Provider started");
+        logger.warn("LMDB Provider started with store size ["+storeSize+"]");
     }
 
     @Override
@@ -177,13 +201,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-    @Override
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-
-    }
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        if(mapStoreListener==null) return;
-        mapStoreListener.onDistributing(metadata,key,value);
+        //if(mapStoreListener==null) return;
+        //mapStoreListener.onDistributing(metadata,key,value);
     }
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

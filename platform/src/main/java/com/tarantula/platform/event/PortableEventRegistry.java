@@ -10,7 +10,6 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.KeyIndexTrack;
-import com.tarantula.platform.service.persistence.RecoverableMetadata;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentManager;
 import com.tarantula.platform.tournament.TournamentInstance;
@@ -42,7 +41,6 @@ public class PortableEventRegistry implements PortableFactory {
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
 
-    public static final int METADATA_CID = 101;
 
     public static final int LOBBY_CID = 102;
 
@@ -130,9 +128,7 @@ public class PortableEventRegistry implements PortableFactory {
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;
-            case METADATA_CID:
-                _ins = new RecoverableMetadata();
-                break;
+
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
                 break;

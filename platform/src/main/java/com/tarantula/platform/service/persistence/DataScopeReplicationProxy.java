@@ -22,7 +22,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-    @Override
+
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());

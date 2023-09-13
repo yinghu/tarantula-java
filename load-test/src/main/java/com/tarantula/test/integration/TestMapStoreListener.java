@@ -23,10 +23,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
 
-    @Override
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
 
-    }
 
     @Override
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value) {

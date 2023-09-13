@@ -10,7 +10,7 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
-import com.tarantula.platform.service.persistence.*;
+
 
 public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
@@ -44,7 +44,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
 
-    public static final int METADATA_CID = PortableEventRegistry.METADATA_CID;
 
     public static final int LOBBY_CID =PortableEventRegistry.LOBBY_CID;//DEPLOY OBJECT
 
@@ -106,9 +105,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;
-            case METADATA_CID:
-                _ins = new RecoverableMetadata();
-                break;
+
             case APPLICATION_DESCRIPTOR_CID:
                 _ins = new DeploymentDescriptor();
                 break;

@@ -118,6 +118,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int snowflakeNodeNumber = 1;
     public int[] snowflakeEpochStart = {2020,1,1};// start from 2020 1,1
 
+    public int storeSizeMb = 100;
     public String dataStoreDir;
 
     public boolean dataStoreDailyBackup;
@@ -201,7 +202,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
-        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.maxReplicationNumber,dataStoreProvider -> {
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.storeSizeMb,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);

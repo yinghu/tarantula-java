@@ -20,7 +20,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-    @Override
+
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());

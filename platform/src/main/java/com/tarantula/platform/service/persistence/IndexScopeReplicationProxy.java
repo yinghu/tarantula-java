@@ -23,7 +23,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
-    @Override
+
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
 
     }

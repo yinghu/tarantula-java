@@ -70,6 +70,7 @@ public class TarantulaMain {
 			TarantulaContext.operationRetries = Integer.parseInt(override(overriding,"tarantula.operation.retries",_user,_config));
 			TarantulaContext.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 			btx.snowflakeNodeNumber = Integer.parseInt(override(overriding,"tarantula.snowflake.node.number",_user,_config));
+			btx.storeSizeMb = Integer.parseInt(override(overriding,"tarantula.data.store.size.mb",_user,_config));
 			String[] epochStart = override(overriding,"tarantula.snowflake.epoch.start",_user,_config).split(",");
 			btx.snowflakeEpochStart = new int[]{Integer.parseInt(epochStart[0]),Integer.parseInt(epochStart[1]),Integer.parseInt(epochStart[2])};
 			btx.runAsMirror = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.run.as.mirror",_user,_config));

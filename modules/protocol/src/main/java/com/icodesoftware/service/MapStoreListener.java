@@ -11,7 +11,7 @@ public interface MapStoreListener extends ServiceProvider {
     <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t);
 
     //dispatch cluster operation
-    void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
+    //void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
 
     void onDistributing(Metadata metadata, ByteBuffer key,ByteBuffer value);
 

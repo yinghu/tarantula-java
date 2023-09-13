@@ -1,8 +1,6 @@
 package com.icodesoftware.service;
 
-import com.icodesoftware.Recoverable;
-
-public interface Metadata extends Recoverable {
+public interface Metadata{
 
      String typeId();
      String source();
@@ -10,5 +8,4 @@ public interface Metadata extends Recoverable {
      int classId();
      int partition();
 
-     Metadata fromRevision(long revision);
 }

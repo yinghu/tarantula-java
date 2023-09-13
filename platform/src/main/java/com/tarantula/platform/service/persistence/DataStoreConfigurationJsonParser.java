@@ -27,7 +27,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
     private int partitionNumber;
 
-    private int maxReplicationNumber;
+    private int storeSizeMb;
 
     private boolean dataStoreDailyBackup;
 
@@ -36,10 +36,10 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private DataStoreProvider.OnStart onStart;
     private ClusterProvider.Node node;
 
-    private int snowflakeNodeNumber;
-    private long snowflakeEpochStart;
 
-    public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx,int maxReplicationNumber, DataStoreProvider.OnStart onStart){
+
+    public DataStoreConfigurationJsonParser(String dconfig,ServiceContext tx,int storeSizeMb, DataStoreProvider.OnStart onStart){
+        this.storeSizeMb = storeSizeMb;
         this.dataStoreProviderConfiguration = dconfig;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
@@ -61,7 +61,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
         properties.put("partitionNumber",this.partitionNumber);
-        properties.put("maxReplicationNumber",this.maxReplicationNumber);
+        properties.put("storeSizeMb",this.storeSizeMb);
         properties.put("dir",this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);

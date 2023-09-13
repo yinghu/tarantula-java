@@ -14,11 +14,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
+
     private final String name;
 
     private final String bucket ="DBS";
 
-    private Metadata metadata;
+    private final Metadata metadata;
 
     private int scope;
 
@@ -26,6 +27,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
     public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
+        this.metadata = new LocalMetadata(scope,name);
         this.scope = scope;
         this.name = name;
         this.dbi = dbi;
