@@ -202,8 +202,19 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        //if(mapStoreListener==null) return;
-        //mapStoreListener.onDistributing(metadata,key,value);
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+            integrationMapStoreListener.onDistributing(metadata,key,value);
+            return;
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE){
+            dataMapStoreListener.onDistributing(metadata,key,value);
+            return;
+        }
+        if(metadata.scope()==Distributable.INDEX_SCOPE){
+            dataMapStoreListener.onDistributing(metadata,key,value);
+            return;
+        }
+        logger.warn("Scope ["+metadata.scope()+"] mapStoreListener not registered");
     }
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

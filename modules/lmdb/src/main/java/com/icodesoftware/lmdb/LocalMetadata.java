@@ -1,7 +1,6 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.RecoverableObject;
 
 
 public class LocalMetadata  implements Metadata {
@@ -19,6 +18,11 @@ public class LocalMetadata  implements Metadata {
     @Override
     public String source() {
         return name;
+    }
+
+    @Override
+    public int scope() {
+        return scope;
     }
 
     @Override
