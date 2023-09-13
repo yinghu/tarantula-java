@@ -1,21 +1,19 @@
 package com.tarantula.platform.service.metrics;
 
-import com.google.gson.JsonObject;
+
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
+
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.ResourceKey;
+
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
-import com.tarantula.platform.statistics.StatisticsUtil;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
-    private final static String LABEL = "category";
     //private String name;
     private double total=0;
     private double hourly=0;
@@ -24,16 +22,13 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     private double monthly=0;
     private double yearly=0;
 
-    private boolean loaded;
-
     public SystemStatisticsEntry(){
-        this.label = LABEL;
+        this.onEdge = true;
     }
-    public SystemStatisticsEntry(String bucket, String oid, String name){
+    public SystemStatisticsEntry(String name,String label){
         this();
-        this.bucket = bucket;
-        //this.oid = oid;
         this.name = name;
+        this.label = label;
     }
     public SystemStatisticsEntry(Statistics.Entry entry){
         this();
@@ -151,16 +146,30 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
 
-
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.hourly = buffer.readDouble();
+        this.daily = buffer.readDouble();
+        this.weekly = buffer.readDouble();
+        this.monthly = buffer.readDouble();
+        this.yearly = buffer.readDouble();
+        this.total = buffer.readDouble();
+        this.timestamp = buffer.readLong();
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeDouble(hourly);
+        buffer.writeDouble(daily);
+        buffer.writeDouble(weekly);
+        buffer.writeDouble(monthly);
+        buffer.writeDouble(yearly);
+        buffer.writeDouble(total);
+        buffer.writeLong(timestamp);
+        return true;
+    }
     Statistics.Entry duplicate(){
         return new SystemStatisticsEntry(this);
     }
-    public synchronized boolean load(){
-        if(loaded){
-            return false;
-        }
-        loaded = true;
-        this.dataStore.createIfAbsent(this,true);
-        return true;
-    }
+
 }

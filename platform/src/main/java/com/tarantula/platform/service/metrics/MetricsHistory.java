@@ -8,7 +8,6 @@ import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.time.LocalDateTime;
@@ -21,15 +20,26 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     final static String LABEL_PREFIX = "history";
 
 
-    private Property[] metrics;
+    private MetricsProperty[] metrics;
 
     private double dailyGain;
     private double weeklyGain;
     private double monthlyGain;
     private double yearlyGain;
 
+    public int day;
+
     public MetricsHistory(){
-        this.metrics = new Property[HOURLY_HISTORY_BUFFER_SIZE];
+        this.onEdge = true;
+        this.metrics = new MetricsProperty[HOURLY_HISTORY_BUFFER_SIZE];
+        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+            this.metrics[i]=new MetricsProperty(i,"m"+i,0d,0l);
+        }
+    }
+    public MetricsHistory(String category,int year,int day){
+        this();
+        this.label = LABEL_PREFIX+"_"+category+"_"+year;
+        this.day = day;
     }
 
     @Override
@@ -61,6 +71,31 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         }
     }
 
+    public boolean read(DataBuffer buffer){
+        this.day = buffer.readInt();
+        this.dailyGain = buffer.readDouble();
+        this.weeklyGain = buffer.readDouble();
+        this.monthlyGain = buffer.readDouble();
+        this.yearlyGain = buffer.readDouble();
+        for(int i=0; i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+            metrics[i].value = buffer.readDouble();
+            metrics[i].timestamp(buffer.readLong());
+        }
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(day);
+        buffer.writeDouble(dailyGain);
+        buffer.writeDouble(weeklyGain);
+        buffer.writeDouble(monthlyGain);
+        buffer.writeDouble(yearlyGain);
+        for(int i=0; i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+            buffer.writeDouble((double)metrics[i].value());
+            buffer.writeLong(metrics[i].timestamp());
+        }
+        return true;
+    }
+
 
     public Property[] metrics(){
         return metrics;
@@ -82,12 +117,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         return yearlyGain;
     }
 
-    public void distributionKey(String rkey){
-        String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
-        bucket = idx[0];
-        //oid = idx[1];
-        label = idx[2];
-    }
+
     @Override
     public int getFactoryId() {
         return StatisticsPortableRegistry.OID;
@@ -98,17 +128,10 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         return StatisticsPortableRegistry.METRICS_HISTORY_CID;
     }
     //key label format history_[category]_[year]_[dayofyear]  history_httpRequestCount_2022_145
-    public Key key(){
-        return new AssociateKey(this.distributionId,label);
-    }
 
     public void archiveHourly(Property property){
         int hour  = TimeUtil.fromUTCMilliseconds(property.timestamp()).getHour();
-        MetricsProperty archive = (MetricsProperty)metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1];
-        if(archive==null){
-            metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1] = property;
-            return;
-        }
+        MetricsProperty archive = metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1];
         double v = (Double)archive.value;
         double d = (Double)property.value();
         archive.value = v+d;
@@ -139,8 +162,8 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         this.timestamp = TimeUtil.toUTCMilliseconds(updated);
     }
 
-    public static String historyLabel(String bucket,String oid,String category,LocalDateTime today){
-        StringBuffer buffer = new StringBuffer().append(bucket).append(Recoverable.PATH_SEPARATOR).append(oid);
+    public static String historyLabel(long metricsId,String category,LocalDateTime today){
+        StringBuffer buffer = new StringBuffer().append(metricsId).append(Recoverable.PATH_SEPARATOR);
         buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_");
         return buffer.append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
     }

@@ -1,18 +1,65 @@
 package com.tarantula.test;
 
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Property;
+import com.icodesoftware.Statistics;
 import com.icodesoftware.service.Metrics;
-import com.tarantula.platform.service.metrics.MetricsProperty;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.*;
+
+import com.tarantula.platform.statistics.StatisticsPortableRegistry;
+import com.tarantula.platform.util.RecoverableQuery;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MetricsTest extends DataStoreHook{
 
+
+    @Test(groups = { "PerformanceMetrics" })
+    public void metricsSetupTest() {
+        DataStore dataStore = dataStoreProvider.createDataStore("test_metrics_"+Metrics.SYSTEM);
+        SystemStatistics statistics = new SystemStatistics();
+        statistics.distributionId(serviceContext.distributionId());
+        statistics.label(Metrics.SYSTEM);
+        statistics.dataStore(dataStore);
+        statistics.load();
+        Assert.assertEquals(statistics.summary().size(),0);
+        statistics.entry(SystemMetrics.ACCESS_AMAZON_S3_COUNT).update(1).update();
+        statistics.entry(SystemMetrics.ACCESS_GOOGLE_LOGIN_COUNT).update(1).update();
+        Assert.assertEquals(statistics.summary().size(),2);
+
+        SystemStatistics load = new SystemStatistics();
+        load.distributionId(statistics.distributionId());
+        load.label(Metrics.SYSTEM);
+        load.dataStore(dataStore);
+        load.load();
+        Assert.assertEquals(load.summary().size(),2);
+        load.summary().forEach(e->{
+            Assert.assertNotNull(e.name());
+            Assert.assertEquals(e.total(),1.0D);
+            Assert.assertEquals(e.hourly(),1.0D);
+            Assert.assertEquals(e.daily(),1.0D);
+            Assert.assertEquals(e.weekly(),1.0D);
+            Assert.assertEquals(e.monthly(),1.0D);
+            Assert.assertEquals(e.yearly(),1.0D);
+        });
+        LocalDateTime localDateTime = LocalDateTime.now();
+        for(int i=1;i<=12;i++) {
+            MetricsHistory metricsHistory = new MetricsHistory(SystemMetrics.ACCESS_AMAZON_S3_COUNT, localDateTime.getYear(),i);
+            metricsHistory.ownerKey(statistics.key());
+            Assert.assertTrue(dataStore.create(metricsHistory));
+        }
+        RecoverableQuery<MetricsHistory> query = RecoverableQuery.query(statistics.distributionId(),new MetricsHistory(SystemMetrics.ACCESS_AMAZON_S3_COUNT, localDateTime.getYear(),1), StatisticsPortableRegistry.INS);
+        Assert.assertEquals(dataStore.list(query).size(),12);
+        for(int i=1;i<=12;i++){
+            Assert.assertNotNull(statistics.loadMetricsHistory(12));
+        }
+        Assert.assertNull(statistics.loadMetricsHistory(13));
+    }
 
     //@Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
@@ -39,6 +86,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==0,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
+
     }
 
     //@Test(groups = { "PerformanceMetrics" })

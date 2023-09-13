@@ -149,12 +149,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();
-        //this.statistics.distributionId(nodeId);
+        this.statistics.distributionId(nodeId);
+        this.statistics.label(name);
         this.statistics.dataStore(this.dataStore);
-        //this.dataStore.createIfAbsent(statistics,true);
-        this.bucket = this.statistics.bucket();
-        //this = this.statistics.oid();
-        //logger.warn("Metrics statistics loaded->"+statistics.key().asString());
+        this.statistics.load();
         //reset snapshots
         for(String category : categories){
             //reset statistics entry and archive history
@@ -405,7 +403,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         return MetricsProperty.historyPropertyLabel(current);
     }
     private String historyLabel(String category,LocalDateTime today){
-        return MetricsHistory.historyLabel(this.bucket,this.oid,category,today);
+        return MetricsHistory.historyLabel(this.statistics.distributionId(),category,today);
     }
 
     private String categoryKey(String category,String classifier){
@@ -474,10 +472,12 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     private MetricsHistory metricsHistory(String category,LocalDateTime end){
         String akey = historyLabel(category,end);
         return archives.computeIfAbsent(akey,k->{
-            MetricsHistory metricsHistory = new MetricsHistory();
-            metricsHistory.distributionKey(akey);
-            metricsHistory.initializeHourly(end);
-            this.dataStore.createIfAbsent(metricsHistory,true);
+            MetricsHistory metricsHistory = this.statistics.loadMetricsHistory(end.getDayOfYear());
+            if(metricsHistory!=null) return metricsHistory;
+            metricsHistory = new MetricsHistory(category,end.getYear(),end.getDayOfYear());
+            metricsHistory.ownerKey(this.statistics.key());
+            //metricsHistory.initializeHourly(end);
+            this.dataStore.create(metricsHistory);
             return metricsHistory;
         });
     }

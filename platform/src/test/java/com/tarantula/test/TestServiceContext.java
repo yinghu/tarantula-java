@@ -8,6 +8,7 @@ import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.ClusterNode;
+import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class TestServiceContext implements ServiceContext {
         this.node.dataStoreDirectory = "target/tld";
         PresencePortableRegistry registry = new PresencePortableRegistry<>();
         GamePortableRegistry gamePortableRegistry = new GamePortableRegistry();
+        StatisticsPortableRegistry statisticsPortableRegistry = new StatisticsPortableRegistry();
     }
     @Override
     public DataStore dataStore(int scope, String s) {

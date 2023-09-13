@@ -1,12 +1,13 @@
 package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
+import com.tarantula.platform.statistics.StatisticsPortableRegistry;
+import com.tarantula.platform.util.RecoverableQuery;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,31 +17,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SystemStatistics extends RecoverableObject implements Statistics {
 
 
-    private final static String LABEL = "statistics";
-    private int count;
+
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     public SystemStatistics(){
-        this.label = LABEL;
-    }
 
-    @Override
-    public int scope() {
-        return Distributable.LOCAL_SCOPE;
     }
 
 
     public Entry entry(String key) {
-        SystemStatisticsEntry entry = this.mappings.computeIfAbsent(key,(k)->{
+        return this.mappings.computeIfAbsent(key,(k)->{
             //new entry
-            SystemStatisticsEntry se = new SystemStatisticsEntry(this.bucket,this.owner,k);
+            SystemStatisticsEntry se = new SystemStatisticsEntry(k,this.label);
+            se.ownerKey(this.key());
+            this.dataStore.create(se);
             se.dataStore(this.dataStore);
             return se;
         });
-        if(entry.load()){
-            this.dataStore.update(this);//update index
-        }//load as request
-        return entry;
     }
     //memory copy list
     public List<Entry> summary(){
@@ -66,27 +59,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         return StatisticsPortableRegistry.SYSTEM_STATISTICS_CID;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.clear();
-        this.mappings.forEach((k,v)->{
-            this.properties.put(v.name(),"1");//index stats name
-        });
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        properties.forEach((k,v)->{
-            SystemStatisticsEntry entry = new SystemStatisticsEntry(this.bucket,this.distributionKey(),k);
-            entry.dataStore(this.dataStore);
-            //entry.load();
-            mappings.put(k,entry);
-        });
-    }
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
+
 
     @Override
     public JsonObject toJson() {
@@ -100,8 +73,23 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         return jo;
     }
 
-    public int count(int delta){
-        count += delta;
-        return count;
+    public void load(){
+        RecoverableQuery<SystemStatisticsEntry> query = RecoverableQuery.query(this.distributionId,new SystemStatisticsEntry("",label),StatisticsPortableRegistry.INS);
+        dataStore.list(query, e->{
+            mappings.put(e.name(),e);
+            return true;
+        });
+    }
+    public MetricsHistory loadMetricsHistory(int day){
+        RecoverableQuery<MetricsHistory> query = RecoverableQuery.query(distributionId(),new MetricsHistory(SystemMetrics.ACCESS_AMAZON_S3_COUNT, LocalDateTime.now().getYear(),1), StatisticsPortableRegistry.INS);
+        MetricsHistory[] loaded ={null};
+        dataStore.list(query,m->{
+            if(m.day==day){
+                loaded[0]=m;
+                return false;
+            }
+            return true;
+        });
+        return loaded[0];
     }
 }

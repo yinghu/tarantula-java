@@ -16,7 +16,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
 
     private Listener listener;
 
-    private int count;
+
     public UserStatistics(){
 
     }
@@ -30,7 +30,6 @@ public class UserStatistics extends RecoverableObject implements Statistics {
             //new entry
             StatisticsEntry se = new StatisticsEntry(this.key(),ename);
             this.dataStore.create(se);
-            this.count++;
             this.dataStore.update(this);
             se.dataStore(this.dataStore);
             return se;
@@ -77,17 +76,12 @@ public class UserStatistics extends RecoverableObject implements Statistics {
         return jo;
     }
 
-    public int count(int delta){
-        //count += delta;
-        return mappings.size();
-    }
-
     public boolean read(DataBuffer buffer){
-        this.count = buffer.readInt();
+        //this.count = buffer.readInt();
         return true;
     }
     public boolean write(DataBuffer buffer) {
-        buffer.writeInt(count);
+        //buffer.writeInt(count);
         return true;
     }
 
