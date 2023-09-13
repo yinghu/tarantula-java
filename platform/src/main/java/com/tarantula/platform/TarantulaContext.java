@@ -561,7 +561,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
-        //initMetricsProvider();
+        initMetricsProvider();
 
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
             v.setup(this);

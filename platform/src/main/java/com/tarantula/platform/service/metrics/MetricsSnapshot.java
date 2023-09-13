@@ -1,33 +1,34 @@
 package com.tarantula.platform.service.metrics;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Property;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.JsonUtil;
+
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.ResourceKey;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+
 
 public class MetricsSnapshot extends RecoverableObject  {
 
-    private Property[] metrics;
+    public final static int TRACKING_NUMBER = 12;
+    private MetricsProperty[] metrics;
 
-    public MetricsSnapshot(int trackingNumber,String category,String classifier){
-        this.routingNumber = trackingNumber;
-        this.name = category;
-        this.index = classifier;
-        this.metrics = new Property[trackingNumber];
+    public MetricsSnapshot(String category,String classifier){
+        this();
+        this.name = classifier;
+        this.label = "snapshot_"+category;
+
     }
 
     public MetricsSnapshot(){
-
+        this.onEdge = true;
+        this.metrics = new MetricsProperty[TRACKING_NUMBER];
+        for(int i=0;i<TRACKING_NUMBER;i++){
+            this.metrics[i]=new MetricsProperty(i,"m"+i,0d,0l);
+        }
     }
 
     @Override
@@ -35,38 +36,30 @@ public class MetricsSnapshot extends RecoverableObject  {
         return Distributable.LOCAL_SCOPE;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("trackingNumber",routingNumber);
-        this.properties.put("timestamp",timestamp);
-        for(int i=0;i<routingNumber;i++){
-            this.properties.put("m"+i,metrics[i].toJson().toString());
+
+    public boolean read(DataBuffer buffer){
+        this.name = buffer.readUTF8();
+        this.timestamp = buffer.readLong();
+        for(int i=0; i<TRACKING_NUMBER;i++){
+            metrics[i].value = buffer.readDouble();
+            metrics[i].timestamp(buffer.readLong());
         }
-        return this.properties;
+        return true;
+    }
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
+        buffer.writeLong(timestamp);
+        for(int i=0; i<TRACKING_NUMBER;i++){
+            buffer.writeDouble((double)metrics[i].value());
+            buffer.writeLong(metrics[i].timestamp());
+        }
+        return true;
     }
 
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.routingNumber = ((Number)properties.get("trackingNumber")).intValue();
-        this.timestamp = ((Number)properties.get("timestamp")).longValue();
-        this.metrics = new Property[routingNumber];
-        for(int i=0;i<routingNumber;i++){
-            JsonObject mj = JsonUtil.parse((String)properties.get("m"+i));
-            metrics[i] = new MetricsProperty(i,mj.get("name").getAsString(),Double.parseDouble(mj.get("value").getAsString()),mj.get("timestamp").getAsLong());
-        }
-    }
-
-
-    public Property[] metrics(){
+    public MetricsProperty[] metrics(){
         return metrics;
     }
-    public void distributionKey(String rkey){
-        //String[] idx = rkey.split(Recoverable.PATH_SEPARATOR);
-        //bucket = idx[0];
-        //d = idx[1];
-        //index = idx[2];
-        //name = idx[3];
-    }
+
     @Override
     public int getFactoryId() {
         return StatisticsPortableRegistry.OID;
@@ -77,25 +70,22 @@ public class MetricsSnapshot extends RecoverableObject  {
         return StatisticsPortableRegistry.METRICS_SNAPSHOT_CID;
     }
 
-    public Key key(){
-        return new ResourceKey(this.bucket,owner,new String[]{index,name});
-    }
 
-    public void initialize(Property property,LocalDateTime timeUpdated){
-        metrics[property.routingNumber()]=property;
+    public void initialize(MetricsProperty property,LocalDateTime timeUpdated){
+        metrics[property.routingNumber()].name = property.name;
         this.timestamp = TimeUtil.toUTCMilliseconds(timeUpdated);
     }
     public MetricsSnapshot update(double currentData){
-        ((MetricsProperty)metrics[routingNumber-1]).value = currentData;//
+        metrics[TRACKING_NUMBER-1].value = currentData;//
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         return this;
     }
-    public Property push(Property property,LocalDateTime dateTime){
-        Property toHistory = metrics[routingNumber-1];
-        for(int i=0;i<routingNumber-1;i++){
+    public MetricsProperty push(MetricsProperty property,LocalDateTime dateTime){
+        MetricsProperty toHistory = metrics[TRACKING_NUMBER-1];
+        for(int i=0;i<TRACKING_NUMBER-1;i++){
             metrics[i]=metrics[i+1];
         }
-        metrics[routingNumber-1] = property;
+        metrics[TRACKING_NUMBER-1] = property;
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }
@@ -118,8 +108,8 @@ public class MetricsSnapshot extends RecoverableObject  {
         return dateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
     }
 
-    public void reset(DataStore.Stream<Property> reset){
-        for(Property p : metrics){
+    public void reset(DataStore.Stream<MetricsProperty> reset){
+        for(MetricsProperty p : metrics){
             reset.on(p);
         }
     }

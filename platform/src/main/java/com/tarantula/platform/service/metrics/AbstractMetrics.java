@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
+import com.mysql.cj.CacheAdapter;
 import com.tarantula.platform.statistics.StatisticsUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 
@@ -65,7 +66,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
 
     protected long pendingUpdateInterval = 10000;
-    protected int metricsTrackingNumber = 12;
+    protected int metricsTrackingNumber = MetricsSnapshot.TRACKING_NUMBER;
 
     protected DataStore dataStore;
     private SystemStatistics statistics;
@@ -161,7 +162,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             MetricsHistory lastMetricsHistory = metricsHistory(category,lastUpdate);
             if(!StatisticsUtil.validateHourly(lastUpdate,_cur)){
                 String xh = MetricsSnapshot.hourlyLabel(lastUpdate);
-                Property property = new MetricsProperty(metricsTrackingNumber-1,xh,entry.hourly(),_cur);
+                Spot property = new MetricsProperty(metricsTrackingNumber-1,xh,entry.hourly(),_cur);
                 lastMetricsHistory.archiveHourly(property);
                 entry.hourly(0,_cur);
 
@@ -280,7 +281,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public List<String> categories(){
         return categories;
     }
-    public Property[] snapshot(String category, String classifier){
+    public Spot[] snapshot(String category, String classifier){
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
         return metricsSnapshot.metrics();
     }
@@ -322,7 +323,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             MetricsSnapshot md = metricsSnapshot(category,LeaderBoard.DAILY);
             md.update(daily);
             String xd = MetricsSnapshot.dailyLabel(end.plusDays(1));
-            Property pd = new MetricsProperty(metricsTrackingNumber-1,xd,0,end);
+            MetricsProperty pd = new MetricsProperty(metricsTrackingNumber-1,xd,0,end);
             md.push(pd,end);
             this.dataStore.update(md);
             if(end.getDayOfWeek().getValue() == 1){//weekly reset
@@ -332,7 +333,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 MetricsSnapshot mw = metricsSnapshot(category,LeaderBoard.WEEKLY);
                 mw.update(weekly);
                 String xw = MetricsSnapshot.weeklyLabel(end.plusDays(8-end.getDayOfWeek().getValue()));
-                Property pw = new MetricsProperty(metricsTrackingNumber-1,xw,0,end);
+                MetricsProperty pw = new MetricsProperty(metricsTrackingNumber-1,xw,0,end);
                 mw.push(pw,end);
                 this.dataStore.update(mw);
 
@@ -344,7 +345,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 MetricsSnapshot mm = metricsSnapshot(category,LeaderBoard.MONTHLY);
                 mm.update(monthly);
                 String xm = MetricsSnapshot.monthlyLabel(end.plusMonths(1));
-                Property pm = new MetricsProperty(metricsTrackingNumber-1,xm,0,end);
+                MetricsProperty pm = new MetricsProperty(metricsTrackingNumber-1,xm,0,end);
                 mm.push(pm,end);
                 this.dataStore.update(mm);
             }
@@ -355,7 +356,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 MetricsSnapshot my = metricsSnapshot(category,LeaderBoard.MONTHLY);
                 my.update(yearly);
                 String xy = MetricsSnapshot.yearlyLabel(end.plusYears(1));
-                Property py = new MetricsProperty(metricsTrackingNumber-1,xy,0,end);
+                MetricsProperty py = new MetricsProperty(metricsTrackingNumber-1,xy,0,end);
                 my.push(py,end);
                 this.dataStore.update(my);
             }
@@ -376,8 +377,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 MetricsSnapshot snapshot = metricsSnapshot(category,LeaderBoard.HOURLY);
                 snapshot.update(hourly);
                 String xh = MetricsSnapshot.hourlyLabel(end.plusHours(2));
-                Property property = new MetricsProperty(metricsTrackingNumber-1,xh,0,end);
-                Property history = snapshot.push(property,end);
+                MetricsProperty property = new MetricsProperty(metricsTrackingNumber-1,xh,0,end);
+                Spot history = snapshot.push(property,end);
                 //archive history hourly
                 MetricsHistory metricsHistory = metricsHistory(category,end);
                 metricsHistory.archiveHourly(new MetricsProperty(metricsTrackingNumber-1,historyPropertyLabel(end),history.value(),end));
@@ -460,12 +461,13 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     private MetricsSnapshot metricsSnapshot(String category,String classifier){
         String ckey = categoryKey(category,classifier);
         return snapshots.computeIfAbsent(ckey,k->{
-            MetricsSnapshot pending = new MetricsSnapshot(metricsTrackingNumber,category,classifier);
-            pending.bucket(bucket);
-            //pending.distributionId(dis);
+            MetricsSnapshot pending = this.statistics.loadMetricsSnapshot(classifier);
+            if(pending!=null) return pending;
+            pending = new MetricsSnapshot(category,classifier);
+            pending.ownerKey(this.statistics.key());
             initialize(classifier,pending,LocalDateTime.now());
             pending.dataStore(this.dataStore);
-            this.dataStore.createIfAbsent(pending,true);
+            this.dataStore.create(pending);
             return pending;
         });
     }
@@ -476,7 +478,8 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             if(metricsHistory!=null) return metricsHistory;
             metricsHistory = new MetricsHistory(category,end.getYear(),end.getDayOfYear());
             metricsHistory.ownerKey(this.statistics.key());
-            //metricsHistory.initializeHourly(end);
+            metricsHistory.initializeHourly(end);
+            metricsHistory.dataStore(dataStore);
             this.dataStore.create(metricsHistory);
             return metricsHistory;
         });

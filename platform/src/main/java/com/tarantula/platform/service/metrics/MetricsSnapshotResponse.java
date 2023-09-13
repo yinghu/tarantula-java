@@ -2,7 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Property;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.RecoverableObject;
 
 
@@ -18,18 +18,18 @@ public class MetricsSnapshotResponse extends RecoverableObject{
         this.metrics = new JsonArray();
     }
 
-    public void snapshot(Property[] snapshot){
-        for(Property p : snapshot) {
+    public void snapshot(Metrics.Spot[] snapshot){
+        for(Metrics.Spot p : snapshot) {
             JsonObject m = new JsonObject();
             m.addProperty("x",p.name());
-            m.addProperty("y",p.value().toString());
+            m.addProperty("y",Double.toString(p.value()));
             metrics.add(m);
         }
     }
-    public void archive(String name,Object value){
+    public void archive(String name,double value){
         JsonObject m = new JsonObject();
         m.addProperty("x",name);
-        m.addProperty("y",value.toString());
+        m.addProperty("y",Double.toString(value));
         metrics.add(m);
     }
 

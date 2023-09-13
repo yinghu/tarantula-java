@@ -1,8 +1,8 @@
 package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.IndexKey;
@@ -11,19 +11,19 @@ import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class MetricsProperty extends RecoverableObject implements Property {
+public class MetricsProperty extends RecoverableObject implements Metrics.Spot {
 
     public String name;
-    public Object value;
+    public double value;
 
 
     public MetricsProperty(){
     }
 
-    public MetricsProperty(int index, String name, Object value,LocalDateTime dateCreated){
+    public MetricsProperty(int index, String name, double value,LocalDateTime dateCreated){
         this(index,name,value,TimeUtil.toUTCMilliseconds(dateCreated));
     }
-    public MetricsProperty(int index,String name, Object value,long timestamp){
+    public MetricsProperty(int index,String name, double value,long timestamp){
         this.routingNumber = index;
         this.name = name;
         this.value = value;
@@ -55,12 +55,13 @@ public class MetricsProperty extends RecoverableObject implements Property {
         this.timestamp = ((Number)properties.get("timestamp")).longValue();
     }
 
-    public String name(){
-        return name;
-    }
-    public Object value(){
+    public double value(){
         return value;
     }
+    public void value(double value){
+        this.value = value;
+    }
+
     @Override
     public String toString(){
         return "["+routingNumber+":"+this.name+"/"+this.value+"]";
@@ -69,7 +70,7 @@ public class MetricsProperty extends RecoverableObject implements Property {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name",name);
-        jsonObject.addProperty("value",value.toString());
+        jsonObject.addProperty("value",Double.toString(value));
         jsonObject.addProperty("timestamp",timestamp);
         return jsonObject;
     }

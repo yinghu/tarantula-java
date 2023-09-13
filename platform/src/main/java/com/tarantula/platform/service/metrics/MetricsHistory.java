@@ -1,17 +1,15 @@
 package com.tarantula.platform.service.metrics;
 
-import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.Property;
+
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metrics;
-import com.icodesoftware.util.JsonUtil;
+
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
-
 import java.time.LocalDateTime;
-import java.util.Map;
+
 
 public class MetricsHistory extends RecoverableObject implements Metrics.History {
 
@@ -46,30 +44,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     public int scope() {
         return Distributable.LOCAL_SCOPE;
     }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("dailyGain",dailyGain);
-        this.properties.put("weeklyGain",weeklyGain);
-        this.properties.put("monthlyGain",monthlyGain);
-        this.properties.put("yearlyGain",yearlyGain);
-        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
-            this.properties.put("m"+i,metrics[i].toJson().toString());
-        }
-        return this.properties;
-    }
 
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.dailyGain = ((Number)properties.get("dailyGain")).doubleValue();
-        this.weeklyGain = ((Number)properties.get("weeklyGain")).doubleValue();
-        this.monthlyGain = ((Number)properties.get("monthlyGain")).doubleValue();
-        this.yearlyGain = ((Number)properties.get("yearlyGain")).doubleValue();
-        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
-            Object payload = properties.get("m"+i);
-            JsonObject mj = JsonUtil.parse((String)payload);
-            metrics[i]=(new MetricsProperty(i, mj.get("name").getAsString(), Double.parseDouble(mj.get("value").getAsString()),mj.get("timestamp").getAsLong()));
-        }
-    }
 
     public boolean read(DataBuffer buffer){
         this.day = buffer.readInt();
@@ -97,11 +72,11 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     }
 
 
-    public Property[] metrics(){
+    public Metrics.Spot[] metrics(){
         return metrics;
     }
 
-    public Property[] hourlyGain(){
+    public Metrics.Spot[] hourlyGain(){
         return metrics;
     }
     public double dailyGain(){
@@ -129,11 +104,11 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     }
     //key label format history_[category]_[year]_[dayofyear]  history_httpRequestCount_2022_145
 
-    public void archiveHourly(Property property){
+    public void archiveHourly(Metrics.Spot property){
         int hour  = TimeUtil.fromUTCMilliseconds(property.timestamp()).getHour();
         MetricsProperty archive = metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1];
-        double v = (Double)archive.value;
-        double d = (Double)property.value();
+        double v = archive.value;
+        double d = property.value();
         archive.value = v+d;
     }
 

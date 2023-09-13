@@ -77,6 +77,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         RecoverableQuery<SystemStatisticsEntry> query = RecoverableQuery.query(this.distributionId,new SystemStatisticsEntry("",label),StatisticsPortableRegistry.INS);
         dataStore.list(query, e->{
             mappings.put(e.name(),e);
+            e.dataStore(dataStore);
             return true;
         });
     }
@@ -85,6 +86,21 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
         MetricsHistory[] loaded ={null};
         dataStore.list(query,m->{
             if(m.day==day){
+                m.dataStore(dataStore);
+                loaded[0]=m;
+                return false;
+            }
+            return true;
+        });
+        return loaded[0];
+    }
+
+    public MetricsSnapshot loadMetricsSnapshot(String classifier){
+        RecoverableQuery<MetricsSnapshot> query = RecoverableQuery.query(distributionId(),new MetricsSnapshot(SystemMetrics.ACCESS_AMAZON_S3_COUNT,classifier), StatisticsPortableRegistry.INS);
+        MetricsSnapshot[] loaded ={null};
+        dataStore.list(query,m->{
+            if(m.name().equals(classifier)){
+                m.dataStore(dataStore);
                 loaded[0]=m;
                 return false;
             }

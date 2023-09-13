@@ -1,6 +1,5 @@
 package com.icodesoftware.service;
 
-import com.icodesoftware.Property;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 
@@ -21,7 +20,7 @@ public interface Metrics extends ServiceProvider,MetricsListener{
 
     void atHourly();
 
-    Property[] snapshot(String category, String classifier);
+    Spot[] snapshot(String category, String classifier);
     History archive(String category,LocalDateTime day);
     History archiveWeekly(String category,LocalDateTime day);
     History archiveMonthly(String category,LocalDateTime day);
@@ -30,11 +29,22 @@ public interface Metrics extends ServiceProvider,MetricsListener{
 
 
     interface History extends Recoverable {
-        Property[] hourlyGain();
+        Spot[] hourlyGain();
         double dailyGain();
         double weeklyGain();
         double monthlyGain();
         double yearlyGain();
     }
+
+    interface Spot extends Recoverable{
+        String name();
+        double value();
+
+        void name(String name);
+        void value(double value);
+    }
+
+
+
 
 }

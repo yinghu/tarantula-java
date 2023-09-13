@@ -59,20 +59,36 @@ public class MetricsTest extends DataStoreHook{
             Assert.assertNotNull(statistics.loadMetricsHistory(12));
         }
         Assert.assertNull(statistics.loadMetricsHistory(13));
+
+        MetricsSnapshot metricsSnapshot = new MetricsSnapshot(SystemMetrics.ACCESS_AMAZON_S3_COUNT,LeaderBoard.HOURLY);
+        metricsSnapshot.ownerKey(statistics.key());
+
+        //metricsSnapshot.initialize(new MetricsProperty());
+        System.out.println(MetricsSnapshot.hourlyLabel(LocalDateTime.now()));
+        Assert.assertTrue(dataStore.create(metricsSnapshot));
+
+        MetricsSnapshot metricsSnapshot1 = new MetricsSnapshot(SystemMetrics.ACCESS_AMAZON_S3_COUNT,LeaderBoard.DAILY);
+        metricsSnapshot1.ownerKey(statistics.key());
+        Assert.assertTrue(dataStore.create(metricsSnapshot1));
+
+        Assert.assertNotNull(statistics.loadMetricsSnapshot(LeaderBoard.HOURLY));
     }
 
-    //@Test(groups = { "PerformanceMetrics" })
+    @Test(groups = { "PerformanceMetrics" })
     public void metricsYearlyTest() {
-        //TestServiceContext serviceContext = new TestServiceContext();
+
         LocalDateTime end = LocalDate.parse("2022-12-31").atTime(23,50,0,0);
         MockMetrics metrics = new MockMetrics(end);
         Assert.assertEquals(end.getHour()==23,true);
         metrics.setup(serviceContext);
-        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);
-        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
+        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1D);
+        metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2D);
         metrics.run();//update statistics entry
-        Property[] mc = metrics.snapshot(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT, LeaderBoard.HOURLY);
-        Assert.assertEquals(Double.parseDouble(mc[11].value().toString()) ==3,true);
+        Metrics.Spot[] mc = metrics.snapshot(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT, LeaderBoard.HOURLY);
+        //for(Property p : mc){
+            //System.out.println(p.name());
+        //}
+        Assert.assertEquals((mc[11].value()) ==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).daily()==3,true);
         Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
@@ -169,10 +185,11 @@ public class MetricsTest extends DataStoreHook{
         metrics.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,2);
         metrics.atHourly();
         Metrics.History history = metrics.archive(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,end);
-        Property[] his = history.hourlyGain();
+        Metrics.Spot[] his = history.hourlyGain();
         String h12 = MetricsProperty.historyPropertyLabel(end);
-        Property archived = null;
-        for(Property p : his){
+        Metrics.Spot archived = null;
+        for(Metrics.Spot p : his){
+            //System.out.println(p.name()+">>>"+p.value());
             if(p.name().equals(h12)){
                 archived = p;
                 break;
