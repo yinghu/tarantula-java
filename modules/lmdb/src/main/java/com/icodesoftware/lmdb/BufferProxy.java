@@ -12,7 +12,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     public BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
+        this.buffer.order(ByteOrder.nativeOrder());
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
