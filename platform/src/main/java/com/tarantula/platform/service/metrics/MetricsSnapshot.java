@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 
@@ -112,6 +114,19 @@ public class MetricsSnapshot extends RecoverableObject  {
         for(MetricsProperty p : metrics){
             reset.on(p);
         }
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("name",name);
+        resp.addProperty("timestamp",timestamp);
+        JsonArray spot = new JsonArray();
+        for(MetricsProperty m : metrics){
+            spot.add(m.toJson());
+        }
+        resp.add("data",spot);
+        return resp;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
@@ -141,6 +143,23 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         StringBuffer buffer = new StringBuffer().append(metricsId).append(Recoverable.PATH_SEPARATOR);
         buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_");
         return buffer.append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("day",day);
+        resp.addProperty("dailyGain",dailyGain);
+        resp.addProperty("weeklyGain",weeklyGain);
+        resp.addProperty("monthlyGain",monthlyGain);
+        resp.addProperty("yearlyGain",yearlyGain);
+        resp.addProperty("timestamp",timestamp);
+        JsonArray history = new JsonArray();
+        for(MetricsProperty m : metrics){
+            history.add(m.toJson());
+        }
+        resp.add("data",history);
+        return resp;
     }
 
 }

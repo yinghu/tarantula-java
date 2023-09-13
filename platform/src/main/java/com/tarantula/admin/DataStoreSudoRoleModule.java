@@ -61,7 +61,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("name",t.getClass().getName());
                     debug.addProperty("key",t.key().asString());
                     debug.addProperty("local",h.local());
-                    debug.addProperty("revision",h.revision());
+                    debug.addProperty("revision",Long.toString(h.revision()));
                     debug.addProperty("node",n.nodeName());
                     debug.add("content",t.toJson());
                     keys.add(debug);

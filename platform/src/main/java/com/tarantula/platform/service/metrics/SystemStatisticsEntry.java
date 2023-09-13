@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.metrics;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Statistics;
@@ -172,4 +173,17 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         return new SystemStatisticsEntry(this);
     }
 
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("name",name);
+        resp.addProperty("hourly",hourly);
+        resp.addProperty("daily",daily);
+        resp.addProperty("weekly",weekly);
+        resp.addProperty("monthly",monthly);
+        resp.addProperty("yearly",yearly);
+        resp.addProperty("total",total);
+        resp.addProperty("timestamp",timestamp);
+        return resp;
+    }
 }
