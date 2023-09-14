@@ -10,6 +10,8 @@ import com.icodesoftware.service.Metadata;
 import com.tarantula.platform.event.DataReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
+import java.nio.ByteBuffer;
+
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
@@ -22,6 +24,9 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
     }
 
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
+        logger.warn("on distributing ...");
+    }
 
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){

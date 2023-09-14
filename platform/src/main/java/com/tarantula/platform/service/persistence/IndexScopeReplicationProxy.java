@@ -8,6 +8,8 @@ import com.icodesoftware.service.Metadata;
 
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 
+import java.nio.ByteBuffer;
+
 
 public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -24,8 +26,8 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
 
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
+        
     }
 
 

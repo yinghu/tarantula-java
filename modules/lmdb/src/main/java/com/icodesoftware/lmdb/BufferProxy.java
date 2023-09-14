@@ -125,7 +125,16 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return new BufferProxy(ByteBuffer.wrap(data));
     }
     public byte[] array(){
-        if(buffer.isDirect()) throw new RuntimeException("Do not use it for none heap buffer");
+        if(buffer.isDirect()){
+            byte[] array = new byte[buffer.remaining()];
+            buffer.get(array);
+            return array;
+        }
         return buffer.array();
+    }
+
+    @Override
+    public void close() {
+
     }
 }

@@ -55,6 +55,13 @@ public class BufferProxyTest {
         Assert.assertEquals(dataWrap.readUTF8(),"test");
         Assert.assertEquals(dataWrap.readInt(),100);
         Assert.assertEquals(dataWrap.readUTF8(),"loop");
+
+        ByteBuffer direct = ByteBuffer.allocateDirect(100);
+        Recoverable.DataBuffer buffer = new BufferProxy(direct);
+        buffer.writeUTF8("test1000");
+        direct.flip();
+        byte[] ret = buffer.array();
+        Assert.assertNotNull(ret);
     }
 
     @Test(groups = { "bufferProxy" })

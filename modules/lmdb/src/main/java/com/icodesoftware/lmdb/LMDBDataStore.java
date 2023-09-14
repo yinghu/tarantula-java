@@ -121,6 +121,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!dbi.put(txn,key,value)) return false;
             txn.commit();
             t.revision(header.revision());
+            key.rewind();
+            value.rewind();
+            lmdbDataStoreProvider.onDistributing(metadata,key,value);
             return true;
         }finally {
             txn.close();
@@ -154,6 +157,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             onEdge(t,t.label(),key,txn);
             txn.commit();
             t.revision(Long.MIN_VALUE);
+            key.rewind();
+            value.rewind();
+            lmdbDataStoreProvider.onDistributing(metadata,key,value);
             return true;
         }
         finally {
@@ -191,6 +197,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(okey==null) return false;
             txn.commit();
             //lmdbDataStoreProvider.onDistributing(metadata,okey,key);
+            key.rewind();
+            okey.rewind();
+            lmdbDataStoreProvider.onDistributing(metadata,okey,key);
             return true;
         }finally {
             txn.close();
@@ -289,10 +298,19 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     @Override
-    public boolean set(byte[] key, byte[] value) {
+    public boolean set(BufferStream bufferStream) {
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        ByteBuffer value = ByteBuffer.allocateDirect(3000);
+        if(!bufferStream.on(new BufferProxy(key),null,new BufferProxy(value))) return false;
+        key.flip();
+        value.flip();
+        System.out.println("buffer stream call");
+        return true;
+        //return set(key,value);
+    }
+    public boolean set(byte[] key,byte[] value){
         return false;
     }
-
     @Override
     public byte[] get(byte[] key) {
         return new byte[0];

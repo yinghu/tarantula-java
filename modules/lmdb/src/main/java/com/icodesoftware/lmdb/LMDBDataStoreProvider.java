@@ -10,6 +10,7 @@ import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 
+import com.icodesoftware.service.ServiceContext;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
@@ -184,6 +185,34 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     @Override
+    public void setup(ServiceContext serviceContext){
+        if(keyIndexMapStoreListener!=null){
+            keyIndexMapStoreListener.setup(serviceContext);
+        }
+        if(integrationMapStoreListener!=null){
+            integrationMapStoreListener.setup(serviceContext);
+        }
+        if(dataMapStoreListener!=null){
+            dataMapStoreListener.setup(serviceContext);
+        }
+        logger.warn("LMDB provider setup");
+    }
+
+    @Override
+    public void waitForData() {
+        if(keyIndexMapStoreListener!=null){
+            keyIndexMapStoreListener.waitForData();
+        }
+        if(integrationMapStoreListener!=null){
+            integrationMapStoreListener.waitForData();
+        }
+        if(dataMapStoreListener!=null){
+            dataMapStoreListener.waitForData();
+        }
+        logger.warn("LMDB provider waitingForData");
+    }
+
+    @Override
     public void shutdown() throws Exception {
         keyDbi.close();
         storeMap.forEach((k,v)->v.close());
@@ -202,15 +231,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        if(metadata.scope()==Distributable.INTEGRATION_SCOPE){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
             integrationMapStoreListener.onDistributing(metadata,key,value);
             return;
         }
-        if(metadata.scope()==Distributable.DATA_SCOPE){
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
             dataMapStoreListener.onDistributing(metadata,key,value);
             return;
         }
-        if(metadata.scope()==Distributable.INDEX_SCOPE){
+        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
             dataMapStoreListener.onDistributing(metadata,key,value);
             return;
         }

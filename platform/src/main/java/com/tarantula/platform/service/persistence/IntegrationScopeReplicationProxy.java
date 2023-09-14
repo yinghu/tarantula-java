@@ -8,6 +8,8 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
+import java.nio.ByteBuffer;
+
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -20,7 +22,9 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-
+    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
+        //serviceContext.clusterProvider().accessIndexService().
+    }
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());

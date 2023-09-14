@@ -28,13 +28,12 @@ import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
+import com.tarantula.platform.service.cluster.keyindex.KeyIndexServiceProxy;
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.MetricsManager;
-import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
-import com.tarantula.platform.service.persistence.ClusterNode;
-import com.tarantula.platform.service.persistence.MirrorClusterBackupProvider;
+import com.tarantula.platform.service.persistence.*;
 import com.tarantula.platform.util.*;
 
 
@@ -206,6 +205,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
+                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,new IndexScopeReplicationProxy());
+                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,new IntegrationScopeReplicationProxy());
+                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,new DataScopeReplicationProxy());
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
                 this._initMirrorClusterBackup();
@@ -563,7 +565,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
         initMetricsProvider();
-
+        this.deploymentDataStoreProvider.waitForData();
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
             v.setup(this);
             v.waitForData();//block for global data sync

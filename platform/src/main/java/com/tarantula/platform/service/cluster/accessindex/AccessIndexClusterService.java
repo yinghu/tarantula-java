@@ -6,6 +6,7 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -36,7 +37,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     private NodeEngine nodeEngine;
 
     private DataStoreOnPartition[] dataStoreOnPartitions;
-
+    private DataStore dataStore;
     private TarantulaContext tarantulaContext;
     private DeploymentServiceProvider deploymentServiceProvider;
     private String bucket;
