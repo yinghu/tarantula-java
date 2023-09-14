@@ -34,7 +34,7 @@ public class JWTTokenTest {
         roles.put(AccessControl.root.name(),AccessControl.root);
         String jwtToken = jwt.token((h, p) -> {
             Access.Role r = roles.get(access.role());
-            byte[] mark = waterMark(key, BufferProxy.buffer(200).writeLong(access.distributionId()).writeLong(session.stub()).writeInt(r.accessControl()).array());
+            byte[] mark = waterMark(key, BufferProxy.buffer(200,false).writeLong(access.distributionId()).writeLong(session.stub()).writeInt(r.accessControl()).array());
             h.addProperty("kid", CipherUtil.toBase64Key(mark));
             p.addProperty("aud", access.role());
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));

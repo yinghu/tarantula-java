@@ -2,19 +2,13 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.Recoverable;
 
-import java.nio.ByteBuffer;
-
-
 public interface MapStoreListener extends ServiceProvider {
 
     //dispatch backup operation
     <T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t);
 
     //dispatch cluster operation
-    //void onDistributing(Metadata metadata,String stringKey, byte[] key, byte[] value);
-
-    void onDistributing(Metadata metadata, ByteBuffer key,ByteBuffer value);
-
+    void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
     //recover cluster operation
     byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 

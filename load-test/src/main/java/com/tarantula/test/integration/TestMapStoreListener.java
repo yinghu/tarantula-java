@@ -24,12 +24,10 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
 
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
 
-    @Override
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value) {
-        DataStore ds = provider.createDataStore("user_backup");
-        ds.backup().set(key,value);
     }
+
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

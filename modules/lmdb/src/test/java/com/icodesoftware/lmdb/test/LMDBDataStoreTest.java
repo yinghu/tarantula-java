@@ -9,6 +9,7 @@ import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.util.NaturalKey;
 
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -50,7 +51,11 @@ public class LMDBDataStoreTest {
     public void createIfAbsentTest() {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
         String key = "a100";
+        Recoverable.Key onwerKey = new SnowflakeKey(1000);
         TestAccessIndex created = new TestAccessIndex(key);
+        created.ownerKey(onwerKey);
+        created.onEdge(true);
+        created.label("access");
         created.distributionId(localDistributionIdGenerator.id());
         Assert.assertTrue(ds.createIfAbsent(created,false));
         TestAccessIndex not_created = new TestAccessIndex(key);
@@ -75,6 +80,7 @@ public class LMDBDataStoreTest {
             Assert.assertEquals(header.factoryId(),testAccessIndex.getFactoryId());
             return true;
         }));
+        Assert.assertEquals(ds.list(new TestAccessQuery(1000,"access")).size(),1);
     }
 
     @Test(groups = { "LMDB" })
@@ -127,7 +133,7 @@ public class LMDBDataStoreTest {
             if(h.classId()==10){
                 TestUser testUser = new TestUser();
                 testUser.read(buffer);
-                //System.out.println(testUser.oid());
+                Assert.assertNotNull(testUser.login());
                 ct[0]++;
             }
             return true;

@@ -42,7 +42,7 @@ public interface DataStore {
     interface Backup{
         boolean set(BufferStream bufferStream);
         boolean set(byte[] key,byte[] value);
-        boolean set(ByteBuffer key, ByteBuffer value);
+
         byte[] get(byte[] key);
 
         void unset(byte[] key);

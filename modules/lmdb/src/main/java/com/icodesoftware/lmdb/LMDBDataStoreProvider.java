@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
@@ -50,10 +52,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
 
+    private final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(10);
+
     private MapStoreListener integrationMapStoreListener;
     private MapStoreListener keyIndexMapStoreListener;
     private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
+
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -230,7 +235,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     }
 
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
             integrationMapStoreListener.onDistributing(metadata,key,value);
             return;
@@ -263,6 +268,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         Path _path = Paths.get(path);
         if(!Files.exists(_path)) Files.createDirectories(_path);
         return _path;
+    }
+
+    BufferCache fromCache(){
+        BufferCache cache = pendingQueue.poll();
+        if(cache!=null) return cache;
+        return new BufferCache(300,2700,pendingQueue);
     }
 
 }

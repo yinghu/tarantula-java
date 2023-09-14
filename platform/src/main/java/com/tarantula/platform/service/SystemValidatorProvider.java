@@ -283,7 +283,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String ticket(long key,long stub,int duration){
-        byte[] data = BufferProxy.buffer(200).writeLong(key).writeLong(stub).writeInt(duration).array();
+        byte[] data = BufferProxy.buffer(200,false).writeLong(key).writeLong(stub).writeInt(duration).array();
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
@@ -581,7 +581,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public String jwtToken(Access access,OnSession session){
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
-            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200,false);
             dataBuffer.writeLong(access.distributionId()).writeLong(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));

@@ -9,10 +9,16 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private ByteBuffer buffer;
 
+    private BufferCache bufferCache;
 
     public BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
         this.buffer.order(ByteOrder.nativeOrder());
+    }
+
+    public BufferProxy(ByteBuffer buffer,BufferCache bufferCache){
+        this(buffer);
+        this.bufferCache = bufferCache;
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
@@ -117,9 +123,11 @@ public class BufferProxy implements Recoverable.DataBuffer {
         String ret = sb.toString();
         return ret.equals(Recoverable.UTF_NULL)?null:ret;
     }
-
-    public static Recoverable.DataBuffer buffer(int size){
-        return new BufferProxy(ByteBuffer.allocate(size));
+    public static Recoverable.DataBuffer buffer(int size,boolean direct,BufferCache bufferCache){
+        return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size),bufferCache);
+    }
+    public static Recoverable.DataBuffer buffer(int size,boolean direct){
+        return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
     }
     public static Recoverable.DataBuffer wrap(byte[] data){
         return new BufferProxy(ByteBuffer.wrap(data));
@@ -135,6 +143,21 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     @Override
     public void close() {
-
+        if(bufferCache==null) return;
+        bufferCache.close();
     }
+
+    public ByteBuffer flip(){
+        buffer.flip();
+        return buffer;
+    }
+    public ByteBuffer rewind(){
+        buffer.rewind();
+        return buffer;
+    }
+    public ByteBuffer clear(){
+        buffer.clear();
+        return buffer;
+    }
+
 }

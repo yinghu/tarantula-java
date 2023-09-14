@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 public interface Recoverable extends Distributable,JsonSerializable,Bufferable,Validatable {
@@ -94,9 +95,14 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         short readShort();
 
         byte readByte();
+
         String readUTF8();
 
         byte[] array();
+
+        ByteBuffer flip();
+        ByteBuffer rewind();
+        ByteBuffer clear();
 
     }
 }

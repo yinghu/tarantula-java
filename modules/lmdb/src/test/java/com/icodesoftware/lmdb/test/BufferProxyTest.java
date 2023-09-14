@@ -48,8 +48,9 @@ public class BufferProxyTest {
     }
     @Test(groups = { "bufferProxy" })
     public void bufferToArrayTest() {
-        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200,true);
         dataBuffer.writeUTF8("test").writeInt(100).writeUTF8("loop");
+        dataBuffer.flip();
         byte[] data = dataBuffer.array();
         Recoverable.DataBuffer dataWrap = BufferProxy.wrap(data);
         Assert.assertEquals(dataWrap.readUTF8(),"test");
@@ -67,7 +68,7 @@ public class BufferProxyTest {
     @Test(groups = { "bufferProxy" })
     public void bufferUTFNullTest() {
         String n = null;
-        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200);
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200,false);
         dataBuffer.writeUTF8(n).writeInt(100).writeUTF8("loop");
         byte[] data = dataBuffer.array();
         Recoverable.DataBuffer dataWrap = BufferProxy.wrap(data);
