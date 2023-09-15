@@ -49,10 +49,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 16;
 
+    private final static int KEY_SIZE = 200;
+    private final static int VALUE_SIZE = 1800;
+
+    private final static int PENDING_BUFFER_SIZE = 10;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
 
-    private final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(10);
+    private final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);
+
 
     private MapStoreListener integrationMapStoreListener;
     private MapStoreListener keyIndexMapStoreListener;
@@ -273,7 +278,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     BufferCache fromCache(){
         BufferCache cache = pendingQueue.poll();
         if(cache!=null) return cache;
-        return new BufferCache(300,2700,pendingQueue);
+        return new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue);
     }
 
 }

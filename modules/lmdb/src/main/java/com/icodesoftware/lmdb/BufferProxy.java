@@ -9,16 +9,9 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private ByteBuffer buffer;
 
-    private BufferCache bufferCache;
-
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
         this.buffer.order(ByteOrder.nativeOrder());
-    }
-
-    private BufferProxy(ByteBuffer buffer,BufferCache bufferCache){
-        this(buffer);
-        this.bufferCache = bufferCache;
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
@@ -126,9 +119,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
     public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
         return new BufferProxy(buffer);
     }
-    public static Recoverable.DataBuffer buffer(int size,boolean direct,BufferCache bufferCache){
-        return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size),bufferCache);
-    }
+
     public static Recoverable.DataBuffer buffer(int size,boolean direct){
         return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
     }
@@ -142,12 +133,6 @@ public class BufferProxy implements Recoverable.DataBuffer {
             return array;
         }
         return buffer.array();
-    }
-
-    @Override
-    public void close() {
-        if(bufferCache==null) return;
-        bufferCache.close();
     }
 
     public ByteBuffer flip(){

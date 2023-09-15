@@ -62,7 +62,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         void update(boolean local,long revisionDelta);
     }
 
-    interface DataBuffer extends Closable{
+    interface DataBuffer{
 
         DataBuffer writeHeader(DataHeader header);
         DataBuffer writeInt(int i);

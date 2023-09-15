@@ -34,13 +34,12 @@ public class TestMapStoreListener implements MapStoreListener {
             }
             return true;
         });
-        key.close();
-        value.close();
     }
 
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return new byte[0];
+
+        return null;
     }
 
     @Override
