@@ -6,13 +6,20 @@ import com.icodesoftware.service.Metadata;
 public class LocalMetadata  implements Metadata {
     private int scope;
     private String name;
+
+    private String label;
     public LocalMetadata(int scope,String name){
         this.name = name;
         this.scope = scope;
     }
+    public LocalMetadata(int scope,String name,String label){
+        this.name = name;
+        this.scope = scope;
+        this.label = label;
+    }
     @Override
-    public String typeId() {
-        return null;
+    public String label() {
+        return label;
     }
 
     @Override
@@ -40,5 +47,8 @@ public class LocalMetadata  implements Metadata {
         return 0;
     }
 
+    public String toString(){
+        return "Name ["+name+"] Scope ["+scope+"] Label ["+label+"]";
+    }
 
 }

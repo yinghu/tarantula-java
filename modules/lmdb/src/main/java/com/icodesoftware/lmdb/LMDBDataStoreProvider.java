@@ -54,7 +54,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private final static int PENDING_BUFFER_SIZE = 10;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
-    private final static ConcurrentHashMap<String,Dbi<ByteBuffer>> edgMap = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
     private final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);
 
@@ -121,15 +121,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         });
     }
 
-    public Dbi<ByteBuffer> createEdgeDB(int scope,String edgeName){
+    public LocalEdgeDataStore createEdgeDB(int scope,String source,String label){
+        String edgeName = source+"_"+label;
         if(scope== Distributable.DATA_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k->data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k->integration.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),integration.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
         if(scope==Distributable.INDEX_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k->index.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT));
+            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),index.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
@@ -227,7 +228,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         keyDbi.close();
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
-        edgMap.forEach((k,v)->v.close());
+        edgMap.forEach((k,v)->v.dbi.close());
         edgMap.clear();
         data.close();
         integration.close();

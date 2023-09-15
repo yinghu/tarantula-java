@@ -3,7 +3,7 @@ package com.icodesoftware.service;
 public interface Metadata{
 
      int scope();
-     String typeId();
+     String label();
      String source();
      int factoryId();
      int classId();

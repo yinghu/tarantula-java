@@ -42,6 +42,9 @@ public interface DataStore {
     interface Backup{
         boolean set(BufferStream bufferStream);
         Recoverable.DataBuffer get(BufferStream bufferStream);
+
+        void list(Recoverable.Key key,String label,BufferStream bufferStream);
+
         boolean set(byte[] key,byte[] value);
 
         byte[] get(byte[] key);
@@ -54,7 +57,6 @@ public interface DataStore {
 
     interface Stream<T extends Recoverable>{
         boolean on(T t);
-
     }
 
     interface BufferStream{
