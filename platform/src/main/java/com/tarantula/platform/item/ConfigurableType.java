@@ -43,18 +43,16 @@ public class ConfigurableType extends RecoverableObject implements Configuration
         return ItemPortableRegistry.CONFIGURABLE_TYPES_CID;
     }
     public boolean readKey(Recoverable.DataBuffer buffer){
-        buffer.readUTF8();
-        name = buffer.readUTF8();
+        name = buffer.readUTF8().split("/")[1];
         return true;
     }
     public boolean writeKey(Recoverable.DataBuffer buffer){
         if(name==null) return false;
-        buffer.writeUTF8("type");
-        buffer.writeUTF8(name);
+        buffer.writeUTF8("type/"+name);
         return true;
     }
     @Override
     public Key key() {
-        return new NaturalKey(this.name);
+        return new NaturalKey("type/"+this.name);
     }
 }

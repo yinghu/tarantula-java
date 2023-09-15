@@ -11,12 +11,12 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private BufferCache bufferCache;
 
-    public BufferProxy(ByteBuffer buffer){
+    private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
         this.buffer.order(ByteOrder.nativeOrder());
     }
 
-    public BufferProxy(ByteBuffer buffer,BufferCache bufferCache){
+    private BufferProxy(ByteBuffer buffer,BufferCache bufferCache){
         this(buffer);
         this.bufferCache = bufferCache;
     }
@@ -122,6 +122,9 @@ public class BufferProxy implements Recoverable.DataBuffer {
         }
         String ret = sb.toString();
         return ret.equals(Recoverable.UTF_NULL)?null:ret;
+    }
+    public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
+        return new BufferProxy(buffer);
     }
     public static Recoverable.DataBuffer buffer(int size,boolean direct,BufferCache bufferCache){
         return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size),bufferCache);

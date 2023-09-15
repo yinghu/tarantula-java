@@ -6,6 +6,7 @@ import com.icodesoftware.Recoverable;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class BufferCache {
+
     public final Recoverable.DataBuffer key;
     public final Recoverable.DataBuffer value;
 

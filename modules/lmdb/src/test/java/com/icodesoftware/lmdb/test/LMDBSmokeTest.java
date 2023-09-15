@@ -1,6 +1,8 @@
 package com.icodesoftware.lmdb.test;
 
 
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
@@ -135,12 +137,12 @@ public class LMDBSmokeTest {
         long v =  snowflakeIdGenerator.snowflakeId();
         //System.out.println(snowflakeIdGenerator.fromSnowflakeId(v)[2]);
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        BufferProxy kp = new BufferProxy(key);
+        Recoverable.DataBuffer kp = BufferProxy.buffer(key);
         //key.order(ByteOrder.LITTLE_ENDIAN);
         kp.writeLong(k);
         key.flip();
         ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        BufferProxy vp = new BufferProxy(value);
+        Recoverable.DataBuffer vp = BufferProxy.buffer(value);
         //value.order(ByteOrder.LITTLE_ENDIAN);
         vp.writeLong(v);
         value.flip();
@@ -152,7 +154,7 @@ public class LMDBSmokeTest {
         //Txn<ByteBuffer> read = env.txnRead();
         if(dbi.get(txn,key)!=null){
             txn.val().order(ByteOrder.LITTLE_ENDIAN);
-            BufferProxy p = new BufferProxy(txn.val());
+            Recoverable.DataBuffer p = BufferProxy.buffer(txn.val());
             long vx = p.readLong();
             long[] v1 = snowflakeIdGenerator.fromSnowflakeId(v);
             long[] v2 = snowflakeIdGenerator.fromSnowflakeId(vx);

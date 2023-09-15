@@ -24,9 +24,9 @@ public class MapStoreSyncEvent extends Data implements Event {
     public MapStoreSyncEvent(Recoverable recoverable){
         factoryId = recoverable.getFactoryId();
         classId = recoverable.getClassId();
-        recoverable.writeKey(new BufferProxy(key));
+        recoverable.writeKey(BufferProxy.buffer(key));
         key.flip();
-        recoverable.write(new BufferProxy(value));
+        recoverable.write(BufferProxy.buffer(value));
         value.flip();
     }
     @Override

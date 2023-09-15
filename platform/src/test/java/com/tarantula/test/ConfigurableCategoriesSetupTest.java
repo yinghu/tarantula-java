@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 public class ConfigurableCategoriesSetupTest extends DataStoreHook{
 
 
-    //@Test(groups = { "ConfigurableCategories" })
+    @Test(groups = { "ConfigurableCategories" })
     public void configSettingTest() {
         GameObjectSetup gameObjectSetup = new GameObjectSetup();
         gameObjectSetup.setup(serviceContext);
@@ -78,7 +78,7 @@ public class ConfigurableCategoriesSetupTest extends DataStoreHook{
         //Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableTypeQuery(ConfigurableTypeQuery.CommodityKey,"type")).size(),2);
     }
 
-    //@Test(groups = { "ConfigurableCategories" })
+    @Test(groups = { "ConfigurableCategories" })
     public void configurableTypeTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
         ConfigurableCategories categories = new ConfigurableCategories();

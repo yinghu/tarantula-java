@@ -19,7 +19,7 @@ public class BufferProxyTest {
     @Test(groups = { "bufferProxy" })
     public void bufferTest() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(700);
-        BufferProxy proxy = new BufferProxy(buffer);
+        Recoverable.DataBuffer proxy = BufferProxy.buffer(buffer);
         proxy.writeBoolean(true);
         proxy.writeDouble(10);
         proxy.writeShort((short)4);
@@ -58,7 +58,7 @@ public class BufferProxyTest {
         Assert.assertEquals(dataWrap.readUTF8(),"loop");
 
         ByteBuffer direct = ByteBuffer.allocateDirect(100);
-        Recoverable.DataBuffer buffer = new BufferProxy(direct);
+        Recoverable.DataBuffer buffer = BufferProxy.buffer(direct);
         buffer.writeUTF8("test1000");
         direct.flip();
         byte[] ret = buffer.array();

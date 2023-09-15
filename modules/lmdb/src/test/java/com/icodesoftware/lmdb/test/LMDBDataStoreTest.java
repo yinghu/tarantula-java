@@ -178,7 +178,7 @@ public class LMDBDataStoreTest {
         TestUserEx testUser = new TestUserEx("user",ownerId1);
         TestMapStoreListener mapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         ByteBuffer key = ByteBuffer.allocate(100);
-        Recoverable.DataBuffer dataBuffer = new BufferProxy(key);
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(key);
         localDistributionIdGenerator.assign(dataBuffer);
         key.flip();
         testUser.readKey(dataBuffer);

@@ -80,8 +80,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
             RecoverableListener rc = this.rMap.get(msc.factoryId);
             if(rc!=null){
                 Recoverable r = rc.create(msc.classId);
-                r.readKey(new BufferProxy(msc.key));
-                r.read(new BufferProxy(msc.value));
+                r.readKey(BufferProxy.buffer(msc.key));
+                r.read(BufferProxy.buffer(msc.value));
                 rc.onUpdated(r);
             }
             else{
