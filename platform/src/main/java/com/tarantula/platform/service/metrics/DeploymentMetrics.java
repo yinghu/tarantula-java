@@ -15,6 +15,6 @@ public class DeploymentMetrics extends AbstractMetrics{
         this.name = Metrics.DEPLOYMENT;
         this.deploymentIncluded = true;
         this.logger = JDKLogger.getLogger(DeploymentMetrics.class);
-        this.dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"tarantula_deployment_metrics");
+        this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_deployment_metrics");
     }
 }

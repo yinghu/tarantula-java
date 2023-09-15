@@ -496,7 +496,19 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public DataStore dataStore(int scope,String name){
-         return this.deploymentDataStoreProvider.createDataStore(name);
+         if(scope==Distributable.LOCAL_SCOPE){
+             return this.deploymentDataStoreProvider.createLocalDataStore(name);
+         }
+         if(scope==Distributable.DATA_SCOPE){
+            return this.deploymentDataStoreProvider.createDataStore(name);
+         }
+         if(scope==Distributable.INTEGRATION_SCOPE){
+             return this.deploymentDataStoreProvider.createAccessIndexDataStore(name);
+         }
+         if(scope==Distributable.INDEX_SCOPE){
+             return this.deploymentDataStoreProvider.createKeyIndexDataStore(name);
+         }
+         throw new IllegalArgumentException("scope ["+scope+"] not supported");
     }
 
     //list the database list on deploy service

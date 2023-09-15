@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
@@ -38,7 +39,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     }
 
-
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+        return false;
+    }
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return null;

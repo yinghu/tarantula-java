@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
@@ -37,13 +36,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private String integrationPath="target/lmdb/integration";
     private String indexPath = "target/lmdb/index";
 
-    private String keyPath = "target/lmdb/key";
+    private String localPath = "target/lmdb/local";
     private Env<ByteBuffer> data;
     private Env<ByteBuffer> integration;
     private Env<ByteBuffer> index;
-
-    private Env<ByteBuffer> key;
-    private Dbi<ByteBuffer> keyDbi;
+    private Env<ByteBuffer> local;
 
     private long storeSize = 1_048_576L; // 1MB = 1,048,576 (1024*1024)
     private int maxDatabaseNumber = 1024;
@@ -72,11 +69,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
-        String _keyPath = ((JsonElement)properties.get("keyPath")).getAsString();
+        String _localPath = ((JsonElement)properties.get("localPath")).getAsString();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
-        this.keyPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_keyPath;
+        this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
     }
 
     @Override
@@ -132,6 +129,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(scope==Distributable.INDEX_SCOPE){
             return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),index.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
+        if(scope==Distributable.LOCAL_SCOPE){
+            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),local.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
+        }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
@@ -149,7 +149,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             return new LMDBDataStore(Distributable.DATA_SCOPE,name,dbi,data,this);
         });
     }
-
+    public DataStore createLocalDataStore(String name){
+        return storeMap.computeIfAbsent(name,k->{
+            Dbi<ByteBuffer> dbi = local.openDbi(name, DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(Distributable.LOCAL_SCOPE,name,dbi,local,this);
+        });
+    }
     @Override
     public List<String> list() {
         ArrayList<String> dlist = new ArrayList<>();
@@ -190,8 +195,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
         integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
         index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
-        key = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(keyPath).toFile());
-        keyDbi = key.openDbi("keys",DbiFlags.MDB_CREATE);
+        local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
         logger.warn("LMDB Provider started with store size ["+storeSize+"]");
     }
 
@@ -225,7 +229,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public void shutdown() throws Exception {
-        keyDbi.close();
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
         edgMap.forEach((k,v)->v.dbi.close());
@@ -233,7 +236,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         data.close();
         integration.close();
         index.close();
-        key.close();
+        local.close();
     }
 
     @Override
@@ -252,9 +255,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
             dataMapStoreListener.onDistributing(metadata,key,value);
-            return;
         }
-        logger.warn("Scope ["+metadata.scope()+"] mapStoreListener not registered");
+    }
+
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+        return false;
     }
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {

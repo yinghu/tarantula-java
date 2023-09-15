@@ -16,6 +16,6 @@ public class SystemMetrics extends AbstractMetrics{
         this.gameIncluded = true;
         this.paymentIncluded = true;
         this.logger = JDKLogger.getLogger(SystemMetrics.class);
-        this.dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"tarantula_system_metrics");
+        this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_system_metrics");
     }
 }

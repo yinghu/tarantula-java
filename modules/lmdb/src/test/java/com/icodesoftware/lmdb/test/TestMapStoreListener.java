@@ -23,7 +23,9 @@ public class TestMapStoreListener implements MapStoreListener {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+        return false;
+    }
 
     @Override
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {

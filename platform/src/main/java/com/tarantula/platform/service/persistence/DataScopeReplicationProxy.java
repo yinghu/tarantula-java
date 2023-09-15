@@ -7,6 +7,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.event.DataReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
@@ -23,10 +24,12 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        logger.warn("on distributing ...");
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        logger.warn("on distributing >>"+metadata.toString()+">>"+asyncDistributing);
+        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
+        //this.serviceContext.keyIndexService().createIfAbsent()
     }
+
 
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){

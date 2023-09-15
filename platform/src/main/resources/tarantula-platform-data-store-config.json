@@ -6,7 +6,7 @@
             {"dataPath":"tarantula/data"},
             {"integrationPath":"tarantula/integration"},
             {"indexPath":"tarantula/index"},
-            {"keyPath":"tarantula/key"}
+            {"localPath":"tarantula/local"}
         ]
     },
     "integration-backup-router": {

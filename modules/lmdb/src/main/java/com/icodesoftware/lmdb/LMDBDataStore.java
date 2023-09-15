@@ -105,6 +105,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if (dbi.get(txn, key.flip()) == null) return false;
+            //if(lmdbDataStoreProvider.onRecovering(metadata,))
             Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
             Recoverable.DataHeader header = proxy.readHeader();
             if(header.revision()!=t.revision()) return false;
@@ -377,7 +378,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         key.rewind();
         return true;
     }
-    private boolean offEdge(Recoverable.Key t,String label,Txn<ByteBuffer> txn){
+    private  boolean offEdge(Recoverable.Key t,String label,Txn<ByteBuffer> txn){
         if(t==null || label ==null) return false;
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;

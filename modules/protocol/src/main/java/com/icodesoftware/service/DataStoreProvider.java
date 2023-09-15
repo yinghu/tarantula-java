@@ -29,7 +29,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     DataStore createDataStore(String name);
     //create partitioned data scope data store
-    default DataStore create(String name,int partition){return  null;}
+    DataStore createLocalDataStore(String name);
 
     List<String> list();
     DataStore lookup(String name);

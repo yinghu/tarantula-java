@@ -1,5 +1,6 @@
 package com.tarantula.test;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.MapStoreListener;
@@ -44,6 +45,9 @@ public class TestMapStoreListener implements MapStoreListener {
         return null;
     }
 
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+        return false;
+    }
     @Override
     public void onDeleting(Metadata metadata, byte[] key) {
 

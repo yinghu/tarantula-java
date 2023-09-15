@@ -15,6 +15,6 @@ public class AccessMetrics extends AbstractMetrics{
         this.accessIncluded = true;
         this.accountIncluded = true;
         this.logger = JDKLogger.getLogger(AccessMetrics.class);
-        this.dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"tarantula_access_metrics");
+        this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_access_metrics");
     }
 }

@@ -1,5 +1,6 @@
 package com.icodesoftware.service;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 
 public interface MapStoreListener extends ServiceProvider {
@@ -10,6 +11,7 @@ public interface MapStoreListener extends ServiceProvider {
     //dispatch cluster operation
     void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
     //recover cluster operation
+    boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream);
     byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 
     void onDeleting(Metadata metadata,byte[] key);

@@ -14,6 +14,6 @@ public class PaymentMetrics extends AbstractMetrics{
         this.name = Metrics.PAYMENT;
         this.paymentIncluded = true;
         this.logger = JDKLogger.getLogger(PaymentMetrics.class);
-        this.dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"tarantula_payment_metrics");
+        this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_payment_metrics");
     }
 }
