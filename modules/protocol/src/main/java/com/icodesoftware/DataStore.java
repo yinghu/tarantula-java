@@ -1,7 +1,5 @@
 package com.icodesoftware;
 
-
-import java.nio.ByteBuffer;
 import java.util.List;
 
 public interface DataStore {
@@ -28,11 +26,9 @@ public interface DataStore {
     <T extends Recoverable> boolean load(T t);
     <T extends Recoverable> boolean delete(T t);
 
-    boolean load(Recoverable.Key key, BufferStream buffer);
-
     <T extends Recoverable> boolean createEdge(T t,String label);
-    <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label);
-    <T extends Recoverable> boolean deleteEdge(Recoverable.Key key,String label);
+    boolean deleteEdge(Recoverable.Key key,Recoverable.Key edge,String label);
+    boolean deleteEdge(Recoverable.Key key,String label);
 
     <T extends Recoverable> List<T> list(RecoverableFactory<T> query);
     <T extends Recoverable> void list(RecoverableFactory<T> query,Stream<T> stream);
@@ -40,18 +36,18 @@ public interface DataStore {
     Backup backup();
 
     interface Backup{
+
+        boolean get(Recoverable.Key key, BufferStream buffer);
         boolean set(BufferStream bufferStream);
-        Recoverable.DataBuffer get(BufferStream bufferStream);
+        void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream);
 
-        void list(Recoverable.Key key,String label,BufferStream bufferStream);
+        //boolean set(byte[] key,byte[] value);
 
-        boolean set(byte[] key,byte[] value);
+        //byte[] get(byte[] key);
 
-        byte[] get(byte[] key);
+        //void unset(byte[] key);
 
-        void unset(byte[] key);
-
-        void list(BufferStream buffer);
+        void forEach(BufferStream buffer);
     }
 
 
@@ -60,7 +56,7 @@ public interface DataStore {
     }
 
     interface BufferStream{
-       boolean on(Recoverable.DataBuffer keyBuffer, Recoverable.DataHeader dataHeader,Recoverable.DataBuffer dataBuffer);
+       boolean on(Recoverable.DataBuffer keyBuffer,Recoverable.DataBuffer dataBuffer);
     }
 
     interface Updatable{

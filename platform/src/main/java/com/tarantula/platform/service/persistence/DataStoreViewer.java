@@ -34,7 +34,8 @@ public class DataStoreViewer implements DataStoreSummary {
 
 
     public void list(DataStoreSummary.View view){
-        dataStore.backup().list((k,h,v)-> {
+        dataStore.backup().forEach((k,v)-> {
+            Recoverable.DataHeader h = v.readHeader();
             RecoverableRegistry registry = tarantulaContext.recoverableRegistry(h.factoryId());
             Recoverable r = registry.create(h.classId());
             r.readKey(k);

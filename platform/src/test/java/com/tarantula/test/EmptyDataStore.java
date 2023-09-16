@@ -60,10 +60,6 @@ public class EmptyDataStore implements DataStore {
         return false;
     }
 
-    @Override
-    public boolean load(Recoverable.Key key, BufferStream buffer) {
-        return false;
-    }
 
     @Override
     public <T extends Recoverable> boolean createEdge(T t, String label) {
@@ -71,12 +67,12 @@ public class EmptyDataStore implements DataStore {
     }
 
     @Override
-    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key key, Recoverable.Key edge, String label) {
+    public boolean deleteEdge(Recoverable.Key key, Recoverable.Key edge, String label) {
         return false;
     }
 
     @Override
-    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key key, String label) {
+    public  boolean deleteEdge(Recoverable.Key key, String label) {
         return false;
     }
 

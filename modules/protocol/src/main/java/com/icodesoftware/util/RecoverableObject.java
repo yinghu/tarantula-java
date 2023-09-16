@@ -1,5 +1,7 @@
 package com.icodesoftware.util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
@@ -12,14 +14,14 @@ public class RecoverableObject implements Recoverable {
 
     protected String bucket;
 
-    protected Key ownerKey;
+    protected transient Key ownerKey;
 
     protected String owner;
     protected  String label;
 
     protected  boolean disabled;
 
-    protected  Map<String,Object> properties = new HashMap();
+    protected  transient Map<String,Object> properties = new HashMap();
 
     protected  boolean onEdge;
 
@@ -31,7 +33,7 @@ public class RecoverableObject implements Recoverable {
     protected String index;
 
     protected String name;
-    protected DataStore dataStore;
+    protected transient DataStore dataStore;
 
     public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;
@@ -193,9 +195,7 @@ public class RecoverableObject implements Recoverable {
 
     @Override
     public JsonObject toJson(){
-        JsonObject ret = new JsonObject();
-        ret.addProperty("warn","override toJson");
-        return ret;
+        return new Gson().toJsonTree(this).getAsJsonObject();
     }
 
 }

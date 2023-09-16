@@ -53,7 +53,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
-                            this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source()).backup().set(r.key(),r.value());
+                            //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source()).backup().set(r.key(),r.value());
                             KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
                         });
@@ -82,7 +82,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 for(int i=0;i<dataReplicationEvent.data().length;i++){
                     OnReplication r = dataReplicationEvent.data()[i];
                     DataStore dataStore = tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source());
-                    dataStore.backup().set(r.key(),r.value());
+                    //dataStore.backup().set(r.key(),r.value());
                     sources[i]=r.source();
                     keys[i]=new String(r.key());
                 }
@@ -116,10 +116,10 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
 
     public void delete(String  source,byte[] key){
-        this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().unset(key);
+        //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().unset(key);
     }
     public byte[] load(String source,byte[] key){
-        return this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().get(key);
+        return null;//this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().get(key);
     }
     public void replicate(OnReplication[] onReplications){
         synchronized (pendingUpdates){
@@ -142,7 +142,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().list((k,h,v)->{
+                this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().forEach((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
                         //recoverService.onSync(batch[0],keys,values,memberId,source);
                         batch[0] = 0;

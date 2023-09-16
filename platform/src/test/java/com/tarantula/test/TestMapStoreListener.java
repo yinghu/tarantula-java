@@ -45,7 +45,7 @@ public class TestMapStoreListener implements MapStoreListener {
         return null;
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
         return false;
     }
     @Override

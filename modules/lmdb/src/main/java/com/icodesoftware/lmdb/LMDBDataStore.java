@@ -105,7 +105,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         Txn<ByteBuffer> txn = env.txnWrite(); //can read also
         try{
             if (dbi.get(txn, key.flip()) == null) return false;
-            //if(lmdbDataStoreProvider.onRecovering(metadata,))
             Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
             Recoverable.DataHeader header = proxy.readHeader();
             if(header.revision()!=t.revision()) return false;
@@ -140,6 +139,13 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 Recoverable.DataHeader h = proxy.readHeader();
                 t.read(proxy);
                 t.revision(h.revision());
+                return false;
+            }
+            key.rewind();
+            if(lmdbDataStoreProvider.onRecovering(metadata,key,cache.value)){
+                System.out.println("LOADED");
+                if (!dbi.put(txn, key.rewind(),cache.value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
+                if(!loading) return false;
                 return false;
             }
             Recoverable.DataBuffer value = cache.value;
@@ -191,34 +197,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
 
-    public  <T extends Recoverable> boolean deleteEdge(Recoverable.Key t,String label){
+    public  boolean deleteEdge(Recoverable.Key t,String label){
         Txn<ByteBuffer> txn = env.txnWrite();
         if(!offEdge(t,label,txn)) return false;
         txn.commit();
         return true;
     }
-    public <T extends Recoverable> boolean deleteEdge(Recoverable.Key t,Recoverable.Key edge,String label){
+    public boolean deleteEdge(Recoverable.Key t,Recoverable.Key edge,String label){
         Txn<ByteBuffer> txn = env.txnWrite();
         if(!offEdge(t,label,edge,txn)) return false;
         txn.commit();
         return true;
     }
-
-    public boolean load(Recoverable.Key key, BufferStream buffer) {
-        BufferCache cache = lmdbDataStoreProvider.fromCache();
-        Recoverable.DataBuffer akey = cache.key;
-        if(!key.write(akey)) return false;
-        Txn<ByteBuffer> txn = env.txnRead(); //read only
-        try{
-            if (dbi.get(txn, akey.flip()) == null) return false;
-            Recoverable.DataBuffer data = BufferProxy.buffer(txn.val());
-            return buffer.on(BufferProxy.buffer(txn.key()),data.readHeader(),data);
-        }finally {
-            txn.close();
-            cache.reset();
-        }
-    }
-
     public <T extends Recoverable> boolean delete(T t){
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;
@@ -283,36 +273,32 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         dbi.close();
     }
 
+    //BACKUP METHODS
+    public boolean get(Recoverable.Key key, BufferStream buffer) {
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        Recoverable.DataBuffer akey = cache.key;
+        if(!key.write(akey)) return false;
+        Txn<ByteBuffer> txn = env.txnRead(); //read only
+        try{
+            if (dbi.get(txn, akey.flip()) == null) return false;
+            Recoverable.DataBuffer data = BufferProxy.buffer(txn.val());
+            return buffer.on(BufferProxy.buffer(txn.key()),data);
+        }finally {
+            txn.close();
+            cache.reset();
+        }
+    }
+
     @Override
     public boolean set(BufferStream bufferStream) {
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;
         Recoverable.DataBuffer value = cache.value;
-        if(!bufferStream.on(key, null,value)) return false;
+        if(!bufferStream.on(key,value)) return false;
         return set(key.flip(),value.flip());
     }
-    public boolean set(byte[] key,byte[] value){
-        return false;
-    }
-    @Override
-    public byte[] get(byte[] key) {
 
-        return new byte[0];
-    }
-    public Recoverable.DataBuffer get(BufferStream bufferStream){
-        BufferCache cache = lmdbDataStoreProvider.fromCache();
-        if(!bufferStream.on(cache.key,null,cache.value)) return null;
-        Txn<ByteBuffer> txn = env.txnWrite();
-        try{
-            if(dbi.get(txn,cache.key.flip())==null) return null;
-            return BufferProxy.buffer(txn.val());
-        }
-        finally {
-            txn.close();
-            cache.reset();
-        }
-    }
-    public void list(Recoverable.Key key,String label,BufferStream bufferStream){
+    public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(metadata.scope(),name,label);
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         if(!key.write(cache.key)) return;
@@ -321,15 +307,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
         for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
             CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-            bufferStream.on(cache.key,null,BufferProxy.buffer(kv.val()));
+            bufferStream.on(cache.key,BufferProxy.buffer(kv.val()));
         }
         txn.close();
 
     }
-    @Override
-    public void unset(byte[] key) {
 
-    }
     private boolean set(ByteBuffer key, ByteBuffer value){
         Txn<ByteBuffer> txn = env.txnWrite();
         try{
@@ -341,12 +324,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
     @Override
-    public void list(BufferStream binary) {
+    public void forEach(BufferStream stream) {
         final Txn<ByteBuffer> txn = env.txnRead();
         final Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
         while (cursor.next()){
             Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(cursor.val());
-            if(!binary.on(BufferProxy.buffer(cursor.key()),dataBuffer.readHeader(),dataBuffer)) break;
+            if(!stream.on(BufferProxy.buffer(cursor.key()),dataBuffer)) break;
         }
         cursor.close();
         txn.close();

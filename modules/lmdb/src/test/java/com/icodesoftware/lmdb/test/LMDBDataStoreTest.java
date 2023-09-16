@@ -49,7 +49,7 @@ public class LMDBDataStoreTest {
 
     @Test(groups = { "LMDB" })
     public void createIfAbsentTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME+"1");
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
         String key = "a100";
         Recoverable.Key onwerKey = new SnowflakeKey(1000);
         TestAccessIndex created = new TestAccessIndex(key);
@@ -67,9 +67,9 @@ public class LMDBDataStoreTest {
         Assert.assertTrue(ds.load(not_created));
         Assert.assertEquals(not_created.revision(),Long.MIN_VALUE+3);
 
-        Assert.assertTrue(ds.load(new NaturalKey(key),(keybuffer,header,dataBuffer) -> {
+        Assert.assertTrue(ds.backup().get(new NaturalKey(key),(keybuffer,dataBuffer) -> {
             TestAccessIndex testAccessIndex = new TestAccessIndex();
-            //Recoverable.DataHeader header = dataBuffer.readHeader();
+            Recoverable.DataHeader header = dataBuffer.readHeader();
             testAccessIndex.read(dataBuffer);
             Assert.assertEquals(testAccessIndex.distributionId(),created.distributionId());
             //System.out.println(testAccessIndex.distributionId());
@@ -81,6 +81,7 @@ public class LMDBDataStoreTest {
             return true;
         }));
         Assert.assertEquals(ds.list(new TestAccessQuery(1000,"access")).size(),1);
+        //ds.backup().get()
     }
 
     @Test(groups = { "LMDB" })
@@ -99,7 +100,7 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(ds.create(testUser));
         }
         int[] c={0};
-        ds.backup().list((k,h,v)->{
+        ds.backup().forEach((k,v)->{
             c[0]++;
             return true;
         });
@@ -127,9 +128,9 @@ public class LMDBDataStoreTest {
         int[] ct = {0};
 
 
-        dsx.backup().list((key,h,buffer)->{
+        dsx.backup().forEach((key,buffer)->{
             //ct[0]++;
-            //Recoverable.DataHeader h = buffer.readHeader();
+            Recoverable.DataHeader h = buffer.readHeader();
             if(h.classId()==10){
                 TestUser testUser = new TestUser();
                 testUser.read(buffer);
@@ -203,7 +204,8 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(ds.create(ex));
         }
         int[] ct ={0};
-        ds.backup().list((k,h,v)->{
+        ds.backup().forEach((k,v)->{
+            v.readHeader();
             TestUserEx ex = new TestUserEx(true);
             ex.readKey(k);
             ex.read(v);

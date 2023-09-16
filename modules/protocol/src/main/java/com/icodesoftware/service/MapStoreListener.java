@@ -11,7 +11,7 @@ public interface MapStoreListener extends ServiceProvider {
     //dispatch cluster operation
     void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
     //recover cluster operation
-    boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream);
+    boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
     byte[] onRecovering(Metadata metadata,String stringKey,byte[] key);
 
     void onDeleting(Metadata metadata,byte[] key);

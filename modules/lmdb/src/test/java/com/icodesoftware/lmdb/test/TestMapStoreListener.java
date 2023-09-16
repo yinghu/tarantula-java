@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BinaryKey;
@@ -23,8 +24,14 @@ public class TestMapStoreListener implements MapStoreListener {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
-        return false;
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
+        DataStore dataStore = provider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME+"_backup");
+        return dataStore.backup().get(new BinaryKey(key.array()),(k, v)->{
+            for(byte b :v.array()){
+                bufferStream.writeByte(b);
+            }
+            return true;
+        });
     }
 
     @Override
@@ -34,22 +41,23 @@ public class TestMapStoreListener implements MapStoreListener {
             List<BinaryKey> keys = new ArrayList<>();
 
             DataStore dataStore = provider.createDataStore(metadata.source());
-            dataStore.backup().list(new BinaryKey(key.array()),metadata.label(),(k, h, v)->{
+            dataStore.backup().forEachEdgeKey(new BinaryKey(key.array()),metadata.label(),(k, v)->{
                 //System.out.println("EDGE->From ["+metadata.label());
                 keys.add(new BinaryKey(v.array()));
                 return true;
             });
 
-            keys.forEach(p->{
-                dataStore.load(p,(k,h,v)->{
+            keys.forEach(p->
+                dataStore.backup().get(p,(k,v)->{
+                    Recoverable.DataHeader h = v.readHeader();
                     if(h.classId()==10){
                         TestUser testUser = new TestUser();
                         testUser.read(v);
                         //System.out.println(testUser.login());
                     }
                     return true;
-                });
-            });
+                })
+            );
         }
         //DataStore ds = provider.createDataStore("user_backup");
         //ds.backup().set((k,h,v)->{

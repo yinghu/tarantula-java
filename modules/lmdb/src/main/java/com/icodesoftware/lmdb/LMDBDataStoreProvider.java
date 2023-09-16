@@ -258,7 +258,17 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            return integrationMapStoreListener.onRecovering(metadata,key,bufferStream);
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
+
+        }
+        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
+            return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
+        }
         return false;
     }
     @Override

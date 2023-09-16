@@ -99,7 +99,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
                         }
                         else if(scope == Distributable.INTEGRATION_SCOPE){
                             DataStore ds = this.dataStoreProvider.createAccessIndexDataStore(source);
-                            ds.backup().set(key.getBytes(),payload.toString().getBytes());
+                            //ds.backup().set(key.getBytes(),payload.toString().getBytes());
                         }
                     });
                 }

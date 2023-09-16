@@ -43,7 +43,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     public byte[] get(int partition,byte[] key) {
         DataStoreOnPartition dso = onPartition(partition);
-        return dso.dataStore.backup().get(key);
+        return null;//dso.dataStore.backup().get(key);
     }
 
     @Override
@@ -190,7 +190,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
                 int[] batch={0,i};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                dso.dataStore.backup().list((k,h,v)->{
+                dso.dataStore.backup().forEach((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
                         //distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
                         batch[0] = 0;
@@ -216,7 +216,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         for(int i=0;i<keys.length;i++){
             DataStoreOnPartition dso = onPartition(partition);
             int ix = i;
-            dso.lock(keys[i],()->dso.dataStore.backup().set(keys[ix],values[ix]));
+            //dso.lock(keys[i],()->dso.dataStore.backup().set(keys[ix],values[ix]));
         }
     }
 

@@ -68,7 +68,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     if(updates.size()>0){
                         updates.forEach(r->{
                             DataStoreOnPartition dso = this.onPartition(r.partition());
-                            dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
+                            //dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
                             KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name,new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
                             tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
                         });
@@ -158,7 +158,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                 for(int i=0;i<integrationReplicationEvent.data().length;i++){
                     OnReplication r = integrationReplicationEvent.data()[i];
                     DataStoreOnPartition dso = this.onPartition(r.partition());
-                    dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
+                    //dso.lock(r.key(),()-> dso.dataStore.backup().set(r.key(),r.value()));
                     sources[i]=dso.name;
                     keys[i]=new String(r.key());
                 }
@@ -202,7 +202,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
     public byte[] recover(int partition,byte[] key){
-        return this.onPartition(partition).dataStore.backup().get(key);
+        return null;//this.onPartition(partition).dataStore.backup().get(key);
     }
     public int syncStart(String memberId,int partition,String syncKey){
         AccessIndexService recoverService = tarantulaContext.integrationCluster().accessIndexService();
@@ -211,7 +211,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                 int[] batch={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                this.onPartition(partition).dataStore.backup().list((k,h,v)->{
+                this.onPartition(partition).dataStore.backup().forEach((k,v)->{
                     if(batch[0] == tarantulaContext.recoverBatchSize){
                         //recoverService.onSync(batch[0],keys,values,memberId,partition);
                         batch[0] = 0;

@@ -53,7 +53,7 @@ public class LMDBConcurrencyVerifier {
         System.out.println("Expected keys ["+total+"]");
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("users");
         int[] ct={0};
-        dataStore.backup().list((k,h,v)->{
+        dataStore.backup().forEach((k,v)->{
             ct[0]++;
             return true;
         });
