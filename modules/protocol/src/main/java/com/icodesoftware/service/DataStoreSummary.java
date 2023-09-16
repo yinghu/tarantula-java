@@ -6,7 +6,7 @@ public interface DataStoreSummary {
 
     String name();
 
-    int partitionNumber();
+    //int partitionNumber();
 
     long totalRecords();
 

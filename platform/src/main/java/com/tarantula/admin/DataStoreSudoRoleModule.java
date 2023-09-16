@@ -47,7 +47,7 @@ public class DataStoreSudoRoleModule implements Module {
             DataStoreSummary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             summary.addProperty("name",sum.name());
-            summary.addProperty("partitionNumber",sum.partitionNumber());
+            //summary.addProperty("partitionNumber",sum.partitionNumber());
             summary.addProperty("totalRecords",sum.totalRecords());
             JsonArray keys = new JsonArray();
             int[] kn = {Integer.parseInt(query[1])};
@@ -100,7 +100,7 @@ public class DataStoreSudoRoleModule implements Module {
             AccessIndexService.AccessIndexStore accessIndexStore = this.deploymentServiceProvider.accessIndexStore();
             JsonObject summary = new JsonObject();
             summary.addProperty("name",accessIndexStore.name());
-            summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
+            //summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
             summary.addProperty("totalRecords",accessIndexStore.totalRecords());
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
@@ -148,7 +148,7 @@ public class DataStoreSudoRoleModule implements Module {
             KeyIndexService.KeyIndexStore accessIndexStore = this.deploymentServiceProvider.keyIndexStore();
             JsonObject summary = new JsonObject();
             summary.addProperty("name",accessIndexStore.name());
-            summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
+            //summary.addProperty("partitionNumber",accessIndexStore.partitionNumber());
             summary.addProperty("totalRecords",accessIndexStore.totalRecords());
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);

@@ -22,10 +22,7 @@ public class DataStoreViewer implements DataStoreSummary {
         return dataStore.name();
     }
 
-    @Override
-    public int partitionNumber() {
-        return dataStore.partitionNumber();
-    }
+
 
     @Override
     public long totalRecords() {

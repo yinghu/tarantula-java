@@ -12,9 +12,6 @@ public interface DataStore {
 
     long count();
 
-    int partitionNumber();
-
-    long count(int partition);
 
     <T extends Recoverable> boolean create(T t);
 

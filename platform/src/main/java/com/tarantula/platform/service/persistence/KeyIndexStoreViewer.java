@@ -26,11 +26,6 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
     }
 
     @Override
-    public int partitionNumber() {
-        return tarantulaContext.accessIndexRoutingNumber;
-    }
-
-    @Override
     public long totalRecords() {
         return dataStore.count();
     }
@@ -55,7 +50,7 @@ public class KeyIndexStoreViewer implements KeyIndexService.KeyIndexStore {
     public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
         //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        distributionKeyIndexService.load(dataStore.partitionNumber(),key,view);
+        //distributionKeyIndexService.load(dataStore.partitionNumber(),key,view);
     }
 
     private DataStore dataStore(int partition){

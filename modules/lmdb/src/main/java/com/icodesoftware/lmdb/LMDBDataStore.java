@@ -59,15 +59,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         return count;
     }
 
-    @Override
-    public int partitionNumber() {
-        return 0;
-    }
-
-    @Override
-    public long count(int partition) {
-        return 0;
-    }
 
     @Override
     public <T extends Recoverable> boolean create(T t) {
@@ -355,16 +346,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     }
 
-    private boolean set(ByteBuffer key, ByteBuffer value){
-        Txn<ByteBuffer> txn = env.txnWrite();
-        try{
-            if(!dbi.put(txn,key,value)) return false;
-            txn.commit();
-            return true;
-        }finally {
-            txn.close();
-        }
-    }
     @Override
     public void forEach(BufferStream stream) {
         final Txn<ByteBuffer> txn = env.txnRead();
@@ -375,6 +356,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
         cursor.close();
         txn.close();
+    }
+
+    //help methods
+    private boolean set(ByteBuffer key, ByteBuffer value){
+        Txn<ByteBuffer> txn = env.txnWrite();
+        try{
+            if(!dbi.put(txn,key,value)) return false;
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+        }
     }
 
     private boolean onEdge(Recoverable.Key ownerKey, String label, Recoverable.Key edgeKey, Txn<ByteBuffer> txn){

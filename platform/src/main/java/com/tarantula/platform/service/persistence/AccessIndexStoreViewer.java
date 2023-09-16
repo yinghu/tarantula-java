@@ -25,10 +25,6 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         return "AccessIndexStore";
     }
 
-    @Override
-    public int partitionNumber() {
-        return tarantulaContext.accessIndexRoutingNumber;
-    }
 
     @Override
     public long totalRecords() {
@@ -57,7 +53,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
         DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue;
-            byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
+            //byte[] ret = distributionDataViewer.load(dataStore.partitionNumber(),key,node);
             //if(ret!=null) view.on(node,t);
         }
     }
