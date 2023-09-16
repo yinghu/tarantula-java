@@ -23,7 +23,7 @@ public class LobbyTypeIndexTest extends DataStoreHook{
         Assert.assertEquals(created.lobbyId(),lobbyId);
         Assert.assertEquals(created.gameClusterId(),gameClusterId);
         LobbyTypeIdIndex load = new LobbyTypeIdIndex(deploymentId,"holee-lobby");
-        Assert.assertFalse(dataStore.createIfAbsent(load,true));
+        Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.lobbyId(),lobbyId);
         Assert.assertEquals(load.gameClusterId(),gameClusterId);
     }

@@ -7,15 +7,15 @@ public class AssociateObject extends RecoverableObject {
 
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
-        label = buffer.readUTF8();
         distributionId = buffer.readLong();
+        label = buffer.readUTF8();
         return true;
     }
     @Override
     public boolean writeKey(Recoverable.DataBuffer buffer){
         if(distributionId==0 && label ==null) return false;
-        buffer.writeUTF8(label);
         buffer.writeLong(distributionId);
+        buffer.writeUTF8(label);
         return true;
     }
 
