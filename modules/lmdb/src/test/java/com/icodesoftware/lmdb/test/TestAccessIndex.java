@@ -9,7 +9,6 @@ import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
@@ -85,9 +84,7 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
     public String toString(){
         return "Access Index ["+owner+"]->"+bucket+"/"+distributionId+"] referenceID =>"+referenceId+"]";
     }
-    public void distributionKey(String distributionKey){
-       //skip the natural key
-    }
+
     public Key key(){
         return new NaturalKey(this.owner);
     }

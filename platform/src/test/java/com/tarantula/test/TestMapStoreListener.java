@@ -35,11 +35,8 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){}
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
 
-    }
 
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){}
     @Override
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return null;

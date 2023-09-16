@@ -33,14 +33,13 @@ public class LMDBDataStoreTest {
     public void setUp() throws Exception{
 
         lmdbDataStoreProvider = new LMDBDataStoreProvider();
-        //lmdbDataStoreProvider.configure(new HashMap<>(){{
-            //put("dir","target/lmdb");
-        //}});
         localDistributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         lmdbDataStoreProvider.registerDistributionIdGenerator(localDistributionIdGenerator);
         lmdbDataStoreProvider.start();
         testMapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,testMapStoreListener);
+        lmdbDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,testMapStoreListener);
+
     }
     @AfterTest
     public void tearDown() throws Exception{
@@ -81,7 +80,19 @@ public class LMDBDataStoreTest {
             return true;
         }));
         Assert.assertEquals(ds.list(new TestAccessQuery(1000,"access")).size(),1);
-        //ds.backup().get()
+        DataStore dataStore = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME+"_backup");
+        TestAccessIndex preset = new TestAccessIndex("preset");
+        Assert.assertTrue(dataStore.createIfAbsent(preset,false));
+        Assert.assertTrue(ds.update(preset));
+        Assert.assertTrue(ds.load(preset));
+        Assert.assertEquals(preset.revision(),Long.MIN_VALUE+1);
+        System.out.println(preset.revision());
+        Assert.assertFalse(ds.createIfAbsent(preset,true));
+        Assert.assertEquals(preset.revision(),Long.MIN_VALUE+1);
+        TestAccessIndex preset1 = new TestAccessIndex("preset");
+        Assert.assertTrue(ds.load(preset1));
+        Assert.assertTrue(ds.update(preset1));
+        Assert.assertEquals(preset1.revision(),Long.MIN_VALUE+2);
     }
 
     @Test(groups = { "LMDB" })

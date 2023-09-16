@@ -24,11 +24,12 @@ public class TestMapStoreListener implements MapStoreListener {
     public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         DataStore dataStore = provider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME+"_backup");
-        return dataStore.backup().get(new BinaryKey(key.array()),(k, v)->{
+        byte[] kbs = key.array();
+        return dataStore.backup().get(new BinaryKey(kbs),(k, v)->{
             for(byte b :v.array()){
-                bufferStream.writeByte(b);
+                value.writeByte(b);
             }
             return true;
         });

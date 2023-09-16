@@ -104,15 +104,13 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
 
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
-        owner = buffer.readUTF8();
-        ownerKey.readKey(buffer);
+        ownerKey.read(buffer);
         return true;
     }
     @Override
     public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(owner==null && ownerKey ==null) return false;
-        buffer.writeUTF8(owner);
-        ownerKey.writeKey(buffer);
+        if(ownerKey ==null) return false;
+        ownerKey.write(buffer);
         return true;
     }
 
@@ -153,5 +151,10 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
             slaveNodes[i] = slaveNodes[i-1];
         }
         return true;
+    }
+
+    @Override
+    public Key key() {
+        return ownerKey;
     }
 }
