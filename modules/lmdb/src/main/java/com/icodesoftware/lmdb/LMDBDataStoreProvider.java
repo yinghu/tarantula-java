@@ -31,6 +31,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
+    private static final String INTEGRATION_STORE_PREFIX = "integration_";
+    private static final String DATA_STORE_PREFIX = "data_";
     private String name;
     private String dataPath ="target/lmdb/data";
     private String integrationPath="target/lmdb/integration";
@@ -112,14 +114,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = integration.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,name,dbi,integration,this);
+        final String storeName = INTEGRATION_STORE_PREFIX+name;
+        return storeMap.computeIfAbsent(storeName,k->{
+            Dbi<ByteBuffer> dbi = integration.openDbi(storeName, DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,storeName,dbi,integration,this);
         });
     }
 
     public LocalEdgeDataStore createEdgeDB(int scope,String source,String label){
-        String edgeName = source+"_"+label;
+        final String edgeName = source+"_"+label;
         if(scope== Distributable.DATA_SCOPE){
             return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
@@ -144,9 +147,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public DataStore createDataStore(String name){
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.DATA_SCOPE,name,dbi,data,this);
+        final String storeName = DATA_STORE_PREFIX+name;
+        return storeMap.computeIfAbsent(storeName,k->{
+            Dbi<ByteBuffer> dbi = data.openDbi(storeName, DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(Distributable.DATA_SCOPE,storeName,dbi,data,this);
         });
     }
     public DataStore createLocalDataStore(String name){

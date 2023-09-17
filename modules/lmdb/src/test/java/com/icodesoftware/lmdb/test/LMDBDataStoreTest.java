@@ -17,7 +17,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 
@@ -48,7 +47,7 @@ public class LMDBDataStoreTest {
 
     @Test(groups = { "LMDB" })
     public void createIfAbsentTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
         String key = "a100";
         Recoverable.Key onwerKey = new SnowflakeKey(1000);
         TestAccessIndex created = new TestAccessIndex(key);
@@ -207,7 +206,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void backupListTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("batch_users");
+        DataStore ds = lmdbDataStoreProvider.createDataStore("data_batch_users");
 
         int batch = 100;
         for(int i=0;i<batch;i++){
