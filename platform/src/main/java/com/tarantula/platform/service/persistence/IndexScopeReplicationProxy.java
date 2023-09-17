@@ -20,10 +20,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     public IndexScopeReplicationProxy(){
         super(Distributable.INDEX_SCOPE);
     }
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
 
 
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
@@ -32,13 +29,13 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
 
 
-    @Override
+
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         return this.distributionKeyIndexService.recover(metadata.partition(),key);
     }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key) {
 
     }
 

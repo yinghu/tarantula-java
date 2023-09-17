@@ -20,10 +20,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     public DataScopeReplicationProxy(){
         super(Distributable.DATA_SCOPE);
     }
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         logger.warn("on distributing >>"+metadata.toString()+">>"+asyncDistributing);
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
@@ -83,7 +80,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
     }
 
-    @Override
+
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
         if(keyIndexTrack==null) return null;
@@ -91,8 +88,8 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
-        this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key) {
+        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
     }
 
 

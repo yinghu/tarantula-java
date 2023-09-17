@@ -20,10 +20,7 @@ public class TestMapStoreListener implements MapStoreListener {
     public TestMapStoreListener(LMDBDataStoreProvider provider){
         this.provider = provider;
     }
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         DataStore dataStore = provider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME+"_backup");
         byte[] kbs = key.array();
@@ -72,14 +69,10 @@ public class TestMapStoreListener implements MapStoreListener {
         //});
     }
 
-    @Override
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
 
-        return null;
-    }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
 
     }
 

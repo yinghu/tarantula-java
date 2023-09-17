@@ -18,10 +18,7 @@ public class TestMapStoreListener implements MapStoreListener {
         this.provider = provider;
         snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
     }
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         return false;
@@ -31,13 +28,9 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
 
-    @Override
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return new byte[0];
-    }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key) {
 
     }
     public void assignKey(Recoverable.DataBuffer dataBuffer){

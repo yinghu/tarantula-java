@@ -34,21 +34,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         this.scope = scope;
     }
 
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         return false;
     }
-    @Override
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return null;
-    }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
 
     }
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){}

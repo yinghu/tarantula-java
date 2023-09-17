@@ -244,10 +244,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         pendingQueue.clear();
     }
 
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
-
-    }
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
@@ -276,13 +272,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         return false;
     }
-    @Override
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return null;
-    }
+
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
 
     }
 

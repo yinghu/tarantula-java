@@ -18,10 +18,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public IntegrationScopeReplicationProxy(){
         super(Distributable.INTEGRATION_SCOPE);
     }
-    @Override
-    public <T extends Recoverable> void onBackingUp(Metadata metadata, String key, T t) {
 
-    }
     public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
         //serviceContext.clusterProvider().accessIndexService().
     }
@@ -73,7 +70,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
 
-    @Override
+
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
         KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
         if(keyIndexTrack==null) return null;
@@ -81,7 +78,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
     @Override
-    public void onDeleting(Metadata metadata, byte[] key) {
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key) {
 
     }
 
