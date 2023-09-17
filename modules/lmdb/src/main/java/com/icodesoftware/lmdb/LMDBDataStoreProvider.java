@@ -31,8 +31,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
-    private static final String INTEGRATION_STORE_PREFIX = "integration_";
-    private static final String DATA_STORE_PREFIX = "data_";
     private String name;
     private String dataPath ="target/lmdb/data";
     private String integrationPath="target/lmdb/integration";
@@ -51,11 +49,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static int KEY_SIZE = 200;
     private final static int VALUE_SIZE = 1800;
 
-    private final static int PENDING_BUFFER_SIZE = 10;
+    private final static int PENDING_BUFFER_SIZE = 16;
     private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
-    private final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);
+    final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
 
 
     private MapStoreListener integrationMapStoreListener;
@@ -114,10 +112,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
-        final String storeName = INTEGRATION_STORE_PREFIX+name;
-        return storeMap.computeIfAbsent(storeName,k->{
-            Dbi<ByteBuffer> dbi = integration.openDbi(storeName, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,storeName,dbi,integration,this);
+        return storeMap.computeIfAbsent(name,k->{
+            Dbi<ByteBuffer> dbi = integration.openDbi(name, DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,name,dbi,integration,this);
         });
     }
 
@@ -145,12 +142,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             return new LMDBDataStore(Distributable.INDEX_SCOPE,name,dbi,index,this);
         });
     }
-
+    @Override
     public DataStore createDataStore(String name){
-        final String storeName = DATA_STORE_PREFIX+name;
-        return storeMap.computeIfAbsent(storeName,k->{
-            Dbi<ByteBuffer> dbi = data.openDbi(storeName, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.DATA_SCOPE,storeName,dbi,data,this);
+        return storeMap.computeIfAbsent(name,k->{
+            Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(Distributable.DATA_SCOPE,name,dbi,data,this);
         });
     }
     public DataStore createLocalDataStore(String name){
@@ -200,7 +196,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
         index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
         local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
-        logger.warn("LMDB Provider started with store size ["+storeSize+"]");
+        for(int i=0;i<PENDING_BUFFER_SIZE;i++){
+            pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
+        }
+        logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
     }
 
     @Override
@@ -214,7 +213,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.setup(serviceContext);
         }
-        logger.warn("LMDB provider setup");
+        logger.warn("LMDB provider map store listener setup");
     }
 
     @Override
@@ -228,7 +227,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.waitForData();
         }
-        logger.warn("LMDB provider waitingForData");
+        logger.warn("LMDB provider map store listener waitingForData");
     }
 
     @Override
@@ -241,6 +240,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         integration.close();
         index.close();
         local.close();
+        logger.warn("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
+        pendingQueue.clear();
     }
 
     @Override

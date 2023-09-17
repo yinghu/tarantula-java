@@ -1,7 +1,5 @@
 package com.icodesoftware.lmdb.test;
 
-
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.SnowflakeIdGenerator;
@@ -17,16 +15,13 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+
 
 public class LMDBSmokeTest {
 
 
     private String dir = "target/smoke";
-    private long mapSize = 100_100_100;
+    private long mapSize = 1_048_576L;
 
     long offset = 1_000_000_000_000l;
 
@@ -45,7 +40,7 @@ public class LMDBSmokeTest {
         env.close();
     }
 
-    @Test(groups = { "LMDB" })
+    @Test(groups = { "LMDBSmoke" })
     public void smokeTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -87,7 +82,7 @@ public class LMDBSmokeTest {
         c.close();
         Assert.assertEquals(ct[0],10);
     }
-    @Test(groups = { "LMDB" })
+    @Test(groups = { "LMDBSmoke" })
     public void keyTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_int_key", DbiFlags.MDB_CREATE);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -128,7 +123,7 @@ public class LMDBSmokeTest {
         return new long[]{start,end-1};
     }
 
-    @Test(groups = { "LMDB" })
+    @Test(groups = { "LMDBSmoke" })
     public void snowflakeTest() {
         SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(99, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_snow_flake", DbiFlags.MDB_CREATE);

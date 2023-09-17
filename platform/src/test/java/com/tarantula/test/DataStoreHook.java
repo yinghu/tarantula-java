@@ -20,12 +20,12 @@ public class DataStoreHook {
     }
     @AfterTest
     public void tearDown() throws Exception{
-        //try{
-            //dataStoreProvider.shutdown();
-        //}catch (Exception ex){
+        try{
+            DataStoreTestEvn.dataStoreProvider.shutdown();
+        }catch (Exception ex){
             //System.out.println(name);
-            //ex.printStackTrace();
-        //}
+            ex.printStackTrace();
+        }
     }
 
 }

@@ -10,7 +10,7 @@ public class BufferCache {
     public final Recoverable.DataBuffer key;
     public final Recoverable.DataBuffer value;
 
-    private final ArrayBlockingQueue<BufferCache> bufferQueue;
+    private ArrayBlockingQueue<BufferCache> bufferQueue;
 
     public BufferCache(final int keySize,final int valueSize,ArrayBlockingQueue<BufferCache> bufferQueue){
         this.key = BufferProxy.buffer(keySize,true);

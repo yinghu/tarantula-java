@@ -115,6 +115,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             }
         }finally {
             txn.close();
+            if(updated) cache.reset();
         }
         if(updated) return true;
         key.rewind();
@@ -153,6 +154,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 t.read(v);
                 t.revision(h.revision());
             }
+            cache.reset();
             return true;
         });
         if(existed) return false;
@@ -198,10 +200,16 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         if(loaded) return true;
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;
-        if(!t.writeKey(key)) return false;
+        if(!t.writeKey(key)) {
+            cache.reset();
+            return false;
+        }
         Recoverable.DataBuffer value = cache.value;
         key.flip();
-        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)) return false;
+        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)) {
+            cache.reset();
+            return false;
+        }
         Txn<ByteBuffer> txn = env.txnWrite(); //read only
         try{
             if (!dbi.put(txn, key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
@@ -270,7 +278,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream){
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;
-        if(!query.key().write(key)) return;
+        if(!query.key().write(key)){
+            cache.reset();
+            return;
+        }
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
         Txn<ByteBuffer> txn = env.txnRead();
         ByteBuffer akey = key.flip();
@@ -286,7 +297,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     t.revision(local.revision());
                     t.readKey(BufferProxy.buffer(kv.val()));
                     t.label(query.label());
-
                     if(!stream.on(t)) break;
                 }
             }
@@ -336,13 +346,17 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         if(!key.write(cache.key)) return;
         Txn<ByteBuffer> txn = env.txnRead();
-        ByteBuffer akey = cache.key.flip();
-        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
-        for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
-            CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-            bufferStream.on(cache.key,BufferProxy.buffer(kv.val()));
+        try{
+            ByteBuffer akey = cache.key.flip();
+            CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
+            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
+                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                bufferStream.on(cache.key,BufferProxy.buffer(kv.val()));
+            }
+        }finally {
+            txn.close();
+            cache.reset();
         }
-        txn.close();
 
     }
 
