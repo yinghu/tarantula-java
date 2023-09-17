@@ -56,6 +56,7 @@ public class LMDBDataStoreTest {
         created.label("access");
         created.distributionId(localDistributionIdGenerator.id());
         Assert.assertTrue(ds.createIfAbsent(created,false));
+        //Assert.assertTrue(ds.createIfAbsent(created,false));
         TestAccessIndex not_created = new TestAccessIndex(key);
         Assert.assertFalse(ds.createIfAbsent(not_created,false));
         Assert.assertTrue(ds.load(not_created));
