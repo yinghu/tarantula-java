@@ -1,6 +1,9 @@
 package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class BinaryKey implements Recoverable.Key {
 
     public byte[] key;
@@ -26,18 +29,18 @@ public class BinaryKey implements Recoverable.Key {
     }
     @Override
     public String toString(){
-        return "Owner access key ["+key+"]";
+        return asString();
     }
 
     @Override
     public int hashCode(){
-        return this.key.hashCode();
+        return Objects.hashCode(key);
     }
 
     @Override
     public boolean equals(Object obj){
         BinaryKey r = (BinaryKey)obj;
-        return key.equals(r.key);
+        return Arrays.equals(key,r.key);
     }
 }
 

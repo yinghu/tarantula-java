@@ -8,12 +8,15 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
+    private final LocalEdgeDataStore idx;
 
     private final String name;
 
@@ -23,16 +26,23 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private int scope;
 
+    private final ConcurrentHashMap<String,String> edgeIndex;
+    private final static String IDX_EDGE = "I_D_X";
+    private final static long IDX_KEY = 1L;
+
     //NOTES : key+value < 2032 bytes ( 511 bytes for key ; value <= 1521 bytes (2032 - 511 - 8)
 
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
     public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
+        this.edgeIndex = new ConcurrentHashMap<>();
         this.metadata = new LocalMetadata(scope,name);
         this.scope = scope;
         this.name = name;
         this.dbi = dbi;
         this.env = env;
         this.lmdbDataStoreProvider = lmdbDataStoreProvider;
+        idx = this.lmdbDataStoreProvider.createEdgeDB(scope,name,IDX_EDGE);
+        
     }
 
     @Override
@@ -139,6 +149,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!t.write(value)) return false;
             if(!dbi.put(xtxn,key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
             xtxn.commit();
+            key.rewind();
+            value.rewind();
+            lmdbDataStoreProvider.onDistributing(metadata,key,value);
         }
         finally {
             xtxn.close();
@@ -278,6 +291,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             offEdge(t.ownerKey(),t.label(),t.key(),txn);
             txn.commit();
+            lmdbDataStoreProvider.onDeleting(metadata,key);
             return true;
         }finally {
             txn.close();
@@ -300,31 +314,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!query.key().write(key)) return;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
-            key.rewind();
             if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value)){
-                final Txn<ByteBuffer> txn = env.txnWrite();
-                ByteBuffer akey = key.rewind();
-                CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
-                try{
-                    for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
-                        CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-                        if(lmdbDataStoreProvider.onRecovering(metadata,BufferProxy.buffer(kv.val()), cache.value)){
-                            
-                            //dbi.put(txn,kv.val().rewind(),cache.value.flip());
-                            //txn.commit();
-                            cache.value.flip();
-                            Recoverable.DataHeader header = cache.value.readHeader();
-                            T t = query.create();
-                            t.read(cache.value);
-                            t.revision(header.revision());
-                            stream.on(t);
-                        }
-                    }
-                }
-                finally {
-                    cursor.close();
-                    txn.close();
-                }
+                list(key.rewind(),localEdgeDataStore,query,stream);
             }
         }finally {
             cache.reset();
@@ -483,6 +474,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
             if(!localEdgeDataStore.dbi.delete(txn,key.flip(),value.flip())) return false;
             key.rewind();
+            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key);
             return true;
         }finally {
             cache.reset();

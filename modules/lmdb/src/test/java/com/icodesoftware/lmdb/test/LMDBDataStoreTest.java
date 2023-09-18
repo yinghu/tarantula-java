@@ -50,21 +50,25 @@ public class LMDBDataStoreTest {
     public void setupTest() {
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("data_user");
         long ownerId = localDistributionIdGenerator.id();
-        TestUser testUser = new TestUser("user",ownerId);
-        testUser.label("friend");
-        Assert.assertTrue(ds.create(testUser));
-        Assert.assertTrue(ds.createEdge(testUser,"slots"));
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"friend")).size(),1);
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"slots")).size(),1);
+        int size = 5;
+        for(int i=0;i<size;i++){
+            TestUser testUser = new TestUser("user"+i,ownerId);
+            testUser.label("friend");
+            Assert.assertTrue(ds.create(testUser));
+            Assert.assertTrue(ds.createEdge(testUser,"slots"));
+        }
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"friend")).size(),size);
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"slots")).size(),size);
         DataStore bk = lmdbDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_"+ds.name());
-        Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"friend")).size(),1);
-        Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"slots")).size(),1);
-
+        Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"friend")).size(),size);
+        Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"slots")).size(),size);
         DataStore x = lmdbDataStoreProvider.createDataStore("data_jam");
-        x.list(new TestUserQuery(ownerId,"friend")).forEach(f->{
-            System.out.println(f.login());
+        Assert.assertEquals(x.list(new TestUserQuery(ownerId,"friend")).size(),size);
+        Assert.assertEquals(x.list(new TestUserQuery(ownerId,"slots")).size(),size);
+        ds.list(new TestUserQuery(ownerId,"friend")).forEach((t)->{
+            t.ownerKey(new SnowflakeKey(ownerId));
+            System.out.println(ds.delete(t));
         });
-
     }
     //@Test(groups = { "LMDB" })
     public void createIfAbsentTest() {

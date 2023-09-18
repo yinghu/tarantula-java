@@ -3,14 +3,13 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
-import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BinaryKey;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class TestMapStoreListener implements MapStoreListener {
 
@@ -23,7 +22,6 @@ public class TestMapStoreListener implements MapStoreListener {
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_data_user");
         if(metadata.label()==null){
-            System.out.println(metadata.source()+">>>"+metadata.label());
             byte[] kbs = key.array();
             return dataStore.backup().get(new BinaryKey(kbs),(k, v)->{
                 for(byte b :v.array()){
@@ -34,19 +32,36 @@ public class TestMapStoreListener implements MapStoreListener {
         }
         DataStore src = provider.lookup(metadata.source());
         int[] suc = {0};
-        System.out.println(metadata.source()+">>>"+metadata.label());
-        dataStore.backup().forEachEdgeKey(new BinaryKey(key.array()),metadata.label(),(k,v)->{
+        ArrayList<BinaryKey> klist = new ArrayList<>();
+        byte[] arr = key.array();
+        dataStore.backup().forEachEdgeKey(new BinaryKey(arr),metadata.label(),(k,v)->{
             if(src.backup().setEdge(metadata.label(),(x,y)->{
-               for(byte b : k.array()){
+               for(byte b : arr){
                    x.writeByte(b);
                }
-               for(byte b : v.array()){
+               byte[] vb = v.array();
+               klist.add(new BinaryKey(vb));
+               for(byte b : vb){
                    y.writeByte(b);
                }
                return true;
-           })) suc[0]++;
-           return true;
+            })) suc[0]++;
+            return true;
         });
+        klist.forEach(k->
+            dataStore.backup().get(k,(mk,mv)->{
+                src.backup().set((tk,tv)->{
+                    for(byte b :k.key){
+                        tk.writeByte(b);
+                    }
+                    for(byte b :mv.array()){
+                        tv.writeByte(b);
+                    }
+                    return true;
+                });
+                return true;
+            })
+        );
         return suc[0]>0;
     }
 
@@ -81,7 +96,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
-
+        System.out.println(metadata.source()+">>>"+metadata.label());
     }
 
     @Override
