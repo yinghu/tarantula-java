@@ -21,8 +21,9 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
-        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_"+metadata.source());
+        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_data_user");
         if(metadata.label()==null){
+            System.out.println(metadata.source()+">>>"+metadata.label());
             byte[] kbs = key.array();
             return dataStore.backup().get(new BinaryKey(kbs),(k, v)->{
                 for(byte b :v.array()){
@@ -33,8 +34,9 @@ public class TestMapStoreListener implements MapStoreListener {
         }
         DataStore src = provider.lookup(metadata.source());
         int[] suc = {0};
+        System.out.println(metadata.source()+">>>"+metadata.label());
         dataStore.backup().forEachEdgeKey(new BinaryKey(key.array()),metadata.label(),(k,v)->{
-           if(src.backup().setEdge(metadata.label(),(x,y)->{
+            if(src.backup().setEdge(metadata.label(),(x,y)->{
                for(byte b : k.array()){
                    x.writeByte(b);
                }

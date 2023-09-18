@@ -302,7 +302,29 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
             key.rewind();
             if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value)){
-                list(key.rewind(),localEdgeDataStore,query,stream);
+                final Txn<ByteBuffer> txn = env.txnWrite();
+                ByteBuffer akey = key.rewind();
+                CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
+                try{
+                    for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
+                        CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                        if(lmdbDataStoreProvider.onRecovering(metadata,BufferProxy.buffer(kv.val()), cache.value)){
+                            
+                            //dbi.put(txn,kv.val().rewind(),cache.value.flip());
+                            //txn.commit();
+                            cache.value.flip();
+                            Recoverable.DataHeader header = cache.value.readHeader();
+                            T t = query.create();
+                            t.read(cache.value);
+                            t.revision(header.revision());
+                            stream.on(t);
+                        }
+                    }
+                }
+                finally {
+                    cursor.close();
+                    txn.close();
+                }
             }
         }finally {
             cache.reset();
@@ -415,10 +437,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             }
 
         }finally {
+            cursor.close();
             txn.close();
         }
         int ifOdd = matched[0]+matched[1];
-        return !(ifOdd==0 || ifOdd % 2 !=0);
+        return  (ifOdd >0 && ifOdd % 2 ==0);
     }
     private boolean set(ByteBuffer key, ByteBuffer value){
         final Txn<ByteBuffer> txn = env.txnWrite();

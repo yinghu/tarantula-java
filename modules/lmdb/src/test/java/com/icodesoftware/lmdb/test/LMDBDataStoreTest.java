@@ -59,6 +59,12 @@ public class LMDBDataStoreTest {
         DataStore bk = lmdbDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_"+ds.name());
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"friend")).size(),1);
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"slots")).size(),1);
+
+        DataStore x = lmdbDataStoreProvider.createDataStore("data_jam");
+        x.list(new TestUserQuery(ownerId,"friend")).forEach(f->{
+            System.out.println(f.login());
+        });
+
     }
     //@Test(groups = { "LMDB" })
     public void createIfAbsentTest() {

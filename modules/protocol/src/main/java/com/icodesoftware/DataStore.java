@@ -37,8 +37,7 @@ public interface DataStore {
         boolean get(Recoverable.Key key, BufferStream buffer);
         boolean set(BufferStream bufferStream);
         void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream);
-
-        //boolean set(byte[] key,byte[] value);
+        boolean setEdge(String label,BufferStream bufferStream);
 
         //byte[] get(byte[] key);
 
