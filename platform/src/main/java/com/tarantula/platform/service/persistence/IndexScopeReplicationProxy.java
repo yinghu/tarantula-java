@@ -6,6 +6,8 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metadata;
 
+import com.icodesoftware.util.BinaryKey;
+import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
 
 import java.nio.ByteBuffer;
@@ -23,21 +25,20 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
 
 
 
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        //KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
+        //this.serviceContext.keyIndexService().createIfAbsent()
     }
-
-
-
-
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        return this.distributionKeyIndexService.recover(metadata.partition(),key);
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+        logger.warn(metadata.source());
+        return false;
     }
-
     @Override
     public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-
+        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
     }
+
+
 
     @Override
     public void waitForData() {

@@ -7,6 +7,7 @@ import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndex;
+import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
 
@@ -47,7 +48,7 @@ public class AccessIndexStoreViewer implements AccessIndexService.AccessIndexSto
     public void load(byte[] key, DataStoreSummary.View view){
         DataStore dataStore = dataStore(this.tarantulaContext.clusterProvider().partition(key));
         //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
+        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new BinaryKey(key));
         if(keyIndex==null) return;
         ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
         DistributionAccessIndexViewer distributionDataViewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();

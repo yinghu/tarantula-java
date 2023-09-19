@@ -6,6 +6,7 @@ import com.icodesoftware.RecoverableRegistry;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndex;
+import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
 
@@ -43,7 +44,7 @@ public class DataStoreViewer implements DataStoreSummary {
 
     public void load(byte[] key, DataStoreSummary.View view){
         //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new String(key));
+        KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new BinaryKey(key));
         if(keyIndex==null) return;
         ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
         DistributionDataViewer distributionDataViewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();

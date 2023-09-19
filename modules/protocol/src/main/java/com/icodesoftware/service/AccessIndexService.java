@@ -22,7 +22,7 @@ public interface AccessIndexService extends ServiceProvider {
 
     int onReplicate(String nodeName,int partition, byte[] key, byte[] value, ClusterProvider.Node[] nodes);
     void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node);
-    byte[] onRecover(int partition,byte[] key,ClusterProvider.Node[] nodes);
+    byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes);
 
 
     interface Listener{

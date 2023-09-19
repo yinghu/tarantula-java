@@ -10,7 +10,7 @@ import java.io.IOException;
 public class AccessIndexLoadOperation extends Operation implements PartitionAwareOperation {
 
 
-    private int partition;
+    private String source;
 
     private byte[] key;
     private byte[] value;
@@ -18,14 +18,14 @@ public class AccessIndexLoadOperation extends Operation implements PartitionAwar
     }
 
 
-    public AccessIndexLoadOperation(int partition, byte[] key) {
-        this.partition = partition;
+    public AccessIndexLoadOperation(String source, byte[] key) {
+        this.source = source;
         this.key = key;
     }
     @Override
     public void run() throws Exception {
         AccessIndexClusterService ais = this.getService();
-        value = ais.recover(partition,key);
+        value = ais.recover(source,key);
     }
 
     @Override
@@ -36,14 +36,14 @@ public class AccessIndexLoadOperation extends Operation implements PartitionAwar
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeInt(partition);
+        out.writeUTF(source);
         out.writeByteArray(key);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.partition = in.readInt();
+        this.source = in.readUTF();
         this.key = in.readByteArray();
     }
 }

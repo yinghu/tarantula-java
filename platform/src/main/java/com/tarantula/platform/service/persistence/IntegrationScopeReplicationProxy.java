@@ -5,11 +5,9 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
-
-import java.nio.ByteBuffer;
-
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
@@ -19,8 +17,32 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         super(Distributable.INTEGRATION_SCOPE);
     }
 
-    public void onDistributing(Metadata metadata, ByteBuffer key, ByteBuffer value){
-        //serviceContext.clusterProvider().accessIndexService().
+
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        if(asyncDistributing){
+            return;
+        }
+        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
+        if(!this.serviceContext.keyIndexService().createIfAbsent(keyIndexTrack)){
+            keyIndexTrack.placeMasterNode(localNode.nodeName());
+            this.serviceContext.keyIndexService().update(keyIndexTrack);
+        }
+        //this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),)
+    }
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+        BinaryKey binaryKey = new BinaryKey(key.array());
+        KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.source(),binaryKey);
+        if(keyIndex==null) return false;
+        byte[] data = serviceContext.clusterProvider().accessIndexService().onRecover(metadata.source(),binaryKey.key,nodeList(keyIndex));
+        if(data==null) return false;
+        for(byte b : data){
+            buffer.writeByte(b);
+        }
+        return true;
+    }
+    @Override
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
     }
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
@@ -72,14 +94,11 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
 
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
+        KeyIndex keyIndexTrack = this.lookup(metadata.source(),new BinaryKey(key));
         if(keyIndexTrack==null) return null;
-        return serviceContext.clusterProvider().accessIndexService().onRecover(metadata.partition(),key,nodeList(keyIndexTrack));
+        return serviceContext.clusterProvider().accessIndexService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }
 
-    @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
 
-    }
 
 }

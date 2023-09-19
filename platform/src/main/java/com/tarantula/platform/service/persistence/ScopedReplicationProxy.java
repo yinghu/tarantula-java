@@ -3,15 +3,13 @@ package com.tarantula.platform.service.persistence;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
-import com.icodesoftware.DataStore;
+
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.EventOnReplication;
-import com.tarantula.platform.util.SystemUtil;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -90,7 +88,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return serviceContext.keyIndexService().nodeList(keyIndex,expected);
     }
 
-    protected KeyIndex lookup(String source,String key){
+    protected KeyIndex lookup(String source,Recoverable.Key key){
         return this.serviceContext.keyIndexService().lookup(source,key);
     }
 
@@ -118,11 +116,5 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public void waitForData() {
         this.localNode = serviceContext.node();
     }
-    public void assignKey(Recoverable.DataBuffer dataBuffer){
 
-    }
-
-    public long distributionId(){
-        return 1;//snowflakeIdGenerator.snowflakeId();
-    }
 }

@@ -11,9 +11,6 @@ import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.event.DataReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
-import java.nio.ByteBuffer;
-
-
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
 
@@ -22,12 +19,17 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
-        logger.warn("on distributing >>"+metadata.toString()+">>"+asyncDistributing);
+
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
         //this.serviceContext.keyIndexService().createIfAbsent()
     }
-
-
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+        return false;
+    }
+    @Override
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
+    }
     public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
         if(asyncDistributing){
             ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
@@ -62,7 +64,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             }
             return;
         }
-        KeyIndex keyIndex = this.lookup(metadata.source(),stringKey);
+        KeyIndex keyIndex = this.lookup(metadata.source(),new BinaryKey(key));
         if(keyIndex==null){
             ClusterProvider.Node[] nodes = nextNodeList(this.maxReplicationNumber());
             int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(localNode.nodeName(),metadata.source(),key,value,nodes);
@@ -82,15 +84,12 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
 
 
     public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        KeyIndex keyIndexTrack = this.lookup(metadata.source(),stringKey);
+        KeyIndex keyIndexTrack = this.lookup(metadata.source(),new BinaryKey(key));
         if(keyIndexTrack==null) return null;
         return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
     }
 
-    @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
-    }
+
 
 
 }

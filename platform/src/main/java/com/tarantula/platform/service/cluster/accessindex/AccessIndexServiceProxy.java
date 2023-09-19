@@ -152,10 +152,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return replicated;
     }
-    public byte[] onRecover(int partition,byte[] key,ClusterProvider.Node[] nodes){
+    public byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
-        AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(partition,key);
+        AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(source,key);
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue; //next node
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
@@ -228,9 +228,9 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     //DistributionAccessIndexViewer methods
     @Override
-    public byte[] load(int partition, byte[] key, ClusterProvider.Node node) {
+    public byte[] load(String source, byte[] key, ClusterProvider.Node node) {
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexLoadOperation operation = new AccessIndexLoadOperation(partition,key);
+        AccessIndexLoadOperation operation = new AccessIndexLoadOperation(source,key);
         Member m = nodeEngine.getClusterService().getMember(node.memberId());
         if(m==null) return null;
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());

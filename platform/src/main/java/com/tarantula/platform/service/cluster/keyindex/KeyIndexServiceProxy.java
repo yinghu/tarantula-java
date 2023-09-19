@@ -40,12 +40,12 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     }
 
 
-    public byte[] recover(int partition,byte[] key) {
+    public byte[] recover(String source,byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
         if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
             return null;
         }
-        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(partition,key);
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(source,key);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,nodeEngine.getMasterAddress());
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<KeyIndex> future = builder.invoke();
@@ -92,10 +92,10 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         return (boolean)ret.result;
     }
 
-    public void load(int partition,byte[] key, DataStoreSummary.View view){
+    public void load(String source,byte[] key, DataStoreSummary.View view){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> memberSet = nodeEngine.getClusterService().getMembers();
-        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(partition,key);
+        KeyIndexLookupOperation operation = new KeyIndexLookupOperation(source,key);
         for(Member m : memberSet){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,m.getAddress());
