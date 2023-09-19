@@ -570,12 +570,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             log.warn("Using local deployment id ["+node.deploymentId+"]");
         }
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
-
-        integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
-        //
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
+        integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
+        //
+
         initMetricsProvider();
         this.deploymentDataStoreProvider.waitForData();
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
