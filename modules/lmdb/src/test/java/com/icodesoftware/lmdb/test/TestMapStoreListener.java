@@ -95,8 +95,30 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     @Override
-    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
-        System.out.println(metadata.source()+">>>"+metadata.label());
+    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME + "_" + metadata.source());
+        if(metadata.label()==null){
+            boolean del = dataStore.backup().unset((k,v)->{
+                for(byte b : key.array()){
+                    k.writeByte(b);
+                }
+                return true;
+            });
+            System.out.println("DEL :"+metadata.source()+":"+dataStore.name()+":"+del);
+            return;
+        }
+        boolean del = dataStore.backup().unsetEdge(metadata.label(),(k,v)->{
+            for(byte b : key.array()){
+                k.writeByte(b);
+            }
+            if(value==null) return true;
+            for(byte b : value.array()){
+                v.writeByte(b);
+            }
+            return true;
+        },value==null);
+        System.out.println("UNSET EDGE :"+metadata.label()+":"+del);
+
     }
 
     @Override

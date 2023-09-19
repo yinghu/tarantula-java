@@ -275,16 +275,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
 
     @Override
-    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key) {
+    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
-            integrationMapStoreListener.onDeleting(metadata,key);
+            integrationMapStoreListener.onDeleting(metadata,key,value);
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-             dataMapStoreListener.onDeleting(metadata,key);
+             dataMapStoreListener.onDeleting(metadata,key,value);
 
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            dataMapStoreListener.onDeleting(metadata,key);
+            dataMapStoreListener.onDeleting(metadata,key,value);
         }
     }
 

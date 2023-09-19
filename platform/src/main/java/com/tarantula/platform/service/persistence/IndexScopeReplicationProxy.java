@@ -35,7 +35,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
     @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key) {
+    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
 
     }
 

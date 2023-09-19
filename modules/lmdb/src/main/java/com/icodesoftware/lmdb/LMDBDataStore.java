@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
@@ -28,7 +27,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final ConcurrentHashMap<String,String> edgeIndex;
     private final static String IDX_EDGE = "I_D_X";
-    private final static long IDX_KEY = 1L;
+    private final static ByteBuffer IDX_KEY = ByteBuffer.allocateDirect(8).putLong(1L).flip();
 
     //NOTES : key+value < 2032 bytes ( 511 bytes for key ; value <= 1521 bytes (2032 - 511 - 8)
 
@@ -42,7 +41,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         this.env = env;
         this.lmdbDataStoreProvider = lmdbDataStoreProvider;
         idx = this.lmdbDataStoreProvider.createEdgeDB(scope,name,IDX_EDGE);
-        
+        IDX_KEY.getLong();
+        loadEdges();
     }
 
     @Override
@@ -261,6 +261,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
 
+
     public  boolean deleteEdge(Recoverable.Key t,String label){
         final Txn<ByteBuffer> txn = env.txnWrite();
         try{
@@ -288,10 +289,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if(!t.writeKey(key)) return false;
             if(!dbi.delete(txn, key.flip())) return false;
-            key.rewind();
-            offEdge(t.ownerKey(),t.label(),t.key(),txn);
+            removeEdges(txn,key.rewind());
             txn.commit();
-            lmdbDataStoreProvider.onDeleting(metadata,key);
+            key.rewind();
+            lmdbDataStoreProvider.onDeleting(metadata,key,cache.value);
             return true;
         }finally {
             txn.close();
@@ -398,6 +399,47 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if(!bufferStream.on(cache.key,cache.value)) return false;
             if(!localEdgeDataStore.dbi.put(txn,cache.key.flip(),cache.value.flip())) return false;
+            idx.dbi.put(txn,cache.value.rewind(),cache.key.rewind(),PutFlags.MDB_NODUPDATA);
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+            cache.reset();
+        }
+    }
+
+    public boolean unsetEdge(String label,BufferStream bufferStream,boolean fromLabel){
+        if(label==null) return false;
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
+        final Txn<ByteBuffer> txn = env.txnWrite();
+        try{
+            Recoverable.DataBuffer key = cache.key;
+            Recoverable.DataBuffer value = cache.value;
+            if(!bufferStream.on(key,value)) return false;
+            if(fromLabel){
+                if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+            }
+            else {
+                if (!localEdgeDataStore.dbi.delete(txn, key.flip(), value.flip())) return false;
+            }
+            txn.commit();
+            return true;
+        }finally {
+            txn.close();
+            cache.reset();
+        }
+    }
+    public boolean unset(BufferStream bufferStream){
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        final Txn<ByteBuffer> txn = env.txnWrite();
+        try{
+            Recoverable.DataBuffer key = cache.key;
+            Recoverable.DataBuffer value = cache.value;
+            if(!bufferStream.on(key,value)) return false;
+            if(!dbi.delete(txn,key.flip())) return false;
+            removeEdges(txn,key.rewind());
+
             txn.commit();
             return true;
         }finally {
@@ -406,6 +448,43 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
     //help methods
+
+    private void loadEdges(){
+        final Txn<ByteBuffer> txn = env.txnRead();
+        try {
+            IDX_KEY.rewind();
+            CursorIterable<ByteBuffer> cursor = idx.dbi.iterate(txn, KeyRange.closed(IDX_KEY,IDX_KEY));
+            for (Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator(); it.hasNext(); ) {
+                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                String edge = new String(BufferProxy.buffer(kv.val()).array());
+                edgeIndex.put(edge,edge);
+            }
+        }finally {
+            txn.close();
+        }
+    }
+    private void setEdge(Txn<ByteBuffer> txn,String edge){
+        if(edgeIndex.putIfAbsent(edge,edge)==null){
+            byte[] bytes = edge.getBytes();
+            ByteBuffer lbl = ByteBuffer.allocateDirect(bytes.length).put(bytes).flip();
+            if(!idx.dbi.put(txn,IDX_KEY.rewind(),lbl, PutFlags.MDB_NODUPDATA)) throw new RuntimeException("lmdb failure to insert key/value");
+        }
+    }
+    private void removeEdges(Txn<ByteBuffer> txn,ByteBuffer key){
+        CursorIterable<ByteBuffer> cursor = idx.dbi.iterate(txn, KeyRange.closed(key,key));
+        for (Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator(); it.hasNext(); ) {
+            CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+            it.remove();
+            edgeIndex.forEach((k,v)->{
+                LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,k);
+                key.rewind();
+                System.out.println("DEL EDGE :"+k+":"+localEdgeDataStore.dbi.delete(txn,kv.val(),key));
+                kv.val().rewind();
+            });
+        }
+        cursor.close();
+    }
+
     private <T extends Recoverable> boolean list(ByteBuffer key,LocalEdgeDataStore localEdgeDataStore,RecoverableFactory<T> query, Stream<T> stream){
         final Txn<ByteBuffer> txn = env.txnRead();
         CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(key,key));
@@ -453,8 +532,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if(!ownerKey.write(key)) return false;
             if(!edgeKey.write(value)) return false;
+            setEdge(txn,label);
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-            if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;
+            if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) throw new RuntimeException("lmdb failure to insert key/value");
+            idx.dbi.put(txn,value.rewind(),key.rewind(),PutFlags.MDB_NODUPDATA);
             key.rewind();
             value.rewind();
             lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value);
@@ -474,7 +555,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
             if(!localEdgeDataStore.dbi.delete(txn,key.flip(),value.flip())) return false;
             key.rewind();
-            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key);
+            value.rewind();
+            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value);
             return true;
         }finally {
             cache.reset();
@@ -489,6 +571,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
             if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
             key.rewind();
+            this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null);
             return true;
         } finally {
             cache.reset();
