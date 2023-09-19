@@ -349,7 +349,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         long nodeId = Long.parseLong(node[1]);
         String memberId = mEvent.getMember().getUuid();
         log.warn("Member ["+memberId+"] joined on node ["+nodeName+":"+nodeId+"]");
-        this.vMap.putIfAbsent(memberId.getBytes(),BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId))); //memberId => nodeId index
+        this.vMap.putIfAbsent(memberId.getBytes(),BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId).flip())); //memberId => nodeId index
         summary.register(fromCluster(nodeId));
         for(int i=0;i<10;i++){
             try{
@@ -383,7 +383,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
         nList.forEach(nodeListener -> nodeListener.nodeRemoved(removed));
         this.summary.unregister(removed);
-        this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1]))));//remove nodeId = > node
+        this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1])).flip()));//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
     //public void onNodeAdded(String memberId){
@@ -392,7 +392,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private Node fromCluster(long nodeId){
         Node n = new ClusterNode();
-        byte[] ret = this.vMap.get(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId)));
+        byte[] ret = this.vMap.get(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(nodeId).flip()));
         if(ret==null) return null;
         n.fromBinary(ret);
         return n;
