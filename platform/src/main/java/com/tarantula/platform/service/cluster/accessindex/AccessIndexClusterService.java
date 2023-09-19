@@ -173,9 +173,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
 
-    public void replicate(String nodeName,int partition,byte[] key,byte[] value){
+    public void replicate(String nodeName,byte[] key,byte[] value){
+        log.warn("replicating->"+nodeName);
         synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(nodeName,partition,key,value));
+            pendingUpdates.add(new ReplicationData(nodeName,0,key,value));
         }
     }
     public void replicate(OnReplication[] onReplications){
@@ -224,7 +225,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
     public void replicateAsBatch(String nodeName,OnReplication[] batch){
         for(OnReplication d : batch) {
-            replicate(nodeName,d.partition(), d.key(), d.value());
+            replicate(nodeName,d.key(), d.value());
         }
     }
     public void syncEnd(String syncKey){

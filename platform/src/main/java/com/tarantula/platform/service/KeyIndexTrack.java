@@ -6,11 +6,12 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.KeyIndex;
+import com.icodesoftware.util.BinaryKey;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.Map;
+
 
 public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Portable {
 
@@ -64,26 +65,6 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",masterNode);
-        this.properties.put("2",slaveNodes.length);
-        if(slaveNodes.length == 0) return this.properties;
-        for(int i=0;i<slaveNodes.length;i++){
-            properties.put("s"+i,slaveNodes[i]);
-        }
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.masterNode = (String)properties.get("1");
-        int slaves = ((Number)properties.get("2")).intValue();
-        if(slaves == 0) return;
-        slaveNodes = new String[slaves];
-        for(int i=0;i<slaves;i++){
-            slaveNodes[i] = (String)properties.get("s"+i);
-        }
-    }
-    @Override
     public boolean read(DataBuffer buffer){
         this.masterNode = buffer.readUTF8();
         this.slaveNodes = new String[buffer.readInt()];
@@ -104,6 +85,7 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
 
     @Override
     public boolean readKey(Recoverable.DataBuffer buffer){
+        if(ownerKey==null) ownerKey = new BinaryKey();
         ownerKey.read(buffer);
         return true;
     }

@@ -12,6 +12,9 @@ public class BinaryKey implements Recoverable.Key {
         this.key = key;
     }
 
+    public BinaryKey(){
+    }
+
     public String asString(){
         return "binary key";
     }

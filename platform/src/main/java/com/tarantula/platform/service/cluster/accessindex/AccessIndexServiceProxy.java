@@ -135,10 +135,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
         }
     }
-    public int onReplicate(String nodeName,int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
+    public int onReplicate(String nodeName, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
         int replicated = 0;
-        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(nodeName,partition,key,value);
+        ReplicateOnIntegrationScopeOperation operation = new ReplicateOnIntegrationScopeOperation(nodeName,key,value);
         for(ClusterProvider.Node node : nodes){
             if(node==null) break;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());

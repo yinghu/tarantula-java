@@ -49,7 +49,7 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public int onReplicate(String nodeName,int partition, byte[] key, byte[] value,  ClusterProvider.Node[] nodes) {
+    public int onReplicate(String nodeName,byte[] key, byte[] value,  ClusterProvider.Node[] nodes) {
         return 0;
     }
 

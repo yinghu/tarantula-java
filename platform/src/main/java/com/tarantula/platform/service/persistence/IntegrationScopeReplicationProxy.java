@@ -22,12 +22,14 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         if(asyncDistributing){
             return;
         }
-        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
+        BinaryKey binaryKey = new BinaryKey(key.array());
+        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),binaryKey);
+        keyIndexTrack.placeMasterNode(localNode.nodeName());
         if(!this.serviceContext.keyIndexService().createIfAbsent(keyIndexTrack)){
             keyIndexTrack.placeMasterNode(localNode.nodeName());
             this.serviceContext.keyIndexService().update(keyIndexTrack);
         }
-        //this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),)
+        this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),binaryKey.key,value.array(),nodeList(keyIndexTrack));
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         BinaryKey binaryKey = new BinaryKey(key.array());
@@ -80,7 +82,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             return;
         }
         ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
-        int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),metadata.partition(),key,value,nodes);
+        int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),key,value,nodes);
         if(replicated==0) {
             logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
             KeyIndex keyIndex = new KeyIndexTrack();
