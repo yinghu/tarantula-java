@@ -29,7 +29,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             keyIndexTrack.placeMasterNode(localNode.nodeName());
             this.serviceContext.keyIndexService().update(keyIndexTrack);
         }
-        ClusterProvider.Node[] nlist = nodeList(keyIndexTrack);
+        ClusterProvider.Node[] nlist = nextNodeList(3);
         int c = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),binaryKey.key,value.array(),nlist);
         logger.warn("Distributing ["+metadata.source()+"]["+c+"]["+nlist.length+"]");
     }
