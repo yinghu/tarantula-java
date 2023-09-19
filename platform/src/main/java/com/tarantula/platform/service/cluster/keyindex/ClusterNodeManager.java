@@ -32,6 +32,7 @@ public class ClusterNodeManager implements ClusterProvider.NodeListener {
 
     @Override
     public void nodeAdded(ClusterProvider.Node node) {
+        System.out.println(node.nodeName()+" added>>"+node.memberId());
         limit.getAndAccumulate(0,(x,y)->{
             nodeMappings.put(node.nodeName(),node);//mapping index
             if(pendingNodes.length==0){
