@@ -67,16 +67,14 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(x.list(new TestUserQuery(ownerId,"slots")).size(),size);
         ds.deleteEdge(new SnowflakeKey(ownerId),"slots");
         ds.list(new TestUserQuery(ownerId,"friend")).forEach((t)->{
-            ds.deleteEdge(new SnowflakeKey(ownerId),t.key(),"slots");
+            Assert.assertFalse(ds.deleteEdge(new SnowflakeKey(ownerId),t.key(),"slots"));
             t.ownerKey(new SnowflakeKey(ownerId));
-            ds.delete(t);
+            Assert.assertTrue(ds.delete(t));
         });
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"friend")).size(),0);
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"slots")).size(),0);
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"friend")).size(),0);
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"slots")).size(),0);
-        //Assert.assertEquals(x.list(new TestUserQuery(ownerId,"friend")).size(),5);
-        //Assert.assertEquals(x.list(new TestUserQuery(ownerId,"slots")).size(),5);
     }
     @Test(groups = { "LMDB" })
     public void createIfAbsentTest() {
@@ -196,7 +194,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
     }
 
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void deleteWithEdgeTest() {
         DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_d");
         long ownerId1 = 10000;

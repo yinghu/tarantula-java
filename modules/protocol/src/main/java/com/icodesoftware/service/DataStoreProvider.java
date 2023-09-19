@@ -4,7 +4,6 @@ package com.icodesoftware.service;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 
-import java.nio.channels.ReadableByteChannel;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ public interface DataStoreProvider extends ServiceProvider {
     void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator);
     void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
-    MapStoreListener mapStoreListener(int scope);
 
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);
@@ -33,20 +31,6 @@ public interface DataStoreProvider extends ServiceProvider {
 
     List<String> list();
     DataStore lookup(String name);
-
-    //incremental back up
-    void backup(int scope);
-
-    //full back up with callback recover
-    void backup(int scope,OnBackup backup);
-
-    //recover from incremental back up
-    void recover(int scope,OnBackup backup);
-
-    //long nextId(String name);
-    interface OnBackup{
-        void on(String fName,int fSize,ReadableByteChannel in);
-    }
 
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);

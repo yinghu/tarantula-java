@@ -19,8 +19,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final String name;
 
-    private final String bucket ="DBS";
-
     private final Metadata metadata;
 
     private int scope;
@@ -45,15 +43,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         loadEdges();
     }
 
-    @Override
-    public String bucket() {
-        return bucket;
-    }
-
-    @Override
-    public String node() {
-        return null;
-    }
 
     @Override
     public String name() {
@@ -63,12 +52,19 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     @Override
     public long count() {
         Txn<ByteBuffer> txn = env.txnRead();
-        Stat st = dbi.stat(txn);
-        long count = st.entries;
-        txn.close();
-        return count;
+        try{
+            Stat st = dbi.stat(txn);
+            return st.entries;
+        }finally {
+            txn.close();
+        }
     }
 
+    public List<String> edgeList(){
+        ArrayList<String> elist = new ArrayList<>();
+        edgeIndex.forEach((k,v)->elist.add(k));
+        return elist;
+    }
 
     @Override
     public <T extends Recoverable> boolean create(T t) {
@@ -439,7 +435,6 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!bufferStream.on(key,value)) return false;
             if(!dbi.delete(txn,key.flip())) return false;
             removeEdges(txn,key.rewind());
-
             txn.commit();
             return true;
         }finally {

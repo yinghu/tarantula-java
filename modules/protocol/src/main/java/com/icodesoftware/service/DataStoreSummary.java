@@ -6,8 +6,6 @@ public interface DataStoreSummary {
 
     String name();
 
-    //int partitionNumber();
-
     long totalRecords();
 
     void list(DataStoreSummary.View view);

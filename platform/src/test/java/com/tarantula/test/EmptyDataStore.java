@@ -4,19 +4,11 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmptyDataStore implements DataStore {
 
-    @Override
-    public String bucket() {
-        return null;
-    }
-
-    @Override
-    public String node() {
-        return null;
-    }
 
     @Override
     public String name() {
@@ -27,12 +19,9 @@ public class EmptyDataStore implements DataStore {
     public long count() {
         return 0;
     }
-    public int partitionNumber(){
-        return 0;
-    }
-
-    public long count(int partition){
-        return 0;
+    public List<String> edgeList(){
+        ArrayList<String> elist = new ArrayList<>();
+        return elist;
     }
     @Override
     public <T extends Recoverable> boolean create(T t) {

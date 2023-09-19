@@ -4,14 +4,14 @@ import java.util.List;
 
 public interface DataStore {
 
-    String bucket();
+    //String bucket();
 
-    String node();
+    //String node();
 
     String name();
 
     long count();
-
+    List<String> edgeList();
 
     <T extends Recoverable> boolean create(T t);
 

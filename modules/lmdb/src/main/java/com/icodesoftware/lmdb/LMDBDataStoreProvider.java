@@ -96,19 +96,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator){
         if(distributionIdGenerator!=null) this.distributionIdGenerator = distributionIdGenerator;
     }
-    @Override
-    public MapStoreListener mapStoreListener(int scope) {
-        if(scope==Distributable.INTEGRATION_SCOPE){
-            return integrationMapStoreListener;
-        }
-        if(scope==Distributable.INDEX_SCOPE){
-            return keyIndexMapStoreListener;
-        }
-        if(scope==Distributable.DATA_SCOPE){
-            return dataMapStoreListener;
-        }
-        throw new RuntimeException("Scope ["+scope+"] not supported");
-    }
+
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
@@ -169,20 +157,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return storeMap.get(name);
     }
 
-    @Override
-    public void backup(int scope) {
 
-    }
-
-    @Override
-    public void backup(int scope, OnBackup backup) {
-
-    }
-
-    @Override
-    public void recover(int scope, OnBackup backup) {
-
-    }
 
     @Override
     public String name() {
