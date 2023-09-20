@@ -10,6 +10,7 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.KeyIndexTrack;
+import com.tarantula.platform.service.cluster.ClusterBatch;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentManager;
 import com.tarantula.platform.tournament.TournamentInstance;
@@ -80,7 +81,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int CONNECTION_STUB_CID = 127;
 
     public static final int KEY_INDEX_CID = 128;
-
+    public static final int CLUSTER_BATCH_CID = 129;
     public Portable create(int cid) {
         Portable _ins;
 		switch(cid){
@@ -185,6 +186,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case KEY_INDEX_CID:
                 _ins = new KeyIndexTrack();
+                break;
+            case CLUSTER_BATCH_CID:
+                _ins = new ClusterBatch();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

@@ -35,7 +35,7 @@ public class DataReplicationEvent extends OnReplicationEvent {
         int size = in.readInt("3");
         data = new OnReplication[size];
         for(int i=0;i<data.length;i++){
-            data[i]=new ReplicationData(source,in.readUTF("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
+            data[i]=new ReplicationData(source,null,in.readUTF("p"+i),in.readByteArray("k"+i),in.readByteArray("v"+i));
         }
     }
     @Override

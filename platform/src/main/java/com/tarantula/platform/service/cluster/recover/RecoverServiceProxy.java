@@ -5,7 +5,6 @@ import com.hazelcast.spi.AbstractDistributedObject;
 
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.util.ExceptionUtil;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
@@ -89,6 +88,25 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return ret;
     }
+    public Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes){
+        NodeEngine nodeEngine = getNodeEngine();
+        byte[] ret = null;
+        RecoverEdgeOperation operation = new RecoverEdgeOperation(source,label,key);
+        for(ClusterProvider.Node node : nodes){
+            Member m = nodeEngine.getClusterService().getMember(node.memberId());
+            if(m==null) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(callResult.successful&&callResult.result!=null){
+                ret = (byte[]) callResult.result;
+                break;
+            }
+        }
+        return null;//ret;
+    }
     public void onDelete(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
@@ -106,14 +124,14 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
     }
     @Override
-    public int onReplicate(String nodeName,String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
+    public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
         int expected = 0;
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue;
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
             if(m==null) continue;
-            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(nodeName,source,key,value);
+            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(nodeName,source,label,key,value);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
@@ -124,6 +142,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return expected;
     }
+
     public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node){
 
         NodeEngine nodeEngine = getNodeEngine();

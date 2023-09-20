@@ -67,7 +67,7 @@ public class OffHeapDataScopeReplication implements ScopedOnReplication{
             value[i]=unsafe.getByte(mp++);
         }
         unsafe.freeMemory(memoryAddress);
-        return new ReplicationData(new String(node),new String(src),key,value);
+        return new ReplicationData(new String(node),null,new String(src),key,value);
     }
 
     public void drop(){

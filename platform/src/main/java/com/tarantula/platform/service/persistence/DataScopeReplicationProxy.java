@@ -1,14 +1,15 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BinaryKey;
-import com.tarantula.platform.event.DataReplicationEvent;
 import com.tarantula.platform.service.KeyIndexTrack;
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
@@ -19,77 +20,70 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
-
-        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
-        //this.serviceContext.keyIndexService().createIfAbsent()
+        if(asyncDistributing){
+            return;
+        }
+        BinaryKey binaryKey = new BinaryKey(key.array());
+        ClusterProvider.Node[] nlist = nextNodeList(maxReplicationNumber());
+        int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(localNode.nodeName(),metadata.source(),metadata.label(),binaryKey.key,value.array(),nlist);
+        logger.warn("Distributing ["+metadata.source()+"]["+replicated+"]["+nlist.length+"]");
+        if(replicated>0) return;
+        logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+        KeyIndex keyIndex = new KeyIndexTrack(metadata.label()==null?metadata.source():metadata.source()+"_"+metadata.label(),binaryKey);
+        keyIndex.placeMasterNode(localNode.nodeName());
+        if(!this.serviceContext.keyIndexService().createIfAbsent(keyIndex)){
+            keyIndex.placeMasterNode(localNode.nodeName());
+            this.serviceContext.keyIndexService().update(keyIndex);
+        }
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
-        return false;
+        logger.warn("Recovering ["+metadata.source()+":"+metadata.label());
+        BinaryKey binaryKey = new BinaryKey(key.array());
+        KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.label()==null?metadata.source(): metadata.source()+"_"+metadata.label(),binaryKey);
+        if(keyIndex==null) return false;
+        ClusterProvider.Node[] nlist = nodeList(keyIndex);
+        if(metadata.label()==null){
+            logger.warn("Recovering ["+metadata.source()+"]["+nlist.length+"]");
+            byte[] data = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),binaryKey.key,nodeList(keyIndex));
+            if(data==null) return false;
+            for(byte b : data){
+                buffer.writeByte(b);
+            }
+            return true;
+        }else{
+            logger.warn("Recovering edge ["+metadata.source()+":"+metadata.label()+"]["+nlist.length+"]");
+            Batchable batch = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),metadata.label(),binaryKey.key,nodeList(keyIndex));
+            if(batch==null) return false;
+            DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,metadata.source());
+            batch.data().forEach(edge-> {
+                dataStore.backup().setEdge(metadata.label(), (k, v) -> {
+                    for (byte b : binaryKey.key) {
+                        k.writeByte(b);
+                    }
+                    for (byte b : edge) {
+                        v.writeByte(b);
+                    }
+                    return true;
+                });
+                byte[] data = this.serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),edge,nlist);
+                dataStore.backup().set((k,v)->{
+                    for (byte b : edge) {
+                        k.writeByte(b);
+                    }
+                    for (byte b : data) {
+                        v.writeByte(b);
+                    }
+                    return true;
+                });
+
+            });
+
+            return true;
+        }
     }
     @Override
     public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
     }
-    public void onDistributing(Metadata metadata, String stringKey, byte[] key, byte[] value) {
-        if(asyncDistributing){
-            ClusterProvider.Node[] nodes = nextNodeList(serviceContext.clusterProvider().maxReplicationNumber());
-            int replicated = 0;
-            for(ClusterProvider.Node node : nodes){
-                if(node==null){
-                    continue;
-                }
-                replicated++;
-                pendingEvents.compute(node,(n,e)->{
-                    if(e==null) {
-                        e = new DataReplicationEvent(maxPendingSize, localNode.nodeName(), node.nodeName());
-                        serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
-                    }
-                    OffHeapDataScopeReplication offHeapOnReplication = new OffHeapDataScopeReplication();
-                    offHeapOnReplication.write(node.nodeName(),metadata.source(),key,value);
-                    if(e.offer(offHeapOnReplication)) return e;
-                    serviceContext.schedule(new ReplicationSynchronizerOverflow(serviceContext,OVERFLOW_TIMER,e));
-                    DataReplicationEvent ex = new DataReplicationEvent(maxPendingSize,localNode.nodeName(),node.nodeName());
-                    ex.offer(offHeapOnReplication);
-                    serviceContext.schedule(new ReplicationSynchronizerTimeout(this,syncInterval,n));
-                    return ex;
-                });
-            }
-            if(replicated==0){
-                logger.warn("Replication number [" + 0 + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
-                KeyIndex keyIndex = new KeyIndexTrack();
-                keyIndex.owner(metadata.source());
-                keyIndex.index(stringKey);
-                keyIndex.placeMasterNode(localNode.nodeName());
-                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
-            }
-            return;
-        }
-        KeyIndex keyIndex = this.lookup(metadata.source(),new BinaryKey(key));
-        if(keyIndex==null){
-            ClusterProvider.Node[] nodes = nextNodeList(this.maxReplicationNumber());
-            int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(localNode.nodeName(),metadata.source(),key,value,nodes);
-            logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
-            if(replicated==0){
-                keyIndex = new KeyIndexTrack();
-                keyIndex.owner(metadata.source());
-                keyIndex.index(stringKey);
-                keyIndex.placeMasterNode(localNode.nodeName());
-                this.serviceContext.keyIndexService().createIfAbsent(keyIndex);
-            }
-            return;
-        }
-        int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(localNode.nodeName(),metadata.source(),key,value,nodeList(keyIndex,this.maxReplicationNumber()));
-        logger.warn("Replication number ["+replicated+"] of "+serviceContext.clusterProvider().maxReplicationNumber()+"]");
-    }
-
-
-    public byte[] onRecovering(Metadata metadata, String stringKey, byte[] key) {
-        KeyIndex keyIndexTrack = this.lookup(metadata.source(),new BinaryKey(key));
-        if(keyIndexTrack==null) return null;
-        return serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),key,nodeList(keyIndexTrack));
-    }
-
-
-
 
 }

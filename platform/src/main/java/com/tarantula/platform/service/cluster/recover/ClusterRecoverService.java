@@ -10,18 +10,21 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
+import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.EventOnReplication;
 
 import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.event.OnReplicationEvent;
 
+import com.tarantula.platform.service.cluster.ClusterBatch;
 import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,9 +56,35 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     }
                     if(updates.size()>0){
                         updates.forEach(r->{
-                            //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source()).backup().set(r.key(),r.value());
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
-                            this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
+                            DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createDataStore(r.source());
+                            if(r.label()==null){
+                                if(dataStore.backup().set((k,v)->{
+                                    for(byte b : r.key()){
+                                        k.writeByte(b);
+                                    }
+                                    for(byte b : r.value()){
+                                        v.writeByte(b);
+                                    }
+                                    return true;
+                                })){
+                                    KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
+                                    this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
+                                }
+                            }
+                            else{
+                                if(dataStore.backup().setEdge(r.label(),(k,v)->{
+                                    for(byte b : r.key()){
+                                        k.writeByte(b);
+                                    }
+                                    for(byte b : r.value()){
+                                        v.writeByte(b);
+                                    }
+                                    return true;
+                                })){
+                                    KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source()+"_"+r.label(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
+                                    this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
+                                }
+                            }
                         });
                         updates.clear();
                     }
@@ -119,8 +148,26 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().unset(key);
     }
     public byte[] load(String source,byte[] key){
-        return null;//this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().get(key);
+        byte[][] ret = {null};
+        if(!this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().get(new BinaryKey(key),(k,v)->{
+            ret[0]=v.array();
+            return true;
+        })){
+            return null;
+        }
+        return ret[0];
     }
+
+    public ClusterBatch loadEdge(String source, String label, byte[] key){
+        ClusterBatch clusterBatch = new ClusterBatch();
+        DataStore dataStore = this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source);
+        dataStore.backup().forEachEdgeKey(new BinaryKey(key),label,(k,v)->{
+            clusterBatch.batch(v.array());
+            return true;
+        });
+        return clusterBatch;
+    }
+
     public void replicate(OnReplication[] onReplications){
         synchronized (pendingUpdates){
             for(OnReplication onReplication : onReplications){
@@ -128,9 +175,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
             }
         }
     }
-    public void replicate(String nodeName,String source,byte[] key,byte[] value){
+    public void replicate(String nodeName,String source,String label,byte[] key,byte[] value){
         synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(nodeName,source,key,value));
+            pendingUpdates.add(new ReplicationData(nodeName,source,label,key,value));
         }
     }
     public int syncStart(String memberId,String source,String syncKey){
@@ -163,7 +210,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public void replicateAsBatch(ReplicationData[] batch){
         for(ReplicationData d : batch){
-            replicate(d.nodeName(),d.source(),d.key(),d.value());
+            //replicate(d.nodeName(),d.source(),d.key(),d.value());
         }
         _total.addAndGet(batch.length);
     }

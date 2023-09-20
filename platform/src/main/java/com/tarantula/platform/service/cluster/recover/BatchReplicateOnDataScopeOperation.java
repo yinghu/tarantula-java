@@ -57,7 +57,7 @@ public class BatchReplicateOnDataScopeOperation extends Operation {
             String source = in.readUTF();
             byte[] key = in.readByteArray();
             byte[] value = in.readByteArray();
-            this.onReplications[i]=new ReplicationData(nodeName,source,key,value);
+            this.onReplications[i]=new ReplicationData(nodeName,source,null,key,value);
         }
     }
 }

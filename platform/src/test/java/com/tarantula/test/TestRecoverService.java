@@ -1,5 +1,6 @@
 package com.tarantula.test;
 
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
@@ -11,10 +12,14 @@ public class TestRecoverService implements RecoverService {
     }
 
     @Override
-    public int onReplicate(String nodeName,String source, byte[] key, byte[] value, ClusterProvider.Node[] nodes) {
-        return 0;
+    public Batchable onRecover(String source, String label, byte[] key, ClusterProvider.Node[] nodes) {
+        return null;
     }
 
+
+    public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
+        return 0;
+    }
     @Override
     public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node) {
 

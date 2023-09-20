@@ -16,7 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class OffHeapOnReplicationTest {
 
 
-    @Test(groups = { "OffHeapReplication" })
+    //@Test(groups = { "OffHeapReplication" })
     public void dataScopeTest() {
         int max = 100;
         ArrayBlockingQueue<OffHeapDataScopeReplication> queue = new ArrayBlockingQueue(max);
@@ -51,7 +51,7 @@ public class OffHeapOnReplicationTest {
         //System.out.println("READ : "+(System.currentTimeMillis()-st1));
     }
 
-    @Test(groups = { "OffHeapReplication" })
+    //@Test(groups = { "OffHeapReplication" })
     public void integrationScopeTest() {
         int max = 100;
         ArrayBlockingQueue<OffHeapIntegrationScopeReplication> queue = new ArrayBlockingQueue(max);

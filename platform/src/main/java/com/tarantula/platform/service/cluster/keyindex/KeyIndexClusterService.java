@@ -73,29 +73,13 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
             KeyIndexEvent keyIndexEvent = (KeyIndexEvent)event;
             KeyIndex keyIndex = new KeyIndexTrack(keyIndexEvent.owner(),new BinaryKey(keyIndexEvent.payload()));
             DataStore dataStore = tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexStore.STORE_NAME+keyIndex.owner());
-            logger.warn(dataStore.name());
             keyIndex.placeMasterNode(keyIndexEvent.source());
             keyIndex.placeSlaveNode(keyIndexEvent.label());
-            //for(int i=0;i<keyIndexEvent.owners.length;i++){
-                //KeyIndex keyIndex = new KeyIndexTrack();
-                //keyIndex.owner(keyIndexEvent.owners[i]);
-                //keyIndex.index(keyIndexEvent.keys[i]);
-                //String ckey = keyIndex.key().asString();
-                //DataStore dso = dataStore(event.source());
-                //byte[] key = ckey.getBytes();
-                /**
-                dso.lock(key,()->{
-                    if(dso.dataStore.load(keyIndex)){
-                        if(keyIndex.placeMasterNode(event.source()) || keyIndex.placeSlaveNode(event.label())){
-                            dso.dataStore.update(keyIndex);
-                        }
-                        return true;
-                    }
-                    keyIndex.placeMasterNode(event.source());
-                    keyIndex.placeSlaveNode(event.label());
-                    return dso.dataStore.createIfAbsent(keyIndex,false);
-                });**/
-            //}
+            if(!dataStore.createIfAbsent(keyIndex,true)){
+                keyIndex.placeMasterNode(keyIndexEvent.source());
+                keyIndex.placeSlaveNode(keyIndexEvent.label());
+                dataStore.update(keyIndex);
+            }
             return true;
         });
         tarantulaContext.keyIndexService = this;

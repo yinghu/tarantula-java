@@ -157,7 +157,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                             k.writeByte(b);
                         }
                         for(byte b : r.value()){
-                            k.writeByte(b);
+                            v.writeByte(b);
                         }
                         return true;
                     });

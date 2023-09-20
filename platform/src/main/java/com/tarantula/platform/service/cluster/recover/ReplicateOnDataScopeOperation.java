@@ -12,32 +12,34 @@ public class ReplicateOnDataScopeOperation extends Operation {
 
     private String nodeName;
     private String source;
+    private String label;
+    private byte[] key;
+    private byte[] value;
 
-    //private byte[] key;
-    //private byte[] value;
-
-    private ByteBuffer bkey = ByteBuffer.allocateDirect(100);
-    private ByteBuffer vkey = ByteBuffer.allocateDirect(500);
 
     public ReplicateOnDataScopeOperation() {
     }
 
 
+    public ReplicateOnDataScopeOperation(String nodeName,String source,String label, byte[] key, byte[] value) {
+        this.nodeName = nodeName;
+        this.source = source;
+        this.label = label;
+        this.key = key;
+        this.value = value;
+    }
     public ReplicateOnDataScopeOperation(String nodeName,String source, byte[] key, byte[] value) {
         this.nodeName = nodeName;
         this.source = source;
-        bkey.put(key).flip();
-        //this.key = key;
-        //this.value = value;
-        vkey.put(value).flip();
+        this.key = key;
+        this.value = value;
     }
-
 
 
     @Override
     public void run() throws Exception {
         ClusterRecoverService cis = this.getService();
-        cis.replicate(nodeName,source,BufferUtil.toArray(bkey),BufferUtil.toArray(vkey));
+        cis.replicate(nodeName,source,label,key,value);
     }
 
     @Override
@@ -50,8 +52,9 @@ public class ReplicateOnDataScopeOperation extends Operation {
         super.writeInternal(out);
         out.writeUTF(nodeName);
         out.writeUTF(source);
-        out.writeByteArray(BufferUtil.toArray(bkey));
-        out.writeByteArray(BufferUtil.toArray(vkey));
+        out.writeUTF(label);
+        out.writeByteArray(key);
+        out.writeByteArray(value);
     }
 
     @Override
@@ -59,9 +62,8 @@ public class ReplicateOnDataScopeOperation extends Operation {
         super.readInternal(in);
         nodeName = in.readUTF();
         source = in.readUTF();
-        //key = in.readByteArray();
-        //value = in.readByteArray();
-        bkey.put(in.readByteArray()).flip();
-        vkey.put(in.readByteArray()).flip();
+        label = in.readUTF();
+        key = in.readByteArray();
+        value = in.readByteArray();
     }
 }

@@ -8,6 +8,7 @@ public class ReplicationData implements OnReplication {
     private String nodeName;
     private int scope;
     private String source;
+    private String label;
 
     private byte[] key;
     private byte[] value;
@@ -16,9 +17,10 @@ public class ReplicationData implements OnReplication {
     private String keyAsString;
     private Recoverable recoverable;
 
-    public ReplicationData(String nodeName,String source,byte[] key, byte[] value){
+    public ReplicationData(String nodeName,String source,String label,byte[] key, byte[] value){
         this.nodeName = nodeName;
         this.source = source;
+        this.label = label;
         this.key = key;
         this.value = value;
     }
@@ -50,7 +52,9 @@ public class ReplicationData implements OnReplication {
         return source;
     }
 
-
+    public String label(){
+        return label;
+    }
     public int factoryId(){
         return factoryId;
     }
