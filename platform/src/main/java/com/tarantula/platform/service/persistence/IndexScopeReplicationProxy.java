@@ -28,10 +28,16 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         //KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),new BinaryKey(key.array()));
         //this.serviceContext.keyIndexService().createIfAbsent()
+        logger.warn(metadata.source()+">"+metadata.label());
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
-        logger.warn(metadata.source());
-        return false;
+        logger.warn("Recovering from "+metadata.source()+"]");
+        byte[] data = distributionKeyIndexService.recover(metadata.source(),key.array());
+        if(data==null) return false;
+        for(byte b : data){
+            buffer.writeByte(b);
+        }
+        return true;
     }
     @Override
     public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {

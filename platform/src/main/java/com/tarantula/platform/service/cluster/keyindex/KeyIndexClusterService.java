@@ -38,6 +38,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public byte[] get(String source,byte[] key) {
+        logger.warn("recovering data from ["+source+"]");
         DataStore dso = dataStore(source);
         byte[][] data={null};
         if(!dso.backup().get(new BinaryKey(key),(k,v)->{
@@ -100,6 +101,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
 
     public KeyIndex lookup(String source, Recoverable.Key key){
+        logger.warn("lookup from ["+source+"]");
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack(source,key);
         DataStore dataStore = tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+source);
         if(dataStore.load(keyIndexTrack)) return keyIndexTrack;

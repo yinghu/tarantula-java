@@ -230,7 +230,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             return;
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            dataMapStoreListener.onDistributing(metadata,key,value);
+            keyIndexMapStoreListener.onDistributing(metadata,key,value);
         }
     }
 
@@ -243,7 +243,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
+            return keyIndexMapStoreListener.onRecovering(metadata,key,bufferStream);
         }
         return false;
     }
@@ -259,7 +259,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            dataMapStoreListener.onDeleting(metadata,key,value);
+            keyIndexMapStoreListener.onDeleting(metadata,key,value);
         }
     }
 

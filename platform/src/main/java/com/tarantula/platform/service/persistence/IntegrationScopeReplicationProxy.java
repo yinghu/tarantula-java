@@ -23,17 +23,21 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             return;
         }
         BinaryKey binaryKey = new BinaryKey(key.array());
-        KeyIndexTrack keyIndexTrack = new KeyIndexTrack(metadata.source(),binaryKey);
-        keyIndexTrack.placeMasterNode(localNode.nodeName());
-        if(!this.serviceContext.keyIndexService().createIfAbsent(keyIndexTrack)){
+        KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),binaryKey);
+        if(keyIndexTrack==null) {
+            keyIndexTrack = new KeyIndexTrack(metadata.source(), binaryKey);
+            keyIndexTrack.placeMasterNode(localNode.nodeName());
+            this.serviceContext.keyIndexService().createIfAbsent(keyIndexTrack);
+        }else {
             keyIndexTrack.placeMasterNode(localNode.nodeName());
             this.serviceContext.keyIndexService().update(keyIndexTrack);
         }
-        ClusterProvider.Node[] nlist = nextNodeList(3);
+        ClusterProvider.Node[] nlist = nextNodeList(maxReplicationNumber());
         int c = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),binaryKey.key,value.array(),nlist);
         logger.warn("Distributing ["+metadata.source()+"]["+c+"]["+nlist.length+"]");
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+        logger.warn("Recovering ["+metadata.source()+"]["+metadata.label()+"]");
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.source(),binaryKey);
         if(keyIndex==null) return false;
