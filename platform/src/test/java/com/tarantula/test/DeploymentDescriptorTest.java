@@ -3,8 +3,6 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 
-
-
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.LobbyDescriptor;
