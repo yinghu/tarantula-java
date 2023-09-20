@@ -62,7 +62,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                     if(updates.size()>0){
                         updates.forEach(r->{
                             DataStore dso = this.dataStore();
-                            dso.backup().set((k,v)->{
+                            if(dso.backup().set((k,v)->{
                                 for(byte b : r.key()){
                                     k.writeByte(b);
                                 }
@@ -70,9 +70,11 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
                                     k.writeByte(b);
                                 }
                                 return true;
-                            });
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
-                            tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
+                            })){
+                                log.warn("Publishing key index event");
+                                KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
+                                tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
+                            }
                         });
                         updates.clear();
                     }
@@ -176,7 +178,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public void replicate(String nodeName,byte[] key,byte[] value){
         log.warn("replicating->"+nodeName);
         synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(nodeName,0,key,value));
+            pendingUpdates.add(new ReplicationData(nodeName,key,value));
         }
     }
     public void replicate(OnReplication[] onReplications){

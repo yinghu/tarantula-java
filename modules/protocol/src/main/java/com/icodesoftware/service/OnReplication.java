@@ -8,7 +8,7 @@ public interface OnReplication {
     int classId();
     String nodeName();
     String source();
-    int partition();
+    //int partition();
     byte[] key();
     byte[] value();
     String keyAsString();

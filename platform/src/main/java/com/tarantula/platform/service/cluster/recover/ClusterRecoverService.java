@@ -54,7 +54,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
                     if(updates.size()>0){
                         updates.forEach(r->{
                             //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source()).backup().set(r.key(),r.value());
-                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),new String(r.key()),r.nodeName(),this.tarantulaContext.node().nodeName());
+                            KeyIndexEvent keyIndexEvent = new KeyIndexEvent(r.source(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
                             this.tarantulaContext.keyIndexService.onReplicated(keyIndexEvent);
                         });
                         updates.clear();

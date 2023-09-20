@@ -21,8 +21,8 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
         int sourceLength = src.length;
         memoryAddress = unsafe.allocateMemory(keyLength+valueLength+sourceLength+16);
         long mp = memoryAddress;
-        unsafe.putInt(mp,partition);
-        mp += 4;
+        //unsafe.putInt(mp,partition);
+        //mp += 4;
         unsafe.putInt(mp,sourceLength);
         mp += 4;
         unsafe.putInt(mp,keyLength);
@@ -42,8 +42,8 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
 
     public OnReplication read(){
         long mp = memoryAddress;
-        int partition = unsafe.getInt(mp);
-        mp += 4;
+        //int partition = unsafe.getInt(mp);
+        //mp += 4;
         byte[] src = new byte[unsafe.getInt(mp)];
         mp += 4;
         byte[] key = new byte[unsafe.getInt(mp)];
@@ -60,7 +60,7 @@ public class OffHeapIntegrationScopeReplication implements ScopedOnReplication {
             value[i]=unsafe.getByte(mp++);
         }
         unsafe.freeMemory(memoryAddress);
-        return new ReplicationData(new String(src),partition,key,value);
+        return new ReplicationData(new String(src),key,value);
     }
 
     public void drop(){

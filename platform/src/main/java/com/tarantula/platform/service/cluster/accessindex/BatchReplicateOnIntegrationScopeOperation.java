@@ -42,7 +42,7 @@ public class BatchReplicateOnIntegrationScopeOperation extends Operation {
         out.writeInt(size);
         for(int i=0;i<size;i++){
             OnReplication onReplication = onReplications[i];
-            out.writeInt(onReplication.partition());
+            //out.writeInt(onReplication.partition());
             out.writeByteArray(onReplication.key());
             out.writeByteArray(onReplication.value());
         }
@@ -55,10 +55,10 @@ public class BatchReplicateOnIntegrationScopeOperation extends Operation {
         int sz = in.readInt();
         onReplications = new OnReplication[sz];
         for(int i=0;i<sz;i++){
-            int  partition = in.readInt();
+            //int  partition = in.readInt();
             byte[] key = in.readByteArray();
             byte[] value = in.readByteArray();
-            onReplications[i] = new ReplicationData(nodeName,partition,key,value);
+            onReplications[i] = new ReplicationData(nodeName,key,value);
         }
     }
 }

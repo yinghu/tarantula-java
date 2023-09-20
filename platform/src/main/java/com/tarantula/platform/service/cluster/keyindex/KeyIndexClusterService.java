@@ -71,13 +71,18 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         TarantulaContext._integrationClusterStarted.await();
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
             KeyIndexEvent keyIndexEvent = (KeyIndexEvent)event;
-            for(int i=0;i<keyIndexEvent.owners.length;i++){
-                KeyIndex keyIndex = new KeyIndexTrack();
-                keyIndex.owner(keyIndexEvent.owners[i]);
-                keyIndex.index(keyIndexEvent.keys[i]);
-                String ckey = keyIndex.key().asString();
-                DataStore dso = dataStore(event.source());
-                byte[] key = ckey.getBytes();
+            KeyIndex keyIndex = new KeyIndexTrack(keyIndexEvent.owner(),new BinaryKey(keyIndexEvent.payload()));
+            DataStore dataStore = tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexStore.STORE_NAME+keyIndex.owner());
+            logger.warn(dataStore.name());
+            keyIndex.placeMasterNode(keyIndexEvent.source());
+            keyIndex.placeSlaveNode(keyIndexEvent.label());
+            //for(int i=0;i<keyIndexEvent.owners.length;i++){
+                //KeyIndex keyIndex = new KeyIndexTrack();
+                //keyIndex.owner(keyIndexEvent.owners[i]);
+                //keyIndex.index(keyIndexEvent.keys[i]);
+                //String ckey = keyIndex.key().asString();
+                //DataStore dso = dataStore(event.source());
+                //byte[] key = ckey.getBytes();
                 /**
                 dso.lock(key,()->{
                     if(dso.dataStore.load(keyIndex)){
@@ -90,7 +95,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
                     keyIndex.placeSlaveNode(event.label());
                     return dso.dataStore.createIfAbsent(keyIndex,false);
                 });**/
-            }
+            //}
             return true;
         });
         tarantulaContext.keyIndexService = this;

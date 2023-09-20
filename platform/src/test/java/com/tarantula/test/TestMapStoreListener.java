@@ -32,7 +32,8 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
-        Recoverable.DataHeader header = value.readHeader();
+         /**
+         Recoverable.DataHeader header = value.readHeader();
         if(header.factoryId()== PortableEventRegistry.OID && header.classId()== PortableEventRegistry.KEY_INDEX_CID){
             DataStore ds = dataStoreProvider.createKeyIndexDataStore(metadata.source());
             ds.backup().get(new BinaryKey(key.array()),(k,v)->{
@@ -46,7 +47,7 @@ public class TestMapStoreListener implements MapStoreListener {
                 }
                 return true;
             });
-        }
+        }**/
     }
 
 

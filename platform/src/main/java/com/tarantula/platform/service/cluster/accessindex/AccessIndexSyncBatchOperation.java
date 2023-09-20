@@ -32,7 +32,7 @@ public class AccessIndexSyncBatchOperation extends Operation {
         AccessIndexClusterService cds = this.getService();
         ReplicationData[] data = new ReplicationData[length];
         for(int i=0;i<length;i++){
-            data[i]=new ReplicationData("",source,keys[i],values[i]);
+            data[i]=new ReplicationData("",keys[i],values[i]);
         }
         cds.replicateAsBatch("",data);
     }
@@ -45,7 +45,7 @@ public class AccessIndexSyncBatchOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeInt(source);
+        //out.writeInt(source);
         out.writeInt(length);
         for(int i=0;i<length;i++){
             out.writeByteArray(keys[i]);
@@ -56,7 +56,7 @@ public class AccessIndexSyncBatchOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        source = in.readInt();
+        //source = in.readInt();
         this.length = in.readInt();
         keys = new byte[length][];
         values = new byte[length][];

@@ -23,23 +23,24 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             return;
         }
         BinaryKey binaryKey = new BinaryKey(key.array());
-        KeyIndex keyIndexTrack = this.serviceContext.keyIndexService().lookup(metadata.source(),binaryKey);
-        if(keyIndexTrack==null) {
-            keyIndexTrack = new KeyIndexTrack(metadata.source(), binaryKey);
-            keyIndexTrack.placeMasterNode(localNode.nodeName());
-            this.serviceContext.keyIndexService().createIfAbsent(keyIndexTrack);
-        }else {
-            keyIndexTrack.placeMasterNode(localNode.nodeName());
-            this.serviceContext.keyIndexService().update(keyIndexTrack);
-        }
         ClusterProvider.Node[] nlist = nextNodeList(maxReplicationNumber());
-        int c = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),binaryKey.key,value.array(),nlist);
-        logger.warn("Distributing ["+metadata.source()+"]["+c+"]["+nlist.length+"]");
+        int replicated = this.serviceContext.clusterProvider().accessIndexService().onReplicate(localNode.nodeName(),binaryKey.key,value.array(),nlist);
+        logger.warn("Distributing ["+metadata.source()+"]["+replicated+"]["+nlist.length+"]");
+        if(replicated>0) return;
+        logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
+        KeyIndex keyIndex = new KeyIndexTrack(metadata.source(),binaryKey);
+        keyIndex.placeMasterNode(localNode.nodeName());
+        if(!this.serviceContext.keyIndexService().createIfAbsent(keyIndex)){
+            keyIndex.placeMasterNode(localNode.nodeName());
+            this.serviceContext.keyIndexService().update(keyIndex);
+        }
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.source(),binaryKey);
         if(keyIndex==null) return false;
+        ClusterProvider.Node[] nlist = nodeList(keyIndex);
+        logger.warn("Recovering ["+metadata.source()+"]["+nlist.length+"]");
         byte[] data = serviceContext.clusterProvider().accessIndexService().onRecover(metadata.source(),binaryKey.key,nodeList(keyIndex));
         if(data==null) return false;
         for(byte b : data){
