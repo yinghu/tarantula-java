@@ -39,6 +39,8 @@ public class KeyIndexTest extends DataStoreHook{
         Assert.assertEquals(index.masterNode(),load.masterNode());
         Assert.assertTrue(dataStore.load(load1));
         Assert.assertEquals(index1.masterNode(),load1.masterNode());
+        load1.placeSlaveNode("n04");
+        Assert.assertTrue(dataStore.update(load1));
 
 
     }

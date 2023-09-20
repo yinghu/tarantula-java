@@ -18,7 +18,7 @@ public class DataStoreTestEvn {
     static ServiceContext serviceContext;
 
     static DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
-    static MapStoreListener mapStoreListener = new TestMapStoreListener();
+    static TestMapStoreListener mapStoreListener = new TestMapStoreListener();
 
     static boolean started = false;
     public static void setUp() {
@@ -37,6 +37,7 @@ public class DataStoreTestEvn {
                 DataStoreTestEvn.dataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,mapStoreListener);
                 DataStoreTestEvn.dataStoreProvider.waitForData();
                 ((TestServiceContext)serviceContext).dataStoreProvider = dataStoreProvider;
+                mapStoreListener.dataStoreProvider = dataStoreProvider;
 
             }catch (Exception exx){
                 exx.printStackTrace();

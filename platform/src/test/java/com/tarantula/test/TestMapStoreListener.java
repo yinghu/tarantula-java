@@ -2,19 +2,19 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.MapStoreListener;
-import com.icodesoftware.util.SnowflakeIdGenerator;
-import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.util.SystemUtil;
 
-import java.nio.ByteBuffer;
-import java.util.UUID;
+import com.icodesoftware.util.BinaryKey;
+import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.service.KeyIndexTrack;
 
 public class TestMapStoreListener implements MapStoreListener {
 
-    SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-    @Override
+    DataStoreProvider dataStoreProvider;
+     @Override
     public String name() {
         return null;
     }
@@ -31,7 +31,23 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){}
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        Recoverable.DataHeader header = value.readHeader();
+        if(header.factoryId()== PortableEventRegistry.OID && header.classId()== PortableEventRegistry.KEY_INDEX_CID){
+            DataStore ds = dataStoreProvider.createKeyIndexDataStore(metadata.source());
+            ds.backup().get(new BinaryKey(key.array()),(k,v)->{
+                KeyIndex keyIndex = new KeyIndexTrack();
+                keyIndex.readKey(k);
+                Recoverable.DataHeader h = v.readHeader();
+                keyIndex.read(v);
+                System.out.println("PPPP->"+h.factoryId()+">>>"+h.classId()+">>"+keyIndex.masterNode());
+                for(String s : keyIndex.slaveNodes()){
+                    System.out.println(s);
+                }
+                return true;
+            });
+        }
+    }
 
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
