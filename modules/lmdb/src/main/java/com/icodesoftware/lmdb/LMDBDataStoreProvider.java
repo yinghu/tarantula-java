@@ -174,6 +174,18 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
+        data.getDbiNames().forEach(n->{
+            logger.warn("Data DB : "+new String(n));
+        });
+        integration.getDbiNames().forEach(n->{
+            logger.warn("Integration DB : "+new String(n));
+        });
+        index.getDbiNames().forEach(n->{
+            logger.warn("Index DB : "+new String(n));
+        });
+        local.getDbiNames().forEach(n->{
+            logger.warn("Local DB : "+new String(n));
+        });
         logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
     }
 
