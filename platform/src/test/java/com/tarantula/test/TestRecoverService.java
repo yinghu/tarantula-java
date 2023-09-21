@@ -36,8 +36,15 @@ public class TestRecoverService implements RecoverService {
     }
 
     @Override
-    public void onDelete(String source, byte[] key) {
+    public void onDelete(String source,byte[] key) {
         
+    }
+
+    public void onDeleteEdge(String source,String label,byte[] key){
+
+    }
+    public void onDeleteEdge(String source,String label,byte[] key,byte[] edge){
+
     }
 
     @Override

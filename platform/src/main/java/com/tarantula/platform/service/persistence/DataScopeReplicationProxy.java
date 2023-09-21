@@ -5,10 +5,7 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.Batchable;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.KeyIndex;
-import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 
@@ -83,7 +80,18 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     }
     @Override
     public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
+        logger.warn("DB Delete : "+metadata.source()+" : "+metadata.label());
+        RecoverService recoverService = this.serviceContext.clusterProvider().recoverService();
+        if(metadata.label()==null) {
+            recoverService.onDelete(metadata.source(),key.array());
+            return;
+        }
+        if(value==null){
+            recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array());
+            return;
+        }
+        recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array(),value.array());
+
     }
 
 }

@@ -123,6 +123,38 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
     }
+    public void onDeleteEdge(String source,String label,byte[] key){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        DeleteEdgeFromLabelOperation operation = new DeleteEdgeFromLabelOperation(source,label,key);
+        for(Member m : mlist){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!callResult.successful){
+                //metricsListener.onUpdated();
+            }
+        }
+    }
+    public void onDeleteEdge(String source,String label,byte[] key,byte[] edge){
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        DeleteEdgeOperation operation = new DeleteEdgeOperation(source,label,key,edge);
+        for(Member m : mlist){
+            if(m.localMember()) continue;
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            });
+            if(!callResult.successful){
+                //metricsListener.onUpdated();
+            }
+        }
+    }
     @Override
     public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();

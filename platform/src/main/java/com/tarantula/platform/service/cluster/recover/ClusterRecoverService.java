@@ -144,8 +144,35 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     }
 
-    public void delete(String  source,byte[] key){
-        //this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source).backup().unset(key);
+    public void delete(String source,byte[] key){
+        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createDataStore(source);
+        dataStore.backup().unset((k,v)->{
+            for(byte b: key){
+                k.writeByte(b);
+            }
+            return true;
+        });
+    }
+    public void deleteEdge(String source,String label,byte[] key){
+        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createDataStore(source);
+        dataStore.backup().unsetEdge(label,(k,v)->{
+            for(byte b: key){
+                k.writeByte(b);
+            }
+            return true;
+        },true);
+    }
+    public void deleteEdge(String source,String label,byte[] key,byte[] edge){
+        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createDataStore(source);
+        dataStore.backup().unsetEdge(label,(k,v)->{
+            for(byte b: key){
+                k.writeByte(b);
+            }
+            for(byte b: edge){
+                v.writeByte(b);
+            }
+            return true;
+        },false);
     }
     public byte[] load(String source,byte[] key){
         byte[][] ret = {null};

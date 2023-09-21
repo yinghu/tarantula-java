@@ -43,6 +43,7 @@ public class DataStoreViewer implements DataStoreSummary {
     }
 
     public void load(byte[] key, DataStoreSummary.View view){
+        //System.out.println(new String(key));
         //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
         //KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new BinaryKey(key));
         //if(keyIndex==null) return;

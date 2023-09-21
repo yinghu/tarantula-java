@@ -6,6 +6,8 @@ public interface RecoverService extends ServiceProvider{
 
     //operates master or member node
     void onDelete(String source,byte[] key);
+    void onDeleteEdge(String source,String label,byte[] key);
+    void onDeleteEdge(String source,String label,byte[] key,byte[] edge);
     byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes);
     Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes);
 
