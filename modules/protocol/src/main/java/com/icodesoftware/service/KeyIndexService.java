@@ -6,7 +6,7 @@ import com.icodesoftware.Recoverable;
 public interface KeyIndexService extends ServiceProvider{
 
     String NAME = "KeyIndexService";
-
+    String STORE_NAME = "kdx_";
     //KeyIndex lookup(String source,String key);
     KeyIndex lookup(String source, Recoverable.Key key);
 
@@ -25,7 +25,4 @@ public interface KeyIndexService extends ServiceProvider{
 
     ClusterProvider.Node[] recoveringNodeList(String source,String key);
 
-    interface KeyIndexStore extends DataStoreSummary {
-        String STORE_NAME = "kdx_";
-    }
 }

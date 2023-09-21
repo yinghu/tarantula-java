@@ -13,7 +13,7 @@ public class ClusterNodeTest extends DataStoreHook{
 
     @Test(groups = { "ClusterNode" })
     public void clusterNodeSetupTest() {
-        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
         ClusterNode node = (ClusterNode)serviceContext.node();
         long bucketId = serviceContext.distributionId();
         long nodeId = serviceContext.distributionId();

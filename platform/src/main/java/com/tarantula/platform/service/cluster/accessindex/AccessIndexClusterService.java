@@ -18,7 +18,6 @@ import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.EventOnReplication;
-import com.tarantula.platform.event.IntegrationReplicationEvent;
 import com.tarantula.platform.event.KeyIndexEvent;
 import com.tarantula.platform.event.OnReplicationEvent;
 
@@ -190,7 +189,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
     public byte[] recover(String source,byte[] key){
-        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
         byte[][] data ={null};
         if(!dataStore.backup().get(new BinaryKey(key),(k,v)->{
             data[0] = v.array();
@@ -235,6 +234,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
     private DataStore dataStore(){
-        return this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        return this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
     }
 }

@@ -38,6 +38,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public byte[] get(String source,byte[] key) {
+        logger.warn("SRC : "+source);
         DataStore dso = dataStore(source);
         byte[][] data={null};
         if(!dso.backup().get(new BinaryKey(key),(k,v)->{
@@ -72,7 +73,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         tarantulaContext.clusterProvider().subscribe(KeyIndexService.NAME,event -> {
             KeyIndexEvent keyIndexEvent = (KeyIndexEvent)event;
             KeyIndex keyIndex = new KeyIndexTrack(keyIndexEvent.owner(),new BinaryKey(keyIndexEvent.payload()));
-            DataStore dataStore = tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexStore.STORE_NAME+keyIndex.owner());
+            DataStore dataStore = this.dataStore(keyIndex.owner());
             keyIndex.placeMasterNode(keyIndexEvent.source());
             keyIndex.placeSlaveNode(keyIndexEvent.label());
             if(!dataStore.createIfAbsent(keyIndex,true)){
@@ -90,7 +91,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
 
     public KeyIndex lookup(String source, Recoverable.Key key){
         KeyIndexTrack keyIndexTrack = new KeyIndexTrack(source,key);
-        DataStore dataStore = tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+source);
+        DataStore dataStore = dataStore(source);
         if(dataStore.load(keyIndexTrack)) return keyIndexTrack;
         return null;
     }
@@ -184,7 +185,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     private DataStore dataStore(String source){
-        return this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexStore.STORE_NAME+source);
+        return this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexService.STORE_NAME+source);
     }
 
 }

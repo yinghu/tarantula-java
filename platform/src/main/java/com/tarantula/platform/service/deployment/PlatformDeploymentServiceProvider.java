@@ -9,15 +9,14 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
-import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.persistence.AccessIndexStoreViewer;
+
 import com.tarantula.platform.service.persistence.DataStoreViewer;
-import com.tarantula.platform.service.persistence.KeyIndexStoreViewer;
+
 import com.tarantula.platform.util.*;
 
 import java.io.*;
@@ -818,13 +817,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
     }
 
-    public AccessIndexService.AccessIndexStore accessIndexStore(){
-        return new AccessIndexStoreViewer(this.tarantulaContext,this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME));
-    }
-
-    public  KeyIndexService.KeyIndexStore keyIndexStore(){
-        return new KeyIndexStoreViewer(tarantulaContext,this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME));
-    }
 
     public void issueDataStoreBackup(){
 

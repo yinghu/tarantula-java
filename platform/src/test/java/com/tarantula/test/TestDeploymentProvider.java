@@ -221,15 +221,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public void registerAccessIndexListener(AccessIndexService.Listener listener) {
 
     }
-    @Override
-    public AccessIndexService.AccessIndexStore accessIndexStore() {
-        return null;
-    }
 
-    @Override
-    public KeyIndexService.KeyIndexStore keyIndexStore() {
-        return null;
-    }
 
     @Override
     public void issueDataStoreBackup() {

@@ -59,7 +59,7 @@ public class LMDBDataStoreTest {
         }
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"friend")).size(),size);
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId,"slots")).size(),size);
-        DataStore bk = lmdbDataStoreProvider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_"+ds.name());
+        DataStore bk = lmdbDataStoreProvider.createKeyIndexDataStore(KeyIndexService.STORE_NAME+ds.name());
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"friend")).size(),size);
         Assert.assertEquals(bk.list(new TestUserQuery(ownerId,"slots")).size(),size);
         DataStore x = lmdbDataStoreProvider.createDataStore("data_jam");
@@ -78,7 +78,7 @@ public class LMDBDataStoreTest {
     }
     @Test(groups = { "LMDB" })
     public void createIfAbsentTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
         String key = "a100";
         Recoverable.Key onwerKey = new SnowflakeKey(1000);
         TestAccessIndex created = new TestAccessIndex(key);

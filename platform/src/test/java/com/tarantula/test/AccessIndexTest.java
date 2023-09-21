@@ -13,7 +13,7 @@ public class AccessIndexTest extends DataStoreHook{
 
     @Test(groups = { "AccessIndex" })
     public void accessIndexTest() {
-        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME);
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
         //Assert.assertEquals(dataStore.name(),AccessIndexService.AccessIndexStore.STORE_NAME);
         String access = "access100";
         AccessIndexTrack accessIndexTrack = new AccessIndexTrack(access, AccessIndex.USER_INDEX,serviceContext.distributionId());

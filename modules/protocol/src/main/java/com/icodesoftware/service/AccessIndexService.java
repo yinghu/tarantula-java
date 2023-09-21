@@ -2,12 +2,11 @@ package com.icodesoftware.service;
 
 
 import com.icodesoftware.AccessIndex;
-import com.icodesoftware.DataStore;
 
 public interface AccessIndexService extends ServiceProvider {
 
     String NAME = "AccessIndexService";
-
+    String STORE_NAME = "tarantula_access_index";
     AccessIndex set(String accessKey,int referenceId);
     AccessIndex setIfAbsent(String accessKey,int referenceId);
 
@@ -30,8 +29,4 @@ public interface AccessIndexService extends ServiceProvider {
         void onStart();
     }
 
-    interface AccessIndexStore extends DataStoreSummary {
-        String STORE_NAME = "tarantula_access_index";
-
-    }
 }

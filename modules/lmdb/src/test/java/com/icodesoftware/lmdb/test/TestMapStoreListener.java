@@ -20,7 +20,7 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
-        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_data_user");
+        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME+"data_user");
         if(metadata.label()==null){
             byte[] kbs = key.array();
             return dataStore.backup().get(new BinaryKey(kbs),(k, v)->{
@@ -67,7 +67,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME + "_" + metadata.source());
+        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME + metadata.source());
         if(metadata.label()==null){
             dataStore.backup().set((k,v)->{
                 for(byte b : key.array()){
@@ -96,7 +96,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME + "_" + metadata.source());
+        DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME +  metadata.source());
         if(metadata.label()==null){
             boolean del = dataStore.backup().unset((k,v)->{
                 for(byte b : key.array()){

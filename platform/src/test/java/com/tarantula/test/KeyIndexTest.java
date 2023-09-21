@@ -15,7 +15,7 @@ public class KeyIndexTest extends DataStoreHook{
 
     @Test(groups = { "KeyIndex" })
     public void setupTest() {
-        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(KeyIndexService.KeyIndexStore.STORE_NAME+"_user");
+        DataStore dataStore = dataStoreProvider.createAccessIndexDataStore(KeyIndexService.STORE_NAME+"user");
         String masterNode = "n01";
         String slaveNode1 = "n02";
         String slaveNode2 = "n03";
